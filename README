@@ -1,3 +1,17 @@
-This directory contains the Blindside Networks supported integrations for Moodle 1.9, 2.0, and 2.1.
+Integration of BigBlueButton with Moodle 1.9, 2.0 and 2.1
 
-http://blindsidenetworks.com/
+
+Authors:
+	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+	Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
+
+
+@copyright 2010-2011 Blindside Networks
+
+@license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+
+
+--------------------------------------------------------
+
+07/25/2011	| Support for playback recording	
+

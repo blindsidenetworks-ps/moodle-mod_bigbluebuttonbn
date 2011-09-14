@@ -171,29 +171,6 @@ function bigbluebutton_get_participants($bigbluebuttonid) {
 
 
 /**
- * This function returns if a scale is being used by one bigbluebutton
- * if it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
- *
- * @param int $bigbluebuttonid ID of an instance of this module
- * @return mixed
- * @todo Finish documenting this function
- */
-function bigbluebutton_scale_used($bigbluebuttonid, $scaleid) {
-    $return = false;
-
-    //$rec = get_record("bigbluebutton","id","$bigbluebuttonid","scale","-$scaleid");
-    //
-    //if (!empty($rec) && !empty($scaleid)) {
-    //    $return = true;
-    //}
-
-    return $return;
-}
-
-
-/**
  * Checks if scale is being used by any instance of bigbluebutton.
  * This function was added in 1.9
  *
