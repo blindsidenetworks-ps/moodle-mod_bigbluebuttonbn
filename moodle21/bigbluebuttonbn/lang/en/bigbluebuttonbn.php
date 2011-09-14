@@ -73,6 +73,16 @@ $string['view_error_unable_join'] = 'Unable to join the meeting. Please check th
 $string['view_error_unable_join_teacher'] = 'Unable to connect to the BigBlueButton server. Please contact the Administrator.';
 $string['view_error_unable_join_student'] = 'Unable to connect to the BigBlueButton server. Please contact your Teacher or the Administrator.';
 
+$string['view_recording_list_recording'] = 'Recording';
+$string['view_recording_list_course'] = 'Course';
+$string['view_recording_list_activity'] = 'Activity';
+$string['view_recording_list_description'] = 'Description';
+$string['view_recording_list_date'] = 'Date';
+$string['view_recording_list_actionbar'] = 'Toolbar';
+$string['view_recording_list_actionbar_delete'] = 'Delete';
+$string['view_recording_list_actionbar_hide'] = 'Hide';
+$string['view_recording_list_actionbar_show'] = 'Show';
+
 $string['bbbnotavailableyet'] = 'Sorry, this session is not yet available.';
 $string['bbbinprocess'] = 'This activity is in process.';
 $string['bbbfinished'] = 'This activity is over.';

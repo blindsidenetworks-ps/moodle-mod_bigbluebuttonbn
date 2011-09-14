@@ -85,9 +85,16 @@ echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 echo '<script type="text/javascript" >var meetingid = "'.$meetingID.'";</script>'."\n";
 echo '<script type="text/javascript" >var ismoderator = "'.($moderator?'true':'false').'";</script>'."\n";
 
-echo '<script type="text/javascript" >var joining = "false";</script>'."\n";
-echo '<script type="text/javascript" >var bigbluebuttonbn_view = "after";</script>'."\n";
-
+echo '<script type="text/javascript" >'."\n";
+echo '    var joining = "false";'."\n";
+echo '    var bigbluebuttonbn_view = "after";'."\n"; 
+echo '    var view_recording_list_recording = "'.get_string('view_recording_list_recording', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_course = "'.get_string('view_recording_list_course', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_activity = "'.get_string('view_recording_list_activity', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_description = "'.get_string('view_recording_list_description', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_date = "'.get_string('view_recording_list_date', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_actionbar = "'.get_string('view_recording_list_actionbar', 'bigbluebuttonbn').'";'."\n";
+echo '</script>'."\n";
 
 echo '    <center>'."\n";
 echo '      <div id="dynamic"></div>'."\n";

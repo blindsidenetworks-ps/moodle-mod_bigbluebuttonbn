@@ -73,6 +73,16 @@ $string['view_error_unable_join'] = 'No es posible acceder a la sesión. Verifiq
 $string['view_error_unable_join_teacher'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte al Administrador.';
 $string['view_error_unable_join_student'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte a su Maestro o al Administrador.';
 
+$string['view_recording_list_recording'] = 'Grabación';
+$string['view_recording_list_course'] = 'Curso';
+$string['view_recording_list_activity'] = 'Actividad';
+$string['view_recording_list_description'] = 'Descripción';
+$string['view_recording_list_date'] = 'Fecha';
+$string['view_recording_list_actionbar'] = 'Herramientas';
+$string['view_recording_list_actionbar_delete'] = 'Borrar';
+$string['view_recording_list_actionbar_hide'] = 'Ocultar';
+$string['view_recording_list_actionbar_show'] = 'Mostrar';
+
 $string['bbbnotavailableyet'] = 'Lo sentimos, esta sesión no se encuentra disponible todavia.';
 $string['bbbinprocess'] = 'La actividad se encuentra en proceso.';
 $string['bbbfinished'] = 'La actividad ha terminado.';

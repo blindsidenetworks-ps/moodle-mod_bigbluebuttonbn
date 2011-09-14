@@ -29,6 +29,10 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
 	
     $recordingsbn = BigBlueButtonBN::getRecordingsArray($meetingID, $url, $salt);
 
+    $view_recording_list_actionbar_hide = get_string('view_recording_list_actionbar_hide', 'bigbluebuttonbn');
+    $view_recording_list_actionbar_show = get_string('view_recording_list_actionbar_show', 'bigbluebuttonbn');
+    $view_recording_list_actionbar_delete = get_string('view_recording_list_actionbar_delete', 'bigbluebuttonbn');
+              
     if( isset($recordingsbn) && !isset($recordingsbn['messageKey']) ){
         foreach ( $recordingsbn as $recording ){
             if ( $admin == 'true' || $recording['published'] == 'true' ) {
@@ -42,13 +46,13 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
                     $deleteURL = BigBlueButtonBN::deleteRecordingsURL($recording['recordID'], $url, $salt);
                     if ( $recording['published'] == 'true' ){
                         $publishURL = BigBlueButtonBN::setPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
-                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Hide' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' alt='Hide' onClick='actionCall(\\\"".$publishURL."\\\", \\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
+                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"".$publishURL."\\\", \\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
                     } else {
                         $publishURL = BigBlueButtonBN::setPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
-                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Show' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' alt='Show' onClick='actionCall(\\\"".$publishURL."\\\", \\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
+                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"".$publishURL."\\\", \\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
                     }
-                    $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='Delete' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' alt='Delete' onClick='actionCall(\\\"".$deleteURL."\\\", \\\"delete\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
-                }
+                    $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' alt='Delete' onClick='actionCall(\\\"".$deleteURL."\\\", \\\"delete\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
+                          }
                 
                 $type = '';
                 foreach ( $recording['playbacks'] as $playback ){

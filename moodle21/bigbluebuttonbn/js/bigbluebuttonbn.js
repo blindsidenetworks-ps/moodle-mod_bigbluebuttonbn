@@ -117,12 +117,12 @@
             } else if ( bigbluebuttonbn_view == 'after' ){
                 oTable = $('#example').dataTable( {
                     "aoColumns": [
-                        {"sTitle": "Recording", "sWidth": "150px"},
-                        {"sTitle": "Course", "sWidth": "150px"},
-                        {"sTitle": "Activity", "sWidth": "150px"},
-                        {"sTitle": "Description", "sWidth": "150px"},
-                        {"sTitle": "Date", "sWidth": "200px"},
-                        {"sTitle": "Actionbar", "sWidth": "50px", "sClass": "right", "bVisible" : false},
+                        {"sTitle": view_recording_list_recording, "sWidth": "150px"},
+                        {"sTitle": view_recording_list_course, "sWidth": "150px"},
+                        {"sTitle": view_recording_list_activity, "sWidth": "150px"},
+                        {"sTitle": view_recording_list_description, "sWidth": "150px"},
+                        {"sTitle": view_recording_list_date, "sWidth": "200px"},
+                        {"sTitle": view_recording_list_actionbar, "sWidth": "50px", "sClass": "right", "bVisible" : false},
                         ],
 		    
                     "oTableTools": {
