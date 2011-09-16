@@ -34,41 +34,6 @@ function bigbluebuttonbn_supports($feature) {
 }
 
 /**
- * Returns all other caps used in module
- * @return array
- */
-function bigbluebuttonbn_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups');
-}
-
-/**
- * This function is used by the reset_course_userdata function in moodlelib.
- * @param $data the data submitted from the reset course.
- * @return array status array
- */
-function bigbluebuttonbn_reset_userdata($data) {
-    return array();
-}
-
-/**
- * List of view style log actions
- * @return array
- */
-function bigbluebuttonbn_get_view_actions() {
-    return array('view', 'view all');
-}
-
-/**
- * List of update style log actions
- * @return array
- */
-function bigbluebuttonbn_get_post_actions() {
-    return array('update', 'add');
-}
-
-
-
-/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -115,7 +80,6 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     return $returnid;
     
 }
-
 
 /**
  * Given an object containing all the necessary data,
@@ -173,7 +137,6 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     return true;
 }
 
-
 /**
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
@@ -214,7 +177,6 @@ function bigbluebuttonbn_delete_instance($id) {
     return $result;
 }
 
-
 /**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
@@ -228,7 +190,6 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
     return true;
 }
 
-
 /**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
@@ -238,7 +199,6 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     return true;
 }
-
 
 /**
  * Given a course and a time, this module should find recent activity
@@ -251,6 +211,28 @@ function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart) 
     return false;  //  True if anything was printed, otherwise false
 }
 
+/**
+ * Returns all activity in bigbluebuttonbn since a given time
+ *
+ * @param array $activities sequentially indexed array of objects
+ * @param int $index
+ * @param int $timestart
+ * @param int $courseid
+ * @param int $cmid
+ * @param int $userid defaults to 0
+ * @param int $groupid defaults to 0
+ * @return void adds items into $activities and increases $index
+ */
+function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+}
+
+/**
+ * Prints single activity item prepared by {@see recordingsbn_get_recent_mod_activity()}
+
+ * @return void
+ */
+function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
+}
 
 /**
  * Function to be run periodically according to the moodle cron
@@ -263,6 +245,86 @@ function bigbluebuttonbn_cron () {
     return true;
 }
 
+/**
+ * Must return an array of user records (all data) who are participants
+ * for a given instance of bigbluebuttonbn. Must include every user involved
+ * in the instance, independient of his role (student, teacher, admin...)
+ * See other modules as example.
+ *
+ * @param int $bigbluebuttonbnid ID of an instance of this module
+ * @return mixed boolean/array of students
+ */
+function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
+    return false;
+}
+
+/**
+ * Returns all other caps used in module
+ * @return array
+ */
+function bigbluebuttonbn_get_extra_capabilities() {
+    return array('moodle/site:accessallgroups');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Gradebook API                                                              //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This function returns if a scale is being used by one bigbluebuttonbn
+ * if it has support for grading and scales. Commented code should be
+ * modified if necessary. See forum, glossary or journal modules
+ * as reference.
+ *
+ * @param int $bigbluebuttonbnid ID of an instance of this module
+ * @return mixed
+ */
+function bigbluebuttonbn_scale_used($bigbluebuttonbnid, $scaleid) {
+    $return = false;
+
+    return $return;
+}
+
+/**
+ * Checks if scale is being used by any instance of bigbluebuttonbn.
+ * This function was added in 1.9
+ *
+ * This is used to find out if scale used anywhere
+ * @param $scaleid int
+ * @return boolean True if the scale is used by any bigbluebuttonbn
+ */
+function bigbluebuttonbn_scale_used_anywhere($scaleid) {
+    $return = false;
+
+    return $return;
+}
+
+
+
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * @param $data the data submitted from the reset course.
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_userdata($data) {
+    return array();
+}
+
+/**
+ * List of view style log actions
+ * @return array
+ */
+function bigbluebuttonbn_get_view_actions() {
+    return array('view', 'view all');
+}
+
+/**
+ * List of update style log actions
+ * @return array
+ */
+function bigbluebuttonbn_get_post_actions() {
+    return array('update', 'add');
+}
 
 /**
  * Given a course_module object, this function returns any
@@ -294,63 +356,16 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 }
 
 
-/**
- * Must return an array of user records (all data) who are participants
- * for a given instance of bigbluebuttonbn. Must include every user involved
- * in the instance, independient of his role (student, teacher, admin...)
- * See other modules as example.
- *
- * @param int $bigbluebuttonbnid ID of an instance of this module
- * @return mixed boolean/array of students
+/*** 
+ * Any other bigbluebuttonbn functions go here.  Each of them must have a name that
+ * starts with bigbluebuttonbn_
+ * Remember (see note in first lines) that, if this section grows, it's HIGHLY
+ * recommended to move all funcions below to a new "localib.php" file.
+ **
+ *  Function taken from http://www.php.net/manual/en/function.mt-rand.php
+ *  modified by Sebastian Schneider
+ *  credits go to www.mrnaz.com
  */
-function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
-    return false;
-}
-
-
-/**
- * This function returns if a scale is being used by one bigbluebuttonbn
- * if it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
- *
- * @param int $bigbluebuttonbnid ID of an instance of this module
- * @return mixed
- */
-function bigbluebuttonbn_scale_used($bigbluebuttonbnid, $scaleid) {
-    $return = false;
-
-    return $return;
-}
-
-/**
- * Checks if scale is being used by any instance of bigbluebuttonbn.
- * This function was added in 1.9
- *
- * This is used to find out if scale used anywhere
- * @param $scaleid int
- * @return boolean True if the scale is used by any bigbluebuttonbn
- */
-function bigbluebuttonbn_scale_used_anywhere($scaleid) {
-    global $DB;
-
-    if ($scaleid and $DB->record_exists('bigbluebuttonbn', 'grade', -$scaleid)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-/// Any other bigbluebuttonbn functions go here.  Each of them must have a name that
-/// starts with bigbluebuttonbn_
-/// Remember (see note in first lines) that, if this section grows, it's HIGHLY
-/// recommended to move all funcions below to a new "localib.php" file.
-
-# function taken from http://www.php.net/manual/en/function.mt-rand.php
-# modified by Sebastian Schneider
-# credits go to www.mrnaz.com
 function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 {
     $string = '';

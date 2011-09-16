@@ -203,7 +203,7 @@ function recordingsbn_get_participants($recordingsbnid) {
  * @return array
  */
 function recordingsbn_get_extra_capabilities() {
-    return array();
+    return array('moodle/site:accessallgroups');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,14 +222,11 @@ function recordingsbn_get_extra_capabilities() {
  * @return bool true if the scale is used by the given recordingsbn instance
  */
 function recordingsbn_scale_used($recordingsbnid, $scaleid) {
-    global $DB;
 
-    /** @example */
-    if ($scaleid and $DB->record_exists('recordingsbn', array('id' => $recordingsbnid, 'grade' => -$scaleid))) {
-        return true;
-    } else {
-        return false;
-    }
+    $return = false;
+
+    return $return;
+    
 }
 
 /**
@@ -241,55 +238,9 @@ function recordingsbn_scale_used($recordingsbnid, $scaleid) {
  * @return boolean true if the scale is used by any recordingsbn instance
  */
 function recordingsbn_scale_used_anywhere($scaleid) {
-    global $DB;
+    $return = false;
 
-    /** @example */
-    if ($scaleid and $DB->record_exists('recordingsbn', array('grade' => -$scaleid))) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
- * Creates or updates grade item for the give recordingsbn instance
- *
- * Needed by grade_update_mod_grades() in lib/gradelib.php
- *
- * @param stdClass $recordingsbn instance object with extra cmidnumber and modname property
- * @return void
- */
-function recordingsbn_grade_item_update(stdClass $recordingsbn) {
-    global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    /** @example */
-    $item = array();
-    $item['itemname'] = clean_param($recordingsbn->name, PARAM_NOTAGS);
-    $item['gradetype'] = GRADE_TYPE_VALUE;
-    $item['grademax']  = $recordingsbn->grade;
-    $item['grademin']  = 0;
-
-    grade_update('mod/recordingsbn', $recordingsbn->course, 'mod', 'recordingsbn', $recordingsbn->id, 0, null, $item);
-}
-
-/**
- * Update recordingsbn grades in the gradebook
- *
- * Needed by grade_update_mod_grades() in lib/gradelib.php
- *
- * @param stdClass $recordingsbn instance object with extra cmidnumber and modname property
- * @param int $userid update grade of specific user only, 0 means all participants
- * @return void
- */
-function recordingsbn_update_grades(stdClass $recordingsbn, $userid = 0) {
-    global $CFG, $DB;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    /** @example */
-    $grades = array(); // populate array of grade objects indexed by userid
-
-    grade_update('mod/recordingsbn', $recordingsbn->course, 'mod', 'recordingsbn', $recordingsbn->id, 0, $grades);
+    return $return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
