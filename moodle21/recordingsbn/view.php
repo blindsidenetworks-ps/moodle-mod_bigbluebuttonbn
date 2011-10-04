@@ -32,6 +32,18 @@ if ($id) {
 
 require_login($course, true, $cm);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$PAGE->set_context($context);
+
+// show some info for guests
+if (isguestuser()) {
+    $PAGE->set_title(format_string($recordingsbn->name));
+    echo $OUTPUT->header();
+    echo $OUTPUT->confirm('<p>'.get_string('view_noguests', 'recordingsbn').'</p>'.get_string('liketologin'),
+            get_login_url(), $CFG->wwwroot.'/course/view.php?id='.$course->id);
+
+    echo $OUTPUT->footer();
+    exit;
+}
 
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 

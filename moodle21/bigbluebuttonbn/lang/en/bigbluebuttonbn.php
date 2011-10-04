@@ -66,6 +66,7 @@ $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Server Name';
+$string['view_noguests'] = 'The BigBlueButtonBN is not open to guests';
 $string['view_login_moderator'] = 'Logging in as moderator ...';
 $string['view_login_viewer'] = 'Logging in as viewer ...';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
@@ -89,5 +90,4 @@ $string['bbbfinished'] = 'This activity is over.';
 $string['bbbnorecordings'] = 'There is no recording yet, please come back later.';
 
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
-
 ?>

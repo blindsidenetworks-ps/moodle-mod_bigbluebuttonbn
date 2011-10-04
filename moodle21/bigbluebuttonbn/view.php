@@ -35,6 +35,19 @@ $redirect = optional_param('redirect', 0, PARAM_INT);
 require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$PAGE->set_context($context);
+
+// show some info for guests
+if (isguestuser()) {
+    $PAGE->set_title(format_string($bigbluebuttonbn->name));
+    echo $OUTPUT->header();
+    echo $OUTPUT->confirm('<p>'.get_string('view_noguests', 'bigbluebuttonbn').'</p>'.get_string('liketologin'),
+            get_login_url(), $CFG->wwwroot.'/course/view.php?id='.$course->id);
+
+    echo $OUTPUT->footer();
+    exit;
+}
+
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
 add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);

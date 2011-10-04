@@ -22,3 +22,6 @@ $string['recordingsbnname_help'] = 'This is the content of the help tooltip asso
 $string['recordingsbn'] = 'RecordingsBN';
 $string['pluginadministration'] = 'recordingsbn administration';
 $string['pluginname'] = 'RecordingsBN';
+$string['recordingsbn:view'] = 'View recordings';
+
+$string['view_noguests'] = 'The RecordingsBN module is not open to guests';

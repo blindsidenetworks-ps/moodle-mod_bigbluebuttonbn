@@ -15,7 +15,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-/***************************** remove these comment marks and modify the code as needed
     'mod/recordingsbn:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -28,14 +27,5 @@ $capabilities = array(
         )
     ),
 
-    'mod/recordingsbn:submit' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => array(
-            'student' => CAP_ALLOW
-        )
-    ),
-******************************/
 );
 
