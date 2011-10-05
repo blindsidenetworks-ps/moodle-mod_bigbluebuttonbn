@@ -59,7 +59,7 @@ $bbbsession['url'] = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 
 $serverVersion = BigBlueButtonBN::getServerVersion($bbbsession['url']); 
 if ( !isset($serverVersion) ) { //Server is not working
-    $meetingsArray = BigBlueButtonBN::getMeetingsArray($url, $salt);
+    //$meetingsArray = BigBlueButtonBN::getMeetingsArray($url, $salt);
     if ( $administrator )
         print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
     else if ( $moderator )
@@ -109,7 +109,6 @@ foreach( $teachers as $teacher ){
 }
 
 //Database info related to the activity
-$bbbsession['meetingid'] = $bigbluebuttonbn->meetingid;
 $bbbsession['meetingname'] = $bigbluebuttonbn->name;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
@@ -136,14 +135,12 @@ if( $bbbsession['timeduration'] > 0 )
 
 //Additional info related to the course
 $bbbsession['coursename'] = $course->fullname;
+$bbbsession['courseid'] = $course->id;
+$bbbsession['cm'] = $cm;
 
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course;
-if( $moderator) 
-    $bbbsession['joinURL'] = BigBlueButtonBN::joinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
-else
-    $bbbsession['joinURL'] = BigBlueButtonBN::joinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 //
 // BigBlueButton Setup Ends
 //
@@ -164,8 +161,6 @@ $PAGE->requires->js('/mod/bigbluebuttonbn/js/heartbeat.js', true);
 $PAGE->requires->js('/mod/bigbluebuttonbn/js/dataTables.js', true);    
 $PAGE->requires->js('/mod/bigbluebuttonbn/js/bigbluebuttonbn.js', true);    
 
-echo '<script type="text/javascript" >var meetingid = "'.$bbbsession['meetingid'].'";</script>'."\n";
-echo '<script type="text/javascript" >var joinurl = "'.$bbbsession['joinURL'].'";</script>'."\n";
 echo '<script type="text/javascript" >var logouturl = "'.$bbbsession['logoutURL'].'";</script>'."\n";
 echo '<script type="text/javascript" >var newwindow = "'.$bbbsession['textflag']['newwindow'].'";</script>'."\n";
 echo '<script type="text/javascript" >var waitformoderator = "'.$bbbsession['textflag']['wait'].'";</script>'."\n";
@@ -175,6 +170,18 @@ $PAGE->set_cacheable(false);
 
 // Output starts here
 echo $OUTPUT->header();
+
+/// find out current groups mode
+groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+$bbbsession['meetingid'] = groups_get_activity_groupmode($cm) == 0?  $bigbluebuttonbn->meetingid: $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
+if( $moderator) 
+    $bbbsession['joinURL'] = BigBlueButtonBN::joinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
+else
+    $bbbsession['joinURL'] = BigBlueButtonBN::joinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
+//echo 'meetingid = '.$bbbsession['meetingid']."<br>\n";
+//echo 'joinurl = '.$bbbsession['joinURL']."<br>\n";
+echo '<script type="text/javascript" >var meetingid = "'.$bbbsession['meetingid'].'";</script>'."\n";
+echo '<script type="text/javascript" >var joinurl = "'.$bbbsession['joinURL'].'";</script>'."\n";
 
 if (!$bigbluebuttonbn->timeavailable ) {
     if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue){
@@ -222,42 +229,34 @@ echo $OUTPUT->footer();
 
 function bigbluebuttonbn_view_joining( $bbbsession ){
 
-        echo '<script type="text/javascript" >var joining = "true";</script>'."\n";
         echo '<script type="text/javascript" >var bigbluebuttonbn_view = "join";</script>'."\n";
 
         if( $bbbsession['flag']['moderator'] || !$bbbsession['flag']['wait'] ) {  // If is a moderator or if is a viewer and no waiting is required
             //
             // Join directly
             //
-            if( $bbbsession['flag']['moderator'] )
-                print "<br />".get_string('view_login_moderator', 'bigbluebuttonbn' )."<br /><br />";
-            else
-                print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
-            print "<center><img src='pix/loading.gif' /></center>";
-
+            
             $response = BigBlueButtonBN::createMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], array("meta_course" => $bbbsession['coursename'], "meta_activity" => $bbbsession['meetingname'], "meta_description" => $bbbsession['description'], "meta_email" => $bbbsession['useremail'], "meta_recording" => $bbbsession['textflag']['record']) );
 
-            if (!$response) {
-		// If the server is unreachable, then prompts the user of the necessary action
-                if ( $bbbsession['flag']['administrator'] )
-                    print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-                else if ( $bbbsession['flag']['moderator'] )
-                    print_error( 'view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
+            if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && groups_get_activity_allowed_groups($bbbsession['cm']) ){
+                print '<script type="text/javascript" >var joining = "false";</script>';
+                print "Select the group you want to join and confirm the action&nbsp;&nbsp;<input type='button' onClick='bigbluebuttonbn_joinURL()' value='Join'>";
+                
+            } else {
+                print '<script type="text/javascript" >var joining = "true";</script>';
+                
+                if( $bbbsession['flag']['moderator'] )
+                    print "<br />".get_string('view_login_moderator', 'bigbluebuttonbn' )."<br /><br />";
                 else
-                    print_error( 'view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            }
-
-            if( $response['returncode'] == "FAILED" ) {
-		// The meeting was not created
-		if ($response['messageKey'] == "checksumError"){
-                    print_error( get_string( 'index_checksum_error', 'bigbluebuttonbn' ));
-		}
-		else {
-                    print_error( $response['message'] );
-		}
+                    print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
+                
+                print "<center><img src='pix/loading.gif' /></center>";
+                
             }
         
         } else {    // "Viewer" && Waiting for moderator is required;
+
+            echo '<script type="text/javascript" >var joining = "true";</script>'."\n";
 
             print "<div align='center'>";
             if( BigBlueButtonBN::isMeetingRunning( $bbbsession['meetingid'], $bbbsession['url'], $bbbsession['salt'] ) == "true" ) {

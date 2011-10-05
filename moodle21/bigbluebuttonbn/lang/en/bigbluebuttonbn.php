@@ -46,8 +46,9 @@ $string['mod_form_field_duration_help'] = 'Setting the duration for a meeting wi
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_ending'] = 'Ending the virtual classroom ... please wait';
-$string['index_header_name'] = 'Room';
 $string['index_heading'] = 'BigBlueButton Rooms';
+$string['index_heading_name'] = 'Room';
+$string['index_heading_group'] = 'Group';
 $string['index_heading_actions'] = 'Actions';
 $string['index_heading_moderator'] = 'Moderators';
 $string['index_heading_users'] = 'Users';

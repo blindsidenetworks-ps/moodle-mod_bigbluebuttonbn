@@ -15,3 +15,11 @@ M.mod_bigbluebuttonbn.init = function(Y) {
         document.getElementsByName("timedue[enabled]")[0].removeAttribute("checked");
     }
 }
+
+M.mod_bigbluebuttonbn.setgroups = function() {
+    var elSel = document.getElementsByName('groupmode')[0];
+    if (elSel.length > 0)
+    {
+        elSel.remove(elSel.length - 1);
+    }
+}

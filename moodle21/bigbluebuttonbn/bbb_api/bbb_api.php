@@ -84,14 +84,6 @@ class BigBlueButtonBN {
 			
 
 			$arg_list = func_get_args();
-			#debug output for the number of arguments
-			#    	for ($i = 0; $i < $numargs; $i++) {
-			#        	echo "Argument $i is: " . $arg_list[$i] . "<br />\n";
-			#    	}
-				
-			//    $this->createMeeting( $this->userName, $this->meetingID, $this->welcomeString, $this->modPW, $this->attPW, $this->securitySalt, $this->URL );
-			 //   echo "Object created";
-			//	 echo '<br />';
 		}// end else if
 	}
 	

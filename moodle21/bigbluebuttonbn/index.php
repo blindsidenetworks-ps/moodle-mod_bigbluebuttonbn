@@ -59,7 +59,8 @@ if (! $bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course
 $timenow            = time();
 $strweek            = get_string('week');
 $strtopic           = get_string('topic');
-$heading_name       = get_string('index_header_name', 'bigbluebuttonbn' );
+$heading_name       = get_string('index_heading_name', 'bigbluebuttonbn' );
+$heading_group       = get_string('index_heading_group', 'bigbluebuttonbn' );
 $heading_users      = get_string('index_heading_users', 'bigbluebuttonbn');
 $heading_viewer     = get_string('index_heading_viewer', 'bigbluebuttonbn');
 $heading_moderator  = get_string('index_heading_moderator', 'bigbluebuttonbn' );
@@ -70,8 +71,8 @@ $heading_recording  = get_string('index_heading_recording', 'bigbluebuttonbn' );
 $table = new html_table();
 
 if ($course->format == 'weeks') {
-    $table->head  = array ($strweek, $heading_name, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
-    $table->align = array ('center', 'center', 'center', 'center', 'center',  'center', 'center' );
+    $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
+    $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
 } else if ($course->format == 'topics') {
     $table->head  = array ($strtopic, $strname);
     $table->align = array ('center', 'left', 'left', 'left');
@@ -104,9 +105,14 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 // print_object( $bigbluebuttonbns );
 
 foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
+    displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt);
+}
+
+function displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt){
     $joinURL = null;
     $user = null;
     $result = null;
+    $group = "-";
     $users = "-";
     $running = "-";
     $actions = "-";
@@ -202,9 +208,9 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
 	}
         
         if ($course->format == 'weeks' or $course->format == 'topics' ) {
-            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $viewerList, $moderatorList, $recording, $actions );
+            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $group, $viewerList, $moderatorList, $recording, $actions );
         } else {
-            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $viewerList, $moderatorList, $recording, $actions );
+            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $group, $viewerList, $moderatorList, $recording, $actions );
         }
         
     }

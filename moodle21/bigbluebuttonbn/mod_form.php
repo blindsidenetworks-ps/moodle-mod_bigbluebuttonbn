@@ -97,6 +97,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
+        //$this->standard_hidden_coursemodule_elements();
         //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
@@ -105,6 +106,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $PAGE->requires->js_init_code(js_writer::set_variable('M.yui.bigbluebuttonbn_page', "mod_form" ));
             $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init');
         }
+
+        // Take off the option visible groups
+        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.setgroups');
         
     }
 
