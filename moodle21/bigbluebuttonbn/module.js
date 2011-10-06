@@ -23,3 +23,11 @@ M.mod_bigbluebuttonbn.setgroups = function() {
         elSel.remove(elSel.length - 1);
     }
 }
+
+M.mod_bigbluebuttonbn.setusergroups = function() {
+    var elSel = document.getElementsByName('group')[0];
+    if (elSel.length > 0)
+    {
+        elSel.remove(0);
+    }
+}

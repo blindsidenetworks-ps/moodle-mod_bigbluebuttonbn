@@ -14,9 +14,9 @@
 require_once('../../config.php');
 require_once('lib.php');
 
-
-$id = required_param('id', PARAM_INT);		// Course Module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // bigbluebuttonbn instance ID
+$id = required_param('id', PARAM_INT);      // Course Module ID, or
+$a  = optional_param('a', 0, PARAM_INT);    // bigbluebuttonbn instance ID
+$g  = optional_param('g', 0, PARAM_INT);    // group instance ID
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 require_course_login($course, true);
@@ -97,18 +97,34 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 
 	$meetingID = $bigbluebuttonbn->meetingid;
 	$modPW = $bigbluebuttonbn->moderatorpass;
-
-	$getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+        if( isset($g) )
+            $getArray = BigBlueButtonBN::endMeeting( $meetingID.'['.$g.']', $modPW, $url, $salt );
+        else
+            $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
 	redirect('index.php?id='.$id);
 }
 
 // print_object( $bigbluebuttonbns );
 
 foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
-    displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt);
+    //print_r($bigbluebuttonbn);
+    $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
+
+    if ( groups_get_activity_groupmode($cm) > 0 ){
+        $groups = groups_get_activity_allowed_groups($cm);
+        if( isset($groups))
+        foreach( $groups as $group){
+            //print_r($group);
+            $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $group);
+        }
+    } else {
+        $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn);
+    }
+    
 }
 
-function displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt){
+
+function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
     $joinURL = null;
     $user = null;
     $result = null;
@@ -128,13 +144,18 @@ function displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt){
 	$modPW = $bigbluebuttonbn->moderatorpass;
 	$attPW = $bigbluebuttonbn->viewerpass;
 
-	$joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
+        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
 
 	//
 	// Output Users in the meeting
 	//
-	$getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
-
+        if( $groupObj == null ){
+            $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
+        } else {
+            //print_r($groupObj);
+           $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid.'['.$groupObj->id.']', $modPW, $url, $salt );
+           $group = $groupObj->name;
+        }
 	//echo $bigbluebuttonbn->meetingid;
 	//print_object( $getArray );
 
@@ -175,7 +196,10 @@ function displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt){
 		// $status =  get_string('index_running', 'bigbluebuttonbn' );
 			
 		if ( $moderator ) {
-                    $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
+                    if( $groupObj == null )
+                        $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
+                    else
+                        $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="hidden" name="g" value="'.$groupObj->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
 		}
                 
                 if ( isset($getArray['metadata']->recording) && $getArray['metadata']->recording == 'true' ) // if it has been set when meeting created, set the variable on/off
@@ -207,11 +231,7 @@ function displayBigBlueButtonRooms($course, $bigbluebuttonbn, $url, $salt){
             }
 	}
         
-        if ($course->format == 'weeks' or $course->format == 'topics' ) {
-            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $group, $viewerList, $moderatorList, $recording, $actions );
-        } else {
-            $table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $group, $viewerList, $moderatorList, $recording, $actions );
-        }
+        return array ($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions );
         
     }
 

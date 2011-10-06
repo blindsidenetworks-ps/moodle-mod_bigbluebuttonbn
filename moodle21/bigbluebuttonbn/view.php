@@ -173,7 +173,14 @@ echo $OUTPUT->header();
 
 /// find out current groups mode
 groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
-$bbbsession['meetingid'] = groups_get_activity_groupmode($cm) == 0?  $bigbluebuttonbn->meetingid: $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
+if (groups_get_activity_groupmode($cm) == 0) {
+    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid;
+} else {
+    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
+    if ($moderator) // Take off the option visible groups       
+        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.setusergroups');
+}
+
 if( $moderator) 
     $bbbsession['joinURL'] = BigBlueButtonBN::joinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 else
