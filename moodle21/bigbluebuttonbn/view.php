@@ -247,7 +247,7 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && groups_get_activity_allowed_groups($bbbsession['cm']) ){
                 print '<script type="text/javascript" >var joining = "false";</script>';
-                print "Select the group you want to join and confirm the action&nbsp;&nbsp;<input type='button' onClick='bigbluebuttonbn_joinURL()' value='Join'>";
+                print get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='bigbluebuttonbn_joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
                 
             } else {
                 print '<script type="text/javascript" >var joining = "true";</script>';

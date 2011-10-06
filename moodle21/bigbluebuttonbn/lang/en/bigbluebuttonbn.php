@@ -74,7 +74,6 @@ $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a 
 $string['view_error_unable_join'] = 'Unable to join the meeting. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['view_error_unable_join_teacher'] = 'Unable to connect to the BigBlueButton server. Please contact the Administrator.';
 $string['view_error_unable_join_student'] = 'Unable to connect to the BigBlueButton server. Please contact your Teacher or the Administrator.';
-
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_recording_list_course'] = 'Course';
 $string['view_recording_list_activity'] = 'Activity';
@@ -84,6 +83,8 @@ $string['view_recording_list_actionbar'] = 'Toolbar';
 $string['view_recording_list_actionbar_delete'] = 'Delete';
 $string['view_recording_list_actionbar_hide'] = 'Hide';
 $string['view_recording_list_actionbar_show'] = 'Show';
+$string['view_groups_selection'] = 'Select the group you want to join and confirm the action'; 
+$string['view_groups_selection_join'] = 'Join'; 
 
 $string['bbbnotavailableyet'] = 'Sorry, this session is not yet available.';
 $string['bbbinprocess'] = 'This activity is in process.';

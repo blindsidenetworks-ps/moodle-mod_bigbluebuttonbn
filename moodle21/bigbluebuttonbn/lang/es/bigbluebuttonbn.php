@@ -73,7 +73,6 @@ $string['view_wait'] = 'La clase virtual no ha iniciado todavia. Espere hasta qu
 $string['view_error_unable_join'] = 'No es posible acceder a la sesión. Verifique la URL del servidor BigBlueButton y si este se encuentra funcionando.';
 $string['view_error_unable_join_teacher'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte al Administrador.';
 $string['view_error_unable_join_student'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte a su Maestro o al Administrador.';
-
 $string['view_recording_list_recording'] = 'Grabación';
 $string['view_recording_list_course'] = 'Curso';
 $string['view_recording_list_activity'] = 'Actividad';
@@ -83,6 +82,8 @@ $string['view_recording_list_actionbar'] = 'Herramientas';
 $string['view_recording_list_actionbar_delete'] = 'Borrar';
 $string['view_recording_list_actionbar_hide'] = 'Ocultar';
 $string['view_recording_list_actionbar_show'] = 'Mostrar';
+$string['view_groups_selection'] = 'Seleccione el grupo al que quiere ingresar y confirme la acción'; 
+$string['view_groups_selection_join'] = 'Ingresar'; 
 
 $string['bbbnotavailableyet'] = 'Lo sentimos, esta sesión no se encuentra disponible todavia.';
 $string['bbbinprocess'] = 'La actividad se encuentra en proceso.';
