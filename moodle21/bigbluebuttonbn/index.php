@@ -144,17 +144,16 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
 	$modPW = $bigbluebuttonbn->moderatorpass;
 	$attPW = $bigbluebuttonbn->viewerpass;
 
-        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
-
 	//
 	// Output Users in the meeting
 	//
         if( $groupObj == null ){
             $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
+            $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
-            //print_r($groupObj);
-           $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid.'['.$groupObj->id.']', $modPW, $url, $salt );
-           $group = $groupObj->name;
+            $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid.'['.$groupObj->id.']', $modPW, $url, $salt );
+            $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
+            $group = $groupObj->name;
         }
 	//echo $bigbluebuttonbn->meetingid;
 	//print_object( $getArray );

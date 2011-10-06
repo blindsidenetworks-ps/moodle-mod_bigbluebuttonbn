@@ -57,9 +57,10 @@ $string['index_heading_recording'] = 'Recording';
 $string['index_running'] = 'running';
 $string['index_enabled'] = 'enabled';
 $string['index_disabled'] = 'disabled';
-$string['index_error_checksum'] =  'A checksum error occured. Make sure you entered the correct salt.';
-$string['index_warning_adding_meeting'] =  'Unable to assign a new meetingid.';
-$string['index_error_unable_display'] =  'Unable to display the meetings. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['index_error_checksum'] = 'A checksum error occured. Make sure you entered the correct salt.';
+$string['index_warning_adding_meeting'] = 'Unable to assign a new meetingid.';
+$string['index_error_unable_display'] = 'Unable to display the meetings. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['index_error_forciblyended'] = 'Unable to join this meeting because it has been manualy ended.';
 
 $string['modCountNotUserRun'] = 0;
 $string['modulename'] = 'BigBlueButtonBN';

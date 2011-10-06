@@ -59,6 +59,7 @@ $string['index_disabled'] = 'inactivo';
 $string['index_error_unable_display'] =  'No es posible desplegar las sesiones. Por favor verifique la URL del servidor bigbluebuttonbn y que este se encuentre funcionando.';
 $string['index_error_checksum'] =  'Ha ocurrido un error en la suma de verificación. Asegurese de ingresar la sal de seguridad correcta.';
 $string['index_warning_adding_meeting'] =  'No es posible asignar una nueva session.';
+$string['index_error_forciblyended'] = 'No es posible ingresar a esta reunión por que ha sido finalizada manualmente.';
 
 $string['modCountNotUserRun'] = 0;
 $string['modulename'] = 'BigBlueButtonBN';
