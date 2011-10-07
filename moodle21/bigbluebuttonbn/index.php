@@ -104,17 +104,13 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 	redirect('index.php?id='.$id);
 }
 
-// print_object( $bigbluebuttonbns );
-
 foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
-    //print_r($bigbluebuttonbn);
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
 
     if ( groups_get_activity_groupmode($cm) > 0 ){
         $groups = groups_get_activity_allowed_groups($cm);
         if( isset($groups))
         foreach( $groups as $group){
-            //print_r($group);
             $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $group);
         }
     } else {
@@ -136,7 +132,6 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
     $moderatorList = "-";
     $recording = "-";
 		
-    //print_object( $bigbluebuttonbn );
 
     if ( !$bigbluebuttonbn->visible ) {
     	// Nothing to do
@@ -155,15 +150,12 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }
-	//echo $bigbluebuttonbn->meetingid;
-	//print_object( $getArray );
 
 	if (!$getArray) {
             //
             // The server was unreachable
             //
             print_error( get_string( 'index_error_unable_display', 'bigbluebuttonbn' ));
-            // print_error( 'Unable to display the meetings. Please check the url of the bigbluebuttonbn server AND check to see if the bigbluebuttonbn server is running.' );
             return;
 	}
 
@@ -192,7 +184,6 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
             // The meeting info was returned
             //
             if ($getArray['running'] == 'true') {
-		// $status =  get_string('index_running', 'bigbluebuttonbn' );
 			
 		if ( $moderator ) {
                     if( $groupObj == null )

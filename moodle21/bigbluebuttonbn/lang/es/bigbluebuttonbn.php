@@ -68,6 +68,7 @@ $string['pluginadministration'] = 'Administración de BigBlueButton';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Nombre del servidor';
 $string['view_noguests'] = 'El modulo BigBlueButtonBN no se encuentra disponible para visitantes';
+$string['view_nojoin'] = 'El rol en el que se encuentra no cuenta con permisos para ingresar a esta sesión.';
 $string['view_login_moderator'] = 'Ingresando como moderador ...';
 $string['view_login_viewer'] = 'Ingresando como observador ...';
 $string['view_wait'] = 'La clase virtual no ha iniciado todavia. Espere hasta que un moderador inicie la sesión ...';

@@ -69,6 +69,7 @@ $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Server Name';
 $string['view_noguests'] = 'The BigBlueButtonBN is not open to guests';
+$string['view_nojoin'] = 'You are not in a role allowed to join this session.';
 $string['view_login_moderator'] = 'Logging in as moderator ...';
 $string['view_login_viewer'] = 'Logging in as viewer ...';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
