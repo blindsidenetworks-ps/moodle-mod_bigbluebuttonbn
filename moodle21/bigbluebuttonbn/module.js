@@ -28,6 +28,7 @@ M.mod_bigbluebuttonbn.setusergroups = function() {
     var elSel = document.getElementsByName('group')[0];
     if (elSel.length > 0)
     {
-        elSel.remove(0);
+        elSel.options[0].text = 'Select group';
+        elSel.options[0].value = elSel.options[1].value;
     }
 }

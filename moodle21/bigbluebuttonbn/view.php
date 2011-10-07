@@ -129,7 +129,8 @@ $bbbsession['cm'] = $cm;
 
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
-$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course;
+//$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course;
+$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='.$id;
 //
 // BigBlueButton Setup Ends
 //
@@ -182,12 +183,9 @@ groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?i
 if (groups_get_activity_groupmode($cm) == 0) {
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid;
 } else {
-    if ( groups_get_activity_group($cm) == '0' )
-        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'[1]';
-    else
-        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
-    //if ($moderator) // Take off the option visible groups       
-    //    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.setusergroups');
+    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
+    if ($moderator) // Take off the option visible groups       
+        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.setusergroups');
 }
 
 if( $moderator) 
