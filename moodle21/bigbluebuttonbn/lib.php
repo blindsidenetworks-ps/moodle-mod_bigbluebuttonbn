@@ -347,11 +347,11 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     $info->name  = $bigbluebuttonbn->name;
     
     if ( $bigbluebuttonbn->newwindow == 1 ){
-        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1";
-        $info->extra = "onclick=\"window.open('$fullurl'); return false;\"";
+        $info->extra = "onclick=\"window.open('"."$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1"."'); return false;\"";
     } else {
         $info->extra = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
     }
+
     return $info;
 }
 

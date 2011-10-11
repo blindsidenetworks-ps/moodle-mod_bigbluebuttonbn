@@ -1,9 +1,5 @@
         function bigbluebuttonbn_joinURL(){
-            if ( newwindow == 'true' ){
-                window.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/joinbbb.php?joinurl=' + encodeURIComponent(joinurl)+'&logouturl=' + encodeURIComponent(logouturl);
-            } else {
-                window.location = joinurl;
-            }
+            window.location = joinurl;
         }
     
         function bigbluebuttonbn_callback() {

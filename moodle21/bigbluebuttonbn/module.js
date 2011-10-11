@@ -8,20 +8,18 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
  *
  * @param {Object} Y YUI instance
  */
-M.mod_bigbluebuttonbn.init = function(Y) {
-    
-    if (M.yui.bigbluebuttonbn_page == 'mod_form'){
-        document.getElementsByName("timeavailable[enabled]")[0].removeAttribute("checked");
-        document.getElementsByName("timedue[enabled]")[0].removeAttribute("checked");
-    }
+M.mod_bigbluebuttonbn.modform_Adding_withSchedule = function(Y) {
+    document.getElementsByName("timeavailable[enabled]")[0].removeAttribute("checked");
+    document.getElementsByName("timedue[enabled]")[0].removeAttribute("checked");
+    setGroupMode();
 }
 
-M.mod_bigbluebuttonbn.setgroups = function() {
-    var elSel = document.getElementsByName('groupmode')[0];
-    if (elSel.length > 0)
-    {
-        elSel.remove(elSel.length - 1);
-    }
+M.mod_bigbluebuttonbn.modform_Adding_withoutSchedule = function(Y) {
+    setGroupMode();
+}
+
+M.mod_bigbluebuttonbn.modform_Editting = function() {
+    setGroupMode();
 }
 
 M.mod_bigbluebuttonbn.setusergroups = function() {
@@ -30,5 +28,13 @@ M.mod_bigbluebuttonbn.setusergroups = function() {
     {
         elSel.options[0].text = 'Select group';
         elSel.options[0].value = elSel.options[1].value;
+    }
+}
+
+function setGroupMode(){
+    var elSel = document.getElementsByName('groupmode')[0];
+    if (elSel.length > 0)
+    {
+        elSel.remove(elSel.length - 1);
     }
 }

@@ -129,7 +129,6 @@ $bbbsession['cm'] = $cm;
 
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
-//$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='.$id;
 //
 // BigBlueButton Setup Ends
@@ -138,13 +137,9 @@ $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='
 /// Print the page header
 $PAGE->set_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
 
-if ( isset($redirect) && $redirect == 1 ){
-    $PAGE->blocks->show_only_fake_blocks();
-} else {
-    $PAGE->set_title($bigbluebuttonbn->name);
-    $PAGE->set_heading($course->shortname);
-    $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
-}
+$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_heading($course->shortname);
+$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
 
 // Validate if the user is in a role allowed to join
 if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
@@ -271,8 +266,8 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
                 
         } else { ///////////////Everything is ok /////////////////////
-                
-            if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && groups_get_activity_allowed_groups($bbbsession['cm']) ){
+            
+            if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
                 print '<script type="text/javascript" >var joining = "false";</script>';
                 print get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='bigbluebuttonbn_joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
             
