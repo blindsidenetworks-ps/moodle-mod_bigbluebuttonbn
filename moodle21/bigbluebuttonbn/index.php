@@ -144,10 +144,16 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
 	//
         if( $groupObj == null ){
             $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
-            $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
+            if ( $bigbluebuttonbn->newwindow == 1 )
+                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
+            else
+                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
             $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid.'['.$groupObj->id.']', $modPW, $url, $salt );
-            $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
+            if ( $bigbluebuttonbn->newwindow == 1 )
+                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
+            else
+                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }
 

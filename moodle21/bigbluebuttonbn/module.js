@@ -22,6 +22,10 @@ M.mod_bigbluebuttonbn.modform_Editting = function() {
     setGroupMode();
 }
 
+M.mod_bigbluebuttonbn.viewend_CloseWindow = function() {
+    window.close();
+}
+
 M.mod_bigbluebuttonbn.setusergroups = function() {
     var elSel = document.getElementsByName('group')[0];
     if (elSel.length > 0)

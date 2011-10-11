@@ -34,9 +34,21 @@ require_login($course, true, $cm);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 $PAGE->set_context($context);
 
-if( has_capability('mod/bigbluebuttonbn:moderate', $context) )
-    header('Location: '.$CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course );
-else
-    header('Location: '.$CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course );
+$PAGE->set_url('/mod/bigbluebuttonbn/view_end.php', array('id' => $cm->id));
 
+
+if ( $bigbluebuttonbn->newwindow == 1 ){
+    echo $OUTPUT->header();
+    
+    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.viewend_CloseWindow');
+    
+    echo $OUTPUT->footer();
+        
+} else {
+    if( has_capability('mod/bigbluebuttonbn:moderate', $context) )
+        header('Location: '.$CFG->wwwroot.'/mod/bigbluebuttonbn/index.php?id='.$bigbluebuttonbn->course );
+    else
+        header('Location: '.$CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course );
+}
+    
 ?>

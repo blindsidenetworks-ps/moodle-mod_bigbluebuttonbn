@@ -136,10 +136,7 @@ $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='
 
 /// Print the page header
 $PAGE->set_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
-
-$PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_heading($course->shortname);
-$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
 
 // Validate if the user is in a role allowed to join
 if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
@@ -156,6 +153,9 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     echo $OUTPUT->footer();
     exit;
 }
+
+$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
 
 
 $PAGE->requires->js('/mod/bigbluebuttonbn/js/jquery.min.js', true);    
