@@ -48,7 +48,6 @@ $bbbsession['url'] = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 
 $serverVersion = BigBlueButtonBN::getServerVersion($bbbsession['url']); 
 if ( !isset($serverVersion) ) { //Server is not working
-    //$meetingsArray = BigBlueButtonBN::getMeetingsArray($url, $salt);
     if ( $administrator )
         print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
     else if ( $moderator )
@@ -101,7 +100,6 @@ foreach( $teachers as $teacher ){
 $bbbsession['meetingname'] = $bigbluebuttonbn->name;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-    // $bbbsession['welcome'] = str_replace("%course%", '<b>'.$course->fullname.'</b>', get_string('mod_form_field_welcome_default', 'bigbluebuttonbn').'. '); //Replace the keys %course% and %school%
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
 
