@@ -1,6 +1,6 @@
 version: 1.0-b3 (October 12, 2011)
 
-	Beta release for use with BigBlueButton 0.71a and BigBlueButton 0.8-beta servers with support for groups in bigbluebuttonbn
+	Added support for separate groups in bigbluebuttonbn
 
 version: 1.0-b2 (September 13, 2011)
 

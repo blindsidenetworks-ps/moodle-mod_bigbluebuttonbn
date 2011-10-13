@@ -1,6 +1,6 @@
 version: 1.0-b3 (October 12, 2011)
 
-	Includes support for groups and configurable prevention of access for guest users
+	Added support for separate groups
 
 version: 1.0-b2 (September 16, 2011)
 
