@@ -3,7 +3,7 @@
  * View and administrate BigBlueButton playback recordings
  *
  * Authors:
- *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  *
  * @package   mod_bigbluebutton
  * @copyright 2011 Blindside Networks Inc.
@@ -17,4 +17,4 @@ $module->requires  = 2010112400;      // Requires this Moodle version
 $module->cron      = 0;               // Period for cron to check this module (secs)
 $module->component = 'mod_recordingsbn'; // To check on upgrade, that module sits in correct place
 $module->maturity = MATURITY_BETA;      // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-$module->release  = '1.0-b3'; 
+$module->release  = '1.0.4'; 
