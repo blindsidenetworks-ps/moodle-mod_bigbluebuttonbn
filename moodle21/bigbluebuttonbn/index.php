@@ -70,16 +70,9 @@ $heading_recording  = get_string('index_heading_recording', 'bigbluebuttonbn' );
 
 $table = new html_table();
 
-if ($course->format == 'weeks') {
-    $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
-    $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
-} else if ($course->format == 'topics') {
-    $table->head  = array ($strtopic, $strname);
-    $table->align = array ('center', 'left', 'left', 'left');
-} else {
-    $table->head  = array ($strname);
-    $table->align = array ('left', 'left', 'left');
-}
+//if ($course->format == 'weeks') { }
+$table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
+$table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
 
 
 $salt = trim($CFG->BigBlueButtonBNSecuritySalt);

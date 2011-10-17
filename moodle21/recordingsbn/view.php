@@ -81,7 +81,7 @@ $username = $USER->firstname.' '.$USER->lastname;
 $userID = $USER->id;
 
 // Recordings plugin code
-$results = $DB->get_records_sql('SELECT * FROM mdl_bigbluebuttonbn WHERE mdl_bigbluebuttonbn.course ='.$course->id );
+$results = $DB->get_records_sql('SELECT * FROM '.$CFG->prefix.'bigbluebuttonbn WHERE mdl_bigbluebuttonbn.course ='.$course->id );
 $meetingID='';
 
 foreach ($results as $result) {
