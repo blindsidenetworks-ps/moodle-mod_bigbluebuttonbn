@@ -1,4 +1,16 @@
 <?php
+/**
+ * Language File
+ * 
+ * Authors:
+ * 	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
+ * 
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2011 Blindside Networks 
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
+defined('MOODLE_INTERNAL') || die();
 
 $lang['bbbduetimeoverstartingtime'] = 'La date de fin doit être supérieure à la date de début.';
 $lang['bbbdurationwarning'] = 'La durée maximale de cette session est de %duration% minutes.';
@@ -43,6 +55,8 @@ $lang['mod_form_field_description'] = 'Description de la session enregistrée';
 $lang['mod_form_field_duedate'] = 'Connexion jusqu\'à';
 $lang['mod_form_field_duration_help'] = 'Définir la durée d\'une conférence établira la durée maximale d\'une conférence, avant que l\'enregistrement ne se termine.';
 $lang['mod_form_field_duration'] = 'Durée';
+$string['mod_form_field_limitusers'] = 'Limite de participants';
+$string['mod_form_field_limitusers_help'] = 'Limite maximum de participants par session';
 $lang['mod_form_field_name'] = 'Nom de la conférence';
 $lang['mod_form_field_newwindow'] = 'Ouvrir BigBlueButton dans une nouvelle fenêtre';
 $lang['mod_form_field_record'] = 'Enregistrer';
@@ -76,4 +90,3 @@ $lang['view_recording_list_date'] = 'Date';
 $lang['view_recording_list_description'] = 'Description';
 $lang['view_recording_list_recording'] = 'Enregistrement';
 $lang['view_wait'] = 'La conférence n\'a pas encore démarré. En attente de connexion d\'un modérateur...';
-?>
