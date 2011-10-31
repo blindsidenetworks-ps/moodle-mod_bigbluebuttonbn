@@ -1,9 +1,9 @@
 <?php
 /**
- * Language File
+ * Language File - English (en)
  * 
  * Authors:
- * 	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ *      Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
@@ -29,7 +29,7 @@ $string['bigbluebuttonbnSalt'] = 'Security Salt';
 $string['bigbluebuttonbnUrl'] = 'BigBlueButton Server URL';
 $string['bigbluebuttonbnWait'] = 'User has to wait';
 $string['configsecuritysalt'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
-$string['general_error_unable_connect'] =  'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_disabled'] = 'disabled';
 $string['index_enabled'] = 'enabled';
@@ -74,8 +74,8 @@ $string['serverhost'] = 'Server Name';
 $string['view_error_unable_join_student'] = 'Unable to connect to the BigBlueButton server. Please contact your Teacher or the Administrator.';
 $string['view_error_unable_join_teacher'] = 'Unable to connect to the BigBlueButton server. Please contact the Administrator.';
 $string['view_error_unable_join'] = 'Unable to join the meeting. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
-$string['view_groups_selection_join'] = 'Join'; 
-$string['view_groups_selection'] = 'Select the group you want to join and confirm the action'; 
+$string['view_groups_selection_join'] = 'Join';
+$string['view_groups_selection'] = 'Select the group you want to join and confirm the action';
 $string['view_login_moderator'] = 'Logging in as moderator ...';
 $string['view_login_viewer'] = 'Logging in as viewer ...';
 $string['view_noguests'] = 'The BigBlueButtonBN is not open to guests';
@@ -90,3 +90,4 @@ $string['view_recording_list_date'] = 'Date';
 $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
+?>
