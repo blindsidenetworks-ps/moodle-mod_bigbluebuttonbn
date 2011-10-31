@@ -176,7 +176,36 @@ groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?i
 if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid;
 } else {                                        // Separate groups mode
-    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'['.groups_get_activity_group($cm).']';
+    //If doesnt have group
+    $bbbsession['group'] = groups_get_activity_group($cm);
+    if( $bbbsession['group'] == '0' ){
+        if ( $bbbsession['flag']['administrator'] ) {
+            $groups_in_activity = groups_get_activity_allowed_groups($cm);
+            if ( count($groups_in_activity) == 0 ){ //There are no groups at all
+                print_error( 'view_error_no_group', 'bigbluebuttonbn', $CFG->wwwroot.'/course/view.php?id='.$course->id );
+                echo $OUTPUT->footer();
+                exit;
+            } else { // There is only 1 group
+                $bbbsession['group'] = current($groups_in_activity)->id;
+            }
+        } else if ( $bbbsession['flag']['moderator'] ) {
+            $groups_in_activity = groups_get_activity_allowed_groups($cm);
+            if ( count($groups_in_activity) == 0 ){ //There are no groups at all
+                print_error( 'view_error_no_group_teacher', 'bigbluebuttonbn', $CFG->wwwroot.'/course/view.php?id='.$course->id );
+                echo $OUTPUT->footer();
+                exit;
+            } else { // There is only 1 group
+                $bbbsession['group'] = current($groups_in_activity)->id;
+            }
+        } else {
+            print_error( 'view_error_no_group_student', 'bigbluebuttonbn', $CFG->wwwroot.'/course/view.php?id='.$course->id );
+            echo $OUTPUT->footer();
+            exit;
+        }
+
+    }
+    
+    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'['.$bbbsession['group'].']';
     if ($moderator) // Take off the option visible groups       
         $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.setusergroups');
 }
