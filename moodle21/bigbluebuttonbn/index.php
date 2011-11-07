@@ -90,7 +90,7 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 
 	$meetingID = $bigbluebuttonbn->meetingid;
 	$modPW = $bigbluebuttonbn->moderatorpass;
-        if( isset($g) )
+        if( $g != '0'  )
             $getArray = BigBlueButtonBN::endMeeting( $meetingID.'['.$g.']', $modPW, $url, $salt );
         else
             $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
