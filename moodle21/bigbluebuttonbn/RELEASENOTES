@@ -1,0 +1,20 @@
+version: 1.0.6 (October 31, 2011)
+
+	Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php 
+
+version: 1.0.5 (October 19, 2011)
+
+	Extended supported languages
+
+version: 1.0.4 (October 12, 2011)
+
+	Added support for separate groups
+
+version: 1.0-b2 (September 16, 2011)
+
+	Removed unneeded code related to grade scales
+
+version: 1.0-b1 (September 13, 2011)
+
+	Beta release for use with BigBlueButton 0.71a and BigBlueButton 0.8-beta servers
+

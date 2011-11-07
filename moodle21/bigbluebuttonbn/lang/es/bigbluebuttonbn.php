@@ -1,9 +1,9 @@
 <?php
 /**
- * Language File
+ * Language File - Spanish, Español (es)
  * 
  * Authors:
- * 	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ *      Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
@@ -29,14 +29,14 @@ $string['bigbluebuttonbnSalt'] = 'Security Salt';
 $string['bigbluebuttonbnUrl'] = 'URL del servidor BigBlueButton';
 $string['bigbluebuttonbnWait'] = 'El usuario debe esperar';
 $string['configsecuritysalt'] = 'La sal de seguridadpara su servidor BigBlueButton.  (Esta salt de seguridad proporcionada por default es de un servidor proporcionado por Blindside Networks para proposito de pruebas.)';
-$string['general_error_unable_connect'] =  'No es posible establecer conexión. Verifique la URL del servidor BigBlueButton y si este se encuentra funcionando.';
+$string['general_error_unable_connect'] = 'No es posible establecer conexión. Verifique la URL del servidor BigBlueButton y si este se encuentra funcionando.';
 $string['index_confirm_end'] = 'Desea terminar con la clase virtual?';
 $string['index_disabled'] = 'inactivo';
 $string['index_enabled'] = 'activo';
 $string['index_ending'] = 'Terminando la clase virtual ... espere un momento por favor';
-$string['index_error_checksum'] =  'Ha ocurrido un error en la suma de verificación. Asegurese de ingresar la sal de seguridad correcta.';
+$string['index_error_checksum'] = 'Ha ocurrido un error en la suma de verificación. Asegurese de ingresar la sal de seguridad correcta.';
 $string['index_error_forciblyended'] = 'No es posible ingresar a esta reunión por que ha sido finalizada manualmente.';
-$string['index_error_unable_display'] =  'No es posible desplegar las sesiones. Por favor verifique la URL del servidor bigbluebuttonbn y que este se encuentre funcionando.';
+$string['index_error_unable_display'] = 'No es posible desplegar las sesiones. Por favor verifique la URL del servidor bigbluebuttonbn y que este se encuentre funcionando.';
 $string['index_heading_actions'] = 'Acciones';
 $string['index_heading_group'] = 'Grupo';
 $string['index_heading_moderator'] = 'Moderadores';
@@ -46,7 +46,7 @@ $string['index_heading_users'] = 'Usuarios';
 $string['index_heading_viewer'] = 'Observadores';
 $string['index_heading'] = 'Salones de BigBlueButton';
 $string['index_running'] = 'en ejecución';
-$string['index_warning_adding_meeting'] =  'No es posible asignar una nueva sesion.';
+$string['index_warning_adding_meeting'] = 'No es posible asignar una nueva sesion.';
 $string['mod_form_block_general'] = 'Configuración General';
 $string['mod_form_block_record'] = 'Configuración de grabaciones';
 $string['mod_form_block_schedule'] = 'Programación para sesiones';
@@ -71,11 +71,11 @@ $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['pluginadministration'] = 'Administración de BigBlueButton';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Nombre del servidor';
-$string['view_error_unable_join_student'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte a su Maestro o al Administrador.';
-$string['view_error_unable_join_teacher'] =  'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte al Administrador.';
+$string['view_error_unable_join_student'] = 'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte a su Maestro o al Administrador.';
+$string['view_error_unable_join_teacher'] = 'No es posible establecer conexión con el servidor BigBlueButton. Por favor contacte al Administrador.';
 $string['view_error_unable_join'] = 'No es posible acceder a la sesión. Verifique la URL del servidor BigBlueButton y si este se encuentra funcionando.';
-$string['view_groups_selection_join'] = 'Ingresar'; 
-$string['view_groups_selection'] = 'Seleccione el grupo al que quiere ingresar y confirme la acción'; 
+$string['view_groups_selection_join'] = 'Ingresar';
+$string['view_groups_selection'] = 'Seleccione el grupo al que quiere ingresar y confirme la acción';
 $string['view_login_moderator'] = 'Ingresando como moderador ...';
 $string['view_login_viewer'] = 'Ingresando como observador ...';
 $string['view_noguests'] = 'El modulo BigBlueButtonBN no se encuentra disponible para visitantes';
@@ -90,3 +90,4 @@ $string['view_recording_list_date'] = 'Fecha';
 $string['view_recording_list_description'] = 'Descripción';
 $string['view_recording_list_recording'] = 'Grabación';
 $string['view_wait'] = 'La clase virtual no ha iniciado todavia. Espere hasta que un moderador inicie la sesión ...';
+?>
