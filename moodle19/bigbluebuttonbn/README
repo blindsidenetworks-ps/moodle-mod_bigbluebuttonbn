@@ -35,11 +35,11 @@ These instructions assume your Moodle 1.9 server is installed at /var/www/moodle
 
     This will create the directory
  
-        ./mod/bigbluebutton
+        ./mod/bigbluebuttonbn
 
     and install the language file in
 
-        ./lang/en_utf8/bigbluebutton.php
+        ./lang/en_utf8/bigbluebuttonbn.php
         
 3.  Login to your moodle site as administrator
 4.  Click notifications.  

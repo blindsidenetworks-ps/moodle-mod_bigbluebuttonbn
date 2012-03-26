@@ -22,11 +22,11 @@
  */
 
     //This php script contains all the stuff to backup/restore
-    //bigbluebutton mods
+    //bigbluebuttonbn mods
 
     //This is the "graphical" structure of the BigBlueButton mod:
     //
-    //                       bigbluebutton
+    //                       bigbluebuttonbn
     //                     (CL,pk->id)
     //
     // Meaning: pk->primary key field of the table
@@ -39,28 +39,28 @@
     //-----------------------------------------------------------
 
     //This function executes all the backup procedure about this mod
-    function bigbluebutton_backup_mods($bf,$preferences) {
+    function bigbluebuttonbn_backup_mods($bf,$preferences) {
         global $CFG;
 
         $status = true; 
 
-        ////Iterate over bigbluebutton table
-        if ($bigbluebuttons = get_records ("bigbluebutton","course", $preferences->backup_course,"id")) {
-            foreach ($bigbluebuttons as $bigbluebutton) {
-                if (backup_mod_selected($preferences,'bigbluebutton',$bigbluebutton->id)) {
-                    $status = bigbluebutton_backup_one_mod($bf,$preferences,$bigbluebutton);
+        ////Iterate over bigbluebuttonbn table
+        if ($bigbluebuttonbns = get_records ("bigbluebuttonbn","course", $preferences->backup_course,"id")) {
+            foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
+                if (backup_mod_selected($preferences,'bigbluebuttonbn',$bigbluebuttonbn->id)) {
+                    $status = bigbluebuttonbn_backup_one_mod($bf,$preferences,$bigbluebuttonbn);
                 }
             }
         }
         return $status;
     }
    
-    function bigbluebutton_backup_one_mod($bf,$preferences,$bigbluebutton) {
+    function bigbluebuttonbn_backup_one_mod($bf,$preferences,$bigbluebuttonbn) {
 
         global $CFG;
     
-        if (is_numeric($bigbluebutton)) {
-            $bigbluebutton = get_record('bigbluebutton','id',$bigbluebutton);
+        if (is_numeric($bigbluebuttonbn)) {
+            $bigbluebuttonbn = get_record('bigbluebuttonbn','id',$bigbluebuttonbn);
         }
     
         $status = true;
@@ -68,14 +68,14 @@
         //Start mod
         fwrite ($bf,start_tag("MOD",3,true));
         //Print assignment data
-        fwrite ($bf,full_tag("ID",4,false,$bigbluebutton->id));
-        fwrite ($bf,full_tag("MODTYPE",4,false,"bigbluebutton"));
-        fwrite ($bf,full_tag("NAME",4,false,$bigbluebutton->name));
-        fwrite ($bf,full_tag("MODERATORPASS",4,false,$bigbluebutton->moderatorpass));
-        fwrite ($bf,full_tag("VIEWERPASS",4,false,$bigbluebutton->viewerpass));
-        fwrite ($bf,full_tag("WAIT",4,false,$bigbluebutton->wait));
-        fwrite ($bf,full_tag("MEETINGID",4,false,$bigbluebutton->meetingid));
-        fwrite ($bf,full_tag("TIMEMODIFIED",4,false,$bigbluebutton->timemodified));
+        fwrite ($bf,full_tag("ID",4,false,$bigbluebuttonbn->id));
+        fwrite ($bf,full_tag("MODTYPE",4,false,"bigbluebuttonbn"));
+        fwrite ($bf,full_tag("NAME",4,false,$bigbluebuttonbn->name));
+        fwrite ($bf,full_tag("MODERATORPASS",4,false,$bigbluebuttonbn->moderatorpass));
+        fwrite ($bf,full_tag("VIEWERPASS",4,false,$bigbluebuttonbn->viewerpass));
+        fwrite ($bf,full_tag("WAIT",4,false,$bigbluebuttonbn->wait));
+        fwrite ($bf,full_tag("MEETINGID",4,false,$bigbluebuttonbn->meetingid));
+        fwrite ($bf,full_tag("TIMEMODIFIED",4,false,$bigbluebuttonbn->timemodified));
         //End mod
         $status = fwrite ($bf,end_tag("MOD",3,true));
 
@@ -83,23 +83,23 @@
     }
 
     ////Return an array of info (name,value)
-    function bigbluebutton_check_backup_mods($course,$user_data=false,$backup_unique_code,$instances=null) {
+    function bigbluebuttonbn_check_backup_mods($course,$user_data=false,$backup_unique_code,$instances=null) {
         if (!empty($instances) && is_array($instances) && count($instances)) {
             $info = array();
             foreach ($instances as $id => $instance) {
-                $info += bigbluebutton_check_backup_mods_instances($instance,$backup_unique_code);
+                $info += bigbluebuttonbn_check_backup_mods_instances($instance,$backup_unique_code);
             }
             return $info;
         }
         
          //First the course data
-         $info[0][0] = get_string("modulenameplural","bigbluebutton");
-         $info[0][1] = count_records("bigbluebutton", "course", "$course");
+         $info[0][0] = get_string("modulenameplural","bigbluebuttonbn");
+         $info[0][1] = count_records("bigbluebuttonbn", "course", "$course");
          return $info;
     } 
 
     ////Return an array of info (name,value)
-    function bigbluebutton_check_backup_mods_instances($instance,$backup_unique_code) {
+    function bigbluebuttonbn_check_backup_mods_instances($instance,$backup_unique_code) {
          //First the course data
         $info[$instance->id.'0'][0] = '<b>'.$instance->name.'</b>';
         $info[$instance->id.'0'][1] = '';

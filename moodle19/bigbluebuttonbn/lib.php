@@ -5,13 +5,14 @@
  *
  * Authors:
  *      Fred Dixon (ffdixon [at] blindsidenetworks [dt] org)
+ *      Jesus Federico (jesus [at] blindsidenetworks [dt] org)
  *
- * @package   mod_bigbluebutton
- * @copyright 2010 Blindside Networks
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2012 Blindside Networks
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-include( 'bbb_api/bbb_api.php' );
+require_once('bbb_api/bbb_api.php');
 
 
 /**
@@ -20,23 +21,23 @@ include( 'bbb_api/bbb_api.php' );
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $bigbluebutton An object from the form in mod_form.php
- * @return int The id of the newly inserted bigbluebutton record
+ * @param object $bigbluebuttonbn An object from the form in mod_form.php
+ * @return int The id of the newly inserted bigbluebuttonbn record
  */
-function bigbluebutton_add_instance($bigbluebutton) {
+function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 
-    $bigbluebutton->timecreated = time();
+    $bigbluebuttonbn->timecreated = time();
 
-	if (record_exists( 'bigbluebutton', 'meetingID', $bigbluebutton->name)) {
+	if (record_exists( 'bigbluebuttonbn', 'meetingID', $bigbluebuttonbn->name)) {
 		error("A meeting with that name already exists.");
 		return false;
 	}
 
-	$bigbluebutton->moderatorpass = bigbluebutton_rand_string( 16 );
-	$bigbluebutton->viewerpass = bigbluebutton_rand_string( 16 );
-	$bigbluebutton->meetingid = bigbluebutton_rand_string( 16 );
+	$bigbluebuttonbn->moderatorpass = bigbluebuttonbn_rand_string( 16 );
+	$bigbluebuttonbn->viewerpass = bigbluebuttonbn_rand_string( 16 );
+	$bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string( 16 );
 
-	return insert_record('bigbluebutton', $bigbluebutton);
+	return insert_record('bigbluebuttonbn', $bigbluebuttonbn);
 }
 
 
@@ -45,22 +46,22 @@ function bigbluebutton_add_instance($bigbluebutton) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $bigbluebutton An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn An object from the form in mod_form.php
  * @return boolean Success/Fail
  */
-function bigbluebutton_update_instance($bigbluebutton) {
+function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
 
-    $bigbluebutton->timemodified = time();
-    $bigbluebutton->id = $bigbluebutton->instance;
+    $bigbluebuttonbn->timemodified = time();
+    $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
 
-	if (! isset($bigbluebutton->wait)) {
-		$bigbluebutton->wait = 0;
+	if (! isset($bigbluebuttonbn->wait)) {
+		$bigbluebuttonbn->wait = 0;
 	}
 
 
     # You may have to add extra stuff in here #
 
-    return update_record('bigbluebutton', $bigbluebutton);
+    return update_record('bigbluebuttonbn', $bigbluebuttonbn);
 }
 
 
@@ -72,10 +73,10 @@ function bigbluebutton_update_instance($bigbluebutton) {
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
  */
-function bigbluebutton_delete_instance($id) {
+function bigbluebuttonbn_delete_instance($id) {
     global $CFG;
 
-    if (! $bigbluebutton = get_record('bigbluebutton', 'id', $id)) {
+    if (! $bigbluebuttonbn = get_record('bigbluebuttonbn', 'id', $id)) {
         return false;
     }
 
@@ -84,17 +85,17 @@ function bigbluebutton_delete_instance($id) {
     //
 	// End the session associated with this instance (if it's running)
 	//
-	$meetingID = $bigbluebutton->meetingid;
-	$modPW = $bigbluebutton->moderatorpass;
-	$url = trim(trim($CFG->BigBlueButtonServerURL),'/').'/';
-	$salt = trim($CFG->BigBlueButtonSecuritySalt);
+	$meetingID = $bigbluebuttonbn->meetingid;
+	$modPW = $bigbluebuttonbn->moderatorpass;
+	$url = trim(trim($CFG->bigbluebuttonbnServerURL),'/').'/';
+	$salt = trim($CFG->bigbluebuttonbnSecuritySalt);
 
-	$getArray = BigBlueButton::endMeeting( $meetingID, $modPW, $url, $salt );
+	$getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
 	
-    if (! delete_records('bigbluebutton', 'id', $bigbluebutton->id)) {
+    if (! delete_records('bigbluebuttonbn', 'id', $bigbluebuttonbn->id)) {
     	//echo $endURL = '<a href='.BBBMeeting::endMeeting( $mToken, "mp", getBBBServerIP(), $salt ).'>'."End Meeting".'</a>';
 #switch to remove the meetingname
-#    	  BBBMeeting::endMeeting( $bigbluebutton->, "mp", getBBBServerIP(), $bigbluebutton->salt );
+#    	  BBBMeeting::endMeeting( $bigbluebuttonbn->, "mp", getBBBServerIP(), $bigbluebuttonbn->salt );
         $result = false;
     }
 
@@ -112,7 +113,7 @@ function bigbluebutton_delete_instance($id) {
  * @return null
  * @todo Finish documenting this function
  */
-function bigbluebutton_user_outline($course, $user, $mod, $bigbluebutton) {
+function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
     return $return;
 }
 
@@ -124,20 +125,20 @@ function bigbluebutton_user_outline($course, $user, $mod, $bigbluebutton) {
  * @return boolean
  * @todo Finish documenting this function
  */
-function bigbluebutton_user_complete($course, $user, $mod, $bigbluebutton) {
+function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     return true;
 }
 
 
 /**
  * Given a course and a time, this module should find recent activity
- * that has occurred in bigbluebutton activities and print it out.
+ * that has occurred in bigbluebuttonbn activities and print it out.
  * Return true if there was output, or false is there was none.
  *
  * @return boolean
  * @todo Finish documenting this function
  */
-function bigbluebutton_print_recent_activity($course, $isteacher, $timestart) {
+function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart) {
     return false;  //  True if anything was printed, otherwise false
 }
 
@@ -150,36 +151,36 @@ function bigbluebutton_print_recent_activity($course, $isteacher, $timestart) {
  * @return boolean
  * @todo Finish documenting this function
  **/
-function bigbluebutton_cron () {
+function bigbluebuttonbn_cron () {
     return true;
 }
 
 
 /**
  * Must return an array of user records (all data) who are participants
- * for a given instance of bigbluebutton. Must include every user involved
+ * for a given instance of bigbluebuttonbn. Must include every user involved
  * in the instance, independient of his role (student, teacher, admin...)
  * See other modules as example.
  *
- * @param int $bigbluebuttonid ID of an instance of this module
+ * @param int $bigbluebuttonbnid ID of an instance of this module
  * @return mixed boolean/array of students
  */
-function bigbluebutton_get_participants($bigbluebuttonid) {
+function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
     global $CFG;
     return false;
 }
 
 
 /**
- * Checks if scale is being used by any instance of bigbluebutton.
+ * Checks if scale is being used by any instance of bigbluebuttonbn.
  * This function was added in 1.9
  *
  * This is used to find out if scale used anywhere
  * @param $scaleid int
- * @return boolean True if the scale is used by any bigbluebutton
+ * @return boolean True if the scale is used by any bigbluebuttonbn
  */
-function bigbluebutton_scale_used_anywhere($scaleid) {
-    if ($scaleid and record_exists('bigbluebutton', 'grade', -$scaleid)) {
+function bigbluebuttonbn_scale_used_anywhere($scaleid) {
+    if ($scaleid and record_exists('bigbluebuttonbn', 'grade', -$scaleid)) {
         return true;
     } else {
         return false;
@@ -193,7 +194,7 @@ function bigbluebutton_scale_used_anywhere($scaleid) {
  *
  * @return boolean true if success, false on error
  */
-function bigbluebutton_install() {
+function bigbluebuttonbn_install() {
     return true;
 }
 
@@ -204,21 +205,21 @@ function bigbluebutton_install() {
  *
  * @return boolean true if success, false on error
  */
-function bigbluebutton_uninstall() {
+function bigbluebuttonbn_uninstall() {
     return true;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////
-/// Any other bigbluebutton functions go here.  Each of them must have a name that
-/// starts with bigbluebutton_
+/// Any other bigbluebuttonbn functions go here.  Each of them must have a name that
+/// starts with bigbluebuttonbn_
 /// Remember (see note in first lines) that, if this section grows, it's HIGHLY
 /// recommended to move all funcions below to a new "localib.php" file.
 
 # function taken from http://www.php.net/manual/en/function.mt-rand.php
 # modified by Sebastian Schneider
 # credits go to www.mrnaz.com
-function bigbluebutton_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 {
     $string = '';
     for ($i = 0; $i < $len; $i++)
