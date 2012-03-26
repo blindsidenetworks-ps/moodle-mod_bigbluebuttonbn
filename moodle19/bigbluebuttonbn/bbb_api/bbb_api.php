@@ -64,7 +64,7 @@ $logout = logout url (url)
 
 // TODO::
 // create some set methods 
-class BigBlueButton {
+class BigBlueButtonBN {
 	
 	var $userName = array();
 	var $meetingID; // the meeting id
@@ -81,7 +81,7 @@ class BigBlueButton {
 	
 	var $conferenceIsRunning = false;
 	
-	// this constructor is used to create a BigBlueButton Object
+	// this constructor is used to create a BigBlueButtonBN Object
 	// use this object to create servers
 	// Use is either 0 arguments or all 7 arguments
 	public function __construct() {
@@ -125,7 +125,7 @@ class BigBlueButton {
 	*
 	*@return The url to join the meeting
 	*/
-	public function joinURL( $meetingID, $userName, $PW, $SALT, $URL, $userID = 0 ) {
+	public static function joinURL( $meetingID, $userName, $PW, $SALT, $URL, $userID = 0 ) {
 		$url_join = $URL."api/join?";
 		$params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW);
 		if ($userID) {
@@ -149,7 +149,7 @@ class BigBlueButton {
 	*
 	*@return The url to join the meeting
 	*/
-	public function createMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL ) {
+	public static function createMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL ) {
 		$url_create = $URL."api/create?";
 		$voiceBridge = 70000 + rand(0, 9999);
 
@@ -171,7 +171,7 @@ class BigBlueButton {
 	*
 	*@return The url to check if the specified meeting is running.
 	*/
-	public function isMeetingRunningURL( $meetingID, $URL, $SALT ) {
+	public static function isMeetingRunningURL( $meetingID, $URL, $SALT ) {
 		$base_url = $URL."api/isMeetingRunning?";
 		$params = 'meetingID='.urlencode($meetingID);
 		return ($base_url.$params.'&checksum='.sha1("isMeetingRunning".$params.$SALT) );	
@@ -187,7 +187,7 @@ class BigBlueButton {
 	*
 	*@return The url to check if the specified meeting is running.
 	*/
-	public function getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) {
+	public static function getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) {
 		$base_url = $URL."api/getMeetingInfo?";
 		$params = 'meetingID='.urlencode($meetingID).'&password='.urlencode($modPW);
 		return ( $base_url.$params.'&checksum='.sha1("getMeetingInfo".$params.$SALT));	
@@ -201,7 +201,7 @@ class BigBlueButton {
 	*
 	*@return The url of getMeetings.
 	*/
-	public function getMeetingsURL($URL, $SALT) { 
+	public static function getMeetingsURL($URL, $SALT) { 
 		$base_url = $URL."api/getMeetings?";
 		$params = 'random='.(rand() * 1000 );
 		return ( $base_url.$params.'&checksum='.sha1("getMeetings".$params.$SALT));
@@ -217,7 +217,7 @@ class BigBlueButton {
 	*
 	*@return The url to end the specified meeting.
 	*/
-	public function endMeetingURL( $meetingID, $modPW, $URL, $SALT ) {
+	public static function endMeetingURL( $meetingID, $modPW, $URL, $SALT ) {
 		$base_url = $URL."api/end?";
 		$params = 'meetingID='.urlencode($meetingID).'&password='.urlencode($modPW);
 		return ( $base_url.$params.'&checksum='.sha1("end".$params.$SALT) );
@@ -238,12 +238,12 @@ class BigBlueButton {
 	*
 	*@return The joinURL if successful or an error message if unsuccessful
 	*/
-	public function createMeetingAndGetJoinURL( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
+	public static function createMeetingAndGetJoinURL( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
 
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
 		
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
-			return ( BigBlueButton::joinURL( $meetingID, $username, $mPW, $SALT, $URL ) );
+			return ( BigBlueButtonBN::joinURL( $meetingID, $username, $mPW, $SALT, $URL ) );
 		}	
 		else if( $xml ) {
 			return ( $xml->messageKey.' : '.$xml->message );
@@ -270,10 +270,11 @@ class BigBlueButton {
 	*	- If failed it returns an array containing a returncode, messageKey, message. 
 	*	- If success it returns an array containing a returncode, messageKey, message, meetingID, attendeePW, moderatorPW, hasBeenForciblyEnded.
 	*/
-	public function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
+	public static function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
 
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
 
+		return $xml;
 		if( $xml ) {
 			if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
 			else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
@@ -296,8 +297,8 @@ class BigBlueButton {
 	*	If failed it returns an xml packet containing a returncode, messagekey, and message. 
 	*	If success it returnsan xml packet containing a returncode, 
 	*/
-	public function getMeetingInfo( $meetingID, $modPW, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+	public static function getMeetingInfo( $meetingID, $modPW, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 		if($xml){
 			return ( str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML())));
 		}
@@ -318,8 +319,8 @@ class BigBlueButton {
 	*	- If success it returns an array containing a meetingID, moderatorPW, attendeePW, hasBeenForciblyEnded, running, startTime, endTime,  
 		  participantCount, moderatorCount, attendees.
 	*/
-	public function getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+	public static function getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 				
 		if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meetings were returned
 			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
@@ -347,8 +348,8 @@ class BigBlueButton {
 	*	- If failed then returns a boolean of false.
 	*	- If succeeded then returns an xml of all the meetings.
 	*/
-	public function getMeetings( $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingsURL( $URL, $SALT ) );
+	public static function getMeetings( $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingsURL( $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
 			if( $xml->messageKey )
 				return ( $xml->message->asXML() );	
@@ -358,7 +359,7 @@ class BigBlueButton {
 				foreach ($xml->meetings->meeting as $meeting)
 				{
 					echo '<meeting>';
-					echo BigBlueButton::getMeetingInfo($meeting->meetingID, $meeting->moderatorPW, $URL, $SALT);
+					echo BigBlueButtonBN::getMeetingInfo($meeting->meetingID, $meeting->moderatorPW, $URL, $SALT);
 					echo '</meeting>';
 				}
 			}
@@ -382,8 +383,8 @@ class BigBlueButton {
 	*	- If SUCCESS then returns an array of all the meetings. Each element in the array is an array containing a meetingID, 
 		  moderatorPW, attendeePW, hasBeenForciblyEnded, running.
 	*/
-	public function getMeetingsArray( $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingsURL( $URL, $SALT ) );
+	public static function getMeetingsArray( $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingsURL( $URL, $SALT ) );
 
 		if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
 			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -392,7 +393,7 @@ class BigBlueButton {
 		
 			foreach ($xml->meetings->meeting as $meeting)
 			{
-            //$meetings[] = BigBlueButton::getMeetingInfo($meeting->meetingID, $meeting->moderatorPW, $URL, $SALT);
+            //$meetings[] = BigBlueButtonBN::getMeetingInfo($meeting->meetingID, $meeting->moderatorPW, $URL, $SALT);
 				$meetings[] = array( 'meetingID' => $meeting->meetingID, 'moderatorPW' => $meeting->moderatorPW, 'attendeePW' => $meeting->attendeePW, 'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded, 'running' => $meeting->running );
 			}
 
@@ -419,8 +420,8 @@ class BigBlueButton {
 	*
 	*@return A boolean of true if the attendees were printed successfully and false otherwise.
 	*/
-	public function getUsers( $meetingID, $modPW, $URL, $SALT, $UNAME = false ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+	public static function getUsers( $meetingID, $modPW, $URL, $SALT, $UNAME = false ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
 			ob_start();
 			if( count( $xml->attendees ) && count( $xml->attendees->attendee ) ) {
@@ -453,8 +454,8 @@ class BigBlueButton {
 	*	- If FAILED, returns an array containing a returncode, messageKey, message.
 	*	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
 	*/
-	public function getUsersArray( $meetingID, $modPW, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+	public static function getUsersArray( $meetingID, $modPW, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 
 		if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null ) {//The meetings were returned
 			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -487,8 +488,8 @@ class BigBlueButton {
 	*	- Null if the server is unreachable
 	* 	- An array containing a returncode, messageKey, message.
 	*/
-	public function endMeeting( $meetingID, $modPW, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::endMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
+	public static function endMeeting( $meetingID, $modPW, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::endMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
 
 		if( $xml ) { //If the xml packet returned failure it displays the message to the user
 			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -500,7 +501,7 @@ class BigBlueButton {
 	}
 	
 	/**
-	*This method check the BigBlueButton server to see if the meeting is running (i.e. there is someone in the meeting)
+	*This method check the BigBlueButtonBN server to see if the meeting is running (i.e. there is someone in the meeting)
 	*
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
 	*@param SALT -- the security salt of the bigbluebutton server
@@ -508,8 +509,8 @@ class BigBlueButton {
 	*
 	*@return A boolean of true if the meeting is running and false if it is not running
 	*/
-	public function isMeetingRunning( $meetingID, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::isMeetingRunningURL( $meetingID, $URL, $SALT ) );
+	public static function isMeetingRunning( $meetingID, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::isMeetingRunningURL( $meetingID, $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS' ) 
 			return ( $xml->running == 'true' ? 'true' : 'false' );
 		else
@@ -517,7 +518,7 @@ class BigBlueButton {
 	}
 	
 	/**
-	*This method calls isMeetingRunning on the BigBlueButton server.
+	*This method calls isMeetingRunning on the BigBlueButtonBN server.
 	*
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
 	*@param SALT -- the security salt of the bigbluebutton server
@@ -527,8 +528,8 @@ class BigBlueButton {
 	* 	- If SUCCESS it returns an xml packet
 	* 	- If the FAILED or the server is unreachable returns a string of 'false'
 	*/
-	public function getMeetingXML( $meetingID, $URL, $SALT ) {
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::isMeetingRunningURL( $meetingID, $URL, $SALT ) );
+	public static function getMeetingXML( $meetingID, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButtonBN::isMeetingRunningURL( $meetingID, $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS') 
 			return ( str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML())));
 		else
@@ -566,11 +567,11 @@ class BigBlueButton {
 		}
 		// if the identifier is attendee, call getUsers
 		else if( $IDENTIFIER == 'attendee' ) {
-			return BigBlueButton::getUsers( $meetingID, $modPW, $URL, $SALT );
+			return BigBlueButtonBN::getUsers( $meetingID, $modPW, $URL, $SALT );
 		}
 		// if the identifier is meetings, call getMeetings
 		else if( $IDENTIFIER == 'meetings' ) {
-			return BigBlueButton::getMeetings( $URL, $SALT );
+			return BigBlueButtonBN::getMeetings( $URL, $SALT );
 		}
 		// return nothing
 		else {

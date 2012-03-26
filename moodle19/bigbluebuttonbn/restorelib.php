@@ -5,19 +5,20 @@
  *
  * Authors:
  *      Fred Dixon (ffdixon [at] blindsidenetworks [dt] org)
+ *      Jesus Federico (jesus [at] blindsidenetworks [dt] org)
  *
- * @package   mod_bigbluebutton
- * @copyright 2010 Blindside Networks
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2012 Blindside Networks
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 
     //This php script contains all the stuff to backup/restore
-    //bigbluebutton mods
+    //bigbluebuttonbn mods
 
-    //This is the "graphical" structure of the bigbluebutton mod:   
+    //This is the "graphical" structure of the bigbluebuttonbn mod:   
     //
-    //                       bigbluebutton 
+    //                       bigbluebuttonbn 
     //                    (CL,pk->id)
     //
     // Meaning: pk->primary key field of the table
@@ -30,7 +31,7 @@
     //-----------------------------------------------------------
 
     //This function executes all the restore procedure about this mod
-    function bigbluebutton_restore_mods($mod,$restore) {
+    function bigbluebuttonbn_restore_mods($mod,$restore) {
 
         global $CFG;
 
@@ -47,20 +48,20 @@
             //$GLOBALS['traverse_array']="";                                                              //Debug
           
             //Now, build the LABEL record structure
-            $bigbluebutton->course = $restore->course_id;
-            $bigbluebutton->name = backup_todb($info['MOD']['#']['NAME']['0']['#']);
-            $bigbluebutton->moderatorpass= backup_todb($info['MOD']['#']['MODERATORPASS']['0']['#']);
-            $bigbluebutton->viewerpass= backup_todb($info['MOD']['#']['VIEWERPASS']['0']['#']);
-            $bigbluebutton->wait= backup_todb($info['MOD']['#']['WAIT']['0']['#']);
-            $bigbluebutton->meetingid= backup_todb($info['MOD']['#']['MEETINGID']['0']['#']);
-            $bigbluebutton->timemodified = backup_todb($info['MOD']['#']['TIMEMODIFIED']['0']['#']);
+            $bigbluebuttonbn->course = $restore->course_id;
+            $bigbluebuttonbn->name = backup_todb($info['MOD']['#']['NAME']['0']['#']);
+            $bigbluebuttonbn->moderatorpass= backup_todb($info['MOD']['#']['MODERATORPASS']['0']['#']);
+            $bigbluebuttonbn->viewerpass= backup_todb($info['MOD']['#']['VIEWERPASS']['0']['#']);
+            $bigbluebuttonbn->wait= backup_todb($info['MOD']['#']['WAIT']['0']['#']);
+            $bigbluebuttonbn->meetingid= backup_todb($info['MOD']['#']['MEETINGID']['0']['#']);
+            $bigbluebuttonbn->timemodified = backup_todb($info['MOD']['#']['TIMEMODIFIED']['0']['#']);
 
-            //The structure is equal to the db, so insert the bigbluebutton
-            $newid = insert_record ("bigbluebutton",$bigbluebutton);
+            //The structure is equal to the db, so insert the bigbluebuttonbn
+            $newid = insert_record ("bigbluebuttonbn",$bigbluebuttonbn);
 
             //Do some output     
             if (!defined('RESTORE_SILENTLY')) {
-                echo "<li>".get_string("modulename","bigbluebutton")." \"".format_string(stripslashes($bigbluebutton->name),true)."\"</li>";
+                echo "<li>".get_string("modulename","bigbluebuttonbn")." \"".format_string(stripslashes($bigbluebuttonbn->name),true)."\"</li>";
             }
             backup_flush(300);
 
@@ -79,25 +80,25 @@
         return $status;
     }
 
-    function bigbluebutton_decode_content_links_caller($restore) {
+    function bigbluebuttonbn_decode_content_links_caller($restore) {
         global $CFG;
         $status = true;
 
 /**
-        if ($bigbluebuttons = get_records_sql ("SELECT l.id, l.moderatorpass, l.viewerpass, l.wait, l.meetingid
-                                   FROM {$CFG->prefix}bigbluebutton l
+        if ($bigbluebuttonbns = get_records_sql ("SELECT l.id, l.moderatorpass, l.viewerpass, l.wait, l.meetingid
+                                   FROM {$CFG->prefix}bigbluebuttonbn l
                                    WHERE l.course = $restore->course_id")) {
             $i = 0;   //Counter to send some output to the browser to avoid timeouts
-            foreach ($bigbluebuttons as $bigbluebutton) {
+            foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
                 //Increment counter
                 $i++;
-                $content = $bigbluebutton->content;
+                $content = $bigbluebuttonbn->content;
                 $result = restore_decode_content_links_worker($content,$restore);
 
                 if ($result != $content) {
                     //Update record
-                    $bigbluebutton->content = addslashes($result);
-                    $status = update_record("bigbluebutton", $bigbluebutton);
+                    $bigbluebuttonbn->content = addslashes($result);
+                    $status = update_record("bigbluebuttonbn", $bigbluebuttonbn);
                     if (debugging()) {
                         if (!defined('RESTORE_SILENTLY')) {
                             echo '<br /><hr />'.s($content).'<br />changed to<br />'.s($result).'<hr /><br />';
@@ -122,7 +123,7 @@
 
     //This function returns a log record with all the necessay transformations
     //done. It's used by restore_log_module() to restore modules log.
-    function bigbluebutton_restore_logs($restore,$log) {
+    function bigbluebuttonbn_restore_logs($restore,$log) {
                     
         $status = false;
                     

@@ -1,23 +1,22 @@
 <?php
-
 /**
- * View all BigBlueButton instances in this course.
+ * View all BigBlueButtonBN instances in this course.
  *
  * Authors:
  *      Fred Dixon (ffdixon [at] blindsidenetworks [dt] org)
+ *      Jesus Federico (jesus [at] blindsidenetworks [dt] org)
  *
- * @package   mod_bigbluebutton
- * @copyright 2010 Blindside Networks
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2012 Blindside Networks
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-
-require_once('../../config.php');
-require_once('lib.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
 
 
 $id = required_param('id', PARAM_INT);    // Course Module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // bigbluebutton instance ID
+$a  = optional_param('a', 0, PARAM_INT);  // bigbluebuttonbn instance ID
 
 
 if (! $course = get_record('course', 'id', $id)) {
@@ -28,29 +27,29 @@ require_course_login($course);
 
 
 $coursecontext = get_context_instance(CONTEXT_COURSE, $id);
-$moderator = has_capability('mod/bigbluebutton:moderate', $coursecontext);
+$moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
 
-add_to_log($course->id, 'bigbluebutton', 'view all', "index.php?id=$course->id", '');
+add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
 
 
-/// Get all required stringsbigbluebutton
+/// Get all required stringsbigbluebuttonbn
 
-$strbigbluebuttons = get_string('modulenameplural', 'bigbluebutton');
-$strbigbluebutton  = get_string('modulename', 'bigbluebutton');
+$strbigbluebuttonbns = get_string('modulenameplural', 'bigbluebuttonbn');
+$strbigbluebuttonbn  = get_string('modulename', 'bigbluebuttonbn');
 
 
 /// Print the header
 
 $navlinks = array();
-$navlinks[] = array('name' => $strbigbluebuttons, 'link' => '', 'type' => 'activity');
+$navlinks[] = array('name' => $strbigbluebuttonbns, 'link' => '', 'type' => 'activity');
 $navigation = build_navigation($navlinks);
 
-print_header_simple($strbigbluebuttons, '', $navigation, '', '', true, '', navmenu($course));
+print_header_simple($strbigbluebuttonbns, '', $navigation, '', '', true, '', navmenu($course));
 
 /// Get all the appropriate data
 
-if (! $bigbluebuttons = get_all_instances_in_course('bigbluebutton', $course)) {
-    notice('There are no instances of bigbluebutton', "../../course/view.php?id=$course->id");
+if (! $bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
+    notice('There are no instances of bigbluebuttonbn', "../../course/view.php?id=$course->id");
 }
 
 /// Print the list of instances (your module will probably extend this)
@@ -58,11 +57,11 @@ if (! $bigbluebuttons = get_all_instances_in_course('bigbluebutton', $course)) {
 $timenow  = time();
 $strweek  = get_string('week');
 $strtopic = get_string('topic');
-$heading_name  			= get_string('index_header_name', 'bigbluebutton' );
-$heading_users			= get_string('index_heading_users', 'bigbluebutton');
-$heading_viewer  		= get_string('index_heading_viewer', 'bigbluebutton');
-$heading_moderator 		= get_string('index_heading_moderator', 'bigbluebutton' );
-$heading_actions 		= get_string('index_heading_actions', 'bigbluebutton' );
+$heading_name = get_string('index_header_name', 'bigbluebuttonbn' );
+$heading_users = get_string('index_heading_users', 'bigbluebuttonbn');
+$heading_viewer = get_string('index_heading_viewer', 'bigbluebuttonbn');
+$heading_moderator = get_string('index_heading_moderator', 'bigbluebuttonbn' );
+$heading_actions = get_string('index_heading_actions', 'bigbluebuttonbn' );
 
 
 if ($course->format == 'weeks') {
@@ -85,27 +84,27 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 	//
 	// A request to end the meeting
 	//
-	if (! $bigbluebutton = get_record('bigbluebutton', 'id', $a)) {
+	if (! $bigbluebuttonbn = get_record('bigbluebuttonbn', 'id', $a)) {
         	error("BigBlueButton ID $a is incorrect");
 	}
-	print get_string('index_ending', 'bigbluebutton');
+	print get_string('index_ending', 'bigbluebuttonbn');
 
-	$meetingID = $bigbluebutton->meetingid;
-	$modPW = $bigbluebutton->moderatorpass;
+	$meetingID = $bigbluebuttonbn->meetingid;
+	$modPW = $bigbluebuttonbn->moderatorpass;
 
-	$getArray = BigBlueButton::endMeeting( $meetingID, $modPW, $url, $salt );
+	$getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
 	// print_object( $getArray );
-	$bigbluebutton->meetingid = bigbluebutton_rand_string( 16 );
-	if (! update_record('bigbluebutton', $bigbluebutton) ) {
+	$bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string( 16 );
+	if (! update_record('bigbluebuttonbn', $bigbluebuttonbn) ) {
 		notice( "Unable to assign a new meetingid" );
 	} else {
 		redirect('index.php?id='.$id);
 	}
 }
 
-// print_object( $bigbluebuttons );
+// print_object( $bigbluebuttonbns );
 
-foreach ($bigbluebuttons as $bigbluebutton) {
+foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
 	$info = null;
 	$joinURL = null;
 	$user = null;
@@ -116,25 +115,25 @@ foreach ($bigbluebuttons as $bigbluebutton) {
 	$viewerList = "-";
 	$moderatorList = "-";
 		
-	// print_object( $bigbluebutton );
+	// print_object( $bigbluebuttonbn );
 
-    if (!$bigbluebutton->visible) {
+    if (!$bigbluebuttonbn->visible) {
     	// Nothing to do
     } else {
-		$modPW = get_field( 'bigbluebutton', 'moderatorpass', 'name', $bigbluebutton->name );
-		$attPW = get_field( 'bigbluebutton', 'viewerpass',  'name', $bigbluebutton->name );
+		$modPW = get_field( 'bigbluebuttonbn', 'moderatorpass', 'name', $bigbluebuttonbn->name );
+		$attPW = get_field( 'bigbluebuttonbn', 'viewerpass',  'name', $bigbluebuttonbn->name );
 
 		// print "## $modPW ##";
 
-		$joinURL = '<a href="view.php?id='.$bigbluebutton->coursemodule.'">'.format_string($bigbluebutton->name).'</a>';
-		// $status = $bigbluebutton->meetingid;
+		$joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
+		// $status = $bigbluebuttonbn->meetingid;
 
 		//echo "XX";
 
 		//
 		// Output Users in the meeting
 		//
-		$getArray = BigBlueButton::getMeetingInfoArray( $bigbluebutton->meetingid, $modPW, $url, $salt );
+		$getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
 
 		// print_object( $getArray );
 
@@ -142,7 +141,7 @@ foreach ($bigbluebuttons as $bigbluebutton) {
 			//
 			// The server was unreachable
 			//
-			error( get_string( 'index_unable_display', 'bigbluebutton' ));
+			error( get_string( 'index_unable_display', 'bigbluebuttonbn' ));
 			return;
 		}
 
@@ -151,7 +150,7 @@ foreach ($bigbluebuttons as $bigbluebutton) {
 			// There was an error returned
 			//
 			if ($info['messageKey'] == "checksumError") {
-				error( get_string( 'index_checksum_error', 'bigbluebutton' ));
+				error( get_string( 'index_checksum_error', 'bigbluebuttonbn' ));
 				return;
 			}
 
@@ -171,10 +170,10 @@ foreach ($bigbluebuttons as $bigbluebutton) {
 			// The meeting info was returned
 			//
 			if ($getArray['running'] == 'true') {
-				//$status =  get_string('index_running', 'bigbluebutton' );
+				//$status =  get_string('index_running', 'bigbluebuttonbn' );
 				
 				if ( $moderator ) {
-					$actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$id.'"><INPUT type="hidden" name="a" value="'.$bigbluebutton->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebutton' ).'\')"></form>';
+					$actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
 				}
 
 				$xml = $getArray['attendees'];
@@ -205,13 +204,13 @@ foreach ($bigbluebuttons as $bigbluebutton) {
 	}
 
 	if ($course->format == 'weeks' or $course->format == 'topics' ) {
-		$table->data[] = array ($bigbluebutton->section, $joinURL, $users, $viewerList, $moderatorList, $actions );
+		$table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $viewerList, $moderatorList, $actions );
 	} else {
-		$table->data[] = array ($bigbluebutton->section, $joinURL, $users, $viewerList, $moderatorList, $actions );
+		$table->data[] = array ($bigbluebuttonbn->section, $joinURL, $users, $viewerList, $moderatorList, $actions );
 	}
 }
 
-print_heading($strbigbluebuttons);
+print_heading($strbigbluebuttonbns);
 print_table($table);
 
 print_footer($course);
