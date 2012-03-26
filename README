@@ -1,4 +1,4 @@
-Integration of BigBlueButton with Moodle 1.9, 2.0 and 2.1
+Integration of BigBlueButton with Moodle 1.9 and 2.x
 
 
 Authors:
@@ -10,8 +10,4 @@ Authors:
 
 @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
 
-
---------------------------------------------------------
-
-07/25/2011	| Support for playback recording	
 
