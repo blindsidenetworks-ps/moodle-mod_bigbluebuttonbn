@@ -87,8 +87,8 @@ function bigbluebuttonbn_delete_instance($id) {
 	//
 	$meetingID = $bigbluebuttonbn->meetingid;
 	$modPW = $bigbluebuttonbn->moderatorpass;
-	$url = trim(trim($CFG->BigBlueButtonServerURL),'/').'/';
-	$salt = trim($CFG->BigBlueButtonSecuritySalt);
+	$url = trim(trim($CFG->bigbluebuttonbnServerURL),'/').'/';
+	$salt = trim($CFG->bigbluebuttonbnSecuritySalt);
 
 	$getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
 	
