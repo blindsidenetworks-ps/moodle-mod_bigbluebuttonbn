@@ -11,8 +11,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once('../../config.php');
-require_once('lib.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
 
 $id = required_param('id', PARAM_INT);      // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);    // bigbluebuttonbn instance ID

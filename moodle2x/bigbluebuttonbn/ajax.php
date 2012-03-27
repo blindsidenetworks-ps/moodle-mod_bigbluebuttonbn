@@ -11,7 +11,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once( "../bigbluebuttonbn/bbb_api/bbb_api.php" );
+require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
@@ -58,7 +58,15 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
                 foreach ( $recording['playbacks'] as $playback ){
                     $type .= '<a href=\"'.$playback['url'].'\" target=\"_new\">'.$playback['type'].'</a>&#32;';	
                 }
-               echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $recording['startTime']).'","'.$actionbar.'"],'."\n";
+                
+                //Make sure the startTime is timestamp
+                if( !is_number($recording['startTime']) ){
+                    $date = date_create($recording['startTime']);
+                	$recording['startTime'] = date_timestamp_get($date);
+                }
+                //Format the date
+                $formatedStartDate = date("D M j, Y G:i:s T", $recording['startTime']/1000);
+         		echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"],'."\n";
             }
         }
     }
@@ -66,7 +74,6 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
 }
 
 echo '	["","","","","",""]'."\n";
-//echo '	["","","","",""]'."\n";
 echo ']  }'."\n";
 
 

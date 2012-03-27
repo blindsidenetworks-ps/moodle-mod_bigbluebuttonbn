@@ -11,8 +11,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once( "../../config.php" );
-require_once("lib.php");
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
 
 $name = $_GET['name'];
 
