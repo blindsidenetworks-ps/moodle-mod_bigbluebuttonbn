@@ -60,9 +60,10 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
                 }
                 
                 //Make sure the startTime is timestamp
+                date_default_timezone_set($USER->timezone);
                 if( !is_number($recording['startTime']) ){
                     $date = date_create($recording['startTime']);
-                	$recording['startTime'] = date_timestamp_get($date);
+                    $recording['startTime'] = date_timestamp_get($date) * 1000;
                 }
                 //Format the date
                 $formatedStartDate = date("D M j, Y G:i:s T", $recording['startTime']/1000);
