@@ -1,10 +1,12 @@
 <?php
-
 /**
- * View and administrate BigBlueButton playback recordings
+ * Language File - Spanish, Español (es)
  *
  * Authors:
- *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *     Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *
+ * Translation contributed by:
+ *     Jesus Federico
  *
  * @package   mod_bigbluebutton
  * @copyright 2011 Blindside Networks Inc.
@@ -16,11 +18,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'RecordingsBN';
 $string['modulenameplural'] = 'RecordingsBN';
-$string['modulename_help'] = 'Utilce el modulo de  | The recordingsbn module allows...';
-$string['recordingsbnname'] = 'Recordings name';
-$string['recordingsbnname_help'] = 'This is the content of the help tooltip associated with the recordingsbnname field. Markdown syntax is supported.';
+$string['modulename_help'] = 'Utilce el modulo recordingsBN como recurso en un curso para tener acceso a las grabaciones relacionadas con este.';
+$string['recordingsbnname'] = 'Nombre de grabacion';
+$string['recordingsbnname_help'] = 'RecordingsBN proporciona una lista de grabaciones alojadas en un Servidor BigBlueButton ofreciendo acceso directo a ellas.';
 $string['recordingsbn'] = 'RecordingsBN';
-$string['pluginadministration'] = 'recordingsbn administration';
+$string['pluginadministration'] = 'Administracion de recordingsbn';
 $string['pluginname'] = 'RecordingsBN';
+$string['recordingsbn:view'] = 'Ver las grabaciones almacenadas en un Servidor BigBlueButton';
 
 $string['view_noguests'] = 'El modulo RecordingsBN no se encuentra disponible para visitantes';
+?>
