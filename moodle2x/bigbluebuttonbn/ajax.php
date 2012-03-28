@@ -11,7 +11,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once( "../bigbluebuttonbn/bbb_api/bbb_api.php" );
+require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
@@ -37,9 +37,9 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
         foreach ( $recordingsbn as $recording ){
             if ( $admin == 'true' || $recording['published'] == 'true' ) {
                 
-                $meta_course = isset($recording['meta_course'])?$recording['meta_course']:'';
-                $meta_activity = isset($recording['meta_activity'])?$recording['meta_activity']:'';
-                $meta_description = isset($recording['meta_description'])?$recording['meta_description']:'';
+                $meta_course = isset($recording['meta_course'])?str_replace('"', '\"', $recording['meta_course']):'';
+                $meta_activity = isset($recording['meta_activity'])?str_replace('"', '\"', $recording['meta_activity']):'';
+                $meta_description = isset($recording['meta_description'])?str_replace('"', '\"', $recording['meta_description']):'';
 
                 $actionbar = '';
                 if ( $admin == 'true' ) {
@@ -58,7 +58,16 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
                 foreach ( $recording['playbacks'] as $playback ){
                     $type .= '<a href=\"'.$playback['url'].'\" target=\"_new\">'.$playback['type'].'</a>&#32;';	
                 }
-               echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $recording['startTime']).'","'.$actionbar.'"],'."\n";
+                
+                //Make sure the startTime is timestamp
+                date_default_timezone_set($USER->timezone);
+                if( !is_number($recording['startTime']) ){
+                    $date = date_create($recording['startTime']);
+                    $recording['startTime'] = date_timestamp_get($date) * 1000;
+                }
+                //Format the date
+                $formatedStartDate = date("D M j, Y G:i:s T", $recording['startTime']/1000);
+         		echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"],'."\n";
             }
         }
     }
@@ -66,7 +75,6 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
 }
 
 echo '	["","","","","",""]'."\n";
-//echo '	["","","","",""]'."\n";
 echo ']  }'."\n";
 
 
