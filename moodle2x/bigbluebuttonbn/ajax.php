@@ -37,9 +37,9 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
         foreach ( $recordingsbn as $recording ){
             if ( $admin == 'true' || $recording['published'] == 'true' ) {
                 
-                $meta_course = isset($recording['meta_course'])?$recording['meta_course']:'';
-                $meta_activity = isset($recording['meta_activity'])?$recording['meta_activity']:'';
-                $meta_description = isset($recording['meta_description'])?$recording['meta_description']:'';
+                $meta_course = isset($recording['meta_course'])?str_replace('"', '\"', $recording['meta_course']):'';
+                $meta_activity = isset($recording['meta_activity'])?str_replace('"', '\"', $recording['meta_activity']):'';
+                $meta_description = isset($recording['meta_description'])?str_replace('"', '\"', $recording['meta_description']):'';
 
                 $actionbar = '';
                 if ( $admin == 'true' ) {
