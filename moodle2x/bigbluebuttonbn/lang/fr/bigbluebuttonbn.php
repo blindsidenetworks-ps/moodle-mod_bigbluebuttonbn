@@ -3,8 +3,8 @@
  * Language File - French, Fran√ßais (fr)
  *
  * Authors:
- *      Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ *    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  *
  * Translation contributed by:
  *     SÈverin Terrier

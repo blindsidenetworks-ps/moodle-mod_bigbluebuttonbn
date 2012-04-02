@@ -55,7 +55,6 @@ class restore_recordingsbn_activity_structure_step extends restore_activity_stru
 
     protected function after_execute() {
         // Add recordingsbn related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_recordingsbn', 'intro', null);
     }
 
 }

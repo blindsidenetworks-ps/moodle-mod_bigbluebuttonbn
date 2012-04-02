@@ -50,8 +50,8 @@ class backup_recordingsbn_activity_structure_step extends backup_activity_struct
         // (none)
 
         // Define file annotations
-        $recordingsbn->annotate_files('mod_recordingsbn', 'intro', null); // This file area hasn't itemid
-
+        // (none)
+        
         // Return the root element (recordingsbn), wrapped into standard activity structure
         return $this->prepare_activity_structure($recordingsbn);
     }

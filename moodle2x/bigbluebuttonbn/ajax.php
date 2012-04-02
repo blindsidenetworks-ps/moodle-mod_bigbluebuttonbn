@@ -4,7 +4,7 @@
  * View and administrate BigBlueButton playback recordings
  *
  * Authors:
- *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
+ *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2011-2012 Blindside Networks Inc.
