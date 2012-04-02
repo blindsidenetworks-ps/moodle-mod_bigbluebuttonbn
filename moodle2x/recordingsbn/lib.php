@@ -29,7 +29,7 @@ function recordingsbn_supports($feature) {
         case FEATURE_GROUPS:                    return false;
         case FEATURE_GROUPINGS:                 return false;
         case FEATURE_GROUPMEMBERSONLY:          return flase;
-        case FEATURE_MOD_INTRO:                 return true;
+        case FEATURE_MOD_INTRO:                 return false;
         case FEATURE_COMPLETION_TRACKS_VIEWS:   return false;
         case FEATURE_GRADE_HAS_GRADE:           return false;
         case FEATURE_GRADE_OUTCOMES:            return false;
