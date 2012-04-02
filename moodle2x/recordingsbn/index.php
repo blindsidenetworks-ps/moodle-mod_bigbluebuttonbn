@@ -3,7 +3,7 @@
  * View and administrate BigBlueButton playback recordings
  *
  * Authors:
- *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *    Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
  *
  * @package   mod_bigbluebutton
  * @copyright 2011-2012 Blindside Networks Inc.

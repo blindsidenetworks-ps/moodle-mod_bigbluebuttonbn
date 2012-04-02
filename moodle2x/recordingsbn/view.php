@@ -3,7 +3,7 @@
  * View and administrate BigBlueButton playback recordings
  *
  * Authors:
- *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *    Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
  *
  * @package   mod_bigbluebutton
  * @copyright 2011-2012 Blindside Networks Inc.
@@ -63,10 +63,6 @@ $PAGE->requires->js('/mod/bigbluebuttonbn/js/bigbluebuttonbn.js', true);
 
 // Output starts here
 echo $OUTPUT->header();
-
-if ($recordingsbn->intro) { // Conditions to show the intro can change to look for own settings or whatever
-    echo $OUTPUT->box(format_module_intro('recordingsbn', $recordingsbn, $cm->id), 'generalbox mod_introbox', 'recordingsbnintro');
-}
 
 //
 // BigBlueButton Setup

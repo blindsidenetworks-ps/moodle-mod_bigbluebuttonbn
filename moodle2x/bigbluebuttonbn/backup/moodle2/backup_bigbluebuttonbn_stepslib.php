@@ -50,7 +50,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         // (none)
 
         // Define file annotations
-        $bigbluebuttonbn->annotate_files('mod_bigbluebuttonbn', 'intro', null); // This file area hasn't itemid
+        // (none)
 
         // Return the root element (bigbluebuttonbn), wrapped into standard activity structure
         return $this->prepare_activity_structure($bigbluebuttonbn);

@@ -3,10 +3,10 @@
  * Language File - French, Fran√ßais (fr)
  *
  * Authors:
- *     Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
+ *    Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
  *
  * Translation contributed by:
- *     SÈverin Terrier
+ *    SÈverin Terrier
  *
  * @package   mod_bigbluebutton
  * @copyright 2011-2012 Blindside Networks Inc.
