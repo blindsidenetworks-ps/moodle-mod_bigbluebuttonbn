@@ -118,12 +118,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     
     public function validation($data, $files) {
+        $current_activity =& $this->current;
+        
         $errors = parent::validation($data, $files);
 
-        // Check open and close times are consistent.
-        if ($data['timeavailable'] != 0 && $data['timedue'] != 0 &&
-                $data['timedue'] < $data['timeavailable']) {
-            $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+        if ( $current_activity->section > 0 ) {  //This is not a general activity, it is part of a week, so it can have schedule 
+            // Check open and close times are consistent.
+            if ($data['timeavailable'] != 0 && $data['timedue'] != 0 && $data['timedue'] < $data['timeavailable']) {
+                $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+            }
         }
         
         return $errors;
