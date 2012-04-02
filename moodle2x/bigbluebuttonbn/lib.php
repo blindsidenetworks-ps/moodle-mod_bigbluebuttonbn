@@ -3,7 +3,7 @@
  * Library calls for Moodle and BigBlueButton.
  * 
  * Authors:
- * 	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * 	    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
@@ -57,10 +57,9 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 
     $returnid = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     
-    if ($bigbluebuttonbn->timeavailable ){
+    if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
         $event = NULL;
         $event->name        = $bigbluebuttonbn->name;
-        $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
         $event->courseid    = $bigbluebuttonbn->course;
         $event->groupid     = 0;
         $event->userid      = 0;
@@ -101,10 +100,9 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
 
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
 
-    if ($bigbluebuttonbn->timeavailable ){
+    if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
         $event = NULL;
         $event->name        = $bigbluebuttonbn->name;
-        $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
         $event->courseid    = $bigbluebuttonbn->course;
         $event->groupid     = 0;
         $event->userid      = 0;
@@ -299,8 +297,6 @@ function bigbluebuttonbn_scale_used_anywhere($scaleid) {
     return $return;
 }
 
-
-
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
  * @param $data the data submitted from the reset course.
@@ -339,7 +335,7 @@ function bigbluebuttonbn_get_post_actions() {
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat, newwindow')) {
+    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, newwindow')) {
         return NULL;
     }
 
@@ -349,12 +345,11 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     if ( $bigbluebuttonbn->newwindow == 1 ){
         $info->extra = "onclick=\"window.open('"."$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1"."'); return false;\"";
     } else {
-        $info->extra = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
+        //$info->extra = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
     }
 
     return $info;
 }
-
 
 /*** 
  * Any other bigbluebuttonbn functions go here.  Each of them must have a name that
