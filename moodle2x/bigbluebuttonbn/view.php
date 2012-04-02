@@ -133,7 +133,7 @@ $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='
 //
 
 /// Print the page header
-$PAGE->set_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+$PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
 $PAGE->set_heading($course->shortname);
 
 // Validate if the user is in a role allowed to join

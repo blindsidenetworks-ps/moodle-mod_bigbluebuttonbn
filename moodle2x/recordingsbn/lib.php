@@ -28,7 +28,7 @@ function recordingsbn_supports($feature) {
         case FEATURE_IDNUMBER:                  return false;
         case FEATURE_GROUPS:                    return false;
         case FEATURE_GROUPINGS:                 return false;
-        case FEATURE_GROUPMEMBERSONLY:          return flase;
+        case FEATURE_GROUPMEMBERSONLY:          return false;
         case FEATURE_MOD_INTRO:                 return false;
         case FEATURE_COMPLETION_TRACKS_VIEWS:   return false;
         case FEATURE_GRADE_HAS_GRADE:           return false;

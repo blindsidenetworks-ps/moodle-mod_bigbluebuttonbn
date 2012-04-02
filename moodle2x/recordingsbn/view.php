@@ -49,8 +49,7 @@ $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 add_to_log($course->id, 'recordingsbn', 'view', "view.php?id={$cm->id}", $recordingsbn->name, $cm->id);
 
 /// Print the page header
-
-$PAGE->set_url('/mod/recordingsbn/view.php', array('id' => $cm->id));
+$PAGE->set_url($CFG->wwwroot.'/mod/recordingsbn/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($recordingsbn->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'recordingsbn')));

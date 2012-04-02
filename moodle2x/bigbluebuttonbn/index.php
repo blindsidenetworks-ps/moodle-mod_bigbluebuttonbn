@@ -3,7 +3,7 @@
  * View all BigBlueButton instances in this course.
  * 
  * Authors:
- * 	Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * 	    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
