@@ -117,7 +117,7 @@
                         {"sTitle": view_recording_list_course, "sWidth": "150px"},
                         {"sTitle": view_recording_list_activity, "sWidth": "150px"},
                         {"sTitle": view_recording_list_description, "sWidth": "150px"},
-                        {"sTitle": view_recording_list_date, "sWidth": "200px"},
+                        {"sTitle": view_recording_list_date, "sWidth": "200px", "sClass": "right"},
                         {"sTitle": view_recording_list_actionbar, "sWidth": "50px", "sClass": "right", "bVisible" : false},
                         ],
 		    

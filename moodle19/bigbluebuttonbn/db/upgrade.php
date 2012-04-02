@@ -5,9 +5,10 @@
  *
  * Authors:
  *      Fred Dixon (ffdixon [at] blindsidenetworks [dt] org)
+ *      Jesus Federico (jesus [at] blindsidenetworks [dt] org)
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @copyright 2010 Blindside Networks Inc.
+ * @copyright 2010-2012 Blindside Networks Inc.
  * @package mod/bigbluebuttonbn
  */
 

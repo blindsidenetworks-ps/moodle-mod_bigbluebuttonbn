@@ -9,7 +9,7 @@
  *     Jesus Federico
  *
  * @package   mod_bigbluebutton
- * @copyright 2011 Blindside Networks Inc.
+ * @copyright 2011-2012 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 

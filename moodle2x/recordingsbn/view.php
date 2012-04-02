@@ -1,5 +1,4 @@
 <?php
-
 /**
  * View and administrate BigBlueButton playback recordings
  *
@@ -7,7 +6,7 @@
  *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
  *
  * @package   mod_bigbluebutton
- * @copyright 2011 Blindside Networks Inc.
+ * @copyright 2011-2012 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -50,8 +49,7 @@ $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 add_to_log($course->id, 'recordingsbn', 'view', "view.php?id={$cm->id}", $recordingsbn->name, $cm->id);
 
 /// Print the page header
-
-$PAGE->set_url('/mod/recordingsbn/view.php', array('id' => $cm->id));
+$PAGE->set_url($CFG->wwwroot.'/mod/recordingsbn/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($recordingsbn->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'recordingsbn')));

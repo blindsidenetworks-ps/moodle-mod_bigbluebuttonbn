@@ -7,7 +7,7 @@
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2011 Blindside Networks Inc.
+ * @copyright 2011-2012 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -60,14 +60,19 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
                 }
                 
                 //Make sure the startTime is timestamp
-                // date_default_timezone_set($USER->timezone);
                 if( !is_numeric($recording['startTime']) ){
-                    $date = date_create($recording['startTime']);
-                    $recording['startTime'] = date_timestamp_get($date) * 1000;
+                    $date = new DateTime($recording['startTime']);
+                    $recording['startTime'] = date_timestamp_get($date);
+                } else {
+                    $recording['startTime'] = $recording['startTime'] / 1000;
                 }
+                //Set corresponding format
+                //$format = isset(get_string('strftimerecentfull', 'langconfig'));
+                //if( !isset($format) ) 
+                $format = '%a %h %d %H:%M:%S %Z %Y';
                 //Format the date
-                $formatedStartDate = date("D M j, Y G:i:s T", $recording['startTime']/1000);
-         		echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"],'."\n";
+                $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
+                echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"],'."\n";
             }
         }
     }

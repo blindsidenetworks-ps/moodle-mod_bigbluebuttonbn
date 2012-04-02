@@ -7,7 +7,7 @@
  *      Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2011 Blindside Networks 
+ * @copyright 2010-2012 Blindside Networks 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -18,7 +18,7 @@ $string['bbbfinished'] = 'This activity is over.';
 $string['bbbinprocess'] = 'This activity is in process.';
 $string['bbbnorecordings'] = 'There is no recording yet, please come back later.';
 $string['bbbnotavailableyet'] = 'Sorry, this session is not yet available.';
-$string['bbbrecordwarning'] = 'This session is being recorded.  ';
+$string['bbbrecordwarning'] = 'This session is being recorded.';
 $string['bbburl'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/.  (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';

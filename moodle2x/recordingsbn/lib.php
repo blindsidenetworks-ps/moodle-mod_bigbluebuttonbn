@@ -1,5 +1,4 @@
 <?php
-
 /**
  * View and administrate BigBlueButton playback recordings
  *
@@ -7,7 +6,7 @@
  *      Jesus Federico (jesus [at] b l i n ds i de n  e t w o r ks [dt] com)
  *
  * @package   mod_bigbluebutton
- * @copyright 2011 Blindside Networks Inc.
+ * @copyright 2011-2012 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -29,7 +28,7 @@ function recordingsbn_supports($feature) {
         case FEATURE_IDNUMBER:                  return false;
         case FEATURE_GROUPS:                    return false;
         case FEATURE_GROUPINGS:                 return false;
-        case FEATURE_GROUPMEMBERSONLY:          return flase;
+        case FEATURE_GROUPMEMBERSONLY:          return false;
         case FEATURE_MOD_INTRO:                 return false;
         case FEATURE_COMPLETION_TRACKS_VIEWS:   return false;
         case FEATURE_GRADE_HAS_GRADE:           return false;
