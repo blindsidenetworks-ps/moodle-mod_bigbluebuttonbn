@@ -26,8 +26,9 @@ function xmldb_recordingsbn_upgrade($oldversion) {
 
     if ($oldversion < 2012040200) {
 
-        // Define field intro to be droped from recordingsbn
         $table = new xmldb_table('recordingsbn');
+        
+        // Define field intro to be droped from recordingsbn
         $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, 'medium', null, null, null, null,'name');
 
         // Drop field intro
@@ -36,7 +37,6 @@ function xmldb_recordingsbn_upgrade($oldversion) {
         }
 
         // Define field introformat to be droped from recordingsbn
-        $table = new xmldb_table('recordingsbn');
         $field = new xmldb_field('introformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0',
             'intro');
 
@@ -50,6 +50,20 @@ function xmldb_recordingsbn_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2012040200, 'recordingsbn');
     }
 
+    if ($oldversion < 2012040210) {
+        $table = new xmldb_table('recordingsbn');
+        
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0',
+        		'name');
+        
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_default($table, $field, $continue=true, $feedback=true);
+        }
+        
+        upgrade_mod_savepoint(true, 2012040210, 'recordingsbn');
+    }
+        
+    
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
