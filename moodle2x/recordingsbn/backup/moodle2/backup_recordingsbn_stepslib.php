@@ -38,7 +38,7 @@ class backup_recordingsbn_activity_structure_step extends backup_activity_struct
 
         // Define each element separated
         $recordingsbn = new backup_nested_element('recordingsbn', array('id'), array(
-            'name', 'moderatorpass', 'viewerpass', 'wait', 'newwindow', 'record', 'description', 'welcome', 'timedue', 'timeavailable', 'meetingid', 'timemodified'));
+            'name', 'timecreated', 'timemodified'));
 
         // Build the tree
         // (love this)
