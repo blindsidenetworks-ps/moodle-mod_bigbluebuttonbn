@@ -17,19 +17,32 @@ Prerequisites
 You need:
 
   1.  A server running Moodle 1.9+
-  2.  A BigBlueButton server (usually running on a separate, dedicated server).
+  2.  A BigBlueButton server running on a separate server (not on the same server as your Moodle site)
 
-Blindside Networks provides you a test BigBlueButton server for free use.  To use this test server, just accept the default settings when configuring  the activity module.
+Blindside Networks provides you a test BigBlueButton server for testing the Moodle integration.  To use this test server, just accept the default settings when configuring the activity module.  The default settings are
+
+| url: http://test-install.blindsidenetworks.com/bigbluebutton/
+| salt: 8cd8ef52e8e101574e400365b55e11a6
 
 For information on how to setup your own BigBlueButton server see
 
    http://bigbluebutton.org/
 
 
+Obtaining the source
+====================
+This GitHub repostiory at
+
+  https://github.com/blindsidenetworks/moodle-mod_bigbluebutton/tree/master/moodle19/bigbluebuttonbn
+
+contains the latest source.  If you want to use the latest packaged snapshot, you can download it from
+
+  http://blindsidenetworks.com/downloads/moodle/bigbluebutton_blindsidenetworks_activity_module_19.zip
+
 Installation
 ============
 
-These instructions assume your Moodle 1.9 server is installed at /var/www/moodle.
+These instructions assume your Moodle 1.9 server is installed at /var/www/moodle and you've downloaded bigbluebutton_blindsidenetworks_activity_module_19.zip.
 
 1.  Copy bigbluebutton_blindsidenetworks_activity_module_19.zip to /var/www/moodle
 2.  Enter the following commands
@@ -54,7 +67,7 @@ These instructions assume your Moodle 1.9 server is installed at /var/www/moodle
 
         You'll be prompted to configure the activity module.
 
-6.  Enter the URL and salt (security key) to your BigBlueButton server (or use the default values).
+6.  Enter the URL and salt (security key) to your BigBlueButton server (or use the default values for test-install).
 7.  Click the Save Changes button.
 
 At this point, you can enter any course, turn editing on, and add a BigBlueButton activity link to the class.
