@@ -1,3 +1,7 @@
+version: 1.0.7 (April 8, 2012)
+
+	Added Spanish and French.  Synced API calls with BigBlueButton 0.8-beta-4.
+
 version: 1.0.6 (October 31, 2011)
 
 	Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php 
