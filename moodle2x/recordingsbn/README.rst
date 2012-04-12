@@ -18,6 +18,7 @@ You need:
 Blindside Networks provides you a test BigBlueButton server for testing this plugin.  To use this test server, just accept the default settings when configuring the activity module.  The default settings are
 
 	url: http://test-install.blindsidenetworks.com/bigbluebutton/
+
 	salt: 8cd8ef52e8e101574e400365b55e11a6
 
 For information on how to setup your own BigBlueButton server see
