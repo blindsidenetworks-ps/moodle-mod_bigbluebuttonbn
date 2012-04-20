@@ -57,8 +57,8 @@ $PAGE->set_context($context);
 $PAGE->set_cacheable(false);
 
 
-$PAGE->requires->js('/mod/bigbluebuttonbn/js/jquery.min.js', true);    
-$PAGE->requires->js('/mod/bigbluebuttonbn/js/dataTables.js', true);    
+$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/jquery/1.7.2/jquery.min.js', true);    
+$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/dataTables/1.9.1/jquery.dataTables.min.js', true);    
 $PAGE->requires->js('/mod/bigbluebuttonbn/js/bigbluebuttonbn.js', true);    
 
 // Output starts here
@@ -115,7 +115,7 @@ echo '</script>'."\n";
 
 echo '    <center>'."\n";
 echo '      <div id="dynamic"></div>'."\n";
-echo '      <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">'."\n";
+echo '      <table cellpadding="0" cellspacing="0" border="0" class="display" id="recordingsbn">'."\n";
 echo '        <thead>'."\n";
 echo '        </thead>'."\n";
 echo '        <tbody>'."\n";
