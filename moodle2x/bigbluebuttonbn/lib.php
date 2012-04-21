@@ -11,7 +11,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once( 'bbb_api/bbb_api.php' );
+require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
 require_once($CFG->dirroot.'/calendar/lib.php');
 
 defined('MOODLE_INTERNAL') || die;

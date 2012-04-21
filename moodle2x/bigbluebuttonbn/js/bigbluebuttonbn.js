@@ -10,57 +10,39 @@ function bigbluebuttonbn_callback() {
 	}
 }
 
-function actionCall(url, action, recordingID) {
+function actionCall(action, recordingID) {
 	action = (typeof action == 'undefined') ? 'publish' : action;
 
-	if (action == 'publish' || (action == 'delete' && confirm("Are you sure to delete this recording?"))) {
-		if (window.XMLHttpRequest) {
-			req = new XMLHttpRequest();
-		} else if (window.ActiveXObject) {
-
-			try {
-				req = new ActiveXObject("Msxml2.XMLHTTP");
-			} catch (e) {
-
-				try {
-					req = new ActiveXObject("Microsoft.XMLHTTP");
-				} catch (e) {
-				}
-			}
-		}
-
-		var req = new XMLHttpRequest();
-		if (action == 'publish') {
-			var el_img = document.getElementById('actionbar-publish-img-'
-					+ recordingID);
-			var el_a = document.getElementById('actionbar-publish-img-'
-					+ recordingID);
-			if (el_img) {
-				if (el_img.alt == 'Hide') {
-					el_img.alt = 'Show';
+	if (action == 'publish' || action == 'unpublish' || (action == 'delete' && confirm("Are you sure to delete this recording?"))) {
+		if (action == 'publish' || action == 'unpublish') {
+			
+			var el_a = document.getElementById('actionbar-publish-a-'+ recordingID);
+			if (el_a) {
+				var el_img = document.getElementById('actionbar-publish-img-'+ recordingID);
+				if (el_a.title == view_recording_list_actionbar_hide ) {
+					el_a.title = view_recording_list_actionbar_show;
 					el_img.src = 'pix/show.gif';
-					el_a.title = 'Show';
 
 				} else {
-					el_img.alt = 'Hide';
+					el_a.title = view_recording_list_actionbar_hide;
 					el_img.src = 'pix/hide.gif';
-					el_a.title = 'Hide';
 
 				}
 
 			}
+			
 		} else {
 			// Deletes the line in the dataTable
 			var row = $(document.getElementById('actionbar-publish-img-'+ recordingID)).closest("tr").get(0);
 			oTable.fnDeleteRow(oTable.fnGetPosition(row));
 
 		}
-
-		req.open("GET", url, true);
-		req.onreadystatechange = function() {
-		}
-
-		req.send(null);
+		
+		$.ajax({
+		    url	: M.cfg.wwwroot + '/mod/bigbluebuttonbn/bbb-broker.php?action=' + action + '&recordingID=' + recordingID,
+		    dataType : 'xml'
+		});
+		
 	}
 }
 
@@ -79,7 +61,6 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource, fnCallback
 
 		/* Got the data - add it to the table */
 		for ( var i = 0; i < json.aaData.length; i++) {
-			// that.oApi._fnAddData( oSettings, json.aaData[i] );
 			that.oApi._fnAddData(oSettings, json[oSettings.sAjaxDataProp][i]);
 		}
 
