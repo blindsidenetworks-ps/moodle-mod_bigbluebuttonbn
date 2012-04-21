@@ -111,6 +111,9 @@ echo '    var view_recording_list_activity = "'.get_string('view_recording_list_
 echo '    var view_recording_list_description = "'.get_string('view_recording_list_description', 'bigbluebuttonbn').'";'."\n";
 echo '    var view_recording_list_date = "'.get_string('view_recording_list_date', 'bigbluebuttonbn').'";'."\n";
 echo '    var view_recording_list_actionbar = "'.get_string('view_recording_list_actionbar', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_actionbar_hide = "'.get_string('view_recording_list_actionbar_hide', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_actionbar_show = "'.get_string('view_recording_list_actionbar_show', 'bigbluebuttonbn').'";'."\n";
+echo '    var view_recording_list_actionbar_delete = "'.get_string('view_recording_list_actionbar_delete', 'bigbluebuttonbn').'";'."\n";
 echo '</script>'."\n";
 
 echo '    <center>'."\n";
