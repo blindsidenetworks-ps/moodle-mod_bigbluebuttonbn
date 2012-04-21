@@ -61,7 +61,6 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource, fnCallback
 
 		/* Got the data - add it to the table */
 		for ( var i = 0; i < json.aaData.length; i++) {
-			// that.oApi._fnAddData( oSettings, json.aaData[i] );
 			that.oApi._fnAddData(oSettings, json[oSettings.sAjaxDataProp][i]);
 		}
 
