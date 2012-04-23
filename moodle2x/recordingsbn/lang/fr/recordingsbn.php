@@ -13,6 +13,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/mod/recordingsbn/lang/_locales/recordingsbn_fr.php');
+
+$string["modulename"] = "Enregistrements BBB";
+$string["modulenameplural"] = "Enregistrements BBB";
+$string["modulename_help"] = "Utilisez le module enregistrements BBB pour voir les enregistrements de conférences BigBlueButton";
+$string["recordingsbnname"] = "Nom de la liste des enregistrements";
+$string["recordingsbnname_help"] = "Ce module enregistrements BBB permet de lister les conférences passées dans ce cours, qui ont été enregistrées, afin de les visionner après coup.";
+$string["recordingsbn"] = "Enregistrements BBB";
+$string["pluginadministration"] = "Administration enregistrements BBB";
+$string["pluginname"] = "Enregistrements BBB";
+$string["recordingsbn:view"] = "Voir les enregistrements BBB";
+$string["view_noguests"] = "Le module enregistrements conférences BBB n\'est pas ouvert aux visiteurs anonymes";
 
 ?>
