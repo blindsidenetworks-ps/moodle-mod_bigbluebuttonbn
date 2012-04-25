@@ -12,5 +12,3 @@ For installation videos, see:
 
 Copyright 2010-2012 Blindside Networks.
 Licensed under the http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
-
-
