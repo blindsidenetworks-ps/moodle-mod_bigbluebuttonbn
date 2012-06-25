@@ -64,4 +64,23 @@ class restore_recordingsbn_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         return array();
     }
+
+    static public function define_restore_log_rules() {
+        $rules = array();
+
+        $rules[] = new restore_log_rule('recordingsbn', 'add', 'view.php?id={course_module}', '{recordingsbn}');
+        $rules[] = new restore_log_rule('recordingsbn', 'update', 'view.php?id={course_module}', '{recordingsbn}');
+        $rules[] = new restore_log_rule('recordingsbn', 'view', 'view.php?id={course_module}', '{recordingsbn}');
+
+        return $rules;
+    }
+
+    static public function define_restore_log_rules_for_course() {
+        $rules = array();
+
+        $rules[] = new restore_log_rule('recordingsbn', 'view all', 'index.php?id={course}', null);
+
+        return $rules;
+    }
+
 }
