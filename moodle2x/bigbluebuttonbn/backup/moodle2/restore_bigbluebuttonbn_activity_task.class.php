@@ -64,4 +64,22 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         return array();
     }
+
+    static public function define_restore_log_rules() {
+        $rules = array();
+
+        $rules[] = new restore_log_rule('bigbluebuttonbn', 'add', 'view.php?id={course_module}', '{bigbluebuttonbn}');
+        $rules[] = new restore_log_rule('bigbluebuttonbn', 'update', 'view.php?id={course_module}', '{bigbluebuttonbn}');
+        $rules[] = new restore_log_rule('bigbluebuttonbn', 'view', 'view.php?id={course_module}', '{bigbluebuttonbn}');
+
+        return $rules;
+    }
+
+    static public function define_restore_log_rules_for_course() {
+        $rules = array();
+
+        $rules[] = new restore_log_rule('bigbluebuttonbn', 'view all', 'index.php?id={course}', null);
+
+        return $rules;
+    }
 }
