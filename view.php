@@ -86,15 +86,13 @@ $bbbsession['useremail'] = '';
 $context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
 $teachers = get_role_users(3, $context); //Teacher
 foreach( $teachers as $teacher ){
-    if( $bbbsession['useremail'] != '' )
-        $bbbsession['useremail'] .= ',';
-    $bbbsession['useremail'] .= $teacher->email;
+    if (strlen($bbbsession['useremail']) > 0) $bbbsession['useremail'] .= ',';
+        $bbbsession['useremail'] .= fullname($teacher).' <'.$teacher->email.'>';
 }
 $teachers = get_role_users(4, $context); //Non-editing teacher
 foreach( $teachers as $teacher ){
-    if( $bbbsession['useremail'] != '' )
-        $bbbsession['useremail'] .= ',';
-    $bbbsession['useremail'] .= $teacher->email;
+    if (strlen($bbbsession['useremail']) > 0) $bbbsession['useremail'] .= ',';
+    $bbbsession['useremail'] .= fullname($teacher).' <'.$teacher->email.'>';
 }
 
 //Database info related to the activity
@@ -272,7 +270,7 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
         // Join directly
         //
         
-        $response = BigBlueButtonBN::createMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'].'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], array("meta_course" => $bbbsession['coursename'], "meta_activity" => $bbbsession['meetingname'], "meta_description" => $bbbsession['description'], "meta_email" => $bbbsession['useremail'], "meta_recording" => $bbbsession['textflag']['record']) );
+        $response = BigBlueButtonBN::createMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'].'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], array("meta_course" => $bbbsession['coursename'], "meta_activity" => $bbbsession['meetingname'], "meta_description" => $bbbsession['description'], "meta_email" => $bbbsession['useremail'], "meta_teachers" => $bbbsession['useremail'], "meta_recording" => $bbbsession['textflag']['record']) );
 
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action

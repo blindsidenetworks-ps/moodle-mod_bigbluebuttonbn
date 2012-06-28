@@ -352,14 +352,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 }
 
 /*** 
- * Any other bigbluebuttonbn functions go here.  Each of them must have a name that
- * starts with bigbluebuttonbn_
- * Remember (see note in first lines) that, if this section grows, it's HIGHLY
- * recommended to move all funcions below to a new "localib.php" file.
- **
- *  Function taken from http://www.php.net/manual/en/function.mt-rand.php
- *  modified by Sebastian Schneider
- *  credits go to www.mrnaz.com
+ * Any other bigbluebuttonbn functions go here.
  */
 function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 {
