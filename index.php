@@ -88,12 +88,14 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 	}
 	echo get_string('index_ending', 'bigbluebuttonbn');
 
-	$meetingID = $bigbluebuttonbn->meetingid;
+	$meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
+	
 	$modPW = $bigbluebuttonbn->moderatorpass;
-        if( $g != '0'  )
-            $getArray = BigBlueButtonBN::endMeeting( $meetingID.'['.$g.']', $modPW, $url, $salt );
-        else
-            $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+    if( $g != '0'  ) {
+        $getArray = BigBlueButtonBN::endMeeting( $meetingID.'['.$g.']', $modPW, $url, $salt );
+    } else {
+        $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+    }
 	redirect('index.php?id='.$id);
 }
 
@@ -102,9 +104,10 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
 
     if ( groups_get_activity_groupmode($cm) > 0 ){
         $groups = groups_get_activity_allowed_groups($cm);
-        if( isset($groups))
-        foreach( $groups as $group){
-            $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $group);
+        if( isset($groups)) {
+            foreach( $groups as $group){
+                $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $group);
+            }
         }
     } else {
         $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn);
@@ -132,24 +135,25 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
 	$modPW = $bigbluebuttonbn->moderatorpass;
 	$attPW = $bigbluebuttonbn->viewerpass;
 
+	$meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
 	//
 	// Output Users in the meeting
 	//
-        if( $groupObj == null ){
-            $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid, $modPW, $url, $salt );
-            if ( $bigbluebuttonbn->newwindow == 1 )
-                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
-            else
-                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
-        } else {
-            $getArray = BigBlueButtonBN::getMeetingInfoArray( $bigbluebuttonbn->meetingid.'['.$groupObj->id.']', $modPW, $url, $salt );
-            if ( $bigbluebuttonbn->newwindow == 1 )
-                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
-            else
-                $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
-            $group = $groupObj->name;
-        }
-
+	if( $groupObj == null ){
+	    $getArray = BigBlueButtonBN::getMeetingInfoArray( $meetingID, $modPW, $url, $salt );
+	    if ( $bigbluebuttonbn->newwindow == 1 )
+	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
+	    else
+	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
+	} else {
+	    $getArray = BigBlueButtonBN::getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $salt );
+	    if ( $bigbluebuttonbn->newwindow == 1 )
+	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
+	    else
+	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
+	    $group = $groupObj->name;
+	}
+	
 	if (!$getArray) {
             //
             // The server was unreachable
@@ -159,24 +163,24 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
 	}
 
 	if (isset($getArray['messageKey'])) {
-            //
-            // There was an error returned
-            //
-            if ($getArray['messageKey'] == "checksumError") {
-		print_error( get_string( 'index_error_checksum', 'bigbluebuttonbn' ));
-		return;
-            }
-
-            if ($getArray['messageKey'] == "notFound" || $getArray['messageKey'] == "invalidMeetingId") {
+	    //
+	    // There was an error returned
+	    //
+	    if ($getArray['messageKey'] == "checksumError") {
+	        print_error( get_string( 'index_error_checksum', 'bigbluebuttonbn' ));
+	        return;
+	    }
+	     
+        if ($getArray['messageKey'] == "notFound" || $getArray['messageKey'] == "invalidMeetingId") {
 		//
 		// The meeting does not exist yet on the BigBlueButton server.  This is OK.
 		//
-            } else {
+        } else {
 		//
 		// There was an error
 		//
-                $users = $getArray['messageKey'].": ".$getArray['message'];
-            }
+            $users = $getArray['messageKey'].": ".$getArray['message'];
+        }
 	} else {
 
             //
