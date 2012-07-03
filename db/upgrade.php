@@ -53,7 +53,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $table->add_field('bigbluebuttonbnid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('record', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-
+        $table->add_field('event', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+                
         // Adding keys to table bigbluebuttonbn_log
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
