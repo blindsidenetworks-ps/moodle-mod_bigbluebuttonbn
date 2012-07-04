@@ -11,9 +11,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
 require_login();
 
@@ -27,7 +27,7 @@ switch ($action) {
     case "publish":
         $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
         if( $recordingID ){
-        	if (BigBlueButtonBN::setPublishRecordings($recordingID, 'true', $url, $salt)) {
+        	if (bigbluebuttonbn_doPublishRecordings($recordingID, 'true', $url, $salt)) {
                 echo "Success";
         	} else {
                 echo "Failed";
@@ -39,7 +39,7 @@ switch ($action) {
     case "unpublish":
         $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
         if( $recordingID ){
-        	if (BigBlueButtonBN::setPublishRecordings($recordingID, 'false', $url, $salt)) {
+        	if (bigbluebuttonbn_doPublishRecordings($recordingID, 'false', $url, $salt)) {
                 echo "Success";
         	} else {
                 echo "Failed";
@@ -51,7 +51,7 @@ switch ($action) {
     case "delete":
         $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
         if( $recordingID ){
-        	if (BigBlueButtonBN::deleteRecordings($recordingID, $url, $salt)) {
+        	if (bigbluebuttonbn_doDeleteRecordings($recordingID, $url, $salt)) {
                 echo "Success";
         	} else {
                 echo "Failed";
@@ -60,8 +60,16 @@ switch ($action) {
             echo 'No recordingID';
         }	
         break;
+    case "ping":
+        $meetingID = optional_param('meetingID', 0, PARAM_TEXT);
+        if( $meetingID ){
+            echo bigbluebuttonbn_getMeetingXML( $meetingID, $url, $salt );
+        } else {
+            echo 'false';
+        }	
+        break;
     default:
-        echo BigBlueButtonBN::getServerVersion($url);
+        echo bigbluebuttonbn_getServerVersion($url);
 }
 
 

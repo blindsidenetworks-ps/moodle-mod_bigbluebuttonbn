@@ -89,7 +89,7 @@ $(document).ready(function(){
             bigbluebuttonbn_joinURL();
         } else {
             $.jheartbeat.set({
-                url: M.cfg.wwwroot + "/mod/bigbluebuttonbn/test.php?name=" + meetingid,
+                url: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb-broker.php?action=ping&meetingID=" + meetingid,
                 delay: 5000
                 }, function() {
                     bigbluebuttonbn_callback();

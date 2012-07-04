@@ -13,6 +13,9 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/locallib.php');
+
+require_login();
 
 $id = required_param('id', PARAM_INT);      // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);    // bigbluebuttonbn instance ID
@@ -92,9 +95,9 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) {
 	
 	$modPW = $bigbluebuttonbn->moderatorpass;
     if( $g != '0'  ) {
-        $getArray = BigBlueButtonBN::endMeeting( $meetingID.'['.$g.']', $modPW, $url, $salt );
+        $getArray = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $salt ) );
     } else {
-        $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+        $getArray = bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $salt ));
     }
 	redirect('index.php?id='.$id);
 }
@@ -140,13 +143,13 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
 	// Output Users in the meeting
 	//
 	if( $groupObj == null ){
-	    $getArray = BigBlueButtonBN::getMeetingInfoArray( $meetingID, $modPW, $url, $salt );
+	    $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $salt );
 	    if ( $bigbluebuttonbn->newwindow == 1 )
 	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
 	    else
 	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
 	} else {
-	    $getArray = BigBlueButtonBN::getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $salt );
+	    $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $salt );
 	    if ( $bigbluebuttonbn->newwindow == 1 )
 	        $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
 	    else
