@@ -27,8 +27,10 @@ function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzA
 function bigbluebuttonbn_log(array $bbbsession, $event) {
     global $DB;
     
+    $log = new stdClass();
+    
     $log->meetingid = $bbbsession['meetingid'];
-    $log->courseid = $bbbsession['courseid'];
+    $log->courseid = $bbbsession['courseid']; 
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
     $log->record = $bbbsession['textflag']['record'] == 'true'? 1: 0;
     $log->timecreated = time();
@@ -92,7 +94,6 @@ function bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) {
     $params = 'meetingID='.urlencode($meetingID).'&password='.urlencode($modPW);
     return ( $base_url.$params.'&checksum='.sha1("end".$params.$SALT) );
 }
-
 
 function bigbluebuttonbn_getRecordingsURL($meetingID, $URL, $SALT ) {
     $base_url_record = $URL."api/getRecordings?";

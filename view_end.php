@@ -15,8 +15,6 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-require_login($course, true, $cm);
-
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $b  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
 
@@ -31,6 +29,8 @@ if ($id) {
 } else {
     error('You must specify a course_module ID or an instance ID');
 }
+
+require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 $PAGE->set_context($context);
