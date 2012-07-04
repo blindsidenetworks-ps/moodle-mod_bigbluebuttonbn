@@ -125,7 +125,7 @@ $(document).ready(function(){
                  
         setInterval(function() {
             oTable.fnReloadAjax();
-        }, 10000);
+        }, 300000);
 
     }
 });
