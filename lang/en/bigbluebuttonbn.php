@@ -23,6 +23,7 @@ $string['bbbrecordwarning'] = 'This session is being recorded.';
 $string['bbburl'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
+$string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 $string['bigbluebuttonbnfieldset'] = 'Custom example fieldset';
 $string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';

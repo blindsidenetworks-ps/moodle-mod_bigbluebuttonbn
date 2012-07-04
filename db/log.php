@@ -5,6 +5,7 @@
  *
  * Authors:
  *    Fred Dixon (ffdixon [at] blindsidenetworks [dt] com)
+ *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 Blindside Networks
