@@ -57,11 +57,10 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
         $voiceBridge = 70000 + rand(0, 9999);
 
     $meta = '';
-    while ($data = current($metadata)) {
-        $meta = $meta.'&'.key($metadata).'='.urlencode($data);
-        next($metadata);
+    foreach ($metadata as $key => $value) {
+        $meta = $meta.'&'.$key.'='.urlencode($value);
     }
-
+    
     $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL).'&record='.$record.$meta;
 
     $duration = intval($duration);
@@ -157,7 +156,7 @@ function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
 
 function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
-
+    
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meetings were returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
     }
