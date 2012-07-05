@@ -12,7 +12,6 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
@@ -27,7 +26,8 @@ if ($id) {
     $course     = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
-    error('You must specify a course_module ID or an instance ID');
+    //print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
+    print_error('You must specify a course_module ID or an instance ID');
 }
 
 require_login($course, true, $cm);

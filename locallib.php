@@ -13,6 +13,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+require_once(dirname(__FILE__).'/lib.php');
+
+
 function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 {
     $string = '';
@@ -225,6 +228,25 @@ function bigbluebuttonbn_doPublishRecordings( $recordIDs, $set, $URL, $SALT ) {
     return true;
 }
 
+function bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
+
+    if( $xml ) { //If the xml packet returned failure it displays the message to the user
+        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+    }
+    else { //If the server is unreachable, then prompts the user of the necessary action
+        return null;
+    }
+
+}
+
+function bigbluebuttonbn_isMeetingRunning( $meetingID, $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
+    if( $xml && $xml->returncode == 'SUCCESS' )
+        return ( ( $xml->running == 'true' ) ? true : false);
+    else
+        return ( false );
+}
 
 
 function bigbluebuttonbn_getServerVersion( $URL ){

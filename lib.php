@@ -154,12 +154,14 @@ function bigbluebuttonbn_delete_instance($id) {
     //
     // End the session associated with this instance (if it's running)
     //
-    $meetingID = $bigbluebuttonbn->meetingid;
+    $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    
     $modPW = $bigbluebuttonbn->moderatorpass;
     $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
     $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 
-    $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+    //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $salt) )
+    //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $salt );
 	
     if (! $DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         $result = false;

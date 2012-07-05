@@ -12,7 +12,6 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 require_login();
@@ -64,6 +63,18 @@ switch ($action) {
         $meetingID = optional_param('meetingID', 0, PARAM_TEXT);
         if( $meetingID ){
             echo bigbluebuttonbn_getMeetingXML( $meetingID, $url, $salt );
+        } else {
+            echo 'false';
+        }	
+        break;
+    case "test":
+        $meetingID = optional_param('meetingID', 0, PARAM_TEXT);
+        if( $meetingID ){
+            if(bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt ))
+                echo 'true';
+            else
+                echo 'false';
+                
         } else {
             echo 'false';
         }	
