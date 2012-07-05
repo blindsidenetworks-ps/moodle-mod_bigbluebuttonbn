@@ -98,9 +98,9 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     if (! isset($bigbluebuttonbn->record))      $bigbluebuttonbn->record = 0;
 
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
-
+    
     if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
-        $event = NULL;
+        $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
         $event->groupid     = 0;
