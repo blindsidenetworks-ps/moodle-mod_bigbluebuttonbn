@@ -41,7 +41,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         // Once we reach this point, we can store the new version and consider the module
         // upgraded to the version 2012040200 so the next time this block is skipped
         upgrade_mod_savepoint(true, 2012040200, 'bigbluebuttonbn');
-    } else if ($result && $oldversion < 2012062705) {
+    }
+    
+    if ($result && $oldversion < 2012062705) {
 
         // Define table bigbluebuttonbn_log to be created
         $table = new xmldb_table('bigbluebuttonbn_log');

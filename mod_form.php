@@ -13,6 +13,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(dirname(__FILE__).'/locallib.php');
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
@@ -26,11 +28,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
         $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 
-        $serverVersion = BigBlueButtonBN::getServerVersion($url); //
+        $serverVersion = bigbluebuttonbn_getServerVersion($url); 
         if ( !isset($serverVersion) ) {
             print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
         } else {
-            $xml = BigBlueButtonBN::_wrap_simplexml_load_file( BigBlueButtonBN::getMeetingsURL( $url, $salt ) );
+            $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $url, $salt ) );
             if ( $xml->returncode == 'FAILED' ){
                 print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
             }

@@ -11,9 +11,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
 require_login();
 
@@ -29,7 +28,7 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
     if ( !isset($_GET['admin']) || ($admin = $_GET['admin']) != 'true' )
         $admin = 'false'; 	//To be replaced by a jquery operation
 	
-    $recordingsbn = BigBlueButtonBN::getRecordingsArray($meetingID, $url, $salt);
+    $recordingsbn = bigbluebuttonbn_getRecordingsArray($meetingID, $url, $salt);
 
     $view_recording_list_actionbar_hide = get_string('view_recording_list_actionbar_hide', 'bigbluebuttonbn');
     $view_recording_list_actionbar_show = get_string('view_recording_list_actionbar_show', 'bigbluebuttonbn');
@@ -45,12 +44,12 @@ if ( isset($_GET['name']) && $_GET['name'] != '' ){
 
                 $actionbar = '';
                 if ( $admin == 'true' ) {
-                    $deleteURL = BigBlueButtonBN::deleteRecordingsURL($recording['recordID'], $url, $salt);
+                    $deleteURL = bigbluebuttonbn_getDeleteRecordingsURL($recording['recordID'], $url, $salt);
                     if ( $recording['published'] == 'true' ){
-                        $publishURL = BigBlueButtonBN::setPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
+                        $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
                         $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
                     } else {
-                        $publishURL = BigBlueButtonBN::setPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
+                        $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
                         $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
                     }
                     $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\")'   /></a>";

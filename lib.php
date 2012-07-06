@@ -11,10 +11,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once(dirname(__FILE__).'/bbb_api/bbb_api.php');
-require_once($CFG->dirroot.'/calendar/lib.php');
-
 defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->dirroot.'/calendar/lib.php');
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
@@ -99,9 +98,9 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     if (! isset($bigbluebuttonbn->record))      $bigbluebuttonbn->record = 0;
 
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
-
+    
     if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
-        $event = NULL;
+        $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
         $event->groupid     = 0;
@@ -155,12 +154,14 @@ function bigbluebuttonbn_delete_instance($id) {
     //
     // End the session associated with this instance (if it's running)
     //
-    $meetingID = $bigbluebuttonbn->meetingid;
+    $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    
     $modPW = $bigbluebuttonbn->moderatorpass;
     $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
     $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 
-    $getArray = BigBlueButtonBN::endMeeting( $meetingID, $modPW, $url, $salt );
+    //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $salt) )
+    //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $salt );
 	
     if (! $DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         $result = false;
@@ -349,20 +350,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     }
 
     return $info;
-}
-
-/*** 
- * Any other bigbluebuttonbn functions go here.
- */
-function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
-{
-    $string = '';
-    for ($i = 0; $i < $len; $i++)
-    {
-        $pos = rand(0, strlen($chars)-1);
-        $string .= $chars{$pos};
-    }
-    return (sha1($string));
 }
 
 ?>
