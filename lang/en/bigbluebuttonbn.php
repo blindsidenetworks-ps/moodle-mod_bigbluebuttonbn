@@ -70,7 +70,11 @@ $string['mod_form_field_welcome_help'] = 'Replaces the default message setted up
 $string['mod_form_field_welcome'] = 'Welcome message';
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
-$string['modulename_help'] = 'The BigBlueButtonBN Activity Module allows the creation of activities into the course, and activities provide an easy way for the teacher to create and manage a virtual meeting room / classroom on the BigBlueButton server, and for the student to log into the correct room.';
+$string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
+
+Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
+
+To view later recordings, add a RecordingsBN resource to this course.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
