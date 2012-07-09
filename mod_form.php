@@ -31,11 +31,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
         if ( !isset($serverVersion) ) {
             print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-        } else {
-            $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $url, $salt ) );
-            if ( $xml->returncode == 'FAILED' ){
-                print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            }
         }
 
         $mform =& $this->_form;

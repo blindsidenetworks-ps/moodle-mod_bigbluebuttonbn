@@ -83,8 +83,7 @@ For a video overview of installing and using this plugin,
 
 Contact Us
 ==========
-If you have feedback, enhancement requests, or would like commercial support for hosting, integrating, customizing, branding, or scaling BigBlueButt
-on, contact us at
+If you have feedback, enhancement requests, or would like commercial support for hosting, integrating, customizing, branding, or scaling BigBlueButton, contact us at
 
 	http://blindsidenetworks.com/
 
