@@ -282,7 +282,7 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
         curl_close( $ch );
 
         if($data)
-            return (new SimpleXMLElement($data,LIBXML_NOCDATA));
+            return (new SimpleXMLElement($data, LIBXML_NOCDATA));
         else
             return false;
     }
