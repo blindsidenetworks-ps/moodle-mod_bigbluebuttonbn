@@ -181,21 +181,24 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
         $recordings = array();
 
         foreach ($xml->recordings->recording as $recording) {
-            $recordings[(string) $recording->recordID] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime );
-            $recordings[(string) $recording->recordID]['playbacks'] = array();
+            $playbackArray = array();
             foreach ( $recording->playback->format as $format ){
-                $recordings[(string) $recording->recordID]['playbacks'][(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
+                $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
             }
 
             //Add the metadata to the recordings array
+            $metadataArray = array();
             $metadata = get_object_vars($recording->metadata);
-            while ($data = current($metadata)) {
-                $recordings[(string) $recording->recordID]['meta_'.key($metadata)] = $data;
-                next($metadata);
+            foreach ($metadata as $key => $value) {
+                if(is_object($value)) $value = '';
+                $metadataArray['meta_'.$key] = $value;
             }
+            
+            $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+            
         }
 
-        ksort($recordings);
+        usort($recordings, bigbluebuttonbn_recordingBuildSorter('startTime'));
 
         return $recordings;
 
@@ -204,6 +207,14 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
     } else { //If the server is unreachable, then prompts the user of the necessary action
         return NULL;
     }
+}
+
+function bigbluebuttonbn_recordingBuildSorter($key){
+    return function ($a, $b) use ($key){
+        if( $a[$key] < $b[$key]) return -1;
+        else if( $a[$key] == $b[$key]) return 0;
+        else return 1;
+    };
 }
 
 function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {
