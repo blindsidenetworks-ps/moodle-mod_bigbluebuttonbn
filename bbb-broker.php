@@ -14,7 +14,16 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-require_login();
+$moderator = false;
+
+$cid = optional_param('cid', 0, PARAM_INT);
+if ($cid) {
+    $course = $DB->get_record('course', array('id'=>$cid), '*', MUST_EXIST);
+    require_login($course, true);
+
+    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+    $moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
+}
 
 $action = optional_param('action', 0, PARAM_TEXT); 
 if(!$action) $action="version";
@@ -24,39 +33,45 @@ $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 
 switch ($action) {
     case "publish":
-        $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
-        if( $recordingID ){
-        	if (bigbluebuttonbn_doPublishRecordings($recordingID, 'true', $url, $salt)) {
+        $recordingID = optional_param('recordingid', 0, PARAM_TEXT);
+        if( !$moderator ) {
+            echo "Action not allowed";
+        } else if( $recordingID ){
+            if (bigbluebuttonbn_doPublishRecordings($recordingID, 'true', $url, $salt)) {
                 echo "Success";
-        	} else {
+            } else {
                 echo "Failed";
-        	}
+            }
         } else {
-            echo 'No recordingID';
-        }	
+            echo "Missing recordingid";
+        }
         break;
     case "unpublish":
-        $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
-        if( $recordingID ){
-        	if (bigbluebuttonbn_doPublishRecordings($recordingID, 'false', $url, $salt)) {
+        $recordingID = optional_param('recordingid', 0, PARAM_TEXT);
+        if( !$moderator ) {
+            echo "Action not allowed";
+        } else if( $recordingID ){
+           	if (bigbluebuttonbn_doPublishRecordings($recordingID, 'false', $url, $salt)) {
                 echo "Success";
         	} else {
                 echo "Failed";
         	}
         } else {
-            echo 'No recordingID';
+            echo "Missing recordingid";
         }	
         break;
     case "delete":
-        $recordingID = optional_param('recordingID', 0, PARAM_TEXT);
-        if( $recordingID ){
-        	if (bigbluebuttonbn_doDeleteRecordings($recordingID, $url, $salt)) {
+        $recordingID = optional_param('recordingid', 0, PARAM_TEXT);
+        if( !$moderator ) {
+            echo "Action not allowed";
+        } else if( $recordingID ){
+           	if (bigbluebuttonbn_doDeleteRecordings($recordingID, $url, $salt)) {
                 echo "Success";
         	} else {
                 echo "Failed";
         	}
         } else {
-            echo 'No recordingID';
+            echo "Missing recordingid";
         }	
         break;
     case "ping":
