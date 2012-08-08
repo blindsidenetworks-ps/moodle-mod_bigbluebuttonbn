@@ -14,14 +14,12 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-require_login();
-
 $id = required_param('id', PARAM_INT);      // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);    // bigbluebuttonbn instance ID
 $g  = optional_param('g', 0, PARAM_INT);    // group instance ID
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
-require_course_login($course, true);
+require_login($course, true);
 
 $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
@@ -48,16 +46,12 @@ $PAGE->set_title($strbigbluebuttonbns);
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 
-// print_header_simple($strbigbluebuttonbns, '', $navigation, '', '', true, '', navmenu($course));
-
 /// Get all the appropriate data
-
 if (! $bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
     notice('There are no instances of bigbluebuttonbn', "../../course/view.php?id=$course->id");
 }
 
 /// Print the list of instances
-
 $timenow            = time();
 $strweek            = get_string('week');
 $strtopic           = get_string('topic');
@@ -72,7 +66,6 @@ $heading_recording  = get_string('index_heading_recording', 'bigbluebuttonbn' );
 
 $table = new html_table();
 
-//if ($course->format == 'weeks') { }
 $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
 $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
 
@@ -81,7 +74,7 @@ $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 $logoutURL = $CFG->wwwroot;
 
-if( isset($_POST['submit']) && $_POST['submit'] == 'end' ) { 
+if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) { 
 	//
 	// A request to end the meeting
 	//

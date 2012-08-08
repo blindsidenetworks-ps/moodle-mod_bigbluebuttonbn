@@ -1,4 +1,4 @@
-<?php //Buld the <head>
+<?php
 
 /**
  * View and administrate BigBlueButton playback recordings
@@ -14,73 +14,86 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-require_login();
+$moderator = false;
+$viewer = false;
 
-$salt = trim($CFG->BigBlueButtonBNSecuritySalt);
-$url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
+$cid = optional_param('cid', 0, PARAM_INT); // course_module ID, or
+$mid  = optional_param('mid', 0, PARAM_TEXT);  // bigbluebuttonbn instance ID
+if ($cid) {
+    $course = $DB->get_record('course', array('id'=>$cid), '*', MUST_EXIST);
+    require_login($course, true);
 
-echo '{ "aaData": ['."\n";
-
-if ( isset($_GET['name']) && $_GET['name'] != '' ){
-
-    $meetingID = $_GET['name'];
-
-    if ( !isset($_GET['admin']) || ($admin = $_GET['admin']) != 'true' )
-        $admin = 'false'; 	//To be replaced by a jquery operation
-	
-    $recordingsbn = bigbluebuttonbn_getRecordingsArray($meetingID, $url, $salt);
-
-    $view_recording_list_actionbar_hide = get_string('view_recording_list_actionbar_hide', 'bigbluebuttonbn');
-    $view_recording_list_actionbar_show = get_string('view_recording_list_actionbar_show', 'bigbluebuttonbn');
-    $view_recording_list_actionbar_delete = get_string('view_recording_list_actionbar_delete', 'bigbluebuttonbn');
-              
-    if( isset($recordingsbn) && !isset($recordingsbn['messageKey']) ){
-        foreach ( $recordingsbn as $recording ){
-            if ( $admin == 'true' || $recording['published'] == 'true' ) {
-                
-                $meta_course = isset($recording['meta_course'])?str_replace('"', '\"', $recording['meta_course']):'';
-                $meta_activity = isset($recording['meta_activity'])?str_replace('"', '\"', $recording['meta_activity']):'';
-                $meta_description = isset($recording['meta_description'])?str_replace('"', '\"', $recording['meta_description']):'';
-
-                $actionbar = '';
-                if ( $admin == 'true' ) {
-                    $deleteURL = bigbluebuttonbn_getDeleteRecordingsURL($recording['recordID'], $url, $salt);
-                    if ( $recording['published'] == 'true' ){
-                        $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
-                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
-                    } else {
-                        $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
-                        $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
-                    }
-                    $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\")'   /></a>";
-                          }
-                
-                $type = '';
-                foreach ( $recording['playbacks'] as $playback ){
-                    $type .= '<a href=\"'.$playback['url'].'\" target=\"_new\">'.$playback['type'].'</a>&#32;';	
-                }
-                
-                //Make sure the startTime is timestamp
-                if( !is_numeric($recording['startTime']) ){
-                    $date = new DateTime($recording['startTime']);
-                    $recording['startTime'] = date_timestamp_get($date);
-                } else {
-                    $recording['startTime'] = $recording['startTime'] / 1000;
-                }
-                //Set corresponding format
-                //$format = isset(get_string('strftimerecentfull', 'langconfig'));
-                //if( !isset($format) ) 
-                $format = '%a %h %d %H:%M:%S %Z %Y';
-                //Format the date
-                $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
-                echo '	["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"],'."\n";
-            }
-        }
-    }
-
+    $viewer = true;
+    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+    $moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
 }
 
-echo '	["","","","","",""]'."\n";
+$ajax_response = '';
+if( $viewer ) {
+    $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
+    $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
+    
+    if ( $mid ){
+        $recordingsbn = bigbluebuttonbn_getRecordingsArray($mid, $url, $salt);
+    
+        $view_recording_list_actionbar_hide = get_string('view_recording_list_actionbar_hide', 'bigbluebuttonbn');
+        $view_recording_list_actionbar_show = get_string('view_recording_list_actionbar_show', 'bigbluebuttonbn');
+        $view_recording_list_actionbar_delete = get_string('view_recording_list_actionbar_delete', 'bigbluebuttonbn');
+    
+        if( isset($recordingsbn) && !isset($recordingsbn['messageKey']) ){
+            foreach ( $recordingsbn as $recording ){
+                if ( $moderator || $recording['published'] == 'true' ) {
+    
+                    $meta_course = isset($recording['meta_course'])?str_replace('"', '\"', $recording['meta_course']):'';
+                    $meta_activity = isset($recording['meta_activity'])?str_replace('"', '\"', $recording['meta_activity']):'';
+                    $meta_description = isset($recording['meta_description'])?str_replace('"', '\"', $recording['meta_description']):'';
+    
+                    $actionbar = '';
+                    if ( $moderator ) {
+                        $deleteURL = bigbluebuttonbn_getDeleteRecordingsURL($recording['recordID'], $url, $salt);
+                        if ( $recording['published'] == 'true' ){
+                            $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
+                            $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+                        } else {
+                            $publishURL = bigbluebuttonbn_getPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
+                            $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+                        }
+                        $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+                    }
+    
+                    $type = '';
+                    foreach ( $recording['playbacks'] as $playback ){
+                        $type .= '<a href=\"'.$playback['url'].'\" target=\"_new\">'.$playback['type'].'</a>&#32;';
+                    }
+    
+                    //Make sure the startTime is timestamp
+                    if( !is_numeric($recording['startTime']) ){
+                        $date = new DateTime($recording['startTime']);
+                        $recording['startTime'] = date_timestamp_get($date);
+                    } else {
+                        $recording['startTime'] = $recording['startTime'] / 1000;
+                    }
+                    //Set corresponding format
+                    //$format = isset(get_string('strftimerecentfull', 'langconfig'));
+                    //if( !isset($format) )
+                    $format = '%a %h %d %H:%M:%S %Z %Y';
+                    //Format the date
+                    $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
+                    if( strlen($ajax_response) > 0 ) $ajax_response .= ", \n";
+                    $ajax_response .= '["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"]';
+                }
+            }
+        }
+    
+    }
+    
+}
+
+echo '{ "aaData": ['."\n";
+if( strlen($ajax_response) > 0 )
+    echo $ajax_response."\n";
+else
+    echo '["","","","","",""]'."\n";
 echo ']  }'."\n";
 
 
