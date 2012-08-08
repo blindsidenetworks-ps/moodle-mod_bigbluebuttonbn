@@ -14,6 +14,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once(dirname(__FILE__).'/lib.php');
+require_once($CFG->dirroot.'/lib/filelib.php');
 
 
 function bigbluebuttonbn_rand_string($len, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
@@ -252,6 +253,7 @@ function bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $URL, $SALT ) {
 
 function bigbluebuttonbn_isMeetingRunning( $meetingID, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
+    
     if( $xml && $xml->returncode == 'SUCCESS' )
         return ( ( $xml->running == 'true' ) ? true : false);
     else
@@ -278,9 +280,24 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
         return 'false';
 }
 
-
-
 function bigbluebuttonbn_wrap_simplexml_load_file($url){
+
+    if (extension_loaded('curl')) {
+        $c = new curl();
+        $response = $c->get($url);
+
+        if($response)
+            return (new SimpleXMLElement($response, LIBXML_NOCDATA));
+        else
+            return false;
+
+    } else {
+        return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
+    }
+
+}
+
+function bigbluebuttonbn_wrap_simplexml_load_file2($url){
 
     if (extension_loaded('curl')) {
         $ch = curl_init() or die ( curl_error() );
@@ -296,7 +313,9 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
             return (new SimpleXMLElement($data, LIBXML_NOCDATA));
         else
             return false;
+    
+    } else {
+        return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
     }
-
-    return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
+    
 }
