@@ -154,9 +154,9 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
 $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
 
-$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/jquery/1.7.2/jquery.min.js', true);
-$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/heartbeat/0.1.1/heartbeat.js', true);    
-$PAGE->requires->js('/mod/bigbluebuttonbn/js/bigbluebuttonbn.js', true);
+$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/jquery/1.7.2/jquery.min.js');
+$PAGE->requires->js('/mod/bigbluebuttonbn/js/libs/heartbeat/0.1.1/heartbeat.js');    
+$PAGE->requires->js('/mod/bigbluebuttonbn/js/bigbluebuttonbn.js');
 
 echo '<script type="text/javascript" >var logouturl = "'.$bbbsession['logoutURL'].'";</script>'."\n";
 echo '<script type="text/javascript" >var newwindow = "'.$bbbsession['textflag']['newwindow'].'";</script>'."\n";
