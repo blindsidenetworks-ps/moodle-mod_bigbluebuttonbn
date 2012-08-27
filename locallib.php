@@ -302,7 +302,7 @@ function bigbluebuttonbn_wrap_simplexml_load_file2($url){
     if (extension_loaded('curl')) {
         $ch = curl_init() or die ( curl_error() );
         $timeout = 10;
-        curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt( $ch, CURLOPT_URL, $url );
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
         curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout);
