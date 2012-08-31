@@ -44,9 +44,9 @@ if( $viewer ) {
             foreach ( $recordingsbn as $recording ){
                 if ( $moderator || $recording['published'] == 'true' ) {
     
-                    $meta_course = isset($recording['meta_course'])?str_replace('"', '\"', $recording['meta_course']):'';
-                    $meta_activity = isset($recording['meta_activity'])?str_replace('"', '\"', $recording['meta_activity']):'';
-                    $meta_description = isset($recording['meta_description'])?str_replace('"', '\"', $recording['meta_description']):'';
+                    $meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
+                    $meta_activity = isset($recording['meta_contextactivity'])?str_replace('"', '\"', $recording['meta_contextactivity']):'';
+                    $meta_description = isset($recording['meta_contextactivitydescription'])?str_replace('"', '\"', $recording['meta_contextactivitydescription']):'';
     
                     $actionbar = '';
                     if ( $moderator ) {

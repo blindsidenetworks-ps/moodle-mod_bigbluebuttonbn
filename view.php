@@ -26,7 +26,6 @@ if ($id) {
     $course     = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
-    //print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
     print_error('You must specify a course_module ID or an instance ID');
 }
 
@@ -81,20 +80,6 @@ $bbbsession['textflag']['moderator'] = $moderator? 'true': 'false';
 $bbbsession['flag']['administrator'] = $administrator;
 $bbbsession['textflag']['administrator'] = $administrator? 'true': 'false';
 
-//Load the email of the users enroled as teacher for the course
-$bbbsession['useremail'] = '';
-$context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
-$teachers = get_role_users(3, $context); //Teacher
-foreach( $teachers as $teacher ){
-    if (strlen($bbbsession['useremail']) > 0) $bbbsession['useremail'] .= ',';
-        $bbbsession['useremail'] .= fullname($teacher).' <'.$teacher->email.'>';
-}
-$teachers = get_role_users(4, $context); //Non-editing teacher
-foreach( $teachers as $teacher ){
-    if (strlen($bbbsession['useremail']) > 0) $bbbsession['useremail'] .= ',';
-    $bbbsession['useremail'] .= fullname($teacher).' <'.$teacher->email.'>';
-}
-
 //Database info related to the activity
 $bbbsession['meetingname'] = $bigbluebuttonbn->name;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
@@ -127,6 +112,39 @@ $bbbsession['cm'] = $cm;
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view_end.php?id='.$id;
+
+//Metadata
+$bbbsession['origin'] = "Moodle";
+$bbbsession['originVersion'] = $CFG->release;
+$parsedUrl = parse_url($CFG->wwwroot);
+$bbbsession['originServerName'] = $parsedUrl['host'];
+$bbbsession['originServerUrl'] = $CFG->wwwroot;
+$bbbsession['originServerCommonName'] = '';
+$bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn 1.0.8';
+$bbbsession['context'] = $course->fullname;
+$bbbsession['contextActivity'] = $bigbluebuttonbn->name;
+$bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
+
+//Load the email of the users enroled as teacher for the course
+$bbbsession['contextTeacherEmail'] = '';
+$context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
+$teachers = get_role_users(3, $context); //Teacher
+foreach( $teachers as $teacher ){
+    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ',';
+    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
+}
+$teachers = get_role_users(4, $context); //Non-editing teacher
+foreach( $teachers as $teacher ){
+    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ', ';
+    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
+}
+$bbbsession['contextStudentEmail'] = '';
+$students = get_role_users(5, $context); //Student
+foreach( $students as $student ){
+    if (strlen($bbbsession['contextStudentEmail']) > 0) $bbbsession['contextStudentEmail'] .= ', ';
+    $bbbsession['contextStudentEmail'] .= fullname($student).' <'.$student->email.'>';
+}
+
 //
 // BigBlueButton Setup Ends
 //
@@ -268,7 +286,18 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
         //
         // Join directly
         //
-        $metadata = array("meta_course" => $bbbsession['coursename'], "meta_activity" => $bbbsession['meetingname'], "meta_description" => $bbbsession['description'], "meta_email" => $bbbsession['useremail'], "meta_teachers" => $bbbsession['useremail'], "meta_recording" => $bbbsession['textflag']['record']);
+        $metadata = array("meta_origin" => $bbbsession['origin'],
+                "meta_originVersion" => $bbbsession['originVersion'],
+                "meta_originServerName" => $bbbsession['originServerName'],
+                "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
+                "meta_originTag" => $bbbsession['originTag'],
+                "meta_context" => $bbbsession['context'],
+                "meta_contextActivity" => $bbbsession['contextActivity'],
+                "meta_contextActivityDescription" => $bbbsession['contextActivityDescription'],
+                "meta_meetingModerators" => $bbbsession['contextTeacherEmail'],
+                "meta_meetingAttendees" => $bbbsession['contextStudentEmail'],
+                "meta_email" => $bbbsession['contextTeacherEmail'],
+                "meta_recording" => $bbbsession['textflag']['record']);
         $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
         
         if (!$response) {
@@ -327,7 +356,7 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
             print "<br />".get_string('view_wait', 'bigbluebuttonbn' )."<br /><br />";
             print '<center><img src="pix/polling.gif"></center>';
         }
-
+        
         print "</div>";
     
     }
