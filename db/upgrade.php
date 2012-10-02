@@ -69,6 +69,16 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2012062705, 'bigbluebuttonbn');
     }
 
+    if ($result && $oldversion < 2012100100) {
+
+        $table = new xmldb_table('bigbluebuttonbn');
+        $field = new xmldb_field('welcome');
+        $field->set_attributes(XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null, null, 'type');
+
+        $dbman->change_field_type($table, $field, $continue=true, $feedback=true);
+        
+        upgrade_mod_savepoint(true, 2012100100, 'bigbluebuttonbn');
+    }
     return $result;
 }
 
