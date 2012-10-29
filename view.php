@@ -125,25 +125,30 @@ $bbbsession['context'] = $course->fullname;
 $bbbsession['contextActivity'] = $bigbluebuttonbn->name;
 $bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
 
+////////////////////////////////////////////////////
+//This implementation will work only for a small number of users enrolled (teachers or students)
+//this is beacuse the long a GET call can be is limited by the configuration of the Webserver 
+////////////////////////////////////////////////////
+
 //Load the email of the users enroled as teacher for the course
 $bbbsession['contextTeacherEmail'] = '';
-$context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
-$teachers = get_role_users(3, $context); //Teacher
-foreach( $teachers as $teacher ){
-    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ',';
-    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
-}
-$teachers = get_role_users(4, $context); //Non-editing teacher
-foreach( $teachers as $teacher ){
-    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ', ';
-    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
-}
+//$context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
+//$teachers = get_role_users(3, $context); //Teacher
+//foreach( $teachers as $teacher ){
+//    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ',';
+//    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
+//}
+//$teachers = get_role_users(4, $context); //Non-editing teacher
+//foreach( $teachers as $teacher ){
+//    if (strlen($bbbsession['contextTeacherEmail']) > 0) $bbbsession['contextTeacherEmail'] .= ', ';
+//    $bbbsession['contextTeacherEmail'] .= fullname($teacher).' <'.$teacher->email.'>';
+//}
 $bbbsession['contextStudentEmail'] = '';
-$students = get_role_users(5, $context); //Student
-foreach( $students as $student ){
-    if (strlen($bbbsession['contextStudentEmail']) > 0) $bbbsession['contextStudentEmail'] .= ', ';
-    $bbbsession['contextStudentEmail'] .= fullname($student).' <'.$student->email.'>';
-}
+//$students = get_role_users(5, $context); //Student
+//foreach( $students as $student ){
+//    if (strlen($bbbsession['contextStudentEmail']) > 0) $bbbsession['contextStudentEmail'] .= ', ';
+//    $bbbsession['contextStudentEmail'] .= fullname($student).' <'.$student->email.'>';
+//}
 
 //
 // BigBlueButton Setup Ends
