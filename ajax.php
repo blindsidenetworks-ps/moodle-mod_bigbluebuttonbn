@@ -43,7 +43,13 @@ if( $viewer ) {
         if( isset($recordingsbn) && !isset($recordingsbn['messageKey']) ){
             foreach ( $recordingsbn as $recording ){
                 if ( $moderator || $recording['published'] == 'true' ) {
-    
+                    
+                    $endTime = isset($recording['endTime'])? intval(str_replace('"', '\"', $recording['endTime'])):0;
+                    $endTime = $endTime - ($endTime % 1000);
+                    $startTime = isset($recording['startTime'])? intval(str_replace('"', '\"', $recording['startTime'])):0;
+                    $startTime = $startTime - ($startTime % 1000);
+                    $duration = intval(($endTime - $startTime) / 60000);
+                    
                     $meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
                     $meta_activity = isset($recording['meta_contextactivity'])?str_replace('"', '\"', $recording['meta_contextactivity']):'';
                     $meta_description = isset($recording['meta_contextactivitydescription'])?str_replace('"', '\"', $recording['meta_contextactivitydescription']):'';
@@ -80,7 +86,7 @@ if( $viewer ) {
                     //Format the date
                     $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
                     if( strlen($ajax_response) > 0 ) $ajax_response .= ", \n";
-                    $ajax_response .= '["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'","'.$actionbar.'"]';
+                    $ajax_response .= '["'.$type.'","'.$meta_course.'","'.$meta_activity.'","'.$meta_description.'","'.str_replace( " ", "&nbsp;", $formatedStartDate).'", "'. $duration.'", "'.$actionbar.'"]';
                 }
             }
         }
@@ -93,7 +99,7 @@ echo '{ "aaData": ['."\n";
 if( strlen($ajax_response) > 0 )
     echo $ajax_response."\n";
 else
-    echo '["","","","","",""]'."\n";
+    echo '["","","","","","",""]'."\n";
 echo ']  }'."\n";
 
 
