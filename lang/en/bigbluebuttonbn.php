@@ -99,6 +99,7 @@ $string['view_recording_list_activity'] = 'Activity';
 $string['view_recording_list_course'] = 'Course';
 $string['view_recording_list_date'] = 'Date';
 $string['view_recording_list_description'] = 'Description';
+$string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
 
