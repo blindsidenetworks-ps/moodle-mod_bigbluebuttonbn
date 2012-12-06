@@ -44,7 +44,7 @@ if ($id) {
 }
 
 
-header('Content-Type: application/json; charset=utf-8');
+//header('Content-Type: text/plainjson; charset=utf-8');
 if ( !$error ) {
 	
 	if (!isloggedin() && $PAGE->course->id == SITEID) {
@@ -55,20 +55,27 @@ if ( !$error ) {
     $hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
 			
 	if( !$hascourseaccess ){
-		header("HTTP/1.0 401 Unauthorized");
+		echo "Unauthorized";
+		//header("HTTP/1.0 401 Unauthorized");
 		//http_response_code(401);
 	} else {
 		$salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 		$url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 				
-		//$ismeetingrunning = bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt );
-		//echo $ismeetingrunning? 'true': 'false';
+		echo "Hello";
+		try{
+			$ismeetingrunning = bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt );
+			print $ismeetingrunning;
+		}catch(Exception $e){
+			echo $e;
+		}
+		//echo $ismeetingrunning;
 		//echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
-		echo $callback.'({ "status" : "'.'false'.'" });';
-		
+				
 	}
 
 } else {
-	header("HTTP/1.0 400 Bad Request. ".$error);
+	echo $error;
+	//header("HTTP/1.0 400 Bad Request. ".$error);
 	//http_response_code(400);
 }

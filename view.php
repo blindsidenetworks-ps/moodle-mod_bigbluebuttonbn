@@ -262,7 +262,8 @@ echo '<script type="text/javascript" >var bigbluebuttonbn_view = "'.$bigbluebutt
 $jsmodule = array(
         'name'     => 'mod_bigbluebuttonbn',
         'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        'requires' => array('datasource-function', 'datasource-polling'),
+        //'requires' => array('datasource-function', 'datasource-polling'),
+        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
 );
 $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
 
