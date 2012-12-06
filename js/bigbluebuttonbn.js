@@ -16,7 +16,7 @@ $(document).ready(function(){
             bigbluebuttonbn_joinURL();
         } else {
             $.jheartbeat.set({
-                url: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb-broker.php?action=ping&meetingID=" + meetingid,
+                url: M.cfg.wwwroot + "/mod/bigbluebuttonbn/ping.php?id=" + cmid + "&meetingid=" + meetingid,
                 delay: 5000
                 }, function() {
                     bigbluebuttonbn_callback();

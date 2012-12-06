@@ -8,15 +8,45 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
  *
  * @param {Object} Y YUI instance
  */
-M.mod_bigbluebuttonbn.modform_Adding_withSchedule = function(Y) {
-    document.getElementsByName("timeavailable[enabled]")[0].removeAttribute("checked");
-    document.getElementsByName("timedue[enabled]")[0].removeAttribute("checked");
-    setGroupMode();
-}
 
-M.mod_bigbluebuttonbn.modform_Adding_withoutSchedule = function(Y) {
-    setGroupMode();
-}
+M.mod_bigbluebuttonbn.init_view = function(Y) {
+	
+	if ( joining == 'true' ){
+	    if (ismoderator == 'true' || waitformoderator == 'false'){
+	      	M.mod_bigbluebuttonbn.joinURL();
+	    } else {
+	    	
+	    	/////////////////
+	        var getDateString = function() {
+	            return new Date();
+	        };
+
+	        var dataSource = new Y.DataSource.Function({source:getDateString});
+
+	        var request = {
+	            callback : {
+	                success: function(e) {
+	                    console.debug('success');
+	                    document.getElementById('txtUpdate').innerHTML = e.response.results[0];
+	                },
+	                failure: function(e) {
+	                    console.debug('failure');
+	                }
+	            }
+	        };
+
+	        var id = dataSource.setInterval(5000, request );
+	    	////////////////////////////
+	    	
+	    }
+	}
+};
+
+
+M.mod_bigbluebuttonbn.joinURL = function(){
+	console.log(joinurl);
+	//window.location = joinurl;
+};
 
 M.mod_bigbluebuttonbn.modform_Editting = function() {
     setGroupMode();

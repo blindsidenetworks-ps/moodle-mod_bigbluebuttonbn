@@ -13,9 +13,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$module->version  = 2012110100;
+$module->version  = 2012120100;
 $module->requires = 2010112400;
 $module->cron     = 0;
 $module->component = 'mod_bigbluebuttonbn';
-$module->maturity = MATURITY_RC;  // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-$module->release  = '1.0.8'; 
+$module->maturity = MATURITY_BETA;  // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
+$module->release  = '1.0.9'; 
