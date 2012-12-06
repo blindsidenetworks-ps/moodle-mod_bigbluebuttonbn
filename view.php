@@ -202,7 +202,6 @@ else
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 
 
-echo '<div id="txtUpdate">Test</div>';
 $joining = false;
 $bigbluebuttonbn_view = '';
 if (!$bigbluebuttonbn->timeavailable ) {
@@ -250,28 +249,27 @@ if (!$bigbluebuttonbn->timeavailable ) {
     
 }
 
-echo '<script type="text/javascript" >var newwindow = "'.$bbbsession['textflag']['newwindow'].'";</script>'."\n";
-echo '<script type="text/javascript" >var waitformoderator = "'.$bbbsession['textflag']['wait'].'";</script>'."\n";
-echo '<script type="text/javascript" >var ismoderator = "'.$bbbsession['textflag']['moderator'].'";</script>'."\n";
-echo '<script type="text/javascript" >var cmid = "'.$cm->id.'";</script>'."\n";
-echo '<script type="text/javascript" >var meetingid = "'.$bbbsession['meetingid'].'";</script>'."\n";
-echo '<script type="text/javascript" >var joinurl = "'.$bbbsession['joinURL'].'";</script>'."\n";
-echo '<script type="text/javascript" >var joining = "'.($joining? 'true':'false').'";</script>';
-echo '<script type="text/javascript" >var bigbluebuttonbn_view = "'.$bigbluebuttonbn_view.'";</script>'."\n";
+//JavaScript variables
+$jsVars = array(
+        'newwindow' => $bbbsession['textflag']['newwindow'],
+        'waitformoderator' => $bbbsession['textflag']['wait'],
+        'ismoderator' => $bbbsession['textflag']['moderator'],
+        'meetingid' => $bbbsession['meetingid'],
+        'joinurl' => $bbbsession['joinURL'],
+        'joining' => ($joining? 'true':'false'),
+        'bigbluebuttonbn_view' => $bigbluebuttonbn_view
+);
 
 $jsmodule = array(
         'name'     => 'mod_bigbluebuttonbn',
         'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        //'requires' => array('datasource-function', 'datasource-polling'),
         'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
 );
+$PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
 $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
 
 // Finish the page
 echo $OUTPUT->footer();
-
-
-
 
 
 function bigbluebuttonbn_view_joining( $bbbsession ){

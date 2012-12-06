@@ -18,34 +18,17 @@ $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $callback = optional_param('callback', "", PARAM_TEXT);
 $meetingID = optional_param('meetingid', 0, PARAM_TEXT);
 
-if ($id) {
-    if ( ! $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST) ) {
-        $error = 'Course Module ID was incorrect';
-    }
-
-    if ( ! $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST) ) {
-        $error = 'Course is misconfigured';
-    }
-
-    if ( ! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST) ) {
-        $error = 'Course module is incorrect';
-    }
     
-    if (!$meetingID) {
-    	$error = 'You must specify a meetingID';
-    }
-
-    if (!$callback) {
-    	$error = 'This call must include a javascript callback';
-    }
-    
-} else {
-    $error = 'You must specify a course_module ID';
+if (!$meetingID) {
+    $error = 'You must specify a meetingID';
 }
 
+if (!$callback) {
+    $error = 'This call must include a javascript callback';
+}
 
 header('Content-Type: application/json; charset=utf-8');
-if ( !$error ) {
+if ( !isset($error) ) {
 	
 	if (!isloggedin() && $PAGE->course->id == SITEID) {
 		$userid = guest_user()->id;
@@ -61,11 +44,9 @@ if ( !$error ) {
 		$salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 		$url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 				
-		//$ismeetingrunning = bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt );
-		//echo $ismeetingrunning? 'true': 'false';
-		//echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
-		echo $callback.'({ "status" : "'.'false'.'" });';
-		
+		$ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt )? 'true': 'false');
+		echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
+		//echo $callback.'({ "status" : "'.'false'.'" });';
 	}
 
 } else {
