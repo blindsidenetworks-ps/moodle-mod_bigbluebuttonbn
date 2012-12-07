@@ -13,8 +13,6 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-
 $callback = optional_param('callback', "", PARAM_TEXT);
 $meetingID = optional_param('meetingid', 0, PARAM_TEXT);
 
@@ -46,7 +44,6 @@ if ( !isset($error) ) {
 				
 		$ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt )? 'true': 'false');
 		echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
-		//echo $callback.'({ "status" : "'.'false'.'" });';
 	}
 
 } else {
