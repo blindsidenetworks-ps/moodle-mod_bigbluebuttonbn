@@ -44,7 +44,6 @@ $PAGE->set_url('/mod/bigbluebuttonbn/index.php', array('id'=>$id));
 $PAGE->navbar->add($strbigbluebuttonbns, "index.php?id=$course->id");
 $PAGE->set_title($strbigbluebuttonbns);
 $PAGE->set_heading($course->fullname);
-echo $OUTPUT->header();
 
 /// Get all the appropriate data
 if (! $bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
@@ -110,7 +109,15 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     
 }
 
+echo $OUTPUT->header();
 
+echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
+echo html_writer::table($table);
+
+echo $OUTPUT->footer();
+
+
+/// Functions
 function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
     $joinURL = null;
     $user = null;
@@ -223,9 +230,5 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
     }
 
 }
-
-echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
-echo html_writer::table($table);
-echo $OUTPUT->footer();
 
 ?>
