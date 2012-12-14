@@ -120,8 +120,6 @@ echo $OUTPUT->footer();
 /// Functions
 function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
     $joinURL = null;
-    $user = null;
-    $result = null;
     $group = "-";
     $users = "-";
     $running = "-";

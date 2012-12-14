@@ -57,7 +57,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     $returnid = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     
     if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
-        $event = NULL;
+        $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
         $event->groupid     = 0;
