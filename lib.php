@@ -97,7 +97,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     if (! isset($bigbluebuttonbn->wait))        $bigbluebuttonbn->wait = 0;
     if (! isset($bigbluebuttonbn->record))      $bigbluebuttonbn->record = 0;
 
-    $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+    $returnid = $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     
     if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
         $event = new stdClass();
@@ -131,7 +131,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
         
     }
     
-    return true;
+    return $returnid;
 }
 
 /**

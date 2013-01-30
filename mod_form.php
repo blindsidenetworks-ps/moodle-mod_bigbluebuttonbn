@@ -99,17 +99,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // add standard buttons, common to all modules
         $this->add_action_buttons();
         
-        if ( isset($current_activity->add) ){ 
-            // If is adding the activity, turn off the schedule by default & Take off the option [visible groups]
-            //if ( $current_activity->section > 0 ) {  //This is not a general activity, it is part of a week, so it can have schedule 
-                $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.modform_Adding_withSchedule');
-            //} else {
-            //    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.modform_Adding_withoutSchedule');
-            //}
-        } else { 
-            // Take off the option [visible groups]
-            $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.modform_Editting');
-        }
+        // Take off the option [visible groups]
+        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.modform_Editting');
         
     }
 
