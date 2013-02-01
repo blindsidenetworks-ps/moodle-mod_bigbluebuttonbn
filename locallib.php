@@ -199,7 +199,7 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
             
         }
 
-        usort($recordings, bigbluebuttonbn_recordingBuildSorter('startTime'));
+        usort($recordings, bigbluebuttonbn_recordingBuildSorter());
 
         return $recordings;
 
@@ -210,12 +210,10 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
     }
 }
 
-function bigbluebuttonbn_recordingBuildSorter($key){
-    return function ($a, $b) use ($key){
-        if( $a[$key] < $b[$key]) return -1;
-        else if( $a[$key] == $b[$key]) return 0;
-        else return 1;
-    };
+function bigbluebuttonbn_recordingBuildSorter($a, $b){
+    if( $a['startTime'] < $b['startTime']) return -1;
+    else if( $a['startTime'] == $b['startTime']) return 0;
+    else return 1;
 }
 
 function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {

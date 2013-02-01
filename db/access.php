@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Capabilities for BigBlueButton
  *
