@@ -339,17 +339,17 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, newwindow')) {
         return NULL;
     }
-
-    $info = new stdClass();
-    $info->name  = $bigbluebuttonbn->name;
+    
+    $info = new cached_cm_info();
+    $info->name = $bigbluebuttonbn->name;
     
     if ( $bigbluebuttonbn->newwindow == 1 ){
-        $info->extra = "onclick=\"window.open('"."$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1"."'); return false;\"";
-    } else {
-        //$info->extra = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
+        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1";
+        $info->onclick = "window.open('$fullurl'); return false;";
     }
-
+    
     return $info;
+
 }
 
 ?>
