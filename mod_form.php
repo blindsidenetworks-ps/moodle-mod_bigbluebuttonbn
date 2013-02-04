@@ -58,15 +58,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Second block starts here
         //-------------------------------------------------------------------------------
-        //if ( $current_activity->section > 0 ) {  //This is not a general activity, it is part of a week, so it can have schedule 
-            $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
+        $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
 
-            $mform->addElement('date_time_selector', 'timeavailable', get_string('mod_form_field_availabledate', 'bigbluebuttonbn'), array('optional'=>true));
-            $mform->setDefault('timeavailable', time());
-            $mform->addElement('date_time_selector', 'timedue', get_string('mod_form_field_duedate', 'bigbluebuttonbn'), array('optional' => true));
-            $mform->setDefault('timedue', time()+3600);
-          
-        //}
+        $mform->addElement('date_time_selector', 'timeavailable', get_string('mod_form_field_availabledate', 'bigbluebuttonbn'), array('optional'=>true));
+        $mform->setDefault('timeavailable', 0);
+        $mform->addElement('date_time_selector', 'timedue', get_string('mod_form_field_duedate', 'bigbluebuttonbn'), array('optional' => true));
+        $mform->setDefault('timedue', 0);
         //-------------------------------------------------------------------------------
         // Second block ends here
         //-------------------------------------------------------------------------------
@@ -110,12 +107,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
         $errors = parent::validation($data, $files);
 
-        //if ( $current_activity->section > 0 ) {  //This is not a general activity, it is part of a week, so it can have schedule 
-            // Check open and close times are consistent.
-            if ($data['timeavailable'] != 0 && $data['timedue'] != 0 && $data['timedue'] < $data['timeavailable']) {
-                $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
-            }
-        //}
+        if ($data['timeavailable'] != 0 && $data['timedue'] != 0 && $data['timedue'] < $data['timeavailable']) {
+            $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+        }
         
         return $errors;
     }
