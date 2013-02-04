@@ -43,7 +43,6 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
 };
 
 M.mod_bigbluebuttonbn.joinURL = function() {
-    // console.debug(bigbluebuttonbn.joinurl);
     window.location = bigbluebuttonbn.joinurl;
 };
 
