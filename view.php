@@ -235,7 +235,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
 } else if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue ) {
     //GO JOINING
     $bigbluebuttonbn_view = 'join';
-    bigbluebuttonbn_view_joining( $bbbsession );
+    $joining = bigbluebuttonbn_view_joining( $bbbsession );
         
 } else {
     //CALLING AFTER
