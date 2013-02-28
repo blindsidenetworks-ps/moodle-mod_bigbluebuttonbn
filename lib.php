@@ -46,9 +46,9 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 
     $bigbluebuttonbn->timecreated = time();
 
-    $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_rand_string( 16 );
-    $bigbluebuttonbn->viewerpass = bigbluebuttonbn_rand_string( 16 );
-    $bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string( 16 );
+    $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_rand_string();
+    $bigbluebuttonbn->viewerpass = bigbluebuttonbn_rand_string();
+    $bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string();
 
     if (! isset($bigbluebuttonbn->newwindow))   $bigbluebuttonbn->newwindow = 0;
     if (! isset($bigbluebuttonbn->wait))        $bigbluebuttonbn->wait = 0;

@@ -7,13 +7,13 @@
  *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2012 Blindside Networks 
+ * @copyright 2010-2013 Blindside Networks 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$module->version  = 2013020113;
+$module->version  = 2013030100;
 $module->requires = 2010112400;
 $module->cron     = 0;
 $module->component = 'mod_bigbluebuttonbn';
