@@ -19,7 +19,7 @@ Prerequisites
 You need:
 
 	1.  A server running Moodle 2.0+
-	2.  A BigBlueButton 0.8-beta-4 (or later) server running on a separate server (not on the same server as your Moodle site)
+	2.  A BigBlueButton 0.8 (or later) server running on a separate server (not on the same server as your Moodle site)
 	
 Blindside Networks provides you a test BigBlueButton server for testing this plugin.  To use this test server, just accept the default settings when configuring the activity module.  The default settings are
 
