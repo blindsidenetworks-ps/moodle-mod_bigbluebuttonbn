@@ -35,11 +35,11 @@ Obtaining the source
 ====================
 This GitHub repostiory at
 
-  https://github.com/blindsidenetworks/moodle-mod_bigbluebutton/tree/master/moodle2x/bigbluebuttonbn
+  https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn
 
 contains the latest source.  If you want to use the latest packaged snapshot, you can download it from
-
-  http://blindsidenetworks.com/downloads/moodle/bigbluebuttonbn.zip
+  
+  http://blindsidenetworks.com/downloads/moodle/bigbluebutton_blindsidenetworks_activity_module_2x.zip
 
 
 Installation

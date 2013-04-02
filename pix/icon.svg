@@ -2,14 +2,14 @@
 <!-- Generator: Adobe Illustrator 16.0.4, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="30px" height="30px" viewBox="0 0 30 30" enable-background="new 0 0 30 30" xml:space="preserve">
-<symbol  id="New_Symbol" viewBox="-107.423 -107.423 214.847 214.846">
-	<g>
+	 width="24px" height="24px" viewBox="0 0 30 30" enable-background="new 0 0 30 30" xml:space="preserve" preserveAspectRatio="xMinYMid meet">
 		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-58.9473" y1="84.1865" x2="58.9479" y2="-84.1852">
 			<stop  offset="0" style="stop-color:#283274"/>
 			<stop  offset="0.7088" style="stop-color:#293275"/>
 			<stop  offset="0.967" style="stop-color:#273F87"/>
 		</linearGradient>
+<symbol  id="New_Symbol" viewBox="-107.423 -107.423 214.847 214.846">
+	<g>
 		<path fill="url(#SVGID_1_)" stroke="#5D6AA4" stroke-width="9.3191" d="M102.765,0c0-56.755-46.009-102.764-102.765-102.764
 			c-56.754,0-102.764,46.009-102.764,102.764S-56.754,102.764,0,102.764C56.756,102.764,102.765,56.755,102.765,0z"/>
 		
