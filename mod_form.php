@@ -96,12 +96,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // add standard buttons, common to all modules
         $this->add_action_buttons();
         
-        // Take off the option [visible groups]
-        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.modform_Editting');
-        
     }
 
-    
+
     public function validation($data, $files) {
         $current_activity =& $this->current;
         
@@ -113,8 +110,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
         return $errors;
     }
-    
-    
+
+
 }
 
 ?>

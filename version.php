@@ -13,7 +13,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$module->version  = 2013040101;
+$module->version  = 2013040102;
 $module->requires = 2010112400;
 $module->cron     = 0;
 $module->component = 'mod_bigbluebuttonbn';
