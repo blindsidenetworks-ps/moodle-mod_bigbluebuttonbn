@@ -29,6 +29,7 @@ if ($id) {
 } else {
     print_error('You must specify a course_module ID or an instance ID');
 }
+$module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
 
 require_login($course, true, $cm);
 
@@ -121,7 +122,7 @@ $parsedUrl = parse_url($CFG->wwwroot);
 $bbbsession['originServerName'] = $parsedUrl['host'];
 $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
-$bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn 1.0.8';
+$bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module->version.')';
 $bbbsession['context'] = $course->fullname;
 $bbbsession['contextActivity'] = $bigbluebuttonbn->name;
 $bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
