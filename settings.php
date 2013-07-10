@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings for bigblueButton
+ * Settings for BigBlueButtonBN
  *
  * Authors:
  *    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
