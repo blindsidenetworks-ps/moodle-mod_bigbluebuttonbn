@@ -40,6 +40,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"' );
         $mform->addRule( 'name', null, 'required', null, 'client' );
+        $mform->setType('name', PARAM_TEXT);
 
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
@@ -82,6 +83,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('duration', 'timeduration', get_string('mod_form_field_duration', 'bigbluebuttonbn')); //Set zero for unlimited
             $mform->setDefault('timeduration', 14400);
             $mform->addHelpButton('timeduration', 'mod_form_field_duration', 'bigbluebuttonbn');
+            $mform->setType('description', PARAM_TEXT);
         }
         //-------------------------------------------------------------------------------
         // Third block ends here
