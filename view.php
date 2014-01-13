@@ -30,7 +30,13 @@ if ($id) {
 } else {
     print_error('You must specify a course_module ID or an instance ID');
 }
-$module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
+
+if ( $CFG->version < '2013111800' ) {
+    $module = $DB->get_record('modules', array('name' => 'recordingsbn'));
+    $module_version = $module->version;
+} else {
+    $module_version = get_config('mod_recordingsbn', 'version');
+}
 
 require_login($course, true, $cm);
 
@@ -123,7 +129,7 @@ $parsedUrl = parse_url($CFG->wwwroot);
 $bbbsession['originServerName'] = $parsedUrl['host'];
 $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
-$bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module->version.')';
+$bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
 $bbbsession['context'] = $course->fullname;
 $bbbsession['contextActivity'] = $bigbluebuttonbn->name;
 $bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
@@ -251,7 +257,7 @@ echo $OUTPUT->footer();
 
 
 function bigbluebuttonbn_view_joining( $bbbsession ){
-    
+
     $joining = false;
 
     if( $bbbsession['flag']['moderator'] || !$bbbsession['flag']['wait'] ) {  // If is a moderator or if is a viewer and no waiting is required
@@ -268,7 +274,7 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
                 "meta_contextActivityDescription" => $bbbsession['contextActivityDescription'],
                 "meta_recording" => $bbbsession['textflag']['record']);
         $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
-        
+
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action
             if ( $bbbsession['flag']['administrator'] )
@@ -287,29 +293,23 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
             }
         } else if ($response['hasBeenForciblyEnded'] == "true"){
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
-                
         } else { ///////////////Everything is ok /////////////////////
-            
             bigbluebuttonbn_log($bbbsession, 'Create');
-            
+
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
                 print "&nbsp;&nbsp;".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
-            
             } else {
                 $joining = true;
-              
+
                 if( $bbbsession['flag']['moderator'] )
                     print "<br />".get_string('view_login_moderator', 'bigbluebuttonbn' )."<br /><br />";
                 else
                     print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
                 
                 print "<center><img src='pix/loading.gif' /></center>";
-                
             }
         }
-        
     } else {    // "Viewer" && Waiting for moderator is required;
-
         $joining = true;
 
         print "<div align='center'>";
@@ -317,18 +317,13 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
             /// Since the meeting is already running, we just join the session
             print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
             print "<center><img src='pix/loading.gif' /></center>";
-
         } else {
             print "<br />".get_string('view_wait', 'bigbluebuttonbn' )."<br /><br />";
             print '<center><img src="pix/polling.gif"></center>';
         }
-        
         print "</div>";
-    
     }
-    
     return $joining;
-        
 }
 
 function bigbluebuttonbn_view_before( $bbbsession ){
@@ -343,21 +338,18 @@ function bigbluebuttonbn_view_before( $bbbsession ){
         echo '    <td class="c1">'.userdate($bbbsession['timedue']).'</td></tr>';
     }
     echo '</table>';
-        
 }
 
 
 function bigbluebuttonbn_view_after( $bbbsession ){
 
     $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['salt']);
-            
+
     if ( !isset($recordingsArray) || array_key_exists('messageKey', $recordingsArray)) {   // There are no recordings for this meeting
         if ( $bbbsession['flag']['record'] )
             print_string('bbbnorecordings', 'bigbluebuttonbn');
-        
     } else {                                                                                // Actually, there are recordings for this meeting
         echo '    <center>'."\n";
-            
         echo '      <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">'."\n";
         echo '        <thead>'."\n";
         echo '        </thead>'."\n";
@@ -366,11 +358,8 @@ function bigbluebuttonbn_view_after( $bbbsession ){
         echo '        <tfoot>'."\n";
         echo '        </tfoot>'."\n";
         echo '      </table>'."\n";
-
         echo '    </center>'."\n";
-            
     }
-        
 }
 
 
