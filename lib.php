@@ -50,9 +50,10 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     $bigbluebuttonbn->viewerpass = bigbluebuttonbn_rand_string();
     $bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string();
 
-    if (! isset($bigbluebuttonbn->newwindow))   $bigbluebuttonbn->newwindow = 0;
-    if (! isset($bigbluebuttonbn->wait))        $bigbluebuttonbn->wait = 0;
-    if (! isset($bigbluebuttonbn->record))      $bigbluebuttonbn->record = 0;
+    if (! isset($bigbluebuttonbn->newwindow))     $bigbluebuttonbn->newwindow = 0;
+    if (! isset($bigbluebuttonbn->wait))          $bigbluebuttonbn->wait = 0;
+    if (! isset($bigbluebuttonbn->record))        $bigbluebuttonbn->record = 0;
+    if (! isset($bigbluebuttonbn->allmoderators)) $bigbluebuttonbn->allmoderators = 0;
 
     $returnid = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     
@@ -93,9 +94,10 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
 
-    if (! isset($bigbluebuttonbn->newwindow))   $bigbluebuttonbn->newwindow = 0;
-    if (! isset($bigbluebuttonbn->wait))        $bigbluebuttonbn->wait = 0;
-    if (! isset($bigbluebuttonbn->record))      $bigbluebuttonbn->record = 0;
+    if (! isset($bigbluebuttonbn->newwindow))     $bigbluebuttonbn->newwindow = 0;
+    if (! isset($bigbluebuttonbn->wait))          $bigbluebuttonbn->wait = 0;
+    if (! isset($bigbluebuttonbn->record))        $bigbluebuttonbn->record = 0;
+    if (! isset($bigbluebuttonbn->allmoderators)) $bigbluebuttonbn->allmoderators = 0;
 
     $returnid = $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     

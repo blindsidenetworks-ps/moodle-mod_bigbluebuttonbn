@@ -56,7 +56,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $table->add_field('record', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('event', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
-                
+
         // Adding keys to table bigbluebuttonbn_log
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
@@ -76,9 +76,21 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $field->set_attributes(XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null, null, 'type');
 
         $dbman->change_field_type($table, $field, $continue=true, $feedback=true);
-        
+
         upgrade_mod_savepoint(true, 2012100100, 'bigbluebuttonbn');
     }
+
+    if ($result && $oldversion < 2014050100) {
+
+        $table = new xmldb_table('bigbluebuttonbn');
+        $field = new xmldb_field('allmoderators');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+
+        $dbman->add_field($table, $field, $continue=true, $feedback=true);
+
+        upgrade_mod_savepoint(true, 2014050100, 'bigbluebuttonbn');
+    }
+
     return $result;
 }
 

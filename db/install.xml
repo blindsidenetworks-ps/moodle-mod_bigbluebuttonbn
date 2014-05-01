@@ -11,8 +11,9 @@
         <FIELD NAME="moderatorpass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the moderator password" PREVIOUS="name" NEXT="viewerpass"/>
         <FIELD NAME="viewerpass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the viewer password" PREVIOUS="moderatorpass" NEXT="wait"/>
         <FIELD NAME="wait" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the user has to wait, either 1 or 0" PREVIOUS="viewerpass" NEXT="newwindow"/>
-        <FIELD NAME="newwindow" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the user has to wait, either 1 or 0" PREVIOUS="wait" NEXT="record"/>
-        <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the meeting session has to be recorded, either 1 or 0" PREVIOUS="newwindow" NEXT="description"/>
+        <FIELD NAME="newwindow" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the user has to wait, either 1 or 0" PREVIOUS="wait" NEXT="allmoderators"/>
+        <FIELD NAME="allmoderators" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the user has to wait, either 1 or 0" PREVIOUS="newwindow" NEXT="record"/>
+        <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the meeting session has to be recorded, either 1 or 0" PREVIOUS="allmoderators" NEXT="description"/>
         <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Description of this activity" PREVIOUS="record" NEXT="welcome"/>
         <FIELD NAME="welcome" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Welcome message for the chat window" PREVIOUS="description" NEXT="voicebridge"/>
         <FIELD NAME="voicebridge" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Voice conference number participants enter to join the voice conference." PREVIOUS="welcome" NEXT="timedue"/>

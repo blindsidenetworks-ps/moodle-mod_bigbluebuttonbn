@@ -101,10 +101,12 @@ $bbbsession['voicebridge'] = $bigbluebuttonbn->voicebridge;
 $bbbsession['description'] = $bigbluebuttonbn->description;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
 $bbbsession['flag']['wait'] = $bigbluebuttonbn->wait;
+$bbbsession['flag']['allmoderators'] = $bigbluebuttonbn->allmoderators;
 $bbbsession['flag']['record'] = $bigbluebuttonbn->record;
 $bbbsession['textflag']['newwindow'] = $bigbluebuttonbn->newwindow? 'true':'false';
 $bbbsession['textflag']['wait'] = $bigbluebuttonbn->wait? 'true': 'false';
 $bbbsession['textflag']['record'] = $bigbluebuttonbn->record? 'true': 'false';
+$bbbsession['textflag']['allmoderators'] = $bigbluebuttonbn->allmoderators? 'true': 'false';
 if( $bigbluebuttonbn->record )
     $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
 
@@ -181,7 +183,7 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
 }
 
-if( $moderator) 
+if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 else
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
