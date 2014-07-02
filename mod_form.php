@@ -76,7 +76,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Third block starts here
         //-------------------------------------------------------------------------------
-        if ( floatval($serverVersion) >= 0.8 && $allowrecording ) {
+        if ( floatval($serverVersion) >= 0.8 && $allowRecording ) {
             $mform->addElement('header', 'general', get_string('mod_form_block_record', 'bigbluebuttonbn'));
 
             $mform->addElement( 'checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn') );
