@@ -27,7 +27,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //BigBlueButton server data
         $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
         $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
-        $allowRecording = ($CFG->BigBlueButtonBNAllowRecording=='1') ? true : false;
+
+        if (isset($CFG->BigBlueButtonBNAllowRecording) && isset($CFG->BigBlueButtonBNAllowAllModerators)) {
+            $allowRecording = ($CFG->BigBlueButtonBNAllowRecording=='1') ? true : false;
+            $allowAllModerators = ($CFG->BigBlueButtonBNAllowAllModerators=='1') ? true : false;
+        } else {
+            $allowRecording = false;
+            $allowAllModerators = false;
+        }
 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
         if ( !isset($serverVersion) ) {
@@ -56,8 +63,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
         $mform->setDefault( 'wait', 1 );
 
-        $mform->addElement( 'checkbox', 'allmoderators', get_string('mod_form_field_allmoderators', 'bigbluebuttonbn') );
-        $mform->setDefault( 'allmoderators', 0 );
+        if ($allowAllModerators) {
+            $mform->addElement( 'checkbox', 'allmoderators', get_string('mod_form_field_allmoderators', 'bigbluebuttonbn') );
+            $mform->setDefault( 'allmoderators', 0 );
+        }
 
         //-------------------------------------------------------------------------------
         // Second block starts here

@@ -13,6 +13,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+$string['bbballowallmoderators'] = 'Show setting that will allow the teacher to allow all students to moderate the session';
 $string['bbballowrecording'] = 'Show setting that will allow the user to record the session';
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
 $string['bbbdurationwarning'] = 'The maximum duration for this session is %duration% minutes.';
@@ -26,6 +27,7 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
+$string['bigbluebuttonbnAllowAllModerators'] = 'Allow All Students To Moderate';
 $string['bigbluebuttonbnAllowRecording'] = 'BigBlueButton Allow Recording';
 $string['bigbluebuttonbnfieldset'] = 'Custom example field set';
 $string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';
