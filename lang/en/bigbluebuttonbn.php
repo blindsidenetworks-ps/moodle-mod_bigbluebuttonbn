@@ -13,6 +13,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+$string['bbballowrecording'] = 'Show setting that will allow the user to record the session';
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
 $string['bbbdurationwarning'] = 'The maximum duration for this session is %duration% minutes.';
 $string['bbbfinished'] = 'This activity is over.';
@@ -25,6 +26,7 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
+$string['bigbluebuttonbnAllowRecording'] = 'BigBlueButton Allow Recording';
 $string['bigbluebuttonbnfieldset'] = 'Custom example field set';
 $string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';
 $string['bigbluebuttonbnSalt'] = 'BigBlueButton Shared Secret';
