@@ -21,7 +21,7 @@ $g  = optional_param('g', 0, PARAM_INT);    // group instance ID
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 require_login($course, true);
 
-$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+$coursecontext = context_course::instance($course->id);
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
 
 add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
@@ -35,10 +35,6 @@ $strbigbluebuttonbn  = get_string('modulename', 'bigbluebuttonbn');
 $PAGE->set_pagelayout('incourse');
 
 /// Print the header
-
-$navlinks = array();
-$navlinks[] = array('name' => $strbigbluebuttonbns, 'link' => '', 'type' => 'activity');
-$navigation = build_navigation($navlinks);
 
 $PAGE->set_url('/mod/bigbluebuttonbn/index.php', array('id'=>$id));
 $PAGE->navbar->add($strbigbluebuttonbns, "index.php?id=$course->id");

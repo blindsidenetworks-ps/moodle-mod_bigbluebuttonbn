@@ -34,7 +34,7 @@ if ($id) {
 if ( $CFG->version < '2013111800' ) {
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
 } else {
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
     $context = context_module::instance($cm->id);
