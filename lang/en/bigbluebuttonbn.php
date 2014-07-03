@@ -24,7 +24,6 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';
 $string['bigbluebuttonbnSalt'] = 'BigBlueButton Shared Secret';
 $string['bigbluebuttonbnUrl'] = 'BigBlueButton Server URL';
 $string['bigbluebuttonbnWait'] = 'User has to wait';
