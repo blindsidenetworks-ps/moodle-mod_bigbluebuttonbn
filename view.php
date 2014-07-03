@@ -31,6 +31,11 @@ if ($id) {
     print_error('You must specify a course_module ID or an instance ID');
 }
 
+require_login($course, true, $cm);
+
+//Extra parameters
+$redirect = optional_param('redirect', 0, PARAM_INT);
+
 if ( $CFG->version < '2013111800' ) {
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
@@ -39,16 +44,10 @@ if ( $CFG->version < '2013111800' ) {
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
     $context = context_module::instance($cm->id);
 }
-
-require_login($course, true, $cm);
-
-//Extra parameters
-$redirect = optional_param('redirect', 0, PARAM_INT);
-
 $PAGE->set_context($context);
-
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
+
 add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 
 //Validates if the BigBlueButton server is running 

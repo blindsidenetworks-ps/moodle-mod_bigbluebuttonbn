@@ -21,8 +21,12 @@ $g  = optional_param('g', 0, PARAM_INT);    // group instance ID
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 require_login($course, true);
 
-$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-$moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
+if ( $CFG->version < '2013111800' ) {
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+} else {
+    $context = context_module::instance($cm->id);
+}
+$moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 
 add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
 
