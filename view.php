@@ -20,11 +20,11 @@ $b  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
 $group  = optional_param('group', 0, PARAM_INT);  // bigbluebuttonbn group ID
 
 if ($id) {
-    $cm         = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $bigbluebuttonbn  = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
 } elseif ($b) {
-    $bigbluebuttonbn  = $DB->get_record('bigbluebuttonbn', array('id' => $n), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $n), '*', MUST_EXIST);
     $course     = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
@@ -40,15 +40,20 @@ if ( $CFG->version < '2013111800' ) {
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 } else {
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
     $context = context_module::instance($cm->id);
+    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create(
+            array(
+                    'context' => $context,
+                    'objectid' => $bigbluebuttonbn->id
+                    )
+            );
+    $event->trigger();
 }
-$PAGE->set_context($context);
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
-
-add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 
 //Validates if the BigBlueButton server is running 
 //BigBlueButton server data
@@ -75,9 +80,8 @@ if ( !isset($serverVersion) ) { //Server is not working
     }
 }
 
-//
-// BigBlueButton Setup
-//
+//// BigBlueButton Setup Starts
+
 //Server data
 $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
 $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
@@ -136,19 +140,17 @@ $bbbsession['context'] = $course->fullname;
 $bbbsession['contextActivity'] = $bigbluebuttonbn->name;
 $bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
 
-//
-// BigBlueButton Setup Ends
-//
+//// BigBlueButton Setup Ends
 
 // Mark viewed by user (if required)
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 /// Print the page header
+$PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
-$PAGE->set_heading($course->shortname);
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
-$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
+$PAGE->set_heading($course->shortname);
 $PAGE->set_cacheable(false);
 if( !$bbbsession['flag']['moderator'] && $bbbsession['flag']['wait'] ) {
     $PAGE->blocks->show_only_fake_blocks(); //Disable blocks for layouts which do include pre-post blocks
@@ -197,7 +199,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
     if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue){
         //GO JOINING
         $bigbluebuttonbn_view = 'join';
-        $joining = bigbluebuttonbn_view_joining( $bbbsession );
+        $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
         
     } else {
         //CALLING AFTER
@@ -224,7 +226,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
 } else if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue ) {
     //GO JOINING
     $bigbluebuttonbn_view = 'join';
-    $joining = bigbluebuttonbn_view_joining( $bbbsession );
+    $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
         
 } else {
     //CALLING AFTER
@@ -261,7 +263,7 @@ $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false,
 echo $OUTPUT->footer();
 
 
-function bigbluebuttonbn_view_joining( $bbbsession ){
+function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn ){
 
     $joining = false;
 
@@ -300,6 +302,13 @@ function bigbluebuttonbn_view_joining( $bbbsession ){
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
         } else { ///////////////Everything is ok /////////////////////
             bigbluebuttonbn_log($bbbsession, 'Create');
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
+                    array(
+                            'context' => $context,
+                            'objectid' => $bigbluebuttonbn->id
+                    )
+            );
+            $event->trigger();
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
                 print "&nbsp;&nbsp;".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";

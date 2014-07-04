@@ -10,7 +10,7 @@
  * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-
+/*
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -21,33 +21,73 @@ $g  = optional_param('g', 0, PARAM_INT);    // group instance ID
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 require_login($course, true);
 
-if ( $CFG->version < '2013111800' ) {
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-} else {
-    $context = context_module::instance($cm->id);
-}
-$moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
+$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+$moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
 
 add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
 
 
-/// Get all required stringsbigbluebuttonbn
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
-$strbigbluebuttonbns = get_string('modulenameplural', 'bigbluebuttonbn');
-$strbigbluebuttonbn  = get_string('modulename', 'bigbluebuttonbn');
+$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
+$n  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
+$group  = optional_param('group', 0, PARAM_INT);  // bigbluebuttonbn group ID
 
-$PAGE->set_pagelayout('incourse');
+if ($id) {
+    $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+    //$cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
+    //$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    //$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+} elseif ($b) {
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $n), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+} else {
+    print_error('You must specify a course_module ID or an instance ID');
+}
+
+
+*/
+
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/locallib.php');
+
+$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
+
+if ($id) {
+    $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+} else {
+    print_error('You must specify a course_module ID or an instance ID');
+}
+
+require_login($course, true);
+
+if ( $CFG->version < '2013111800' ) {
+    $context = get_context_instance(CONTEXT_COURSE, $course->id);;
+    add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
+} else {
+    $context = context_course::instance($course->id);
+    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create(
+            array(
+                    'context' => $context,
+                    )
+            );
+    $event->trigger();
+}
+$moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
+$administrator = has_capability('moodle/category:manage', $context);
 
 /// Print the header
-
-$navlinks = array();
-$navlinks[] = array('name' => $strbigbluebuttonbns, 'link' => '', 'type' => 'activity');
-$navigation = build_navigation($navlinks);
-
+//$PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/index.php', array('id'=>$id));
-$PAGE->navbar->add($strbigbluebuttonbns, "index.php?id=$course->id");
-$PAGE->set_title($strbigbluebuttonbns);
+$PAGE->set_title(get_string('modulename', 'bigbluebuttonbn'));
 $PAGE->set_heading($course->fullname);
+$PAGE->set_cacheable(false);
+$PAGE->set_pagelayout('incourse');
+
+//$navigation = build_navigation(array('name' => get_string('modulename', 'bigbluebuttonbn'), 'link' => '', 'type' => 'activity'));
+$PAGE->navbar->add(get_string('modulename', 'bigbluebuttonbn'), "index.php?id=$course->id");
 
 /// Get all the appropriate data
 if (! $bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
@@ -66,12 +106,10 @@ $heading_moderator  = get_string('index_heading_moderator', 'bigbluebuttonbn' );
 $heading_actions    = get_string('index_heading_actions', 'bigbluebuttonbn' );
 $heading_recording  = get_string('index_heading_recording', 'bigbluebuttonbn' );
 
-
 $table = new html_table();
 
 $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
 $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
-
 
 $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
@@ -120,7 +158,6 @@ echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
 echo html_writer::table($table);
 
 echo $OUTPUT->footer();
-
 
 /// Functions
 function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){

@@ -101,4 +101,14 @@ $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
 
+$string['event_activity_created'] = 'BigBlueButtonBN activity created';
+$string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
+$string['event_activity_viewed_all'] = 'BigBlueButtonBN activity management viewed';
+$string['event_activity_modified'] = 'BigBlueButtonBN activity modified';
+$string['event_activity_deleted'] = 'BigBlueButtonBN activity deleted';
+$string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
+$string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
+$string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
+$string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibely ended';
+
 ?>
