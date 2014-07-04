@@ -12,10 +12,26 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
+global $CFG;
 
-$plugin->version  = 2014070300;
-$plugin->requires = 2013101800;
-$plugin->cron     = 0;
-$plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_RC;  // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-$plugin->release  = '1.0.11';
+$version = 2014070306;
+$cron = 0;
+$component = 'mod_bigbluebuttonbn';
+$maturity = MATURITY_BETA;    // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
+$release = '1.0.11';
+
+if ( $CFG->version < '2013111800' ) {
+    $module->version = $version;
+    $module->requires = 2010112400.1;
+    $module->cron = $cron;
+    $module->component = $component;
+    $module->maturity = $maturity;
+    $module->release = $release;
+} else {
+    $plugin->version  = $version;
+    $plugin->requires = 2013101800;
+    $plugin->cron     = $cron;
+    $plugin->component = $component;
+    $plugin->maturity = $maturity;
+    $plugin->release  = $release;
+}
