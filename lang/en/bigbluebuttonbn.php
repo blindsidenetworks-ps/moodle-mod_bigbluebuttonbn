@@ -109,6 +109,6 @@ $string['event_activity_deleted'] = 'BigBlueButtonBN activity deleted';
 $string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
 $string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
 $string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
-$string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibely ended';
+$string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibly ended';
 
 ?>

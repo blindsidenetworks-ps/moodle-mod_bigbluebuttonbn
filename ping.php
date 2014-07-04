@@ -36,13 +36,15 @@ if ( !isset($error) ) {
     	
     if( !$hascourseaccess ){
         header("HTTP/1.0 401 Unauthorized");
-        //http_response_code(401);
     } else {
         $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
         $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 
         try{
             $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt )? 'true': 'false');
+            if( $ismeetingrunning === 'true' ) {
+                //log the join event
+            }
             echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
         }catch(Exception $e){
             header("HTTP/1.0 502 Bad Gateway. ".$e->getMessage());
@@ -52,5 +54,4 @@ if ( !isset($error) ) {
 
 } else {
     header("HTTP/1.0 400 Bad Request. ".$error);
-    //http_response_code(400);
 }
