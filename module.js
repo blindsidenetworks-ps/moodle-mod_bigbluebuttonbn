@@ -16,7 +16,6 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
  */
 
 M.mod_bigbluebuttonbn.init_view = function(Y) {
-
     if (bigbluebuttonbn.joining == 'true') {
         if (bigbluebuttonbn.ismoderator == 'true' || bigbluebuttonbn.waitformoderator == 'false') {
             M.mod_bigbluebuttonbn.joinURL();
@@ -27,7 +26,7 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
             });
 
             var request = {
-                request : "meetingid=" + bigbluebuttonbn.meetingid,
+                request : "meetingid=" + bigbluebuttonbn.meetingid + "&id=" + bigbluebuttonbn.bigbluebuttonbnid,
                 callback : {
                     success : function(e) {
                         if (e.data.status == 'true') {

@@ -16,14 +16,13 @@ defined('MOODLE_INTERNAL') || die;
 require_once(dirname(__FILE__).'/lib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 
-
 function bigbluebuttonbn_rand_string() {
     return md5(uniqid(rand(), true));
 }
 
 function bigbluebuttonbn_log(array $bbbsession, $event) {
     global $DB;
-    
+
     $log = new stdClass();
     
     $log->meetingid = $bbbsession['meetingid'];

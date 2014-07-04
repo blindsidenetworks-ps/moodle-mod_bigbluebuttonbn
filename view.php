@@ -25,8 +25,8 @@ if ($id) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
 } elseif ($b) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $n), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm         = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
     print_error('You must specify a course_module ID or an instance ID');
 }
@@ -248,7 +248,8 @@ $jsVars = array(
         'meetingid' => $bbbsession['meetingid'],
         'joinurl' => $bbbsession['joinURL'],
         'joining' => ($joining? 'true':'false'),
-        'bigbluebuttonbn_view' => $bigbluebuttonbn_view
+        'bigbluebuttonbn_view' => $bigbluebuttonbn_view,
+        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid']
 );
 
 $jsmodule = array(
@@ -264,6 +265,7 @@ echo $OUTPUT->footer();
 
 
 function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn ){
+    global $CFG, $DB;
 
     $joining = false;
 
@@ -301,14 +303,20 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
         } else if ($response['hasBeenForciblyEnded'] == "true"){
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
         } else { ///////////////Everything is ok /////////////////////
+            /// Moodle event logger: Create an event for meeting created
+            if ( $CFG->version < '2013111800' ) {
+            } else {
+                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
+                        array(
+                                'context' => $context,
+                                'objectid' => $bigbluebuttonbn->id
+                        )
+                );
+                $event->trigger();
+            }
+
+            /// Internal log: Instert a record with the meeting created
             bigbluebuttonbn_log($bbbsession, 'Create');
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
-                    array(
-                            'context' => $context,
-                            'objectid' => $bigbluebuttonbn->id
-                    )
-            );
-            $event->trigger();
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
                 print "&nbsp;&nbsp;".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
@@ -322,8 +330,23 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 
                 print "<center><img src='pix/loading.gif' /></center>";
             }
+
+            /// Moodle event logger: Create an event for meeting joined
+            if ( $CFG->version < '2013111800' ) {
+            } else {
+                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
+                        array(
+                                'context' => $context,
+                                'objectid' => $bigbluebuttonbn->id
+                        )
+                );
+                $event->trigger();
+            }
         }
-    } else {    // "Viewer" && Waiting for moderator is required;
+    } else {
+        //    
+        // "Viewer" && Waiting for moderator is required;
+        //
         $joining = true;
 
         print "<div align='center'>";
@@ -331,7 +354,19 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             /// Since the meeting is already running, we just join the session
             print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
             print "<center><img src='pix/loading.gif' /></center>";
+            /// Moodle event logger: Create an event for meeting joined
+            if ( $CFG->version < '2013111800' ) {
+            } else {
+                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
+                        array(
+                                'context' => $context,
+                                'objectid' => $bigbluebuttonbn->id
+                        )
+                );
+                $event->trigger();
+            }
         } else {
+            /// Since the meeting is not running, the spining wheel is shown
             print "<br />".get_string('view_wait', 'bigbluebuttonbn' )."<br /><br />";
             print '<center><img src="pix/polling.gif"></center>';
         }

@@ -29,7 +29,7 @@ class bigbluebuttonbn_meeting_ended extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_meeting_created', 'mod_bigbluebuttonbn');
+        return get_string('event_meeting_ended', 'mod_bigbluebuttonbn');
     }
 
     /**

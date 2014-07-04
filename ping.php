@@ -13,8 +13,9 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$callback = optional_param('callback', "", PARAM_TEXT);
-$meetingID = optional_param('meetingid', 0, PARAM_TEXT);
+$meetingID = required_param('meetingid', PARAM_TEXT);
+$callback = required_param('callback', PARAM_TEXT);
+$id = optional_param('id', 0, PARAM_INT);
 
 if (!$meetingID) {
     $error = 'You must specify a meetingID';
@@ -43,7 +44,24 @@ if ( !isset($error) ) {
         try{
             $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt )? 'true': 'false');
             if( $ismeetingrunning === 'true' ) {
-                //log the join event
+                ///log the join event
+                if ( $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id), '*', MUST_EXIST) ) {
+                    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+                    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+                    /// Moodle event logger: Create an event for meeting joined
+                    if ( $CFG->version < '2013111800' ) {
+                        add_to_log($course->id, 'bigbluebuttonbn', 'end meeting', "index.php?id=$course->id", '');
+                    } else {
+                        $context = context_module::instance($cm->id);
+                        $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
+                                array(
+                                        'context' => $context,
+                                        'objectid' => $bigbluebuttonbn->id
+                                )
+                        );
+                        $event->trigger();
+                    }
+                }
             }
             echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
         }catch(Exception $e){
