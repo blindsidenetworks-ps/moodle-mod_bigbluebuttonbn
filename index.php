@@ -2,11 +2,9 @@
 /**
  * View all BigBlueButton instances in this course.
  * 
- * Authors:
- *    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
- * 
  * @package   mod_bigbluebuttonbn
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
