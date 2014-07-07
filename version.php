@@ -10,27 +10,17 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-global $CFG;
 
-$version = 2014070400;
-$cron = 0;
-$component = 'mod_bigbluebuttonbn';
-$release = '1.0.11';
-/// [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-$maturity = MATURITY_BETA;
+#$module->version = 2014070400;
+#$module->requires = 2010112400;
+#$module->cron = 0;
+#$module->component = 'mod_bigbluebuttonbn';
+#$module->maturity = MATURITY_BETA;    // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
+#$module->release = '1.0.11';
 
-if ( $CFG->version < '2013111800' ) {
-    $module->version = $version;
-    $module->requires = 2010112400.1;
-    $module->cron = $cron;
-    $module->component = $component;
-    $module->maturity = $maturity;
-    $module->release = $release;
-} else {
-    $plugin->version  = $version;
-    $plugin->requires = 2013101800;
-    $plugin->cron     = $cron;
-    $plugin->component = $component;
-    $plugin->maturity = $maturity;
-    $plugin->release  = $release;
-}
+$plugin->version  = 2014070400;
+$plugin->requires = 2013051400;
+$plugin->cron     = 0;
+$plugin->component = 'mod_bigbluebuttonbn';
+$plugin->maturity = MATURITY_BETA;    // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
+$plugin->release  = '1.0.11';
