@@ -354,4 +354,17 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 
 }
 
+/**
+ * bbb_add_to_log hack for using legacy add to log without debug screaming at us
+ */
+function bbb_add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user=0) {
+    if (function_exists('get_log_manager')) {
+        $manager = get_log_manager();
+        $manager->legacy_add_to_log($courseid, $module, $action, $url, $info, $cm, $user);
+    } else if (function_exists('add_to_log')) {
+        add_to_log($courseid, $module, $action, $url, $info, $cm, $user);
+    }
+}
+
+
 ?>

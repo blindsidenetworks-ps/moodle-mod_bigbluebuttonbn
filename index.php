@@ -24,7 +24,7 @@ require_login($course, true);
 $coursecontext = context_course::instance($course->id);
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $coursecontext);
 
-add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
+bbb_add_to_log($course->id, 'bigbluebuttonbn', 'view all', "index.php?id=$course->id", '');
 
 
 /// Get all required stringsbigbluebuttonbn
