@@ -47,9 +47,11 @@ if ( !isset($error) ) {
                     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
                     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
                     /// Moodle event logger: Create an event for meeting joined
-                    if ( $CFG->version < '2013111800' ) {
-                        add_to_log($course->id, 'bigbluebuttonbn', 'end meeting', "index.php?id=$course->id", '');
+                    if ( $CFG->version < '2014051200' ) {
+                        //This is valid before v2.7
+                        add_to_log($course->id, 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $cm->id);
                     } else {
+                        //This is valid after v2.7
                         $context = context_module::instance($cm->id);
                         $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
                                 array(

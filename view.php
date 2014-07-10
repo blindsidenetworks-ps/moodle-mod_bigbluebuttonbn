@@ -31,25 +31,31 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-//Extra parameters
-$redirect = optional_param('redirect', 0, PARAM_INT);
-
 if ( $CFG->version < '2013111800' ) {
+    //This is valid before v2.6
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-    add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 } else {
+    //This is valid after v2.6
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
     $context = context_module::instance($cm->id);
+}
+
+if ( $CFG->version < '2014051200' ) {
+    //This is valid before v2.7
+    add_to_log($course->id, 'bigbluebuttonbn', 'view', 'view.php?id=$cm->id', $bigbluebuttonbn->name, $cm->id);
+} else {
+    //This is valid after v2.7
     $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create(
             array(
                     'context' => $context,
                     'objectid' => $bigbluebuttonbn->id
-                    )
-            );
+            )
+    );
     $event->trigger();
 }
+
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
 
@@ -302,8 +308,11 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
         } else { ///////////////Everything is ok /////////////////////
             /// Moodle event logger: Create an event for meeting created
-            if ( $CFG->version < '2013111800' ) {
+            if ( $CFG->version < '2014051200' ) {
+                //This is valid before v2.7
+                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting created', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
             } else {
+                //This is valid after v2.7
                 $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
                         array(
                                 'context' => $context,
@@ -313,7 +322,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 $event->trigger();
             }
 
-            /// Internal log: Instert a record with the meeting created
+            /// Internal logger: Instert a record with the meeting created
             bigbluebuttonbn_log($bbbsession, 'Create');
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
@@ -330,8 +339,11 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             }
 
             /// Moodle event logger: Create an event for meeting joined
-            if ( $CFG->version < '2013111800' ) {
+            if ( $CFG->version < '2014051200' ) {
+                //This is valid before v2.7
+                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
             } else {
+                //This is valid after v2.7
                 $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
                         array(
                                 'context' => $context,
@@ -353,8 +365,11 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
             print "<center><img src='pix/loading.gif' /></center>";
             /// Moodle event logger: Create an event for meeting joined
-            if ( $CFG->version < '2013111800' ) {
+            if ( $CFG->version < '2014051200' ) {
+                //This is valid before v2.7
+                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
             } else {
+                //This is valid after v2.7
                 $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
                         array(
                                 'context' => $context,

@@ -29,10 +29,18 @@ if ($id) {
 require_login($course, true, $cm);
 
 if ( $CFG->version < '2013111800' ) {
+    //This is valid before v2.6
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-    add_to_log($course->id, 'bigbluebuttonbn', 'view_end', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 } else {
+    //This is valid after v2.6
     $context = context_module::instance($cm->id);
+}
+
+if ( $CFG->version < '2014051200' ) {
+    //This is valid before v2.7
+    add_to_log($course->id, 'bigbluebuttonbn', 'meeting left', '', $bigbluebuttonbn->name, $cm->id);
+} else {
+    //This is valid after v2.7
     $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left::create(
             array(
                     'context' => $context,
@@ -41,6 +49,7 @@ if ( $CFG->version < '2013111800' ) {
             );
     $event->trigger();
 }
+
 $PAGE->set_context($context);
 
 $PAGE->set_url('/mod/bigbluebuttonbn/view_end.php', array('id' => $cm->id));
