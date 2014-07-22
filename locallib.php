@@ -13,7 +13,12 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once(dirname(__FILE__).'/lib.php');
+//require_once($CFG->libdir.'/accesslib.php');
+require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
+
+const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
+const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 
 function bigbluebuttonbn_rand_string() {
     return md5(uniqid(rand(), true));
@@ -285,4 +290,27 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
         return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
     }
 
+}
+
+function _bigbluebuttonbn_get_roster($course){
+    $context = get_context_instance(CONTEXT_COURSE, $course->id);
+
+    $instructor_roster = array_merge(lti_get_roster_group($context, 'editingteacher'), lti_get_roster_group($context, 'teacher'));
+    $roster = array("Instructor" => $instructor_roster);
+    return $roster;
+}
+
+function _bigbluebuttonbn_get_roster_group($context, $rolename){
+    global $DB;
+    $roster = array();
+    $role = $DB->get_record('role', array('shortname' => $rolename));
+    $users = get_role_users($role->id, $context);
+    foreach($users as $user){
+        $roster_element = array( "sourcedid" => $user->id,
+                "name_given" => $user->firstname,
+                "name_family" => $user->lastname,
+        );
+        array_push($roster, $roster_element);
+    }
+    return $roster;
 }

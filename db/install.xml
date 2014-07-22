@@ -42,5 +42,17 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="bigbluebuttonbn_participant" COMMENT="The bigbluebuttonbn table to store participant roles" PREVIOUS="bigbluebuttonbn_log">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="meetingid"/>
+        <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="selectiontype" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="meetingid" NEXT="selectionid"/>
+        <FIELD NAME="selectionid" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectiontype" NEXT="role"/>
+        <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectionid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>

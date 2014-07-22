@@ -19,13 +19,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
 
-        global $CFG, $PAGE;
+        global $CFG, $DB, $PAGE, $USER;
 
-        //Validates if the BigBlueButton server is running 
         //BigBlueButton server data
         $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
         $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 
+        //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
         if ( !isset($serverVersion) ) {
             print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
@@ -34,6 +34,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         $current_activity =& $this->current;
 
+        //-------------------------------------------------------------------------------
+        // First block starts here
+        //-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
 
         $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"' );
@@ -52,12 +55,107 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
         $mform->setDefault( 'wait', 1 );
-
-        $mform->addElement( 'checkbox', 'allmoderators', get_string('mod_form_field_allmoderators', 'bigbluebuttonbn') );
-        $mform->setDefault( 'allmoderators', 0 );
-
+        //-------------------------------------------------------------------------------
+        // First block ends here
+        //-------------------------------------------------------------------------------
+        
+        
         //-------------------------------------------------------------------------------
         // Second block starts here
+        //-------------------------------------------------------------------------------
+        $mform->addElement('header', 'general', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
+
+        //$mform->addElement( 'checkbox', 'allmoderators', get_string('mod_form_field_allmoderators', 'bigbluebuttonbn') );
+        //$mform->setDefault( 'allmoderators', 0 );
+
+        $participant_types = array(
+                'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
+                'role' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
+                'user' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn')
+                );
+        $participant_roles = array();
+        foreach( role_fix_names(get_all_roles()) as $role ){
+            if($role->archetype != 'guest' && $role->archetype != 'user' && $role->archetype != 'frontpage' && $role->archetype != 'coursecreator')
+            $participant_roles[$role->archetype] = $role->localname;  
+        }
+
+        //var_dump($participant_roles);
+        //var_dump($participant_roles[1]->shortname);
+        //var_dump($participant_roles[1]->localname);
+        //$coursecontext = get_course_context($course->id);
+        //$participant_roles =  role_fix_names(get_all_roles($coursecontext), $coursecontext, ROLENAME_ALIAS);
+        //$participant_users = bigbluebuttonbn_get_roster();
+
+        $bbb_roles = array(
+                BIGBLUEBUTTONBN_ROLE_VIEWER => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
+                BIGBLUEBUTTONBN_ROLE_MODERATOR => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn')
+                );
+        
+        $participant_list = array();
+        if( isset($this->curent->meetingid) ){
+            $bigbluebuttonbn_participant_list = $DB->get_record('bigbluebuttonbn_participant', array('meetingid'=>$this->current->meetingid), '*', MUST_EXIST);
+            foreach($bigbluebuttonbn_participant_list as $bigbluebuttonbn_participant){
+                array_push($participant_list, array('selectiontype' => $bigbluebuttonbn_participant->selectiontype, 
+                                                    'selectionid' => $bigbluebuttonbn_participant->selectionid, 
+                                                    'role' => $bigbluebuttonbn_participant->role));
+            }
+        } else {
+            array_push($participant_list, array('selectiontype' => 'all',
+                                                'selectionid' => 'all',
+                                                'role' => BIGBLUEBUTTONBN_ROLE_VIEWER));
+            array_push($participant_list, array('selectiontype' => 'user',
+                                                'selectionid' => $USER->id,
+                                                'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR));
+        }
+
+        
+        $x = '<div id="fitem_bigbluebuttonbn_participant_selection" class="fitem fitem_fselect ">'."\n".
+             '  <div class="fitemtitle">'."\n".
+             '    <label for="bigbluebuttonbn_participant_selectiontype">Add participant </label>'."\n".
+             '  </div>'."\n".
+             '  <div class="felement fselect">'."\n".
+             '    <select id="bigbluebuttonbn_participant_selectiontype" onclick="console.debug(&quot;Hello!&quot;); return 0;" name="selectiontype">'."\n".
+             '      <option value="all" selected="selected">All users enrolled</option>'."\n".
+             '      <option value="role">Role</option>'."\n".
+             '      <option value="user">User</option>'."\n".
+             '    </select>'."\n".
+             '    &nbsp;&nbsp;'."\n".
+             '    <select name="selectionid" id="id_selectionid" disabled="disabled">'."\n".
+             '      <option value="all" selected="selected">---------------</option>'."\n".
+             '    </select>'."\n".
+             '    &nbsp;&nbsp;'."\n".
+             '    <input name="addselectionid" value="Add" type="button" id="id_addselectionid" />'."\n".
+             '  </div>'."\n".
+             '</div>'."\n";
+        
+        $mform->addElement('html', $x);
+
+        /*
+        $attributes = array('id' => 'bigbluebuttonbn_participant_selectiontype', 
+                            'onclick' => 'console.debug("Hello!"); return 0;'
+                            );
+        $select = $mform->addElement('select', 'selectiontype', get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $participant_types, $attributes);
+        $select->setSelected('all');
+
+        $attributes = array();
+        $select = $mform->addElement('select', 'selectionid', null, array(), $attributes);
+
+        $mform->addElement('button', 'addselectionid', 'Add');
+        */        
+
+
+        $mform->addElement('html', '<script type="text/javascript">var participant_list = "{}"; </script>');
+        $mform->addElement('html', '<div id="bigbluebuttonbn_participant_roles"></div>');
+        $mform->addElement('html', '<div id="bigbluebuttonbn_participant_users"></div>');
+        $mform->addElement('html', '<div id="bigbluebuttonbn_participant_list"></div>');
+        
+        //-------------------------------------------------------------------------------
+        // Second block ends here
+        //-------------------------------------------------------------------------------
+        
+        
+        //-------------------------------------------------------------------------------
+        // Third block starts here
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
 
@@ -66,12 +164,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('date_time_selector', 'timedue', get_string('mod_form_field_duedate', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('timedue', 0);
         //-------------------------------------------------------------------------------
-        // Second block ends here
+        // Third block ends here
         //-------------------------------------------------------------------------------
         
         
         //-------------------------------------------------------------------------------
-        // Third block starts here
+        // Fourth block starts here
         //-------------------------------------------------------------------------------
         if ( floatval($serverVersion) >= 0.8 ) {
             $mform->addElement('header', 'general', get_string('mod_form_block_record', 'bigbluebuttonbn'));
@@ -86,7 +184,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->setType('description', PARAM_TEXT);
         }
         //-------------------------------------------------------------------------------
-        // Third block ends here
+        // Fourth block ends here
         //-------------------------------------------------------------------------------
 
 
