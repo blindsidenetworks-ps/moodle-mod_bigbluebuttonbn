@@ -7,7 +7,7 @@
  *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)    
  * 
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2012 Blindside Networks 
+ * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -148,10 +148,17 @@ $completion->set_module_viewed($cm);
 /// Print the page header
 $PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
 $PAGE->set_heading($course->shortname);
+$PAGE->set_title(format_string($bigbluebuttonbn->name));
+$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
+$PAGE->set_cacheable(false);
+if( !$bbbsession['flag']['moderator'] && $bbbsession['flag']['wait'] ) {
+    $PAGE->blocks->show_only_fake_blocks(); //Disable blocks for layouts which do include pre-post blocks
+} else {
+    $PAGE->set_pagelayout('incourse');
+}
 
 // Validate if the user is in a role allowed to join
 if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
-    $PAGE->set_title(format_string($bigbluebuttonbn->name));
     echo $OUTPUT->header();
     if (isguestuser()) {
         echo $OUTPUT->confirm('<p>'.get_string('view_noguests', 'bigbluebuttonbn').'</p>'.get_string('liketologin'),
@@ -164,10 +171,6 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     echo $OUTPUT->footer();
     exit;
 }
-
-$PAGE->set_title($bigbluebuttonbn->name);
-$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'bigbluebuttonbn')));
-$PAGE->set_cacheable(false);
 
 // Output starts here
 echo $OUTPUT->header();
