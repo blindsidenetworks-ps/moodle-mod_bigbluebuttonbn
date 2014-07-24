@@ -34,7 +34,7 @@ if ($id) {
 if ( $CFG->version < '2013111800' ) {
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
 } else {
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
     $context = context_module::instance($cm->id);
@@ -49,7 +49,7 @@ $PAGE->set_context($context);
 
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
-add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
+bbb_add_to_log($course->id, 'bigbluebuttonbn', 'view', "view.php?id=$cm->id", $bigbluebuttonbn->name, $cm->id);
 
 //Validates if the BigBlueButton server is running 
 //BigBlueButton server data
