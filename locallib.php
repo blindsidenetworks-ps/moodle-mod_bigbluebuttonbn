@@ -7,7 +7,7 @@
  * 
  * @package   mod
  * @subpackage bigbluebuttonbn
- * @copyright 2010-2012 Blindside Networks 
+ * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 

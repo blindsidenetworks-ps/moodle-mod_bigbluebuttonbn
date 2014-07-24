@@ -6,9 +6,8 @@
  *    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  *    
- *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2012 Blindside Networks
+ * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -25,7 +24,6 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['bigbluebuttonbnfieldset'] = 'Custom example field set';
 $string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';
 $string['bigbluebuttonbnSalt'] = 'BigBlueButton Shared Secret';
 $string['bigbluebuttonbnUrl'] = 'BigBlueButton Server URL';
