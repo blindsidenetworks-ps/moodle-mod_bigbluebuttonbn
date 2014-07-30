@@ -90,7 +90,7 @@ if ( !isset($serverVersion) ) { //Server is not working
 $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
 $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 //User data
-$bbbsession['username'] = $USER->firstname.' '.$USER->lastname;
+$bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
 $bbbsession['userID'] = $USER->id;
 $bbbsession['flag']['moderator'] = $moderator;
 $bbbsession['textflag']['moderator'] = $moderator? 'true': 'false';
