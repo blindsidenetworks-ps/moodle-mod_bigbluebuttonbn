@@ -12,7 +12,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__).'/locallib.php');
-
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
@@ -21,6 +20,24 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         global $CFG, $DB, $PAGE, $USER;
 
+        $course_id = optional_param('course', 0, PARAM_INT); // course_module ID, or
+        $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
+        if ($course_id) {
+            $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
+        } else if ($course_module_id) {
+            $course_module = get_coursemodule_from_id('bigbluebuttonbn', $course_module_id, 0, false, MUST_EXIST);
+            $course = $DB->get_record('course', array('id' => $course_module->course), '*', MUST_EXIST);
+        }
+        
+        if ( $CFG->version < '2013111800' ) {
+            //This is valid before v2.6
+            $context = get_context_instance(CONTEXT_COURSE, $course->id);
+        } else {
+            //This is valid after v2.6
+            $context = context_course::instance($course->id);
+        }
+        //error_log('context: ' . print_r($context, true));
+        
         //BigBlueButton server data
         $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
         $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
@@ -109,25 +126,34 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         
-        $x = '<div id="fitem_bigbluebuttonbn_participant_selection" class="fitem fitem_fselect ">'."\n".
+        $x = '<div id="fitem_bigbluebuttonbn_participant_selection" class="fitem fitem_fselect">'."\n".
              '  <div class="fitemtitle">'."\n".
              '    <label for="bigbluebuttonbn_participant_selectiontype">Add participant </label>'."\n".
              '  </div>'."\n".
              '  <div class="felement fselect">'."\n".
-             '    <select id="bigbluebuttonbn_participant_selectiontype" onclick="console.debug(&quot;Hello!&quot;); return 0;" name="selectiontype">'."\n".
+             '    <select name="bigbluebuttonbn_participant_selection_type" id="bigbluebuttonbn_participant_selection_type" onchange="bigbluebuttonbn_set_participant_selection(); return 0;" name="selectiontype">'."\n".
              '      <option value="all" selected="selected">All users enrolled</option>'."\n".
-             '      <option value="role">Role</option>'."\n".
-             '      <option value="user">User</option>'."\n".
+             '      <option value="roles">Role</option>'."\n".
+             '      <option value="users">User</option>'."\n".
              '    </select>'."\n".
              '    &nbsp;&nbsp;'."\n".
-             '    <select name="selectionid" id="id_selectionid" disabled="disabled">'."\n".
+             '    <select name="bigbluebuttonbn_participant_selection" id="bigbluebuttonbn_participant_selection" disabled="disabled">'."\n".
              '      <option value="all" selected="selected">---------------</option>'."\n".
              '    </select>'."\n".
              '    &nbsp;&nbsp;'."\n".
              '    <input name="addselectionid" value="Add" type="button" id="id_addselectionid" />'."\n".
              '  </div>'."\n".
-             '</div>'."\n";
-        
+             '</div>'."\n".
+             '<div id="fitem_bigbluebuttonbn_participant_list" class="fitem">'."\n".
+             '  <div class="fitemtitle">'."\n".
+             '    <label for="bigbluebuttonbn_participant_list">Participant list </label>'."\n".
+             '  </div>'."\n".
+             '</div>'."\n".
+             '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/mod_form.js">'."\n".
+             '</script>'."\n";
+        /*
+         * bigbluebuttonbn_set_participant_selection()
+        */      
         $mform->addElement('html', $x);
 
         /*
@@ -143,8 +169,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('button', 'addselectionid', 'Add');
         */        
 
-
-        $mform->addElement('html', '<script type="text/javascript">var participant_list = "{}"; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "roles": '._bigbluebuttonbn_get_roles_json().', "users": '._bigbluebuttonbn_get_users_json($context).'}; </script>');
+        $mform->addElement('html', '<script type="text/javascript">console.debug(bigbluebuttonbn_participant_selection);</script>');
+        //$mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_roles = '._bigbluebuttonbn_get_roles_json().'; </script>');
+        //$mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_users = '._bigbluebuttonbn_get_users_json($context).'; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '._bigbluebuttonbn_get_participant_list_json().'; </script>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_roles"></div>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_users"></div>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_list"></div>');
@@ -178,6 +207,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->setDefault( 'record', 0 );
 	
             $mform->addElement('text', 'description', get_string('mod_form_field_description','bigbluebuttonbn'), 'maxlength="100" size="32"' );
+            $mform->addHelpButton('description', 'mod_form_field_description', 'bigbluebuttonbn');
             $mform->addElement('duration', 'timeduration', get_string('mod_form_field_duration', 'bigbluebuttonbn')); //Set zero for unlimited
             $mform->setDefault('timeduration', 14400);
             $mform->addHelpButton('timeduration', 'mod_form_field_duration', 'bigbluebuttonbn');
@@ -198,7 +228,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
     }
 
-
     public function validation($data, $files) {
         $current_activity =& $this->current;
         
@@ -210,8 +239,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
         return $errors;
     }
-
-
 }
 
 ?>

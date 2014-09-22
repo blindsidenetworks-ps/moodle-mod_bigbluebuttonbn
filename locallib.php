@@ -292,25 +292,62 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
 
 }
 
-function _bigbluebuttonbn_get_roster($course){
-    $context = get_context_instance(CONTEXT_COURSE, $course->id);
-
-    $instructor_roster = array_merge(lti_get_roster_group($context, 'editingteacher'), lti_get_roster_group($context, 'teacher'));
-    $roster = array("Instructor" => $instructor_roster);
-    return $roster;
+function _bigbluebuttonbn_get_roles($rolename='all'){
+    global $DB;
+    if( $rolename != 'all')
+        $roles = $DB->get_record('role', array('shortname' => $rolename));
+    else
+        $roles = $DB->get_records('role', array());
+    return $roles;
 }
 
-function _bigbluebuttonbn_get_roster_group($context, $rolename){
-    global $DB;
-    $roster = array();
-    $role = $DB->get_record('role', array('shortname' => $rolename));
-    $users = get_role_users($role->id, $context);
-    foreach($users as $user){
-        $roster_element = array( "sourcedid" => $user->id,
-                "name_given" => $user->firstname,
-                "name_family" => $user->lastname,
-        );
-        array_push($roster, $roster_element);
+function _bigbluebuttonbn_get_role_name($role_shortname){
+    switch ($role_shortname) {
+        case 'manager':         $original = get_string('manager', 'role'); break;
+        case 'coursecreator':   $original = get_string('coursecreators'); break;
+        case 'editingteacher':  $original = get_string('defaultcourseteacher'); break;
+        case 'teacher':         $original = get_string('noneditingteacher'); break;
+        case 'student':         $original = get_string('defaultcoursestudent'); break;
+        case 'guest':           $original = get_string('guest'); break;
+        case 'user':            $original = get_string('authenticateduser'); break;
+        case 'frontpage':       $original = get_string('frontpageuser', 'role'); break;
+        // We should not get here, the role UI should require the name for custom roles!
+        default:                $original = $role->shortname; break;
     }
-    return $roster;
+    return $original;
+}
+
+function _bigbluebuttonbn_get_roles_json($rolename='all'){
+    $roles = _bigbluebuttonbn_get_roles($rolename);
+    $roles_json = array();
+    foreach($roles as $role){
+        $role_element = array( "id" => $role->id,
+                "name" => _bigbluebuttonbn_get_role_name($role->shortname)
+        );
+        array_push($roles_json, $role_element);
+    }
+    error_log('roles_json: ' . print_r(json_encode($roles_json), true));
+    return json_encode($roles_json);
+}
+
+function _bigbluebuttonbn_get_users_json($context){
+    $roles = _bigbluebuttonbn_get_roles();
+    $users_json = array();
+    foreach($roles as $role){
+        $users = get_role_users($role->id, $context);
+        foreach($users as $user){
+            $user_element = array( "id" => $user->id,
+                    "name" => $user->firstname.' '.$user->lastname
+            );
+            array_push($users_json, $user_element);
+        }
+    }
+    error_log('users_json: ' . print_r(json_encode($users_json), true));
+    return json_encode($users_json);
+}
+
+function _bigbluebuttonbn_get_participant_list_json(){
+    $participant_list_json = "[";
+    $participant_list_json .= "]";
+    return $participant_list_json;
 }

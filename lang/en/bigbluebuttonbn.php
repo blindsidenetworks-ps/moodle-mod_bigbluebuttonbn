@@ -50,6 +50,7 @@ $string['mod_form_block_schedule'] = 'Schedule for sessions';
 $string['mod_form_block_record'] = 'Record settings';
 $string['mod_form_field_availabledate'] = 'Join open';
 $string['mod_form_field_description'] = 'Description of recorded session';
+$string['mod_form_field_description_help'] = 'A short description for the recording that is being shown in the recording list. It can be changed per session.';
 $string['mod_form_field_duedate'] = 'Join closed';
 $string['mod_form_field_duration_help'] = 'Setting the duration for a meeting will establish the maximum time for a meeting to keep alive before the recording finish';
 $string['mod_form_field_duration'] = 'Duration';
