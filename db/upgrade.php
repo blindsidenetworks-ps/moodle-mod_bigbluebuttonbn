@@ -89,7 +89,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014050100, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2014070402) {
+    if ($result && $oldversion < 2014070410) {
     
         // Define table bigbluebuttonbn_participant to be created
         $table = new xmldb_table('bigbluebuttonbn_participant');
@@ -97,8 +97,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         // Adding fields to table bigbluebuttonbn_participant
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('meetingid', XMLDB_TYPE_CHAR, '256', null, XMLDB_NOTNULL, null, null);
-        //$table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        //$table->add_field('coursemodule', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+        $table->add_field('bigbluebuttonbnid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('selectiontype', XMLDB_TYPE_CHAR, '99', XMLDB_NOTNULL, null, null);
         $table->add_field('selectionid', XMLDB_TYPE_CHAR, '99', XMLDB_NOTNULL, null, null);
         $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
@@ -112,7 +112,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         }
 
         // bigbluebuttonbn savepoint reached
-        upgrade_mod_savepoint(true, 2014070402, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2014070410, 'bigbluebuttonbn');
     }
 
     /*

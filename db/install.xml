@@ -46,6 +46,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="meetingid"/>
         <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="meetingid" NEXT="bigbluebuttonbnid"/>
+        <FIELD NAME="bigbluebuttonbnid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="selectiontype"/>
         <FIELD NAME="selectiontype" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="meetingid" NEXT="selectionid"/>
         <FIELD NAME="selectionid" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectiontype" NEXT="role"/>
         <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectionid"/>
