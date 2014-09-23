@@ -373,7 +373,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
         }
     } else {
         array_push($participant_list_array,
-                array( "id" => null,
+                array( "id" => -1,
                     "selectiontype" => "all",
                     "selectionid" => null,
                     "role" => BIGBLUEBUTTONBN_ROLE_VIEWER
@@ -381,7 +381,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
         );
 
         array_push($participant_list_array,
-                array( "id" => null,
+                array( "id" => -2,
                     "selectiontype" => "role",
                     "selectionid" => "editingteacher",
                     "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
