@@ -323,7 +323,7 @@ function bigbluebuttonbn_get_roles($rolename='all'){
     $roles_json = array();
     foreach($roles as $role){
         array_push($roles_json,
-                array( "id" => $role->id,
+                array( "id" => $role->shortname,
                     "name" => bigbluebuttonbn_get_role_name($role->shortname)
                 )
         );
@@ -376,15 +376,15 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
                 array( "id" => null,
                     "selectiontype" => "all",
                     "selectionid" => null,
-                    "role" => "viewer"
+                    "role" => BIGBLUEBUTTONBN_ROLE_VIEWER
                 )
         );
 
         array_push($participant_list_array,
                 array( "id" => null,
-                    "selectiontype" => "roles",
-                    "selectionid" => "3",
-                    "role" => "moderator"
+                    "selectiontype" => "role",
+                    "selectionid" => "editingteacher",
+                    "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
                 )
         );
         
