@@ -363,7 +363,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
         if (is_array($participant_list)) {
             foreach($participant_list as $participant){
                 array_push($participant_list_array,
-                        array( "id" => $participant["id"],
+                        array(
                             "selectiontype" => $participant["selectiontype"],
                             "selectionid" => $participant["selectionid"],
                             "role" => $participant["role"]
@@ -373,15 +373,15 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
         }
     } else {
         array_push($participant_list_array,
-                array( "id" => -1,
+                array(
                     "selectiontype" => "all",
-                    "selectionid" => null,
+                    "selectionid" => "all",
                     "role" => BIGBLUEBUTTONBN_ROLE_VIEWER
                 )
         );
 
         array_push($participant_list_array,
-                array( "id" => -2,
+                array(
                     "selectiontype" => "role",
                     "selectionid" => "editingteacher",
                     "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
