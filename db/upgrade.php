@@ -89,30 +89,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014050100, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2014070410) {
-    
-        // Define table bigbluebuttonbn_participant to be created
-        $table = new xmldb_table('bigbluebuttonbn_participant');
+    if ($result && $oldversion < 2014070420) {
 
-        // Adding fields to table bigbluebuttonbn_participant
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('meetingid', XMLDB_TYPE_CHAR, '256', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        $table->add_field('bigbluebuttonbnid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        $table->add_field('selectiontype', XMLDB_TYPE_CHAR, '99', XMLDB_NOTNULL, null, null);
-        $table->add_field('selectionid', XMLDB_TYPE_CHAR, '99', XMLDB_NOTNULL, null, null);
-        $table->add_field('role', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table = new xmldb_table('bigbluebuttonbn');
+        $field = new xmldb_field('participants', XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
 
-        // Adding keys to table bigbluebuttonbn_log
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->add_field($table, $field, $continue=true, $feedback=true);
 
-        // Conditionally launch create table for bigbluebuttonbn_log
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // bigbluebuttonbn savepoint reached
-        upgrade_mod_savepoint(true, 2014070410, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2014070420, 'bigbluebuttonbn');
     }
 
     /*

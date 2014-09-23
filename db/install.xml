@@ -22,7 +22,8 @@
         <FIELD NAME="timeduration" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeavailable" NEXT="meetingid"/>
         <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false" COMMENT="the meetingID" PREVIOUS="timeduration" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="meetingid" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="course"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="course" NEXT="timemodified"/>
+        <FIELD NAME="participants" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Participants and permissions" PREVIOUS="timemodified"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -37,20 +38,6 @@
         <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="bigbluebuttonbnid" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="record" NEXT="event"/>
         <FIELD NAME="event" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="timecreated"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="bigbluebuttonbn_participant" COMMENT="The bigbluebuttonbn table to store participant roles" PREVIOUS="bigbluebuttonbn_log">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="meetingid"/>
-        <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="courseid"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="meetingid" NEXT="bigbluebuttonbnid"/>
-        <FIELD NAME="bigbluebuttonbnid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="selectiontype"/>
-        <FIELD NAME="selectiontype" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="meetingid" NEXT="selectionid"/>
-        <FIELD NAME="selectionid" TYPE="char" LENGTH="99" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectiontype" NEXT="role"/>
-        <FIELD NAME="role" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="selectionid"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -16,6 +16,7 @@ require_once(dirname(__FILE__).'/lib.php');
 //require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
+require_once($CFG->dirroot.'/lib/formslib.php');
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
@@ -355,18 +356,19 @@ function bigbluebuttonbn_get_users_json($context){
     return json_encode(bigbluebuttonbn_get_users($context));
 }
 
-function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
     global $DB;
     $participant_list_array = array();
-    if( $bigbluebuttonbnid != null ) {
-        $participant_list = $DB->get_record('bigbluebuttonbn_participant', array('bigbluebuttonbnid' => $bigbluebuttonbnid));
+    if( $bigbluebuttonbn != null ) {
+        $participant_list = json_decode(htmlspecialchars_decode($bigbluebuttonbn->participants));
+        error_log('$participant_list: ' . print_r($participant_list, true));
         if (is_array($participant_list)) {
             foreach($participant_list as $participant){
                 array_push($participant_list_array,
                         array(
-                            "selectiontype" => $participant["selectiontype"],
-                            "selectionid" => $participant["selectionid"],
-                            "role" => $participant["role"]
+                            "selectiontype" => $participant->selectiontype,
+                            "selectionid" => $participant->selectionid,
+                            "role" => $participant->role
                         )
                 );
             }

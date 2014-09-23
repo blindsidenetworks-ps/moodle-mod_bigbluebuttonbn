@@ -72,6 +72,7 @@ $string['mod_form_field_participant_list_type_all'] = 'All users enrolled';
 $string['mod_form_field_participant_list_type_user'] = 'User';
 $string['mod_form_field_participant_list_type_role'] = 'Role';
 $string['mod_form_field_participant_list_text_as'] = 'as';
+$string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';

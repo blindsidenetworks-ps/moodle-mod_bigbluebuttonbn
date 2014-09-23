@@ -20,8 +20,9 @@ bigbluebuttonbn_set_participant_selection = function() {
 }
 
 bigbluebuttonbn_participant_list_update = function() {
-    var participant_list_hidden = document.getElementById('bigbluebuttonbn_participant_list_hidden');
-    participant_list_hidden.value = JSON.stringify(bigbluebuttonbn_participant_list);
+    var participant_list = document.getElementsByName('participants')[0];
+    participant_list.value = JSON.stringify(bigbluebuttonbn_participant_list).replace(/"/g, '&quot;');
+    console.debug(participant_list);
 }
 
 bigbluebuttonbn_participant_remove = function(type, id) {
