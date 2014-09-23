@@ -9,7 +9,7 @@ bigbluebuttonbn_set_participant_selection = function() {
                 bigbluebuttonbn_select_add_option('bigbluebuttonbn_participant_selection', options[j].name, options[j].id);
             }
             if( j == 0){
-                bigbluebuttonbn_select_add_option('bigbluebuttonbn_participant_selection', '---------------', 0);
+                bigbluebuttonbn_select_add_option('bigbluebuttonbn_participant_selection', '---------------', 'all');
                 bigbluebuttonbn_select_disable('bigbluebuttonbn_participant_selection')
             } else {
                 bigbluebuttonbn_select_enable('bigbluebuttonbn_participant_selection')

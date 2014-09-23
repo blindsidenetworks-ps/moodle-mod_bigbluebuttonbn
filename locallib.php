@@ -292,7 +292,8 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
 
 }
 
-function _bigbluebuttonbn_get_roles($rolename='all'){
+//    error_log('roles_json: ' . print_r(json_encode($roles_json), true));
+function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){
     global $DB;
     if( $rolename != 'all')
         $roles = $DB->get_record('role', array('shortname' => $rolename));
@@ -301,7 +302,7 @@ function _bigbluebuttonbn_get_roles($rolename='all'){
     return $roles;
 }
 
-function _bigbluebuttonbn_get_role_name($role_shortname){
+function bigbluebuttonbn_get_role_name($role_shortname){
     switch ($role_shortname) {
         case 'manager':         $original = get_string('manager', 'role'); break;
         case 'coursecreator':   $original = get_string('coursecreators'); break;
@@ -317,37 +318,80 @@ function _bigbluebuttonbn_get_role_name($role_shortname){
     return $original;
 }
 
-function _bigbluebuttonbn_get_roles_json($rolename='all'){
-    $roles = _bigbluebuttonbn_get_roles($rolename);
+function bigbluebuttonbn_get_roles($rolename='all'){
+    $roles = bigbluebuttonbn_get_db_moodle_roles($rolename);
     $roles_json = array();
     foreach($roles as $role){
-        $role_element = array( "id" => $role->id,
-                "name" => _bigbluebuttonbn_get_role_name($role->shortname)
+        array_push($roles_json,
+                array( "id" => $role->id,
+                    "name" => bigbluebuttonbn_get_role_name($role->shortname)
+                )
         );
-        array_push($roles_json, $role_element);
     }
-    error_log('roles_json: ' . print_r(json_encode($roles_json), true));
-    return json_encode($roles_json);
+    return $roles_json;
 }
 
-function _bigbluebuttonbn_get_users_json($context){
-    $roles = _bigbluebuttonbn_get_roles();
-    $users_json = array();
+function bigbluebuttonbn_get_roles_json($rolename='all'){
+    return json_encode(bigbluebuttonbn_get_roles($rolename));
+}
+
+function bigbluebuttonbn_get_users($context){
+    $roles = bigbluebuttonbn_get_db_moodle_roles();
+    $users_array = array();
     foreach($roles as $role){
         $users = get_role_users($role->id, $context);
         foreach($users as $user){
-            $user_element = array( "id" => $user->id,
-                    "name" => $user->firstname.' '.$user->lastname
+            array_push($users_array,
+                    array( "id" => $user->id,
+                        "name" => $user->firstname.' '.$user->lastname
+                    )
             );
-            array_push($users_json, $user_element);
         }
     }
-    error_log('users_json: ' . print_r(json_encode($users_json), true));
-    return json_encode($users_json);
+    return $users_array;
 }
 
-function _bigbluebuttonbn_get_participant_list_json(){
-    $participant_list_json = "[";
-    $participant_list_json .= "]";
-    return $participant_list_json;
+function bigbluebuttonbn_get_users_json($context){
+    return json_encode(bigbluebuttonbn_get_users($context));
+}
+
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbnid=null){
+    global $DB;
+    $participant_list_array = array();
+    if( $bigbluebuttonbnid != null ) {
+        $participant_list = $DB->get_record('bigbluebuttonbn_participant', array('bigbluebuttonbnid' => $bigbluebuttonbnid));
+        if (is_array($participant_list)) {
+            foreach($participant_list as $participant){
+                array_push($participant_list_array,
+                        array( "id" => $participant["id"],
+                            "selectiontype" => $participant["selectiontype"],
+                            "selectionid" => $participant["selectionid"],
+                            "role" => $participant["role"]
+                        )
+                );
+            }
+        }
+    } else {
+        array_push($participant_list_array,
+                array( "id" => null,
+                    "selectiontype" => "all",
+                    "selectionid" => null,
+                    "role" => "viewer"
+                )
+        );
+
+        array_push($participant_list_array,
+                array( "id" => null,
+                    "selectiontype" => "roles",
+                    "selectionid" => "3",
+                    "role" => "moderator"
+                )
+        );
+        
+    }
+    return $participant_list_array;
+}
+
+function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid=null){
+    return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
 }

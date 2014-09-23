@@ -24,9 +24,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
         if ($course_id) {
             $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
+            $bigbluebuttonbn = null;
         } else if ($course_module_id) {
-            $course_module = get_coursemodule_from_id('bigbluebuttonbn', $course_module_id, 0, false, MUST_EXIST);
-            $course = $DB->get_record('course', array('id' => $course_module->course), '*', MUST_EXIST);
+            $cm = get_coursemodule_from_id('bigbluebuttonbn', $course_module_id, 0, false, MUST_EXIST);
+            $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
         }
         
         if ( $CFG->version < '2013111800' ) {
@@ -169,11 +171,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('button', 'addselectionid', 'Add');
         */        
 
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "roles": '._bigbluebuttonbn_get_roles_json().', "users": '._bigbluebuttonbn_get_users_json($context).'}; </script>');
-        $mform->addElement('html', '<script type="text/javascript">console.debug(bigbluebuttonbn_participant_selection);</script>');
-        //$mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_roles = '._bigbluebuttonbn_get_roles_json().'; </script>');
-        //$mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_users = '._bigbluebuttonbn_get_users_json($context).'; </script>');
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '._bigbluebuttonbn_get_participant_list_json().'; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "roles": '.bigbluebuttonbn_get_roles_json().', "users": '.bigbluebuttonbn_get_users_json($context).'}; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.bigbluebuttonbn_get_participant_list_json($bigbluebuttonbn != null? $bigbluebuttonbn->id: null).'; </script>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_roles"></div>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_users"></div>');
         $mform->addElement('html', '<div id="bigbluebuttonbn_participant_list"></div>');
