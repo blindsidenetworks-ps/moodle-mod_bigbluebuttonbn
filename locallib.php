@@ -361,7 +361,6 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
     $participant_list_array = array();
     if( $bigbluebuttonbn != null ) {
         $participant_list = json_decode(htmlspecialchars_decode($bigbluebuttonbn->participants));
-        error_log('$participant_list: ' . print_r($participant_list, true));
         if (is_array($participant_list)) {
             foreach($participant_list as $participant){
                 array_push($participant_list_array,
