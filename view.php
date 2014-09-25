@@ -92,6 +92,7 @@ $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 //User data
 $bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
 $bbbsession['userID'] = $USER->id;
+$bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 $bbbsession['flag']['moderator'] = $moderator;
 $bbbsession['textflag']['moderator'] = $moderator? 'true': 'false';
 $bbbsession['flag']['administrator'] = $administrator;
@@ -191,11 +192,10 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
 }
 
-if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
+if( bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'], $bigbluebuttonbn->participants) )
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 else
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
-
 
 $joining = false;
 $bigbluebuttonbn_view = '';

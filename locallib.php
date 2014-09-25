@@ -293,7 +293,6 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
 
 }
 
-//    error_log('roles_json: ' . print_r(json_encode($roles_json), true));
 function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){
     global $DB;
     if( $rolename != 'all')
@@ -395,4 +394,50 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
 
 function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid=null){
     return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
+}
+
+//error_log('db_moodle_roles: ' . print_r(json_encode($db_moodle_roles), true));
+function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
+    $participant_list = json_decode(htmlspecialchars_decode($participants));
+    if (is_array($participant_list)) {
+        // Iterate looking for all configuration
+        foreach($participant_list as $participant){
+            if( $participant->selectiontype == 'all' ) {
+                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                    return true;
+            }
+        }
+
+        //Iterate looking for roles
+        $db_moodle_roles = bigbluebuttonbn_get_db_moodle_roles();
+        foreach($participant_list as $participant){
+            if( $participant->selectiontype == 'role' ) {
+                foreach( $roles as $role ) {
+                    $db_moodle_role = bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role->roleid);
+                    if( $participant->selectionid == $db_moodle_role->shortname ) {
+                        if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                            return true;
+                    }
+                }
+            }
+        }
+
+        //Iterate looking for users
+        foreach($participant_list as $participant){
+            if( $participant->selectiontype == 'user' ) {
+                if( $participant->selectionid == $user ) {
+                    if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                        return true;
+                }
+            }
+        }
+    }
+}
+
+function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $roleid) {
+    foreach( $db_moodle_roles as $db_moodle_role ){
+        if( $roleid ==  $db_moodle_role->id ) {
+            return $db_moodle_role;
+        }
+    }
 }
