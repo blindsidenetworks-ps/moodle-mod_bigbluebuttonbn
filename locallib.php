@@ -282,15 +282,26 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
         $response = $c->get($url);
 
-        if($response)
-            return (new SimpleXMLElement($response, LIBXML_NOCDATA));
-        else
+        if($response) {
+            $previous = libxml_use_internal_errors(true);
+            try {
+                return (new SimpleXMLElement($response, LIBXML_NOCDATA));
+            } catch  (Exception $e){
+                libxml_use_internal_errors($previous);
+                return false;
+            }
+        } else {
             return false;
-
+        }
     } else {
-        return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
+        $previous = libxml_use_internal_errors(true);
+        try {
+            return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
+        } catch  (Exception $e){
+            libxml_use_internal_errors($previous);
+            return false;
+        }
     }
-
 }
 
 function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){

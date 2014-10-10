@@ -74,7 +74,7 @@ if ( !isset($serverVersion) ) { //Server is not working
         print_error( 'view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course );
 } else {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $bbbsession['url'], $bbbsession['salt'] ) );
-    if ( !isset($xml) || $xml->returncode == 'FAILED' ){ // The salt is wrong
+    if ( !isset($xml) || $xml == false || !isset($xml->returncode) || $xml->returncode == 'FAILED' ){ // The salt is wrong
         if ( $administrator ) 
             print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
         else if ( $moderator )
