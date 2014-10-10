@@ -2,11 +2,9 @@
 /**
  * Language File
  *
- * Authors:
- *    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- *    
  * @package   mod_bigbluebuttonbn
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
@@ -24,7 +22,6 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['bigbluebuttonbnintro'] = 'BigBlueButton Intro';
 $string['bigbluebuttonbnSalt'] = 'BigBlueButton Shared Secret';
 $string['bigbluebuttonbnUrl'] = 'BigBlueButton Server URL';
 $string['bigbluebuttonbnWait'] = 'User has to wait';
@@ -48,10 +45,12 @@ $string['index_heading'] = 'BigBlueButton Rooms';
 $string['index_running'] = 'running';
 $string['index_warning_adding_meeting'] = 'Unable to assign a new meeting ID.';
 $string['mod_form_block_general'] = 'General settings';
-$string['mod_form_block_record'] = 'Record settings';
+$string['mod_form_block_participants'] = 'Participants';
 $string['mod_form_block_schedule'] = 'Schedule for sessions';
+$string['mod_form_block_record'] = 'Record settings';
 $string['mod_form_field_availabledate'] = 'Join open';
 $string['mod_form_field_description'] = 'Description of recorded session';
+$string['mod_form_field_description_help'] = 'A short description for the recording that is being shown in the recording list. It can be changed per session.';
 $string['mod_form_field_duedate'] = 'Join closed';
 $string['mod_form_field_duration_help'] = 'Setting the duration for a meeting will establish the maximum time for a meeting to keep alive before the recording finish';
 $string['mod_form_field_duration'] = 'Duration';
@@ -67,6 +66,16 @@ $string['mod_form_field_allmoderators'] = "Allow all participants to be moderato
 $string['mod_form_field_welcome_default'] = '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>';
 $string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like <b>...</b> or <i></i> ';
 $string['mod_form_field_welcome'] = 'Welcome message';
+$string['mod_form_field_participant_add'] = 'Add participant';
+$string['mod_form_field_participant_list'] = 'Prticipant list';
+$string['mod_form_field_participant_list_type_all'] = 'All users enrolled';
+$string['mod_form_field_participant_list_type_user'] = 'User';
+$string['mod_form_field_participant_list_type_role'] = 'Role';
+$string['mod_form_field_participant_list_text_as'] = 'as';
+$string['mod_form_field_participant_list_action_add'] = 'Add';
+$string['mod_form_field_participant_list_action_remove'] = 'Remove';
+$string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
+$string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
@@ -101,5 +110,15 @@ $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
+
+$string['event_activity_created'] = 'BigBlueButtonBN activity created';
+$string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
+$string['event_activity_viewed_all'] = 'BigBlueButtonBN activity management viewed';
+$string['event_activity_modified'] = 'BigBlueButtonBN activity modified';
+$string['event_activity_deleted'] = 'BigBlueButtonBN activity deleted';
+$string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
+$string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
+$string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
+$string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibly ended';
 
 ?>

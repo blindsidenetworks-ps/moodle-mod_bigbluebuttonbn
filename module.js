@@ -1,9 +1,7 @@
 /**
- * Authors:
- *    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @copyright 2012-2014 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
@@ -16,7 +14,6 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
  */
 
 M.mod_bigbluebuttonbn.init_view = function(Y) {
-
     if (bigbluebuttonbn.joining == 'true') {
         if (bigbluebuttonbn.ismoderator == 'true' || bigbluebuttonbn.waitformoderator == 'false') {
             M.mod_bigbluebuttonbn.joinURL();
@@ -27,7 +24,7 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
             });
 
             var request = {
-                request : "meetingid=" + bigbluebuttonbn.meetingid,
+                request : "meetingid=" + bigbluebuttonbn.meetingid + "&id=" + bigbluebuttonbn.bigbluebuttonbnid,
                 callback : {
                     success : function(e) {
                         if (e.data.status == 'true') {
