@@ -276,7 +276,6 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_wrap_simplexml_load_file($url){
-
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
@@ -285,21 +284,25 @@ function bigbluebuttonbn_wrap_simplexml_load_file($url){
         if($response) {
             $previous = libxml_use_internal_errors(true);
             try {
-                return (new SimpleXMLElement($response, LIBXML_NOCDATA));
-            } catch  (Exception $e){
+                $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
+                return $xml;
+            } catch (Exception $e){
                 libxml_use_internal_errors($previous);
-                return false;
+                error_log("The XML response is not correct on wrap_simplexml_load_file: ".$e->getMessage());
+                return NULL;
             }
         } else {
-            return false;
+            error_log("No response on wrap_simplexml_load_file");
+            return NULL;
         }
     } else {
         $previous = libxml_use_internal_errors(true);
         try {
-            return (simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA));
+            $xml = simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA);
+            return $xml;
         } catch  (Exception $e){
             libxml_use_internal_errors($previous);
-            return false;
+            return NULL;
         }
     }
 }
@@ -445,9 +448,9 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     }
 }
 
-function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $roleid) {
+function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
     foreach( $db_moodle_roles as $db_moodle_role ){
-        if( $roleid ==  $db_moodle_role->id ) {
+        if( $role_id ==  $db_moodle_role->id ) {
             return $db_moodle_role;
         }
     }

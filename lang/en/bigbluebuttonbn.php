@@ -61,7 +61,7 @@ $string['mod_form_field_newwindow'] = 'Open BigBlueButton in a new window';
 $string['mod_form_field_record'] = 'Record';
 $string['mod_form_field_voicebridge_help'] = 'Voice conference number that participants enter to join the voice conference.';
 $string['mod_form_field_voicebridge'] = 'Voice bridge';
-$string['mod_form_field_wait'] = 'Students must wait until a moderator joins';
+$string['mod_form_field_wait'] = 'Viewers must wait until a moderator joins';
 $string['mod_form_field_allmoderators'] = "Allow all participants to be moderators";
 $string['mod_form_field_welcome_default'] = '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>';
 $string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like <b>...</b> or <i></i> ';
