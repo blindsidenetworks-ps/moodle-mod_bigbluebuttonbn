@@ -446,6 +446,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             }
         }
     }
+    return false;
 }
 
 function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
@@ -454,4 +455,14 @@ function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
             return $db_moodle_role;
         }
     }
+}
+
+function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
+    $key = $defaultKey;
+    if ( $messageKey == "checksumError" ){
+        $key = 'index_error_checksum';
+    } else if ( $messageKey == 'maxConcurrent' ) {
+        $key = 'view_error_max_concurrent';
+    }
+    return $key;
 }

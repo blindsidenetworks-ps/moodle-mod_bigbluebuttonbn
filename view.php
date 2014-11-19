@@ -56,7 +56,17 @@ if ( $CFG->version < '2014051200' ) {
     $event->trigger();
 }
 
-$moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
+//User data
+$bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
+$bbbsession['userID'] = $USER->id;
+$bbbsession['roles'] = get_user_roles($context, $USER->id, true);
+
+if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" ){
+    //The room that is being used comes from a previous version
+    $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
+} else {
+    $moderator = bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'], $bigbluebuttonbn->participants);
+}
 $administrator = has_capability('moodle/category:manage', $context);
 
 //Validates if the BigBlueButton server is running 
@@ -89,10 +99,7 @@ if ( !isset($serverVersion) ) { //Server is not working
 //Server data
 $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
 $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
-//User data
-$bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
-$bbbsession['userID'] = $USER->id;
-$bbbsession['roles'] = get_user_roles($context, $USER->id, true);
+//User roles
 $bbbsession['flag']['moderator'] = $moderator;
 $bbbsession['textflag']['moderator'] = $moderator? 'true': 'false';
 $bbbsession['flag']['administrator'] = $administrator;
@@ -192,7 +199,7 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
 }
 
-if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] || bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'], $bigbluebuttonbn->participants) )
+if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
 else
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
@@ -291,22 +298,26 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
 
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action
-            if ( $bbbsession['flag']['administrator'] )
+            if ( $bbbsession['flag']['administrator'] ) {
                 print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            else if ( $bbbsession['flag']['moderator'] )
+            } else if ( $bbbsession['flag']['moderator'] ) {
                 print_error( 'view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            else
+            } else {
                 print_error( 'view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
+            }
 
         } else if( $response['returncode'] == "FAILED" ) {
             // The meeting was not created
-            if ($response['messageKey'] == "checksumError"){
-                print_error( get_string( 'index_error_checksum', 'bigbluebuttonbn' ));
+            $error_key = bigbluebuttonbn_get_error_key( $response['messageKey'], 'view_error_create' );
+            if( !$error_key ) {
+                print_error( $response['message'], 'bigbluebuttonbn' );
             } else {
-                print_error( $response['message'] );
+                print_error( $error_key, 'bigbluebuttonbn' );
             }
+
         } else if ($response['hasBeenForciblyEnded'] == "true"){
             print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
+
         } else { ///////////////Everything is ok /////////////////////
             /// Moodle event logger: Create an event for meeting created
             if ( $CFG->version < '2014051200' ) {
