@@ -446,6 +446,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             }
         }
     }
+    return false;
 }
 
 function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
