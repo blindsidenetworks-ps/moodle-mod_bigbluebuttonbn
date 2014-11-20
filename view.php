@@ -164,10 +164,11 @@ $PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm-
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_heading($course->shortname);
 $PAGE->set_cacheable(false);
-if( !$bbbsession['flag']['moderator'] && $bbbsession['flag']['wait'] ) {
-    $PAGE->blocks->show_only_fake_blocks(); //Disable blocks for layouts which do include pre-post blocks
-} else {
+if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || !$bbbsession['flag']['wait'] ) {
     $PAGE->set_pagelayout('incourse');
+} else {
+    //Disable blocks for layouts which do include pre-post blocks
+    $PAGE->blocks->show_only_fake_blocks();
 }
 
 // Validate if the user is in a role allowed to join
@@ -256,6 +257,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
 $jsVars = array(
         'newwindow' => $bbbsession['textflag']['newwindow'],
         'waitformoderator' => $bbbsession['textflag']['wait'],
+        'isadministrator' => $bbbsession['textflag']['administrator'],
         'ismoderator' => $bbbsession['textflag']['moderator'],
         'meetingid' => $bbbsession['meetingid'],
         'joinurl' => $bbbsession['joinURL'],
@@ -281,7 +283,8 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
 
     $joining = false;
 
-    if( $bbbsession['flag']['moderator'] || !$bbbsession['flag']['wait'] ) {  // If is a moderator or if is a viewer and no waiting is required
+    // If user is administrator, moderator or if is viewer and no waiting is required
+    if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || !$bbbsession['flag']['wait'] ) {
         //
         // Join directly
         //
@@ -342,7 +345,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             } else {
                 $joining = true;
 
-                if( $bbbsession['flag']['moderator'] )
+                if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] )
                     print "<br />".get_string('view_login_moderator', 'bigbluebuttonbn' )."<br /><br />";
                 else
                     print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
