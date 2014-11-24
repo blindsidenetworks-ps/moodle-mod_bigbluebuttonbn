@@ -30,7 +30,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
         }
-        
+
         if ( $CFG->version < '2013111800' ) {
             //This is valid before v2.6
             $context = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -203,10 +203,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 	
             $mform->addElement('text', 'description', get_string('mod_form_field_description','bigbluebuttonbn'), 'maxlength="100" size="32"' );
             $mform->addHelpButton('description', 'mod_form_field_description', 'bigbluebuttonbn');
+            $mform->setType('description', PARAM_TEXT);
             $mform->addElement('duration', 'timeduration', get_string('mod_form_field_duration', 'bigbluebuttonbn')); //Set zero for unlimited
             $mform->setDefault('timeduration', 14400);
             $mform->addHelpButton('timeduration', 'mod_form_field_duration', 'bigbluebuttonbn');
-            $mform->setType('description', PARAM_TEXT);
         }
         //-------------------------------------------------------------------------------
         // Fourth block ends here
