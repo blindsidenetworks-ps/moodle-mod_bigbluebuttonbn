@@ -316,7 +316,8 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){
     return $roles;
 }
 
-function bigbluebuttonbn_get_role_name($role_shortname){
+function bigbluebuttonbn_get_role_name($role){
+    $role_shortname = $role->shortname;
     switch ($role_shortname) {
         case 'manager':         $original = get_string('manager', 'role'); break;
         case 'coursecreator':   $original = get_string('coursecreators'); break;
@@ -327,7 +328,7 @@ function bigbluebuttonbn_get_role_name($role_shortname){
         case 'user':            $original = get_string('authenticateduser'); break;
         case 'frontpage':       $original = get_string('frontpageuser', 'role'); break;
         // We should not get here, the role UI should require the name for custom roles!
-        default:                $original = $role->shortname; break;
+        default:                $original = $role->name; break;
     }
     return $original;
 }
@@ -338,7 +339,7 @@ function bigbluebuttonbn_get_roles($rolename='all'){
     foreach($roles as $role){
         array_push($roles_json,
                 array( "id" => $role->shortname,
-                    "name" => bigbluebuttonbn_get_role_name($role->shortname)
+                    "name" => bigbluebuttonbn_get_role_name($role)
                 )
         );
     }
