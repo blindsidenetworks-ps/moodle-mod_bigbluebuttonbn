@@ -316,21 +316,26 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){
     return $roles;
 }
 
-function bigbluebuttonbn_get_role_name($role){
-    $role_shortname = $role->shortname;
+function bigbluebuttonbn_get_role_name($role_shortname){
     switch ($role_shortname) {
-        case 'manager':         $original = get_string('manager', 'role'); break;
-        case 'coursecreator':   $original = get_string('coursecreators'); break;
-        case 'editingteacher':  $original = get_string('defaultcourseteacher'); break;
-        case 'teacher':         $original = get_string('noneditingteacher'); break;
-        case 'student':         $original = get_string('defaultcoursestudent'); break;
-        case 'guest':           $original = get_string('guest'); break;
-        case 'user':            $original = get_string('authenticateduser'); break;
-        case 'frontpage':       $original = get_string('frontpageuser', 'role'); break;
+        case 'manager':         $role_name = get_string('manager', 'role'); break;
+        case 'coursecreator':   $role_name = get_string('coursecreators'); break;
+        case 'editingteacher':  $role_name = get_string('defaultcourseteacher'); break;
+        case 'teacher':         $role_name = get_string('noneditingteacher'); break;
+        case 'student':         $role_name = get_string('defaultcoursestudent'); break;
+        case 'guest':           $role_name = get_string('guest'); break;
+        case 'user':            $role_name = get_string('authenticateduser'); break;
+        case 'frontpage':       $role_name = get_string('frontpageuser', 'role'); break;
         // We should not get here, the role UI should require the name for custom roles!
-        default:                $original = $role->name; break;
+        default:
+            $role = bigbluebuttonbn_get_db_moodle_roles($role_shortname);
+            if( $role != null )
+                $role_name = $role->name;
+            else
+                $role_name = $role_shortname;
+            break;
     }
-    return $original;
+    return $role_name;
 }
 
 function bigbluebuttonbn_get_roles($rolename='all'){
@@ -339,7 +344,7 @@ function bigbluebuttonbn_get_roles($rolename='all'){
     foreach($roles as $role){
         array_push($roles_json,
                 array( "id" => $role->shortname,
-                    "name" => bigbluebuttonbn_get_role_name($role)
+                    "name" => bigbluebuttonbn_get_role_name($role->shortname)
                 )
         );
     }
