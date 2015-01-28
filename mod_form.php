@@ -204,9 +204,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('text', 'description', get_string('mod_form_field_description','bigbluebuttonbn'), 'maxlength="100" size="32"' );
             $mform->addHelpButton('description', 'mod_form_field_description', 'bigbluebuttonbn');
             $mform->setType('description', PARAM_TEXT);
-            $mform->addElement('duration', 'timeduration', get_string('mod_form_field_duration', 'bigbluebuttonbn')); //Set zero for unlimited
-            $mform->setDefault('timeduration', 14400);
-            $mform->addHelpButton('timeduration', 'mod_form_field_duration', 'bigbluebuttonbn');
+            //$mform->addElement('duration', 'timeduration', get_string('mod_form_field_duration', 'bigbluebuttonbn')); //Set zero for unlimited
+            //$mform->setDefault('timeduration', 14400);
+            //$mform->addHelpButton('timeduration', 'mod_form_field_duration', 'bigbluebuttonbn');
         }
         //-------------------------------------------------------------------------------
         // Fourth block ends here
