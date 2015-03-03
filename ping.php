@@ -36,11 +36,11 @@ if ( !isset($error) ) {
     if( !$hascourseaccess ){
         header("HTTP/1.0 401 Unauthorized");
     } else {
-        $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
-        $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
+        $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+        $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
 
         try{
-            $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $salt )? 'true': 'false');
+            $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $shared_secret )? 'true': 'false');
             if( $ismeetingrunning === 'true' ) {
                 ///log the join event
                 if ( $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id), '*', MUST_EXIST) ) {

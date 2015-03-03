@@ -157,11 +157,11 @@ function bigbluebuttonbn_delete_instance($id) {
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     
     $modPW = $bigbluebuttonbn->moderatorpass;
-    $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
-    $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
+    $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
-    //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $salt) )
-    //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $salt );
+    //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret) )
+    //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
 	
     if (! $DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         $result = false;

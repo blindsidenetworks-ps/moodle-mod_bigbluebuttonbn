@@ -110,6 +110,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
+    if ($result && $oldversion < 2015030100) {
+        //upgrade_mod_savepoint(true, 2015030100, 'bigbluebuttonbn');
+    }
     /*
     if ($result && $oldversion < 2014070403) {
     

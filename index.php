@@ -65,8 +65,8 @@ $table = new html_table();
 $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
 $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
 
-$salt = trim($CFG->BigBlueButtonBNSecuritySalt);
-$url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
+$url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+$shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 $logoutURL = $CFG->wwwroot;
 
 if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) { 
@@ -97,9 +97,9 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) {
 	$meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
 	$modPW = $bigbluebuttonbn->moderatorpass;
     if( $g != '0'  ) {
-        $getArray = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $salt ) );
+        $getArray = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $shared_secret ) );
     } else {
-        $getArray = bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $salt ));
+        $getArray = bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $shared_secret ));
     }
 	redirect('index.php?id='.$id);
 } else {
@@ -121,15 +121,15 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
 
     if ( groups_get_activity_groupmode($cm) > 0 ){
-        $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
+        $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
         $groups = groups_get_activity_allowed_groups($cm);
         if( isset($groups)) {
             foreach( $groups as $group){
-                $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $group);
+                $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, $group);
             }
         }
     } else {
-        $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn);
+        $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn);
     }
     
 }
@@ -142,7 +142,7 @@ echo html_writer::table($table);
 echo $OUTPUT->footer();
 
 /// Functions
-function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
+function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
     $joinURL = null;
     $group = "-";
     $users = "-";
@@ -164,13 +164,13 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
         // Output Users in the meeting
         //
         if( $groupObj == null ){
-            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $salt );
+            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $shared_secret );
             if ( $bigbluebuttonbn->newwindow == 1 )
                 $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
             else
                 $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
-            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $salt );
+            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $shared_secret );
             if ( $bigbluebuttonbn->newwindow == 1 )
                 $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'" target="_blank">'.format_string($bigbluebuttonbn->name).'</a>';
             else

@@ -71,8 +71,8 @@ $administrator = has_capability('moodle/category:manage', $context);
 
 //Validates if the BigBlueButton server is running 
 //BigBlueButton server data
-$bbbsession['salt'] = trim($CFG->BigBlueButtonBNSecuritySalt);
-$bbbsession['url'] = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
+$bbbsession['shared_secret'] = trim($CFG->bigbluebuttonbn_server_url);
+$bbbsession['url'] = trim(trim($CFG->bigbluebuttonbn_shared_secret),'/').'/';
 
 $serverVersion = bigbluebuttonbn_getServerVersion($bbbsession['url']); 
 if ( !isset($serverVersion) ) { //Server is not working
@@ -83,8 +83,8 @@ if ( !isset($serverVersion) ) { //Server is not working
     else
         print_error( 'view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course );
 } else {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $bbbsession['url'], $bbbsession['salt'] ) );
-    if ( !isset($xml) || !isset($xml->returncode) || $xml->returncode == 'FAILED' ){ // The salt is wrong
+    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $bbbsession['url'], $bbbsession['shared_secret'] ) );
+    if ( !isset($xml) || !isset($xml->returncode) || $xml->returncode == 'FAILED' ){ // The shared secret is wrong
         if ( $administrator ) 
             print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
         else if ( $moderator )
@@ -201,9 +201,9 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
 }
 
 if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
-    $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
+    $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['userID']);
 else
-    $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['userID']);
+    $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['userID']);
 
 
 $joining = false;
@@ -297,7 +297,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 "meta_contextActivity" => $bbbsession['contextActivity'],
                 "meta_contextActivityDescription" => $bbbsession['contextActivityDescription'],
                 "meta_recording" => $bbbsession['textflag']['record']);
-        $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['salt'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
+        $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
 
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action
@@ -375,7 +375,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
         $joining = true;
 
         print "<div align='center'>";
-        if( bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getIsMeetingRunningURL( $bbbsession['meetingid'], $bbbsession['url'], $bbbsession['salt'] )) == "true" ) {
+        if( bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getIsMeetingRunningURL( $bbbsession['meetingid'], $bbbsession['url'], $bbbsession['shared_secret'] )) == "true" ) {
             /// Since the meeting is already running, we just join the session
             print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
             print "<center><img src='pix/loading.gif' /></center>";
@@ -420,7 +420,7 @@ function bigbluebuttonbn_view_before( $bbbsession ){
 
 function bigbluebuttonbn_view_after( $bbbsession ){
 
-    $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['salt']);
+    $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['shared_secret']);
 
     if ( !isset($recordingsArray) || array_key_exists('messageKey', $recordingsArray)) {   // There are no recordings for this meeting
         if ( $bbbsession['flag']['record'] )
