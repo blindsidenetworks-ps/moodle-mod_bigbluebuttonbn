@@ -6,7 +6,7 @@
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -111,6 +111,30 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
     }
 
     if ($result && $oldversion < 2015030100) {
+        // Update the bigbluebuttonbn table
+        $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field allmoderators
+        $field = new xmldb_field('allmoderators');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Drop field description
+        $field = new xmldb_field('description');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field tagging
+        $field = new xmldb_field('tagging');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        
+        // Migrate existing CFG values and add default values to the new ones
+        error_debug(var_dump($settings));
+
+        // Update version
         //upgrade_mod_savepoint(true, 2015030100, 'bigbluebuttonbn');
     }
     /*

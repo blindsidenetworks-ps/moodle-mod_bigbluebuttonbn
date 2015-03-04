@@ -5,7 +5,7 @@
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -48,6 +48,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $voicebridge_editable = $CFG->bigbluebuttonbn_voicebridge_editable;
         $recording_default = $CFG->bigbluebuttonbn_recording_default;
         $recording_default_editable = $CFG->bigbluebuttonbn_recording_editable;
+        $tagging_default = $CFG->bigbluebuttonbn_recordingtagging_default;
+        $tagging_default_editable = $CFG->bigbluebuttonbn_recordingtagging_editable;
         $newwindow_default = $CFG->bigbluebuttonbn_newwindow_default;
         $newwindow_editable = $CFG->bigbluebuttonbn_newwindow_editable;
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
@@ -75,7 +77,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
 
         if ( $voicebridge_editable ) {
-            $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), 'maxlength="5" size="10"' );
+            $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
+            $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'), 'numeric', '####', 'server');
             $mform->setDefault( 'voicebridge', 0 );
             $mform->addHelpButton('voicebridge', 'mod_form_field_voicebridge', 'bigbluebuttonbn');
         }
@@ -100,6 +103,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $mform->setDefault( 'record', $recording_default );
             } else {
                 $mform->addElement( 'hidden', 'record', $recording_default );
+            }
+
+            if ( $tagging_default_editable ) {
+                $mform->addElement( 'checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn') );
+                $mform->setDefault( 'record', $tagging_default );
+            } else {
+                $mform->addElement( 'hidden', 'tagging', $tagging_default );
             }
         }
         //-------------------------------------------------------------------------------
@@ -234,6 +244,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if ($data['timeavailable'] != 0 && $data['timedue'] != 0 && $data['timedue'] < $data['timeavailable']) {
             $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+        }
+        
+        if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'])) {
+            $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
         }
         
         return $errors;

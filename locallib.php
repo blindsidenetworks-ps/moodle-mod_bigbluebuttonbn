@@ -6,7 +6,7 @@
  * @subpackage bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -51,15 +51,12 @@ function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL ) {
 
 function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $metadata = array() ) {
     $url_create = $URL."api/create?";
-    if ( $voiceBridge == 0)
-        $voiceBridge = 70000 + rand(0, 9999);
 
-    $meta = '';
-    foreach ($metadata as $key => $value) {
-        $meta = $meta.'&'.$key.'='.urlencode($value);
-    }
-    
-    $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL).'&record='.$record.$meta;
+    $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&logoutURL='.urlencode($logoutURL).'&record='.$record;
+
+    $voiceBridge = intval($voiceBridge);
+    if ( $voiceBridge > 0 && $voiceBridge < 79999)
+        $params .= '&voiceBridge='.$voiceBridge;
 
     $duration = intval($duration);
     if( $duration > 0 )
@@ -67,6 +64,10 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
 
     if( trim( $welcome ) )
         $params .= '&welcome='.urlencode($welcome);
+
+    foreach ($metadata as $key => $value) {
+        $params .= '&'.$key.'='.urlencode($value);
+    }
 
     return ( $url_create.$params.'&checksum='.sha1("create".$params.$SALT) );
 }

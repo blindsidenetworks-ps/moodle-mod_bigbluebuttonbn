@@ -5,7 +5,7 @@
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -112,7 +112,7 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
 
-$bbbsession['voicebridge'] = $bigbluebuttonbn->voicebridge;
+$bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
 $bbbsession['description'] = $bigbluebuttonbn->description;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
 $bbbsession['flag']['wait'] = $bigbluebuttonbn->wait;
@@ -294,9 +294,8 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
                 "meta_originTag" => $bbbsession['originTag'],
                 "meta_context" => $bbbsession['context'],
-                "meta_contextActivity" => $bbbsession['contextActivity'],
-                "meta_contextActivityDescription" => $bbbsession['contextActivityDescription'],
-                "meta_recording" => $bbbsession['textflag']['record']);
+                "meta_recording_description" => '',
+                "meta_recording_tagging" => '');
         $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
 
         if (!$response) {
