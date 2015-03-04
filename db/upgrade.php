@@ -110,9 +110,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030100) {
+    if ($result && $oldversion < 2015030110) {
+        error_log('Update 2015030110 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field timeduration
+        $field = new xmldb_field('timeduration');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
         //// Drop field allmoderators
         $field = new xmldb_field('allmoderators');
         if( $dbman->field_exists($table, $field) ) {
@@ -128,14 +134,33 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field timecreated
+        $field = new xmldb_field('timecreated');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Rename field timeavailable
+        $field = new xmldb_field('timeavailable');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->rename_field($table, $field, 'openingtime', $continue=true, $feedback=true);
+        }
+        //// Rename field timedue
+        $field = new xmldb_field('timedue');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->rename_field($table, $field, 'closingtime', $continue=true, $feedback=true);
         }
         
         // Migrate existing CFG values and add default values to the new ones
-        error_debug(var_dump($settings));
+        global $settings;
+        error_log('\$settings: ' . print_r(json_encode($settings), true));
 
         // Update version
-        //upgrade_mod_savepoint(true, 2015030100, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2015030110, 'bigbluebuttonbn');
+        error_log('Update 2015030110 ends');
     }
     /*
     if ($result && $oldversion < 2014070403) {

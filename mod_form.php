@@ -20,7 +20,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         global $CFG, $DB, $PAGE, $USER;
 
-        $course_id = optional_param('course', 0, PARAM_INT); // course_module ID, or
+        $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
         if ($course_id) {
             $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
@@ -78,6 +78,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if ( $voicebridge_editable ) {
             $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
+            $mform->setType('voicebridge', PARAM_INT);
             $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'), 'numeric', '####', 'server');
             $mform->setDefault( 'voicebridge', 0 );
             $mform->addHelpButton('voicebridge', 'mod_form_field_voicebridge', 'bigbluebuttonbn');
@@ -216,12 +217,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Third block starts here
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
+        if( $bigbluebuttonbn && ($bigbluebuttonbn->openingtime != 0 || $bigbluebuttonbn->closingtime != 0))
+            $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
+        else
+            $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
 
-        $mform->addElement('date_time_selector', 'timeavailable', get_string('mod_form_field_availabledate', 'bigbluebuttonbn'), array('optional'=>true));
-        $mform->setDefault('timeavailable', 0);
-        $mform->addElement('date_time_selector', 'timedue', get_string('mod_form_field_duedate', 'bigbluebuttonbn'), array('optional' => true));
-        $mform->setDefault('timedue', 0);
+        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional'=>true));
+        $mform->setDefault('openingtime', 0);
+        $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
+        $mform->setDefault('closingtime', 0);
         //-------------------------------------------------------------------------------
         // Third block ends here
         //-------------------------------------------------------------------------------
@@ -242,11 +246,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
         $errors = parent::validation($data, $files);
 
-        if ($data['timeavailable'] != 0 && $data['timedue'] != 0 && $data['timedue'] < $data['timeavailable']) {
-            $errors['timedue'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+        if ($data['openingtime'] != 0 && $data['closingtime'] != 0 && $data['closingtime'] < $data['openingtime']) {
+            $errors['closingtime'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
         }
         
-        if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'])) {
+        //error_log(print_r(json_encode($data)));
+        if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
             $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
         }
         

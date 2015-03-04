@@ -5,7 +5,7 @@
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -55,7 +55,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 
     $returnid = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     
-    if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
+    if (isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
@@ -63,12 +63,12 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
         $event->userid      = 0;
         $event->modulename  = 'bigbluebuttonbn';
         $event->instance    = $returnid;
-        $event->timestart   = $bigbluebuttonbn->timeavailable;
+        $event->timestart   = $bigbluebuttonbn->openingtime;
 
-        if ( $bigbluebuttonbn->timedue ){
-            $event->timeduration = $bigbluebuttonbn->timedue - $bigbluebuttonbn->timeavailable;
+        if ( $bigbluebuttonbn->closingtime ){
+            $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
         } else {
-            $event->timeduration = 0;
+            $event->durationtime = 0;
         }
         
         calendar_event::create($event);
@@ -99,7 +99,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
 
     $returnid = $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     
-    if (isset($bigbluebuttonbn->timeavailable) && $bigbluebuttonbn->timeavailable ){
+    if (isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
@@ -107,13 +107,13 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
         $event->userid      = 0;
         $event->modulename  = 'bigbluebuttonbn';
         $event->instance    = $bigbluebuttonbn->id;
-        $event->timestart   = $bigbluebuttonbn->timeavailable;
+        $event->timestart   = $bigbluebuttonbn->openingtime;
 
-        if ( $bigbluebuttonbn->timedue ){
-            $event->timeduration = $bigbluebuttonbn->timedue - $bigbluebuttonbn->timeavailable;
+        if ( $bigbluebuttonbn->closingtime ){
+            $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
             
         } else {
-            $event->timeduration = 0;
+            $event->durationtime = 0;
             
         }
 

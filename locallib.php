@@ -377,7 +377,6 @@ function bigbluebuttonbn_get_users_json($context){
 }
 
 function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
-    global $DB;
     $participant_list_array = array();
     if( $bigbluebuttonbn != null ) {
         $participant_list = json_decode(htmlspecialchars_decode($bigbluebuttonbn->participants));
@@ -472,4 +471,23 @@ function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
         $key = 'view_error_max_concurrent';
     }
     return $key;
+}
+
+function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
+    global $DB;
+    $is_unique = true;
+    $table = "bigbluebuttonbn";
+    //$select = "voicebridge = ".$voicebridge." AND (closingtime = 0 OR closingtime > ".time().")";
+    $select = "voicebridge = ".$voicebridge;
+    if( $id ) $select .= " AND id <> ".$id; 
+    if ( $rooms = $DB->get_records_select($table, $select)  ) {
+        //error_log(print_r(json_encode($rooms, true)));
+        $is_unique = false;
+    }
+
+    return $is_unique;
+}
+
+function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
+    return 0;
 }

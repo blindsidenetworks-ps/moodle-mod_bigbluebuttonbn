@@ -125,11 +125,11 @@ $bbbsession['textflag']['allmoderators'] = $bigbluebuttonbn->allmoderators? 'tru
 if( $bigbluebuttonbn->record )
     $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
 
-$bbbsession['timeavailable'] = $bigbluebuttonbn->timeavailable;
-$bbbsession['timedue'] = $bigbluebuttonbn->timedue;
-$bbbsession['timeduration'] = intval($bigbluebuttonbn->timeduration / 60);
-if( $bbbsession['timeduration'] > 0 )
-    $bbbsession['welcome'] .= '<br><br>'.str_replace("%duration%", ''.$bbbsession['timeduration'], get_string('bbbdurationwarning', 'bigbluebuttonbn'));
+$bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
+$bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
+$bbbsession['durationtime'] = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
+if( $bbbsession['durationtime'] > 0 )
+    $bbbsession['welcome'] .= '<br><br>'.str_replace("%duration%", ''.$bbbsession['durationtime'], get_string('bbbdurationwarning', 'bigbluebuttonbn'));
 
 //Additional info related to the course
 $bbbsession['coursename'] = $course->fullname;
@@ -208,8 +208,8 @@ else
 
 $joining = false;
 $bigbluebuttonbn_view = '';
-if (!$bigbluebuttonbn->timeavailable ) {
-    if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue){
+if (!$bigbluebuttonbn->openingtime ) {
+    if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime){
         //GO JOINING
         $bigbluebuttonbn_view = 'join';
         $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
@@ -226,7 +226,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
         
     }
     
-} else if ( time() < $bigbluebuttonbn->timeavailable ){
+} else if ( time() < $bigbluebuttonbn->openingtime ){
     //CALLING BEFORE
     $bigbluebuttonbn_view = 'before';
     echo $OUTPUT->heading(get_string('bbbnotavailableyet', 'bigbluebuttonbn'));
@@ -236,7 +236,7 @@ if (!$bigbluebuttonbn->timeavailable ) {
     
     echo $OUTPUT->box_end();
     
-} else if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue ) {
+} else if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
     $bigbluebuttonbn_view = 'join';
     $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
@@ -296,7 +296,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 "meta_context" => $bbbsession['context'],
                 "meta_recording_description" => '',
                 "meta_recording_tagging" => '');
-        $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['timeduration'], $bbbsession['voicebridge'], $metadata );
+        $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['durationtime'], $bbbsession['voicebridge'], $metadata );
 
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action
@@ -405,13 +405,13 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
 function bigbluebuttonbn_view_before( $bbbsession ){
 
     echo '<table>';
-    if ($bbbsession['timeavailable']) {
+    if ($bbbsession['openingtime']) {
         echo '<tr><td class="c0">'.get_string('mod_form_field_availabledate','bigbluebuttonbn').':</td>';
-        echo '    <td class="c1">'.userdate($bbbsession['timeavailable']).'</td></tr>';
+        echo '    <td class="c1">'.userdate($bbbsession['openingtime']).'</td></tr>';
     }
-    if ($bbbsession['timedue']) {
+    if ($bbbsession['closingtime']) {
         echo '<tr><td class="c0">'.get_string('mod_form_field_duedate','bigbluebuttonbn').':</td>';
-        echo '    <td class="c1">'.userdate($bbbsession['timedue']).'</td></tr>';
+        echo '    <td class="c1">'.userdate($bbbsession['closingtime']).'</td></tr>';
     }
     echo '</table>';
 }
