@@ -36,8 +36,8 @@ if ( !isset($error) ) {
     if( !$hascourseaccess ){
         header("HTTP/1.0 401 Unauthorized");
     } else {
-        $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
         $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+        $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
         try{
             $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $shared_secret )? 'true': 'false');

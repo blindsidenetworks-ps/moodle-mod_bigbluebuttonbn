@@ -42,7 +42,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         //BigBlueButton server data
         $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-        $salt = trim($CFG->bigbluebuttonbn_shared_secret);
+        $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
         //UI configuration options
         $voicebridge_editable = $CFG->bigbluebuttonbn_voicebridge_editable;

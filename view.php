@@ -71,8 +71,8 @@ $administrator = has_capability('moodle/category:manage', $context);
 
 //Validates if the BigBlueButton server is running 
 //BigBlueButton server data
-$bbbsession['shared_secret'] = trim($CFG->bigbluebuttonbn_server_url);
-$bbbsession['url'] = trim(trim($CFG->bigbluebuttonbn_shared_secret),'/').'/';
+$bbbsession['url'] = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+$bbbsession['shared_secret'] = trim($CFG->bigbluebuttonbn_shared_secret);
 
 $serverVersion = bigbluebuttonbn_getServerVersion($bbbsession['url']); 
 if ( !isset($serverVersion) ) { //Server is not working
