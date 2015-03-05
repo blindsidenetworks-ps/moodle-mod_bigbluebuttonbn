@@ -91,6 +91,16 @@ if ($ADMIN->fulltree) {
             get_string('config_permission', 'bigbluebuttonbn'),
             get_string('config_permission_description', 'bigbluebuttonbn')));
 
+    $options = array(
+            '1' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
+            '2' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
+            '3' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn')
+            );
+
+    $settings->add(new admin_setting_configselect('bigbluebuttonbn_moderator_default',
+            get_string('config_permission_moderator_default', 'bigbluebuttonbn'),
+            get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),
+            3, $options));
 }
 
 ?>

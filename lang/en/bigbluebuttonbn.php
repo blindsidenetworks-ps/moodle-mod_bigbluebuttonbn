@@ -60,6 +60,8 @@ $string['config_ui_recordingtagging_editable_description'] = 'Recording tagging 
 
 $string['config_permission'] = 'Permission configuration';
 $string['config_permission_description'] = 'These settings define the permissions by default for the rooms or conference created.';
+$string['config_permission_moderator_default'] = 'Moderator by default';
+$string['config_permission_moderator_default_description'] = 'This rule is used by default when a new room or conference is added.';
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
@@ -82,7 +84,7 @@ $string['index_running'] = 'running';
 $string['index_warning_adding_meeting'] = 'Unable to assign a new meeting ID.';
 $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_participants'] = 'Participants';
-$string['mod_form_block_schedule'] = 'Schedule for sessions';
+$string['mod_form_block_schedule'] = 'Schedule for session';
 $string['mod_form_block_record'] = 'Record settings';
 $string['mod_form_field_openingtime'] = 'Join open';
 $string['mod_form_field_closingtime'] = 'Join closed';
@@ -110,8 +112,9 @@ $string['mod_form_field_welcome_default'] = '<br>Welcome to <b>%%CONFNAME%%</b>!
 $string['mod_form_field_participant_add'] = 'Add participant';
 $string['mod_form_field_participant_list'] = 'Participant list';
 $string['mod_form_field_participant_list_type_all'] = 'All users enrolled';
-$string['mod_form_field_participant_list_type_user'] = 'User';
 $string['mod_form_field_participant_list_type_role'] = 'Role';
+$string['mod_form_field_participant_list_type_user'] = 'User';
+$string['mod_form_field_participant_list_type_owner'] = 'Owner';
 $string['mod_form_field_participant_list_text_as'] = 'as';
 $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';

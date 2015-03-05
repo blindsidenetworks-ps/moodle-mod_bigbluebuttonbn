@@ -491,5 +491,9 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
 }
 
 function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
-    return 0;
+    $now = time();
+    if( $closingtime > 0 && $now < $closingtime )
+        return ($closingtime - time())/60;
+    else
+        return 0;
 }

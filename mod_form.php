@@ -18,7 +18,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
 
-        global $CFG, $DB, $PAGE, $USER;
+        global $CFG, $DB, $USER;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
@@ -217,12 +217,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Third block starts here
         //-------------------------------------------------------------------------------
-        if( $bigbluebuttonbn && ($bigbluebuttonbn->openingtime != 0 || $bigbluebuttonbn->closingtime != 0))
+        if( $bigbluebuttonbn && ($bigbluebuttonbn->openingtime != 0 || $bigbluebuttonbn->closingtime != 0) )
             $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
         else
             $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
 
-        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional'=>true));
+        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('openingtime', 0);
         $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('closingtime', 0);
