@@ -22,34 +22,45 @@ $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 $string['bigbluebuttonbnWait'] = 'User has to wait';
+
+$string['config_general'] = 'General configuration';
+$string['config_general_description'] = 'These settings are <b>always</b> used';
 $string['config_server_url'] = 'BigBlueButton Server URL';
 $string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 $string['config_shared_secret'] = 'BigBlueButton Shared Secret';
 $string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
-$string['config_general'] = 'General configuration';
-$string['config_general_description'] = 'These settings are <b>always</b> used';
+
+$string['config_feature'] = 'Feature configuration';
+$string['config_feature_description'] = 'These settings are feature specific';
+$string['config_feature_recording_default'] = 'Recording feature enabled by default';
+$string['config_feature_recording_default_description'] = 'If enabled the sessions rooms or conference created will have the recording feature enabled.';
+$string['config_feature_waitformoderator_default'] = 'Wait for moderator enabled by default';
+$string['config_feature_waitformoderator_default_description'] = 'Wait for moderator feature is enabled by default when a new room or conference is added.';
+$string['config_feature_waitformoderator_ping_interval'] = 'Wait for moderator ping (seconds)';
+$string['config_feature_waitformoderator_ping_interval_description'] = 'When the wait for moderator feature is enabled, the client pings for the status of the session each [number] seconds. This parameter defines the interval for requests made to the Moodle server';
+$string['config_feature_waitformoderator_cache_ttl'] = 'Wait for moderator cache TTL (seconds)';
+$string['config_feature_waitformoderator_cache_ttl_description'] = 'To support a heavy load of clients this plugin makes use of a cache. This parameter defines the time the cache will be kept before the next request is sent to the BigBluebutton server.';
+$string['config_feature_newwindow_default'] = 'Open in a new window enabled by default';
+$string['config_feature_newwindow_default_description'] = 'Open in a new window feature is enabled by default when a new room or conference is added. When this feature is enabled the BigBluebutton session will be oppened in a new window for users entering into the room or conference.';
+$string['config_feature_recordingtagging_default'] = 'Recording tagging enabled by default';
+$string['config_feature_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used by the RecordingsBN plugin.';
+
 $string['config_ui'] = 'UI configuration';
 $string['config_ui_description'] = 'These settings enable or disable options in the UI and also defines default values for these options.';
-$string['config_ui_recording_default'] = 'Recording feature enabled by default';
-$string['config_ui_recording_default_description'] = 'If enabled the sessions rooms or conference created will have the recording feature enabled.';
 $string['config_ui_recording_editable'] = 'Recording feature can be edited';
 $string['config_ui_recording_editable_description'] = 'If enabled, the activities have an option to activate the start/stop recording button in BigBlueButton.';
-$string['config_ui_waitformoderator_default'] = 'Wait for moderator enabled by default';
-$string['config_ui_waitformoderator_default_description'] = 'Wait for moderator feature is enabled by default when a new room or conference is added.';
 $string['config_ui_waitformoderator_editable'] = 'Wait for moderator feature can be edited';
 $string['config_ui_waitformoderator_editable_description'] = 'Wait for moderator value by default can be edited when the room or conference is added or updated.';
-$string['config_ui_newwindow_default'] = 'Open in a new window enabled by default';
-$string['config_ui_newwindow_default_description'] = 'Open in a new window feature is enabled by default when a new room or conference is added. When this feature is enabled the BigBluebutton session will be oppened in a new window for users entering into the room or conference.';
 $string['config_ui_newwindow_editable'] = 'Open in a new window feature can be edited';
 $string['config_ui_newwindow_editable_description'] = 'Open in a new window value by default can be edited when the room or conference is added or updated.';
 $string['config_ui_voicebridge_editable'] = 'Conference voice bridge can be edited';
 $string['config_ui_voicebridge_editable_description'] = 'Conference voice bridge number can be permanently assigned to a room conference. When assigned, the number can not be used by any other room or conference';
-$string['config_ui_recordingtagging_default'] = 'Recording tagging enabled by default';
-$string['config_ui_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used by the RecordingsBN plugin.';
 $string['config_ui_recordingtagging_editable'] = 'Recording tagging feature can be edited';
 $string['config_ui_recordingtagging_editable_description'] = 'Recording tagging value by default can be edited when the room or conference is added or updated.';
+
 $string['config_permission'] = 'Permission configuration';
 $string['config_permission_description'] = 'These settings define the permissions by default for the rooms or conference created.';
+
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';

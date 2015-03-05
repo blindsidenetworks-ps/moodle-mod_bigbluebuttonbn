@@ -22,51 +22,69 @@ if ($ADMIN->fulltree) {
             get_string( 'config_shared_secret', 'bigbluebuttonbn' ),
             get_string( 'config_shared_secret_description', 'bigbluebuttonbn' ), '8cd8ef52e8e101574e400365b55e11a6' ) );
 
+    $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_heading',
+            get_string('config_feature', 'bigbluebuttonbn'),
+            get_string('config_feature_description', 'bigbluebuttonbn')));
+    //default value for 'recording' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_default',
+            get_string('config_feature_recording_default', 'bigbluebuttonbn'),
+            get_string('config_feature_recording_default_description', 'bigbluebuttonbn'),
+            1));
+    //default value for 'wait for moderator' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_default',
+            get_string('config_feature_waitformoderator_default', 'bigbluebuttonbn'),
+            get_string('config_feature_waitformoderator_default_description', 'bigbluebuttonbn'),
+            0));
+    //ping interval value for 'wait for moderator' feature
+    $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_ping_interval',
+            get_string('config_feature_waitformoderator_ping_interval', 'bigbluebuttonbn'),
+            get_string('config_feature_waitformoderator_ping_interval_description', 'bigbluebuttonbn'),
+            10));
+    //cache TTL value for 'wait for moderator' feature
+    $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_cache_ttl',
+            get_string('config_feature_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
+            get_string('config_feature_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
+            60));
+    //default value for 'open in a new window' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_default',
+            get_string('config_feature_newwindow_default', 'bigbluebuttonbn'),
+            get_string('config_feature_newwindow_default_description', 'bigbluebuttonbn'),
+            1));
+    //default value for 'recording tagging' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
+            get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
+            get_string('config_feature_recordingtagging_default_description', 'bigbluebuttonbn'),
+            0));
+    
     $settings->add( new admin_setting_heading('bigbluebuttonbn_ui_heading',
             get_string('config_ui', 'bigbluebuttonbn'),
             get_string('config_ui_description', 'bigbluebuttonbn')));
 
-    //ui and default value for 'recording' feature
+    //ui for 'recording' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_editable',
             get_string('config_ui_recording_editable', 'bigbluebuttonbn'),
             get_string('config_ui_recording_editable_description', 'bigbluebuttonbn'),
             1));
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_default',
-            get_string('config_ui_recording_default', 'bigbluebuttonbn'),
-            get_string('config_ui_recording_default_description', 'bigbluebuttonbn'),
-            1));
-    //ui and default value for 'wait for moderator' feature
+    //ui for 'wait for moderator' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_editable',
             get_string('config_ui_waitformoderator_editable', 'bigbluebuttonbn'),
             get_string('config_ui_waitformoderator_editable_description', 'bigbluebuttonbn'),
             1));
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_default',
-            get_string('config_ui_waitformoderator_default', 'bigbluebuttonbn'),
-            get_string('config_ui_waitformoderator_default_description', 'bigbluebuttonbn'),
-            0));
-    //ui and default value for 'open in a new window' feature
+    //ui for 'open in a new window' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_editable',
             get_string('config_ui_newwindow_editable', 'bigbluebuttonbn'),
             get_string('config_ui_newwindow_editable_description', 'bigbluebuttonbn'),
             1));
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_default',
-            get_string('config_ui_newwindow_default', 'bigbluebuttonbn'),
-            get_string('config_ui_newwindow_default_description', 'bigbluebuttonbn'),
-            1));
-    //voicebridge
+    //ui for establishing static voicebridge
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_voicebridge_editable',
             get_string('config_ui_voicebridge_editable', 'bigbluebuttonbn'),
             get_string('config_ui_voicebridge_editable_description', 'bigbluebuttonbn'),
             0));
-    //ui and default value for 'recording tagging' feature
+    //ui for 'recording tagging' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
             get_string('config_ui_recordingtagging_editable', 'bigbluebuttonbn'),
             get_string('config_ui_recordingtagging_editable_description', 'bigbluebuttonbn'),
             1));
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
-            get_string('config_ui_recordingtagging_default', 'bigbluebuttonbn'),
-            get_string('config_ui_recordingtagging_default_description', 'bigbluebuttonbn'),
-            0));
     
     
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission_heading',

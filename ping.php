@@ -73,9 +73,10 @@ if ( !isset($error) ) {
 }
 
 function bigbluebuttonbn_meeting_running($meetingID, $url, $shared_secret) {
+    global $CFG;
+
     $meeting_running = false;
-    //$cache_ttl = $CFG->cache_ttl;
-    $cache_ttl = 30;
+    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
 
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'ping_cache');
     $result = $cache->get($meetingID);
@@ -83,9 +84,11 @@ function bigbluebuttonbn_meeting_running($meetingID, $url, $shared_secret) {
     $now = time();
     if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) ) {
         //Use the value in the cache
+        error_log('Data taken from cache');
         $meeting_running = $result['meeting_running'];
     } else {
         //Ping again and refresh the cache
+        error_log('Data taken from the ping response');
         $meeting_running = bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $shared_secret );
         $cache->set($meetingID, array('creation_time' => time(), 'meeting_running' => $meeting_running));
     }
