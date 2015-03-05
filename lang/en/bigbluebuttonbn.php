@@ -39,9 +39,9 @@ $string['config_feature_waitformoderator_default_description'] = 'Wait for moder
 $string['config_feature_waitformoderator_ping_interval'] = 'Wait for moderator ping (seconds)';
 $string['config_feature_waitformoderator_ping_interval_description'] = 'When the wait for moderator feature is enabled, the client pings for the status of the session each [number] seconds. This parameter defines the interval for requests made to the Moodle server';
 $string['config_feature_waitformoderator_cache_ttl'] = 'Wait for moderator cache TTL (seconds)';
-$string['config_feature_waitformoderator_cache_ttl_description'] = 'To support a heavy load of clients this plugin makes use of a cache. This parameter defines the time the cache will be kept before the next request is sent to the BigBluebutton server.';
+$string['config_feature_waitformoderator_cache_ttl_description'] = 'To support a heavy load of clients this plugin makes use of a cache. This parameter defines the time the cache will be kept before the next request is sent to the BigBlueButton server.';
 $string['config_feature_newwindow_default'] = 'Open in a new window enabled by default';
-$string['config_feature_newwindow_default_description'] = 'Open in a new window feature is enabled by default when a new room or conference is added. When this feature is enabled the BigBluebutton session will be oppened in a new window for users entering into the room or conference.';
+$string['config_feature_newwindow_default_description'] = 'Open in a new window feature is enabled by default when a new room or conference is added. When this feature is enabled the BigBlueButton session will be oppened in a new window for users entering into the room or conference.';
 $string['config_feature_recordingtagging_default'] = 'Recording tagging enabled by default';
 $string['config_feature_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used by the RecordingsBN plugin.';
 

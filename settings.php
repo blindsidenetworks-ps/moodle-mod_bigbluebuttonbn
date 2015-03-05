@@ -36,15 +36,15 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_waitformoderator_default_description', 'bigbluebuttonbn'),
             0));
     //ping interval value for 'wait for moderator' feature
-    $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_ping_interval',
+    $settings->add(new admin_setting_configtext_with_advanced('bigbluebuttonbn_waitformoderator_ping_interval',
             get_string('config_feature_waitformoderator_ping_interval', 'bigbluebuttonbn'),
             get_string('config_feature_waitformoderator_ping_interval_description', 'bigbluebuttonbn'),
-            10));
+            array('value' => '10', 'fix' => false), PARAM_INT));
     //cache TTL value for 'wait for moderator' feature
-    $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_cache_ttl',
+    $settings->add(new admin_setting_configtext_with_advanced('bigbluebuttonbn_waitformoderator_cache_ttl',
             get_string('config_feature_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
             get_string('config_feature_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
-            60));
+            60, PARAM_INT));
     //default value for 'open in a new window' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_default',
             get_string('config_feature_newwindow_default', 'bigbluebuttonbn'),

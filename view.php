@@ -262,7 +262,7 @@ $jsVars = array(
         'joining' => ($joining? 'true':'false'),
         'bigbluebuttonbn_view' => $bigbluebuttonbn_view,
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
-        'ping_interval' => $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000
+        'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
 );
 
 $jsmodule = array(
