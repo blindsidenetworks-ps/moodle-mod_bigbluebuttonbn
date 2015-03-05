@@ -37,7 +37,7 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
                 }
             };
 
-            var id = dataSource.setInterval(10000, request);
+            var id = dataSource.setInterval(5000, request);
 
         }
     }

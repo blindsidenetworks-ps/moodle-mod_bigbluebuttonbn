@@ -113,15 +113,12 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
 }
 
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
-$bbbsession['description'] = $bigbluebuttonbn->description;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
 $bbbsession['flag']['wait'] = $bigbluebuttonbn->wait;
-$bbbsession['flag']['allmoderators'] = $bigbluebuttonbn->allmoderators;
 $bbbsession['flag']['record'] = $bigbluebuttonbn->record;
 $bbbsession['textflag']['newwindow'] = $bigbluebuttonbn->newwindow? 'true':'false';
 $bbbsession['textflag']['wait'] = $bigbluebuttonbn->wait? 'true': 'false';
 $bbbsession['textflag']['record'] = $bigbluebuttonbn->record? 'true': 'false';
-$bbbsession['textflag']['allmoderators'] = $bigbluebuttonbn->allmoderators? 'true': 'false';
 if( $bigbluebuttonbn->record )
     $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
 
@@ -150,7 +147,8 @@ $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
 $bbbsession['context'] = $course->fullname;
 $bbbsession['contextActivity'] = $bigbluebuttonbn->name;
-$bbbsession['contextActivityDescription'] = $bigbluebuttonbn->description;
+$bbbsession['contextActivityDescription'] = "";
+$bbbsession['contextActivityTagging'] = "";
 
 //// BigBlueButton Setup Ends
 
@@ -200,7 +198,7 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
 }
 
-if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
+if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] )
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['userID']);
 else
     $bbbsession['joinURL'] = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['userID']);
@@ -294,8 +292,8 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
                 "meta_originTag" => $bbbsession['originTag'],
                 "meta_context" => $bbbsession['context'],
-                "meta_recording_description" => '',
-                "meta_recording_tagging" => '');
+                "meta_recording_description" => $bbbsession['contextActivityDescription'],
+                "meta_recording_tagging" => $bbbsession['contextActivityTagging']);
         $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['durationtime'], $bbbsession['voicebridge'], $metadata );
 
         if (!$response) {

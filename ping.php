@@ -39,9 +39,9 @@ if ( !isset($error) ) {
         $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
         $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
-        try{
-            $ismeetingrunning = (bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $shared_secret )? 'true': 'false');
-            if( $ismeetingrunning === 'true' ) {
+        try {
+            $meeting_running = bigbluebuttonbn_meeting_running( $meetingID, $url, $shared_secret );
+            if( $meeting_running  ) {
                 ///log the join event
                 if ( $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id), '*', MUST_EXIST) ) {
                     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -63,13 +63,31 @@ if ( !isset($error) ) {
                     }
                 }
             }
-            echo $callback.'({ "status": "'.$ismeetingrunning.'" });';
-        }catch(Exception $e){
+            echo $callback.'({ "status": "'.($meeting_running?'true':'false').'" });';
+        } catch(Exception $e) {
             header("HTTP/1.0 502 Bad Gateway. ".$e->getMessage());
         }
-        
     }
-
 } else {
     header("HTTP/1.0 400 Bad Request. ".$error);
+}
+
+function bigbluebuttonbn_meeting_running($meetingID, $url, $shared_secret) {
+    $meeting_running = false;
+    //$cache_ttl = $CFG->cache_ttl;
+    $cache_ttl = 30;
+
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'ping_cache');
+    $result = $cache->get($meetingID);
+    
+    $now = time();
+    if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) ) {
+        //Use the value in the cache
+        $meeting_running = $result['meeting_running'];
+    } else {
+        //Ping again and refresh the cache
+        $meeting_running = bigbluebuttonbn_isMeetingRunning( $meetingID, $url, $shared_secret );
+        $cache->set($meetingID, array('creation_time' => time(), 'meeting_running' => $meeting_running));
+    }
+    return $meeting_running;
 }

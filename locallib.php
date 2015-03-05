@@ -54,6 +54,7 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
 
     $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&logoutURL='.urlencode($logoutURL).'&record='.$record;
 
+    error_log($voiceBridge);
     $voiceBridge = intval($voiceBridge);
     if ( $voiceBridge > 0 && $voiceBridge < 79999)
         $params .= '&voiceBridge='.$voiceBridge;
@@ -277,6 +278,7 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_wrap_simplexml_load_file($url){
+    error_log($url);
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
