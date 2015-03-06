@@ -85,6 +85,11 @@ if ($ADMIN->fulltree) {
             get_string('config_ui_recordingtagging_editable', 'bigbluebuttonbn'),
             get_string('config_ui_recordingtagging_editable_description', 'bigbluebuttonbn'),
             1));
+    //ui for 'preupload presentation' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_preuploadpresentation_enabled',
+            get_string('config_ui_preuploadpresentation_enabled', 'bigbluebuttonbn'),
+            get_string('config_ui_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
+            0));
     
     
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission_heading',

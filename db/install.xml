@@ -21,8 +21,9 @@
         <FIELD NAME="openingtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="voicebridge" NEXT="timeclose"/>
         <FIELD NAME="closingtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeopen" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeclose" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="participants"/>
-        <FIELD NAME="participants" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Participants and permissions" PREVIOUS="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="presentation"/>
+        <FIELD NAME="presentation" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Preuploaded presentation" PREVIOUS="timemodified" NEXT="participants"/>
+        <FIELD NAME="participants" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Participants and permissions" PREVIOUS="presentation"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

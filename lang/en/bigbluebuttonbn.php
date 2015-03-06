@@ -57,6 +57,8 @@ $string['config_ui_voicebridge_editable'] = 'Conference voice bridge can be edit
 $string['config_ui_voicebridge_editable_description'] = 'Conference voice bridge number can be permanently assigned to a room conference. When assigned, the number can not be used by any other room or conference';
 $string['config_ui_recordingtagging_editable'] = 'Recording tagging feature can be edited';
 $string['config_ui_recordingtagging_editable_description'] = 'Recording tagging value by default can be edited when the room or conference is added or updated.';
+$string['config_ui_preuploadpresentation_enabled'] = 'Preupload presentation enabled';
+$string['config_ui_preuploadpresentation_enabled_description'] = 'Preupload presentation feature is enabled in the UI when the room or conference is added or updated.';
 
 $string['config_permission'] = 'Permission configuration';
 $string['config_permission_description'] = 'These settings define the permissions by default for the rooms or conference created.';
@@ -83,6 +85,7 @@ $string['index_heading'] = 'BigBlueButton Rooms';
 $string['index_running'] = 'running';
 $string['index_warning_adding_meeting'] = 'Unable to assign a new meeting ID.';
 $string['mod_form_block_general'] = 'General settings';
+$string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_participants'] = 'Participants';
 $string['mod_form_block_schedule'] = 'Schedule for session';
 $string['mod_form_block_record'] = 'Record settings';

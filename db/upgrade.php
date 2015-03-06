@@ -110,7 +110,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030110) {
+    if ($result && $oldversion < 2015030120) {
         error_log('Update 2015030110 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
@@ -135,6 +135,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
+        //// Add field presentation
+        $field = new xmldb_field('presentation');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
         //// Add field timecreated
         $field = new xmldb_field('timecreated');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
@@ -156,11 +162,10 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         
         // Migrate existing CFG values and add default values to the new ones
         global $settings;
-        error_log('\$settings: ' . print_r(json_encode($settings), true));
+        error_log('\$settings: '.print_r(json_encode($settings), true));
 
         // Update version
-        upgrade_mod_savepoint(true, 2015030110, 'bigbluebuttonbn');
-        error_log('Update 2015030110 ends');
+        //upgrade_mod_savepoint(true, 2015030120, 'bigbluebuttonbn');
     }
     /*
     if ($result && $oldversion < 2014070403) {

@@ -120,6 +120,33 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Second block starts here
         //-------------------------------------------------------------------------------
+        if ( $CFG->bigbluebuttonbn_preuploadpresentation_enabled ) {
+            $mform->addElement('header', 'presentation', get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
+            $mform->setExpanded('presentation');
+
+            $filemanager_options = array();
+            $filemanager_options['accepted_types'] = '*';
+            $filemanager_options['maxbytes'] = 0;
+            $filemanager_options['maxfiles'] = -1;
+            $filemanager_options['mainfile'] = true;
+
+            $mform->addElement('filemanager', 'files', get_string('selectfiles'), null, $filemanager_options);
+
+            // add legacy files flag only if used
+            if (isset($this->current->legacyfiles) and $this->current->legacyfiles != RESOURCELIB_LEGACYFILES_NO) {
+                $options = array(RESOURCELIB_LEGACYFILES_DONE   => get_string('legacyfilesdone', 'resource'),
+                    RESOURCELIB_LEGACYFILES_ACTIVE => get_string('legacyfilesactive', 'resource'));
+                $mform->addElement('select', 'legacyfiles', get_string('legacyfiles', 'resource'), $options);
+            }
+        }
+        //-------------------------------------------------------------------------------
+        // Second block ends here
+        //-------------------------------------------------------------------------------
+
+
+        //-------------------------------------------------------------------------------
+        // Third block starts here
+        //-------------------------------------------------------------------------------
         $mform->addElement('header', 'permission', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
 
         // Data required for "Add participant" and initial "Participant list" setup
@@ -209,24 +236,23 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                                     );
         $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_strings = '.json_encode($bigbluebuttonbn_strings).'; </script>');
         //-------------------------------------------------------------------------------
-        // Second block ends here
+        // Third block ends here
         //-------------------------------------------------------------------------------
 
 
         //-------------------------------------------------------------------------------
-        // Third block starts here
+        // Fourth block starts here
         //-------------------------------------------------------------------------------
+        $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
         if( isset($current_activity->openingtime) && $current_activity->openingtime != 0 || isset($current_activity->closingtime) && $current_activity->closingtime != 0 )
-            $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
-        else
-            $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
+            $mform->setExpanded('schedule');
 
         $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('openingtime', 0);
         $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('closingtime', 0);
         //-------------------------------------------------------------------------------
-        // Third block ends here
+        // Fourth block ends here
         //-------------------------------------------------------------------------------
 
 
