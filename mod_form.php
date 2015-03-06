@@ -38,7 +38,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             //This is valid after v2.6
             $context = context_course::instance($course->id);
         }
-        //error_log('context: ' . print_r($context, true));
 
         //BigBlueButton server data
         $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
@@ -54,7 +53,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $newwindow_editable = $CFG->bigbluebuttonbn_newwindow_editable;
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
-        
+
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
         if ( !isset($serverVersion) ) {
@@ -217,7 +216,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Third block starts here
         //-------------------------------------------------------------------------------
-        if( $bigbluebuttonbn && ($bigbluebuttonbn->openingtime != 0 || $bigbluebuttonbn->closingtime != 0) )
+        if( isset($current_activity->openingtime) && $current_activity->openingtime != 0 || isset($current_activity->closingtime) && $current_activity->closingtime != 0 )
             $mform->addElement('header', 'general', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
         else
             $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
