@@ -74,6 +74,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
+        $mform->setType('welcome', PARAM_TEXT);
 
         if ( $voicebridge_editable ) {
             $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
@@ -85,6 +86,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if ( $newwindow_editable ) {
             $mform->addElement( 'checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn') );
+            $mform->setType('newwindow', PARAM_INT);
             $mform->setDefault( 'newwindow', $newwindow_default );
         } else {
             $mform->addElement( 'hidden', 'newwindow', $newwindow_default );
@@ -92,6 +94,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if ( $waitformoderator_editable ) {
             $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
+            $mform->setType('wait', PARAM_INT);
             $mform->setDefault( 'wait', 1 );
         } else {
             $mform->addElement( 'hidden', 'wait', $waitformoderator_default );
@@ -104,6 +107,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             } else {
                 $mform->addElement( 'hidden', 'record', $recording_default );
             }
+            $mform->setType('record', PARAM_INT);
 
             if ( $tagging_default_editable ) {
                 $mform->addElement( 'checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn') );
@@ -111,6 +115,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             } else {
                 $mform->addElement( 'hidden', 'tagging', $tagging_default );
             }
+            $mform->setType('tagging', PARAM_INT);
         }
         //-------------------------------------------------------------------------------
         // First block ends here
@@ -121,23 +126,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Second block starts here
         //-------------------------------------------------------------------------------
         if ( $CFG->bigbluebuttonbn_preuploadpresentation_enabled ) {
-            $mform->addElement('header', 'presentation', get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
-            $mform->setExpanded('presentation');
+            $mform->addElement('header', 'preupload', get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
+            $mform->setExpanded('preupload');
 
             $filemanager_options = array();
             $filemanager_options['accepted_types'] = '*';
-            $filemanager_options['maxbytes'] = 0;
-            $filemanager_options['maxfiles'] = -1;
+            $filemanager_options['maxbytes'] = 0; //$this->course->maxbytes;
+            $filemanager_options['subdirs'] = 0;
+            $filemanager_options['maxfiles'] = 1;
             $filemanager_options['mainfile'] = true;
 
-            $mform->addElement('filemanager', 'files', get_string('selectfiles'), null, $filemanager_options);
-
-            // add legacy files flag only if used
-            if (isset($this->current->legacyfiles) and $this->current->legacyfiles != RESOURCELIB_LEGACYFILES_NO) {
-                $options = array(RESOURCELIB_LEGACYFILES_DONE   => get_string('legacyfilesdone', 'resource'),
-                    RESOURCELIB_LEGACYFILES_ACTIVE => get_string('legacyfilesactive', 'resource'));
-                $mform->addElement('select', 'legacyfiles', get_string('legacyfiles', 'resource'), $options);
-            }
+            $mform->addElement('filemanager', 'presentation', get_string('selectfiles'), null, $filemanager_options);
+            //$mform->addHelpButton('presentation', 'mod_form_field_presentation', 'bigbluebuttonbn');
         }
         //-------------------------------------------------------------------------------
         // Second block ends here
@@ -266,20 +266,35 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
     }
 
-    public function validation($data, $files) {
-        $current_activity =& $this->current;
-        
+    function data_preprocessing(&$default_values) {
+        if ($this->current->instance) {
+            //error_log(json_encode($default_values));
+            error_log(json_encode($this->current));
+            error_log(json_encode($this->current->presentation));
+            // Editing existing instance - copy existing files into draft area.
+            $draftitemid = file_get_submitted_draft_itemid('presentation');
+            error_log(json_encode($draftitemid));
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
+            $default_values['presentation'] = $draftitemid;
+        }
+    }
+
+    function validation($data, $files) {
+
         $errors = parent::validation($data, $files);
 
-        if ($data['openingtime'] != 0 && $data['closingtime'] != 0 && $data['closingtime'] < $data['openingtime']) {
-            $errors['closingtime'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+        if ( isset($data['openingtime']) && isset($data['closingtime']) ) {
+            if ( $data['openingtime'] != 0 && $data['closingtime'] != 0 && $data['closingtime'] < $data['openingtime']) {
+                $errors['closingtime'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
+            }
         }
         
-        //error_log(print_r(json_encode($data)));
-        if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
-            $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
+        if ( isset($data['voicebridge']) ) {
+            if ( !bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
+                $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
+            }
         }
-        
+
         return $errors;
     }
 }
