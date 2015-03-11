@@ -24,7 +24,20 @@ $capabilities = array(
                 ),
                 'clonepermissionsfrom' => 'moodle/course:manageactivities'
         ),
-        
+
+        //
+        // Ability to view a bigbluebuttonbn
+        'mod/bigbluebuttonbn:view' => array(
+                'captype' => 'read',
+                'contextlevel' => CONTEXT_MODULE,
+                'legacy' => array(
+                        'student' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                )
+        ),
+
         //
         // Ability to join a meeting
         'mod/bigbluebuttonbn:join' => array(

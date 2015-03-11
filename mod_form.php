@@ -268,12 +268,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function data_preprocessing(&$default_values) {
         if ($this->current->instance) {
-            //error_log(json_encode($default_values));
-            error_log(json_encode($this->current));
-            error_log(json_encode($this->current->presentation));
             // Editing existing instance - copy existing files into draft area.
             $draftitemid = file_get_submitted_draft_itemid('presentation');
-            error_log(json_encode($draftitemid));
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
             $default_values['presentation'] = $draftitemid;
         }

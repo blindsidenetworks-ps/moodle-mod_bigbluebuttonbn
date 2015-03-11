@@ -111,6 +111,9 @@ $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
+$bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn);
+error_log($bbbsession['presentation']['name']);
+error_log($bbbsession['presentation']['url']);
 
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
@@ -295,7 +298,22 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
                 "meta_context" => $bbbsession['context'],
                 "meta_recording_description" => $bbbsession['contextActivityDescription'],
                 "meta_recording_tagging" => $bbbsession['contextActivityTagging']);
-        $response = bigbluebuttonbn_getCreateMeetingArray( $bbbsession['meetingname'], $bbbsession['meetingid'], $bbbsession['welcome'], $bbbsession['modPW'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['url'], $bbbsession['logoutURL'], $bbbsession['textflag']['record'], $bbbsession['durationtime'], $bbbsession['voicebridge'], $metadata );
+        $response = bigbluebuttonbn_getCreateMeetingArray(
+                $bbbsession['meetingname'],
+                $bbbsession['meetingid'],
+                $bbbsession['welcome'],
+                $bbbsession['modPW'],
+                $bbbsession['viewerPW'],
+                $bbbsession['shared_secret'],
+                $bbbsession['url'],
+                $bbbsession['logoutURL'],
+                $bbbsession['textflag']['record'],
+                $bbbsession['durationtime'],
+                $bbbsession['voicebridge'],
+                $metadata,
+                $bbbsession['presentation']['name'],
+                $bbbsession['presentation']['url']
+        );
 
         if (!$response) {
             // If the server is unreachable, then prompts the user of the necessary action

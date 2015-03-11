@@ -40,11 +40,17 @@ function bigbluebuttonbn_supports($feature) {
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data, $mform) {
-    global $DB;
+    global $DB, $CFG;
 
     $cmid = $data->coursemodule;
     $draftitemid = $data->presentation;
-    $context = context_module::instance($cmid);
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    } else {
+        //This is valid after v2.6
+        $context = context_module::instance($cmid);
+    }
 
     bigbluebuttonbn_process_pre_save($data);
 
@@ -70,13 +76,19 @@ function bigbluebuttonbn_add_instance($data, $mform) {
  * @return boolean Success/Fail
  */
 function bigbluebuttonbn_update_instance($data, $mform) {
-    global $DB, $USER;
+    global $DB, $CFG;
 
     $data->id = $data->instance;
     $cmid = $data->coursemodule;
     $draftitemid = $data->presentation;
-    $context = context_module::instance($cmid);
-
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    } else {
+        //This is valid after v2.6
+        $context = context_module::instance($cmid);
+    }
+    
     bigbluebuttonbn_process_pre_save($data);
 
     unset($data->presentation);
@@ -421,4 +433,110 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draft
         $DB->set_field('bigbluebuttonbn', 'presentation', '', array('id' => $bigbluebuttonbn_id));
     }
 
+}
+
+/**
+ * Serves the bigbluebuttonbn attachments. Implements needed access control ;-)
+ *
+ * @package mod_bigbluebuttonbn
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - justsend the file
+ */
+function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG, $DB;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    $fileareas = bigbluebuttonbn_get_file_areas();
+    if (!array_key_exists($filearea, $fileareas)) {
+        return false;
+    }
+
+    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$cm->instance))) {
+        return false;
+    }
+
+    require_course_login($course, true, $cm);
+
+    if ($filearea === 'presentation') {
+        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".implode('/', $args);
+    } else {
+        return false;
+    }
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    // finally send the file
+    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+}
+
+/**
+ * Returns an array of file areas
+ *
+ * @package  mod_bigbluebuttonbn
+ * @category files
+ * @return array a list of available file areas
+ */
+function bigbluebuttonbn_get_file_areas() {
+    $areas = array();
+    $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
+    return $areas;
+}
+
+function bigbluebuttonbn_pluginfile2($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    // Make sure the filearea is one of those used by the plugin.
+    if ($filearea !== 'presentation') {
+        return false;
+    }
+    
+    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    require_login($course, true, $cm);
+
+    // Check the relevant capabilities - these may vary depending on the filearea being accessed.
+    if (!has_capability('mod/bigbluebuttonbn:view', $context)) {
+        return false;
+    }
+
+    // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
+    $itemid = array_shift($args); // The first item in the $args array.
+
+    // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
+    // user really does have access to the file in question.
+
+    // Extract the filename / filepath from the $args array.
+    $filename = array_pop($args); // The last item in the $args array.
+    if (!$args) {
+        $filepath = '/'; // $args is empty => the path is '/'
+    } else {
+        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
+    }
+
+    // Retrieve the file from the Files API.
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'mod_bigbluebuttonbn', $filearea, $itemid, $filepath, $filename);
+    if (!$file) {
+        return false; // The file does not exist.
+    }
+
+    // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
+    // From Moodle 2.3, use send_stored_file instead.
+    send_file($file, 86400, 0, $forcedownload, $options);
+    error_log("THERE");
 }

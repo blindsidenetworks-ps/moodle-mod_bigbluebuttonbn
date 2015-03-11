@@ -13,10 +13,11 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once(dirname(__FILE__).'/lib.php');
-//require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
+//require_once($CFG->libdir.'/accesslib.php');
+require_once($CFG->libdir.'/completionlib.php');
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
@@ -117,7 +118,7 @@ function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT )
 }
 
 
-function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name="", $presentation_url="" ) {
 
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
 
@@ -496,4 +497,32 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
         return ($closingtime - time())/60;
     else
         return 0;
+}
+
+function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn) {
+    $presentation = $bigbluebuttonbn->presentation;
+    $presentation_name = "";
+    $presentation_url = "";
+
+    if( !empty($presentation) ) {
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0, 'itemid, filepath, filename', false);
+        if (count($files) < 1) {
+            //resource_print_filenotfound($resource, $cm, $course);
+            //die;
+            //exit;
+        } else {
+            $file = reset($files);
+            unset($files);
+            $presentation_name = $file->get_filename();
+            
+            //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
+            $presentation_url = $url->out(false);
+        }
+    }
+
+    $presentation_array = array( "url" => $presentation_url, "name" => $presentation_name);
+
+    return $presentation_array;
 }
