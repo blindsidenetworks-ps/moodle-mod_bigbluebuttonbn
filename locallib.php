@@ -21,6 +21,8 @@ require_once($CFG->libdir.'/completionlib.php');
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
+const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
+const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
 function bigbluebuttonbn_rand_string() {
     return md5(uniqid(rand(), true));
@@ -55,7 +57,6 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
 
     $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&logoutURL='.urlencode($logoutURL).'&record='.$record;
 
-    error_log($voiceBridge);
     $voiceBridge = intval($voiceBridge);
     if ( $voiceBridge > 0 && $voiceBridge < 79999)
         $params .= '&voiceBridge='.$voiceBridge;
@@ -120,7 +121,14 @@ function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT )
 
 function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name="", $presentation_url="" ) {
 
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
+    if( !is_null($presentation_name) && !is_null($presentation_url) ) {
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata),
+                BIGBLUEBUTTONBN_METHOD_POST,
+                "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".$presentation_url."' /></module></modules>"
+                );
+    } else {
+        $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata) );
+    }
 
     if( $xml ) {
         if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
@@ -279,11 +287,57 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_wrap_simplexml_load_file($url){
-    error_log($url);
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
         $response = $c->get($url);
+
+        if($response) {
+            $previous = libxml_use_internal_errors(true);
+            try {
+                $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
+                return $xml;
+            } catch (Exception $e){
+                libxml_use_internal_errors($previous);
+                error_log("The XML response is not correct on wrap_simplexml_load_file: ".$e->getMessage());
+                return NULL;
+            }
+        } else {
+            error_log("No response on wrap_simplexml_load_file");
+            return NULL;
+        }
+    } else {
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $xml = simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA);
+            return $xml;
+        } catch  (Exception $e){
+            libxml_use_internal_errors($previous);
+            return NULL;
+        }
+    }
+}
+
+function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data_string=null){
+    if (extension_loaded('curl')) {
+        $c = new curl();
+        $c->setopt( Array( "SSL_VERIFYPEER" => true));
+        if( $method == BIGBLUEBUTTONBN_METHOD_POST ) {
+            $options = array();
+            if( !is_null($data_string) ) {
+                $options['CURLOPT_HTTPHEADER'] = array(
+                            'Content-Type: text/xml',
+                            'Content-Length: '.strlen($data_string),
+                            'Content-Language: en-US'
+                        );
+                //$options['CURLOPT_POSTFIELDS'] = $data_string;
+                $response = $c->post($url, $data_string, $options);
+            } else {
+                $response = $c->post($url);
+            }
+        } else {
+            $response = $c->get($url);
+        }
 
         if($response) {
             $previous = libxml_use_internal_errors(true);
@@ -419,7 +473,6 @@ function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid=null){
     return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
 }
 
-//error_log('db_moodle_roles: ' . print_r(json_encode($db_moodle_roles), true));
 function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     $participant_list = json_decode(htmlspecialchars_decode($participants));
     if (is_array($participant_list)) {
@@ -501,8 +554,8 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
 
 function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn) {
     $presentation = $bigbluebuttonbn->presentation;
-    $presentation_name = "";
-    $presentation_url = "";
+    $presentation_name = null;
+    $presentation_url = null;
 
     if( !empty($presentation) ) {
         $fs = get_file_storage();

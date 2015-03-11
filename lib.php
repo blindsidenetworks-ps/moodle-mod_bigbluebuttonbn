@@ -465,7 +465,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
-    require_course_login($course, true, $cm);
+    //require_course_login($course, true, $cm);
 
     if ($filearea === 'presentation') {
         $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".implode('/', $args);
