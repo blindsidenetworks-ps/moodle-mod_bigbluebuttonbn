@@ -44,7 +44,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext_with_advanced('bigbluebuttonbn_waitformoderator_cache_ttl',
             get_string('config_feature_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
             get_string('config_feature_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
-            60, PARAM_INT));
+            array('value' => '60', 'fix' => false), PARAM_INT));
     //default value for 'open in a new window' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_default',
             get_string('config_feature_newwindow_default', 'bigbluebuttonbn'),
