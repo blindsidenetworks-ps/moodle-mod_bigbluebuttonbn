@@ -24,10 +24,6 @@ const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
 const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
-function bigbluebuttonbn_rand_string() {
-    return md5(uniqid(rand(), true));
-}
-
 function bigbluebuttonbn_log(array $bbbsession, $event) {
     global $DB;
 
@@ -119,7 +115,7 @@ function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT )
 }
 
 
-function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name="", $presentation_url="" ) {
+function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
 
     if( !is_null($presentation_name) && !is_null($presentation_url) ) {
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata),
@@ -537,7 +533,6 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
     $select = "voicebridge = ".$voicebridge;
     if( $id ) $select .= " AND id <> ".$id; 
     if ( $rooms = $DB->get_records_select($table, $select)  ) {
-        //error_log(print_r(json_encode($rooms, true)));
         $is_unique = false;
     }
 
@@ -552,7 +547,7 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
         return 0;
 }
 
-function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn) {
+function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, $public=false) {
     $presentation = $bigbluebuttonbn->presentation;
     $presentation_name = null;
     $presentation_url = null;
@@ -569,8 +564,19 @@ function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn) {
             unset($files);
             $presentation_name = $file->get_filename();
             
-            //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
-            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
+            if( $public ) {
+                //Create the nonce component for granting a temporary public access
+                $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
+                $presentation_nonce_key = sha1($bigbluebuttonbn->id);
+                $presentation_nonce_value = bigbluebuttonbn_generate_nonce(); 
+                $cache->set($presentation_nonce_key, array( "value" => $presentation_nonce_value, "counter" => 0 ));
+
+                //The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather the file
+                //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $presentation_nonce_value, $file->get_filepath(), $file->get_filename());
+            } else {
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
+            }
             $presentation_url = $url->out(false);
         }
     }
@@ -578,4 +584,17 @@ function bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn) {
     $presentation_array = array( "url" => $presentation_url, "name" => $presentation_name);
 
     return $presentation_array;
+}
+
+function bigbluebuttonbn_generate_nonce() {
+    $mt = microtime();
+    $rand = mt_rand();
+
+    return md5($mt.$rand);
+}
+
+function bigbluebuttonbn_random_password( $length = 8 ) {
+    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
+    $password = substr( str_shuffle( $chars ), 0, $length );
+    return $password;
 }

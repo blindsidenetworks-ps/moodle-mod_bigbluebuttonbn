@@ -111,7 +111,7 @@ $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
-$bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn);
+$bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
 
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;

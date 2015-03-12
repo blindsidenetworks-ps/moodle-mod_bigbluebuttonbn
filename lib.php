@@ -343,14 +343,13 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
-    global $DB;
+    global $DB, $CFG;
 
     if ( !isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated ) {
         $bigbluebuttonbn->timecreated = time();
 
-        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_rand_string();
-        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_rand_string();
-        $bigbluebuttonbn->meetingid = bigbluebuttonbn_rand_string();
+        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
     } else {
         $bigbluebuttonbn->timemodified = time();
     }
@@ -373,7 +372,11 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
-    global $DB;
+    global $DB, $CFG;
+
+    // Now that an id was assigned, generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret]
+    $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
 
     if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
@@ -465,10 +468,39 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
-    //require_course_login($course, true, $cm);
+    if( sizeof($args) > 1 ) {
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
+        $presentation_nonce_key = sha1($bigbluebuttonbn->id);
+        $presentation_nonce = $cache->get($presentation_nonce_key);
+        $presentation_nonce_value = $presentation_nonce['value'];
+        $presentation_nonce_counter = $presentation_nonce['counter'];
+        
+        if( $args["0"] != $presentation_nonce_value ) {
+            return false;
+        }
+
+        //The nonce value is actually used twice because BigBlueButton reads the file two times
+        $presentation_nonce_counter += 1;
+        if( $presentation_nonce_counter < 2 ) {
+            $cache->set($presentation_nonce_key, array( "value" => $presentation_nonce_value, "counter" => $presentation_nonce_counter ));
+        } else {
+            $cache->delete($presentation_nonce_key);
+        }
+
+        $filename = $args["1"];
+
+    } else {
+        require_course_login($course, true, $cm);
+
+        if (!has_capability('mod/bigbluebuttonbn:view', $context)) {
+            return false;
+        }
+
+        $filename = implode('/', $args);
+    }
 
     if ($filearea === 'presentation') {
-        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".implode('/', $args);
+        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
     } else {
         return false;
     }
@@ -493,50 +525,4 @@ function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
     return $areas;
-}
-
-function bigbluebuttonbn_pluginfile2($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
-    if ($context->contextlevel != CONTEXT_MODULE) {
-        return false;
-    }
-
-    // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== 'presentation') {
-        return false;
-    }
-    
-    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
-    require_login($course, true, $cm);
-
-    // Check the relevant capabilities - these may vary depending on the filearea being accessed.
-    if (!has_capability('mod/bigbluebuttonbn:view', $context)) {
-        return false;
-    }
-
-    // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
-    $itemid = array_shift($args); // The first item in the $args array.
-
-    // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
-    // user really does have access to the file in question.
-
-    // Extract the filename / filepath from the $args array.
-    $filename = array_pop($args); // The last item in the $args array.
-    if (!$args) {
-        $filepath = '/'; // $args is empty => the path is '/'
-    } else {
-        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
-    }
-
-    // Retrieve the file from the Files API.
-    $fs = get_file_storage();
-    $file = $fs->get_file($context->id, 'mod_bigbluebuttonbn', $filearea, $itemid, $filepath, $filename);
-    if (!$file) {
-        return false; // The file does not exist.
-    }
-
-    // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
-    // From Moodle 2.3, use send_stored_file instead.
-    send_file($file, 86400, 0, $forcedownload, $options);
-    error_log("THERE");
 }
