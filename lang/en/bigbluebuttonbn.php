@@ -161,6 +161,17 @@ $string['view_message_norecordings'] = 'There are no recording for this meeting.
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 
+$string['view_delete_confirmation'] = 'Are you sure to delete this recording?';
+$string['view_head_actionbar'] = 'Toolbar';
+$string['view_head_activity'] = 'Activity';
+$string['view_head_course'] = 'Course';
+$string['view_head_date'] = 'Date';
+$string['view_head_description'] = 'Description';
+$string['view_head_length'] = 'Length';
+$string['view_head_duration'] = 'Duration';
+$string['view_head_recording'] = 'Recording';
+$string['view_duration_min'] = 'min';
+
 
 $string['event_activity_created'] = 'BigBlueButtonBN activity created';
 $string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
@@ -171,6 +182,9 @@ $string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
 $string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
 $string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
 $string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibly ended';
+$string['event_recording_published'] = 'Recording published';
+$string['event_recording_unpublished'] = 'Recording unpublished';
+$string['event_recording_deleted'] = 'Recording deleted';
 
 
 'Recording feature default value can be edited'

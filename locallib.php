@@ -551,6 +551,8 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
 function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=null) {
     $presentation_name = null;
     $presentation_url = null;
+    $presentation_icon = null;
+    $presentation_mimetype_description = null;
 
     if( !empty($presentation) ) {
         $fs = get_file_storage();
@@ -563,7 +565,9 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
             $file = reset($files);
             unset($files);
             $presentation_name = $file->get_filename();
-            
+            $presentation_icon = file_file_icon($file, 24);
+            $presentation_mimetype_description = get_mimetype_description($file);
+
             if( !is_null($id) ) {
                 //Create the nonce component for granting a temporary public access
                 $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
@@ -581,7 +585,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
         }
     }
 
-    $presentation_array = array( "url" => $presentation_url, "name" => $presentation_name);
+    $presentation_array = array( "url" => $presentation_url, "name" => $presentation_name, "icon" => $presentation_icon, "mimetype_description" => $presentation_mimetype_description);
 
     return $presentation_array;
 }
