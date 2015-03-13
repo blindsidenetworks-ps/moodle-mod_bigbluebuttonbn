@@ -489,11 +489,11 @@ function bigbluebuttonbn_view_before( $bbbsession ){
 
     echo '<table>';
     if ($bbbsession['openingtime']) {
-        echo '<tr><td class="c0">'.get_string('mod_form_field_availabledate','bigbluebuttonbn').':</td>';
+        echo '<tr><td class="c0">'.get_string('mod_form_field_openingtime','bigbluebuttonbn').':</td>';
         echo '    <td class="c1">'.userdate($bbbsession['openingtime']).'</td></tr>';
     }
     if ($bbbsession['closingtime']) {
-        echo '<tr><td class="c0">'.get_string('mod_form_field_duedate','bigbluebuttonbn').':</td>';
+        echo '<tr><td class="c0">'.get_string('mod_form_field_closingtime','bigbluebuttonbn').':</td>';
         echo '    <td class="c1">'.userdate($bbbsession['closingtime']).'</td></tr>';
     }
     echo '</table>';

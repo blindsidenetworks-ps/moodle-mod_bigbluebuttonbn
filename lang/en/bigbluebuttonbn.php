@@ -172,7 +172,6 @@ $string['view_head_duration'] = 'Duration';
 $string['view_head_recording'] = 'Recording';
 $string['view_duration_min'] = 'min';
 
-
 $string['event_activity_created'] = 'BigBlueButtonBN activity created';
 $string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
 $string['event_activity_viewed_all'] = 'BigBlueButtonBN activity management viewed';
