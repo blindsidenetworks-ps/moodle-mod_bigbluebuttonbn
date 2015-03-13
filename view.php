@@ -111,7 +111,6 @@ $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
-$bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
 
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
 $bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
@@ -210,9 +209,10 @@ $bigbluebuttonbn_view = '';
 if (!$bigbluebuttonbn->openingtime ) {
     if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime){
         //GO JOINING
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
         $bigbluebuttonbn_view = 'join';
         $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
-        
+
     } else {
         //CALLING AFTER
         $bigbluebuttonbn_view = 'after';
@@ -222,7 +222,6 @@ if (!$bigbluebuttonbn->openingtime ) {
         bigbluebuttonbn_view_after( $bbbsession );
         
         echo $OUTPUT->box_end();
-        
     }
     
 } else if ( time() < $bigbluebuttonbn->openingtime ){
@@ -232,14 +231,15 @@ if (!$bigbluebuttonbn->openingtime ) {
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
     bigbluebuttonbn_view_before( $bbbsession );
-    
+
     echo $OUTPUT->box_end();
-    
+
 } else if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
     $bigbluebuttonbn_view = 'join';
     $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
-        
+
 } else {
     //CALLING AFTER
     $bigbluebuttonbn_view = 'after';
@@ -247,9 +247,8 @@ if (!$bigbluebuttonbn->openingtime ) {
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
     bigbluebuttonbn_view_after( $bbbsession );
-        
+
     echo $OUTPUT->box_end();
-    
 }
 
 //JavaScript variables
@@ -433,8 +432,8 @@ function bigbluebuttonbn_view_before( $bbbsession ){
 
 
 function bigbluebuttonbn_view_after( $bbbsession ){
-
     $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['shared_secret']);
+    error_log(json_encode($recordingsArray));
 
     if ( !isset($recordingsArray) || array_key_exists('messageKey', $recordingsArray)) {   // There are no recordings for this meeting
         if ( $bbbsession['flag']['record'] )

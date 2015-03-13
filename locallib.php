@@ -282,7 +282,8 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
         return 'false';
 }
 
-function bigbluebuttonbn_wrap_simplexml_load_file($url){
+function bigbluebuttonbn_wrap_simplexml_load_file($url) {
+    error_log($url);
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));

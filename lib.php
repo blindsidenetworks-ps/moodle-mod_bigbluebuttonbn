@@ -347,9 +347,12 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 
     if ( !isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated ) {
         $bigbluebuttonbn->timecreated = time();
+        //Assign password only if it is a new activity
+        if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
+            $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
+            $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
+        }
 
-        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
-        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
     } else {
         $bigbluebuttonbn->timemodified = time();
     }
@@ -360,7 +363,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->wait = 0;
     if (! isset($bigbluebuttonbn->record))
         $bigbluebuttonbn->record = 0;
-
 }
 
 /**
@@ -375,8 +377,11 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     global $DB, $CFG;
 
     // Now that an id was assigned, generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret]
-    $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
+    // But only on new activities
+    if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
+        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
+        $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
+    }
 
     if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
@@ -404,7 +409,6 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     } else {
         $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id));
     }
-
 }
 
 /**
@@ -435,7 +439,6 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draft
         // Set the presentation column in the bigbluebuttonbn table.
         $DB->set_field('bigbluebuttonbn', 'presentation', '', array('id' => $bigbluebuttonbn_id));
     }
-
 }
 
 /**
