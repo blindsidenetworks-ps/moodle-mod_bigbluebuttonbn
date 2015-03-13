@@ -12,10 +12,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
 $string['bbbdurationwarning'] = 'The maximum duration for this session is %duration% minutes.';
-$string['bbbfinished'] = 'This activity is over.';
-$string['bbbinprocess'] = 'This activity is in process.';
-$string['bbbnorecordings'] = 'There is no recording yet, please come back later.';
-$string['bbbnotavailableyet'] = 'Sorry, this session is not yet available.';
 $string['bbbrecordwarning'] = 'This session may be recorded.';
 $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
@@ -159,6 +155,12 @@ $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
+$string['view_section_title_presentation'] = 'Presentation file';
+$string['view_section_title_recordings'] = 'Recordings';
+$string['view_message_norecordings'] = 'There are no recording for this meeting.';
+$string['view_message_finished'] = 'This activity is over.';
+$string['view_message_notavailableyet'] = 'This session is not yet available.';
+
 
 $string['event_activity_created'] = 'BigBlueButtonBN activity created';
 $string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';

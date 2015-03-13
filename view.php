@@ -209,44 +209,46 @@ $bigbluebuttonbn_view = '';
 if (!$bigbluebuttonbn->openingtime ) {
     if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime){
         //GO JOINING
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
         $bigbluebuttonbn_view = 'join';
-        $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
+        $joining = bigbluebuttonbn_view_joining($bbbsession, $context);
 
     } else {
         //CALLING AFTER
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
         $bigbluebuttonbn_view = 'after';
-        echo $OUTPUT->heading(get_string('bbbfinished', 'bigbluebuttonbn'));
+        echo $OUTPUT->heading(get_string('view_message_finished', 'bigbluebuttonbn'), 3);
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
-        bigbluebuttonbn_view_after( $bbbsession );
+        bigbluebuttonbn_view_after($bbbsession);
         
         echo $OUTPUT->box_end();
     }
-    
+
 } else if ( time() < $bigbluebuttonbn->openingtime ){
     //CALLING BEFORE
     $bigbluebuttonbn_view = 'before';
-    echo $OUTPUT->heading(get_string('bbbnotavailableyet', 'bigbluebuttonbn'));
+    echo $OUTPUT->heading(get_string('view_message_notavailableyet', 'bigbluebuttonbn'), 3);
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
-    bigbluebuttonbn_view_before( $bbbsession );
+    bigbluebuttonbn_view_before($bbbsession);
 
     echo $OUTPUT->box_end();
 
 } else if (!$bigbluebuttonbn->closingtime || time() <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn, true);
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     $bigbluebuttonbn_view = 'join';
-    $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
+    $joining = bigbluebuttonbn_view_joining($bbbsession, $context);
 
 } else {
     //CALLING AFTER
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
     $bigbluebuttonbn_view = 'after';
-    echo $OUTPUT->heading(get_string('bbbfinished', 'bigbluebuttonbn'));
+    echo $OUTPUT->heading(get_string('view_message_finished', 'bigbluebuttonbn'), 3);
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
-    bigbluebuttonbn_view_after( $bbbsession );
+    bigbluebuttonbn_view_after($bbbsession);
 
     echo $OUTPUT->box_end();
 }
@@ -277,7 +279,7 @@ $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false,
 echo $OUTPUT->footer();
 
 
-function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn ){
+function bigbluebuttonbn_view_joining( $bbbsession, $context ){
     global $CFG, $DB;
 
     $joining = false;
@@ -338,13 +340,13 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             /// Moodle event logger: Create an event for meeting created
             if ( $CFG->version < '2014051200' ) {
                 //This is valid before v2.7
-                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting created', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
+                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting created', '', $bbbsession['meetingname'], $bbbsession['cm']->id);
             } else {
                 //This is valid after v2.7
                 $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
                         array(
                                 'context' => $context,
-                                'objectid' => $bigbluebuttonbn->id
+                                'objectid' => $bbbsession['bigbluebuttonbnid']
                         )
                 );
                 $event->trigger();
@@ -369,13 +371,13 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             /// Moodle event logger: Create an event for meeting joined
             if ( $CFG->version < '2014051200' ) {
                 //This is valid before v2.7
-                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
+                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bbbsession['meetingname'], $bbbsession['cm']->id);
             } else {
                 //This is valid after v2.7
                 $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
                         array(
                                 'context' => $context,
-                                'objectid' => $bigbluebuttonbn->id
+                                'objectid' => $bbbsession['bigbluebuttonbnid']
                         )
                 );
                 $event->trigger();
@@ -430,25 +432,147 @@ function bigbluebuttonbn_view_before( $bbbsession ){
     echo '</table>';
 }
 
+function bigbluebuttonbn_view_after($bbbsession) {
+    global $OUTPUT;
 
-function bigbluebuttonbn_view_after( $bbbsession ){
-    $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['shared_secret']);
-    error_log(json_encode($recordingsArray));
+    if( !is_null($bbbsession['presentation']['url']) ) {
+        echo '<h4>'.get_string('view_section_title_presentation', 'bigbluebuttonbn').'</h4>'.
+             ''.$OUTPUT->action_link($bbbsession['presentation']['url'], $bbbsession['presentation']['name']).'<br><br>';
+    }
 
-    if ( !isset($recordingsArray) || array_key_exists('messageKey', $recordingsArray)) {   // There are no recordings for this meeting
-        if ( $bbbsession['flag']['record'] )
-            print_string('bbbnorecordings', 'bigbluebuttonbn');
-    } else {                                                                                // Actually, there are recordings for this meeting
-        echo '    <center>'."\n";
-        echo '      <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">'."\n";
-        echo '        <thead>'."\n";
-        echo '        </thead>'."\n";
-        echo '        <tbody>'."\n";
-        echo '        </tbody>'."\n";
-        echo '        <tfoot>'."\n";
-        echo '        </tfoot>'."\n";
-        echo '      </table>'."\n";
-        echo '    </center>'."\n";
+    if( isset($bbbsession['flag']['record']) && $bbbsession['flag']['record'] ) {
+        echo '<h4>'.get_string('view_section_title_recordings', 'bigbluebuttonbn').'</h4>';
+
+        ///Set strings to show
+        $view_head_recording = get_string('view_head_recording', 'recordingsbn');
+        $view_head_course = get_string('view_head_course', 'recordingsbn');
+        $view_head_activity = get_string('view_head_activity', 'recordingsbn');
+        $view_head_description = get_string('view_head_description', 'recordingsbn');
+        $view_head_date = get_string('view_head_date', 'recordingsbn');
+        $view_head_length = get_string('view_head_length', 'recordingsbn');
+        $view_head_duration = get_string('view_head_duration', 'recordingsbn');
+        $view_head_actionbar = get_string('view_head_actionbar', 'recordingsbn');
+        $view_duration_min = get_string('view_duration_min', 'recordingsbn');
+        
+        ///Declare the table
+        $table = new html_table();
+        
+        ///Initialize table headers
+        if ( $bbbsession['flag']['moderator'] ) {
+            $table->head  = array ($view_head_recording, $view_head_activity, $view_head_description, $view_head_date, $view_head_duration, $view_head_actionbar);
+            $table->align = array ('left', 'left', 'left', 'left', 'center', 'left');
+            $recordingsbn_columns = array(
+                    array("key" =>"recording", "label" => $view_head_recording, "width" => "125px", "allowHTML" => true),
+                    array("key" =>"activity", "label" => $view_head_activity, "sortable" => true, "width" => "175px"),
+                    array("key" =>"description", "label" => $view_head_description, "sortable" => true, "width" => "250px"),
+                    array("key" =>"date", "label" => $view_head_date, "sortable" => true, "width" => "220px"),
+                    array("key" =>"duration", "label" => $view_head_duration, "width" => "50px"),
+                    array("key" =>"actionbar", "label" => $view_head_actionbar, "width" => "75px", "allowHTML" => true)
+            );
+        } else {
+            $table->head  = array ($view_head_recording, $view_head_activity, $view_head_description, $view_head_date, $view_head_duration);
+            $table->align = array ('left', 'left', 'left', 'left', 'center');
+            $recordingsbn_columns = array(
+                    array("key" =>"recording", "label" => $view_head_recording, "width" => "125px", "allowHTML" => true),
+                    array("key" =>"activity", "label" => $view_head_activity, "sortable" => true, "width" => "175px"),
+                    array("key" =>"description", "label" => $view_head_description, "sortable" => true, "width" => "250px"),
+                    array("key" =>"date", "label" => $view_head_date, "sortable" => true, "width" => "220px"),
+                    array("key" =>"duration", "label" => $view_head_duration, "width" => "50px")
+            );
+        }
+
+        ///Build table content
+        $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['shared_secret']);
+        
+        if ( !isset($recordings) || array_key_exists('messageKey', $recordings)) {  // There are no recordings for this meeting
+            print_string('view_message_norecordings', 'bigbluebuttonbn');
+        } else {                                                                    // Actually, there are recordings for this meeting
+            foreach ( $recordings as $recording ){
+                if ( $bbbsession['flag']['moderator'] || $recording['published'] == 'true' ) {
+                    $length = 0;
+                    $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
+                    $endTime = $endTime - ($endTime % 1000);
+                    $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
+                    $startTime = $startTime - ($startTime % 1000);
+                    $duration = intval(($endTime - $startTime) / 60000);
+
+                    //$meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
+                    $meta_activity = isset($recording['meta_contextactivity'])?str_replace('"', '\"', $recording['meta_contextactivity']):'';
+                    $meta_description = isset($recording['meta_contextactivitydescription'])?str_replace('"', '\"', $recording['meta_contextactivitydescription']):'';
+
+                    $actionbar = '';
+                    $params['id'] = $bbbsession['cm']->id;
+                    $params['recordingid'] = $recording['recordID'];
+                    if ( $bbbsession['flag']['moderator'] ) {
+                        ///Set action [show|hide]
+                        if ( $recording['published'] == 'true' ){
+                            $params['action'] = 'hide';
+                        } else {
+                            $params['action'] = 'show';
+                        }
+
+                        $url = new moodle_url('/mod/recordingsbn/view.php', $params);
+                        $action = null;
+                        //With text
+                        //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action'] ) )  );
+                        //With icon
+                        $attributes = array('title' => get_string($params['action']));
+                        $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
+                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+            
+                        ///Set action delete
+                        $params['action'] = 'delete';
+                        $url = new moodle_url('/mod/recordingsbn/view.php', $params);
+                        $action = new component_action('click', 'M.util.show_confirm_dialog', array('message' => get_string('view_delete_confirmation', 'recordingsbn')));
+                        //With text
+                        //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action']) )  );
+                        //With icon
+                        $attributes = array('title' => get_string($params['action']));
+                        $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
+                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+                    }
+
+                    $type = '';
+                    foreach ( $recording['playbacks'] as $playback ){
+                        if ($recording['published'] == 'true'){
+                            $type .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
+                        } else {
+                            $type .= $playback['type'].'&#32;';
+                        }
+                    }
+
+                    //Make sure the startTime is timestamp
+                    if( !is_numeric($recording['startTime']) ){
+                        $date = new DateTime($recording['startTime']);
+                        $recording['startTime'] = date_timestamp_get($date);
+                    } else {
+                        $recording['startTime'] = $recording['startTime'] / 1000;
+                    }
+                    //Set corresponding format
+                    $format = get_string('strftimerecentfull', 'langconfig');
+                    if( isset($format) ) {
+                        $formatedStartDate = userdate($recording['startTime'], $format);
+                    } else {
+                        $format = '%a %h %d, %Y %H:%M:%S %Z';
+                        $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
+                    }
+
+                    if ( $bbbsession['flag']['moderator'] ) {
+                        $table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
+                    } else {
+                        $table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
+                    }
+                }
+            }
+            
+            //Print the table
+            echo $OUTPUT->box_start('generalbox boxaligncenter', 'recordingsbn_box')."\n";
+            echo '<div id="recordingsbn_html_table">'."\n";
+            echo html_writer::table($table)."\n";
+            echo '</div>'."\n";
+            echo $OUTPUT->box_end();
+            
+        }
     }
 }
 
