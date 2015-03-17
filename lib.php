@@ -495,7 +495,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
     } else {
         require_course_login($course, true, $cm);
 
-        if (!has_capability('mod/bigbluebuttonbn:view', $context)) {
+        if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
             return false;
         }
 

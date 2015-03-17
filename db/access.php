@@ -19,23 +19,11 @@ $capabilities = array(
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => array(
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
+                        'manager' => CAP_ALLOW,
+                        //'coursecreator' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW
                 ),
                 'clonepermissionsfrom' => 'moodle/course:manageactivities'
-        ),
-
-        //
-        // Ability to view a bigbluebuttonbn
-        'mod/bigbluebuttonbn:view' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'student' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
         ),
 
         //
@@ -44,22 +32,24 @@ $capabilities = array(
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(
-                        'student' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW,
+                        //'coursecreator' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW
                 )
         ),
-        
+
         //
         // Ability to moderate a meeting
         'mod/bigbluebuttonbn:moderate' => array(
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(
-                        'teacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW,
+                        //'coursecreator' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
+                        'teacher' => CAP_ALLOW
                 )
         )
 

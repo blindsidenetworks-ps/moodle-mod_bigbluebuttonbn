@@ -393,17 +393,21 @@ function bigbluebuttonbn_get_role_name($role_shortname){
     return $role_name;
 }
 
-function bigbluebuttonbn_get_roles($rolename='all'){
+function bigbluebuttonbn_get_roles($rolename='all', $format='json'){
     $roles = bigbluebuttonbn_get_db_moodle_roles($rolename);
-    $roles_json = array();
+    $roles_array = array();
     foreach($roles as $role){
-        array_push($roles_json,
-                array( "id" => $role->shortname,
-                    "name" => bigbluebuttonbn_get_role_name($role->shortname)
-                )
-        );
+        if( $format=='json' ) {
+            array_push($roles_array,
+                    array( "id" => $role->shortname,
+                        "name" => bigbluebuttonbn_get_role_name($role->shortname)
+                    )
+            );
+        } else {
+            $roles_array[$role->shortname] = bigbluebuttonbn_get_role_name($role->shortname);
+        }
     }
-    return $roles_json;
+    return $roles_array;
 }
 
 function bigbluebuttonbn_get_roles_json($rolename='all'){
