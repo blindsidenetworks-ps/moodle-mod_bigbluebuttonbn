@@ -363,6 +363,8 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->wait = 0;
     if (! isset($bigbluebuttonbn->record))
         $bigbluebuttonbn->record = 0;
+
+    $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
 }
 
 /**

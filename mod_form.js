@@ -15,7 +15,6 @@ bigbluebuttonbn_participant_selection_set = function() {
                 bigbluebuttonbn_select_enable('bigbluebuttonbn_participant_selection')
             }
         }
-            
     }
 }
 
@@ -54,11 +53,11 @@ bigbluebuttonbn_participant_add = function() {
             found = true;
         }
     }
-    
+
     //If not found
     if( !found ){
         // Add it to memory
-        var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer", "id": null};
+        var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer"};
         bigbluebuttonbn_participant_list.push(participant);
 
         // Add it to the form

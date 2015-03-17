@@ -119,7 +119,7 @@ if ($ADMIN->fulltree) {
             get_string('config_permission_description', 'bigbluebuttonbn')));
 
     $roles = bigbluebuttonbn_get_roles('all', 'array');
-    $owner = array("owner" => "Owner");
+    $owner = array('owneruser' => get_string('owneruser', bigbluebuttonbn));
     $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
             get_string('config_permission_moderator_default', 'bigbluebuttonbn'),
             get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),

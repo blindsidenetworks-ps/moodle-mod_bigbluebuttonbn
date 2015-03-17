@@ -205,7 +205,6 @@ $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
 $string['event_recording_deleted'] = 'Recording deleted';
 
-
-'Recording feature default value can be edited'
+$string['owneruser'] = "Owner";
 
 ?>

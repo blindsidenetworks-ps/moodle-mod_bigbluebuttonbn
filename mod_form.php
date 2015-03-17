@@ -153,7 +153,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $roles = bigbluebuttonbn_get_roles();
         $users = bigbluebuttonbn_get_users($context);
 
-        $participant_list = bigbluebuttonbn_get_participant_list($bigbluebuttonbn != null? $bigbluebuttonbn: null);
+        $participant_list = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
         $mform->addElement('hidden', 'participants', json_encode($participant_list));
         $mform->setType('participants', PARAM_TEXT);
 
@@ -203,7 +203,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $participant_selectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participant_selectiontype, 'bigbluebuttonbn').':</i></b>&nbsp;';
             }
             $participant_role = get_string('mod_form_field_participant_bbb_role_'.$participant['role'], 'bigbluebuttonbn');
-            
+
             $html_participant_selection .= ''.
                 '      <tr id="participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'].'">'."\n".
                 '        <td width="20px"><a onclick="bigbluebuttonbn_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" title="'.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn').'">x</a></td>'."\n".
@@ -216,7 +216,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 '        </td>'."\n".
                 '      </tr>'."\n";
         }
-        
+
         $html_participant_selection .= ''.
              '    </table>'."\n".
              '  </div>'."\n".
