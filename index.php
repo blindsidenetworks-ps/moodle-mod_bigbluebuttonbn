@@ -78,19 +78,8 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) {
 	}
 	$course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
 	$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-	if ( $CFG->version < '2014051200' ) {
-	    //This is valid before v2.7
-	    add_to_log($course->id, 'bigbluebuttonbn', 'meeting ended', "index.php?id=$course->id", '');
-	} else {
-	    //This is valid before v2.7
-	    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_ended::create(
-	            array(
-	                    'context' => $context,
-	                    'objectid' => $bigbluebuttonbn->id
-	            )
-	    );
-	    $event->trigger();
-	}
+
+	bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
 
 	echo get_string('index_ending', 'bigbluebuttonbn');
 
@@ -103,18 +92,7 @@ if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) {
     }
 	redirect('index.php?id='.$id);
 } else {
-    if ( $CFG->version < '2014051200' ) {
-        //This is valid before v2.7
-        add_to_log($course->id, 'bigbluebuttonbn', 'activity management viewed', "index.php?id=$course->id", '');
-    } else {
-        //This is valid after v2.7
-        $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create(
-                array(
-                        'context' => $context,
-                )
-        );
-        $event->trigger();
-    }
+    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED, $bigbluebuttonbn, $context, $cm);
 }
 
 foreach ($bigbluebuttonbns as $bigbluebuttonbn) {

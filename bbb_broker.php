@@ -41,7 +41,7 @@ if ( !empty($error) ) {
                 case 'ping':
                     $meeting_running = bigbluebuttonbn_meeting_ping( $params['id'], $endpoint, $shared_secret );
                     if( $meeting_running  ) {
-                        bigbluebuttonbn_broker_event_log('meeting_joined', $params['bigbluebuttonbn']);
+                        bigbluebuttonbn_broker_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $params['bigbluebuttonbn']);
                     }
                     echo $params['callback'].'({ "status": "'.($meeting_running?'true':'false').'" });';
 
@@ -77,7 +77,6 @@ function bigbluebuttonbn_meeting_ping($meetingid, $endpoint, $shared_secret) {
 
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'ping_cache');
     $result = $cache->get($meetingid);
-    
     $now = time();
     if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) ) {
         //Use the value in the cache
@@ -87,6 +86,7 @@ function bigbluebuttonbn_meeting_ping($meetingid, $endpoint, $shared_secret) {
         $meeting_running = bigbluebuttonbn_isMeetingRunning( $meetingid, $endpoint, $shared_secret );
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_running' => $meeting_running));
     }
+
     return $meeting_running;
 }
 
@@ -143,6 +143,4 @@ function bigbluebuttonbn_broker_event_log($event_type, $bigbluebuttonbn_id) {
         bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm);
     }
 
-    ///log the join event
-    bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm);
 }

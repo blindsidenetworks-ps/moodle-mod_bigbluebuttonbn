@@ -36,19 +36,7 @@ if ( $CFG->version < '2013111800' ) {
     $context = context_module::instance($cm->id);
 }
 
-if ( $CFG->version < '2014051200' ) {
-    //This is valid before v2.7
-    add_to_log($course->id, 'bigbluebuttonbn', 'meeting left', '', $bigbluebuttonbn->name, $cm->id);
-} else {
-    //This is valid after v2.7
-    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left::create(
-            array(
-                    'context' => $context,
-                    'objectid' => $bigbluebuttonbn->id
-                    )
-            );
-    $event->trigger();
-}
+bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
 $PAGE->set_context($context);
 

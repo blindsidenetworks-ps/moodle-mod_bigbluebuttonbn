@@ -45,19 +45,7 @@ if ( $CFG->version < '2013111800' ) {
     $context = context_module::instance($cm->id);
 }
 
-if ( $CFG->version < '2014051200' ) {
-    //This is valid before v2.7
-    add_to_log($course->id, 'bigbluebuttonbn', 'view', 'view.php?id=$cm->id', $bigbluebuttonbn->name, $cm->id);
-} else {
-    //This is valid after v2.7
-    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create(
-            array(
-                    'context' => $context,
-                    'objectid' => $bigbluebuttonbn->id
-            )
-    );
-    $event->trigger();
-}
+bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $context, $cm);
 
 //User data
 $bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
@@ -161,61 +149,15 @@ $bbbsession['contextActivityTagging'] = "";
 if( isset($action) && isset($recordingid) && ($administrator || $moderator) ){
     if( $action == 'show' ) {
         bigbluebuttonbn_doPublishRecordings($recordingid, 'true', $bbbsession['url'], $bbbsession['shared_secret']);
-        if ( $CFG->version < '2014051200' ) {
-            //This is valid before v2.7
-            add_to_log($course->id, 'bigbluebuttonbn', 'recording published', "", $bigbluebuttonbn->name, $cm->id);
-        } else {
-            //This is valid after v2.7
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_published::create(
-                    array(
-                            'context' => $context,
-                            'objectid' => $bigbluebuttonbn->id,
-                            'other' => array(
-                                    //'title' => $title,
-                                    'rid' => $recordingid
-                            )
-                    )
-            );
-            $event->trigger();
-        }
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+
     } else if( $action == 'hide') {
         bigbluebuttonbn_doPublishRecordings($recordingid, 'false', $bbbsession['url'], $bbbsession['shared_secret']);
-        if ( $CFG->version < '2014051200' ) {
-            //This is valid before v2.7
-            add_to_log($course->id, 'bigbluebuttonbn', 'recording unpublished', "", $bigbluebuttonbn->name, $cm->id);
-        } else {
-            //This is valid after v2.7
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_unpublished::create(
-                    array(
-                            'context' => $context,
-                            'objectid' => $bigbluebuttonbn->id,
-                            'other' => array(
-                                    //'title' => $title,
-                                    'rid' => $recordingid
-                            )
-                    )
-            );
-            $event->trigger();
-        }
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+
     } else if( $action == 'delete') {
         bigbluebuttonbn_doDeleteRecordings($recordingid, $bbbsession['url'], $bbbsession['shared_secret']);
-        if ( $CFG->version < '2014051200' ) {
-            //This is valid before v2.7
-            add_to_log($course->id, 'bigbluebuttonbn', 'recording deleted', '', $bigbluebuttonbn->name, $cm->id);
-        } else {
-            //This is valid after v2.7
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_deleted::create(
-                    array(
-                            'context' => $context,
-                            'objectid' => $bigbluebuttonbn->id,
-                            'other' => array(
-                                    //'title' => $title,
-                                    'rid' => $recordingid
-                            )
-                    )
-            );
-            $event->trigger();
-        }
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
     }
 }
 
@@ -405,19 +347,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context ){
 
         } else { ///////////////Everything is ok /////////////////////
             /// Moodle event logger: Create an event for meeting created
-            if ( $CFG->version < '2014051200' ) {
-                //This is valid before v2.7
-                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting created', '', $bbbsession['meetingname'], $bbbsession['cm']->id);
-            } else {
-                //This is valid after v2.7
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create(
-                        array(
-                                'context' => $context,
-                                'objectid' => $bbbsession['bigbluebuttonbnid']
-                        )
-                );
-                $event->trigger();
-            }
+            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
 
             /// Internal logger: Instert a record with the meeting created
             bigbluebuttonbn_log($bbbsession, 'Create');
@@ -438,22 +368,11 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context ){
             if( $CFG->bigbluebuttonbn_recordingtagging_default ){
                 print "<br><br>".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
             }
-            
+
             /// Moodle event logger: Create an event for meeting joined
-            if ( $CFG->version < '2014051200' ) {
-                //This is valid before v2.7
-                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bbbsession['meetingname'], $bbbsession['cm']->id);
-            } else {
-                //This is valid after v2.7
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
-                        array(
-                                'context' => $context,
-                                'objectid' => $bbbsession['bigbluebuttonbnid']
-                        )
-                );
-                $event->trigger();
-            }
+            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
         }
+
     } else {
         //    
         // "Viewer" && Waiting for moderator is required;
@@ -465,20 +384,10 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context ){
             /// Since the meeting is already running, we just join the session
             print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
             print "<center><img src='pix/loading.gif' /></center>";
+
             /// Moodle event logger: Create an event for meeting joined
-            if ( $CFG->version < '2014051200' ) {
-                //This is valid before v2.7
-                add_to_log($bbbsession['courseid'], 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $bbbsession['cm']->id);
-            } else {
-                //This is valid after v2.7
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
-                        array(
-                                'context' => $context,
-                                'objectid' => $bigbluebuttonbn->id
-                        )
-                );
-                $event->trigger();
-            }
+            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
+
         } else {
             /// Since the meeting is not running, the spining wheel is shown
             print "<br />".get_string('view_wait', 'bigbluebuttonbn' )."<br /><br />";
