@@ -423,7 +423,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context ){
             bigbluebuttonbn_log($bbbsession, 'Create');
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
-                print "&nbsp;&nbsp;".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
+                print "<br><br>".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
             } else {
                 $joining = true;
 
@@ -435,6 +435,10 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context ){
                 print "<center><img src='pix/loading.gif' /></center>";
             }
 
+            if( $CFG->bigbluebuttonbn_recordingtagging_default ){
+                print "<br><br>".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
+            }
+            
             /// Moodle event logger: Create an event for meeting joined
             if ( $CFG->version < '2014051200' ) {
                 //This is valid before v2.7

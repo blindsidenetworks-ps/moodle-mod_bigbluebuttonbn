@@ -53,6 +53,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $newwindow_editable = $CFG->bigbluebuttonbn_newwindow_editable;
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
+        $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
 
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
@@ -125,7 +126,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Second block starts here
         //-------------------------------------------------------------------------------
-        if ( $CFG->bigbluebuttonbn_preuploadpresentation_enabled ) {
+        if ( $preuploadpresentation_enabled ) {
             $mform->addElement('header', 'preupload', get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
             $mform->setExpanded('preupload');
 

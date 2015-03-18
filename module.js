@@ -20,11 +20,11 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
         } else {
 
             var dataSource = new Y.DataSource.Get({
-                source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/ping.php?"
+                source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
             });
 
             var request = {
-                request : "meetingid=" + bigbluebuttonbn.meetingid + "&id=" + bigbluebuttonbn.bigbluebuttonbnid,
+                request : "action=ping&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
                 callback : {
                     success : function(e) {
                         if (e.data.status == 'true') {

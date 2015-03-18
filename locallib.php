@@ -624,6 +624,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
 }
 
 function bigbluebuttonbn_generate_nonce() {
+
     $mt = microtime();
     $rand = mt_rand();
 
@@ -631,7 +632,30 @@ function bigbluebuttonbn_generate_nonce() {
 }
 
 function bigbluebuttonbn_random_password( $length = 8 ) {
+
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
     $password = substr( str_shuffle( $chars ), 0, $length );
+
     return $password;
+}
+
+function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm) {
+    global $CFG;
+
+    if ( $CFG->version < '2014051200' ) {
+        //This is valid before v2.7
+        if( $event_type == 'meeting_joined' )
+            add_to_log($course->id, 'bigbluebuttonbn', 'meeting joined', '', $bigbluebuttonbn->name, $cm->id);
+    } else {
+        //This is valid after v2.7
+        $context = context_module::instance($cm->id);
+        if( $event_type == 'meeting_joined' )
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create(
+                    array(
+                            'context' => $context,
+                            'objectid' => $bigbluebuttonbn->id
+                    )
+            );
+        $event->trigger();
+    }
 }
