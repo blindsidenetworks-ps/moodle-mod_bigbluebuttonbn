@@ -146,14 +146,8 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
                     //JavaScript variables
                     $jsVars = array(
-                            'newwindow' => ($bbbsession['newwindow']) ? 'true': 'false',
-                            'waitformoderator' => ($bbbsession['wait']) ? 'true': 'false',
-                            'isadministrator' => ($bbbsession['administrator']) ? 'true' : 'false',
-                            'ismoderator' => ($bbbsession['moderator']) ? 'true' : 'false',
                             'meetingid' => $bbbsession['meetingid'],
-                            'joinurl' => $bbbsession['joinURL'],
                             'joining' => 'true',
-                            'bigbluebuttonbn_view' => 'join',
                             'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
                             'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
                     );

@@ -41,7 +41,7 @@ function bigbluebuttonbn_log(array $bbbsession, $event) {
     $log->meetingid = $bbbsession['meetingid'];
     $log->courseid = $bbbsession['courseid']; 
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
-    $log->record = $bbbsession['textflag']['record'] == 'true'? 1: 0;
+    $log->record = $bbbsession['record']? 1: 0;
     $log->timecreated = time();
     $log->event = $event;
     

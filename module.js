@@ -15,38 +15,30 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.init_view = function(Y) {
     if (bigbluebuttonbn.joining == 'true') {
+        var dataSource = new Y.DataSource.Get({
+            source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+        });
 
-        if (bigbluebuttonbn.isadministrator == 'true' || bigbluebuttonbn.ismoderator == 'true' || bigbluebuttonbn.waitformoderator == 'false') {
-            M.mod_bigbluebuttonbn.joinURL();
-
-        } else {
-
-            var dataSource = new Y.DataSource.Get({
-                source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
-            });
-
-            var request = {
-                request : "action=ping&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
-                callback : {
-                    success : function(e) {
-                        if (e.data.status == 'true') {
-                            M.mod_bigbluebuttonbn.joinURL();
-                        }
-                    },
-                    failure : function(e) {
-                        console.log("Hello");
-                        console.debug(e.error.message);
+        var request = {
+            request : "action=ping&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+            callback : {
+                success : function(e) {
+                    if (e.data.status == 'true') {
+                        M.mod_bigbluebuttonbn.join();
                     }
+                },
+                failure : function(e) {
+                    console.debug(e.error.message);
                 }
-            };
+            }
+        };
 
-            var id = dataSource.setInterval(bigbluebuttonbn.ping_interval, request);
-        }
+        var id = dataSource.setInterval(bigbluebuttonbn.ping_interval, request);
     }
 };
 
-M.mod_bigbluebuttonbn.joinURL = function() {
-    window.location = bigbluebuttonbn.joinurl;
+M.mod_bigbluebuttonbn.join = function() {
+    location.reload();
 };
 
 M.mod_bigbluebuttonbn.viewend_CloseWindow = function() {
