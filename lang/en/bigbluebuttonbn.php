@@ -181,6 +181,29 @@ $string['view_message_norecordings'] = 'There are no recording for this meeting.
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 
+
+$string['view_message_room_closed'] = 'This room is closed.';
+$string['view_message_room_ready'] = 'This room is ready.';
+$string['view_message_room_open'] = 'This room is open.';
+
+$string['view_message_conference_not_started'] = 'This conference has not yet started.';
+
+$string['view_message_conference_room_ready'] = 'This conference room is ready. You can join the session now.';
+$string['view_message_conference_about_to_start'] = 'This conference is about to start.';
+$string['view_message_conference_wait_for_moderator'] = 'Waiting for a moderator to join.';
+
+$string['view_message_conference_in_progress'] = 'This conference is in progress.';
+
+$string['view_message_conference_has_ended'] = 'This conference has ended.';
+
+
+$string['view_groups_selection_warning'] = 'There is a conference room for each group and you have access to more than one. Be sure to select the correct one.';
+//$string['view_groups_selection_message'] = 'Select the group you want to participate.';
+//$string['view_groups_selection_button'] = 'Select';
+$string['view_conference_action_join'] = 'Join session';
+$string['view_conference_action_end'] = 'End session';
+
+
 $string['view_delete_confirmation'] = 'Are you sure to delete this recording?';
 $string['view_head_actionbar'] = 'Toolbar';
 $string['view_head_activity'] = 'Activity';

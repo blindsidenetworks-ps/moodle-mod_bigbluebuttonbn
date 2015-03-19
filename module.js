@@ -15,8 +15,10 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.init_view = function(Y) {
     if (bigbluebuttonbn.joining == 'true') {
+
         if (bigbluebuttonbn.isadministrator == 'true' || bigbluebuttonbn.ismoderator == 'true' || bigbluebuttonbn.waitformoderator == 'false') {
             M.mod_bigbluebuttonbn.joinURL();
+
         } else {
 
             var dataSource = new Y.DataSource.Get({
@@ -32,13 +34,13 @@ M.mod_bigbluebuttonbn.init_view = function(Y) {
                         }
                     },
                     failure : function(e) {
+                        console.log("Hello");
                         console.debug(e.error.message);
                     }
                 }
             };
 
             var id = dataSource.setInterval(bigbluebuttonbn.ping_interval, request);
-
         }
     }
 };
