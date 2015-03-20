@@ -101,24 +101,6 @@ function bigbluebuttonbn_update_instance($data, $mform) {
     return true;
 }
 
-function resource_set_presentation($data) {
-    $displayoptions = array();
-    if ($data->presentation == RESOURCELIB_DISPLAY_POPUP) {
-        $displayoptions['popupwidth']  = $data->popupwidth;
-        $displayoptions['popupheight'] = $data->popupheight;
-    }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
-        $displayoptions['printintro']   = (int)!empty($data->printintro);
-    }
-    if (!empty($data->showsize)) {
-        $displayoptions['showsize'] = 1;
-    }
-    if (!empty($data->showtype)) {
-        $displayoptions['showtype'] = 1;
-    }
-    $data->displayoptions = serialize($displayoptions);
-}
-
 /**
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
@@ -319,18 +301,14 @@ function bigbluebuttonbn_get_post_actions() {
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, newwindow')) {
+    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro')) {
         return NULL;
     }
 
     $info = new cached_cm_info();
     $info->name = $bigbluebuttonbn->name;
-
-    if ( $bigbluebuttonbn->newwindow == 1 ){
-        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1";
-        $info->onclick = "window.open('$fullurl'); return false;";
-    }
-
+    $info->intro = $bigbluebuttonbn->intro;
+    
     return $info;
 }
 
@@ -357,8 +335,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->timemodified = time();
     }
 
-    if (! isset($bigbluebuttonbn->newwindow))
-        $bigbluebuttonbn->newwindow = 0;
     if (! isset($bigbluebuttonbn->wait))
         $bigbluebuttonbn->wait = 0;
     if (! isset($bigbluebuttonbn->record))

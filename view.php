@@ -77,13 +77,13 @@ $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 
 //Database info related to the activity
 $bbbsession['meetingname'] = $bigbluebuttonbn->name;
+$bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
 
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
-$bbbsession['newwindow'] = $bigbluebuttonbn->newwindow;
 $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
 if( $bigbluebuttonbn->record )
@@ -188,7 +188,7 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
-echo $OUTPUT->heading($bigbluebuttonbn->welcome, 5);
+echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
 $bigbluebuttonbn_view = '';
 echo $OUTPUT->box_start('generalbox boxaligncenter');

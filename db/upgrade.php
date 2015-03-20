@@ -110,8 +110,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030120) {
-        error_log('Update 2015030110 starts');
+    if ($result && $oldversion < 2015030211) {
+        error_log('Update 2015030211 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
         //// Drop field timeduration
@@ -124,10 +124,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( $dbman->field_exists($table, $field) ) {
             $dbman->drop_field($table, $field, $continue=true, $feedback=true);
         }
-        //// Drop field description
-        $field = new xmldb_field('description');
+        //// Drop field newwindow
+        $field = new xmldb_field('newwindow');
         if( $dbman->field_exists($table, $field) ) {
             $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field intro
+        $field = new xmldb_field('intro');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field introformat
+        $field = new xmldb_field('introformat');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
         //// Add field tagging
         $field = new xmldb_field('tagging');
@@ -165,7 +177,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         error_log('\$settings: '.print_r(json_encode($settings), true));
 
         // Update version
-        //upgrade_mod_savepoint(true, 2015030120, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2015030211, 'bigbluebuttonbn');
     }
     /*
     if ($result && $oldversion < 2014070403) {

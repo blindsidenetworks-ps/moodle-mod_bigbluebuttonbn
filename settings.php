@@ -81,21 +81,6 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
             60, PARAM_INT));
 
-    //// Configuration for new window feature
-    $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_newwindow',
-            get_string('config_feature_newwindow', 'bigbluebuttonbn'),
-            get_string('config_feature_newwindow_description', 'bigbluebuttonbn')));
-    //default value for 'open in a new window' feature
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_default',
-            get_string('config_feature_newwindow_default', 'bigbluebuttonbn'),
-            get_string('config_feature_newwindow_default_description', 'bigbluebuttonbn'),
-            1));
-    // ui for 'open in a new window' feature
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_newwindow_editable',
-            get_string('config_feature_newwindow_editable', 'bigbluebuttonbn'),
-            get_string('config_feature_newwindow_editable_description', 'bigbluebuttonbn'),
-            1));
-
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_voicebridge',
             get_string('config_feature_voicebridge', 'bigbluebuttonbn'),
             get_string('config_feature_voicebridge_description', 'bigbluebuttonbn')));
