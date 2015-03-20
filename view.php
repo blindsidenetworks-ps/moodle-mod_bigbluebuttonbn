@@ -190,7 +190,6 @@ $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->welcome, 5);
 
-$joining = false;
 $bigbluebuttonbn_view = '';
 echo $OUTPUT->box_start('generalbox boxaligncenter');
 if (!$bigbluebuttonbn->openingtime ) {
@@ -239,13 +238,9 @@ echo $OUTPUT->box_end();
 
 //JavaScript variables
 $jsVars = array(
-        'newwindow' => ($bbbsession['newwindow']) ? 'true': 'false',
-        'waitformoderator' => ($bbbsession['wait']) ? 'true': 'false',
-        'isadministrator' => ($bbbsession['administrator']) ? 'true' : 'false',
-        'ismoderator' => ($bbbsession['moderator']) ? 'true' : 'false',
+        'action' => $action,
+        'joining' => 'false',
         'meetingid' => $bbbsession['meetingid'],
-        'joinurl' => $bbbsession['joinURL'],
-        'joining' => ($joining? 'true':'false'),
         'bigbluebuttonbn_view' => $bigbluebuttonbn_view,
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
         'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
@@ -264,17 +259,6 @@ echo $OUTPUT->footer();
 
 function bigbluebuttonbn_view_joining_new($bbbsession){
     global $CFG, $DB, $OUTPUT;
-
-    /*
-     $string['view_message_conference_room_ready'] = 'This conference room is ready.';
-    $string['view_message_conference_about_to_start'] = 'This conference is about to start.';
-    $string['view_message_conference_wait_for_moderator'] = 'Waiting for a moderator to join.';
-    
-    $string['view_message_conference_in_progress'] = 'This conference is in progress.';
-    //echo "<br><br><input type='button' onClick='window.location=\"".$bbbsession['joinURL']."\";' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'>&nbsp;&nbsp;".get_string('view_message_conference_in_progress', 'bigbluebuttonbn' )."<br><br>";
-    //echo "<br><br><input type='button' onClick='window.open(\"".$bbbsession['joinURL']."\");' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'>&nbsp;&nbsp;".get_string('view_message_conference_in_progress', 'bigbluebuttonbn' )."<br><br>";
-
-    */
 
     //See if the session is in progress
     if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
@@ -298,124 +282,6 @@ function bigbluebuttonbn_view_joining_new($bbbsession){
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
     echo "<br><br><input type='button' onClick='window.open(\"".$bbbsession['joinURL']."\");' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'>";
     echo $OUTPUT->box_end();
-}
-
-function bigbluebuttonbn_view_joining($bbbsession, $bigbluebuttonbn, $context, $cm){
-    global $CFG, $DB;
-
-        /*
-        if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 && empty($bbbsession['group']) ){
-            $select_url = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;;
-            print "<br><br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn' )."<br><br>".get_string('view_groups_selection_message', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='window.location=\"".$select_url."\";' value='".get_string('view_groups_selection_button', 'bigbluebuttonbn' )."'>";
-        } else {
-        }
-        */
-    echo $OUTPUT->heading(get_string('view_message_conference_in_progress', 'bigbluebuttonbn'), 3);
-    
-    $joining = false;
-
-    // If user is administrator, moderator or if is viewer and no waiting is required
-    if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
-        //
-        // Join directly
-        //
-        $metadata = array("meta_origin" => $bbbsession['origin'],
-                "meta_originVersion" => $bbbsession['originVersion'],
-                "meta_originServerName" => $bbbsession['originServerName'],
-                "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
-                "meta_originTag" => $bbbsession['originTag'],
-                "meta_context" => $bbbsession['context'],
-                "meta_recording_description" => $bbbsession['contextActivityDescription'],
-                "meta_recording_tagging" => $bbbsession['contextActivityTagging']);
-        $response = bigbluebuttonbn_getCreateMeetingArray(
-                $bbbsession['meetingname'],
-                $bbbsession['meetingid'],
-                $bbbsession['welcome'],
-                $bbbsession['modPW'],
-                $bbbsession['viewerPW'],
-                $bbbsession['shared_secret'],
-                $bbbsession['endpoint'],
-                $bbbsession['logoutURL'],
-                $bbbsession['record']? 'true': 'false',
-                $bbbsession['durationtime'],
-                $bbbsession['voicebridge'],
-                $metadata,
-                $bbbsession['presentation']['name'],
-                $bbbsession['presentation']['url']
-        );
-
-        if (!$response) {
-            // If the server is unreachable, then prompts the user of the necessary action
-            if ( $bbbsession['administrator'] ) {
-                print_error( 'view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            } else if ( $bbbsession['moderator'] ) {
-                print_error( 'view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            } else {
-                print_error( 'view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
-            }
-
-        } else if( $response['returncode'] == "FAILED" ) {
-            // The meeting was not created
-            $error_key = bigbluebuttonbn_get_error_key( $response['messageKey'], 'view_error_create' );
-            if( !$error_key ) {
-                print_error( $response['message'], 'bigbluebuttonbn' );
-            } else {
-                print_error( $error_key, 'bigbluebuttonbn' );
-            }
-
-        } else if ($response['hasBeenForciblyEnded'] == "true"){
-            print_error( get_string( 'index_error_forciblyended', 'bigbluebuttonbn' ));
-
-        } else { ///////////////Everything is ok /////////////////////
-            /// Moodle event logger: Create an event for meeting created
-            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
-
-            /// Internal logger: Instert a record with the meeting created
-            bigbluebuttonbn_log($bbbsession, 'Create');
-
-            if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
-                print "<br><br>".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
-            } else {
-                $joining = true;
-
-                if( $bbbsession['administrator'] || $bbbsession['moderator'] )
-                    print "<br />".get_string('view_login_moderator', 'bigbluebuttonbn' )."<br /><br />";
-                else
-                    print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
-                
-                print "<center><img src='pix/loading.gif' /></center>";
-            }
-
-            if( $CFG->bigbluebuttonbn_recordingtagging_default ){
-            }
-
-            /// Moodle event logger: Create an event for meeting joined
-            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
-        }
-
-    } else {
-        //    
-        // "Viewer" && Waiting for moderator is required;
-        //
-        $joining = true;
-
-        print "<div align='center'>";
-        if( bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getIsMeetingRunningURL( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] )) == "true" ) {
-            /// Since the meeting is already running, we just join the session
-            print "<br />".get_string('view_login_viewer', 'bigbluebuttonbn' )."<br /><br />";
-            print "<center><img src='pix/loading.gif' /></center>";
-
-            /// Moodle event logger: Create an event for meeting joined
-            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
-
-        } else {
-            /// Since the meeting is not running, the spining wheel is shown
-            print "<br />".get_string('view_wait', 'bigbluebuttonbn' )."<br /><br />";
-            print '<center><img src="pix/polling.gif"></center>';
-        }
-        print "</div>";
-    }
-    return $joining;
 }
 
 function bigbluebuttonbn_view_before( $bbbsession ){

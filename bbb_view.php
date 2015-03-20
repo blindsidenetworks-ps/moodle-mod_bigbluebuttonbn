@@ -146,6 +146,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
                     //JavaScript variables
                     $jsVars = array(
+                            'action' => 'ping',
                             'meetingid' => $bbbsession['meetingid'],
                             'joining' => 'true',
                             'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
