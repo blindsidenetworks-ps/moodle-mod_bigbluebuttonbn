@@ -110,7 +110,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030211) {
+    if ($result && $oldversion < 2015030215) {
         error_log('Update 2015030211 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
@@ -159,6 +159,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
+        //// Add field type
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
         //// Rename field timeavailable
         $field = new xmldb_field('timeavailable');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
@@ -177,7 +183,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         error_log('\$settings: '.print_r(json_encode($settings), true));
 
         // Update version
-        upgrade_mod_savepoint(true, 2015030211, 'bigbluebuttonbn');
+        //upgrade_mod_savepoint(true, 2015030215, 'bigbluebuttonbn');
     }
     /*
     if ($result && $oldversion < 2014070403) {

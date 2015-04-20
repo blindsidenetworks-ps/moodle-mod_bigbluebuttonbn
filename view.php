@@ -17,9 +17,6 @@ $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $b  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
 $group  = optional_param('group', 0, PARAM_INT);  // bigbluebuttonbn group ID
 
-$action  = optional_param('action', 0, PARAM_TEXT);
-$recordingid  = optional_param('recordingid', 0, PARAM_TEXT);
-
 if ($id) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -52,6 +49,7 @@ bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn,
 ////////////////////////////////////////////////
 //BigBluebuttonBN activity data
 $bbbsession['bigbluebuttonbnid'] = $bigbluebuttonbn->id;
+$bbbsession['bigbluebuttonbntype'] = $bigbluebuttonbn->type;
 
 //User data
 $bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
@@ -169,6 +167,13 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     exit;
 }
 
+$jsmodule = array(
+        'name'     => 'mod_bigbluebuttonbn',
+        'fullpath' => '/mod/bigbluebuttonbn/module.js',
+        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
+);
+$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
+
 // Output starts here
 echo $OUTPUT->header();
 
@@ -199,12 +204,12 @@ if (!$bigbluebuttonbn->openingtime ) {
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'join';
 
-        bigbluebuttonbn_view_joining_new($bbbsession, $bigbluebuttonbn, $context, $cm);
+        bigbluebuttonbn_view_joining($bbbsession);
 
     } else {
         //CALLING AFTER
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-        $SESSION->bigbluebuttonbn_bbbsession = null;
+        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'after';
 
         bigbluebuttonbn_view_after($bbbsession);
@@ -212,7 +217,7 @@ if (!$bigbluebuttonbn->openingtime ) {
 
 } else if ( time() < $bigbluebuttonbn->openingtime ){
     //CALLING BEFORE
-    $SESSION->bigbluebuttonbn_bbbsession = null;
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'before';
 
     bigbluebuttonbn_view_before($bbbsession);
@@ -223,11 +228,11 @@ if (!$bigbluebuttonbn->openingtime ) {
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
 
-    bigbluebuttonbn_view_joining_new($bbbsession, $bigbluebuttonbn, $context, $cm);
+    bigbluebuttonbn_view_joining($bbbsession);
 
 } else {
     //CALLING AFTER
-    $SESSION->bigbluebuttonbn_bbbsession = null;
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
     $bigbluebuttonbn_view = 'after';
 
@@ -238,50 +243,56 @@ echo $OUTPUT->box_end();
 
 //JavaScript variables
 $jsVars = array(
-        'action' => $action,
-        'joining' => 'false',
+        'action' => 'view',
         'meetingid' => $bbbsession['meetingid'],
-        'bigbluebuttonbn_view' => $bigbluebuttonbn_view,
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
+        'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbntype'],
         'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
 );
-
-$jsmodule = array(
-        'name'     => 'mod_bigbluebuttonbn',
-        'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-);
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
-$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
 
 // Finish the page
 echo $OUTPUT->footer();
 
-function bigbluebuttonbn_view_joining_new($bbbsession){
+function bigbluebuttonbn_view_joining($bbbsession){
     global $CFG, $DB, $OUTPUT;
 
-    //See if the session is in progress
-    if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
-        $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-
-    } else {
-        // If user is administrator, moderator or if is viewer and no waiting is required
-        if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
-            $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-        
-        } else {
-            $initial_message = get_string('view_message_conference_about_to_start', 'bigbluebuttonbn');
-
-        }
-    }
-    
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
-    echo '<br><br>'.$initial_message;
+    echo '<br><span id="status_bar"></span><br>';
+    echo '<br><span id="control_panel"></span><br>';
     echo $OUTPUT->box_end();
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-    echo "<br><br><input type='button' onClick='window.open(\"".$bbbsession['joinURL']."\");' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'>";
+    echo '<br><br><span id="join_button"></span>';
     echo $OUTPUT->box_end();
+
+    if( $bbbsession['bigbluebuttonbntype'] == 0 ) {
+        // View for the bigbluebuttonbn "Classroom" type
+
+        //See if the session is in progress
+        //if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
+        //    $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+        //
+        //} else {
+        //    // If user is administrator, moderator or if is viewer and no waiting is required
+        //    if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
+        //        $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+        //
+        //    } else {
+        //        $initial_message = get_string('view_message_conference_about_to_start', 'bigbluebuttonbn');
+        //
+        //    }
+        //}
+        //
+        //echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+        //echo '<br><br><div id="status_bar">'.$initial_message.'</div>';
+        //echo '<br><br><div id="control_panel"></div>';
+        //echo $OUTPUT->box_end();
+        //
+        //echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
+        //echo "<br><br><div id=\"join_button\"><input type='button' onClick='window.open(\"".$bbbsession['joinURL']."\");' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'></div>";
+        //echo $OUTPUT->box_end();
+    }
 }
 
 function bigbluebuttonbn_view_before( $bbbsession ){
@@ -370,24 +381,34 @@ function bigbluebuttonbn_view_after($bbbsession) {
                             $params['action'] = 'show';
                         }
 
-                        $url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
+                        //$url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
+                        //$url = new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', $params);
+                        $url = null;
                         $action = null;
+                        //$action = new component_action('click', 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'")', array());
                         //With text
                         //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action'] ) )  );
                         //With icon
-                        $attributes = array('title' => get_string($params['action']));
+                        //$attributes = array('title' => get_string($params['action']), 'onclick' => 'alert("'.$params['action'].'"); return;');
+                        $attributes = array('title' => get_string($params['action']), 'onclick' => 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'");');
+                        //$attributes = array('title' => get_string($params['action']));
                         $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
                         $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
 
                         ///Set action delete
                         $params['action'] = 'delete';
-                        $url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
-                        $action = new component_action('click', 'M.util.show_confirm_dialog', array('message' => get_string('view_delete_confirmation', 'bigbluebuttonbn')));
+                        //$url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
+                        //$action = new component_action('click', 'M.util.show_confirm_dialog', array('message' => get_string('view_delete_confirmation', 'bigbluebuttonbn')));
                         //With text
                         //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action']) )  );
                         //With icon
                         $attributes = array('title' => get_string($params['action']));
+                        $attributes = array('title' => get_string($params['action']), 'onclick' => 'M.mod_bigbluebuttonbn.broker_deleteRecording("'.$params['action'].'", "'.$recording['recordID'].'"); return;');
                         $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
+                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+
+                        $attributes = array('title' => get_string($params['action']));
+                        $icon = new pix_icon('t/unlock', get_string($params['action']), 'moodle', $attributes);
                         $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
                     }
 

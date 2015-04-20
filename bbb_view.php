@@ -51,6 +51,8 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
 } else {
     switch (strtolower($action)) {
+        case 'join_now':
+            break;
         case 'logout':
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
             bigbluebutton_bbb_view_close_window();
@@ -146,9 +148,8 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
                     //JavaScript variables
                     $jsVars = array(
-                            'action' => 'ping',
+                            'action' => 'join',
                             'meetingid' => $bbbsession['meetingid'],
-                            'joining' => 'true',
                             'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
                             'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
                     );
@@ -176,7 +177,7 @@ function bigbluebutton_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
 
     echo $OUTPUT->header();
-    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.viewend_CloseWindow');
+    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_windowClose');
     echo $OUTPUT->footer();
 
 }

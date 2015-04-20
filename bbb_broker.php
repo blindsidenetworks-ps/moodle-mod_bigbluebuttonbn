@@ -16,7 +16,25 @@ global $PAGE, $USER;
 $params['callback'] = required_param('callback', PARAM_TEXT);
 $params['action']  = required_param('action', PARAM_TEXT);
 $params['id'] = required_param('id', PARAM_TEXT);
-$params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
+$params['bigbluebuttonbn'] = required_param('bigbluebuttonbn', PARAM_INT);
+
+$error = '';
+
+if ($params['bigbluebuttonbn']) {
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    } else {
+        //This is valid after v2.6
+        $context = context_module::instance($cm->id);
+    }
+
+    $error = bigbluebuttonbn_bbb_broker_add_error($error, "BigBlueButtonBN ID was not included");
+}
 
 $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 
@@ -40,11 +58,12 @@ if( isset($action) && isset($recordingid) && ($bbbsession['administrator'] || $b
 
  */
 
+//error_log($error);
 $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 if ( !isset($bbbsession) || is_null($bbbsession) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
 }
-
+//error_log($error);
 header('Content-Type: application/json; charset=utf-8');
 if ( empty($error) ) {
 
@@ -58,36 +77,61 @@ if ( empty($error) ) {
     if( !$hascourseaccess ){
         header("HTTP/1.0 401 Unauthorized");
     } else {
-        $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-        $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
-
         try {
             switch ( strtolower($params['action']) ){
                 case 'ping':
-                    $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running( $params['id'], $endpoint, $shared_secret );
+                    $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
+                    $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
                     if( $meeting_running  ) {
                         bigbluebuttonbn_bbb_broker_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $params['bigbluebuttonbn']);
                     }
-                    echo $params['callback'].'({ "status": "'.($meeting_running?'true':'false').'" });';
+                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').' });';
 
                     break;
                 case 'info':
-                    $meeting_info = bigbluebuttonbn_broker_get_meeting_info( $params['id'], $endpoint, $shared_secret );
-                    echo $params['callback'].'({ "status": "'.($meeting_info?'true':'false').'" });';
+                    $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
+                    $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
+
+                    if( $meeting_running ) {
+                        $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+                        $can_join = true;
+
+                    } else {
+                        // If user is administrator, moderator or if is viewer and no waiting is required
+                        if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
+                            $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+                            $can_join = true;
+
+                        } else {
+                            $initial_message = get_string('view_message_conference_about_to_start', 'bigbluebuttonbn');
+                            $can_join = false;
+                        }
+                    }
+
+                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": "'.$can_join.'","join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.get_string('view_conference_action_join', 'bigbluebuttonbn').'"  ,"message": "'.$initial_message.'"} });';
                     break;
                 case 'end':
                     break;
                 case 'recordings':
                     break;
                 case 'publish':
+                    error_log("Executing publish");
+                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'unpublish':
+                    error_log("Executing unpublish");
+                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'delete':
                     break;
             }
 
         } catch(Exception $e) {
+            error_log("ERROR: ".$e->getCode().", ".$e->getMessage());
             header("HTTP/1.0 502 Bad Gateway. ".$e->getMessage());
         }
     }
@@ -96,30 +140,47 @@ if ( empty($error) ) {
     header("HTTP/1.0 400 Bad Request. ".$error);
 }
 
-function bigbluebuttonbn_bbb_broker_is_meeting_running($meetingid, $endpoint, $shared_secret) {
-    global $CFG;
-
-    $meeting_running = false;
-    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
-
-    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'ping_cache');
-    $result = $cache->get($meetingid);
-    $now = time();
-    if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) ) {
-        //Use the value in the cache
-        $meeting_running = $result['meeting_running'];
-    } else {
-        //Ping again and refresh the cache
-        $meeting_running = bigbluebuttonbn_isMeetingRunning( $meetingid, $endpoint, $shared_secret );
-        $cache->set($meetingid, array('creation_time' => time(), 'meeting_running' => $meeting_running));
-    }
+function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
+    $meeting_running = (isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == true);
 
     return $meeting_running;
 }
 
+function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password) {
+    global $CFG;
+
+    $meeting_info = array();
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
+
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+    $result = $cache->get($meetingid);
+    $now = time();
+    if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) ) {
+        //Use the value in the cache
+        $meeting_info = json_decode($result['meeting_info'], true);
+    } else {
+        //Ping again and refresh the cache
+        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
+        $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
+    }
+
+    return $meeting_info;
+}
+
+function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=true){
+    global $CFG;
+
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+    bigbluebuttonbn_doPublishRecordings($recordingid, ($publish)? 'true': 'false', $endpoint, $shared_secret);
+}
+
 function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
     $error = '';
-    
+
     if ( !isset($params['callback']) ) {
         $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'This call must include a javascript callback.');
     }
@@ -179,5 +240,4 @@ function bigbluebuttonbn_bbb_broker_event_log($event_type, $bigbluebuttonbn_id) 
         bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm);
     }
 }
-
 ?>

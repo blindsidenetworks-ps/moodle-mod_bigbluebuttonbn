@@ -168,10 +168,15 @@ function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
     }
 }
 
+function bigbluebuttonbn_getMeetingInfo( $meetingID, $modPW, $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+    return $xml;
+}
+
 function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
     
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meetings were returned
+    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meeting info was returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
     }
     else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created

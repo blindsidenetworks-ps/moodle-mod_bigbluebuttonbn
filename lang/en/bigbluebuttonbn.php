@@ -220,6 +220,4 @@ $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
 $string['event_recording_deleted'] = 'Recording deleted';
 
-$string['owneruser'] = "Owner";
-
 ?>
