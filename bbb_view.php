@@ -51,12 +51,9 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
 } else {
     switch (strtolower($action)) {
-        case 'join_now':
-            break;
         case 'logout':
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
             bigbluebutton_bbb_view_close_window();
-
             break;
         case 'join':
             //See if the session is in progress
@@ -138,34 +135,9 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                     }                    
 
                 } else {
-                    //Show the wait for moderator code
-                    echo $OUTPUT->header();
-                    echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
-                    echo $OUTPUT->box_start('generalbox boxaligncenter');
-                    echo "<br /><center>".get_string('view_message_conference_about_to_start', 'bigbluebuttonbn' ).'&nbsp;'.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn' )."</center><br /><br />";
-                    echo '<center><img src="pix/polling.gif"></center>';
-                    echo $OUTPUT->box_end();
-
-                    //JavaScript variables
-                    $jsVars = array(
-                            'action' => 'join',
-                            'meetingid' => $bbbsession['meetingid'],
-                            'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
-                            'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
-                    );
-                    
-                    $jsmodule = array(
-                            'name'     => 'mod_bigbluebuttonbn',
-                            'fullpath' => '/mod/bigbluebuttonbn/module.js',
-                            'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-                    );
-                    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
-                    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
-
-                    echo $OUTPUT->footer();
+                    bigbluebutton_bbb_view_close_window();
                 }
             }
-
             break;
         default:
             bigbluebutton_bbb_view_close_window();

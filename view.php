@@ -167,12 +167,6 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     exit;
 }
 
-$jsmodule = array(
-        'name'     => 'mod_bigbluebuttonbn',
-        'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-);
-$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.init_view', array(), false, $jsmodule);
 
 // Output starts here
 echo $OUTPUT->header();
@@ -243,13 +237,28 @@ echo $OUTPUT->box_end();
 
 //JavaScript variables
 $jsVars = array(
-        'action' => 'view',
+        'action' => $bigbluebuttonbn_view,
         'meetingid' => $bbbsession['meetingid'],
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
         'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbntype'],
-        'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000)
+        'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000),
+        'locales' => array(
+                'join_button' => get_string('view_conference_action_join', 'bigbluebuttonbn' ),
+                'lineup_button' => get_string('view_conference_action_lineup', 'bigbluebuttonbn' ),
+                'end_button' => get_string('view_conference_action_end', 'bigbluebuttonbn' ),
+                'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn' ),
+                'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn' ),
+                'in_progress' => get_string('view_message_conference_in_progress', 'bigbluebuttonbn' ),
+        )
 );
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
+
+$jsmodule = array(
+        'name'     => 'mod_bigbluebuttonbn',
+        'fullpath' => '/mod/bigbluebuttonbn/module.js',
+        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
+);
+$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
 
 // Finish the page
 echo $OUTPUT->footer();
@@ -268,30 +277,6 @@ function bigbluebuttonbn_view_joining($bbbsession){
 
     if( $bbbsession['bigbluebuttonbntype'] == 0 ) {
         // View for the bigbluebuttonbn "Classroom" type
-
-        //See if the session is in progress
-        //if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
-        //    $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-        //
-        //} else {
-        //    // If user is administrator, moderator or if is viewer and no waiting is required
-        //    if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
-        //        $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-        //
-        //    } else {
-        //        $initial_message = get_string('view_message_conference_about_to_start', 'bigbluebuttonbn');
-        //
-        //    }
-        //}
-        //
-        //echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
-        //echo '<br><br><div id="status_bar">'.$initial_message.'</div>';
-        //echo '<br><br><div id="control_panel"></div>';
-        //echo $OUTPUT->box_end();
-        //
-        //echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-        //echo "<br><br><div id=\"join_button\"><input type='button' onClick='window.open(\"".$bbbsession['joinURL']."\");' value='".get_string('view_conference_action_join', 'bigbluebuttonbn' )."'></div>";
-        //echo $OUTPUT->box_end();
     }
 }
 

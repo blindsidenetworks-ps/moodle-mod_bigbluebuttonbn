@@ -82,9 +82,6 @@ if ( empty($error) ) {
                 case 'ping':
                     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
-                    if( $meeting_running  ) {
-                        bigbluebuttonbn_bbb_broker_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $params['bigbluebuttonbn']);
-                    }
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').' });';
 
                     break;
@@ -94,21 +91,24 @@ if ( empty($error) ) {
 
                     if( $meeting_running ) {
                         $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+                        $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
                         $can_join = true;
 
                     } else {
                         // If user is administrator, moderator or if is viewer and no waiting is required
                         if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                             $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+                            $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
                             $can_join = true;
 
                         } else {
-                            $initial_message = get_string('view_message_conference_about_to_start', 'bigbluebuttonbn');
+                            $initial_message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
+                            $join_button_text = get_string('view_conference_action_lineup', 'bigbluebuttonbn');
                             $can_join = false;
                         }
                     }
 
-                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": "'.$can_join.'","join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.get_string('view_conference_action_join', 'bigbluebuttonbn').'"  ,"message": "'.$initial_message.'"} });';
+                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": "'.$can_join.'","join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'"  ,"message": "'.$initial_message.'"} });';
                     break;
                 case 'end':
                     break;
@@ -141,7 +141,7 @@ if ( empty($error) ) {
 }
 
 function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
-    $meeting_running = (isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == true);
+    $meeting_running = (isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == 'true');
 
     return $meeting_running;
 }
