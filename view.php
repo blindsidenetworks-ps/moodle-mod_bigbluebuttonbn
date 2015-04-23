@@ -114,11 +114,9 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
 
 $bbbsession['voicebridge'] = $bigbluebuttonbn->voicebridge;
 $bbbsession['description'] = $bigbluebuttonbn->description;
-$bbbsession['flag']['newwindow'] = $bigbluebuttonbn->newwindow;
 $bbbsession['flag']['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['flag']['allmoderators'] = $bigbluebuttonbn->allmoderators;
 $bbbsession['flag']['record'] = $bigbluebuttonbn->record;
-$bbbsession['textflag']['newwindow'] = $bigbluebuttonbn->newwindow? 'true':'false';
 $bbbsession['textflag']['wait'] = $bigbluebuttonbn->wait? 'true': 'false';
 $bbbsession['textflag']['record'] = $bigbluebuttonbn->record? 'true': 'false';
 $bbbsession['textflag']['allmoderators'] = $bigbluebuttonbn->allmoderators? 'true': 'false';
@@ -255,7 +253,6 @@ if (!$bigbluebuttonbn->timeavailable ) {
 
 //JavaScript variables
 $jsVars = array(
-        'newwindow' => $bbbsession['textflag']['newwindow'],
         'waitformoderator' => $bbbsession['textflag']['wait'],
         'isadministrator' => $bbbsession['textflag']['administrator'],
         'ismoderator' => $bbbsession['textflag']['moderator'],
