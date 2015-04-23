@@ -72,7 +72,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addRule( 'name', null, 'required', null, 'client' );
 
         $this->add_intro_editor(true, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
-        
+
+        $mform->addElement( 'checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn') );
+        $mform->setDefault( 'newwindow', 0 );
+
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
         $mform->setType('welcome', PARAM_TEXT);

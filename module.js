@@ -163,7 +163,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
 }
 
 M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
-    window.open(join_url);
+    location.assign(join_url);
     // Update view
     M.mod_bigbluebuttonbn.view_clean_status_bar();
     M.mod_bigbluebuttonbn.view_clean_control_panel();
