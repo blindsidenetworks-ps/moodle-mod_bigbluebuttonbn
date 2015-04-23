@@ -110,7 +110,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030215) {
+    if ($result && $oldversion < 2015030225) {
         error_log('Update 2015030211 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
@@ -137,31 +137,25 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         }
         //// Add field introformat
         $field = new xmldb_field('introformat');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1, 'intro');
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
         //// Add field tagging
         $field = new xmldb_field('tagging');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'record');
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
         //// Add field presentation
         $field = new xmldb_field('presentation');
-        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field timecreated
-        $field = new xmldb_field('timecreated');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'timemodified');
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
         //// Add field type
         $field = new xmldb_field('type');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'course');
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
@@ -176,6 +170,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
         if( $dbman->field_exists($table, $field) ) {
             $dbman->rename_field($table, $field, 'closingtime', $continue=true, $feedback=true);
+        }
+        //// Add field timecreated
+        $field = new xmldb_field('timecreated');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'closingtime');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
         
         // Migrate existing CFG values and add default values to the new ones

@@ -9,16 +9,16 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
         <FIELD NAME="type" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="course" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="name field for bigbluebuttonbn instances" PREVIOUS="typr" NEXT="intro"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for bigbluebuttonbn instances" PREVIOUS="type" NEXT="intro"/>
         <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="intro field for bigbluebuttonbn insances" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="introformat field for bigbluebuttonbn insances" PREVIOUS="intro" NEXT="meetingid"/>
-        <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false" COMMENT="the meetingID" PREVIOUS="description" NEXT="moderatorpass"/>
-        <FIELD NAME="moderatorpass" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="the moderator password" PREVIOUS="meetingid" NEXT="viewerpass"/>
-        <FIELD NAME="viewerpass" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="the viewer password" PREVIOUS="moderatorpass" NEXT="wait"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="introformat field for bigbluebuttonbn insances" PREVIOUS="intro" NEXT="meetingid"/>
+        <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false" COMMENT="the meetingID" PREVIOUS=""introformat"" NEXT="moderatorpass"/>
+        <FIELD NAME="moderatorpass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the moderator password" PREVIOUS="meetingid" NEXT="viewerpass"/>
+        <FIELD NAME="viewerpass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the viewer password" PREVIOUS="moderatorpass" NEXT="wait"/>
         <FIELD NAME="wait" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the user has to wait, either 1 or 0" PREVIOUS="viewerpass" NEXT="record"/>
         <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="the value if the meeting session has to be recorded, either 1 or 0" PREVIOUS="wait" NEXT="tagging"/>
         <FIELD NAME="tagging" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="record" NEXT="welcome"/>
-        <FIELD NAME="welcome" TYPE="text" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="Welcome message for the chat window" PREVIOUS="tagging" NEXT="voicebridge"/>
+        <FIELD NAME="welcome" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Welcome message for the chat window" PREVIOUS="tagging" NEXT="voicebridge"/>
         <FIELD NAME="voicebridge" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Voice conference number participants enter to join the voice conference." PREVIOUS="welcome" NEXT="timeopen"/>
         <FIELD NAME="openingtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="voicebridge" NEXT="timeclose"/>
         <FIELD NAME="closingtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeopen" NEXT="timecreated"/>
