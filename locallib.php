@@ -697,3 +697,93 @@ function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm)
         $event->trigger();
     }
 }
+
+function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
+    //$meeting_running = ( isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == 'true' );
+    $meeting_running = ( isset($meeting_info) && isset($meeting_info->returncode) && $meeting_info->returncode == 'SUCCESS' );
+    return $meeting_running;
+}
+
+function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $forced=false) {
+    global $CFG;
+
+    $meeting_info = array();
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
+
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+    $result = $cache->get($meetingid);
+    $now = time();
+    if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) && !$forced ) {
+        //Use the value in the cache
+        $meeting_info = json_decode($result['meeting_info']);
+        //error_log("ENCODED 1");
+        //error_log(json_encode($meeting_info));
+    } else {
+        //Ping again and refresh the cache
+        error_log("Ping again and refresh the cache");
+        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
+        $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
+        //error_log("NATURAL 0");
+        //error_log(json_encode($meeting_info));
+        //$result = $cache->get($meetingid);
+        //error_log("ENCODED 0");
+        //$meeting_info = json_decode($result['meeting_info']);
+        //error_log(json_encode($meeting_info));
+    }
+
+    return $meeting_info;
+}
+
+function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=true){
+    global $CFG;
+
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+    bigbluebuttonbn_doPublishRecordings($recordingid, ($publish)? 'true': 'false', $endpoint, $shared_secret);
+}
+
+function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
+    $error = '';
+
+    if ( !isset($params['callback']) ) {
+        $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'This call must include a javascript callback.');
+    }
+
+    if ( !isset($params['action']) ) {
+        $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'Action parameter must be included.');
+    } else {
+        switch ( strtolower($params['action']) ){
+            case 'ping':
+            case 'info':
+            case 'end':
+                if ( !isset($params['id']) ) {
+                    $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'The meetingID must be specified.');
+                }
+                break;
+            case 'recordings':
+            case 'publish':
+            case 'unpublish':
+            case 'delete':
+                if ( !isset($params['id']) ) {
+                    $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The recordingID must be specified.');
+                }
+                break;
+            default:
+                $error = bigbluebuttonbn_bbb_broker_add_error($error, 'Action '.$params['action'].' can not be performed.');
+        }
+    }
+
+    return $error;
+}
+
+function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg) {
+    $error = $org_msg;
+
+    if( !empty($error) ) $error .= ' ';
+    $error .= $new_msg;
+
+    return $error;
+}

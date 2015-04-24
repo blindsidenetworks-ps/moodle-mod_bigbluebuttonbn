@@ -24,17 +24,24 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
     var status_bar = Y.DOM.byId('status_bar');
     var control_panel = Y.DOM.byId('control_panel');
     var join_button = Y.DOM.byId('join_button');
+    var end_button = Y.DOM.byId('end_button');
 
     if (bigbluebuttonbn.action == 'before') {
     } else if (bigbluebuttonbn.action == 'after') {
     } else if (bigbluebuttonbn.action == 'join') {
         bigbluebuttonbn_dataSource.sendRequest({
-            request : "action=info&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+            request : 'action=info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
                 success : function(e) {
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
-                    Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data.status));
+                    Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
                     Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
+                    console.log(e.data.status);
+                    if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
+                        Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
+                    } else {
+                        console.log("cannot be ended");
+                    }
                 },
                 failure : function(e) {
                     console.log(e);
@@ -74,20 +81,73 @@ M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     return(status_bar_span);
 }
 
-M.mod_bigbluebuttonbn.view_init_control_panel = function(status) {
+M.mod_bigbluebuttonbn.view_init_control_panel = function(data) {
     var control_panel_div = Y.DOM.create('<div>');
 
     Y.DOM.setAttribute(control_panel_div, 'id', 'control_panel_div');
-    var control_panel_div_text = '';
-    //if (e.data.running) {
-    //    control_panel_div_text = 'it is running';
-    //} else {
-    //    control_panel_div_text = 'it is NOT running';
-    //}
-    Y.DOM.setText(control_panel_div, control_panel_div_text);
+    var control_panel_div_html = '';
+    if (data.running) {
+        control_panel_div_html = M.mod_bigbluebuttonbn.view_msg_started_at(data.info.startTime) + ' ' + M.mod_bigbluebuttonbn.view_msg_attendees_in(data.info.attendees);
+    }
+    Y.DOM.addHTML(control_panel_div, control_panel_div_html);
 
     return(control_panel_div);
 }
+
+M.mod_bigbluebuttonbn.view_msg_started_at = function (startTime) {
+    var start_timestamp = (parseInt(startTime) -  parseInt(startTime) % 1000);
+    var date = new Date(start_timestamp);
+    //datevalues = [
+    //    date.getFullYear(),
+    //    date.getMonth()+1,
+    //    date.getDate(),
+    //    date.getHours(),
+    //    date.getMinutes(),
+    //    date.getSeconds(),
+    // ];
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+
+    return bigbluebuttonbn.locales.started_at + ' <b>' + hours + ':' + (minutes<10? '0': '') + minutes + '</b>.';
+}
+
+M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
+    var participants = parseInt(participantCount);
+    var msg_users_joined = '<b>' + participants + '</b> ';
+    if( participants == 1 ) {
+        msg_users_joined += bigbluebuttonbn.locales.user + ' ' + bigbluebuttonbn.locales.has_joined + '.'; 
+    } else {
+        msg_users_joined += bigbluebuttonbn.locales.users + ' ' + bigbluebuttonbn.locales.have_joined + '.';
+    }
+    return msg_users_joined;
+}
+
+M.mod_bigbluebuttonbn.view_msg_attendees_in = function (attendees) {
+    var msg_attendees_in = '';
+
+    if (typeof attendees.attendee != 'undefined') {
+        if ( Array.isArray(attendees.attendee) ) {
+            var counter_viewers = 0;
+            var counter_moderators = 0;
+            for( var i = 0; i < attendees.attendee.length; i++ ) {
+                if( attendees.attendee[i].role == 'MODERATOR' )
+                    counter_moderators++;
+                else
+                    counter_viewers++;
+            }
+            msg_attendees_in += bigbluebuttonbn.locales.session_has_users + ' <b>' + counter_moderators + '</b> ' + (counter_moderators == 1? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.moderators) + ' and ';
+            msg_attendees_in += '<b>' + counter_viewers + '</b> ' + (counter_viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
+        } else {
+            msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + (attendees.attendee.role == 'MODERATOR'? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.viewer) + '.';
+        }
+
+    } else {
+        msg_attendees_in = bigbluebuttonbn.locales.session_no_users + '.';
+    }
+
+    return msg_attendees_in;
+}
+
 
 M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     var join_button_input = Y.DOM.create('<input>');
@@ -103,6 +163,20 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
 
     return join_button_input;
 }
+
+M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
+    var end_button_input = Y.DOM.create('<input>');
+
+    Y.DOM.setAttribute(end_button_input, 'id', 'end_button_input');
+    Y.DOM.setAttribute(end_button_input, 'type', 'button');
+    Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
+    if (status.can_end) {
+        Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_endNow(\'' + status.end_url + '\', \'' + bigbluebuttonbn.locales.not_started + '\');');
+    }
+
+    return end_button_input;
+}
+
 
 M.mod_bigbluebuttonbn.view_clean_status_bar = function() {
     var status_bar_span = Y.DOM.byId('status_bar_span');
@@ -148,7 +222,6 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
         request : "action=info&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
         callback : {
             success : function(e) {
-                console.log(e.data);
                 if (e.data.running) {
                     clearInterval(bigbluebuttonbn_ping_interval_id);
                     M.mod_bigbluebuttonbn.broker_joinNow(join_url, e.data.status.message);
@@ -207,10 +280,6 @@ M.mod_bigbluebuttonbn.broker_deleteRecording = function(recordingid) {
         };
 
     var id = dataSource.sendRequest( request );
-};
-
-M.mod_bigbluebuttonbn.view_locationReload = function() {
-    location.reload();
 };
 
 M.mod_bigbluebuttonbn.view_windowClose = function() {

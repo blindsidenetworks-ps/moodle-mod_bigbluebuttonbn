@@ -52,27 +52,38 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 } else {
     switch (strtolower($action)) {
         case 'logout':
+            /// Moodle event logger: Create an event for meeting left
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
-            bigbluebutton_bbb_view_close_window();
+
+            /// Update the cache
+            bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+
+            /// Execute the redirect
+            $view_url = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
+            header('Location: '.$view_url );
             break;
         case 'join':
             //See if the session is in progress
             if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
                 /// Since the meeting is already running, we just join the session
+                //// Build the URL
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                     $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
 
                 } else {
                     $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['viewerPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
                 }
-
                 /// Moodle event logger: Create an event for meeting joined
                 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
+                //// Update the cache
+                bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+                //// Execute the redirect
                 header('Location: '.$join_url );
 
             } else {
                 // If user is administrator, moderator or if is viewer and no waiting is required
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
+                    /// Prepare the metadata
                     $metadata = array("meta_origin" => $bbbsession['origin'],
                             "meta_originVersion" => $bbbsession['originVersion'],
                             "meta_originServerName" => $bbbsession['originServerName'],
@@ -81,6 +92,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             "meta_context" => $bbbsession['context'],
                             "meta_recording_description" => $bbbsession['contextActivityDescription'],
                             "meta_recording_tagging" => $bbbsession['contextActivityTagging']);
+                    /// Execute the create command
                     $response = bigbluebuttonbn_getCreateMeetingArray(
                             $bbbsession['meetingname'],
                             $bbbsession['meetingid'],
@@ -127,15 +139,19 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                         /// Internal logger: Instert a record with the meeting created
                         bigbluebuttonbn_log($bbbsession, 'Create');
 
-                        $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
-
                         /// Moodle event logger: Create an event for meeting joined
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
+
+                        //// Update the cache
+                        bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+
+                        //// Execute the redirect
+                        $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
                         header('Location: '.$join_url );
                     }                    
 
                 } else {
-                    bigbluebutton_bbb_view_close_window();
+                    header('Location: ' . $_SERVER['HTTP_REFERER']);
                 }
             }
             break;

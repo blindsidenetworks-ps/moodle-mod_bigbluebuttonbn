@@ -174,6 +174,24 @@ $string['view_message_norecordings'] = 'There are no recording for this meeting.
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 
+$string['view_message_session_started_at'] = 'This session started at';
+$string['view_message_session_running_for'] = 'This session has been running for';
+$string['view_message_hour'] = 'hour';
+$string['view_message_hours'] = 'hours';
+$string['view_message_minute'] = 'minute';
+$string['view_message_minutes'] = 'minutes';
+$string['view_message_moderator'] = 'moderator';
+$string['view_message_moderators'] = 'moderators';
+$string['view_message_viewer'] = 'viewer';
+$string['view_message_viewers'] = 'viewers';
+$string['view_message_user'] = 'user';
+$string['view_message_users'] = 'users';
+$string['view_message_has_joined'] = 'has joined';
+$string['view_message_have_joined'] = 'have joined';
+$string['view_message_session_no_users'] = 'There are no users in this session';
+$string['view_message_session_has_user'] = 'There is';
+$string['view_message_session_has_users'] = 'There are';
+
 
 $string['view_message_room_closed'] = 'This room is closed.';
 $string['view_message_room_ready'] = 'This room is ready.';

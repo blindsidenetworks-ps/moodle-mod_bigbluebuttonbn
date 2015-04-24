@@ -100,7 +100,8 @@ $bbbsession['cm'] = $cm;
 
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
-$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
+//$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
+$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.'&bn='.$bbbsession['bigbluebuttonbnid'];
 
 //Metadata
 $bbbsession['origin'] = "Moodle";
@@ -190,6 +191,7 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
 }
 
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
+$bbbsession['endMeetingURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=end&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
@@ -248,12 +250,21 @@ $jsVars = array(
         'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbntype'],
         'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000),
         'locales' => array(
-                'join_button' => get_string('view_conference_action_join', 'bigbluebuttonbn' ),
-                'lineup_button' => get_string('view_conference_action_lineup', 'bigbluebuttonbn' ),
-                'end_button' => get_string('view_conference_action_end', 'bigbluebuttonbn' ),
                 'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn' ),
                 'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn' ),
                 'in_progress' => get_string('view_message_conference_in_progress', 'bigbluebuttonbn' ),
+                'started_at' => get_string('view_message_session_started_at', 'bigbluebuttonbn' ),
+                'session_no_users' => get_string('view_message_session_no_users', 'bigbluebuttonbn' ),
+                'session_has_user' => get_string('view_message_session_has_user', 'bigbluebuttonbn' ),
+                'session_has_users' => get_string('view_message_session_has_users', 'bigbluebuttonbn' ),
+                'has_joined' => get_string('view_message_has_joined', 'bigbluebuttonbn' ),
+                'have_joined' => get_string('view_message_have_joined', 'bigbluebuttonbn' ),
+                'user' => get_string('view_message_user', 'bigbluebuttonbn' ),
+                'users' => get_string('view_message_users', 'bigbluebuttonbn' ),
+                'viewer' => get_string('view_message_viewer', 'bigbluebuttonbn' ),
+                'viewers' => get_string('view_message_viewers', 'bigbluebuttonbn' ),
+                'moderator' => get_string('view_message_moderator', 'bigbluebuttonbn' ),
+                'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn' ),
         )
 );
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
@@ -277,7 +288,7 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo $OUTPUT->box_end();
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-    echo '<br><br><span id="join_button"></span>';
+    echo '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>';
     echo $OUTPUT->box_end();
 
     if( $bbbsession['bigbluebuttonbntype'] == 0 ) {

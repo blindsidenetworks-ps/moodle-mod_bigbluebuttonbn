@@ -311,7 +311,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     $info->intro = $bigbluebuttonbn->intro;
 
     if ( $bigbluebuttonbn->newwindow == 1 ) {
-        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id&amp;redirect=1";
+        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id";
         $info->onclick = "window.open('$fullurl'); return false;";
     }
 
