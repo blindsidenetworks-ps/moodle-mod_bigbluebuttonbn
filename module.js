@@ -297,6 +297,7 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
                     if (e.data.status) {
                         console.info("end meeting completed");
                         M.mod_bigbluebuttonbn.view_hide_end_button();
+                        location.reload();
                     }
                 },
                 failure : function(e) {

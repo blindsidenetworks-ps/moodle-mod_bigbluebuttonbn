@@ -123,6 +123,10 @@ if ( empty($error) ) {
                     if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                         //Execute the end command
                         $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
+
+                        /// Update the cache
+                        bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
+
                         echo $params['callback'].'({ "status": true });';
                     } else {
                         error_log("ERROR: User not authorized to execute end command");
