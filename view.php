@@ -191,7 +191,6 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
 }
 
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
-$bbbsession['endMeetingURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=end&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);

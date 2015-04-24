@@ -100,8 +100,7 @@ if ( empty($error) ) {
                         if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                             $end_button_text = get_string('view_conference_action_end', 'bigbluebuttonbn');
                             $can_end = true;
-                            $end_url = $bbbsession['endMeetingURL'];
-                            $status_can_end = '"can_end": '.($can_end? 'true': 'false').', "end_url": "'.$end_url.'", "end_button_text": "'.$end_button_text.'", ';
+                            $status_can_end = '"can_end": '.($can_end? 'true': 'false').', "end_button_text": "'.$end_button_text.'", ';
                         }
 
                     } else {
@@ -120,8 +119,14 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.'"message": "'.$initial_message.'"} });';
                     break;
                 case 'end':
+                    error_log("Executing end meeting");
                     if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                         //Execute the end command
+                        $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
+                        echo $params['callback'].'({ "status": true });';
+                    } else {
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
                 case 'recordings':

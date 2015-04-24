@@ -736,6 +736,15 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
     return $meeting_info;
 }
 
+function bigbluebuttonbn_bbb_broker_do_end_meeting($meetingid, $password){
+    global $CFG;
+
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+    bigbluebuttonbn_doEndMeeting($meetingid, $password, $endpoint, $shared_secret);
+}
+
 function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=true){
     global $CFG;
 

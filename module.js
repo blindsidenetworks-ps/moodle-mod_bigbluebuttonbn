@@ -171,7 +171,7 @@ M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
     Y.DOM.setAttribute(end_button_input, 'type', 'button');
     Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
     if (status.can_end) {
-        Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_endNow(\'' + status.end_url + '\', \'' + bigbluebuttonbn.locales.not_started + '\');');
+        Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_endMeeting();');
     }
 
     return end_button_input;
@@ -191,6 +191,11 @@ M.mod_bigbluebuttonbn.view_clean_control_panel = function() {
 M.mod_bigbluebuttonbn.view_hide_join_button = function() {
     var join_button = Y.DOM.byId('join_button');
     Y.DOM.setStyle(join_button, 'visibility', 'hidden');
+}
+
+M.mod_bigbluebuttonbn.view_hide_end_button = function() {
+    var end_button = Y.DOM.byId('end_button');
+    Y.DOM.setStyle(end_button, 'visibility', 'hidden');
 }
 
 M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
@@ -260,7 +265,7 @@ M.mod_bigbluebuttonbn.broker_publishRecording = function(action, recordingid) {
             }
         };
 
-    var id = dataSource.sendRequest( request );
+    var id = bigbluebuttonbn_dataSource.sendRequest( request );
 };
 
 M.mod_bigbluebuttonbn.broker_deleteRecording = function(recordingid) {
@@ -279,7 +284,28 @@ M.mod_bigbluebuttonbn.broker_deleteRecording = function(recordingid) {
             }
         };
 
-    var id = dataSource.sendRequest( request );
+    var id = bigbluebuttonbn_dataSource.sendRequest( request );
+};
+
+M.mod_bigbluebuttonbn.broker_endMeeting = function() {
+    console.info('End Meeting');
+    var request = {
+            request : 'action=end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+            callback : {
+                success : function(e) {
+                    console.log(e.data);
+                    if (e.data.status) {
+                        console.info("end meeting completed");
+                        M.mod_bigbluebuttonbn.view_hide_end_button();
+                    }
+                },
+                failure : function(e) {
+                    console.log(e.error.message);
+                }
+            }
+        };
+
+    var id = bigbluebuttonbn_dataSource.sendRequest( request );
 };
 
 M.mod_bigbluebuttonbn.view_windowClose = function() {
