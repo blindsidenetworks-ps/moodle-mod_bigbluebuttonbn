@@ -92,6 +92,15 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             "meta_context" => $bbbsession['context'],
                             "meta_recording_description" => $bbbsession['contextActivityDescription'],
                             "meta_recording_tagging" => $bbbsession['contextActivityTagging']);
+
+                    /// Set the duration for the meeting
+                    if ( $CFG->bigbluebuttonbn_scheduled_duration_enabled ) {
+                        $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
+                        if( $durationtime > 0 )
+                            $bbbsession['welcome'] .= '<br><br>'.str_replace("%duration%", ''.$durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));
+                    } else {
+                        $durationtime = 0;
+                    }
                     /// Execute the create command
                     $response = bigbluebuttonbn_getCreateMeetingArray(
                             $bbbsession['meetingname'],
@@ -103,7 +112,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             $bbbsession['endpoint'],
                             $bbbsession['logoutURL'],
                             $bbbsession['record']? 'true': 'false',
-                            $bbbsession['durationtime'],
+                            $durationtime,
                             $bbbsession['voicebridge'],
                             $metadata,
                             $bbbsession['presentation']['name'],

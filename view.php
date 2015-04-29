@@ -89,9 +89,6 @@ if( $bigbluebuttonbn->record )
 
 $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
 $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
-$bbbsession['durationtime'] = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
-if( $bbbsession['durationtime'] > 0 )
-    $bbbsession['welcome'] .= '<br><br>'.str_replace("%duration%", ''.$bbbsession['durationtime'], get_string('bbbdurationwarning', 'bigbluebuttonbn'));
 
 //Additional info related to the course
 $bbbsession['coursename'] = $course->fullname;
@@ -296,7 +293,8 @@ function bigbluebuttonbn_view_joining($bbbsession){
 }
 
 function bigbluebuttonbn_view_before( $bbbsession ){
-
+    global $CFG, $DB, $OUTPUT;
+    
     echo $OUTPUT->heading(get_string('view_message_conference_not_started', 'bigbluebuttonbn'), 3);
 
     echo '<table>';

@@ -58,13 +58,13 @@ $string['config_feature_waitformoderator_cache_ttl_description'] = 'To support a
 
 
 $string['config_feature_voicebridge'] = 'Configuration for "Voice bridge" feature';
-$string['config_feature_voicebridge_description'] = 'These settings enable or disable options in the UI and also defines default values for these options.';
+$string['config_feature_voicebridge_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_feature_voicebridge_editable'] = 'Conference voice bridge can be edited';
 $string['config_feature_voicebridge_editable_description'] = 'Conference voice bridge number can be permanently assigned to a room conference. When assigned, the number can not be used by any other room or conference';
 
 
 $string['config_feature_preuploadpresentation'] = 'Configuration for "Pre-upload presentation" feature';
-$string['config_feature_preuploadpresentation_description'] = 'These settings enable or disable options in the UI and also defines default values for these options.';
+$string['config_feature_preuploadpresentation_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_feature_preuploadpresentation_enabled'] = 'Pre-uploading presentation enabled';
 $string['config_feature_preuploadpresentation_enabled_description'] = 'Preupload presentation feature is enabled in the UI when the room or conference is added or updated.';
 
@@ -79,6 +79,14 @@ $string['config_feature_predefinedprofile'] = 'Predefined profile configuration'
 $string['config_feature_predefinedprofile_description'] = 'These settings define the predefined profiles used to simplify the UI for setting up BigBluebuttonBN activities.';
 $string['config_feature_predefinedprofile_enabled'] = 'Pre-defined profile enabled';
 $string['config_feature_predefinedprofile_enabled_description'] = 'Pre-defined profile feature is enabled in the UI when the room or conference is added or updated.';
+
+
+$string['config_scheduled'] = 'Configuration for "Scheduled sessions"';
+$string['config_scheduled_description'] = 'These settings define some of the behaviour by default for scheduled sessions.';
+$string['config_scheduled_duration_enabled'] = 'Calculate duration enabled';
+$string['config_scheduled_duration_enabled_description'] = 'The duration of an scheduled session is calculated based on the opening and closing times.';
+$string['config_scheduled_duration_compensation'] = 'Compensatory time (minutes)';
+$string['config_scheduled_duration_compensation_description'] = 'Minutes added to the scheduled closing when calculating the duration.';
 
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';

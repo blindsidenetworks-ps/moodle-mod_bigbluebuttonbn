@@ -99,6 +99,20 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
             0));
 
+    $settings->add( new admin_setting_heading('config_scheduled',
+            get_string('config_scheduled', 'bigbluebuttonbn'),
+            get_string('config_scheduled_description', 'bigbluebuttonbn')));
+    // calculated duration for 'scheduled session' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
+            get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
+            get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
+            1));
+    // compensatory time for 'scheduled session' feature
+    $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
+            get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
+            get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
+            10, PARAM_INT));
+    
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
             get_string('config_permission', 'bigbluebuttonbn'),
             get_string('config_permission_description', 'bigbluebuttonbn')));
@@ -118,6 +132,17 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_predefinedprofile_enabled', 'bigbluebuttonbn'),
             get_string('config_feature_predefinedprofile_enabled_description', 'bigbluebuttonbn'),
             1));
+   
+    /*
+    $settings->add( new admin_setting_heading('bigbluebuttonbn_extended',
+            get_string('config_feature_extendedfeatures', 'bigbluebuttonbn'),
+            get_string('config_feature_extendedfeatures_description', 'bigbluebuttonbn')));
+    // ui for 'delegated view' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_predefinedprofile_enabled',
+            get_string('config_feature_predefinedprofile_enabled', 'bigbluebuttonbn'),
+            get_string('config_feature_predefinedprofile_enabled_description', 'bigbluebuttonbn'),
+            1));
+    */
 }
 
 ?>

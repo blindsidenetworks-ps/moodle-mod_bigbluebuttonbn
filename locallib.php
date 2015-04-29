@@ -588,11 +588,17 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
 }
 
 function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
+    global $CFG;
+
+    $dureation = 0;
     $now = time();
-    if( $closingtime > 0 && $now < $closingtime )
-        return ($closingtime - time())/60;
-    else
-        return 0;
+    if( $closingtime > 0 && $now < $closingtime ) {
+        $duration = ceil(($closingtime - $now)/60);
+        $compensation_time = intval($CFG->bigbluebuttonbn_scheduled_duration_compensation);
+        $duration = intval($duration) + $compensation_time;
+    }
+
+    return $duration;
 }
 
 function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=null) {
