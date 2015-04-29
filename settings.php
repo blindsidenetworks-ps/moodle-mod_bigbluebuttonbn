@@ -112,6 +112,11 @@ if ($ADMIN->fulltree) {
             get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
             get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
             10, PARAM_INT));
+    // pre-opening time for 'scheduled session' feature
+    $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
+            get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
+            get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
+            10, PARAM_INT));
     
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
             get_string('config_permission', 'bigbluebuttonbn'),

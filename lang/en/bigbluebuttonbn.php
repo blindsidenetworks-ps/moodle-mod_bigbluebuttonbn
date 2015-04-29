@@ -87,6 +87,8 @@ $string['config_scheduled_duration_enabled'] = 'Calculate duration enabled';
 $string['config_scheduled_duration_enabled_description'] = 'The duration of an scheduled session is calculated based on the opening and closing times.';
 $string['config_scheduled_duration_compensation'] = 'Compensatory time (minutes)';
 $string['config_scheduled_duration_compensation_description'] = 'Minutes added to the scheduled closing when calculating the duration.';
+$string['config_scheduled_pre_opening'] = 'Accessible before opening time (minutes)';
+$string['config_scheduled_pre_opening_description'] = 'The time in minutes for the session to be acceessible before the schedules opening time is due.';
 
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
