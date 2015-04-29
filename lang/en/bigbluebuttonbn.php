@@ -74,6 +74,13 @@ $string['config_permission_description'] = 'These settings define the permission
 $string['config_permission_moderator_default'] = 'Moderator by default';
 $string['config_permission_moderator_default_description'] = 'This rule is used by default when a new room or conference is added.';
 
+
+$string['config_feature_predefinedprofile'] = 'Predefined profile configuration';
+$string['config_feature_predefinedprofile_description'] = 'These settings define the predefined profiles used to simplify the UI for setting up BigBluebuttonBN activities.';
+$string['config_feature_predefinedprofile_enabled'] = 'Pre-defined profile enabled';
+$string['config_feature_predefinedprofile_enabled_description'] = 'Pre-defined profile feature is enabled in the UI when the room or conference is added or updated.';
+
+
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
@@ -132,6 +139,8 @@ $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
+$string['mod_form_field_predefinedprofile'] = 'Predefined profile';
+$string['mod_form_field_predefinedprofile_help'] = 'Predefined profile';
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.

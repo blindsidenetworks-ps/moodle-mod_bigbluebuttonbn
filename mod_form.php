@@ -52,6 +52,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
         $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
+        $predefinedprofile_enabled = $CFG->bigbluebuttonbn_predefinedprofile_enabled;
 
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
@@ -62,6 +63,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         $current_activity =& $this->current;
 
+
+        if( $predefinedprofile_enabled ) {
+            $mform->addElement('select', 'predefinedprofile', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array());
+            //$mform->setDefault('popup', $cfgscorm->popup);
+            //$mform->setAdvanced('popup', $cfgscorm->popup_adv);
+
+            //$mform->addElement( 'list', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn') );
+            //$mform->setDefault( 'newwindow', 0 );
+        }
+
         //-------------------------------------------------------------------------------
         // First block starts here
         //-------------------------------------------------------------------------------
@@ -71,7 +82,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule( 'name', null, 'required', null, 'client' );
 
-        $this->add_intro_editor(true, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
+        $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
+        $mform->setAdvanced('introeditor');
+
+        // Display the label to the right of the checkbox so it looks better & matches rest of the form
+        $coursedesc = $mform->getElement('showdescription');
+        if(!empty($coursedesc)){
+            $coursedesc->setText(' ' . $coursedesc->getLabel());
+            $coursedesc->setLabel('&nbsp');
+        }
+        $mform->setAdvanced('showdescription');
 
         $mform->addElement( 'checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn') );
         $mform->setDefault( 'newwindow', 0 );
@@ -79,6 +99,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
         $mform->setType('welcome', PARAM_TEXT);
+        $mform->setAdvanced('welcome');
 
         if ( $voicebridge_editable ) {
             $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
@@ -86,12 +107,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'), 'numeric', '####', 'server');
             $mform->setDefault( 'voicebridge', 0 );
             $mform->addHelpButton('voicebridge', 'mod_form_field_voicebridge', 'bigbluebuttonbn');
+            $mform->setAdvanced('voicebridge');
         }
 
         if ( $waitformoderator_editable ) {
             $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
+            $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
             $mform->setType('wait', PARAM_INT);
             $mform->setDefault( 'wait', 1 );
+            $mform->setAdvanced('wait');
         } else {
             $mform->addElement( 'hidden', 'wait', $waitformoderator_default );
         }
@@ -100,6 +124,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if ( $recording_default_editable ) {
                 $mform->addElement( 'checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn') );
                 $mform->setDefault( 'record', $recording_default );
+                $mform->setAdvanced('record');
             } else {
                 $mform->addElement( 'hidden', 'record', $recording_default );
             }
@@ -108,6 +133,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if ( $tagging_default_editable ) {
                 $mform->addElement( 'checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn') );
                 $mform->setDefault( 'record', $tagging_default );
+                $mform->setAdvanced('tagging');
             } else {
                 $mform->addElement( 'hidden', 'tagging', $tagging_default );
             }

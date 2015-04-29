@@ -796,3 +796,27 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg) {
 
     return $error;
 }
+
+function bigbluebuttonbn_get_predefinedprofiles() {
+    $predefinedprofiles = array(
+            array('id' => 1, 'name' => "Default", "features" => array("wait", "record", "presentation", "permission", "schedule", "groups") ),
+            array('id' => 2, 'name' => "Classroom", "features" => array("wait", "record", "presentation", "permission") ),
+            array('id' => 3, 'name' => "Conference room", "features" => array("wait", "record", "presentation", "permission") ),
+            array('id' => 4, 'name' => "Collaboration room", "features" => array("wait", "record", "presentation", "permission", "groups") ),
+            array('id' => 5, 'name' => "Session", "features" => array("wait", "record", "presentation", "permission", "schedule") )
+    );
+
+    return $predefinedprofiles;
+}
+
+function bigbluebuttonbn_get_predefinedprofile_display_array() {
+    $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
+
+    $predefinedprofile_display_array = array();
+    foreach($predefinedprofiles as $predefinedprofile) {
+        $profile = array($predefinedprofile['id'] => $predefinedprofile['name']);
+        $predefinedprofile_display_array = array_merge($predefinedprofile_display_array, $profile);
+    }
+
+    return $predefinedprofile_display_array;
+}

@@ -124,11 +124,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( $dbman->field_exists($table, $field) ) {
             $dbman->drop_field($table, $field, $continue=true, $feedback=true);
         }
-//        //// Drop field newwindow
-//        $field = new xmldb_field('newwindow');
-//        if( $dbman->field_exists($table, $field) ) {
-//            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-//        }
         //// Add field intro
         $field = new xmldb_field('intro');
         $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');

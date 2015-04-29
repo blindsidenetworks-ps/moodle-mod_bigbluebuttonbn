@@ -102,7 +102,7 @@ if ($ADMIN->fulltree) {
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
             get_string('config_permission', 'bigbluebuttonbn'),
             get_string('config_permission_description', 'bigbluebuttonbn')));
-
+    // ui for 'permissions' feature
     $roles = bigbluebuttonbn_get_roles('all', 'array');
     $owner = array('owneruser' => get_string('mod_form_field_participant_list_type_owner', "bigbluebuttonbn"));
     $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
@@ -110,6 +110,14 @@ if ($ADMIN->fulltree) {
             get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),
             array_keys($owner), array_merge($owner, $roles)));
 
+    $settings->add( new admin_setting_heading('bigbluebuttonbn_profile',
+            get_string('config_feature_predefinedprofile', 'bigbluebuttonbn'),
+            get_string('config_feature_predefinedprofile_description', 'bigbluebuttonbn')));
+    // ui for 'predefined profile' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_predefinedprofile_enabled',
+            get_string('config_feature_predefinedprofile_enabled', 'bigbluebuttonbn'),
+            get_string('config_feature_predefinedprofile_enabled_description', 'bigbluebuttonbn'),
+            1));
 }
 
 ?>

@@ -44,7 +44,6 @@ function bigbluebuttonbn_add_instance($data, $mform) {
     global $DB, $CFG;
 
     $cmid = $data->coursemodule;
-    $draftitemid = $data->presentation;
     if ( $CFG->version < '2013111800' ) {
         //This is valid before v2.6
         $context = get_context_instance(CONTEXT_MODULE, $cmid);
@@ -61,7 +60,10 @@ function bigbluebuttonbn_add_instance($data, $mform) {
 
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$bigbluebuttonbn_id), '*', MUST_EXIST);
 
-    bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draftitemid);
+    if( isset($data->presentation) ) {
+         $draftitemid = $data->presentation;
+        bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draftitemid);
+    }
 
     bigbluebuttonbn_process_post_save($data);
 
@@ -302,18 +304,67 @@ function bigbluebuttonbn_get_post_actions() {
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, newwindow')) {
+    if ( !$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat, newwindow')) {
         return NULL;
     }
 
     $info = new cached_cm_info();
     $info->name = $bigbluebuttonbn->name;
-    $info->intro = $bigbluebuttonbn->intro;
+    //$info->intro = $bigbluebuttonbn->intro;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $info->content = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
+    }
 
     if ( $bigbluebuttonbn->newwindow == 1 ) {
-        $fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id";
-        $info->onclick = "window.open('$fullurl'); return false;";
+        $viewurl = new moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $coursemodule->id));
+        $info->onclick = "window.open('" . $viewurl->out(false) . "', 'bigbluebuttonbn'); return false;";
+        //$fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id";
+        //$info->onclick = "window.open('$fullurl'); return false;";
     }
+
+    return $info;
+}
+
+function xxx_get_coursemodule_info($coursemodule) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/mod/lti/locallib.php');
+
+    if (!$lti = $DB->get_record('lti', array('id' => $coursemodule->instance),
+            'icon, secureicon, intro, introformat, name, toolurl, launchcontainer')) {
+            return null;
+    }
+
+    $info = new cached_cm_info();
+
+    // We want to use the right icon based on whether the
+    // current page is being requested over http or https.
+    if (lti_request_is_using_ssl() && !empty($lti->secureicon)) {
+        $info->iconurl = new moodle_url($lti->secureicon);
+    } else if (!empty($lti->icon)) {
+        $info->iconurl = new moodle_url($lti->icon);
+    }
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $info->content = format_module_intro('lti', $lti, $coursemodule->id, false);
+    }
+
+    // Does the link open in a new window?
+    $tool = lti_get_tool_by_url_match($lti->toolurl);
+    if ($tool) {
+        $toolconfig = lti_get_type_config($tool->id);
+    } else {
+        $toolconfig = array();
+    }
+    $launchcontainer = lti_get_launch_container($lti, $toolconfig);
+    if ($launchcontainer == LTI_LAUNCH_CONTAINER_WINDOW) {
+        $launchurl = new moodle_url('/mod/lti/launch.php', array('id' => $coursemodule->id));
+        $info->onclick = "window.open('" . $launchurl->out(false) . "', 'lti'); return false;";
+    }
+
+    $info->name = $lti->name;
 
     return $info;
 }
