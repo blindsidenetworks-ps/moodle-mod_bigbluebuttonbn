@@ -35,12 +35,17 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_recording_default', 'bigbluebuttonbn'),
             get_string('config_feature_recording_default_description', 'bigbluebuttonbn'),
             1));
-    // feature for 'recording' feature
+    // UI for 'recording' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_editable',
             get_string('config_feature_recording_editable', 'bigbluebuttonbn'),
             get_string('config_feature_recording_editable_description', 'bigbluebuttonbn'),
             1));
-
+    // Front panel for 'recording' managment feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_icons_enabled',
+            get_string('config_feature_recording_icons_enabled', 'bigbluebuttonbn'),
+            get_string('config_feature_recording_icons_enabled_description', 'bigbluebuttonbn'),
+            1));
+    
     //// Configuration for recording feature
     $settings->add( new admin_setting_heading('bigbluebuttonbn_recordingtagging',
             get_string('config_feature_recordingtagging', 'bigbluebuttonbn'),
@@ -50,7 +55,7 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
             get_string('config_feature_recordingtagging_default_description', 'bigbluebuttonbn'),
             0));
-    // ui for 'recording tagging' feature
+    // UI for 'recording tagging' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
             get_string('config_feature_recordingtagging_editable', 'bigbluebuttonbn'),
             get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
@@ -65,7 +70,7 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_waitformoderator_default', 'bigbluebuttonbn'),
             get_string('config_feature_waitformoderator_default_description', 'bigbluebuttonbn'),
             0));
-    // ui for 'wait for moderator' feature
+    // UI for 'wait for moderator' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_editable',
             get_string('config_feature_waitformoderator_editable', 'bigbluebuttonbn'),
             get_string('config_feature_waitformoderator_editable_description', 'bigbluebuttonbn'),
@@ -84,7 +89,7 @@ if ($ADMIN->fulltree) {
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_voicebridge',
             get_string('config_feature_voicebridge', 'bigbluebuttonbn'),
             get_string('config_feature_voicebridge_description', 'bigbluebuttonbn')));
-    // ui for establishing static voicebridge
+    // UI for establishing static voicebridge
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_voicebridge_editable',
             get_string('config_feature_voicebridge_editable', 'bigbluebuttonbn'),
             get_string('config_feature_voicebridge_editable_description', 'bigbluebuttonbn'),
@@ -93,7 +98,7 @@ if ($ADMIN->fulltree) {
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
             get_string('config_feature_preuploadpresentation', 'bigbluebuttonbn'),
             get_string('config_feature_preuploadpresentation_description', 'bigbluebuttonbn')));
-    // ui for 'preupload presentation' feature
+    // UI for 'preupload presentation' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_preuploadpresentation_enabled',
             get_string('config_feature_preuploadpresentation_enabled', 'bigbluebuttonbn'),
             get_string('config_feature_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
@@ -121,7 +126,7 @@ if ($ADMIN->fulltree) {
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
             get_string('config_permission', 'bigbluebuttonbn'),
             get_string('config_permission_description', 'bigbluebuttonbn')));
-    // ui for 'permissions' feature
+    // UI for 'permissions' feature
     $roles = bigbluebuttonbn_get_roles('all', 'array');
     $owner = array('owneruser' => get_string('mod_form_field_participant_list_type_owner', "bigbluebuttonbn"));
     $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
@@ -132,7 +137,7 @@ if ($ADMIN->fulltree) {
     $settings->add( new admin_setting_heading('bigbluebuttonbn_profile',
             get_string('config_feature_predefinedprofile', 'bigbluebuttonbn'),
             get_string('config_feature_predefinedprofile_description', 'bigbluebuttonbn')));
-    // ui for 'predefined profile' feature
+    // UI for 'predefined profile' feature
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_predefinedprofile_enabled',
             get_string('config_feature_predefinedprofile_enabled', 'bigbluebuttonbn'),
             get_string('config_feature_predefinedprofile_enabled_description', 'bigbluebuttonbn'),

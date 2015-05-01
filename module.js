@@ -36,11 +36,8 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
                     Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
                     Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
-                    console.log(e.data.status);
                     if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
                         Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
-                    } else {
-                        console.log("cannot be ended");
                     }
                 },
                 failure : function(e) {
@@ -50,27 +47,6 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         });
     }
 };
-
-M.mod_bigbluebuttonbn.view_update = function() {
-    var status_bar = Y.DOM.byId('status_bar');
-    var control_panel = Y.DOM.byId('control_panel');
-    var join_button = Y.DOM.byId('join_button');
-
-    bigbluebuttonbn_dataSource.sendRequest({
-        request : "action=info&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
-        callback : {
-            success : function(e) {
-                console.log(e.data);
-                //M.mod_bigbluebuttonbn.view_set_status(e.data.status.message);
-                //Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data.status));
-                //Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
-            },
-            failure : function(e) {
-                console.log(e);
-            }
-        }
-    });
-}
 
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
@@ -210,7 +186,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
     //// create a img element
     var spinning_wheel = Y.DOM.create('<img>');
     Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
-    Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/polling.gif');
+    Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing64.gif');
     Y.DOM.setAttribute(spinning_wheel, 'align', 'center');
     //// add the spinning wheel
     Y.DOM.addHTML(control_panel_div, spinning_wheel);
@@ -249,64 +225,55 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
     Y.DOM.addHTML(Y.DOM.byId('status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
 }
 
-M.mod_bigbluebuttonbn.broker_publishRecording = function(action, recordingid) {
-    console.info('Publish: ' + action);
-    var request = {
-            request : "action=" + ((action == 'hide')? 'unpublish': 'publish') + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
-            callback : {
-                success : function(e) {
-                    if (e.data.status == 'true') {
-                        console.info("publish/unpublish completed");
-                    }
-                },
-                failure : function(e) {
-                    console.log(e.error.message);
+M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
+    console.info('Action: ' + action);
+    var id = bigbluebuttonbn_dataSource.sendRequest({
+        request : "action=" + action + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+        callback : {
+            success : function(e) {
+                if( action == 'delete') {
+                    var recording_td = Y.DOM.byId('recording-td-' + recordingid);
+                    recording_td.remove();
+                } else if( action == 'publish' || action == 'unpublish' ) {
+                    var btn_action = Y.DOM.byId('recording-btn-' + action + '-' + recordingid);
+                    btn_action.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+                    btn_action.setAttribute('alt', (action == 'publish')? bigbluebuttonbn.locales.publishing: bigbluebuttonbn.locales.unpublishing);
+                    btn_action.setAttribute('title', (action == 'publish')? bigbluebuttonbn.locales.publishing: bigbluebuttonbn.locales.unpublishing);
+                    var link_action = Y.DOM.byId('recording-link-' + action + '-' + recordingid);
+                    link_action.setAttribute('onclick', '');
                 }
-            }
-        };
-
-    var id = bigbluebuttonbn_dataSource.sendRequest( request );
-};
-
-M.mod_bigbluebuttonbn.broker_deleteRecording = function(recordingid) {
-    console.info('Delete');
-    var request = {
-            request : "action=delete&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
-            callback : {
-                success : function(e) {
-                    if (e.data.status == 'true') {
-                        console.info("publish/unpublish completed");
-                    }
-                },
-                failure : function(e) {
-                    console.log(e.error.message);
+                console.log(e.data);
+                if (e.data.status == 'true') {
+                    console.info(action + " completed");
                 }
+            },
+            failure : function(e) {
+                console.log(e.error.message);
+            },
+            completed : function(e) {
+                console.log(e);
             }
-        };
-
-    var id = bigbluebuttonbn_dataSource.sendRequest( request );
-};
+        }
+    });
+}
 
 M.mod_bigbluebuttonbn.broker_endMeeting = function() {
     console.info('End Meeting');
-    var request = {
-            request : 'action=end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
-            callback : {
-                success : function(e) {
-                    console.log(e.data);
-                    if (e.data.status) {
-                        console.info("end meeting completed");
-                        M.mod_bigbluebuttonbn.view_hide_end_button();
-                        location.reload();
-                    }
-                },
-                failure : function(e) {
-                    console.log(e.error.message);
+    var id = bigbluebuttonbn_dataSource.sendRequest({
+        request : 'action=end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+        callback : {
+            success : function(e) {
+                if (e.data.status) {
+                    console.info("end meeting completed");
+                    M.mod_bigbluebuttonbn.view_hide_end_button();
+                    location.reload();
                 }
+            },
+            failure : function(e) {
+                console.log(e.error.message);
             }
-        };
-
-    var id = bigbluebuttonbn_dataSource.sendRequest( request );
+        }
+    });
 };
 
 M.mod_bigbluebuttonbn.view_windowClose = function() {

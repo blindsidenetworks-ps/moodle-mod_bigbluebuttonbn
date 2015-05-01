@@ -39,9 +39,11 @@ $string['config_feature_recording_editable_description'] = 'If checked the inter
 $string['config_feature_recordingtagging'] = 'Configuration for "Recording tagging" feature';
 $string['config_feature_recordingtagging_description'] = 'These settings are feature specific';
 $string['config_feature_recordingtagging_default'] = 'Recording tagging enabled by default';
-$string['config_feature_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used by the RecordingsBN plugin.';
+$string['config_feature_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used to identify the recording in the list.';
 $string['config_feature_recordingtagging_editable'] = 'Recording tagging feature can be edited';
 $string['config_feature_recordingtagging_editable_description'] = 'Recording tagging value by default can be edited when the room or conference is added or updated.';
+$string['config_feature_recording_icons_enabled'] = 'Icons for recording management';
+$string['config_feature_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 
 
 $string['config_feature_waitformoderator'] = 'Configuration for "Wait for modeartor" feature';
@@ -177,8 +179,14 @@ $string['view_login_viewer'] = 'Logging in as viewer ...';
 $string['view_noguests'] = 'The BigBlueButtonBN is not open to guests';
 $string['view_nojoin'] = 'You are not in a role allowed to join this session.';
 $string['view_recording_list_actionbar_delete'] = 'Delete';
+$string['view_recording_list_actionbar_deleting'] = 'Deleting';
 $string['view_recording_list_actionbar_hide'] = 'Hide';
 $string['view_recording_list_actionbar_show'] = 'Show';
+$string['view_recording_list_actionbar_publish'] = 'Publish';
+$string['view_recording_list_actionbar_unpublish'] = 'Unpublish';
+$string['view_recording_list_actionbar_publishing'] = 'Publishing';
+$string['view_recording_list_actionbar_unpublishing'] = 'Unpublishing';
+$string['view_recording_list_actionbar_processing'] = 'Processing';
 $string['view_recording_list_actionbar'] = 'Toolbar';
 $string['view_recording_list_activity'] = 'Activity';
 $string['view_recording_list_course'] = 'Course';

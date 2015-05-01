@@ -148,6 +148,10 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'delete':
+                    error_log("Executing delete");
+                    //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                    echo $params['callback'].'({ "status": "true" });';
                     break;
             }
 

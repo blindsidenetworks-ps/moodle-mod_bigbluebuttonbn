@@ -262,6 +262,8 @@ $jsVars = array(
                 'viewers' => get_string('view_message_viewers', 'bigbluebuttonbn' ),
                 'moderator' => get_string('view_message_moderator', 'bigbluebuttonbn' ),
                 'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn' ),
+                'publishing' => get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn' ),
+                'unpublishing' => get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn' ),
         )
 );
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);

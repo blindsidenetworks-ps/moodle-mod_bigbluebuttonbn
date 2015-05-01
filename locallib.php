@@ -235,7 +235,6 @@ function bigbluebuttonbn_recordingBuildSorter($a, $b){
 }
 
 function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {
-
     $ids = 	explode(",", $recordIDs);
     foreach( $ids as $id){
         $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getDeleteRecordingsURL($id, $URL, $SALT) );
@@ -704,6 +703,18 @@ function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm)
     }
 }
 
+function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $forced=false) {
+    global $CFG;
+
+    $recordings = array();
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
+    
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+    
+}
+
 function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
     //$meeting_running = ( isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == 'true' );
     $meeting_running = ( isset($meeting_info) && isset($meeting_info->returncode) && $meeting_info->returncode == 'SUCCESS' );
@@ -758,6 +769,15 @@ function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=
     $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
     bigbluebuttonbn_doPublishRecordings($recordingid, ($publish)? 'true': 'false', $endpoint, $shared_secret);
+}
+
+function bigbluebuttonbn_bbb_broker_do_delete_recording($recordingid){
+    global $CFG;
+
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+    bigbluebuttonbn_doDeleteRecordings($recordingid, $endpoint, $shared_secret);
 }
 
 function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
@@ -828,7 +848,7 @@ function bigbluebuttonbn_get_predefinedprofile_display_array() {
 }
 
 function bigbluebuttonbn_get_recording_table($bbbsession) {
-    global $OUTPUT;
+    global $OUTPUT, $CFG;
 
     ///Set strings to show
     $view_head_recording = get_string('view_head_recording', 'bigbluebuttonbn');
@@ -843,6 +863,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
 
     ///Declare the table
     $table = new html_table();
+    $table->data = array();
 
     ///Initialize table headers
     if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
@@ -874,42 +895,77 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
                 $params['id'] = $bbbsession['cm']->id;
                 $params['recordingid'] = $recording['recordID'];
                 if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+                    $url = '#';
+                    $action = null;
+
                     ///Set action [show|hide]
                     if ( $recording['published'] == 'true' ){
-                        $params['action'] = 'hide';
+                        $manage_tag = 'hide';
+                        $manage_action = 'unpublish';
                     } else {
-                        $params['action'] = 'show';
+                        $manage_tag = 'show';
+                        $manage_action = 'publish';
                     }
 
-                    //$url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
-                    //$url = new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', $params);
-                    $url = null;
-                    $action = null;
-                    //$action = new component_action('click', 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'")', array());
-                    //With text
-                    //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action'] ) )  );
-                    //With icon
-                    //$attributes = array('title' => get_string($params['action']), 'onclick' => 'alert("'.$params['action'].'"); return;');
-                    $attributes = array('title' => get_string($params['action']), 'onclick' => 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'");');
-                    //$attributes = array('title' => get_string($params['action']));
-                    $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
-                    $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+                    if ($CFG->bigbluebuttonbn_recording_icons_enabled) {
+                        //With icon for publish/unpublish
+                        $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
+                        $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
+                        $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'");');
+                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
-                    ///Set action delete
-                    $params['action'] = 'delete';
+                        //With icon for delete
+                        $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
+                        $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
+                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");');
+                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
+
+                    } else {
+                        //With text for publish/unpublish
+                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'");') );
+                        $actionbar .= "&nbsp;";
+
+                        //With text for delete
+                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");') );
+                    }
+
+                    //$url = new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', $params);
+                    //$action = new component_action('click', 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'")', array());
+
                     //$url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
                     //$action = new component_action('click', 'M.util.show_confirm_dialog', array('message' => get_string('view_delete_confirmation', 'bigbluebuttonbn')));
                     //With text
-                    //$actionbar .= $OUTPUT->action_link(  $link, get_string( $params['action'] ), $action, array( 'title' => get_string($params['action']) )  );
                     //With icon
-                    $attributes = array('title' => get_string($params['action']));
-                    $attributes = array('title' => get_string($params['action']), 'onclick' => 'M.mod_bigbluebuttonbn.broker_deleteRecording("'.$params['action'].'", "'.$recording['recordID'].'"); return;');
-                    $icon = new pix_icon('t/'.$params['action'], get_string($params['action']), 'moodle', $attributes);
-                    $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+                    //$attributes = array('title' => get_string($params['action']));
 
-                    $attributes = array('title' => get_string($params['action']));
-                    $icon = new pix_icon('t/unlock', get_string($params['action']), 'moodle', $attributes);
-                    $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+                    
+                    
+                    //$attributes = array('title' => get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'));
+                    //$attributes = array();
+                    //$icon = new pix_icon('processing16', get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'), 'bigbluebuttonbn', array('id' => 'testXXX') );
+                    //$actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
+                    
+                    //$processing_url = new moodle_url('/mod/bigbluebuttonbn/pix/processing16.gif');
+                    //$attributes = array('title' => get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'), 'src' => $processing_url );
+                    //$actionbar .= '<a href="#" onclick="console.log(\'working\');">'.html_writer::empty_tag('img', $attributes).'</a>';
+                    
+                    /*
+                    $OUTPUT->pix_url('t/delete');
+                    
+                    html_writer::img(
+                            $value->imgsrc,
+                            $value->title,
+                            array('class' => 'iconsmall')
+                    ) . $value->title;
+                    */
+
+                    //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
+                    //action_icon
+                    //pix_icon
+                    //plugin_renderer_base
+                    //render_pix_icon
+                    //core_renderer::render_pix_icon()
+                    //core_renderer::render_pix_icon()
                 }
 
                 $type = '';
@@ -937,11 +993,16 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
                     $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
                 }
 
+                $row = new html_table_row();
+                $row->id = 'recording-td-'.$recording['recordID'];
                 if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
-                    $table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
+                    $row->cells = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
+                    //$table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
                 } else {
-                    $table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
+                    $row->cells = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
+                    //$table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
                 }
+                array_push($table->data, $row);
             }
         }
     }
