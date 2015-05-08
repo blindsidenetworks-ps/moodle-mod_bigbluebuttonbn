@@ -61,7 +61,7 @@ $bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
 $bbbsession['userID'] = $USER->id;
 $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 
-if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" ){
+if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "[]" ){
     //The room that is being used comes from a previous version
     $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 } else {
