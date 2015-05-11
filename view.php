@@ -74,7 +74,6 @@ $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
 $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 
 //Database info related to the activity
-$bbbsession['meetingname'] = $bigbluebuttonbn->name;
 $bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
@@ -175,13 +174,18 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
 echo $OUTPUT->header();
 
 /// find out current groups mode
-groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
 if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+    $bbbsession['meetingname'] = $bigbluebuttonbn->name;
 } else {                                        // Separate groups mode
     //If doesnt have group
     $bbbsession['group'] = (!$group)?groups_get_activity_group($cm): $group;
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+    if( $bbbsession['group'] > 0 )
+        $group_name = groups_get_group_name($bbbsession['group']);
+    else
+        $group_name = get_string('allparticipants');
+    $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';    
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
     echo $OUTPUT->box_end();
@@ -198,6 +202,7 @@ $now = time();
 if (!$bigbluebuttonbn->openingtime ) {
     if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
         //GO JOINING
+        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'join';
@@ -222,6 +227,7 @@ if (!$bigbluebuttonbn->openingtime ) {
 
 } else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
+    groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
