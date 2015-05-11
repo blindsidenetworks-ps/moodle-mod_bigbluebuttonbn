@@ -57,7 +57,7 @@ $bbbsession['userID'] = $USER->id;
 $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 
 //User roles
-if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" ){
+if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]" ){
     //The room that is being used comes from a previous version
     $bbbsession['moderator'] = has_capability('mod/bigbluebuttonbn:moderate', $context);
 } else {
