@@ -38,7 +38,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define each element separated
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
-            'name', 'moderatorpass', 'viewerpass', 'wait', 'newwindow', 'record', 'description', 'welcome', 'voicebridge', 'timedue', 'timeavailable', 'timeduration', 'meetingid', 'timemodified'));
+            'name', 'moderatorpass', 'viewerpass', 'wait', 'newwindow', 'record', 'description', 'welcome', 'voicebridge', 'timedue', 'timeavailable', 'timeduration', 'meetingid', 'timemodified', 'participants'));
 
         // Build the tree
         // (love this)
