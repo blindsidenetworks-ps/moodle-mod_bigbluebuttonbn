@@ -91,7 +91,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $roles = bigbluebuttonbn_get_roles();
         $users = bigbluebuttonbn_get_users($context);
 
-        $participant_list = bigbluebuttonbn_get_participant_list($bigbluebuttonbn != null? $bigbluebuttonbn: null);
+        $participant_list = bigbluebuttonbn_get_participant_list($bigbluebuttonbn != null? $bigbluebuttonbn: null, $context);
         $mform->addElement('hidden', 'participants', json_encode($participant_list));
         $mform->setType('participants', PARAM_TEXT);
         

@@ -374,8 +374,9 @@ function bigbluebuttonbn_get_users_json($context){
     return json_encode(bigbluebuttonbn_get_users($context));
 }
 
-function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
-    global $DB;
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=null){
+    global $USER;
+
     $participant_list_array = array();
     if( $bigbluebuttonbn != null ) {
         $participant_list = json_decode(htmlspecialchars_decode($bigbluebuttonbn->participants));
@@ -399,6 +400,21 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
                 )
         );
 
+        $users = bigbluebuttonbn_get_users($context);
+        foreach( $users as $user ){
+            if( $user['id'] == $USER->id ){
+                array_push($participant_list_array,
+                        array(
+                                "selectiontype" => "user",
+                                "selectionid" => $USER->id,
+                                "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
+                        )
+                );
+                break;
+            }
+        }
+
+        /*
         array_push($participant_list_array,
                 array(
                     "selectiontype" => "role",
@@ -406,6 +422,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null){
                     "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
                 )
         );
+        */
         
     }
     return $participant_list_array;
