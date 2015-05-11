@@ -106,7 +106,6 @@ $bbbsession['flag']['administrator'] = $administrator;
 $bbbsession['textflag']['administrator'] = $administrator? 'true': 'false';
 
 //Database info related to the activity
-$bbbsession['meetingname'] = $bigbluebuttonbn->name;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
@@ -189,13 +188,18 @@ echo $OUTPUT->header();
 
 $bbbsession['bigbluebuttonbnid'] = $bigbluebuttonbn->id;
 /// find out current groups mode
-groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
 if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+    $bbbsession['meetingname'] = $bigbluebuttonbn->name;
 } else {                                        // Separate groups mode
     //If doesnt have group
     $bbbsession['group'] = (!$group)?groups_get_activity_group($cm): $group;
     $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+    if( $bbbsession['group'] > 0 )
+        $group_name = groups_get_group_name($bbbsession['group']);
+    else
+        $group_name = get_string('allparticipants');
+    $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
 }
 
 if( $bbbsession['flag']['administrator'] || $bbbsession['flag']['moderator'] || $bbbsession['flag']['allmoderators'] )
@@ -209,9 +213,10 @@ $bigbluebuttonbn_view = '';
 if (!$bigbluebuttonbn->timeavailable ) {
     if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue){
         //GO JOINING
+        groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id);
         $bigbluebuttonbn_view = 'join';
         $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
-        
+
     } else {
         //CALLING AFTER
         $bigbluebuttonbn_view = 'after';
@@ -219,11 +224,10 @@ if (!$bigbluebuttonbn->timeavailable ) {
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
         bigbluebuttonbn_view_after( $bbbsession );
-        
+
         echo $OUTPUT->box_end();
-        
     }
-    
+
 } else if ( time() < $bigbluebuttonbn->timeavailable ){
     //CALLING BEFORE
     $bigbluebuttonbn_view = 'before';
@@ -231,14 +235,15 @@ if (!$bigbluebuttonbn->timeavailable ) {
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
     bigbluebuttonbn_view_before( $bbbsession );
-    
+
     echo $OUTPUT->box_end();
-    
+
 } else if (!$bigbluebuttonbn->timedue || time() <= $bigbluebuttonbn->timedue ) {
     //GO JOINING
+    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id);
     $bigbluebuttonbn_view = 'join';
     $joining = bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn );
-        
+
 } else {
     //CALLING AFTER
     $bigbluebuttonbn_view = 'after';
@@ -246,9 +251,8 @@ if (!$bigbluebuttonbn->timeavailable ) {
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
 
     bigbluebuttonbn_view_after( $bbbsession );
-        
+
     echo $OUTPUT->box_end();
-    
 }
 
 //JavaScript variables
@@ -338,7 +342,7 @@ function bigbluebuttonbn_view_joining( $bbbsession, $context, $bigbluebuttonbn )
             bigbluebuttonbn_log($bbbsession, 'Create');
 
             if ( groups_get_activity_groupmode($bbbsession['cm']) > 0 && count(groups_get_activity_allowed_groups($bbbsession['cm'])) > 1 ){
-                print "&nbsp;&nbsp;".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
+                print "<br>".get_string('view_groups_selection', 'bigbluebuttonbn' )."&nbsp;&nbsp;<input type='button' onClick='M.mod_bigbluebuttonbn.joinURL()' value='".get_string('view_groups_selection_join', 'bigbluebuttonbn' )."'>";
             } else {
                 $joining = true;
 
