@@ -128,7 +128,7 @@ if ($ADMIN->fulltree) {
             get_string('config_permission_description', 'bigbluebuttonbn')));
     // UI for 'permissions' feature
     $roles = bigbluebuttonbn_get_roles('all', 'array');
-    $owner = array('owneruser' => get_string('mod_form_field_participant_list_type_owner', "bigbluebuttonbn"));
+    $owner = array('owner' => get_string('mod_form_field_participant_list_type_owner', "bigbluebuttonbn"));
     $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
             get_string('config_permission_moderator_default', 'bigbluebuttonbn'),
             get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),
