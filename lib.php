@@ -83,7 +83,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
 
     $data->id = $data->instance;
     $cmid = $data->coursemodule;
-    $draftitemid = $data->presentation;
+    $draftitemid = isset($data->presentation)? $data->presentation: null;
     if ( $CFG->version < '2013111800' ) {
         //This is valid before v2.6
         $context = get_context_instance(CONTEXT_MODULE, $cmid);
