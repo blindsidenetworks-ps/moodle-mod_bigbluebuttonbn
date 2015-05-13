@@ -71,7 +71,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                     '  var bigbluebuttonbn_predefinedprofiles = '.$json_predefinedprofiles.';'.
                     '</script>'."\n";
             $mform->addElement('html', $html_predefinedprofiles);
-            $mform->addElement('select', 'predefinedprofile', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("onchange" => "bigbluebuttonbn_update_predefinedprofile(this);") );
+            $mform->addElement('select', 'type', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("id" => "id_predefinedprofile", "onchange" => "bigbluebuttonbn_update_predefinedprofile(this);") );
         }
 
         //-------------------------------------------------------------------------------
