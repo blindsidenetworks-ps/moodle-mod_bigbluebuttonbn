@@ -63,17 +63,19 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         $current_activity =& $this->current;
 
+        $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
+        $json_predefinedprofiles = json_encode($predefinedprofiles);
+        $html_predefinedprofiles = ''.
+                '<script type="text/javascript">'."\n".
+                '  var bigbluebuttonbn_predefinedprofiles = '.$json_predefinedprofiles.';'.
+                '</script>'."\n";
+        $mform->addElement('html', $html_predefinedprofiles);
+
         if( $predefinedprofile_enabled ) {
-            $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
-            $json_predefinedprofiles = json_encode($predefinedprofiles);
-            $html_predefinedprofiles = ''.
-                    '<script type="text/javascript">'."\n".
-                    '  var bigbluebuttonbn_predefinedprofiles = '.$json_predefinedprofiles.';'.
-                    '</script>'."\n";
-            $mform->addElement('html', $html_predefinedprofiles);
             $mform->addElement('select', 'type', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("id" => "id_predefinedprofile", "onchange" => "bigbluebuttonbn_update_predefinedprofile();") );
         } else {
             $mform->addElement('hidden', 'type', '0', array("id" => "id_predefinedprofile"));
+            $mform->setType('type', PARAM_INT);
         }
 
         //-------------------------------------------------------------------------------
@@ -121,6 +123,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->setAdvanced('wait');
         } else {
             $mform->addElement('hidden', 'wait', $waitformoderator_default );
+            $mform->setType('wait', PARAM_INT);
         }
             
         if ( floatval($serverVersion) >= 0.8 ) {

@@ -126,6 +126,11 @@ bigbluebuttonbn_select_add_option = function(id, text, value) {
 bigbluebuttonbn_update_predefinedprofile = function() {
 
     var selected_predefinedprofile = Y.one('#id_predefinedprofile option:checked');
+    if( selected_predefinedprofile == null) {
+        //The predefinedprofiles were not active, a value from the hidden input field will be used
+        selected_predefinedprofile = Y.one('#id_predefinedprofile');
+    }
+
     var features = bigbluebuttonbn_predefinedprofiles[selected_predefinedprofile.get('value')].features;
 
     // Schedule feature validation
