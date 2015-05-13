@@ -267,4 +267,10 @@ $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
 $string['event_recording_deleted'] = 'Recording deleted';
 
+$string['predefined_profile_default'] = 'Default';
+$string['predefined_profile_classroom'] = 'Classroom';
+$string['predefined_profile_conferenceroom'] = 'Conference room';
+$string['predefined_profile_collaborationroom'] = 'Collaboration room';
+$string['predefined_profile_scheduledsession'] = 'Scheduled session';
+
 ?>

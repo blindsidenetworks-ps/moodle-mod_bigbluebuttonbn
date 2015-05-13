@@ -825,11 +825,11 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg) {
 
 function bigbluebuttonbn_get_predefinedprofiles() {
     $predefinedprofiles = array(
-            array('id' => 1, 'name' => "Default", "features" => array("wait", "record", "presentation", "permission", "schedule", "groups") ),
-            array('id' => 2, 'name' => "Classroom", "features" => array("wait", "record", "presentation", "permission") ),
-            array('id' => 3, 'name' => "Conference room", "features" => array("wait", "record", "presentation", "permission") ),
-            array('id' => 4, 'name' => "Collaboration room", "features" => array("wait", "record", "presentation", "permission", "groups") ),
-            array('id' => 5, 'name' => "Session", "features" => array("wait", "record", "presentation", "permission", "schedule") )
+            array('id' => 0, 'name' => get_string('predefined_profile_default', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => true, 'groups' => true) ),
+            array('id' => 1, 'name' => get_string('predefined_profile_classroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => false) ),
+            array('id' => 2, 'name' => get_string('predefined_profile_conferenceroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => false) ),
+            array('id' => 3, 'name' => get_string('predefined_profile_collaborationroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => true) ),
+            array('id' => 4, 'name' => get_string('predefined_profile_scheduledsession', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => true, 'groups' => false) )
     );
 
     return $predefinedprofiles;
