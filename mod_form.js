@@ -123,7 +123,7 @@ bigbluebuttonbn_select_add_option = function(id, text, value) {
     select.add(option , 0);
 }
 
-bigbluebuttonbn_update_predefinedprofile = function(predefinedprofile) {
+bigbluebuttonbn_update_predefinedprofile = function() {
 
     var selected_predefinedprofile = Y.one('#id_predefinedprofile option:checked');
     var features = bigbluebuttonbn_predefinedprofiles[selected_predefinedprofile.get('value')].features;

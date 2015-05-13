@@ -65,13 +65,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if( $predefinedprofile_enabled ) {
             $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
-            $json_predefinedprofiles = json_encode(bigbluebuttonbn_get_predefinedprofiles());
+            $json_predefinedprofiles = json_encode($predefinedprofiles);
             $html_predefinedprofiles = ''.
                     '<script type="text/javascript">'."\n".
                     '  var bigbluebuttonbn_predefinedprofiles = '.$json_predefinedprofiles.';'.
                     '</script>'."\n";
             $mform->addElement('html', $html_predefinedprofiles);
-            $mform->addElement('select', 'type', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("id" => "id_predefinedprofile", "onchange" => "bigbluebuttonbn_update_predefinedprofile(this);") );
+            $mform->addElement('select', 'type', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("id" => "id_predefinedprofile", "onchange" => "bigbluebuttonbn_update_predefinedprofile();") );
+        } else {
+            $mform->addElement('hidden', 'type', '0', array("id" => "id_predefinedprofile"));
         }
 
         //-------------------------------------------------------------------------------
@@ -79,9 +81,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
 
-        $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"' );
+        $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"');
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule( 'name', null, 'required', null, 'client' );
+        $mform->addRule('name', null, 'required', null, 'client');
 
         $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         $mform->setAdvanced('introeditor');
@@ -94,7 +96,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setAdvanced('showdescription');
 
-        $mform->addElement( 'checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn') );
+        $mform->addElement('checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn'));
         $mform->setDefault( 'newwindow', 0 );
 
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
@@ -112,31 +114,31 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         if ( $waitformoderator_editable ) {
-            $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
+            $mform->addElement('checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn'));
             $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
             $mform->setType('wait', PARAM_INT);
             $mform->setDefault( 'wait', 1 );
             $mform->setAdvanced('wait');
         } else {
-            $mform->addElement( 'hidden', 'wait', $waitformoderator_default );
+            $mform->addElement('hidden', 'wait', $waitformoderator_default );
         }
             
         if ( floatval($serverVersion) >= 0.8 ) {
             if ( $recording_default_editable ) {
-                $mform->addElement( 'checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn') );
+                $mform->addElement('checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn'));
                 $mform->setDefault( 'record', $recording_default );
                 $mform->setAdvanced('record');
             } else {
-                $mform->addElement( 'hidden', 'record', $recording_default );
+                $mform->addElement('hidden', 'record', $recording_default);
             }
             $mform->setType('record', PARAM_INT);
 
             if ( $tagging_default_editable ) {
-                $mform->addElement( 'checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn') );
-                $mform->setDefault( 'record', $tagging_default );
+                $mform->addElement('checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn'));
+                $mform->setDefault('record', $tagging_default);
                 $mform->setAdvanced('tagging');
             } else {
-                $mform->addElement( 'hidden', 'tagging', $tagging_default );
+                $mform->addElement('hidden', 'tagging', $tagging_default );
             }
             $mform->setType('tagging', PARAM_INT);
         }
@@ -286,6 +288,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
+
+        $html_preload_predefinedprofiles = ''.
+                '<script type="text/javascript">'."\n".
+                '  bigbluebuttonbn_update_predefinedprofile();'.
+                '</script>'."\n";
+        $mform->addElement('html', $html_preload_predefinedprofiles);
     }
 
     function data_preprocessing(&$default_values) {
