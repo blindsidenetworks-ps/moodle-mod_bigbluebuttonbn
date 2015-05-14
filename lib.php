@@ -12,6 +12,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot.'/calendar/lib.php');
+require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
@@ -414,7 +415,12 @@ function bigbluebuttonbn_send_notification($bigbluebuttonbn) {
     foreach( $users as $user ) {
         error_log("Sending notification to ".$user->id);
         if( $user->id != $USER->id ){
-            message_post_message($user, $USER, 'Message 2', FORMAT_PLAIN);
+            $messageid = message_post_message($USER, $user, 'Message 2', FORMAT_MOODLE);
+            if (!empty($messageid)) {
+                error_log("Msg was sent ok".$messageid);
+            } else {
+                error_log("Msg was NOT really sent");
+            }
         }
     }
 }
