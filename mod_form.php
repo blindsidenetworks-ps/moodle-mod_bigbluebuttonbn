@@ -222,8 +222,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                     $participant_selectionid = bigbluebuttonbn_get_role_name($participant['selectionid']);
                 } else {
                     foreach($users as $user){
-                        if( $user["id"] == $participant['selectionid']) {
-                            $participant_selectionid = $user["name"];
+                        if( $user->id == $participant['selectionid']) {
+                            $participant_selectionid = $user->firstname.' '.$user->lastname;
                             break;
                         }
                     }
@@ -255,7 +255,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', $html_participant_selection);
 
         // Add data
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.json_encode($users).'}; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}; </script>');
         $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participant_list).'; </script>');
         $bigbluebuttonbn_strings = Array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
                                           "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),

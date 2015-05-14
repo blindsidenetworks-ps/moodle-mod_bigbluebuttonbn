@@ -1,3 +1,10 @@
+/**
+ * @package   mod_bigbluebuttonbn
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @copyright 2014-2015 Blindside Networks Inc.
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
+
 bigbluebuttonbn_participant_selection_set = function() {
     bigbluebuttonbn_select_clear('bigbluebuttonbn_participant_selection');
 

@@ -13,11 +13,6 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once(dirname(__FILE__).'/lib.php');
-require_once($CFG->dirroot.'/lib/accesslib.php');
-require_once($CFG->dirroot.'/lib/filelib.php');
-require_once($CFG->dirroot.'/lib/formslib.php');
-//require_once($CFG->libdir.'/accesslib.php');
-require_once($CFG->libdir.'/completionlib.php');
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
@@ -375,15 +370,6 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
     }
 }
 
-function bigbluebuttonbn_get_db_moodle_roles($rolename='all'){
-    global $DB;
-    if( $rolename != 'all')
-        $roles = $DB->get_record('role', array('shortname' => $rolename));
-    else
-        $roles = $DB->get_records('role', array());
-    return $roles;
-}
-
 function bigbluebuttonbn_get_role_name($role_shortname){
     $role = bigbluebuttonbn_get_db_moodle_roles($role_shortname);
     if( $role != null && $role->name != "") {
@@ -427,24 +413,20 @@ function bigbluebuttonbn_get_roles_json($rolename='all'){
     return json_encode(bigbluebuttonbn_get_roles($rolename));
 }
 
-function bigbluebuttonbn_get_users($context){
-    $roles = bigbluebuttonbn_get_db_moodle_roles();
-    $users_array = array();
-    foreach($roles as $role){
-        $users = get_role_users($role->id, $context);
+function bigbluebuttonbn_get_users_json($users, $full=false) {
+    if( $full ) {
+        return json_encode($users);
+    } else {
+        $users_array = array();
         foreach($users as $user){
             array_push($users_array,
                     array( "id" => $user->id,
-                        "name" => $user->firstname.' '.$user->lastname
+                            "name" => $user->firstname.' '.$user->lastname
                     )
             );
         }
+        return json_encode($users_array);
     }
-    return $users_array;
-}
-
-function bigbluebuttonbn_get_users_json($context){
-    return json_encode(bigbluebuttonbn_get_users($context));
 }
 
 function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=null){
@@ -484,7 +466,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=nu
             if( $moderator_default == 'owner' ) {
                 $users = bigbluebuttonbn_get_users($context);
                 foreach( $users as $user ){
-                    if( $user['id'] == $USER->id ){
+                    if( $user->id == $USER->id ){
                         array_push($participant_list_array,
                                 array(
                                         "selectiontype" => "user",

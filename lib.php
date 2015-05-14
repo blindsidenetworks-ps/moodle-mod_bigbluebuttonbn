@@ -12,6 +12,12 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot.'/calendar/lib.php');
+require_once($CFG->dirroot.'/lib/accesslib.php');
+require_once($CFG->dirroot.'/lib/filelib.php');
+require_once($CFG->dirroot.'/lib/formslib.php');
+//require_once($CFG->libdir.'/accesslib.php');
+require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->dirroot.'/mod/lti/OAuth.php');
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
@@ -43,13 +49,12 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($data, $mform) {
     global $DB, $CFG;
 
-    $cmid = $data->coursemodule;
     if ( $CFG->version < '2013111800' ) {
         //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $context = get_context_instance(CONTEXT_MODULE, $data->coursemodule);
     } else {
         //This is valid after v2.6
-        $context = context_module::instance($cmid);
+        $context = context_module::instance($data->coursemodule);
     }
 
     bigbluebuttonbn_process_pre_save($data);
@@ -82,16 +87,15 @@ function bigbluebuttonbn_update_instance($data, $mform) {
     global $DB, $CFG;
 
     $data->id = $data->instance;
-    $cmid = $data->coursemodule;
     $draftitemid = isset($data->presentation)? $data->presentation: null;
     if ( $CFG->version < '2013111800' ) {
         //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $context = get_context_instance(CONTEXT_MODULE, $data->coursemodule);
     } else {
         //This is valid after v2.6
-        $context = context_module::instance($cmid);
+        $context = context_module::instance($data->coursemodule);
     }
-    
+
     bigbluebuttonbn_process_pre_save($data);
 
     unset($data->presentation);
@@ -327,48 +331,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     return $info;
 }
 
-function xxx_get_coursemodule_info($coursemodule) {
-    global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/lti/locallib.php');
-
-    if (!$lti = $DB->get_record('lti', array('id' => $coursemodule->instance),
-            'icon, secureicon, intro, introformat, name, toolurl, launchcontainer')) {
-            return null;
-    }
-
-    $info = new cached_cm_info();
-
-    // We want to use the right icon based on whether the
-    // current page is being requested over http or https.
-    if (lti_request_is_using_ssl() && !empty($lti->secureicon)) {
-        $info->iconurl = new moodle_url($lti->secureicon);
-    } else if (!empty($lti->icon)) {
-        $info->iconurl = new moodle_url($lti->icon);
-    }
-
-    if ($coursemodule->showdescription) {
-        // Convert intro to html. Do not filter cached version, filters run at display time.
-        $info->content = format_module_intro('lti', $lti, $coursemodule->id, false);
-    }
-
-    // Does the link open in a new window?
-    $tool = lti_get_tool_by_url_match($lti->toolurl);
-    if ($tool) {
-        $toolconfig = lti_get_type_config($tool->id);
-    } else {
-        $toolconfig = array();
-    }
-    $launchcontainer = lti_get_launch_container($lti, $toolconfig);
-    if ($launchcontainer == LTI_LAUNCH_CONTAINER_WINDOW) {
-        $launchurl = new moodle_url('/mod/lti/launch.php', array('id' => $coursemodule->id));
-        $info->onclick = "window.open('" . $launchurl->out(false) . "', 'lti'); return false;";
-    }
-
-    $info->name = $lti->name;
-
-    return $info;
-}
-
 /**
  * Runs any processes that must run before
  * a bigbluebuttonbn insert/update
@@ -413,13 +375,14 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     global $DB, $CFG;
 
-    // Now that an id was assigned, generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret]
-    // But only on new activities
+    // Now that an id was assigned, generate and set the meetingid property based on 
+    // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
     if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
         $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
         $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
     }
 
+    // Add evento to the calendar (but if openingtime is set)
     if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
@@ -445,6 +408,32 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
 
     } else {
         $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id));
+    }
+
+    //Send notification to all users enrolled
+    $notify_participants = true;
+    if( $notify_participants ) {
+        bigbluebuttonbn_send_notification($bigbluebuttonbn);
+    }
+}
+
+function bigbluebuttonbn_send_notification($bigbluebuttonbn) {
+    global $CFG, $USER;
+
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
+    } else {
+        //This is valid after v2.6
+        $context = context_course::instance($bigbluebuttonbn->course);
+    }
+    
+    $users = bigbluebuttonbn_get_users($context);
+    foreach( $users as $user ) {
+        error_log("Sending notification to ".$user->id);
+        if( $user->id != $USER->id ){
+            message_post_message($user, $USER, 'Message 2', FORMAT_PLAIN);
+        }
     }
 }
 
@@ -564,5 +553,42 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
+
     return $areas;
+}
+
+/**
+ * Returns an array with all the roles contained in the database
+ *
+ * @package  mod_bigbluebuttonbn
+ * @return array a list of available roles
+ */
+function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
+    global $DB;
+
+    if( $rolename != 'all')
+        $roles = $DB->get_record('role', array('shortname' => $rolename));
+    else
+        $roles = $DB->get_records('role', array());
+
+    return $roles;
+}
+
+/**
+ * Returns an array with all the users enrolled in a given course
+ *
+ * @package  mod_bigbluebuttonbn
+ * @return array a list of enrolled users in the course
+ */
+function bigbluebuttonbn_get_users($context) {
+    $roles = bigbluebuttonbn_get_db_moodle_roles();
+    $users_array = array();
+    foreach($roles as $role){
+        $users = get_role_users($role->id, $context);
+        foreach($users as $user) {
+            array_push($users_array, $user);
+        }
+    }
+
+    return $users_array;
 }

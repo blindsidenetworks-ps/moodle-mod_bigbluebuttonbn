@@ -37,28 +37,8 @@ if ($params['bigbluebuttonbn']) {
 }
 
 $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
-
-/*
-
-//Execute actions if there is one and it is allowed
-if( isset($action) && isset($recordingid) && ($bbbsession['administrator'] || $bbbsession['moderator']) ){
-    if( $action == 'show' ) {
-        bigbluebuttonbn_doPublishRecordings($recordingid, 'true', $bbbsession['endpoint'], $bbbsession['shared_secret']);
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
-
-    } else if( $action == 'hide') {
-        bigbluebuttonbn_doPublishRecordings($recordingid, 'false', $bbbsession['endpoint'], $bbbsession['shared_secret']);
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
-
-    } else if( $action == 'delete') {
-        bigbluebuttonbn_doDeleteRecordings($recordingid, $bbbsession['endpoint'], $bbbsession['shared_secret']);
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
-    }
-}
-
- */
-
 //error_log($error);
+
 $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 if ( !isset($bbbsession) || is_null($bbbsession) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
@@ -149,7 +129,7 @@ if ( empty($error) ) {
                     break;
                 case 'delete':
                     error_log("Executing delete");
-                    //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
