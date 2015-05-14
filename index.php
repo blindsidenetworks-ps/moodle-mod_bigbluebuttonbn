@@ -23,13 +23,7 @@ if ($id) {
 
 require_login($course, true);
 
-if ( $CFG->version < '2013111800' ) {
-    //This is valid before v2.6
-    $context = get_context_instance(CONTEXT_COURSE, $course->id);;
-} else {
-    //This is valid after v2.6
-    $context = context_course::instance($course->id);
-}
+$context = bigbluebuttonbn_get_context_course($course->id);
 $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
 $administrator = has_capability('moodle/category:manage', $context);
 

@@ -31,13 +31,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
         }
 
-        if ( $CFG->version < '2013111800' ) {
-            //This is valid before v2.6
-            $context = get_context_instance(CONTEXT_COURSE, $course->id);
-        } else {
-            //This is valid after v2.6
-            $context = context_course::instance($course->id);
-        }
+        $context = bigbluebuttonbn_get_context_course($course->id);
 
         //BigBlueButton server data
         $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';

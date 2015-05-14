@@ -29,13 +29,7 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-if ( $CFG->version < '2013111800' ) {
-    //This is valid before v2.6
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-} else {
-    //This is valid after v2.6
-    $context = context_module::instance($cm->id);
-}
+$context = bigbluebuttonbn_get_context_module($cm->id);
 
 /// Print the page header
 $PAGE->set_context($context);

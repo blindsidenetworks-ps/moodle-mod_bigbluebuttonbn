@@ -49,13 +49,7 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($data, $mform) {
     global $DB, $CFG;
 
-    if ( $CFG->version < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $data->coursemodule);
-    } else {
-        //This is valid after v2.6
-        $context = context_module::instance($data->coursemodule);
-    }
+    $context = bigbluebuttonbn_get_context_module($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
 
@@ -88,13 +82,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
 
     $data->id = $data->instance;
     $draftitemid = isset($data->presentation)? $data->presentation: null;
-    if ( $CFG->version < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $data->coursemodule);
-    } else {
-        //This is valid after v2.6
-        $context = context_module::instance($data->coursemodule);
-    }
+    $context = bigbluebuttonbn_get_context_module($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
 
@@ -420,13 +408,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
 function bigbluebuttonbn_send_notification($bigbluebuttonbn) {
     global $CFG, $USER;
 
-    if ( $CFG->version < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_COURSE, $bigbluebuttonbn->course);
-    } else {
-        //This is valid after v2.6
-        $context = context_course::instance($bigbluebuttonbn->course);
-    }
+    $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
     
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
@@ -591,4 +573,32 @@ function bigbluebuttonbn_get_users($context) {
     }
 
     return $users_array;
+}
+
+function bigbluebuttonbn_get_context_module($id) {
+    global $CFG;
+
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_MODULE, $id);
+    } else {
+        //This is valid after v2.6
+        $context = context_module::instance($id);
+    }
+
+    return $context;
+}
+
+function bigbluebuttonbn_get_context_course($id) {
+    global $CFG;
+
+    if ( $CFG->version < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance(CONTEXT_COURSE, $id);
+    } else {
+        //This is valid after v2.6
+        $context = context_course::instance($id);
+    }
+
+    return $context;
 }

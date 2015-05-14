@@ -1,6 +1,6 @@
 <?php
 /**
- * Ping the BigBlueButton server to see if the meeting is running
+ * Intermediator for managing actions executed by the BigBlueButton server
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -24,14 +24,7 @@ if ($params['bigbluebuttonbn']) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-
-    if ( $CFG->version < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-    } else {
-        //This is valid after v2.6
-        $context = context_module::instance($cm->id);
-    }
+    $context = bigbluebuttonbn_get_context_module($cm->id);
 
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "BigBlueButtonBN ID was not included");
 }
