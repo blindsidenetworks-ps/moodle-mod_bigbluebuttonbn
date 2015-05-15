@@ -11,7 +11,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-global $PAGE, $USER;
+global $PAGE, $USER, $SESSION;
 
 $params['callback'] = required_param('callback', PARAM_TEXT);
 $params['action']  = required_param('action', PARAM_TEXT);
@@ -32,8 +32,9 @@ if ($params['bigbluebuttonbn']) {
 $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 //error_log($error);
 
-$bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-if ( !isset($bbbsession) || is_null($bbbsession) ) {
+if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+} else {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
 }
 //error_log($error);
