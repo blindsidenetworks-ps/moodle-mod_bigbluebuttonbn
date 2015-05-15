@@ -47,6 +47,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
         $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
         $predefinedprofile_enabled = $CFG->bigbluebuttonbn_predefinedprofile_enabled;
+        $sendnotifications_enabled = $CFG->bigbluebuttonbn_sendnotifications_enabled;
 
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
@@ -138,6 +139,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $mform->addElement('hidden', 'tagging', $tagging_default );
             }
             $mform->setType('tagging', PARAM_INT);
+        }
+        
+        if ( $sendnotifications_enabled ) {
+            $mform->addElement('checkbox', 'notification', get_string('mod_form_field_notification', 'bigbluebuttonbn'));
+            if ($this->current->instance) {
+                $mform->addHelpButton('notification', 'mod_form_field_notification', 'bigbluebuttonbn');
+            } else {
+                $mform->addHelpButton('notification', 'mod_form_field_notification', 'bigbluebuttonbn');
+            }
+            $mform->setDefault('notification', 0);
         }
         //-------------------------------------------------------------------------------
         // First block ends here

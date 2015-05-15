@@ -400,8 +400,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     }
 
     //Send notification to all users enrolled
-    $notify_participants = true;
-    if( $notify_participants ) {
+    $notification = $bigbluebuttonbn->notification;
+    if( $notification ) {
         bigbluebuttonbn_send_notification($bigbluebuttonbn);
     }
 }

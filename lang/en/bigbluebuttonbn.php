@@ -92,6 +92,11 @@ $string['config_scheduled_duration_compensation_description'] = 'Minutes added t
 $string['config_scheduled_pre_opening'] = 'Accessible before opening time (minutes)';
 $string['config_scheduled_pre_opening_description'] = 'The time in minutes for the session to be acceessible before the schedules opening time is due.';
 
+$string['config_feature_sendnotifications'] = 'Configuration for "Send notifications" feature';
+$string['config_feature_sendnotifications_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
+$string['config_feature_sendnotifications_enabled'] = 'Send notifications enabled';
+$string['config_feature_sendnotifications_enabled_description'] = 'Send notifications feature is enabled in the UI when the room or conference is added or updated.';
+
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
@@ -153,6 +158,14 @@ $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
 $string['mod_form_field_predefinedprofile'] = 'Predefined profile';
 $string['mod_form_field_predefinedprofile_help'] = 'Predefined profile';
+$string['mod_form_field_notification'] = 'Send notification';
+$string['mod_form_field_notification_help'] = 'Send a notification to users enrolled to let them know that this activity has been created or modified';
+$string['mod_form_field_notification_created_help'] = 'Send a notification to users enrolled to let them know that this activity has been created';
+$string['mod_form_field_notification_modified_help'] = 'Send a notification to users enrolled to let them know that this activity has been modified';
+$string['mod_form_field_notification_msg_created'] = 'created';
+$string['mod_form_field_notification_msg_modified'] = 'modified';
+
+
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
