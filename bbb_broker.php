@@ -11,33 +11,34 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-global $PAGE, $USER, $SESSION;
+global $PAGE, $USER, $CFG, $SESSION;
 
-$params['callback'] = required_param('callback', PARAM_TEXT);
-$params['action']  = required_param('action', PARAM_TEXT);
-$params['id'] = required_param('id', PARAM_TEXT);
-$params['bigbluebuttonbn'] = required_param('bigbluebuttonbn', PARAM_INT);
+$params['callback'] = optional_param('callback', '', PARAM_TEXT);
+$params['action']  = optional_param('action', '', PARAM_TEXT);
+$params['id'] = optional_param('id', '', PARAM_TEXT);
+$params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
+$params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
 $error = '';
-
 if ($params['bigbluebuttonbn']) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     $context = bigbluebuttonbn_get_context_module($cm->id);
 
+} else {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "BigBlueButtonBN ID was not included");
 }
 
 $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
-//error_log($error);
 
 if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+
 } else {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
 }
-//error_log($error);
+
 header('Content-Type: application/json; charset=utf-8');
 if ( empty($error) ) {
 
@@ -126,6 +127,10 @@ if ( empty($error) ) {
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
+                    break;
+                case 'recording_ready':
+                    $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
+                    error_log($decoded_parameters);
                     break;
                 case 'moodle_notify':
                     break;

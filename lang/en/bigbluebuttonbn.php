@@ -286,4 +286,25 @@ $string['predefined_profile_conferenceroom'] = 'Conference room';
 $string['predefined_profile_collaborationroom'] = 'Collaboration room';
 $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
+
+$string['notification_email_title'] = '{0} has been {1}';
+$string['notification_email_body'] = '<p>A {0} has been {1}.</p>';
+$string['notification_email_body_meeting_details'] = '<p><b>{0} Details:</b>'.
+        '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
+        '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>'.
+        '{2}. </td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">Description: </td><td>'.
+        '{3}. </td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">Start date: </td><td>'.
+        '{4}. </td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">End date: </td><td>'.
+        '{5}. </td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">Created by: </td><td>'.
+        '{6}. </td></tr>'.
+        '</tbody></table>'.
+        '</p>';
+$string['notification_email_footer'] = '<p><hr/><br/>'.
+        'This automatic notification message was sent by {0} ({1}) '.
+        'from the course {2}.</p>';
+
 ?>

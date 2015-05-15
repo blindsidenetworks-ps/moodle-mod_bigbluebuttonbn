@@ -94,11 +94,6 @@ $bbbsession['coursename'] = $course->fullname;
 $bbbsession['courseid'] = $course->id;
 $bbbsession['cm'] = $cm;
 
-//Operation URLs
-$bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
-//$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
-$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.'&bn='.$bbbsession['bigbluebuttonbnid'];
-
 //Metadata
 $bbbsession['origin'] = "Moodle";
 $bbbsession['originVersion'] = $CFG->release;
@@ -191,7 +186,13 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
     echo $OUTPUT->box_end();
 }
 
+//Operation URLs
+$bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
+$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.'&bn='.$bbbsession['bigbluebuttonbnid'];
+//$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready&id='.$bbbsession['meetingid'].'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
+$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready';
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
+
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);

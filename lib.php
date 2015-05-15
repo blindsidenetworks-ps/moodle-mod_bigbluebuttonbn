@@ -16,9 +16,10 @@ require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
-//require_once($CFG->libdir.'/accesslib.php');
+require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->dirroot.'/mod/lti/OAuth.php');
+require_once(dirname(__FILE__).'/JWT.php');
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
@@ -400,8 +401,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     }
 
     //Send notification to all users enrolled
-    $notification = $bigbluebuttonbn->notification;
-    if( $notification ) {
+    if( isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification ) {
         bigbluebuttonbn_send_notification($bigbluebuttonbn);
     }
 }
@@ -417,9 +417,9 @@ function bigbluebuttonbn_send_notification($bigbluebuttonbn) {
         if( $user->id != $USER->id ){
             $messageid = message_post_message($USER, $user, 'Message 2', FORMAT_MOODLE);
             if (!empty($messageid)) {
-                error_log("Msg was sent ok".$messageid);
+                error_log("Msg was sent ok. (".$messageid.")");
             } else {
-                error_log("Msg was NOT really sent");
+                error_log("Msg was NOT really sent.");
             }
         }
     }

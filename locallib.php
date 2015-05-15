@@ -577,7 +577,7 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
 function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
     global $CFG;
 
-    $dureation = 0;
+    $duration = 0;
     $now = time();
     if( $closingtime > 0 && $now < $closingtime ) {
         $duration = ceil(($closingtime - $now)/60);
@@ -778,17 +778,18 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
         $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'Action parameter must be included.');
     } else {
         switch ( strtolower($params['action']) ){
-            case 'ping':
-            case 'info':
-            case 'end':
+            case 'server_ping':
+            case 'meeting_info':
+            case 'meeting_end':
                 if ( !isset($params['id']) ) {
                     $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'The meetingID must be specified.');
                 }
                 break;
-            case 'recordings':
-            case 'publish':
-            case 'unpublish':
-            case 'delete':
+            case 'recording_list':
+            case 'rcording_publish':
+            case 'recording_unpublish':
+            case 'recording_delete':
+            case 'recording_ready':
                 if ( !isset($params['id']) ) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The recordingID must be specified.');
                 }
