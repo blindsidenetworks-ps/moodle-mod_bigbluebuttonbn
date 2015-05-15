@@ -28,6 +28,10 @@ const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
 const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
 
+const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = "Create";
+const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = "Join";
+const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";
+
 function bigbluebuttonbn_log(array $bbbsession, $event) {
     global $DB;
 
@@ -36,13 +40,15 @@ function bigbluebuttonbn_log(array $bbbsession, $event) {
     $log->meetingid = $bbbsession['meetingid'];
     $log->courseid = $bbbsession['courseid']; 
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
-    $log->record = $bbbsession['record']? 1: 0;
+    $log->userid = $bbbsession['userID'];
     $log->timecreated = time();
     $log->event = $event;
-    
+    if( $event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE)
+        $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
+
     $returnid = $DB->insert_record('bigbluebuttonbn_log', $log);
-    
 }
+
  ////////////////////////////
 //  BigBlueButton API Calls  //
  ////////////////////////////
@@ -645,7 +651,7 @@ function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm)
 
     if ( $CFG->version < '2014051200' ) {
         //This is valid before v2.7
-        add_to_log($course->id, 'bigbluebuttonbn', BIGBLUEBUTTON_EVENT_MEETING_JOINED, '', $bigbluebuttonbn->name, $cm->id);
+        add_to_log($course->id, 'bigbluebuttonbn', $event_type, '', $bigbluebuttonbn->name, $cm->id);
     } else {
         //This is valid after v2.7
         $context = context_module::instance($cm->id);
@@ -694,7 +700,6 @@ function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $force
     $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
     
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
-    
 }
 
 function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {

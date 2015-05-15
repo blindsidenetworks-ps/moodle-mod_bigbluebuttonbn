@@ -30,7 +30,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
     } else if (bigbluebuttonbn.action == 'after') {
     } else if (bigbluebuttonbn.action == 'join') {
         bigbluebuttonbn_dataSource.sendRequest({
-            request : 'action=info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+            request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
                 success : function(e) {
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
@@ -200,7 +200,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
 
     /// Start the ping
     bigbluebuttonbn_ping_interval_id = bigbluebuttonbn_dataSource.setInterval(bigbluebuttonbn.ping_interval, {
-        request : "action=info&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+        request : "action=meeting_info&id=" + bigbluebuttonbn.meetingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
         callback : {
             success : function(e) {
                 if (e.data.running) {
@@ -228,7 +228,7 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
     console.info('Action: ' + action);
     var id = bigbluebuttonbn_dataSource.sendRequest({
-        request : "action=" + action + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+        request : "action=recording_" + action + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
         callback : {
             success : function(e) {
                 if( action == 'delete') {
@@ -260,7 +260,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
 M.mod_bigbluebuttonbn.broker_endMeeting = function() {
     console.info('End Meeting');
     var id = bigbluebuttonbn_dataSource.sendRequest({
-        request : 'action=end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+        request : 'action=meeting_end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
         callback : {
             success : function(e) {
                 if (e.data.status) {

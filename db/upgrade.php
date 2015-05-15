@@ -110,8 +110,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030225) {
-        error_log('Update 2015030211 starts');
+    if ($result && $oldversion < 2015030255) {
+        error_log('Update 2015030252 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
         //// Drop field timeduration
@@ -172,13 +172,37 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
+
+        // Update the bigbluebuttonbn_log table
+        $table = new xmldb_table('bigbluebuttonbn_log');
+        //// Add field userid
+        $field = new xmldb_field('userid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'bigbluebuttonbnid');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field meta
+        $field = new xmldb_field('meta');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'event');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Drop field recording
+        $field = new xmldb_field('record');
+        if( $dbman->field_exists($table, $field) ) {
+            //// Migrate data in field recording to new format in meta
+            $sql = "UPDATE {bigbluebuttonbn_log} SET meta=CONCAT('{\"record\":', IF(record, 'true', 'false'), '}') WHERE event=?";
+            $DB->execute($sql, array('event' => 'Create'));
+            //// Drop field recording
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
         
         // Migrate existing CFG values and add default values to the new ones
-        global $settings;
-        error_log('\$settings: '.print_r(json_encode($settings), true));
+        //global $settings;
+        //error_log('\$settings: '.print_r(json_encode($settings), true));
 
         // Update version
-        //upgrade_mod_savepoint(true, 2015030215, 'bigbluebuttonbn');
+        //upgrade_mod_savepoint(true, 2015030238, 'bigbluebuttonbn');
     }
     /*
     if ($result && $oldversion < 2014070403) {

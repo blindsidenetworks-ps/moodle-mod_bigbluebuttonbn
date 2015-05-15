@@ -53,14 +53,14 @@ if ( empty($error) ) {
         try {
             switch ( strtolower($params['action']) ){
                 /*
-                case 'ping':
+                case 'server_ping':
                     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').' });';
 
                     break;
                 */
-                case 'info':
+                case 'meeting_info':
                     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
 
@@ -91,7 +91,7 @@ if ( empty($error) ) {
                     }
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.'"message": "'.$initial_message.'"} });';
                     break;
-                case 'end':
+                case 'meeting_end':
                     error_log("Executing end meeting");
                     if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                         //Execute the end command
@@ -106,25 +106,29 @@ if ( empty($error) ) {
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
-                case 'recordings':
+                case 'recording_list':
                     break;
-                case 'publish':
+                case 'recording_publish':
                     error_log("Executing publish");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
-                case 'unpublish':
+                case 'recording_unpublish':
                     error_log("Executing unpublish");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
-                case 'delete':
+                case 'recording_delete':
                     error_log("Executing delete");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
+                    break;
+                case 'moodle_notify':
+                    break;
+                case 'moodle_event':
                     break;
             }
 
