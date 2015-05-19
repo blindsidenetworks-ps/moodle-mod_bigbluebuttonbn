@@ -370,6 +370,9 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
         $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
         $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
+        $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
+    } else {
+        $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
     }
 
     // Add evento to the calendar (but if openingtime is set)
@@ -400,28 +403,33 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id));
     }
 
-    //Send notification to all users enrolled
     if( isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification ) {
-        bigbluebuttonbn_send_notification($bigbluebuttonbn);
-    }
-}
-
-function bigbluebuttonbn_send_notification($bigbluebuttonbn) {
-    global $CFG, $USER;
-
-    $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
-    
-    $users = bigbluebuttonbn_get_users($context);
-    foreach( $users as $user ) {
-        error_log("Sending notification to ".$user->id);
-        if( $user->id != $USER->id ){
-            $messageid = message_post_message($USER, $user, 'Message 2', FORMAT_MOODLE);
-            if (!empty($messageid)) {
-                error_log("Msg was sent ok. (".$messageid.")");
-            } else {
-                error_log("Msg was NOT really sent.");
-            }
+        // Prepare message
+        $msg = new stdClass();
+        $msg->action = $action;
+        $msg->activity_type = $bigbluebuttonbn->type;
+        $msg->activity_title = $bigbluebuttonbn->name;
+        $msg->activity_description = trim($bigbluebuttonbn->intro);
+        $msg->activity_openingtime = "";
+        if ($bigbluebuttonbn->openingtime) {
+            //$date = usergetdate($bigbluebuttonbn->openingtime);
+            //list($d, $m, $y) = array($date['mday'], $date['mon'], $date['year']);
+            //$msg->activity_openingtime = userdate(make_timestamp($y, $m), "Current user time");
+            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime);
         }
+        $msg->activity_closingtime = "";
+        if ($bigbluebuttonbn->closingtime ) {
+            //$date = usergetdate($bigbluebuttonbn->closingtime);
+            //list($d, $m, $y) = array($date['mday'], $date['mon'], $date['year']);
+            //$msg->activity_closingtime = userdate(make_timestamp($y, $m), "Current user time");
+            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime);
+        }
+        $msg->activity_owner = "##Activity Owner##";
+
+        $message_text = get_string('notification_email_body', 'bigbluebuttonbn', $msg);
+        $message_text .= get_string('notification_email_body_meeting_details', 'bigbluebuttonbn', $msg);
+        // Send notification to all users enrolled
+        bigbluebuttonbn_send_notification($bigbluebuttonbn, $message_text);
     }
 }
 
@@ -569,16 +577,47 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
  * @return array a list of enrolled users in the course
  */
 function bigbluebuttonbn_get_users($context) {
+    global $DB;
+
     $roles = bigbluebuttonbn_get_db_moodle_roles();
-    $users_array = array();
+    $sqluserids = array();
     foreach($roles as $role){
         $users = get_role_users($role->id, $context);
         foreach($users as $user) {
-            array_push($users_array, $user);
+            array_push($sqluserids, $user->id);
         }
     }
+    $users_array = $DB->get_records_select("user", "id IN (" . implode(', ', $sqluserids) . ") AND deleted = 0");
 
     return $users_array;
+}
+
+function bigbluebuttonbn_send_notification($bigbluebuttonbn, $message="") {
+    global $CFG, $DB, $USER;
+
+    $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+
+    //Complete message
+    $msg = new stdClass();
+    $msg->user_name = $USER->firstname.' '.$USER->lastname;
+    $msg->user_email = $USER->email;
+    $msg->course_name = "$course->fullname";
+    $message .= get_string('notification_email_footer', 'bigbluebuttonbn', $msg);
+
+    $users = bigbluebuttonbn_get_users($context);
+    foreach( $users as $user ) {
+        //error_log("Sending notification from ".json_encode($USER)." to ".json_encode($user));
+        //error_log("Sending notification from ".$USER->id." to ".$user->id);
+        if( $user->id != $USER->id ){
+            $messageid = message_post_message($USER, $user, $message, FORMAT_MOODLE);
+            if (!empty($messageid)) {
+                error_log("Msg was sent ok. (".$messageid.")");
+            } else {
+                error_log("Msg was NOT really sent.");
+            }
+        }
+    }
 }
 
 function bigbluebuttonbn_get_context_module($id) {

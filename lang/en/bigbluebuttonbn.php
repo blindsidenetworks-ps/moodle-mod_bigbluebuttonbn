@@ -287,24 +287,28 @@ $string['predefined_profile_collaborationroom'] = 'Collaboration room';
 $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 
-$string['notification_email_title'] = '{0} has been {1}';
-$string['notification_email_body'] = '<p>A {0} has been {1}.</p>';
-$string['notification_email_body_meeting_details'] = '<p><b>{0} Details:</b>'.
+$string['notification_email_title'] = '{$a->activity_type} has been {$a->action}';
+$string['notification_email_body'] = '<p>{$a->activity_type} {$a->activity_title} has been {$a->action}.</p>';
+$string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title} Details:</b>'.
         '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
         '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>'.
-        '{2}. </td></tr>'.
+        '{$a->activity_title}.</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">Description: </td><td>'.
-        '{3}. </td></tr>'.
+        '{$a->activity_description}.</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">Start date: </td><td>'.
-        '{4}. </td></tr>'.
+        '{$a->activity_openingtime}.</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">End date: </td><td>'.
-        '{5}. </td></tr>'.
+        '{$a->activity_closingtime}.</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">Created by: </td><td>'.
-        '{6}. </td></tr>'.
+        '{$a->activity_owner}.</td></tr>'.
         '</tbody></table>'.
         '</p>';
 $string['notification_email_footer'] = '<p><hr/><br/>'.
-        'This automatic notification message was sent by {0} ({1}) '.
-        'from the course {2}.</p>';
+        'This automatic notification message was sent by {$a->user_name} ({$a->user_email}) '.
+        'from the course {$a->course_name}.</p>';
+
+$string['notification_email_test0'] = '<p>Hello world</p><br/>';
+$string['notification_email_test1'] = '<p>Hello world {$a}</p><br/>';
+$string['notification_email_test2'] = '<p>Hello world {$a->txt}</p><br/>';
 
 ?>
