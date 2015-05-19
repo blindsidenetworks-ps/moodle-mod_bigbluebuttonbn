@@ -288,7 +288,7 @@ $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 
 $string['notification_email_title'] = '{$a->activity_type} has been {$a->action}';
-$string['notification_email_body'] = '<p>{$a->activity_type} {$a->activity_title} has been {$a->action}.</p>';
+$string['notification_email_body'] = '<p>{$a->activity_type} "{$a->activity_title}" has been {$a->action}.</p>';
 $string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title} Details:</b>'.
         '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
         '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>'.

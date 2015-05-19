@@ -407,7 +407,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         // Prepare message
         $msg = new stdClass();
         $msg->action = $action;
-        $msg->activity_type = $bigbluebuttonbn->type;
+        if( $bigbluebuttonbn->type != 0 )
+            $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
         $msg->activity_title = $bigbluebuttonbn->name;
         $msg->activity_description = trim($bigbluebuttonbn->intro);
         $msg->activity_openingtime = "";
