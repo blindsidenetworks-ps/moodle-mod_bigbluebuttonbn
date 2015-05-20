@@ -789,9 +789,13 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
             case 'recording_publish':
             case 'recording_unpublish':
             case 'recording_delete':
-            case 'recording_ready':
                 if ( !isset($params['id']) ) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The recordingID must be specified.');
+                }
+                break;
+            case 'recording_ready':
+                if( empty($params['signed_parameters']) ) {
+                    $error = bigbluebuttonbn_bbb_broker_add_error($error, 'A JWT encoded string must be included as [signed_parameters].');
                 }
                 break;
             default:
@@ -802,11 +806,14 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
     return $error;
 }
 
-function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg) {
+function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     $error = $org_msg;
 
-    if( !empty($error) ) $error .= ' ';
-    $error .= $new_msg;
+    if( !empty($new_msg) ) {
+        error_log($new_msg);
+        if( !empty($error) ) $error .= ' ';
+        $error .= $new_msg;
+    }
 
     return $error;
 }
@@ -929,44 +936,6 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
                         //With text for delete
                         $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");') );
                     }
-
-                    //$url = new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', $params);
-                    //$action = new component_action('click', 'M.mod_bigbluebuttonbn.broker_publishRecording("'.$params['action'].'", "'.$recording['recordID'].'")', array());
-
-                    //$url = new moodle_url('/mod/bigbluebuttonbn/view.php', $params);
-                    //$action = new component_action('click', 'M.util.show_confirm_dialog', array('message' => get_string('view_delete_confirmation', 'bigbluebuttonbn')));
-                    //With text
-                    //With icon
-                    //$attributes = array('title' => get_string($params['action']));
-
-                    
-                    
-                    //$attributes = array('title' => get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'));
-                    //$attributes = array();
-                    //$icon = new pix_icon('processing16', get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'), 'bigbluebuttonbn', array('id' => 'testXXX') );
-                    //$actionbar .= $OUTPUT->action_icon($url, $icon, $action, $attributes, false);
-                    
-                    //$processing_url = new moodle_url('/mod/bigbluebuttonbn/pix/processing16.gif');
-                    //$attributes = array('title' => get_string('view_recording_list_actionbar_processing', 'bigbluebuttonbn'), 'src' => $processing_url );
-                    //$actionbar .= '<a href="#" onclick="console.log(\'working\');">'.html_writer::empty_tag('img', $attributes).'</a>';
-                    
-                    /*
-                    $OUTPUT->pix_url('t/delete');
-                    
-                    html_writer::img(
-                            $value->imgsrc,
-                            $value->title,
-                            array('class' => 'iconsmall')
-                    ) . $value->title;
-                    */
-
-                    //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
-                    //action_icon
-                    //pix_icon
-                    //plugin_renderer_base
-                    //render_pix_icon
-                    //core_renderer::render_pix_icon()
-                    //core_renderer::render_pix_icon()
                 }
 
                 $type = '';
@@ -1009,4 +978,8 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
     }
 
     return $table;
+}
+
+function bigbluebuttonbn_send_notification_recording_ready($meetingID) {
+    error_log("Processing message for ".$meetingID);
 }

@@ -13,30 +13,34 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 global $PAGE, $USER, $CFG, $SESSION;
 
-$params['callback'] = optional_param('callback', '', PARAM_TEXT);
 $params['action']  = optional_param('action', '', PARAM_TEXT);
+$params['callback'] = optional_param('callback', '', PARAM_TEXT);
 $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
-$error = '';
-if ($params['bigbluebuttonbn']) {
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-    $context = bigbluebuttonbn_get_context_module($cm->id);
+error_log('PROCESSING REQUESTO TO BBB_BROKER');
+if( empty($params['action']) ) {
+    $error = bigbluebuttonbn_bbb_broker_add_error($error, "Parameter [action] was not included");
 
 } else {
-    $error = bigbluebuttonbn_bbb_broker_add_error($error, "BigBlueButtonBN ID was not included");
-}
+    $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 
-$error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
+    if( empty($error) && $params['action'] != "recording_ready" ) {
 
-if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+        if ($params['bigbluebuttonbn']) {
+            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
+            $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+            $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+            $context = bigbluebuttonbn_get_context_module($cm->id);
+        }
 
-} else {
-    $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
+        if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
+            $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+        } else {
+            $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
+        }
+    }
 }
 
 header('Content-Type: application/json; charset=utf-8');
@@ -130,7 +134,9 @@ if ( empty($error) ) {
                     break;
                 case 'recording_ready':
                     $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
-                    error_log($decoded_parameters);
+                    error_log("RECORDING_READY");
+                    error_log(json_encode($decoded_parameters));
+                    bigbluebuttonbn_send_notification_recording_ready($decoded_parameters->meeting_id);
                     break;
                 case 'moodle_notify':
                     break;
@@ -139,7 +145,7 @@ if ( empty($error) ) {
             }
 
         } catch(Exception $e) {
-            error_log("ERROR: ".$e->getCode().", ".$e->getMessage());
+            error_log("BBB_BROKER ERROR: ".$e->getCode().", ".$e->getMessage());
             header("HTTP/1.0 502 Bad Gateway. ".$e->getMessage());
         }
     }
