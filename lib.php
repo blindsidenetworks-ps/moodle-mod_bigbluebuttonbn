@@ -363,7 +363,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
-    global $DB, $CFG;
+    global $DB, $CFG, $USER;
 
     // Now that an id was assigned, generate and set the meetingid property based on 
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
@@ -406,29 +406,30 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     if( isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification ) {
         // Prepare message
         $msg = new stdClass();
+
+        /// Build the message_body
         $msg->action = $action;
         $msg->activity_type = "";
         if( $bigbluebuttonbn->type != 0 )
             $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
         $msg->activity_title = $bigbluebuttonbn->name;
-        $msg->activity_description = trim($bigbluebuttonbn->intro);
+        $message_text = get_string('notification_email_body', 'bigbluebuttonbn', $msg);
+
+        /// Add the meeting details to the message_body
+        $msg->action = ucfirst($action);
+        $msg->activity_description = "";
+        if( !empty($bigbluebuttonbn->intro) )
+            $msg->activity_description = trim($bigbluebuttonbn->intro);
         $msg->activity_openingtime = "";
         if ($bigbluebuttonbn->openingtime) {
-            //$date = usergetdate($bigbluebuttonbn->openingtime);
-            //list($d, $m, $y) = array($date['mday'], $date['mon'], $date['year']);
-            //$msg->activity_openingtime = userdate(make_timestamp($y, $m), "Current user time");
-            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime);
+            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' at '.calendar_time_representation($bigbluebuttonbn->openingtime);
         }
         $msg->activity_closingtime = "";
         if ($bigbluebuttonbn->closingtime ) {
-            //$date = usergetdate($bigbluebuttonbn->closingtime);
-            //list($d, $m, $y) = array($date['mday'], $date['mon'], $date['year']);
-            //$msg->activity_closingtime = userdate(make_timestamp($y, $m), "Current user time");
-            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime);
+            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' at '.calendar_time_representation($bigbluebuttonbn->closingtime);
         }
-        $msg->activity_owner = "##Activity Owner##";
+        $msg->activity_owner = $USER->firstname.' '.$USER->lastname;
 
-        $message_text = get_string('notification_email_body', 'bigbluebuttonbn', $msg);
         $message_text .= get_string('notification_email_body_meeting_details', 'bigbluebuttonbn', $msg);
         // Send notification to all users enrolled
         bigbluebuttonbn_send_notification($bigbluebuttonbn, $message_text);
@@ -612,7 +613,7 @@ function bigbluebuttonbn_send_notification($bigbluebuttonbn, $message="") {
         //error_log("Sending notification from ".json_encode($USER)." to ".json_encode($user));
         //error_log("Sending notification from ".$USER->id." to ".$user->id);
         if( $user->id != $USER->id ){
-            $messageid = message_post_message($USER, $user, $message, FORMAT_MOODLE);
+            $messageid = message_post_message($USER, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
                 error_log("Msg was sent ok. (".$messageid.")");
             } else {

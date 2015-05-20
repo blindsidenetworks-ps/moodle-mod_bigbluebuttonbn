@@ -289,18 +289,18 @@ $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 $string['notification_email_title'] = '{$a->activity_type} has been {$a->action}';
 $string['notification_email_body'] = '<p>{$a->activity_type} &quot;{$a->activity_title}&quot; has been {$a->action}.</p>';
-$string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title} Details:</b>'.
+$string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title}</b> Details:'.
         '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
         '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>'.
-        '{$a->activity_title}.</td></tr>'.
+        '{$a->activity_title}</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">Description: </td><td>'.
-        '{$a->activity_description}.</td></tr>'.
+        '{$a->activity_description}</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">Start date: </td><td>'.
-        '{$a->activity_openingtime}.</td></tr>'.
+        '{$a->activity_openingtime}</td></tr>'.
         '<tr><td style="font-weight:bold;color:#555;">End date: </td><td>'.
-        '{$a->activity_closingtime}.</td></tr>'.
-        '<tr><td style="font-weight:bold;color:#555;">Created by: </td><td>'.
-        '{$a->activity_owner}.</td></tr>'.
+        '{$a->activity_closingtime}</td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">{$a->action} by: </td><td>'.
+        '{$a->activity_owner}</td></tr>'.
         '</tbody></table>'.
         '</p>';
 $string['notification_email_footer'] = '<p><hr/><br/>'.
