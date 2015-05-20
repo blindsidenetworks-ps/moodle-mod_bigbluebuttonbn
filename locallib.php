@@ -980,6 +980,13 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
     return $table;
 }
 
-function bigbluebuttonbn_send_notification_recording_ready($meetingID) {
-    error_log("Processing message for ".$meetingID);
+function bigbluebuttonbn_send_notification_recording_ready($meeting_id) {
+    global $DB;
+
+    $meeting_id_elements = explode("[", $meeting_id);
+    $meeting_id_elements = explode("-", $meeting_id_elements[0]);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
+    $sender = get_admin();
+
+    bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, "Recording is ready");
 }

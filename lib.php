@@ -16,9 +16,10 @@ require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
+require_once($CFG->dirroot.'/mod/lti/OAuth.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->dirroot.'/mod/lti/OAuth.php');
+require_once($CFG->libdir.'/datalib.php');
 require_once(dirname(__FILE__).'/JWT.php');
 
 function bigbluebuttonbn_supports($feature) {
@@ -432,7 +433,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
 
         $message_text .= get_string('notification_email_body_meeting_details', 'bigbluebuttonbn', $msg);
         // Send notification to all users enrolled
-        bigbluebuttonbn_send_notification($bigbluebuttonbn, $message_text);
+        bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
     }
 }
 
@@ -595,25 +596,23 @@ function bigbluebuttonbn_get_users($context) {
     return $users_array;
 }
 
-function bigbluebuttonbn_send_notification($bigbluebuttonbn, $message="") {
-    global $CFG, $DB, $USER;
+function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="") {
+    global $CFG, $DB;
 
     $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
 
     //Complete message
     $msg = new stdClass();
-    $msg->user_name = $USER->firstname.' '.$USER->lastname;
-    $msg->user_email = $USER->email;
+    $msg->user_name = $sender->firstname.' '.$sender->lastname;
+    $msg->user_email = $sender->email;
     $msg->course_name = "$course->fullname";
     $message .= get_string('notification_email_footer', 'bigbluebuttonbn', $msg);
 
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
-        //error_log("Sending notification from ".json_encode($USER)." to ".json_encode($user));
-        //error_log("Sending notification from ".$USER->id." to ".$user->id);
-        if( $user->id != $USER->id ){
-            $messageid = message_post_message($USER, $user, $message, FORMAT_HTML);
+        if( $user->id != $sender->id ){
+            $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
                 error_log("Msg was sent ok. (".$messageid.")");
             } else {

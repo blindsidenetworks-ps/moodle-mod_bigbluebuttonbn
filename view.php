@@ -11,7 +11,6 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
-require_once($CFG->libdir . '/completionlib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $b  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
@@ -192,6 +191,12 @@ $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?acti
 //$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready&id='.$bbbsession['meetingid'].'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready';
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
+
+error_log("ENCODING FOR RECORDINGREADY CALLBACK");
+$jwt_object = new stdClass();
+$jwt_object->meeting_id = $bbbsession['meetingid'];
+$encoded_parameters = JWT::encode($jwt_object, trim($CFG->bigbluebuttonbn_shared_secret));
+error_log($encoded_parameters);
 
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
