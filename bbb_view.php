@@ -87,8 +87,10 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             "meta_context" => $bbbsession['context'],
                             "meta_recording_description" => $bbbsession['contextActivityDescription'],
                             "meta_recording_tagging" => $bbbsession['contextActivityTagging'],
-                            "meta_canvas-recording-ready" => $bbbsession['recordingReadyURL']
-                            );
+                            "meta_canvas-recording-ready-url" => $bbbsession['recordingReadyURL'],
+                            "meta_recording-ready-url" => $bbbsession['recordingReadyURL'],
+                            "meta_recording_ready_url" => $bbbsession['recordingReadyURL']
+                    );
 
                     /// Set the duration for the meeting
                     if ( $CFG->bigbluebuttonbn_scheduled_duration_enabled ) {
