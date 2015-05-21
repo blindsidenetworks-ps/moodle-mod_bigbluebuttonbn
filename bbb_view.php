@@ -85,11 +85,11 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
                             "meta_originTag" => $bbbsession['originTag'],
                             "meta_context" => $bbbsession['context'],
-                            "meta_recording_description" => $bbbsession['contextActivityDescription'],
-                            "meta_recording_tagging" => $bbbsession['contextActivityTagging'],
+                            "meta_recordingDescription" => $bbbsession['contextActivityDescription'],
+                            "meta_recordingTags" => $bbbsession['contextActivityTags'],
+                            "meta_recordingReadyURL" => $bbbsession['recordingReadyURL'],
                             "meta_canvas-recording-ready-url" => $bbbsession['recordingReadyURL'],
-                            "meta_recording-ready-url" => $bbbsession['recordingReadyURL'],
-                            "meta_recording_ready_url" => $bbbsession['recordingReadyURL']
+                            "meta_recording-ready-url" => $bbbsession['recordingReadyURL']
                     );
 
                     /// Set the duration for the meeting
