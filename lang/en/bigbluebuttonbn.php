@@ -287,9 +287,9 @@ $string['predefined_profile_collaborationroom'] = 'Collaboration room';
 $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 
-$string['notification_email_title'] = '{$a->activity_type} has been {$a->action}';
-$string['notification_email_body'] = '<p>{$a->activity_type} &quot;{$a->activity_title}&quot; has been {$a->action}.</p>';
-$string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title}</b> Details:'.
+$string['email_title_notification'] = '{$a->activity_type} has been {$a->action}';
+$string['email_body_notification'] = '<p>{$a->activity_type} &quot;{$a->activity_title}&quot; has been {$a->action}.</p>';
+$string['email_body_notification_meeting_details'] = '<p><b>{$a->activity_title}</b> Details:'.
         '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
         '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>'.
         '{$a->activity_title}</td></tr>'.
@@ -303,7 +303,8 @@ $string['notification_email_body_meeting_details'] = '<p><b>{$a->activity_title}
         '{$a->activity_owner}</td></tr>'.
         '</tbody></table>'.
         '</p>';
-$string['notification_email_footer'] = '<p><hr/><br/>'.
+$string['email_body_recording_ready'] = '<p>Recording for {$a->activity_type} &quot;{$a->activity_title}&quot; is ready.</p>';
+$string['email_footer'] = '<p><hr/><br/>'.
         'This automatic notification message was sent by {$a->user_name} ({$a->user_email}) '.
         'from the course {$a->course_name}.</p>';
 ?>

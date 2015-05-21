@@ -988,5 +988,15 @@ function bigbluebuttonbn_send_notification_recording_ready($meeting_id) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
     $sender = get_admin();
 
-    bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, "Recording is ready");
+    // Prepare message
+    $msg = new stdClass();
+
+    /// Build the message_body
+    $msg->activity_type = "";
+    if( $bigbluebuttonbn->type != 0 )
+        $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
+    $msg->activity_title = $bigbluebuttonbn->name;
+    $message_text = get_string('email_body_recording_ready', 'bigbluebuttonbn', $msg);
+    
+    bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }

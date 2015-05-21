@@ -19,7 +19,6 @@ $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
-error_log('PROCESSING REQUESTO TO BBB_BROKER');
 if( empty($params['action']) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "Parameter [action] was not included");
 
@@ -133,8 +132,8 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':
+                    error_log("Executing recording_ready");
                     $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
-                    error_log("RECORDING_READY");
                     error_log(json_encode($decoded_parameters));
                     bigbluebuttonbn_send_notification_recording_ready($decoded_parameters->meeting_id);
                     break;

@@ -193,11 +193,11 @@ $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broke
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 
 error_log("ENCODING FOR RECORDINGREADY CALLBACK");
-$jwt_object = new stdClass();
-$jwt_object->meeting_id = $bbbsession['meetingid'];
-$encoded_parameters = JWT::encode($jwt_object, trim($CFG->bigbluebuttonbn_shared_secret));
-error_log($encoded_parameters);
-
+$jwt_token = new stdClass();
+$jwt_token->meeting_id = $bbbsession['meetingid'];
+$jwt_key = trim($CFG->bigbluebuttonbn_shared_secret);
+$jwt = JWT::encode($jwt_token, $jwt_key);
+error_log($jwt);
 
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);

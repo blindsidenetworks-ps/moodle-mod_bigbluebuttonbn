@@ -414,7 +414,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         if( $bigbluebuttonbn->type != 0 )
             $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
         $msg->activity_title = $bigbluebuttonbn->name;
-        $message_text = get_string('notification_email_body', 'bigbluebuttonbn', $msg);
+        $message_text = get_string('email_body_notification', 'bigbluebuttonbn', $msg);
 
         /// Add the meeting details to the message_body
         $msg->action = ucfirst($action);
@@ -431,7 +431,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         }
         $msg->activity_owner = $USER->firstname.' '.$USER->lastname;
 
-        $message_text .= get_string('notification_email_body_meeting_details', 'bigbluebuttonbn', $msg);
+        $message_text .= get_string('email_body_notification_meeting_details', 'bigbluebuttonbn', $msg);
         // Send notification to all users enrolled
         bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
     }
@@ -607,7 +607,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $msg->user_name = $sender->firstname.' '.$sender->lastname;
     $msg->user_email = $sender->email;
     $msg->course_name = "$course->fullname";
-    $message .= get_string('notification_email_footer', 'bigbluebuttonbn', $msg);
+    $message .= get_string('email_footer', 'bigbluebuttonbn', $msg);
 
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
