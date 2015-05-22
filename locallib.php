@@ -124,6 +124,11 @@ function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT )
     return ($url_delete.$params.'&checksum='.sha1("publishRecordings".$params.$SALT) );
 }
 
+function bigbluebuttonbn_getCapabilitiesURL($URL, $SALT) {
+    $base_url = $URL."api/getCapabilities?";
+    $params = '';
+    return ( $base_url.$params.'&checksum='.sha1("getCapabilities".$params.$SALT));
+}
 
 function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
 
@@ -148,23 +153,19 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
 function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $URL, $SALT ) );
 
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
+    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-    }
-    else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
 
-        foreach ($xml->meetings->meeting as $meeting)
-        {
+    } else if($xml && $xml->returncode == 'SUCCESS'){                    //If there were meetings already created
+        foreach ($xml->meetings->meeting as $meeting) {
             $meetings[] = array( 'meetingID' => $meeting->meetingID, 'moderatorPW' => $meeting->moderatorPW, 'attendeePW' => $meeting->attendeePW, 'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded, 'running' => $meeting->running );
         }
-
         return $meetings;
 
-    }
-    else if( $xml ) { //If the xml packet returned failure it displays the message to the user
+    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-    }
-    else { //If the server is unreachable, then prompts the user of the necessary action
+
+    } else { //If the server is unreachable, then prompts the user of the necessary action
         return null;
     }
 }
@@ -176,21 +177,19 @@ function bigbluebuttonbn_getMeetingInfo( $meetingID, $modPW, $URL, $SALT ) {
 
 function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
-    
+
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meeting info was returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
-    }
-    else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
+
+    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
         return array( 'meetingID' => $xml->meetingID, 'moderatorPW' => $xml->moderatorPW, 'attendeePW' => $xml->attendeePW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded, 'running' => $xml->running, 'recording' => $xml->recording, 'startTime' => $xml->startTime, 'endTime' => $xml->endTime, 'participantCount' => $xml->participantCount, 'moderatorCount' => $xml->moderatorCount, 'attendees' => $xml->attendees, 'metadata' => $xml->metadata );
-    }
-    else if( ($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
+
+    } else if( ($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-        //return array('returncode' => $xml->returncode, 'message' => $xml->errors->error['message'], 'messageKey' => $xml->errors->error['key']);  //For API version 0.8
-    }
-    else { //If the server is unreachable, then prompts the user of the necessary action
+
+    } else { //If the server is unreachable, then prompts the user of the necessary action
         return null;
     }
-
 }
 
 function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
@@ -226,6 +225,30 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
         return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
     } else { //If the server is unreachable, then prompts the user of the necessary action
         return NULL;
+    }
+}
+
+function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
+    //$xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
+    //// Mocking the getCapabilities
+    $response = "<response><returncode>SUCCESS</returncode><capabilities><capability><name>extendedUI</name><endpoint>http://konekti.blindsidenetworks.com/api/v1/extended-ui</endpoint></capability></capabilities></response>";
+    $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
+    ////
+
+    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The capabilities were returned
+        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+
+    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
+        foreach ($xml->capabilities->capability as $capability) {
+            $capabilities[] = array( 'name' => (string)$capability->name, 'endpoint' => (string)$capability->endpoint );
+        }
+        return $capabilities;
+
+    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
+        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+
+    } else { //If the server is unreachable, then prompts the user of the necessary action
+        return null;
     }
 }
 
@@ -999,4 +1022,36 @@ function bigbluebuttonbn_send_notification_recording_ready($meeting_id) {
     $message_text = get_string('email_body_recording_ready', 'bigbluebuttonbn', $msg);
     
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
+}
+
+function bigbluebuttonbn_server_offers($capability_name){
+    global $CFG;
+
+    $capability_offered = null;
+
+    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+    //Validates if the server may have extended capabilities
+    $parse = parse_url($endpoint);
+    $host = $parse['host'];
+    $host_ends = explode(".", $host);
+    $host_ends_length = count($host_ends);
+
+    if( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' &&  $host_ends[$host_ends_length -2] == 'blindsidenetworks' ) {
+        //Validate the capabilities offered
+        $capabilities = bigbluebuttonbn_getCapabilitiesArray( $endpoint, $shared_secret );
+        if( !$capabilities ) {
+            error_log("Server does not offer extended capabilities");
+
+        } else {
+            error_log(json_encode($capabilities));
+            foreach ($capabilities as $capability) {
+                if( $capability["name"] == $capability_name)
+                    $capability_offered = $capability;
+            }
+        }
+    }
+
+    return $capability_offered;
 }

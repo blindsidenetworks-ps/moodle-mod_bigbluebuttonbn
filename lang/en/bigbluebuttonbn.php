@@ -17,7 +17,6 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:moderate'] = 'Moderate a meeting';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['bigbluebuttonbnWait'] = 'User has to wait';
 
 
 $string['config_general'] = 'General configuration';
@@ -97,6 +96,11 @@ $string['config_feature_sendnotifications_description'] = 'These settings enable
 $string['config_feature_sendnotifications_enabled'] = 'Send notifications enabled';
 $string['config_feature_sendnotifications_enabled_description'] = 'Send notifications feature is enabled in the UI when the room or conference is added or updated.';
 
+$string['config_extended_capabilities'] = 'Configuration for extended capabilities';
+$string['config_extended_capabilities_description'] = 'Configuration for extended capabilities when the BigBlueButton server offers them.';
+$string['config_extended_feature_uidelegation_enabled'] = 'UI delegation is enabled';
+$string['config_extended_feature_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
+
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
@@ -115,8 +119,6 @@ $string['index_heading_recording'] = 'Recording';
 $string['index_heading_users'] = 'Users';
 $string['index_heading_viewer'] = 'Viewers';
 $string['index_heading'] = 'BigBlueButton Rooms';
-$string['index_running'] = 'running';
-$string['index_warning_adding_meeting'] = 'Unable to assign a new meeting ID.';
 $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_participants'] = 'Participants';

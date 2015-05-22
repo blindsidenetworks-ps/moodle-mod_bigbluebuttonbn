@@ -376,7 +376,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
     }
 
-    // Add evento to the calendar (but if openingtime is set)
+    // Add evento to the calendar when if openingtime is set
     if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
         $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
