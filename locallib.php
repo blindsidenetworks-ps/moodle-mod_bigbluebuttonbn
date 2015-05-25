@@ -231,7 +231,7 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
 function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
     //$xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
     //// Mocking the getCapabilities
-    $response = "<response><returncode>SUCCESS</returncode><capabilities><capability><name>extendedUI</name><endpoint>http://konekti.blindsidenetworks.com/api/v1/extended-ui</endpoint></capability></capabilities></response>";
+    $response = "<response><returncode>SUCCESS</returncode><capabilities><capability><name>extended_ui</name><endpoint>http://konekti.blindsidenetworks.com/api/v1/extended_ui</endpoint></capability></capabilities></response>";
     $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
     ////
 

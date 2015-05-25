@@ -314,7 +314,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 
     if ( $bigbluebuttonbn->newwindow == 1 ) {
         $viewurl = new moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $coursemodule->id));
-        $info->onclick = "window.open('" . $viewurl->out(false) . "', 'bigbluebuttonbn'); return false;";
+        $info->onclick = "window.open('". $viewurl->out(false)."'); return false;";
         //$fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id";
         //$info->onclick = "window.open('$fullurl'); return false;";
     }

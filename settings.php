@@ -155,12 +155,12 @@ if ($ADMIN->fulltree) {
     
    
     // Options for 'UI delegation' feature
-    if ( $extendedUI = bigbluebuttonbn_server_offers('extendedUI') ) {
+    if ( $extendedUI = bigbluebuttonbn_server_offers('extended_ui') ) {
         error_log(json_encode($extendedUI));
         $settings->add( new admin_setting_heading('bigbluebuttonbn_extendedui',
                 get_string('config_extended_capabilities', 'bigbluebuttonbn'),
                 get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
-        // ui for 'delegated view' feature
+        // UI for 'delegated view' feature
         $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_uidelegation_enabled',
                 get_string('config_extended_feature_uidelegation_enabled', 'bigbluebuttonbn'),
                 get_string('config_extended_feature_uidelegation_enabled_description', 'bigbluebuttonbn'),
