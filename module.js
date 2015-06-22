@@ -222,6 +222,7 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
     M.mod_bigbluebuttonbn.view_clean_status_bar();
     M.mod_bigbluebuttonbn.view_clean_control_panel();
     M.mod_bigbluebuttonbn.view_hide_join_button();
+    M.mod_bigbluebuttonbn.view_hide_end_button();
     Y.DOM.addHTML(Y.DOM.byId('status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
 }
 
@@ -265,6 +266,8 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
             success : function(e) {
                 if (e.data.status) {
                     console.info("end meeting completed");
+                    M.mod_bigbluebuttonbn.view_clean_control_panel();
+                    M.mod_bigbluebuttonbn.view_hide_join_button();
                     M.mod_bigbluebuttonbn.view_hide_end_button();
                     location.reload();
                 }
