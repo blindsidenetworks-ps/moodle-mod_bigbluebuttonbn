@@ -203,76 +203,15 @@ if (groups_get_activity_groupmode($cm) != 0) {  //It is in groups mode
     echo $OUTPUT->box_end();
 }
 
-if( $CFG->bigbluebuttonbn_uidelegation_enabled ) {
-    $extendedUI = bigbluebuttonbn_server_offers('extended_ui');
-    // Request the launch content with an iframe tag.
-    //echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='.$cm->id.'"></iframe>';
-    echo '<iframe id="contentframe" height="600px" width="100%" src="'.$extendedUI['endpoint'].'" frameBorder="0"></iframe>';
 
-    // Output script to make the iframe tag be as large as possible.
-    $resize = '
-    <script type="text/javascript">
-        //<![CDATA[
-        YUI().use("node", "event", function(Y) {
-            //Take scrollbars off the outer document to prevent double scroll bar effect
-            var doc = Y.one("body");
-            doc.setStyle("overflow", "hidden");
 
-            var frame = Y.one("#contentframe");
-            var padding = 15; //The bottom of the iframe wasn\'t visible on some themes. Probably because of border widths, etc.
-            var lastHeight;
-            var resize = function(e) {
-                var viewportHeight = doc.get("winHeight");
-                if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-                    frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");
-                    lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
-                }
-            };
+echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
+echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
-            resize();
-
-            Y.on("windowresize", resize);
-        });
-    //]]
-    </script>
-    ';
-
-    echo $resize;
-
-} else {
-
-    echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
-    echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
-
-    echo $OUTPUT->box_start('generalbox boxaligncenter');
-    $now = time();
-    if (!$bigbluebuttonbn->openingtime ) {
-        if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
-            //GO JOINING
-            groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
-            $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
-            $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-            $bigbluebuttonbn_view = 'join';
-
-            bigbluebuttonbn_view_joining($bbbsession);
-
-        } else {
-            //CALLING AFTER
-            $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-            $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-            $bigbluebuttonbn_view = 'after';
-
-            bigbluebuttonbn_view_after($bbbsession);
-        }
-
-    } else if ( $now < ($bigbluebuttonbn->openingtime - intval($CFG->bigbluebuttonbn_scheduled_pre_opening) * 60) ){
-        //CALLING BEFORE
-        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-        $bigbluebuttonbn_view = 'before';
-
-        bigbluebuttonbn_view_before($bbbsession);
-
-    } else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
+echo $OUTPUT->box_start('generalbox boxaligncenter');
+$now = time();
+if (!$bigbluebuttonbn->openingtime ) {
+    if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
         //GO JOINING
         groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
@@ -283,15 +222,41 @@ if( $CFG->bigbluebuttonbn_uidelegation_enabled ) {
 
     } else {
         //CALLING AFTER
-        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
+        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'after';
 
         bigbluebuttonbn_view_after($bbbsession);
     }
 
-    echo $OUTPUT->box_end();
+} else if ( $now < ($bigbluebuttonbn->openingtime - intval($CFG->bigbluebuttonbn_scheduled_pre_opening) * 60) ){
+    //CALLING BEFORE
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+    $bigbluebuttonbn_view = 'before';
+
+    bigbluebuttonbn_view_before($bbbsession);
+
+} else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
+    //GO JOINING
+    groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+    $bigbluebuttonbn_view = 'join';
+
+    bigbluebuttonbn_view_joining($bbbsession);
+
+} else {
+    //CALLING AFTER
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
+    $bigbluebuttonbn_view = 'after';
+
+    bigbluebuttonbn_view_after($bbbsession);
 }
+
+echo $OUTPUT->box_end();
+
+
 
 //JavaScript variables
 $jsVars = array(
