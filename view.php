@@ -192,6 +192,8 @@ $jwt_key = trim($CFG->bigbluebuttonbn_shared_secret);
 $jwt = JWT::encode($jwt_token, $jwt_key);
 error_log($jwt);
 
+$bigbluebuttonbn_view = '';
+
 // Output starts here
 echo $OUTPUT->header();
 
@@ -202,9 +204,10 @@ if (groups_get_activity_groupmode($cm) != 0) {  //It is in groups mode
 }
 
 if( $CFG->bigbluebuttonbn_uidelegation_enabled ) {
+    $extendedUI = bigbluebuttonbn_server_offers('extended_ui');
     // Request the launch content with an iframe tag.
     //echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='.$cm->id.'"></iframe>';
-    echo '<iframe id="contentframe" height="600px" width="100%" src="http://dev.bigbluebutton.org"></iframe>';
+    echo '<iframe id="contentframe" height="600px" width="100%" src="'.$extendedUI['endpoint'].'" frameBorder="0"></iframe>';
 
     // Output script to make the iframe tag be as large as possible.
     $resize = '
@@ -241,7 +244,6 @@ if( $CFG->bigbluebuttonbn_uidelegation_enabled ) {
     echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
     echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
-    $bigbluebuttonbn_view = '';
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     $now = time();
     if (!$bigbluebuttonbn->openingtime ) {
