@@ -841,43 +841,6 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     return $error;
 }
 
-function bigbluebuttonbn_get_predefinedprofile_name($profile_id) {
-    if( $profile_id == 0 )
-        return get_string('predefined_profile_default', 'bigbluebuttonbn');
-    else if( $profile_id == 1 )
-        return get_string('predefined_profile_classroom', 'bigbluebuttonbn');
-    else if( $profile_id == 2 )
-        return get_string('predefined_profile_conferenceroom', 'bigbluebuttonbn');
-    else if( $profile_id == 3 )
-        return get_string('predefined_profile_collaborationroom', 'bigbluebuttonbn');
-    else if( $profile_id == 4 )
-        return get_string('predefined_profile_scheduledsession', 'bigbluebuttonbn');
-}
-
-function bigbluebuttonbn_get_predefinedprofiles() {
-    $predefinedprofiles = array(
-            array('id' => 0, 'name' => get_string('predefined_profile_default', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => true, 'groups' => true) ),
-            array('id' => 1, 'name' => get_string('predefined_profile_classroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => false) ),
-            array('id' => 2, 'name' => get_string('predefined_profile_conferenceroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => false) ),
-            array('id' => 3, 'name' => get_string('predefined_profile_collaborationroom', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => false, 'groups' => true) ),
-            array('id' => 4, 'name' => get_string('predefined_profile_scheduledsession', 'bigbluebuttonbn'), 'features' => array( 'wait' => true, 'record' => true, 'presentation' => true, 'permission' => true, 'schedule' => true, 'groups' => false) )
-    );
-
-    return $predefinedprofiles;
-}
-
-function bigbluebuttonbn_get_predefinedprofile_display_array() {
-    $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
-
-    $predefinedprofile_display_array = array();
-    foreach($predefinedprofiles as $predefinedprofile) {
-        $profile = array($predefinedprofile['id'] => $predefinedprofile['name']);
-        $predefinedprofile_display_array = array_merge($predefinedprofile_display_array, $profile);
-    }
-
-    return $predefinedprofile_display_array;
-}
-
 function bigbluebuttonbn_get_recording_table($bbbsession) {
     global $OUTPUT, $CFG;
 

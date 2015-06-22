@@ -46,7 +46,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
         $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
-        $predefinedprofile_enabled = $CFG->bigbluebuttonbn_predefinedprofile_enabled;
         $sendnotifications_enabled = $CFG->bigbluebuttonbn_sendnotifications_enabled;
 
         //Validates if the BigBlueButton server is running 
@@ -57,21 +56,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $mform =& $this->_form;
         $current_activity =& $this->current;
-
-        $predefinedprofiles = bigbluebuttonbn_get_predefinedprofiles();
-        $json_predefinedprofiles = json_encode($predefinedprofiles);
-        $html_predefinedprofiles = ''.
-                '<script type="text/javascript">'."\n".
-                '  var bigbluebuttonbn_predefinedprofiles = '.$json_predefinedprofiles.';'.
-                '</script>'."\n";
-        $mform->addElement('html', $html_predefinedprofiles);
-
-        if( $predefinedprofile_enabled ) {
-            $mform->addElement('select', 'type', get_string('mod_form_field_predefinedprofile', 'bigbluebuttonbn'), bigbluebuttonbn_get_predefinedprofile_display_array(), array("id" => "id_predefinedprofile", "onchange" => "bigbluebuttonbn_update_predefinedprofile();") );
-        } else {
-            $mform->addElement('hidden', 'type', '0', array("id" => "id_predefinedprofile"));
-            $mform->setType('type', PARAM_INT);
-        }
 
         //-------------------------------------------------------------------------------
         // First block starts here

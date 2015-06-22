@@ -57,7 +57,6 @@ $string['config_feature_waitformoderator_cache_ttl'] = 'Wait for moderator cache
 $string['config_feature_waitformoderator_cache_ttl_description'] = 'To support a heavy load of clients this plugin makes use of a cache. This parameter defines the time the cache will be kept before the next request is sent to the BigBlueButton server.';
 
 
-
 $string['config_feature_voicebridge'] = 'Configuration for "Voice bridge" feature';
 $string['config_feature_voicebridge_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_feature_voicebridge_editable'] = 'Conference voice bridge can be edited';

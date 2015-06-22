@@ -135,15 +135,6 @@ if ($ADMIN->fulltree) {
             get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),
             array_keys($owner), array_merge($owner, $roles)));
 
-    $settings->add( new admin_setting_heading('bigbluebuttonbn_profile',
-            get_string('config_feature_predefinedprofile', 'bigbluebuttonbn'),
-            get_string('config_feature_predefinedprofile_description', 'bigbluebuttonbn')));
-    // UI for 'predefined profile' feature
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_predefinedprofile_enabled',
-            get_string('config_feature_predefinedprofile_enabled', 'bigbluebuttonbn'),
-            get_string('config_feature_predefinedprofile_enabled_description', 'bigbluebuttonbn'),
-            1));
-    
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
             get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
             get_string('config_feature_sendnotifications_description', 'bigbluebuttonbn')));
