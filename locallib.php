@@ -841,7 +841,7 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     return $error;
 }
 
-function bigbluebuttonbn_get_recording_table($bbbsession) {
+function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     global $OUTPUT, $CFG;
 
     ///Set strings to show
@@ -869,9 +869,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession) {
     }
 
     ///Build table content
-    $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
-
-    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are no recordings for this meeting
+    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
         foreach ( $recordings as $recording ){
             if ( $bbbsession['administrator'] || $bbbsession['moderator'] || $recording['published'] == 'true' ) {
                 $length = 0;

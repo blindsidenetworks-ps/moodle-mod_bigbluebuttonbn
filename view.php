@@ -311,13 +311,16 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo $OUTPUT->box_end();
 
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
-        $table = bigbluebuttonbn_get_recording_table($bbbsession);
-        
-        if( isset($table->data) ) {
-            //Print the table
-            echo '<div id="bigbluebuttonbn_html_table">'."\n";
-            echo html_writer::table($table)."\n";
-            echo '</div>'."\n";
+        $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+            $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
+
+            if( isset($table->data) ) {
+                //Print the table
+                echo '<div id="bigbluebuttonbn_html_table">'."\n";
+                echo html_writer::table($table)."\n";
+                echo '</div>'."\n";
+            }
         }
     }
 
@@ -360,7 +363,10 @@ function bigbluebuttonbn_view_after($bbbsession) {
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
         echo '<h4>'.get_string('view_section_title_recordings', 'bigbluebuttonbn').'</h4>';
 
-        $table = bigbluebuttonbn_get_recording_table($bbbsession);
+        $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+            $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
+        }
 
         if( isset($table->data) ) {
             //Print the table
@@ -370,7 +376,7 @@ function bigbluebuttonbn_view_after($bbbsession) {
 
         } else {
             print_string('view_message_norecordings', 'bigbluebuttonbn');
-        }                                                                    // Actually, there are recordings for this meeting
+        }
     }
 }
 
