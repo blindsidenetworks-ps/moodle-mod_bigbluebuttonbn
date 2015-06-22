@@ -181,7 +181,6 @@ if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
 //Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.'&bn='.$bbbsession['bigbluebuttonbnid'];
-//$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready&id='.$bbbsession['meetingid'].'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready';
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
 
