@@ -11,16 +11,16 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-#$module->version = 2014101007;
+#$module->version = 2014101008;
 #$module->requires = 2010112400;
 #$module->cron = 0;
 #$module->component = 'mod_bigbluebuttonbn';
 #$module->maturity = MATURITY_STABLE;    // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-#$module->release = '1.0.11';
+#$module->release = '1.1.2';
 
-$plugin->version  = 2014101007;
+$plugin->version  = 2014101008;
 $plugin->requires = 2013111800;
 $plugin->cron     = 0;
 $plugin->component = 'mod_bigbluebuttonbn';
 $plugin->maturity = MATURITY_STABLE;    // [MATURITY_STABLE | MATURITY_RC | MATURITY_BETA | MATURITY_ALPHA]
-$plugin->release  = '1.0.11';
+$plugin->release  = '1.1.2';
