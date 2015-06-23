@@ -19,4 +19,3 @@ function xmldb_bigbluebuttonbn_install() {
     /// insert here code to perform some actions
 
 }
-

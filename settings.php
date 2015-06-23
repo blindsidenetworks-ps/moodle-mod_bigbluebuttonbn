@@ -145,5 +145,3 @@ if ($ADMIN->fulltree) {
             1));
 
 }
-
-?>

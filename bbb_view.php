@@ -176,5 +176,3 @@ function bigbluebutton_bbb_view_close_window() {
     echo $OUTPUT->footer();
 
 }
-
-?>

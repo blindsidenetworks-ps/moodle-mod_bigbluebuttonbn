@@ -378,5 +378,3 @@ function bigbluebuttonbn_view_after($bbbsession) {
         }
     }
 }
-
-?>

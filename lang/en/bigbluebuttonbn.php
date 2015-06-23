@@ -308,4 +308,3 @@ $string['email_body_recording_ready'] = '<p>Recording for {$a->activity_type} &q
 $string['email_footer'] = '<p><hr/><br/>'.
         'This automatic notification message was sent by {$a->user_name} ({$a->user_email}) '.
         'from the course {$a->course_name}.</p>';
-?>

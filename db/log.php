@@ -20,4 +20,3 @@ $logs = array(
     array('module'=>'bigbluebuttonbn', 'action'=>'view', 'mtable'=>'bigbluebuttonbn', 'field'=>'name'),
     array('module'=>'bigbluebuttonbn', 'action'=>'view all', 'mtable'=>'bigbluebuttonbn', 'field'=>'name')
 );
-

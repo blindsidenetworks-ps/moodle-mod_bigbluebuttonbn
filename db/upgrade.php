@@ -227,5 +227,3 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
 
     return $result;
 }
-
-?>

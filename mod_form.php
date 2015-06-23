@@ -322,5 +322,3 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         return $errors;
     }
 }
-
-?>

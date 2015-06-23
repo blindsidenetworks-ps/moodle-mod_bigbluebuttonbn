@@ -218,5 +218,3 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
     }
 
 }
-
-?>
