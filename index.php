@@ -69,7 +69,8 @@ $salt = trim($CFG->BigBlueButtonBNSecuritySalt);
 $url = trim(trim($CFG->BigBlueButtonBNServerURL),'/').'/';
 $logoutURL = $CFG->wwwroot;
 
-if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) { 
+$submit = optional_param('submit', '', PARAM_TEXT);
+if ($submit === 'end' && $moderator) {
 	//
 	// A request to end the meeting
 	//
