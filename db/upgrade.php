@@ -110,28 +110,5 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    /*
-    if ($result && $oldversion < 2014070403) {
-    
-        $table = new xmldb_table('bigbluebuttonbn_participant');
-
-        $field = new xmldb_field('courseid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        $field = new xmldb_field('coursemodule');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        upgrade_mod_savepoint(true, 2014070403, 'bigbluebuttonbn');
-    }
-    */
-
     return $result;
 }
-
-?>

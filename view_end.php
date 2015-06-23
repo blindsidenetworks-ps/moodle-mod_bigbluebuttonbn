@@ -68,5 +68,3 @@ if ( $bigbluebuttonbn->newwindow == 1 ){
     else
         header('Location: '.$CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course );
 }
-    
-?>

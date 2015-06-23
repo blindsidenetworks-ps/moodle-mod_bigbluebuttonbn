@@ -132,7 +132,6 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     } else {
         $table->data[] = displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebuttonbn);
     }
-    
 }
 
 echo $OUTPUT->header();
@@ -178,7 +177,7 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
                 $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }
-        
+
         if (!$getArray) {
             //
             // The server was unreachable
@@ -221,7 +220,7 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
                 if ( isset($getArray['recording']) && $getArray['recording'] == 'true' ){ // if it has been set when meeting created, set the variable on/off
                     $recording = get_string('index_enabled', 'bigbluebuttonbn' );
                 }
-                 
+
                 $xml = $getArray['attendees'];
                 if (count( $xml ) && count( $xml->attendee ) ) {
                     $users = count( $xml->attendee );
@@ -249,9 +248,5 @@ function displayBigBlueButtonRooms($url, $salt, $moderator, $course, $bigbluebut
         }
 
         return array ($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions );
-
     }
-
 }
-
-?>

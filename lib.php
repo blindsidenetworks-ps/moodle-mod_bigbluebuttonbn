@@ -351,5 +351,3 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     return $info;
 
 }
-
-?>

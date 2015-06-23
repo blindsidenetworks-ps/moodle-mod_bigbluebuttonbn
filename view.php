@@ -418,7 +418,6 @@ function bigbluebuttonbn_view_before( $bbbsession ){
     echo '</table>';
 }
 
-
 function bigbluebuttonbn_view_after( $bbbsession ){
 
     $recordingsArray = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['url'], $bbbsession['salt']);
@@ -439,6 +438,3 @@ function bigbluebuttonbn_view_after( $bbbsession ){
         echo '    </center>'."\n";
     }
 }
-
-
-?>
