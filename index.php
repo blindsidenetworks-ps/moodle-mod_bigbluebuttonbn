@@ -63,8 +63,9 @@ $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
 $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 $logoutURL = $CFG->wwwroot;
 
-if( isset($_POST['submit']) && $_POST['submit'] == 'end' && $moderator) { 
-	//
+$submit = optional_param('submit', '', PARAM_TEXT);
+if ($submit === 'end' && $moderator) {
+    //
 	// A request to end the meeting
 	//
 	if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $a), '*', MUST_EXIST) ) {
