@@ -74,6 +74,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $mform->addElement( 'checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn') );
         $mform->setDefault( 'wait', 1 );
+
+        $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit','bigbluebuttonbn'), 'maxlength="3" size="5"' );
+        $mform->addHelpButton('userlimit', 'mod_form_field_userlimit', 'bigbluebuttonbn');
+        $mform->setDefault( 'userlimit', 0 );
+        $mform->setType('userlimit', PARAM_TEXT);
         //-------------------------------------------------------------------------------
         // First block ends here
         //-------------------------------------------------------------------------------

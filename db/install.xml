@@ -23,7 +23,8 @@
         <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false" COMMENT="the meetingID" PREVIOUS="timeduration" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="meetingid" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="course" NEXT="participants"/>
-        <FIELD NAME="participants" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Participants and permissions" PREVIOUS="timemodified"/>
+        <FIELD NAME="participants" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Participants and permissions" PREVIOUS="timemodified" NEXT="userlimit"/>
+        <FIELD NAME="userlimit" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Maximum number of users allowed in the meeting" PREVIOUS="participants"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
