@@ -182,7 +182,7 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
 
     } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-        return array( 'meetingID' => $xml->meetingID, 'moderatorPW' => $xml->moderatorPW, 'attendeePW' => $xml->attendeePW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded, 'running' => $xml->running, 'recording' => $xml->recording, 'startTime' => $xml->startTime, 'endTime' => $xml->endTime, 'participantCount' => $xml->participantCount, 'moderatorCount' => $xml->moderatorCount, 'attendees' => $xml->attendees, 'metadata' => $xml->metadata );
+        return array('returncode' => $xml->returncode, 'meetingID' => $xml->meetingID, 'moderatorPW' => $xml->moderatorPW, 'attendeePW' => $xml->attendeePW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded, 'running' => $xml->running, 'recording' => $xml->recording, 'startTime' => $xml->startTime, 'endTime' => $xml->endTime, 'participantCount' => $xml->participantCount, 'moderatorCount' => $xml->moderatorCount, 'attendees' => $xml->attendees, 'metadata' => $xml->metadata );
 
     } else if( ($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -725,9 +725,19 @@ function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $force
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
 }
 
+function bigbluebuttonbn_bbb_broker_participant_joined($meetingid) {
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+    $result = $cache->get($meetingid);
+    $meeting_info = json_decode($result['meeting_info']);
+    error_log($meeting_info->participantCount);
+    $meeting_info->participantCount += 1;
+    error_log($meeting_info->participantCount);
+    $cache->set($meetingid, array('creation_time' => $result['creation_time'], 'meeting_info' => json_encode($meeting_info) ));
+}
+
 function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
-    //$meeting_running = ( isset($meeting_info) && isset($meeting_info['returncode']) && $meeting_info['returncode'] == 'SUCCESS' && $meeting_info['running'] == 'true' );
     $meeting_running = ( isset($meeting_info) && isset($meeting_info->returncode) && $meeting_info->returncode == 'SUCCESS' );
+
     return $meeting_running;
 }
 
@@ -745,19 +755,11 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
     if( isset($result) && $now < ($result['creation_time'] + $cache_ttl) && !$forced ) {
         //Use the value in the cache
         $meeting_info = json_decode($result['meeting_info']);
-        //error_log("ENCODED 1");
-        //error_log(json_encode($meeting_info));
     } else {
         //Ping again and refresh the cache
         error_log("Ping again and refresh the cache");
         $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
-        //error_log("NATURAL 0");
-        //error_log(json_encode($meeting_info));
-        //$result = $cache->get($meetingid);
-        //error_log("ENCODED 0");
-        //$meeting_info = json_decode($result['meeting_info']);
-        //error_log(json_encode($meeting_info));
     }
 
     return $meeting_info;

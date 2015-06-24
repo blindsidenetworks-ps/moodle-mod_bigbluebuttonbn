@@ -125,7 +125,6 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
     $moderatorList = "-";
     $recording = "-";
 
-
     if ( !$bigbluebuttonbn->visible ) {
         // Nothing to do
     } else {
@@ -137,15 +136,15 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
         // Output Users in the meeting
         //
         if( $groupObj == null ){
-            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $shared_secret );
+            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $shared_secret );
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
-            $getArray = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $shared_secret );
+            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $shared_secret );
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }
         
-        if (!$getArray) {
+        if (!$meetingInfo) {
             //
             // The server was unreachable
             //
@@ -153,16 +152,16 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
             return;
         }
 
-        if (isset($getArray['messageKey'])) {
+        if (isset($meetingInfo['messageKey'])) {
             //
             // There was an error returned
             //
-            if ($getArray['messageKey'] == "checksumError") {
+            if ($meetingInfo['messageKey'] == "checksumError") {
                 print_error( get_string( 'index_error_checksum', 'bigbluebuttonbn' ));
                 return;
             }
 
-            if ($getArray['messageKey'] == "notFound" || $getArray['messageKey'] == "invalidMeetingId") {
+            if ($meetingInfo['messageKey'] == "notFound" || $meetingInfo['messageKey'] == "invalidMeetingId") {
                 //
                 // The meeting does not exist yet on the BigBlueButton server.  This is OK.
                 //
@@ -170,13 +169,13 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
                 //
                 // There was an error
                 //
-                $users = $getArray['messageKey'].": ".$getArray['message'];
+                $users = $meetingInfo['messageKey'].": ".$meetingInfo['message'];
             }
         } else {
             //
             // The meeting info was returned
             //
-            if ($getArray['running'] == 'true') {
+            if ($meetingInfo['running'] == 'true') {
                 if ( $moderator ) {
                     if( $groupObj == null ) {
                         $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
@@ -184,11 +183,11 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
                         $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="hidden" name="g" value="'.$groupObj->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
                     }
                 }
-                if ( isset($getArray['recording']) && $getArray['recording'] == 'true' ){ // if it has been set when meeting created, set the variable on/off
+                if ( isset($meetingInfo['recording']) && $meetingInfo['recording'] == 'true' ){ // if it has been set when meeting created, set the variable on/off
                     $recording = get_string('index_enabled', 'bigbluebuttonbn' );
                 }
                  
-                $xml = $getArray['attendees'];
+                $xml = $meetingInfo['attendees'];
                 if (count( $xml ) && count( $xml->attendee ) ) {
                     $users = count( $xml->attendee );
                     $viewer_count = 0;
@@ -215,7 +214,5 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
         }
 
         return array ($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions );
-
     }
-
 }

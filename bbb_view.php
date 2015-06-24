@@ -50,7 +50,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
             /// Update the cache
-            bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+            $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
 
             /// Execute the redirect
             $view_url = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
@@ -61,7 +61,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
             if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
                 /// Since the meeting is already running, we just join the session
                 //// Update the cache
-                bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+                $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
                 //// Build the URL
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                     $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
@@ -72,6 +72,8 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
                 /// Internal logger: Instert a record with the meeting created
                 bigbluebuttonbn_log($bbbsession, 'Join');
+                //// Before executing the redirect, increment the number of participants
+                bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid']);
                 //// Execute the redirect
                 header('Location: '.$join_url );
 
@@ -146,13 +148,15 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                         /// Internal logger: Instert a record with the meeting created
                         bigbluebuttonbn_log($bbbsession, 'Create');
                         //// Update the cache
-                        bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+                        $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
                         //// Build the URL
                         $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
                         /// Moodle event logger: Create an event for meeting joined
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
                         /// Internal logger: Instert a record with the meeting created
                         bigbluebuttonbn_log($bbbsession, 'Join');
+                        //// Before executing the redirect, increment the number of participants
+                        bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid']);
                         //// Execute the redirect
                         header('Location: '.$join_url );
                     }                    
@@ -174,5 +178,4 @@ function bigbluebutton_bbb_view_close_window() {
     echo $OUTPUT->header();
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_windowClose');
     echo $OUTPUT->footer();
-
 }

@@ -45,6 +45,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $tagging_default_editable = $CFG->bigbluebuttonbn_recordingtagging_editable;
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
+        $userlimit_default = 0; //$CFG->bigbluebuttonbn_userlimit_default;
+        $userlimit_editable = true; //$CFG->bigbluebuttonbn_userlimit_editable;
         $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
         $sendnotifications_enabled = $CFG->bigbluebuttonbn_sendnotifications_enabled;
 
@@ -110,7 +112,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('hidden', 'wait', $waitformoderator_default );
             $mform->setType('wait', PARAM_INT);
         }
-            
+
+        if ( $userlimit_editable ) {
+            $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit','bigbluebuttonbn'), 'maxlength="3" size="5"' );
+            $mform->addHelpButton('userlimit', 'mod_form_field_userlimit', 'bigbluebuttonbn');
+            $mform->setDefault( 'userlimit', $userlimit_default );
+            $mform->setType('userlimit', PARAM_TEXT);
+        } else {
+            $mform->addElement('hidden', 'userlimit', $userlimit_default );
+            $mform->setType('userlimit', PARAM_INT);
+        }
+
         if ( floatval($serverVersion) >= 0.8 ) {
             if ( $recording_default_editable ) {
                 $mform->addElement('checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn'));
@@ -130,7 +142,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
             $mform->setType('tagging', PARAM_INT);
         }
-        
+
         if ( $sendnotifications_enabled ) {
             $mform->addElement('checkbox', 'notification', get_string('mod_form_field_notification', 'bigbluebuttonbn'));
             if ($this->current->instance) {

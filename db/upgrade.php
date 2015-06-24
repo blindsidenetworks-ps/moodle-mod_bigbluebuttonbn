@@ -172,6 +172,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         if( !$dbman->field_exists($table, $field) ) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
+        //// Add field userlimit
+        $field = new xmldb_field('userlimit');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
 
         // Update the bigbluebuttonbn_log table
         $table = new xmldb_table('bigbluebuttonbn_log');

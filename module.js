@@ -33,9 +33,12 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
             request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
                 success : function(e) {
+                    //if( e.data.infp.participantCount < bigbluebuttonbn.userlimit){}
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
                     Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
-                    Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
+                    if(typeof e.data.status.can_join != 'undefined' && e.data.status.can_join ) {
+                        Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
+                    }
                     if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
                         Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
                     }

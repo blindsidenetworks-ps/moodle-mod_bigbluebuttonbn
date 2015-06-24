@@ -57,23 +57,21 @@ if ( empty($error) ) {
     } else {
         try {
             switch ( strtolower($params['action']) ){
-                /*
-                case 'server_ping':
-                    $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
-                    $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
-                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').' });';
-
-                    break;
-                */
                 case 'meeting_info':
                     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
 
                     $status_can_end = '';
                     if( $meeting_running ) {
-                        $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
                         $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
-                        $can_join = true;
+                        if( $meeting_info->participantCount < $bbbsession['userlimit'] ) {
+                            $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+                            $can_join = true;
+
+                        } else {
+                            $initial_message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+                            $can_join = false;
+                        }
 
                         if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                             $end_button_text = get_string('view_conference_action_end', 'bigbluebuttonbn');
@@ -103,7 +101,7 @@ if ( empty($error) ) {
                         $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
 
                         /// Update the cache
-                        bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
+                        $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
 
                         echo $params['callback'].'({ "status": true });';
                     } else {

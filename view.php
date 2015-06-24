@@ -79,6 +79,7 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
 
+$bbbsession['userlimit'] = intval($bigbluebuttonbn->userlimit);
 $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
 $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
@@ -202,8 +203,6 @@ if (groups_get_activity_groupmode($cm) != 0) {  //It is in groups mode
     echo $OUTPUT->box_end();
 }
 
-
-
 echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
 echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
@@ -264,24 +263,26 @@ $jsVars = array(
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
         'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbntype'],
         'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000),
+        //'userlimit' => $bbbsession['userlimit'],
         'locales' => array(
-                'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn' ),
-                'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn' ),
-                'in_progress' => get_string('view_message_conference_in_progress', 'bigbluebuttonbn' ),
-                'started_at' => get_string('view_message_session_started_at', 'bigbluebuttonbn' ),
-                'session_no_users' => get_string('view_message_session_no_users', 'bigbluebuttonbn' ),
-                'session_has_user' => get_string('view_message_session_has_user', 'bigbluebuttonbn' ),
-                'session_has_users' => get_string('view_message_session_has_users', 'bigbluebuttonbn' ),
-                'has_joined' => get_string('view_message_has_joined', 'bigbluebuttonbn' ),
-                'have_joined' => get_string('view_message_have_joined', 'bigbluebuttonbn' ),
-                'user' => get_string('view_message_user', 'bigbluebuttonbn' ),
-                'users' => get_string('view_message_users', 'bigbluebuttonbn' ),
-                'viewer' => get_string('view_message_viewer', 'bigbluebuttonbn' ),
-                'viewers' => get_string('view_message_viewers', 'bigbluebuttonbn' ),
-                'moderator' => get_string('view_message_moderator', 'bigbluebuttonbn' ),
-                'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn' ),
-                'publishing' => get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn' ),
-                'unpublishing' => get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn' ),
+                'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
+                'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'),
+                'in_progress' => get_string('view_message_conference_in_progress', 'bigbluebuttonbn'),
+                'started_at' => get_string('view_message_session_started_at', 'bigbluebuttonbn'),
+                'session_no_users' => get_string('view_message_session_no_users', 'bigbluebuttonbn'),
+                'session_has_user' => get_string('view_message_session_has_user', 'bigbluebuttonbn'),
+                'session_has_users' => get_string('view_message_session_has_users', 'bigbluebuttonbn'),
+                'has_joined' => get_string('view_message_has_joined', 'bigbluebuttonbn'),
+                'have_joined' => get_string('view_message_have_joined', 'bigbluebuttonbn'),
+                'user' => get_string('view_message_user', 'bigbluebuttonbn'),
+                'users' => get_string('view_message_users', 'bigbluebuttonbn'),
+                'viewer' => get_string('view_message_viewer', 'bigbluebuttonbn'),
+                'viewers' => get_string('view_message_viewers', 'bigbluebuttonbn'),
+                'moderator' => get_string('view_message_moderator', 'bigbluebuttonbn'),
+                'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn'),
+                'publishing' => get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn'),
+                'unpublishing' => get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn'),
+                //'userlimit_reached' => get_string('view_error_userlimit_reached', 'bigbluebuttonbn'),
         )
 );
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
