@@ -110,7 +110,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015030255) {
+    if ($result && $oldversion < 2015063000) {
         error_log('Update 2015030252 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
@@ -196,34 +196,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
             //// Drop field recording
             $dbman->drop_field($table, $field, $continue=true, $feedback=true);
         }
-        
-        // Migrate existing CFG values and add default values to the new ones
-        //global $settings;
-        //error_log('\$settings: '.print_r(json_encode($settings), true));
 
-        // Update version
-        //upgrade_mod_savepoint(true, 2015030238, 'bigbluebuttonbn');
+        //upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
     }
-    /*
-    if ($result && $oldversion < 2014070403) {
-    
-        $table = new xmldb_table('bigbluebuttonbn_participant');
-
-        $field = new xmldb_field('courseid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        $field = new xmldb_field('coursemodule');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        upgrade_mod_savepoint(true, 2014070403, 'bigbluebuttonbn');
-    }
-    */
 
     return $result;
 }
