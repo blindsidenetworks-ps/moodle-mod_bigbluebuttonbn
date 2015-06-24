@@ -465,5 +465,4 @@ function bigbluebuttonbn_is_user_limit_reached( $bbbsession ){
         return false;
 
     return true;
-
 }
