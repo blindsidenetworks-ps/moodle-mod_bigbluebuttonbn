@@ -84,7 +84,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $field = new xmldb_field('allmoderators');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
 
-        $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
 
         upgrade_mod_savepoint(true, 2014050100, 'bigbluebuttonbn');
     }
@@ -94,7 +96,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $table = new xmldb_table('bigbluebuttonbn');
         $field = new xmldb_field('participants', XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
 
-        $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
 
         upgrade_mod_savepoint(true, 2014070420, 'bigbluebuttonbn');
     }
@@ -110,7 +114,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 201410105) {
+    if ($result && $oldversion < 2015062100) {
 
         $table = new xmldb_table('bigbluebuttonbn');
         $field = new xmldb_field('userlimit');
@@ -120,7 +124,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
 
-        upgrade_mod_savepoint(true, 2014101008, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2015062100, 'bigbluebuttonbn');
     }
 
     return $result;
