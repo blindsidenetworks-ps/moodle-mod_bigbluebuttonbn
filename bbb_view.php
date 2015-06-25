@@ -73,7 +73,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                 /// Internal logger: Instert a record with the meeting created
                 bigbluebuttonbn_log($bbbsession, 'Join');
                 //// Before executing the redirect, increment the number of participants
-                bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid']);
+                bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']) );
                 //// Execute the redirect
                 header('Location: '.$join_url );
 
@@ -150,13 +150,18 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                         //// Update the cache
                         $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
                         //// Build the URL
-                        $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $bbbsession['modPW'], $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
+                        if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+                            $password = $bbbsession['modPW'];
+                        } else {
+                            $password = $bbbsession['viewerPW'];
+                        }
+                        $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $password, $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
                         /// Moodle event logger: Create an event for meeting joined
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
                         /// Internal logger: Instert a record with the meeting created
                         bigbluebuttonbn_log($bbbsession, 'Join');
                         //// Before executing the redirect, increment the number of participants
-                        bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid']);
+                        bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']) );
                         //// Execute the redirect
                         header('Location: '.$join_url );
                     }                    

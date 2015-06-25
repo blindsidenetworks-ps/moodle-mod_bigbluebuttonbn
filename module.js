@@ -66,7 +66,7 @@ M.mod_bigbluebuttonbn.view_init_control_panel = function(data) {
     Y.DOM.setAttribute(control_panel_div, 'id', 'control_panel_div');
     var control_panel_div_html = '';
     if (data.running) {
-        control_panel_div_html = M.mod_bigbluebuttonbn.view_msg_started_at(data.info.startTime) + ' ' + M.mod_bigbluebuttonbn.view_msg_attendees_in(data.info.attendees);
+        control_panel_div_html = M.mod_bigbluebuttonbn.view_msg_started_at(data.info.startTime) + ' ' + M.mod_bigbluebuttonbn.view_msg_attendees_in(data.info.moderatorCount, data.info.participantCount);
     }
     Y.DOM.addHTML(control_panel_div, control_panel_div_html);
 
@@ -101,27 +101,22 @@ M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
     return msg_users_joined;
 }
 
-M.mod_bigbluebuttonbn.view_msg_attendees_in = function (attendees) {
+M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants) {
     var msg_attendees_in = '';
 
-    if (typeof attendees.attendee != 'undefined') {
-        if ( Array.isArray(attendees.attendee) ) {
-            var counter_viewers = 0;
-            var counter_moderators = 0;
-            for( var i = 0; i < attendees.attendee.length; i++ ) {
-                if( attendees.attendee[i].role == 'MODERATOR' )
-                    counter_moderators++;
-                else
-                    counter_viewers++;
-            }
-            msg_attendees_in += bigbluebuttonbn.locales.session_has_users + ' <b>' + counter_moderators + '</b> ' + (counter_moderators == 1? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.moderators) + ' and ';
-            msg_attendees_in += '<b>' + counter_viewers + '</b> ' + (counter_viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
-        } else {
-            msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + (attendees.attendee.role == 'MODERATOR'? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.viewer) + '.';
-        }
+    if (typeof moderators != 'undefined' && typeof participants != 'undefined') {
+        if( participants > 1 ) {
+            var viewers = participants - moderators;
+            msg_attendees_in += bigbluebuttonbn.locales.session_has_users + ' <b>' + moderators + '</b> ' + (moderators == 1? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.moderators) + ' and ';
+            msg_attendees_in += '<b>' + viewers + '</b> ' + (viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
 
+        } else {
+            msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + (moderators > 0? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.viewer) + '.';
+
+        }
     } else {
         msg_attendees_in = bigbluebuttonbn.locales.session_no_users + '.';
+
     }
 
     return msg_attendees_in;

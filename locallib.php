@@ -725,13 +725,14 @@ function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $force
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
 }
 
-function bigbluebuttonbn_bbb_broker_participant_joined($meetingid) {
+function bigbluebuttonbn_bbb_broker_participant_joined($meetingid, $is_moderator) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
     $meeting_info = json_decode($result['meeting_info']);
-    error_log($meeting_info->participantCount);
     $meeting_info->participantCount += 1;
-    error_log($meeting_info->participantCount);
+    if( $is_moderator ) {
+        $meeting_info->moderatorCount += 1;
+    }
     $cache->set($meetingid, array('creation_time' => $result['creation_time'], 'meeting_info' => json_encode($meeting_info) ));
 }
 
