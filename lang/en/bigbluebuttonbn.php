@@ -45,7 +45,7 @@ $string['config_feature_recording_icons_enabled'] = 'Icons for recording managem
 $string['config_feature_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 
 
-$string['config_feature_waitformoderator'] = 'Configuration for "Wait for modeartor" feature';
+$string['config_feature_waitformoderator'] = 'Configuration for "Wait for moderator" feature';
 $string['config_feature_waitformoderator_description'] = 'These settings are feature specific';
 $string['config_feature_waitformoderator_default'] = 'Wait for moderator enabled by default';
 $string['config_feature_waitformoderator_default_description'] = 'Wait for moderator feature is enabled by default when a new room or conference is added.';
@@ -130,7 +130,7 @@ $string['mod_form_field_intro_help'] = 'A short description for the room or conf
 $string['mod_form_field_duration_help'] = 'Setting the duration for a meeting will establish the maximum time for a meeting to keep alive before the recording finish';
 $string['mod_form_field_duration'] = 'Duration';
 $string['mod_form_field_userlimit'] = 'User limit';
-$string['mod_form_field_userlimit_help'] = 'Maximum limit of users allowed in a meeting';
+$string['mod_form_field_userlimit_help'] = 'Maximum limit of users allowed in a meeting. If the limit is set to 0 the number of users will be unlimited.';
 $string['mod_form_field_name'] = 'Virtual classroom name';
 $string['mod_form_field_room_name'] = 'Room name';
 $string['mod_form_field_conference_name'] = 'Conference name';
