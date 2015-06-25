@@ -45,8 +45,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $tagging_default_editable = (isset($CFG->bigbluebuttonbn_recordingtagging_editable)? $CFG->bigbluebuttonbn_recordingtagging_editable: false);
         $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
         $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
-        $userlimit_default = 0; //$CFG->bigbluebuttonbn_userlimit_default;
-        $userlimit_editable = true; //$CFG->bigbluebuttonbn_userlimit_editable;
+        $userlimit_default = $CFG->bigbluebuttonbn_userlimit_default;
+        $userlimit_editable = $CFG->bigbluebuttonbn_userlimit_editable;
         $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
         $sendnotifications_enabled = $CFG->bigbluebuttonbn_sendnotifications_enabled;
 

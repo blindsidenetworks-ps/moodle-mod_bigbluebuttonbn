@@ -87,6 +87,7 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
             60, PARAM_INT));
 
+    //// Configuration for "static voice bridge" feature
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_voicebridge',
             get_string('config_feature_voicebridge', 'bigbluebuttonbn'),
             get_string('config_feature_voicebridge_description', 'bigbluebuttonbn')));
@@ -96,6 +97,7 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_voicebridge_editable_description', 'bigbluebuttonbn'),
             0));
 
+    //// Configuration for "preupload presentation" feature
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
             get_string('config_feature_preuploadpresentation', 'bigbluebuttonbn'),
             get_string('config_feature_preuploadpresentation_description', 'bigbluebuttonbn')));
@@ -105,24 +107,39 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
             0));
 
-    $settings->add( new admin_setting_heading('config_scheduled',
-            get_string('config_scheduled', 'bigbluebuttonbn'),
-            get_string('config_scheduled_description', 'bigbluebuttonbn')));
-    // calculated duration for 'scheduled session' feature
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
-            get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
-            get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
+    //// Configuration for "user limit" feature
+    $settings->add( new admin_setting_heading('config_userlimit',
+            get_string('config_feature_userlimit', 'bigbluebuttonbn'),
+            get_string('config_feature_userlimit_description', 'bigbluebuttonbn')));
+    //default value for 'user limit' feature
+    $settings->add(new admin_setting_configtext('bigbluebuttonbn_userlimit_default',
+            get_string('config_feature_userlimit_default', 'bigbluebuttonbn'),
+            get_string('config_feature_userlimit_default_description', 'bigbluebuttonbn'),
+            0, PARAM_INT));
+    // UI for 'user limit' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_userlimit_editable',
+            get_string('config_feature_userlimit_editable', 'bigbluebuttonbn'),
+            get_string('config_feature_userlimit_editable_description', 'bigbluebuttonbn'),
             1));
-    // compensatory time for 'scheduled session' feature
-    $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
-            get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
-            get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
-            10, PARAM_INT));
-    // pre-opening time for 'scheduled session' feature
-    $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
-            get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
-            get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
-            10, PARAM_INT));
+
+    //$settings->add( new admin_setting_heading('config_scheduled',
+    //        get_string('config_scheduled', 'bigbluebuttonbn'),
+    //        get_string('config_scheduled_description', 'bigbluebuttonbn')));
+    //// calculated duration for 'scheduled session' feature
+    //$settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
+    //        get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
+    //        get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
+    //        1));
+    //// compensatory time for 'scheduled session' feature
+    //$settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
+    //        get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
+    //        get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
+    //        10, PARAM_INT));
+    //// pre-opening time for 'scheduled session' feature
+    //$settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
+    //        get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
+    //        get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
+    //        10, PARAM_INT));
     
     $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
             get_string('config_permission', 'bigbluebuttonbn'),

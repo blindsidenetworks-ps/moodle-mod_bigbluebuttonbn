@@ -81,6 +81,14 @@ $string['config_feature_predefinedprofile_enabled'] = 'Pre-defined profile enabl
 $string['config_feature_predefinedprofile_enabled_description'] = 'Pre-defined profile feature is enabled in the UI when the room or conference is added or updated.';
 
 
+$string['config_feature_userlimit'] = 'Configuration for "User limit" feature';
+$string['config_feature_userlimit_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
+$string['config_feature_userlimit_default'] = 'User limit enabled by default';
+$string['config_feature_userlimit_default_description'] = 'User limit feature is enabled by default when a new room or conference is added.';
+$string['config_feature_userlimit_editable'] = 'User limit feature can be edited';
+$string['config_feature_userlimit_editable_description'] = 'User limit value by default can be edited when the room or conference is added or updated.';
+
+
 $string['config_scheduled'] = 'Configuration for "Scheduled sessions"';
 $string['config_scheduled_description'] = 'These settings define some of the behaviour by default for scheduled sessions.';
 $string['config_scheduled_duration_enabled'] = 'Calculate duration enabled';
@@ -90,10 +98,12 @@ $string['config_scheduled_duration_compensation_description'] = 'Minutes added t
 $string['config_scheduled_pre_opening'] = 'Accessible before opening time (minutes)';
 $string['config_scheduled_pre_opening_description'] = 'The time in minutes for the session to be acceessible before the schedules opening time is due.';
 
+
 $string['config_feature_sendnotifications'] = 'Configuration for "Send notifications" feature';
 $string['config_feature_sendnotifications_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_feature_sendnotifications_enabled'] = 'Send notifications enabled';
 $string['config_feature_sendnotifications_enabled_description'] = 'Send notifications feature is enabled in the UI when the room or conference is added or updated.';
+
 
 $string['config_extended_capabilities'] = 'Configuration for extended capabilities';
 $string['config_extended_capabilities_description'] = 'Configuration for extended capabilities when the BigBlueButton server offers them.';
