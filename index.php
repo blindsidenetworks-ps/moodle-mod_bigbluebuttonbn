@@ -81,9 +81,9 @@ if ($submit === 'end' && $moderator) {
 	$meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
 	$modPW = $bigbluebuttonbn->moderatorpass;
     if( $g != '0'  ) {
-        $getArray = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $shared_secret ) );
+        $getArray = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $shared_secret ) );
     } else {
-        $getArray = bigbluebuttonbn_wrap_simplexml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $shared_secret ));
+        $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $shared_secret ));
     }
 	redirect('index.php?id='.$id);
 } else {

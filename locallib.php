@@ -141,7 +141,7 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
                 "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".$presentation_url."' /></module></modules>"
                 );
     } else {
-        $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata) );
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata) );
     }
 
     if( $xml ) {
@@ -154,7 +154,7 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
 }
 
 function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingsURL( $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL( $URL, $SALT ) );
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -174,12 +174,12 @@ function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_getMeetingInfo( $meetingID, $modPW, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
     return $xml;
 }
 
 function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null){//The meeting info was returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
@@ -198,7 +198,7 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
 function bigbluebuttonbn_getRecordingsArray( $meetingID, $URL, $SALT ) {
     $recordings = array();
 
-    //$xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
+    //$xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingID );
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
@@ -234,7 +234,7 @@ function bigbluebuttonbn_getRecordingsArray( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
-    //$xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
+    //$xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
     //// Mocking the getCapabilities
     $response = "<response><returncode>SUCCESS</returncode><capabilities><capability><name>extended_ui</name><endpoint>http://192.168.23.6:3000/api/v1/extended_ui</endpoint></capability></capabilities></response>";
     $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
@@ -266,7 +266,7 @@ function bigbluebuttonbn_recordingBuildSorter($a, $b){
 function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {
     $ids = 	explode(",", $recordIDs);
     foreach( $ids as $id){
-        $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getDeleteRecordingsURL($id, $URL, $SALT) );
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getDeleteRecordingsURL($id, $URL, $SALT) );
         if( $xml && $xml->returncode != 'SUCCESS' )
             return false;
     }
@@ -276,7 +276,7 @@ function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {
 function bigbluebuttonbn_doPublishRecordings( $recordIDs, $set, $URL, $SALT ) {
     $ids = 	explode(",", $recordIDs);
     foreach( $ids as $id){
-        $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getPublishRecordingsURL($id, $set, $URL, $SALT) );
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getPublishRecordingsURL($id, $set, $URL, $SALT) );
         if( $xml && $xml->returncode != 'SUCCESS' )
             return false;
     }
@@ -284,7 +284,7 @@ function bigbluebuttonbn_doPublishRecordings( $recordIDs, $set, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
 
     if( $xml ) { //If the xml packet returned failure it displays the message to the user
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
@@ -296,7 +296,7 @@ function bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_isMeetingRunning( $meetingID, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
     
     if( $xml && $xml->returncode == 'SUCCESS' )
         return ( ( $xml->running == 'true' ) ? true : false);
@@ -308,7 +308,7 @@ function bigbluebuttonbn_isMeetingRunning( $meetingID, $URL, $SALT ) {
 function bigbluebuttonbn_getServerVersion( $URL ){
     $base_url_record = $URL."api";
 
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( $base_url_record );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( $base_url_record );
     if( $xml && $xml->returncode == 'SUCCESS' )
         return $xml->version;
     else
@@ -317,43 +317,11 @@ function bigbluebuttonbn_getServerVersion( $URL ){
 }
 
 function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
     if( $xml && $xml->returncode == 'SUCCESS')
         return ( str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML())));
     else
         return 'false';
-}
-
-function bigbluebuttonbn_wrap_simplexml_load_file($url) {
-    if (extension_loaded('curl')) {
-        $c = new curl();
-        $c->setopt( Array( "SSL_VERIFYPEER" => true));
-        $response = $c->get($url);
-
-        if($response) {
-            $previous = libxml_use_internal_errors(true);
-            try {
-                $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
-                return $xml;
-            } catch (Exception $e){
-                libxml_use_internal_errors($previous);
-                error_log("The XML response is not correct on wrap_simplexml_load_file: ".$e->getMessage());
-                return NULL;
-            }
-        } else {
-            error_log("No response on wrap_simplexml_load_file");
-            return NULL;
-        }
-    } else {
-        $previous = libxml_use_internal_errors(true);
-        try {
-            $xml = simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA);
-            return $xml;
-        } catch  (Exception $e){
-            libxml_use_internal_errors($previous);
-            return NULL;
-        }
-    }
 }
 
 function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data_string=null){
