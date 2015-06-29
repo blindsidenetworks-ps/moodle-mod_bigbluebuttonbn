@@ -105,9 +105,13 @@ function bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) {
     return ( $base_url.$params.'&checksum='.sha1("end".$params.$SALT) );
 }
 
-function bigbluebuttonbn_getRecordingsURL($meetingID, $URL, $SALT ) {
+function bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID=null ) {
     $base_url_record = $URL."api/getRecordings?";
-    $params = "meetingID=".urlencode($meetingID);
+    if( $meetingID == null ) {
+        $params = "";
+    } else {
+        $params = "meetingID=".urlencode($meetingID);
+    }
 
     return ($base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT) );
 }
@@ -119,9 +123,9 @@ function bigbluebuttonbn_getDeleteRecordingsURL( $recordID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT ) {
-    $url_delete = $URL."api/publishRecordings?";
+    $url_publish = $URL."api/publishRecordings?";
     $params = 'recordID='.$recordID."&publish=".$set;
-    return ($url_delete.$params.'&checksum='.sha1("publishRecordings".$params.$SALT) );
+    return ($url_publish.$params.'&checksum='.sha1("publishRecordings".$params.$SALT) );
 }
 
 function bigbluebuttonbn_getCapabilitiesURL($URL, $SALT) {
@@ -131,7 +135,8 @@ function bigbluebuttonbn_getCapabilitiesURL($URL, $SALT) {
 }
 
 function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
-
+    error_log($presentation_name);
+    error_log($presentation_url);
     if( !is_null($presentation_name) && !is_null($presentation_url) ) {
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata),
                 BIGBLUEBUTTONBN_METHOD_POST,
@@ -192,13 +197,16 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
     }
 }
 
-function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
-    $xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getRecordingsURL( $meetingID, $URL, $SALT ) );
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-        return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-        $recordings = array();
+function bigbluebuttonbn_getRecordingsArray( $meetingID, $URL, $SALT ) {
+    $recordings = array();
 
+    //$xml = bigbluebuttonbn_wrap_simplexml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingID );
+
+    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
+        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+
+    } else if($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)){ //If there were meetings already created
         foreach ($xml->recordings->recording as $recording) {
             $playbackArray = array();
             foreach ( $recording->playback->format as $format ){
@@ -212,20 +220,19 @@ function bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT ) {
                 if(is_object($value)) $value = '';
                 $metadataArray['meta_'.$key] = $value;
             }
-            
+
             $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
-            
         }
 
         usort($recordings, 'bigbluebuttonbn_recordingBuildSorter');
 
-        return $recordings;
-
     } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-        return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+
     } else { //If the server is unreachable, then prompts the user of the necessary action
-        return NULL;
     }
+
+    return $recordings;
 }
 
 function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
