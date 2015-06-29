@@ -591,7 +591,11 @@ function bigbluebuttonbn_get_users($context) {
             array_push($sqluserids, $user->id);
         }
     }
-    $users_array = $DB->get_records_select("user", "id IN (" . implode(', ', $sqluserids) . ") AND deleted = 0");
+
+    $users_array = array();
+    if( !empty($sqluserids) ) {
+        $users_array = $DB->get_records_select("user", "id IN (" . implode(', ', $sqluserids) . ") AND deleted = 0");
+    }
 
     return $users_array;
 }
