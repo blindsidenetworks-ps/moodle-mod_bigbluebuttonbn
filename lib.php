@@ -618,9 +618,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
         if( $user->id != $sender->id ){
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
-                error_log("Msg was sent ok. (".$messageid.")");
-            } else {
-                error_log("Msg was NOT really sent.");
+                error_log("Msg was NOT sent.");
             }
         }
     }

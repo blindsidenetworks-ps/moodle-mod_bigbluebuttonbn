@@ -95,7 +95,6 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.'"message": "'.$initial_message.'"} });';
                     break;
                 case 'meeting_end':
-                    error_log("Executing end meeting");
                     if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                         //Execute the end command
                         $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
@@ -112,27 +111,22 @@ if ( empty($error) ) {
                 case 'recording_list':
                     break;
                 case 'recording_publish':
-                    error_log("Executing publish");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_unpublish':
-                    error_log("Executing unpublish");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_delete':
-                    error_log("Executing delete");
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':
-                    error_log("Executing recording_ready");
                     $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
-                    error_log(json_encode($decoded_parameters));
                     bigbluebuttonbn_send_notification_recording_ready($decoded_parameters->meeting_id);
                     break;
                 case 'moodle_notify':

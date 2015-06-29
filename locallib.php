@@ -135,8 +135,6 @@ function bigbluebuttonbn_getCapabilitiesURL($URL, $SALT) {
 }
 
 function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
-    error_log($presentation_name);
-    error_log($presentation_url);
     if( !is_null($presentation_name) && !is_null($presentation_url) ) {
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata),
                 BIGBLUEBUTTONBN_METHOD_POST,
@@ -327,7 +325,6 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_wrap_simplexml_load_file($url) {
-    error_log($url);
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
@@ -765,7 +762,6 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
         $meeting_info = json_decode($result['meeting_info']);
     } else {
         //Ping again and refresh the cache
-        error_log("Ping again and refresh the cache");
         $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
     }
@@ -843,7 +839,6 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     $error = $org_msg;
 
     if( !empty($new_msg) ) {
-        error_log($new_msg);
         if( !empty($error) ) $error .= ' ';
         $error .= $new_msg;
     }
@@ -1012,11 +1007,7 @@ function bigbluebuttonbn_server_offers($capability_name){
     if( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' &&  $host_ends[$host_ends_length -2] == 'blindsidenetworks' ) {
         //Validate the capabilities offered
         $capabilities = bigbluebuttonbn_getCapabilitiesArray( $endpoint, $shared_secret );
-        if( !$capabilities ) {
-            error_log("Server does not offer extended capabilities");
-
-        } else {
-            error_log(json_encode($capabilities));
+        if( $capabilities ) {
             foreach ($capabilities as $capability) {
                 if( $capability["name"] == $capability_name)
                     $capability_offered = $capability;
