@@ -38,17 +38,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
         //UI configuration options
-        $voicebridge_editable = $CFG->bigbluebuttonbn_voicebridge_editable;
-        $recording_default = $CFG->bigbluebuttonbn_recording_default;
-        $recording_default_editable = $CFG->bigbluebuttonbn_recording_editable;
+        $voicebridge_editable = (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false);
+        $recording_default = (isset($CFG->bigbluebuttonbn_recording_default)? $CFG->bigbluebuttonbn_recording_default: true);
+        $recording_default_editable = (isset($CFG->bigbluebuttonbn_recording_editable)? $CFG->bigbluebuttonbn_recording_editable: true);
         $tagging_default = (isset($CFG->bigbluebuttonbn_recordingtagging_default)? $CFG->bigbluebuttonbn_recordingtagging_default: false);
         $tagging_default_editable = (isset($CFG->bigbluebuttonbn_recordingtagging_editable)? $CFG->bigbluebuttonbn_recordingtagging_editable: false);
-        $waitformoderator_default = $CFG->bigbluebuttonbn_waitformoderator_default;
-        $waitformoderator_editable = $CFG->bigbluebuttonbn_waitformoderator_editable;
-        $userlimit_default = $CFG->bigbluebuttonbn_userlimit_default;
-        $userlimit_editable = $CFG->bigbluebuttonbn_userlimit_editable;
-        $preuploadpresentation_enabled = $CFG->bigbluebuttonbn_preuploadpresentation_enabled;
-        $sendnotifications_enabled = $CFG->bigbluebuttonbn_sendnotifications_enabled;
+        $waitformoderator_default = (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false);
+        $waitformoderator_editable = (isset($CFG->bigbluebuttonbn_waitformoderator_editable)? $CFG->bigbluebuttonbn_waitformoderator_editable: true);
+        $userlimit_default = (isset($CFG->bigbluebuttonbn_userlimit_default)? $CFG->bigbluebuttonbn_userlimit_default: 0);
+        $userlimit_editable = (isset($CFG->bigbluebuttonbn_userlimit_editable)? $CFG->bigbluebuttonbn_userlimit_editable: false);
+        $preuploadpresentation_enabled = (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false);
+        $sendnotifications_enabled = (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: true);
 
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($url); 
