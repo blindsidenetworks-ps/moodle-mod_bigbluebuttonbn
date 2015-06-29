@@ -105,7 +105,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_preuploadpresentation_enabled',
             get_string('config_feature_preuploadpresentation_enabled', 'bigbluebuttonbn'),
             get_string('config_feature_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
-            1));
+            0));
 
     //// Configuration for "user limit" feature
     $settings->add( new admin_setting_heading('config_userlimit',
@@ -120,7 +120,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_userlimit_editable',
             get_string('config_feature_userlimit_editable', 'bigbluebuttonbn'),
             get_string('config_feature_userlimit_editable_description', 'bigbluebuttonbn'),
-            1));
+            0));
 
     //$settings->add( new admin_setting_heading('config_scheduled',
     //        get_string('config_scheduled', 'bigbluebuttonbn'),
