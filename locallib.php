@@ -195,11 +195,16 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
     }
 }
 
-function bigbluebuttonbn_getRecordingsArray( $meetingID, $URL, $SALT ) {
+function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
-    //$xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
-    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingID );
+    if( is_array($meetingIDs) ) {
+        // getRecordings is executes using a method POST (supported only on BBB 0.91 and later) 
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
+    } else {
+        // getRecordings is executes using a method GET supported by any version of BBB
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingIDs ) );
+    }
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
         $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
@@ -324,23 +329,28 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
         return 'false';
 }
 
-function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data_string=null){
+function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null){
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
         if( $method == BIGBLUEBUTTONBN_METHOD_POST ) {
-            $options = array();
-            if( !is_null($data_string) ) {
-                $options['CURLOPT_HTTPHEADER'] = array(
+            if( !is_null($data) ) {
+                if( !is_array($data) ) {
+                    $options['CURLOPT_HTTPHEADER'] = array(
                             'Content-Type: text/xml',
-                            'Content-Length: '.strlen($data_string),
+                            'Content-Length: '.strlen($data),
                             'Content-Language: en-US'
                         );
-                //$options['CURLOPT_POSTFIELDS'] = $data_string;
-                $response = $c->post($url, $data_string, $options);
+                    $response = $c->post($url, $data, $options);
+
+                } else {
+                    $response = $c->post($url, $data);
+                }
+
             } else {
                 $response = $c->post($url);
             }
+
         } else {
             $response = $c->get($url);
         }
