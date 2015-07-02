@@ -197,13 +197,21 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         $field = new xmldb_field('record');
         if( $dbman->field_exists($table, $field) ) {
             //// Migrate data in field recording to new format in meta
-            $sql = "UPDATE {bigbluebuttonbn_log} SET meta=CONCAT('{\"record\":', IF(record, 'true', 'false'), '}') WHERE event=?";
-            $DB->execute($sql, array('event' => 'Create'));
-            //// Drop field recording
+            $meta = new \stdClass();
+
+            // Record => true.
+            $meta->record = true;
+            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 1));
+
+            // Record => false.
+            $meta->record = false;
+            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 0));
+
+            // Drop field recording
             $dbman->drop_field($table, $field, $continue=true, $feedback=true);
         }
 
-        //upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
     }
 
     return $result;
