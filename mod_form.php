@@ -34,7 +34,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = bigbluebuttonbn_get_context_course($course->id);
 
         //BigBlueButton server data
-        $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+        $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
         $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
 
         //UI configuration options
@@ -51,7 +51,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $sendnotifications_enabled = (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: true);
 
         //Validates if the BigBlueButton server is running 
-        $serverVersion = bigbluebuttonbn_getServerVersion($url); 
+        $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
         if ( !isset($serverVersion) ) {
             print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
         }
