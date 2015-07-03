@@ -111,7 +111,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
     }
 
     if ($result && $oldversion < 2015063000) {
-        error_log('Update 2015030252 starts');
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
         //// Drop field timeduration

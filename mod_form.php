@@ -76,13 +76,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         }
         $mform->setAdvanced('introeditor');
-
-        // Display the label to the right of the checkbox so it looks better & matches rest of the form
-        $coursedesc = $mform->getElement('showdescription');
-        if(!empty($coursedesc)){
-            $coursedesc->setText(' ' . $coursedesc->getLabel());
-            $coursedesc->setLabel('&nbsp');
-        }
         $mform->setAdvanced('showdescription');
 
         $mform->addElement('checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn'));
