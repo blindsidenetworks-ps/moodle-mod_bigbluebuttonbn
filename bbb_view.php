@@ -82,13 +82,13 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                     /// Prepare the metadata
                     $metadata = array("meta_origin" => $bbbsession['origin'],
-                            "meta_originVersion" => $bbbsession['originVersion'],
-                            "meta_originServerName" => $bbbsession['originServerName'],
-                            "meta_originServerCommonName" => $bbbsession['originServerCommonName'],
-                            "meta_originTag" => $bbbsession['originTag'],
-                            "meta_context" => $bbbsession['context'],
-                            "meta_recordingDescription" => $bbbsession['contextActivityDescription'],
-                            "meta_recordingTags" => $bbbsession['contextActivityTags'],
+                            "meta_bn-origin-version" => $bbbsession['originVersion'],
+                            "meta_bn-origin-serve-name" => $bbbsession['originServerName'],
+                            "meta_bn-origin-server-common-name" => $bbbsession['originServerCommonName'],
+                            "meta_bn-origin-tag" => $bbbsession['originTag'],
+                            "meta_bn-context" => $bbbsession['context'],
+                            "meta_bn-recording-description" => $bbbsession['contextActivityDescription'],
+                            "meta_bn-recording-tags" => $bbbsession['contextActivityTags'],
                             "meta_bn-recording-ready-url" => $bbbsession['recordingReadyURL'],
                     );
 
