@@ -863,8 +863,22 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                 $duration = intval(($endTime - $startTime) / 60000);
 
                 //$meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
-                $meta_activity = isset($recording['meta_contextactivity'])?str_replace('"', '\"', $recording['meta_contextactivity']):'';
-                $meta_description = isset($recording['meta_contextactivitydescription'])?str_replace('"', '\"', $recording['meta_contextactivitydescription']):'';
+                //For backward compatibility
+                if( isset($recording['meta_contextactivity']) ) {
+                    $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
+                } if( isset($recording['meta_bn-recording-name']) ) {
+                    $meta_activity = str_replace('"', '\"', $recording['meta_bn-recording-name']);
+                } else {
+                    $meta_activity = str_replace('"', '\"', $recording['meetingName']);
+                }
+
+                if( isset($recording['meta_contextactivitydescription']) ) {
+                    $meta_description = str_replace('"', '\"', $recording['meta_contextactivitydescription']);
+                } else if( isset($recording['meta_bn-recording-description']) ) {
+                    $meta_description = str_replace('"', '\"', $recording['meta_bn-recording-description']);
+                } else {
+                    $meta_description = '';
+                }
 
                 $actionbar = '';
                 $params['id'] = $bbbsession['cm']->id;

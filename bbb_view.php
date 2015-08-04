@@ -81,12 +81,13 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                 // If user is administrator, moderator or if is viewer and no waiting is required
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                     /// Prepare the metadata
-                    $metadata = array("meta_origin" => $bbbsession['origin'],
+                    $metadata = array("meta_bn-origin" => $bbbsession['origin'],
                             "meta_bn-origin-version" => $bbbsession['originVersion'],
-                            "meta_bn-origin-serve-name" => $bbbsession['originServerName'],
+                            "meta_bn-origin-server-name" => $bbbsession['originServerName'],
                             "meta_bn-origin-server-common-name" => $bbbsession['originServerCommonName'],
                             "meta_bn-origin-tag" => $bbbsession['originTag'],
                             "meta_bn-context" => $bbbsession['context'],
+                            "meta_bn-recording-name" => $bbbsession['contextActivityName'],
                             "meta_bn-recording-description" => $bbbsession['contextActivityDescription'],
                             "meta_bn-recording-tags" => $bbbsession['contextActivityTags'],
                             "meta_bn-recording-ready-url" => $bbbsession['recordingReadyURL'],

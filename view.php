@@ -1,6 +1,6 @@
 <?php
 /**
- * Join a BigBlueButton room
+ * View a BigBlueButton room
  *
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
@@ -103,7 +103,7 @@ $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
 $bbbsession['context'] = $course->fullname;
-$bbbsession['contextActivity'] = $bigbluebuttonbn->name;
+$bbbsession['contextActivityName'] = $bigbluebuttonbn->name;
 $bbbsession['contextActivityDescription'] = "";
 $bbbsession['contextActivityTags'] = "";
 ////////////////////////////////////////
