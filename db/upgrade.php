@@ -6,7 +6,7 @@
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2014 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -114,17 +114,107 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015062100) {
-
+    if ($result && $oldversion < 2015063000) {
+        // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field timeduration
+        $field = new xmldb_field('timeduration');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Drop field allmoderators
+        $field = new xmldb_field('allmoderators');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field intro
+        $field = new xmldb_field('intro');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field introformat
+        $field = new xmldb_field('introformat');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1, 'intro');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field tagging
+        $field = new xmldb_field('tagging');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'record');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field presentation
+        $field = new xmldb_field('presentation');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'timemodified');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field type
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'course');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Rename field timeavailable
+        $field = new xmldb_field('timeavailable');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->rename_field($table, $field, 'openingtime', $continue=true, $feedback=true);
+        }
+        //// Rename field timedue
+        $field = new xmldb_field('timedue');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->rename_field($table, $field, 'closingtime', $continue=true, $feedback=true);
+        }
+        //// Add field timecreated
+        $field = new xmldb_field('timecreated');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'closingtime');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field userlimit
         $field = new xmldb_field('userlimit');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field, $continue=true, $feedback=true);
         }
 
-        upgrade_mod_savepoint(true, 2015062100, 'bigbluebuttonbn');
+        // Update the bigbluebuttonbn_log table
+        $table = new xmldb_table('bigbluebuttonbn_log');
+        //// Add field userid
+        $field = new xmldb_field('userid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'bigbluebuttonbnid');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field meta
+        $field = new xmldb_field('meta');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'event');
+        if( !$dbman->field_exists($table, $field) ) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Drop field recording
+        $field = new xmldb_field('record');
+        if( $dbman->field_exists($table, $field) ) {
+            //// Migrate data in field recording to new format in meta
+            $meta = new \stdClass();
+
+            // Record => true.
+            $meta->record = true;
+            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 1));
+
+            // Record => false.
+            $meta->record = false;
+            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 0));
+
+            // Drop field recording
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+
+        upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
     }
 
     return $result;

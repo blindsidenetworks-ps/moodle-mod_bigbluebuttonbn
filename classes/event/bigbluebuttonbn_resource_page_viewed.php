@@ -11,7 +11,7 @@
 namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
-class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
+class bigbluebuttonbn_resource_page_viewed extends \core\event\base {
     /**
      * Init method.
      *
@@ -20,6 +20,7 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'bigbluebuttonbn';
     }
 
     /**
@@ -28,7 +29,7 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_activity_viewed_all', 'mod_bigbluebuttonbn');
+        return get_string('event_resource_page_viewed', 'mod_bigbluebuttonbn');
     }
 
     /**
@@ -37,8 +38,8 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the bigbluebuttonbn activity management page for " .
-        "the course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' viewed the bigbluebuttonbn page for " .
+        "the course id '$this->contextinstanceid'.";
     }
 
     /**

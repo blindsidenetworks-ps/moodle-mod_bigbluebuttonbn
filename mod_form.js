@@ -1,3 +1,10 @@
+/**
+ * @package   mod_bigbluebuttonbn
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @copyright 2014-2015 Blindside Networks Inc.
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
+
 bigbluebuttonbn_participant_selection_set = function() {
     bigbluebuttonbn_select_clear('bigbluebuttonbn_participant_selection');
 
@@ -15,14 +22,12 @@ bigbluebuttonbn_participant_selection_set = function() {
                 bigbluebuttonbn_select_enable('bigbluebuttonbn_participant_selection')
             }
         }
-            
     }
 }
 
 bigbluebuttonbn_participant_list_update = function() {
     var participant_list = document.getElementsByName('participants')[0];
     participant_list.value = JSON.stringify(bigbluebuttonbn_participant_list).replace(/"/g, '&quot;');
-    console.debug(participant_list);
 }
 
 bigbluebuttonbn_participant_remove = function(type, id) {
@@ -54,11 +59,11 @@ bigbluebuttonbn_participant_add = function() {
             found = true;
         }
     }
-    
+
     //If not found
     if( !found ){
         // Add it to memory
-        var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer", "id": null};
+        var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer"};
         bigbluebuttonbn_participant_list.push(participant);
 
         // Add it to the form
