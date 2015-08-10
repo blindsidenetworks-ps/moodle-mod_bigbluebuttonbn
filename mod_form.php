@@ -290,12 +290,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
-
-        $html_preload_predefinedprofiles = ''.
-                '<script type="text/javascript">'."\n".
-                '  bigbluebuttonbn_update_predefinedprofile();'.
-                '</script>'."\n";
-        $mform->addElement('html', $html_preload_predefinedprofiles);
     }
 
     function data_preprocessing(&$default_values) {
