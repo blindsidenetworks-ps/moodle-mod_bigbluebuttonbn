@@ -47,20 +47,20 @@ if ($ADMIN->fulltree) {
             get_string('config_feature_recording_icons_enabled_description', 'bigbluebuttonbn'),
             1));
     
-    ////// Configuration for recording feature
-    //$settings->add( new admin_setting_heading('bigbluebuttonbn_recordingtagging',
-    //        get_string('config_feature_recordingtagging', 'bigbluebuttonbn'),
-    //        get_string('config_feature_recordingtagging_description', 'bigbluebuttonbn')));
-    //// default value for 'recording tagging' feature
-    //$settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
-    //        get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
-    //        get_string('config_feature_recordingtagging_default_description', 'bigbluebuttonbn'),
-    //        0));
-    //// UI for 'recording tagging' feature
-    //$settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
-    //        get_string('config_feature_recordingtagging_editable', 'bigbluebuttonbn'),
-    //        get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
-    //        1));
+    //// Configuration for recording feature
+    $settings->add( new admin_setting_heading('bigbluebuttonbn_recordingtagging',
+            get_string('config_feature_recordingtagging', 'bigbluebuttonbn'),
+            get_string('config_feature_recordingtagging_description', 'bigbluebuttonbn')));
+    // default value for 'recording tagging' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
+            get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
+            get_string('config_feature_recordingtagging_default_description', 'bigbluebuttonbn'),
+            0));
+    // UI for 'recording tagging' feature
+    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
+            get_string('config_feature_recordingtagging_editable', 'bigbluebuttonbn'),
+            get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
+            1));
 
     //// Configuration for wait for moderator feature
     $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_waitformoderator',

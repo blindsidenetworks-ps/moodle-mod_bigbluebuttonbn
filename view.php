@@ -280,7 +280,9 @@ $jsVars = array(
                 'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn'),
                 'publishing' => get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn'),
                 'unpublishing' => get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn'),
-                //'userlimit_reached' => get_string('view_error_userlimit_reached', 'bigbluebuttonbn'),
+                'modal_title' => get_string('view_recording_modal_title', 'bigbluebuttonbn'),
+                'modal_button' => get_string('view_recording_modal_button', 'bigbluebuttonbn'),
+          //'userlimit_reached' => get_string('view_error_userlimit_reached', 'bigbluebuttonbn'),
         )
 );
 $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
@@ -303,6 +305,27 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo '<br><span id="status_bar"></span><br>';
     echo '<br><span id="control_panel"></span><br>';
     echo $OUTPUT->box_end();
+    echo ''.
+      '<div id="panelContent">'.
+      '  <div class="yui3-widget-bd">'.
+      '    <form>'.
+      '      <fieldset>'.
+      '        <div>'.
+      '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'.
+      '          <input type="text" name="name" id="recording_name" placeholder="">'.
+      '        </div><br>'.
+      '        <div>'.
+      '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').'</label><br/>'.
+      '          <input type="text" name="description" id="recording_description" value="" placeholder="">'.
+      '        </div><br>'.
+      '        <div>'.
+      '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'.
+      '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'.
+      '        </div>'.
+      '      </fieldset>'.
+      '    </form>'.
+      '  </div>'.
+      '</div>';
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
     echo '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>';

@@ -828,14 +828,14 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     global $OUTPUT, $CFG;
 
     ///Set strings to show
-    $view_head_recording = get_string('view_head_recording', 'bigbluebuttonbn');
-    $view_head_course = get_string('view_head_course', 'bigbluebuttonbn');
-    $view_head_activity = get_string('view_head_activity', 'bigbluebuttonbn');
-    $view_head_description = get_string('view_head_description', 'bigbluebuttonbn');
-    $view_head_date = get_string('view_head_date', 'bigbluebuttonbn');
-    $view_head_length = get_string('view_head_length', 'bigbluebuttonbn');
-    $view_head_duration = get_string('view_head_duration', 'bigbluebuttonbn');
-    $view_head_actionbar = get_string('view_head_actionbar', 'bigbluebuttonbn');
+    $view_recording_recording = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $view_recording_course = get_string('view_recording_course', 'bigbluebuttonbn');
+    $view_recording_activity = get_string('view_recording_activity', 'bigbluebuttonbn');
+    $view_recording_description = get_string('view_recording_description', 'bigbluebuttonbn');
+    $view_recording_date = get_string('view_recording_date', 'bigbluebuttonbn');
+    $view_recording_length = get_string('view_recording_length', 'bigbluebuttonbn');
+    $view_recording_duration = get_string('view_recording_duration', 'bigbluebuttonbn');
+    $view_recording_actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
     $view_duration_min = get_string('view_duration_min', 'bigbluebuttonbn');
 
     ///Declare the table
@@ -844,10 +844,10 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
 
     ///Initialize table headers
     if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
-        $table->head  = array ($view_head_recording, $view_head_activity, $view_head_description, $view_head_date, $view_head_duration, $view_head_actionbar);
+        $table->head  = array ($view_recording_recording, $view_recording_activity, $view_recording_description, $view_recording_date, $view_recording_duration, $view_recording_actionbar);
         $table->align = array ('left', 'left', 'left', 'left', 'center', 'left');
     } else {
-        $table->head  = array ($view_head_recording, $view_head_activity, $view_head_description, $view_head_date, $view_head_duration);
+        $table->head  = array ($view_recording_recording, $view_recording_activity, $view_recording_description, $view_recording_date, $view_recording_duration);
         $table->align = array ('left', 'left', 'left', 'left', 'center');
     }
 
@@ -906,7 +906,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                         //With icon for delete
                         $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
                         $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
-                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");');
+                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");');
                         $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                     } else {

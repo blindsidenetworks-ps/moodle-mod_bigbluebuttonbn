@@ -268,16 +268,20 @@ $string['view_conference_action_end'] = 'End session';
 $string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
-$string['view_delete_confirmation'] = 'Are you sure to delete this recording?';
-$string['view_head_actionbar'] = 'Toolbar';
-$string['view_head_activity'] = 'Activity';
-$string['view_head_course'] = 'Course';
-$string['view_head_date'] = 'Date';
-$string['view_head_description'] = 'Description';
-$string['view_head_length'] = 'Length';
-$string['view_head_duration'] = 'Duration';
-$string['view_head_recording'] = 'Recording';
-$string['view_duration_min'] = 'min';
+$string['view_recording_delete_confirmation'] = 'Are you sure to delete this recording?';
+$string['view_recording_actionbar'] = 'Toolbar';
+$string['view_recording_activity'] = 'Activity';
+$string['view_recording_course'] = 'Course';
+$string['view_recording_date'] = 'Date';
+$string['view_recording_description'] = 'Description';
+$string['view_recording_length'] = 'Length';
+$string['view_recording_duration'] = 'Duration';
+$string['view_recording_recording'] = 'Recording';
+$string['view_recording_duration_min'] = 'min';
+$string['view_recording_name'] = 'Name';
+$string['view_recording_tags'] = 'Tags';
+$string['view_recording_modal_button'] = 'Apply';
+$string['view_recording_modal_title'] = 'Set values for recording';
 
 $string['event_activity_created'] = 'BigBlueButtonBN activity created';
 $string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';

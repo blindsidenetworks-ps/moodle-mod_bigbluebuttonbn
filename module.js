@@ -15,6 +15,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 var bigbluebuttonbn_dataSource;
 var bigbluebuttonbn_ping_interval_id;
+var bigbluebuttonbn_panel;
 
 M.mod_bigbluebuttonbn.view_init = function(Y) {
     bigbluebuttonbn_dataSource = new Y.DataSource.Get({
@@ -29,6 +30,42 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
     if (bigbluebuttonbn.action == 'before') {
     } else if (bigbluebuttonbn.action == 'after') {
     } else if (bigbluebuttonbn.action == 'join') {
+	    // Create the main modal form.
+        bigbluebuttonbn_panel = new Y.Panel({
+            srcNode      : '#panelContent',
+            headerContent: bigbluebuttonbn.locales.modal_title,
+            width        : 250,
+            zIndex       : 5,
+	        centered     : true,
+	        modal        : true,
+	        visible      : false,
+	        render       : true,
+	        plugins      : [Y.Plugin.Drag]
+        });
+
+        bigbluebuttonbn_panel.addButton({
+            value  : bigbluebuttonbn.locales.modal_button,
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+
+                //var joinBtn = Y.DOM.byId('join_button');
+                var joinBtn  = Y.one('#join_button');
+                var nameField = Y.one('#recording_name');
+                var descriptionField  = Y.one('#recording_description');
+                var tagsField = Y.one('#recording_tags');
+
+                // Define the apply function - this will be called when 'Apply' is
+                // pressed on the modal form.
+                console.info(nameField.get('value'));
+                console.info(descriptionField.get('value'));
+                console.info(tagsField.get('value'));
+                descriptionField.set('value', '');
+                tagsField.set('value', '');
+                bigbluebuttonbn_panel.hide();
+            }
+        });
+
         bigbluebuttonbn_dataSource.sendRequest({
             request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
@@ -129,6 +166,9 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
     Y.DOM.setAttribute(join_button_input, 'type', 'button');
     Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
+    console.info(status);
+    console.info(status.join_url);
+
     if (status.can_join) {
         Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_joinNow(\'' + status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress + '\');');
     } else {
@@ -215,15 +255,29 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
 }
 
 M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
-    location.assign(join_url);
+    YUI().use('datatable-mutable', 'panel', 'dd-plugin', function (Y) {
+        bigbluebuttonbn_panel.show();
+    });
+
+    //var person = prompt("Please enter your name", "Harry Potter");
+
+    //if (person != null) {
+    //    document.getElementById("demo").innerHTML =
+    //    "Hello " + person + "! How are you today?";
+    //}
+
+    //location.assign(join_url);
     // Update view
-    M.mod_bigbluebuttonbn.view_clean_status_bar();
-    M.mod_bigbluebuttonbn.view_clean_control_panel();
-    M.mod_bigbluebuttonbn.view_hide_join_button();
-    M.mod_bigbluebuttonbn.view_hide_end_button();
-    Y.DOM.addHTML(Y.DOM.byId('status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
+    //M.mod_bigbluebuttonbn.view_clean_status_bar();
+    //M.mod_bigbluebuttonbn.view_clean_control_panel();
+    //M.mod_bigbluebuttonbn.view_hide_join_button();
+    //M.mod_bigbluebuttonbn.view_hide_end_button();
+    //Y.DOM.addHTML(Y.DOM.byId('status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
 }
 
+M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
+
+}
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
     console.info('Action: ' + action);
     var id = bigbluebuttonbn_dataSource.sendRequest({
