@@ -85,6 +85,7 @@ $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
 if( $bigbluebuttonbn->record )
     $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+$bbbsession['tagging'] = $bigbluebuttonbn->tagging;
 
 $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
 $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
@@ -303,29 +304,31 @@ function bigbluebuttonbn_view_joining($bbbsession){
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
     echo '<br><span id="status_bar"></span><br>';
-    echo '<br><span id="control_panel"></span><br>';
+    echo '<span id="control_panel"></span>';
     echo $OUTPUT->box_end();
-    echo ''.
-      '<div id="panelContent">'.
-      '  <div class="yui3-widget-bd">'.
-      '    <form>'.
-      '      <fieldset>'.
-      '        <div>'.
-      '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'.
-      '          <input type="text" name="name" id="recording_name" placeholder="">'.
-      '        </div><br>'.
-      '        <div>'.
-      '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').'</label><br/>'.
-      '          <input type="text" name="description" id="recording_description" value="" placeholder="">'.
-      '        </div><br>'.
-      '        <div>'.
-      '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'.
-      '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'.
-      '        </div>'.
-      '      </fieldset>'.
-      '    </form>'.
-      '  </div>'.
-      '</div>';
+    if( $bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator']) ){
+        echo ''.
+          '<div id="panelContent">'.
+          '  <div class="yui3-widget-bd">'.
+          '    <form>'.
+          '      <fieldset>'.
+          '        <div>'.
+          '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'.
+          '          <input type="text" name="name" id="recording_name" placeholder="">'.
+          '        </div><br>'.
+          '        <div>'.
+          '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').'</label><br/>'.
+          '          <input type="text" name="description" id="recording_description" value="" placeholder="">'.
+          '        </div><br>'.
+          '        <div>'.
+          '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'.
+          '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'.
+          '        </div>'.
+          '      </fieldset>'.
+          '    </form>'.
+          '  </div>'.
+          '</div>';
+    }
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
     echo '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>';

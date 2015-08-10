@@ -14,6 +14,9 @@ require_once(dirname(__FILE__).'/locallib.php');
 $id = optional_param('id', 0, PARAM_INT);  // course_module ID, or
 $bn = optional_param('bn', 0, PARAM_INT);  // bigbluebuttonbn instance ID
 $action = required_param('action', PARAM_TEXT);
+$name = optional_param('name', '', PARAM_TEXT);
+$description = optional_param('description', '', PARAM_TEXT);
+$tags = optional_param('tags', '', PARAM_TEXT);
 
 if ($id) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
@@ -87,9 +90,9 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                             "meta_bn-origin-server-common-name" => $bbbsession['originServerCommonName'],
                             "meta_bn-origin-tag" => $bbbsession['originTag'],
                             "meta_bn-context" => $bbbsession['context'],
-                            "meta_bn-recording-name" => $bbbsession['contextActivityName'],
-                            "meta_bn-recording-description" => $bbbsession['contextActivityDescription'],
-                            "meta_bn-recording-tags" => $bbbsession['contextActivityTags'],
+                            "meta_bn-recording-name" => (isset($name) && $name != '')? $name: $bbbsession['contextActivityName'],
+                            "meta_bn-recording-description" => (isset($description) && $description != '')? $description: $bbbsession['contextActivityDescription'],
+                            "meta_bn-recording-tags" => (isset($tags) && $tags != '')? $tags: $bbbsession['contextActivityTags'],
                             "meta_bn-recording-ready-url" => $bbbsession['recordingReadyURL'],
                     );
 

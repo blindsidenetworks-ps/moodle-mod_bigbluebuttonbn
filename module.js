@@ -22,10 +22,10 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
     });
 
-    var status_bar = Y.DOM.byId('status_bar');
-    var control_panel = Y.DOM.byId('control_panel');
-    var join_button = Y.DOM.byId('join_button');
-    var end_button = Y.DOM.byId('end_button');
+    var status_bar = Y.one('#status_bar');
+    var control_panel = Y.one('#control_panel');
+    var join_button = Y.one('#join_button');
+    var end_button = Y.one('#end_button');
 
     if (bigbluebuttonbn.action == 'before') {
     } else if (bigbluebuttonbn.action == 'after') {
@@ -48,21 +48,37 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
             section: Y.WidgetStdMod.FOOTER,
             action : function (e) {
                 e.preventDefault();
+                bigbluebuttonbn_panel.hide();
 
-                //var joinBtn = Y.DOM.byId('join_button');
-                var joinBtn  = Y.one('#join_button');
+                //var nameField = Y.DOM.byId('recording_name');
                 var nameField = Y.one('#recording_name');
                 var descriptionField  = Y.one('#recording_description');
                 var tagsField = Y.one('#recording_tags');
-
                 // Define the apply function - this will be called when 'Apply' is
                 // pressed on the modal form.
-                console.info(nameField.get('value'));
-                console.info(descriptionField.get('value'));
-                console.info(tagsField.get('value'));
+                var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                bigbluebuttonbn_dataSource.sendRequest({
+                    request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+                    callback : {
+                        success : function(e) {
+                            if (e.data.running) {
+                                alert('The meeting is already running, the data typed will not affect the values for this session.');
+                            } else {
+                                var join_url = e.data.status.join_url + '&name=' + name + '&description=' + description + '&tags=' + tags;
+                                M.mod_bigbluebuttonbn.broker_executeJoin(join_url, e.data.status.message);
+                            }
+                        },
+                        failure : function(e) {
+                            console.log(e);
+                        }
+                    }
+                });
+
+                nameField.set('value', '');
                 descriptionField.set('value', '');
                 tagsField.set('value', '');
-                bigbluebuttonbn_panel.hide();
             }
         });
 
@@ -70,7 +86,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
             request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
                 success : function(e) {
-                    //if( e.data.infp.participantCount < bigbluebuttonbn.userlimit){}
+                    //if( e.data.info.participantCount < bigbluebuttonbn.userlimit){}
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
                     Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
                     if(typeof e.data.status.can_join != 'undefined' && e.data.status.can_join ) {
@@ -79,6 +95,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
                     if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
                         Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
                     }
+
                 },
                 failure : function(e) {
                     console.log(e);
@@ -166,11 +183,9 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
     Y.DOM.setAttribute(join_button_input, 'type', 'button');
     Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
-    console.info(status);
-    console.info(status.join_url);
 
     if (status.can_join) {
-        Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_joinNow(\'' + status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress + '\');');
+        Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_joinNow(\'' + status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress + '\', ' + status.can_tag + ');');
     } else {
         Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_waitModerator(\'' + status.join_url +'\');');
     }
@@ -193,28 +208,28 @@ M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
 
 
 M.mod_bigbluebuttonbn.view_clean_status_bar = function() {
-    var status_bar_span = Y.DOM.byId('status_bar_span');
+    var status_bar_span = Y.one('#status_bar_span');
     status_bar_span.remove();
 }
 
 M.mod_bigbluebuttonbn.view_clean_control_panel = function() {
-    var control_panel_div = Y.DOM.byId('control_panel_div');
+    var control_panel_div = Y.one('#control_panel_div');
     control_panel_div.remove();
 }
 
 M.mod_bigbluebuttonbn.view_hide_join_button = function() {
-    var join_button = Y.DOM.byId('join_button');
+    var join_button = Y.one('#join_button');
     Y.DOM.setStyle(join_button, 'visibility', 'hidden');
 }
 
 M.mod_bigbluebuttonbn.view_hide_end_button = function() {
-    var end_button = Y.DOM.byId('end_button');
+    var end_button = Y.one('#end_button');
     Y.DOM.setStyle(end_button, 'visibility', 'hidden');
 }
 
 M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
     /// Show the spinning wheel
-    var control_panel = Y.DOM.byId('control_panel');
+    var control_panel = Y.one('#control_panel');
     //// clean the current content
     M.mod_bigbluebuttonbn.view_clean_control_panel();
     //// create a new div
@@ -243,7 +258,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
             success : function(e) {
                 if (e.data.running) {
                     clearInterval(bigbluebuttonbn_ping_interval_id);
-                    M.mod_bigbluebuttonbn.broker_joinNow(join_url, e.data.status.message);
+                    M.mod_bigbluebuttonbn.broker_joinNow(join_url, e.data.status.message, false);
                 }
             },
             failure : function(e) {
@@ -254,30 +269,41 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
     });
 }
 
-M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message) {
-    YUI().use('datatable-mutable', 'panel', 'dd-plugin', function (Y) {
-        bigbluebuttonbn_panel.show();
-    });
+M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_tag) {
+    if( can_tag ) {
+        bigbluebuttonbn_dataSource.sendRequest({
+            request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+            callback : {
+                success : function(e) {
+                    if (e.data.running) {
+                        M.mod_bigbluebuttonbn.broker_executeJoin(join_url, e.data.status.message);
+                    } else {
+                        YUI().use('panel', function (Y) {
+                            bigbluebuttonbn_panel.show();
+                        });
+                    }
+                },
+                failure : function(e) {
+                    console.log(e);
+                }
+            }
+        });
 
-    //var person = prompt("Please enter your name", "Harry Potter");
-
-    //if (person != null) {
-    //    document.getElementById("demo").innerHTML =
-    //    "Hello " + person + "! How are you today?";
-    //}
-
-    //location.assign(join_url);
-    // Update view
-    //M.mod_bigbluebuttonbn.view_clean_status_bar();
-    //M.mod_bigbluebuttonbn.view_clean_control_panel();
-    //M.mod_bigbluebuttonbn.view_hide_join_button();
-    //M.mod_bigbluebuttonbn.view_hide_end_button();
-    //Y.DOM.addHTML(Y.DOM.byId('status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
+    } else {
+        M.mod_bigbluebuttonbn.broker_executeJoin(join_url, status_message);
+    }
 }
 
 M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
-
+    location.assign(join_url);
+    // Update view
+    M.mod_bigbluebuttonbn.view_clean_status_bar();
+    M.mod_bigbluebuttonbn.view_clean_control_panel();
+    M.mod_bigbluebuttonbn.view_hide_join_button();
+    M.mod_bigbluebuttonbn.view_hide_end_button();
+    Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
 }
+
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
     console.info('Action: ' + action);
     var id = bigbluebuttonbn_dataSource.sendRequest({
@@ -285,17 +311,16 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
         callback : {
             success : function(e) {
                 if( action == 'delete') {
-                    var recording_td = Y.DOM.byId('recording-td-' + recordingid);
+                    var recording_td = Y.one('#recording-td-' + recordingid);
                     recording_td.remove();
                 } else if( action == 'publish' || action == 'unpublish' ) {
-                    var btn_action = Y.DOM.byId('recording-btn-' + action + '-' + recordingid);
+                    var btn_action = Y.one('#recording-btn-' + action + '-' + recordingid);
                     btn_action.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
                     btn_action.setAttribute('alt', (action == 'publish')? bigbluebuttonbn.locales.publishing: bigbluebuttonbn.locales.unpublishing);
                     btn_action.setAttribute('title', (action == 'publish')? bigbluebuttonbn.locales.publishing: bigbluebuttonbn.locales.unpublishing);
-                    var link_action = Y.DOM.byId('recording-link-' + action + '-' + recordingid);
+                    var link_action = Y.one('#recording-link-' + action + '-' + recordingid);
                     link_action.setAttribute('onclick', '');
                 }
-                console.log(e.data);
                 if (e.data.status == 'true') {
                     console.info(action + " completed");
                 }
@@ -317,7 +342,6 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
         callback : {
             success : function(e) {
                 if (e.data.status) {
-                    console.info("end meeting completed");
                     M.mod_bigbluebuttonbn.view_clean_control_panel();
                     M.mod_bigbluebuttonbn.view_hide_join_button();
                     M.mod_bigbluebuttonbn.view_hide_end_button();
