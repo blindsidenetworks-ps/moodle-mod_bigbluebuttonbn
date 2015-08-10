@@ -836,7 +836,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     $view_recording_length = get_string('view_recording_length', 'bigbluebuttonbn');
     $view_recording_duration = get_string('view_recording_duration', 'bigbluebuttonbn');
     $view_recording_actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
-    $view_duration_min = get_string('view_duration_min', 'bigbluebuttonbn');
+    $view_duration_min = get_string('view_recording_duration_min', 'bigbluebuttonbn');
 
     ///Declare the table
     $table = new html_table();

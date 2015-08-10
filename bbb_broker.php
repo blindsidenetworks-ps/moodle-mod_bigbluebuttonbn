@@ -62,9 +62,10 @@ if ( empty($error) ) {
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info); 
 
                     $status_can_end = '';
+                    $status_can_tag = '';
                     if( $meeting_running ) {
                         $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
-                        if( $meeting_info->participantCount < $bbbsession['userlimit'] ) {
+                        if( $bbbsession['userlimit'] == 0 || $meeting_info->participantCount < $bbbsession['userlimit'] ) {
                             $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
                             $can_join = true;
 
@@ -76,7 +77,7 @@ if ( empty($error) ) {
                         if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
                             $end_button_text = get_string('view_conference_action_end', 'bigbluebuttonbn');
                             $can_end = true;
-                            $status_can_end = '"can_end": '.($can_end? 'true': 'false').', "end_button_text": "'.$end_button_text.'", ';
+                            $status_can_end = '"can_end": true, "end_button_text": "'.$end_button_text.'", ';
                         }
 
                     } else {
@@ -91,8 +92,18 @@ if ( empty($error) ) {
                             $join_button_text = get_string('view_conference_action_lineup', 'bigbluebuttonbn');
                             $can_join = false;
                         }
+
+                        if( $bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator']) ) {
+                            $can_tag = true;
+
+                        } else {
+                            $can_tag = false;
+                        }
+                        $status_can_end = '"can_tag": '.($can_tag? 'true': 'false').', ';
+
                     }
-                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.'"message": "'.$initial_message.'"} });';
+
+                    echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.$status_can_tag.'"message": "'.$initial_message.'"} });';
                     break;
                 case 'meeting_end':
                     if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
