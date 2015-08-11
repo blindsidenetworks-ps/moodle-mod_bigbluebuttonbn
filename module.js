@@ -304,7 +304,7 @@ M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
     Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
 }
 
-M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
+M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, meetingid) {
     console.info('Action: ' + action);
     var id = bigbluebuttonbn_dataSource.sendRequest({
         request : "action=recording_" + action + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
@@ -330,7 +330,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
 
                     //Start pooling until the action has been executed
                     bigbluebuttonbn_ping_interval_id = bigbluebuttonbn_dataSource.setInterval(bigbluebuttonbn.ping_interval, {
-                        request : "action=recording_info&id=" + recordingid,
+                        request : "action=recording_info&id=" + recordingid + "&idx=" + meetingid,
                         callback : {
                             success : function(e) {
                                 if (e.data.status == 'true') {

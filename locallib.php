@@ -238,9 +238,42 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     return $recordings;
 }
 
-function bigbluebuttonbn_getRecordingArray( $recordingID, $URL, $SALT ) {
-    $recordings = array();
-    return $recordings;
+function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SALT ) {
+    $recording = array();
+
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
+
+    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
+        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+
+    } else if($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)){ //If there were meetings already created
+        foreach ($xml->recordings->recording as $recording) {
+            if( $recording->recordID == $recordingID ) {
+                $playbackArray = array();
+                foreach ( $recording->playback->format as $format ){
+                    $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
+                }
+
+                //Add the metadata to the recordings array
+                $metadataArray = array();
+                $metadata = get_object_vars($recording->metadata);
+                foreach ($metadata as $key => $value) {
+                    if(is_object($value)) $value = '';
+                    $metadataArray['meta_'.$key] = $value;
+                }
+
+                $recording = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+                break;
+            }
+        }
+
+    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
+        $recording = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+
+    } else { //If the server is unreachable, then prompts the user of the necessary action
+    }
+
+    return $recording;
 }
 
 function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
@@ -256,6 +289,7 @@ function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
     } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
         foreach ($xml->capabilities->capability as $capability) {
             $capabilities[] = array( 'name' => (string)$capability->name, 'endpoint' => (string)$capability->endpoint );
+
         }
         return $capabilities;
 
@@ -906,28 +940,28 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                         //With icon for publish/unpublish
                         $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
                         $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
-                        $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'");');
+                        $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
                         $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                         //With icon for delete
                         $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
                         $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
-                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");');
+                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
                         $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                     } else {
                         //With text for publish/unpublish
-                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'");') );
+                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
                         $actionbar .= "&nbsp;";
 
                         //With text for delete
-                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'");') );
+                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
                     }
                 }
 
                 $type = '';
-                foreach ( $recording['playbacks'] as $playback ){
-                    if ($recording['published'] == 'true'){
+                foreach ( $recording['playbacks'] as $playback ) {
+                    if ($recording['published'] == 'true') {
                         $type .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
                     } else {
                         $type .= $playback['type'].'&#32;';

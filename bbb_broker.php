@@ -16,6 +16,7 @@ global $PAGE, $USER, $CFG, $SESSION;
 $params['action']  = optional_param('action', '', PARAM_TEXT);
 $params['callback'] = optional_param('callback', '', PARAM_TEXT);
 $params['id'] = optional_param('id', '', PARAM_TEXT);
+$params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
@@ -125,9 +126,9 @@ if ( empty($error) ) {
                 case 'recording_list':
                     break;
                 case 'recording_info':
-                    $recording = bigbluebuttonbn_getRecordingArray($params['id'], $endpoint, $shared_secret);
+                    $recording = bigbluebuttonbn_getRecordingArray($params['id'], $params['idx'], $endpoint, $shared_secret);
                     if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
-                        echo $params['callback'].'({ "status": "true", "published": "true" });';
+                        echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
                     } else {
                         echo $params['callback'].'({ "status": "false" });';
                     }
