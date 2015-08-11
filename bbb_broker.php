@@ -125,7 +125,12 @@ if ( empty($error) ) {
                 case 'recording_list':
                     break;
                 case 'recording_info':
-                    echo $params['callback'].'({ "status": "false" });';
+                    $recording = bigbluebuttonbn_getRecordingArray($params['id'], $endpoint, $shared_secret);
+                    if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
+                        echo $params['callback'].'({ "status": "true", "published": "true" });';
+                    } else {
+                        echo $params['callback'].'({ "status": "false" });';
+                    }
                     break;
                 case 'recording_publish':
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);

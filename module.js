@@ -359,6 +359,9 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid) {
                                             console.info(action + " completed");
                                         }
                                     }
+                                } else {
+                                    console.info('The status of the recoding could not be verified');
+                                    clearInterval(bigbluebuttonbn_ping_interval_id);
                                 }
                             },
                             failure : function(e) {

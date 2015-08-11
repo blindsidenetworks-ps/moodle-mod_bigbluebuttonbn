@@ -238,6 +238,11 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     return $recordings;
 }
 
+function bigbluebuttonbn_getRecordingArray( $recordingID, $URL, $SALT ) {
+    $recordings = array();
+    return $recordings;
+}
+
 function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
     //$xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
     //// Mocking the getCapabilities
