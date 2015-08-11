@@ -19,6 +19,9 @@ $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
+$endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+$shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
 if( empty($params['action']) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "Parameter [action] was not included");
 
@@ -120,6 +123,9 @@ if ( empty($error) ) {
                     }
                     break;
                 case 'recording_list':
+                    break;
+                case 'recording_info':
+                    echo $params['callback'].'({ "status": "false" });';
                     break;
                 case 'recording_publish':
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);

@@ -793,6 +793,7 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
                 }
                 break;
             case 'recording_list':
+            case 'recording_info':
             case 'recording_publish':
             case 'recording_unpublish':
             case 'recording_delete':
@@ -1027,7 +1028,9 @@ function bigbluebuttonbn_get_locales_for_ui() {
             'viewers' => get_string('view_message_viewers', 'bigbluebuttonbn'),
             'moderator' => get_string('view_message_moderator', 'bigbluebuttonbn'),
             'moderators' => get_string('view_message_moderators', 'bigbluebuttonbn'),
+            'publish' => get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn'),
             'publishing' => get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn'),
+            'unpublish' => get_string('view_recording_list_actionbar_unpublish', 'bigbluebuttonbn'),
             'unpublishing' => get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn'),
             'modal_title' => get_string('view_recording_modal_title', 'bigbluebuttonbn'),
             'modal_button' => get_string('view_recording_modal_button', 'bigbluebuttonbn'),
