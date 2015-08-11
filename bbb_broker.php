@@ -27,7 +27,7 @@ if( empty($params['action']) ) {
 
     if( empty($error) && $params['action'] != "recording_ready" ) {
 
-        if ($params['bigbluebuttonbn']) {
+        if ($params['bigbluebuttonbn'] != 0) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
             $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
             $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
@@ -123,17 +123,20 @@ if ( empty($error) ) {
                     break;
                 case 'recording_publish':
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
-                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    if( isset($bigbluebuttonbn) )
+                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_unpublish':
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
-                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    if( isset($bigbluebuttonbn) )
+                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_delete':
                     $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
-                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                    if( isset($bigbluebuttonbn) )
+                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':

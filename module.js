@@ -358,3 +358,9 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
 M.mod_bigbluebuttonbn.view_windowClose = function() {
     window.close();
 };
+
+M.mod_bigbluebuttonbn.recordingsbn_init = function(Y) {
+    bigbluebuttonbn_dataSource = new Y.DataSource.Get({
+        source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+    });
+};
