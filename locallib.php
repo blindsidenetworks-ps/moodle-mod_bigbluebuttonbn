@@ -505,7 +505,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=nu
                     "role" => BIGBLUEBUTTONBN_ROLE_VIEWER
                 )
         );
-        
+
         $moderator_defaults = $CFG->bigbluebuttonbn_moderator_default;
         if ( !isset($moderator_defaults) ) {
             $moderator_defaults = array('owner');
@@ -936,7 +936,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                         $manage_action = 'publish';
                     }
 
-                    if ($CFG->bigbluebuttonbn_recording_icons_enabled) {
+                    if ($CFG->bigbluebuttonbn_recording_icons_enabled == 1) {
                         //With icon for publish/unpublish
                         $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
                         $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
@@ -951,11 +951,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
 
                     } else {
                         //With text for publish/unpublish
-                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
+                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
                         $actionbar .= "&nbsp;";
 
                         //With text for delete
-                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
+                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
                     }
                 }
 

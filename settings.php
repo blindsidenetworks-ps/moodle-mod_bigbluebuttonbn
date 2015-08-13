@@ -87,25 +87,36 @@ if ($ADMIN->fulltree) {
     }
 
     //// Configuration for wait for moderator feature
-    if( (!isset($CFG->bigbluebuttonbn_feature_waitformoderator_ui) || $CFG->bigbluebuttonbn_feature_waitformoderator_ui) ) {
+    if( (!isset($CFG->bigbluebuttonbn_waitformoderator_default_ui) || $CFG->bigbluebuttonbn_waitformoderator_default_ui) ||
+        (!isset($CFG->bigbluebuttonbn_waitformoderator_editable_ui) || $CFG->bigbluebuttonbn_waitformoderator_editable_ui) || 
+        (!isset($CFG->bigbluebuttonbn_waitformoderator_ping_interval_ui) || $CFG->bigbluebuttonbn_waitformoderator_ping_interval_ui) || 
+        (!isset($CFG->bigbluebuttonbn_waitformoderator_cache_ttl_ui) || $CFG->bigbluebuttonbn_waitformoderator_cache_ttl_ui) ) {
         $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_waitformoderator',
                 get_string('config_feature_waitformoderator', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_description', 'bigbluebuttonbn')));
+    }
+    if( (!isset($CFG->bigbluebuttonbn_waitformoderator_default_ui) || $CFG->bigbluebuttonbn_waitformoderator_default_ui) ) {
         //default value for 'wait for moderator' feature
         $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_default',
                 get_string('config_feature_waitformoderator_default', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_default_description', 'bigbluebuttonbn'),
                 0));
+    }
+    if( (!isset($CFG->bigbluebuttonbn_waitformoderator_editable_ui) || $CFG->bigbluebuttonbn_waitformoderator_editable_ui) ) {
         // UI for 'wait for moderator' feature
         $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_editable',
                 get_string('config_feature_waitformoderator_editable', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_editable_description', 'bigbluebuttonbn'),
                 1));
+    }
+    if( (!isset($CFG->bigbluebuttonbn_waitformoderator_ping_interval_ui) || $CFG->bigbluebuttonbn_waitformoderator_ping_interval_ui) ) {
         //ping interval value for 'wait for moderator' feature
         $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_ping_interval',
                 get_string('config_feature_waitformoderator_ping_interval', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_ping_interval_description', 'bigbluebuttonbn'),
                 10, PARAM_INT));
+    }
+    if( (!isset($CFG->bigbluebuttonbn_waitformoderator_cache_ttl_ui) || $CFG->bigbluebuttonbn_waitformoderator_cache_ttl_ui) ) {
         //cache TTL value for 'wait for moderator' feature
         $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_cache_ttl',
                 get_string('config_feature_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
@@ -190,20 +201,24 @@ if ($ADMIN->fulltree) {
     if( (!isset($CFG->bigbluebuttonbn_moderator_default_ui) || $CFG->bigbluebuttonbn_moderator_default_ui) ) {
         // UI for 'permissions' feature
         $roles = bigbluebuttonbn_get_roles('all', 'array');
-        $owner = array('owner' => get_string('mod_form_field_participant_list_type_owner', "bigbluebuttonbn"));
+        $owner = array('owner' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
                 get_string('config_permission_moderator_default', 'bigbluebuttonbn'),
                 get_string('config_permission_moderator_default_description', 'bigbluebuttonbn'),
                 array_keys($owner), array_merge($owner, $roles)));
     }
 
-    $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
-            get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
-            get_string('config_feature_sendnotifications_description', 'bigbluebuttonbn')));
-    // UI for 'send notifications' feature
-    $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_sendnotifications_enabled',
-            get_string('config_feature_sendnotifications_enabled', 'bigbluebuttonbn'),
-            get_string('config_feature_sendnotifications_enabled_description', 'bigbluebuttonbn'),
-            1));
+    if( (!isset($CFG->bigbluebuttonbn_sendnotifications_enabled_ui) || $CFG->bigbluebuttonbn_sendnotifications_enabled_ui) ) {
+        $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
+                get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
+                get_string('config_feature_sendnotifications_description', 'bigbluebuttonbn')));
+    }
+    if( (!isset($CFG->bigbluebuttonbn_sendnotifications_enabled_ui) || $CFG->bigbluebuttonbn_sendnotifications_enabled_ui) ) {
+        // UI for 'send notifications' feature
+        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_sendnotifications_enabled',
+                get_string('config_feature_sendnotifications_enabled', 'bigbluebuttonbn'),
+                get_string('config_feature_sendnotifications_enabled_description', 'bigbluebuttonbn'),
+                1));
+    }
 
 }
