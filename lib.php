@@ -21,6 +21,8 @@ require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/datalib.php');
 require_once(dirname(__FILE__).'/JWT.php');
+if( file_exists(dirname(__FILE__).'/config.php') )
+    include_once(dirname(__FILE__).'/config.php');
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
