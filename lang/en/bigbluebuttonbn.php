@@ -84,7 +84,7 @@ $string['config_feature_predefinedprofile_enabled_description'] = 'Pre-defined p
 $string['config_feature_userlimit'] = 'Configuration for "User limit" feature';
 $string['config_feature_userlimit_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_feature_userlimit_default'] = 'User limit enabled by default';
-$string['config_feature_userlimit_default_description'] = 'User limit feature is enabled by default when a new room or conference is added.';
+$string['config_feature_userlimit_default_description'] = 'The number of users allowed in a session by default when a new room or conference is added. If the number is set to 0, no limit is established';
 $string['config_feature_userlimit_editable'] = 'User limit feature can be edited';
 $string['config_feature_userlimit_editable_description'] = 'User limit value by default can be edited when the room or conference is added or updated.';
 
