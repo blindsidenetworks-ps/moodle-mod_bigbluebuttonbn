@@ -226,7 +226,8 @@ if (!$bigbluebuttonbn->openingtime ) {
         bigbluebuttonbn_view_after($bbbsession);
     }
 
-} else if ( $now < ($bigbluebuttonbn->openingtime - intval($CFG->bigbluebuttonbn_scheduled_pre_opening) * 60) ){
+//} else if ( $now < ($bigbluebuttonbn->openingtime - intval($CFG->bigbluebuttonbn_scheduled_pre_opening) * 60) ){
+} else if ( $now < ($bigbluebuttonbn->openingtime ) ) {
     //CALLING BEFORE
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'before';
