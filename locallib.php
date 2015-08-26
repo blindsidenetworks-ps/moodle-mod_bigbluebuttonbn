@@ -1017,7 +1017,7 @@ function bigbluebuttonbn_send_notification_recording_ready($meeting_id) {
     if( $bigbluebuttonbn->type != 0 )
         $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
     $msg->activity_title = $bigbluebuttonbn->name;
-    $message_text = get_string('email_body_recording_ready', 'bigbluebuttonbn', $msg);
+    $message_text = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
     
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }

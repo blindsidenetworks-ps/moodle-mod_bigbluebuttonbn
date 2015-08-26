@@ -422,7 +422,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         if( $bigbluebuttonbn->type != 0 )
             $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
         $msg->activity_title = $bigbluebuttonbn->name;
-        $message_text = get_string('email_body_notification', 'bigbluebuttonbn', $msg);
+        $message_text = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>';
 
         /// Add the meeting details to the message_body
         $msg->action = ucfirst($action);
@@ -439,7 +439,20 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         }
         $msg->activity_owner = $USER->firstname.' '.$USER->lastname;
 
-        $message_text .= get_string('email_body_notification_meeting_details', 'bigbluebuttonbn', $msg);
+        $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':';
+        $message_text .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>';
+        $message_text .= $msg->activity_title.'</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>';
+        $message_text .= $msg->activity_description.'</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>';
+        $message_text .= $msg->activity_openingtime.'</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>';
+        $message_text .= $msg->activity_closingtime.'</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>';
+        $message_text .= $msg->activity_owner.'</td></tr></tbody></table></p>';
+
+
         // Send notification to all users enrolled
         bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
     }
@@ -619,8 +632,9 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $msg->user_name = $sender->firstname.' '.$sender->lastname;
     $msg->user_email = $sender->email;
     $msg->course_name = "$course->fullname";
-    $message .= get_string('email_footer', 'bigbluebuttonbn', $msg);
-
+    $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
+    $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
+    
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
         if( $user->id != $sender->id ){
