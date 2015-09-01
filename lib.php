@@ -452,7 +452,6 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>';
         $message_text .= $msg->activity_owner.'</td></tr></tbody></table></p>';
 
-
         // Send notification to all users enrolled
         bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
     }
@@ -638,8 +637,11 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
         if( $user->id != $sender->id ){
+            error_log("Sending msg to ".$user->firstname." ".$user->lastname.".");
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
+                error_log("Msg sent to ".$user->firstname." ".$user->lastname.".");
+            } else {
                 error_log("Msg was NOT sent.");
             }
         }

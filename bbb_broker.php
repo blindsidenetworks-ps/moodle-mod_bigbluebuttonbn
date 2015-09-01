@@ -11,7 +11,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-global $PAGE, $USER, $CFG, $SESSION;
+global $PAGE, $USER, $CFG, $SESSION, $DB;
 
 $params['action']  = optional_param('action', '', PARAM_TEXT);
 $params['callback'] = optional_param('callback', '', PARAM_TEXT);
@@ -22,6 +22,8 @@ $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEX
 
 $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
 $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+
+$error = '';
 
 if( empty($params['action']) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "Parameter [action] was not included");
@@ -58,6 +60,7 @@ if ( empty($error) ) {
 
     if( !$hascourseaccess ){
         header("HTTP/1.0 401 Unauthorized");
+        return;
     } else {
         try {
             switch ( strtolower($params['action']) ){
@@ -152,8 +155,41 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':
-                    $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
-                    bigbluebuttonbn_send_notification_recording_ready($decoded_parameters->meeting_id);
+                    //Decodes the received JWT string
+                    try {
+                        $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
+
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 400 Bad Request. ".$error);
+                        return;
+                    }
+
+                    // Lookup the bigbluebuttonbn activity corresponding to the meeting_id received
+                    try {
+                        $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
+                        $meeting_id_elements = explode("-", $meeting_id_elements[0]);
+                        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
+
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 410 Gone. ".$error);
+                        return;
+                    }
+
+                    // Sends the messages
+                    try {
+                        bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                        header("HTTP/1.0 202 Accepted");
+                        return;
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 503 Service Unavailable. ".$error);
+                        return;
+                    }
                     break;
                 case 'moodle_notify':
                     break;
@@ -164,9 +200,11 @@ if ( empty($error) ) {
         } catch(Exception $e) {
             error_log("BBB_BROKER ERROR: ".$e->getCode().", ".$e->getMessage());
             header("HTTP/1.0 502 Bad Gateway. ".$e->getMessage());
+            return;
         }
     }
 
 } else {
     header("HTTP/1.0 400 Bad Request. ".$error);
+    return;
 }
