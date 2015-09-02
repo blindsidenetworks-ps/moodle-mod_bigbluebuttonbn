@@ -116,6 +116,15 @@ M.mod_bigbluebuttonbn.view_clean = function() {
     M.mod_bigbluebuttonbn.view_clean_end_button();
 }
 
+M.mod_bigbluebuttonbn.view_remote_update = function(delay) {
+	console.info('running update');
+	setTimeout(function() {
+		M.mod_bigbluebuttonbn.view_clean();
+		M.mod_bigbluebuttonbn.view_update();
+		console.info('update has been run');
+	}, delay);
+}
+
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
 
@@ -176,8 +185,13 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
             msg_attendees_in += '<b>' + viewers + '</b> ' + (viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
 
         } else {
-            msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + (moderators > 0? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.viewer) + '.';
+            if( participants > 0 ) {
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';	
+            } else if ( moderators > 0 ) {
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';	
+            }
         }
+
     } else {
         msg_attendees_in = bigbluebuttonbn.locales.session_no_users + '.';
     }
@@ -433,6 +447,9 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
 };
 
 M.mod_bigbluebuttonbn.view_windowClose = function() {
+    window.onunload = function (e) {
+        opener.M.mod_bigbluebuttonbn.view_remote_update(5000);
+    };
     window.close();
 };
 

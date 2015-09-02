@@ -53,11 +53,10 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
             /// Update the cache
-            $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+            $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], BIGBLUEBUTTONBN_FORCED);
 
-            /// Execute the redirect
-            $view_url = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id;
-            header('Location: '.$view_url );
+            /// Close the tab or window where BBB was opened
+            bigbluebutton_bbb_view_close_window();
             break;
         case 'join':
             //See if the session is in progress

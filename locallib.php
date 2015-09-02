@@ -16,6 +16,8 @@ global $BIGBLUEBUTTONBN_CFG, $CFG;
 
 require_once(dirname(__FILE__).'/lib.php');
 
+const BIGBLUEBUTTONBN_FORCED = true;
+
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
