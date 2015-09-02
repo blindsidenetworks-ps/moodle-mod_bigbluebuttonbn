@@ -1076,74 +1076,91 @@ function bigbluebuttonbn_get_locales_for_ui() {
 }
 
 function bigbluebuttonbn_get_cfg_voicebridge_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable: (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false));    
 }
 
 function bigbluebuttonbn_get_cfg_recording_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default: (isset($CFG->bigbluebuttonbn_recording_default)? $CFG->bigbluebuttonbn_recording_default: true));
 }
 
 function bigbluebuttonbn_get_cfg_recording_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable: (isset($CFG->bigbluebuttonbn_recording_editable)? $CFG->bigbluebuttonbn_recording_editable: true));
 }
 
 function bigbluebuttonbn_get_cfg_recording_tagging_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default: (isset($CFG->bigbluebuttonbn_recordingtagging_default)? $CFG->bigbluebuttonbn_recordingtagging_default: false));
 }
 
 function bigbluebuttonbn_get_cfg_recording_tagging_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable: (isset($CFG->bigbluebuttonbn_recordingtagging_editable)? $CFG->bigbluebuttonbn_recordingtagging_editable: false));
 }
 
 function bigbluebuttonbn_get_cfg_recording_icons_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled: (isset($CFG->bigbluebuttonbn_recording_icons_enabled)? $CFG->bigbluebuttonbn_recording_icons_enabled: true));
 }
 
 function bigbluebuttonbn_get_cfg_waitformoderator_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default: (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false));
 }
 
 function bigbluebuttonbn_get_cfg_waitformoderator_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable: (isset($CFG->bigbluebuttonbn_waitformoderator_editable)? $CFG->bigbluebuttonbn_waitformoderator_editable: true));
 }
 
 function bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval: (isset($CFG->bigbluebuttonbn_waitformoderator_ping_interval)? $CFG->bigbluebuttonbn_waitformoderator_ping_interval: 15));
 }
 
 function bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl: (isset($CFG->bigbluebuttonbn_waitformoderator_cache_ttl)? $CFG->bigbluebuttonbn_waitformoderator_cache_ttl: 60));
 }
 
 function bigbluebuttonbn_get_cfg_userlimit_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default: (isset($CFG->bigbluebuttonbn_userlimit_default)? $CFG->bigbluebuttonbn_userlimit_default: 0));
 }
 
 function bigbluebuttonbn_get_cfg_userlimit_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable: (isset($CFG->bigbluebuttonbn_userlimit_editable)? $CFG->bigbluebuttonbn_userlimit_editable: false));
 }
 
 function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled: (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false));
 }
 
 function bigbluebuttonbn_get_cfg_sendnotifications_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled: (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: false));
 }
 
 function bigbluebuttonbn_get_cfg_moderator_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: 'owner'));
 }
 
 function bigbluebuttonbn_get_cfg_scheduled_duration_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled: (isset($CFG->bigbluebuttonbn_scheduled_duration_enabled)? $CFG->bigbluebuttonbn_scheduled_duration_enabled: false));
 }
 
 function bigbluebuttonbn_get_cfg_scheduled_duration_compensation() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation: (isset($CFG->bigbluebuttonbn_scheduled_duration_compensation)? $CFG->bigbluebuttonbn_scheduled_duration_compensation: 10));
 }
 
 function bigbluebuttonbn_get_cfg_scheduled_pre_opening() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening: (isset($CFG->bigbluebuttonbn_scheduled_pre_opening)? $CFG->bigbluebuttonbn_scheduled_pre_opening: 10));
 }
-
