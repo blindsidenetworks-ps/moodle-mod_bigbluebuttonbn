@@ -295,7 +295,7 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_ta
 }
 
 M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
-    location.assign(join_url);
+    window.open(join_url);
     // Update view
     M.mod_bigbluebuttonbn.view_clean_status_bar();
     M.mod_bigbluebuttonbn.view_clean_control_panel();
