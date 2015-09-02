@@ -30,8 +30,6 @@ if ($id) {
     print_error('You must specify a course_module ID or a BigBlueButtonBN instance ID');
 }
 
-require_login($course, true, $cm);
-
 $context = bigbluebuttonbn_get_context_module($cm->id);
 
 /// Print the page header
@@ -41,14 +39,11 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->blocks->show_only_fake_blocks();
 
-
-$bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-if ( !isset($bbbsession) || is_null($bbbsession) ) {
-    print_error( 'view_error_unable_join', 'bigbluebuttonbn' );
-
-} else {
-    switch (strtolower($action)) {
-        case 'logout':
+if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession))
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+switch (strtolower($action)) {
+    case 'logout':
+        if ( isset($bbbsession) && !is_null($bbbsession) ) {
             /// Moodle event logger: Create an event for meeting left
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
@@ -57,8 +52,18 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
 
             /// Close the tab or window where BBB was opened
             bigbluebutton_bbb_view_close_window();
-            break;
-        case 'join':
+
+        } else {
+            bigbluebutton_bbb_view_close_window_manually();
+        }
+        break;
+    case 'join':
+        require_login($course, true, $cm);
+
+        if ( !isset($bbbsession) || is_null($bbbsession) ) {
+            print_error( 'view_error_unable_join', 'bigbluebuttonbn' );
+
+        } else {
             //See if the session is in progress
             if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
                 /// Since the meeting is already running, we just join the session
@@ -141,11 +146,12 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                     header('Location: '.$bbbsession['logoutURL'] );
                 }
             }
-            break;
-        default:
-            bigbluebutton_bbb_view_close_window();
-    }
+        }
+        break;
+    default:
+        bigbluebutton_bbb_view_close_window();
 }
+
 
 ////////////////// Local functions /////////////////////
 function bigbluebutton_bbb_view_close_window() {
@@ -154,6 +160,10 @@ function bigbluebutton_bbb_view_close_window() {
     echo $OUTPUT->header();
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_windowClose');
     echo $OUTPUT->footer();
+}
+
+function bigbluebutton_bbb_view_close_window_manually() {
+    echo 'This tab/window must be closed manually';
 }
 
 function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn) {
