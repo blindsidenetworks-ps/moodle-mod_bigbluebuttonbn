@@ -201,7 +201,7 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
     if( is_array($meetingIDs) ) {
-        // getRecordings is executes using a method POST (supported only on BBB 0.91 and later) 
+        // getRecordings is executes using a method POST (supported only on BBB 1.0 and later)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
     } else {
         // getRecordings is executes using a method GET supported by any version of BBB
@@ -370,7 +370,7 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
         return 'false';
 }
 
-function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null){
+function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null) {
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
@@ -410,6 +410,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
             error_log("No response on wrap_simplexml_load_file");
             return NULL;
         }
+
     } else {
         $previous = libxml_use_internal_errors(true);
         try {

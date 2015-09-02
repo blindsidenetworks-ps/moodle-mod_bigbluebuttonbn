@@ -22,11 +22,6 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
     });
 
-    var status_bar = Y.one('#status_bar');
-    var control_panel = Y.one('#control_panel');
-    var join_button = Y.one('#join_button');
-    var end_button = Y.one('#end_button');
-
     if (bigbluebuttonbn.action == 'before') {
     } else if (bigbluebuttonbn.action == 'after') {
     } else if (bigbluebuttonbn.action == 'join') {
@@ -82,28 +77,44 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
             }
         });
 
-        bigbluebuttonbn_dataSource.sendRequest({
-            request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
-            callback : {
-                success : function(e) {
-                    //if( e.data.info.participantCount < bigbluebuttonbn.userlimit){}
-                    Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
-                    Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
-                    if(typeof e.data.status.can_join != 'undefined' && e.data.status.can_join ) {
-                        Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
-                    }
-                    if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
-                        Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
-                    }
-
-                },
-                failure : function(e) {
-                    console.log(e);
-                }
-            }
-        });
+        M.mod_bigbluebuttonbn.view_update();
     }
 };
+
+M.mod_bigbluebuttonbn.view_update = function() {
+    var status_bar = Y.one('#status_bar');
+    var control_panel = Y.one('#control_panel');
+    var join_button = Y.one('#join_button');
+    var end_button = Y.one('#end_button');
+
+    bigbluebuttonbn_dataSource.sendRequest({
+        request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+        callback : {
+            success : function(e) {
+                //if( e.data.info.participantCount < bigbluebuttonbn.userlimit){}
+                Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
+                Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
+                if(typeof e.data.status.can_join != 'undefined' && e.data.status.can_join ) {
+                    Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
+                }
+                if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
+                    Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.view_init_end_button(e.data.status));
+                }
+
+            },
+            failure : function(e) {
+                console.log(e);
+            }
+        }
+    });
+}
+
+M.mod_bigbluebuttonbn.view_clean = function() {
+    M.mod_bigbluebuttonbn.view_clean_status_bar();
+    M.mod_bigbluebuttonbn.view_clean_control_panel();
+    M.mod_bigbluebuttonbn.view_clean_join_button();
+    M.mod_bigbluebuttonbn.view_clean_end_button();
+}
 
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
@@ -166,16 +177,13 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
 
         } else {
             msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + (moderators > 0? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.viewer) + '.';
-
         }
     } else {
         msg_attendees_in = bigbluebuttonbn.locales.session_no_users + '.';
-
     }
 
     return msg_attendees_in;
 }
-
 
 M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     var join_button_input = Y.DOM.create('<input>');
@@ -217,14 +225,34 @@ M.mod_bigbluebuttonbn.view_clean_control_panel = function() {
     control_panel_div.remove();
 }
 
+M.mod_bigbluebuttonbn.view_clean_join_button = function() {
+    var join_button = Y.one('#join_button');
+    join_button.setContent('');
+}
+
 M.mod_bigbluebuttonbn.view_hide_join_button = function() {
     var join_button = Y.one('#join_button');
     Y.DOM.setStyle(join_button, 'visibility', 'hidden');
 }
 
+M.mod_bigbluebuttonbn.view_show_join_button = function() {
+    var join_button = Y.one('#join_button');
+    Y.DOM.setStyle(join_button, 'visibility', 'shown');
+}
+
+M.mod_bigbluebuttonbn.view_clean_end_button = function() {
+    var end_button = Y.one('#end_button');
+    end_button.setContent('');
+}
+
 M.mod_bigbluebuttonbn.view_hide_end_button = function() {
     var end_button = Y.one('#end_button');
     Y.DOM.setStyle(end_button, 'visibility', 'hidden');
+}
+
+M.mod_bigbluebuttonbn.view_show_end_button = function() {
+    var end_button = Y.one('#end_button');
+    Y.DOM.setStyle(end_button, 'visibility', 'shown');
 }
 
 M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
@@ -297,11 +325,10 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_ta
 M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
     window.open(join_url);
     // Update view
-    M.mod_bigbluebuttonbn.view_clean_status_bar();
-    M.mod_bigbluebuttonbn.view_clean_control_panel();
-    M.mod_bigbluebuttonbn.view_hide_join_button();
-    M.mod_bigbluebuttonbn.view_hide_end_button();
-    Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_message));
+    setTimeout(function() {
+        M.mod_bigbluebuttonbn.view_clean();
+        M.mod_bigbluebuttonbn.view_update();
+    }, 15000);
 }
 
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, meetingid) {
@@ -370,7 +397,6 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                             }
                         }
                     });
-
                 }
             },
             failure : function(e) {

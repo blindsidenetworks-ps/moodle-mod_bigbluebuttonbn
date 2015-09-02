@@ -690,10 +690,12 @@ function bigbluebuttonbn_get_context_course($id) {
 }
 
 function bigbluebuttonbn_get_cfg_server_url() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? trim(trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url),'/').'/': (isset($CFG->bigbluebuttonbn_server_url)? trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/': 'http://test-install.blindsidenetworks.com/bigbluebutton/'));
 }
 
 function bigbluebuttonbn_get_cfg_shared_secret() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret): (isset($CFG->bigbluebuttonbn_shared_secret)? trim($CFG->bigbluebuttonbn_shared_secret): '8cd8ef52e8e101574e400365b55e11a6'));
 }
 

@@ -142,7 +142,6 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                     header('Location: '.$bbbsession['logoutURL'] );
                 }
             }
-
             break;
         default:
             bigbluebutton_bbb_view_close_window();
