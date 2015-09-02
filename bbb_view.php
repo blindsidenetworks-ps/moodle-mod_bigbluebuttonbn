@@ -82,7 +82,7 @@ if ( !isset($bbbsession) || is_null($bbbsession) ) {
                     );
 
                     /// Set the duration for the meeting
-                    if ( isset($CFG->bigbluebuttonbn_scheduled_duration_enabled) && $CFG->bigbluebuttonbn_scheduled_duration_enabled ) {
+                    if ( bigbluebuttonbn_get_cfg_scheduled_duration_enabled() ) {
                         $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
                         if( $durationtime > 0 )
                             $bbbsession['welcome'] .= '<br><br>'.str_replace("%duration%", ''.$durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));

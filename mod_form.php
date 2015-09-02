@@ -18,7 +18,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
 
-        global $CFG, $DB, $USER;
+        global $CFG, $DB, $USER, $BIGBLUEBUTTONBN_CFG;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
@@ -34,20 +34,20 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = bigbluebuttonbn_get_context_course($course->id);
 
         //BigBlueButton server data
-        $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
+        $endpoint = bigbluebuttonbn_get_cfg_server_url();
 
         //UI configuration options
-        $voicebridge_editable = (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false);
-        $recording_default = (isset($CFG->bigbluebuttonbn_recording_default)? $CFG->bigbluebuttonbn_recording_default: true);
-        $recording_default_editable = (isset($CFG->bigbluebuttonbn_recording_editable)? $CFG->bigbluebuttonbn_recording_editable: true);
-        $tagging_default = (isset($CFG->bigbluebuttonbn_recordingtagging_default)? $CFG->bigbluebuttonbn_recordingtagging_default: false);
-        $tagging_default_editable = (isset($CFG->bigbluebuttonbn_recordingtagging_editable)? $CFG->bigbluebuttonbn_recordingtagging_editable: false);
-        $waitformoderator_default = (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false);
-        $waitformoderator_editable = (isset($CFG->bigbluebuttonbn_waitformoderator_editable)? $CFG->bigbluebuttonbn_waitformoderator_editable: true);
-        $userlimit_default = (isset($CFG->bigbluebuttonbn_userlimit_default)? $CFG->bigbluebuttonbn_userlimit_default: 0);
-        $userlimit_editable = (isset($CFG->bigbluebuttonbn_userlimit_editable)? $CFG->bigbluebuttonbn_userlimit_editable: false);
-        $preuploadpresentation_enabled = (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false);
-        $sendnotifications_enabled = (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: true);
+        $voicebridge_editable = bigbluebuttonbn_get_cfg_voicebridge_editable();
+        $recording_default = bigbluebuttonbn_get_cfg_recording_default();
+        $recording_editable = bigbluebuttonbn_get_cfg_recording_editable();
+        $recording_tagging_default = bigbluebuttonbn_get_cfg_recording_tagging_default();
+        $recording_tagging_editable = bigbluebuttonbn_get_cfg_recording_tagging_editable();
+        $waitformoderator_default = bigbluebuttonbn_get_cfg_waitformoderator_default();
+        $waitformoderator_editable = bigbluebuttonbn_get_cfg_waitformoderator_editable();
+        $userlimit_default = bigbluebuttonbn_get_cfg_userlimit_default();
+        $userlimit_editable = bigbluebuttonbn_get_cfg_userlimit_enabled();
+        $preuploadpresentation_enabled = bigbluebuttonbn_get_cfg_preuploadpresentation_enabled();
+        $sendnotifications_enabled = bigbluebuttonbn_get_cfg_sendnotifications_enabled(); 
 
         //Validates if the BigBlueButton server is running 
         $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
@@ -116,7 +116,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         if ( floatval($serverVersion) >= 0.8 ) {
-            if ( $recording_default_editable ) {
+            if ( $recording_editable ) {
                 $mform->addElement('checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn'));
                 $mform->setDefault( 'record', $recording_default );
                 $mform->setAdvanced('record');
@@ -125,12 +125,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
             $mform->setType('record', PARAM_INT);
 
-            if ( $tagging_default_editable ) {
+            if ( $recording_tagging_editable ) {
                 $mform->addElement('checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn'));
-                $mform->setDefault('record', $tagging_default);
+                $mform->setDefault('record', $recording_tagging_default);
                 $mform->setAdvanced('tagging');
             } else {
-                $mform->addElement('hidden', 'tagging', $tagging_default );
+                $mform->addElement('hidden', 'tagging', $recording_tagging_default );
             }
             $mform->setType('tagging', PARAM_INT);
         }

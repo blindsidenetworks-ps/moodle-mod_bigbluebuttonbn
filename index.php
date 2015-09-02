@@ -59,8 +59,8 @@ $table = new html_table();
 $table->head  = array ($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions );
 $table->align = array ('center', 'left', 'center', 'center', 'center',  'center', 'center' );
 
-$url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-$shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+$endpoint = bigbluebuttonbn_get_cfg_server_url();
+$shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 $logoutURL = $CFG->wwwroot;
 
 $submit = optional_param('submit', '', PARAM_TEXT);
@@ -81,9 +81,9 @@ if ($submit === 'end' && $moderator) {
 	$meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
 	$modPW = $bigbluebuttonbn->moderatorpass;
     if( $g != '0'  ) {
-        $getArray = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $url, $shared_secret ) );
+        $getArray = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $endpoint, $shared_secret ) );
     } else {
-        $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $url, $shared_secret ));
+        $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $endpoint, $shared_secret ));
     }
 	redirect('index.php?id='.$id);
 } else {
@@ -94,15 +94,15 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
 
     if ( groups_get_activity_groupmode($cm) > 0 ){
-        $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
+        $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
         $groups = groups_get_activity_allowed_groups($cm);
         if( isset($groups)) {
             foreach( $groups as $group){
-                $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, $group);
+                $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, $group);
             }
         }
     } else {
-        $table->data[] = displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn);
+        $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn);
     }
 }
 
@@ -114,7 +114,7 @@ echo html_writer::table($table);
 echo $OUTPUT->footer();
 
 /// Functions
-function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
+function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
     $joinURL = null;
     $group = "-";
     $users = "-";
@@ -135,10 +135,10 @@ function displayBigBlueButtonRooms($url, $shared_secret, $moderator, $course, $b
         // Output Users in the meeting
         //
         if( $groupObj == null ){
-            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $url, $shared_secret );
+            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $endpoint, $shared_secret );
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
-            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $url, $shared_secret );
+            $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID.'['.$groupObj->id.']', $modPW, $endpoint, $shared_secret );
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }

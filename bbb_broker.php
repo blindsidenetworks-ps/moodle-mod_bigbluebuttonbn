@@ -20,8 +20,8 @@ $params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
-$endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-$shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+$endpoint = bigbluebuttonbn_get_cfg_server_url();
+$shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
 $error = '';
 
@@ -158,9 +158,12 @@ if ( empty($error) ) {
                     header("HTTP/1.0 501 Not implemented. Feature temporary removed due issues with the performance in Moodle");
                     return;
                     /*
+                     * SENDNOTIFICATIONS: Feature temporary removed due issues with the performance in Moodle
+                     */
+                    /*
                     //Decodes the received JWT string
                     try {
-                        $decoded_parameters = JWT::decode($params['signed_parameters'], trim($CFG->bigbluebuttonbn_shared_secret), array('HS256'));
+                        $decoded_parameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
 
                     } catch (Exception $e) {
                         $error = 'Caught exception: '.$e->getMessage();

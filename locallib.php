@@ -12,6 +12,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $BIGBLUEBUTTONBN_CFG, $CFG;
+
 require_once(dirname(__FILE__).'/lib.php');
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
@@ -506,7 +508,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=nu
                 )
         );
 
-        $moderator_defaults = $CFG->bigbluebuttonbn_moderator_default;
+        $moderator_defaults = bigbluebuttonbn_get_cfg_moderator_default();
         if ( !isset($moderator_defaults) ) {
             $moderator_defaults = array('owner');
         } else {
@@ -625,7 +627,7 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
     $now = time();
     if( $closingtime > 0 && $now < $closingtime ) {
         $duration = ceil(($closingtime - $now)/60);
-        $compensation_time = intval($CFG->bigbluebuttonbn_scheduled_duration_compensation);
+        $compensation_time = intval(bigbluebuttonbn_get_cfg_scheduled_duration_compensation());
         $duration = intval($duration) + $compensation_time;
     }
 
@@ -739,9 +741,9 @@ function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $force
     global $CFG;
 
     $recordings = array();
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
-    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
+    $cache_ttl = bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl();
     
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
 }
@@ -767,9 +769,9 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
     global $CFG;
 
     $meeting_info = array();
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
-    $cache_ttl = $CFG->bigbluebuttonbn_waitformoderator_cache_ttl;
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
+    $cache_ttl = bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl();
 
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
@@ -789,8 +791,8 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
 function bigbluebuttonbn_bbb_broker_do_end_meeting($meetingid, $password){
     global $CFG;
 
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     bigbluebuttonbn_doEndMeeting($meetingid, $password, $endpoint, $shared_secret);
 }
@@ -798,8 +800,8 @@ function bigbluebuttonbn_bbb_broker_do_end_meeting($meetingid, $password){
 function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=true){
     global $CFG;
 
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     bigbluebuttonbn_doPublishRecordings($recordingid, ($publish)? 'true': 'false', $endpoint, $shared_secret);
 }
@@ -807,8 +809,8 @@ function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=
 function bigbluebuttonbn_bbb_broker_do_delete_recording($recordingid){
     global $CFG;
 
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     bigbluebuttonbn_doDeleteRecordings($recordingid, $endpoint, $shared_secret);
 }
@@ -936,7 +938,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                         $manage_action = 'publish';
                     }
 
-                    if ($CFG->bigbluebuttonbn_recording_icons_enabled == 1) {
+                    if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                         //With icon for publish/unpublish
                         $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
                         $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
@@ -1022,8 +1024,8 @@ function bigbluebuttonbn_server_offers($capability_name){
 
     $capability_offered = null;
 
-    $endpoint = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     //Validates if the server may have extended capabilities
     $parse = parse_url($endpoint);
@@ -1072,3 +1074,76 @@ function bigbluebuttonbn_get_locales_for_ui() {
     );
     return $locales;
 }
+
+function bigbluebuttonbn_get_cfg_voicebridge_editable() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable: (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false));    
+}
+
+function bigbluebuttonbn_get_cfg_recording_default() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default: (isset($CFG->bigbluebuttonbn_recording_default)? $CFG->bigbluebuttonbn_recording_default: true));
+}
+
+function bigbluebuttonbn_get_cfg_recording_editable() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable: (isset($CFG->bigbluebuttonbn_recording_editable)? $CFG->bigbluebuttonbn_recording_editable: true));
+}
+
+function bigbluebuttonbn_get_cfg_recording_tagging_default() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default: (isset($CFG->bigbluebuttonbn_recordingtagging_default)? $CFG->bigbluebuttonbn_recordingtagging_default: false));
+}
+
+function bigbluebuttonbn_get_cfg_recording_tagging_editable() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable: (isset($CFG->bigbluebuttonbn_recordingtagging_editable)? $CFG->bigbluebuttonbn_recordingtagging_editable: false));
+}
+
+function bigbluebuttonbn_get_cfg_recording_icons_enabled() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled: (isset($CFG->bigbluebuttonbn_recording_icons_enabled)? $CFG->bigbluebuttonbn_recording_icons_enabled: true));
+}
+
+function bigbluebuttonbn_get_cfg_waitformoderator_default() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default: (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false));
+}
+
+function bigbluebuttonbn_get_cfg_waitformoderator_editable() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable: (isset($CFG->bigbluebuttonbn_waitformoderator_editable)? $CFG->bigbluebuttonbn_waitformoderator_editable: true));
+}
+
+function bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval: (isset($CFG->bigbluebuttonbn_waitformoderator_ping_interval)? $CFG->bigbluebuttonbn_waitformoderator_ping_interval: 15));
+}
+
+function bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl: (isset($CFG->bigbluebuttonbn_waitformoderator_cache_ttl)? $CFG->bigbluebuttonbn_waitformoderator_cache_ttl: 60));
+}
+
+function bigbluebuttonbn_get_cfg_userlimit_default() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default: (isset($CFG->bigbluebuttonbn_userlimit_default)? $CFG->bigbluebuttonbn_userlimit_default: 0));
+}
+
+function bigbluebuttonbn_get_cfg_userlimit_editable() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable: (isset($CFG->bigbluebuttonbn_userlimit_editable)? $CFG->bigbluebuttonbn_userlimit_editable: false));
+}
+
+function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled: (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false));
+}
+
+function bigbluebuttonbn_get_cfg_sendnotifications_enabled() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled: (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: false));
+}
+
+function bigbluebuttonbn_get_cfg_moderator_default() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: 'owner'));
+}
+
+function bigbluebuttonbn_get_cfg_scheduled_duration_enabled() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled: (isset($CFG->bigbluebuttonbn_scheduled_duration_enabled)? $CFG->bigbluebuttonbn_scheduled_duration_enabled: false));
+}
+
+function bigbluebuttonbn_get_cfg_scheduled_duration_compensation() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation: (isset($CFG->bigbluebuttonbn_scheduled_duration_compensation)? $CFG->bigbluebuttonbn_scheduled_duration_compensation: 10));
+}
+
+function bigbluebuttonbn_get_cfg_scheduled_pre_opening() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening: (isset($CFG->bigbluebuttonbn_scheduled_pre_opening)? $CFG->bigbluebuttonbn_scheduled_pre_opening: 10));
+}
+

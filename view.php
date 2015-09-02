@@ -65,8 +65,8 @@ if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == 
 $bbbsession['administrator'] = has_capability('moodle/category:manage', $context);
 
 //BigBlueButton server data
-$bbbsession['endpoint'] = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-$bbbsession['shared_secret'] = trim($CFG->bigbluebuttonbn_shared_secret);
+$bbbsession['endpoint'] = bigbluebuttonbn_get_cfg_server_url();
+$bbbsession['shared_secret'] = bigbluebuttonbn_get_cfg_shared_secret();
 
 //Server data
 $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
@@ -188,7 +188,7 @@ $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action
 
 $jwt_token = new stdClass();
 $jwt_token->meeting_id = $bbbsession['meetingid'];
-$jwt_key = trim($CFG->bigbluebuttonbn_shared_secret);
+$jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
 $jwt = JWT::encode($jwt_token, $jwt_key);
 
 $bigbluebuttonbn_view = '';
@@ -226,7 +226,7 @@ if (!$bigbluebuttonbn->openingtime ) {
         bigbluebuttonbn_view_after($bbbsession);
     }
 
-//} else if ( $now < ($bigbluebuttonbn->openingtime - intval($CFG->bigbluebuttonbn_scheduled_pre_opening) * 60) ){
+//} else if ( $now < ($bigbluebuttonbn->openingtime - intval(bigbluebuttonbn_get_cfg_scheduled_pre_opening()) * 60) ){
 } else if ( $now < ($bigbluebuttonbn->openingtime ) ) {
     //CALLING BEFORE
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
@@ -257,12 +257,13 @@ echo $OUTPUT->box_end();
 
 
 //JavaScript variables
+$waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
 $jsVars = array(
         'action' => $bigbluebuttonbn_view,
         'meetingid' => $bbbsession['meetingid'],
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbnid'],
         'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbntype'],
-        'ping_interval' => ($CFG->bigbluebuttonbn_waitformoderator_ping_interval > 0? $CFG->bigbluebuttonbn_waitformoderator_ping_interval * 1000: 10000),
+        'ping_interval' => ($waitformoderator_ping_interval > 0? $waitformoderator_ping_interval * 1000: 15000),
         'userlimit' => $bbbsession['userlimit'],
         'locales' => bigbluebuttonbn_get_locales_for_ui()
 );

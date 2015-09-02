@@ -11,6 +11,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $BIGBLUEBUTTONBN_CFG, $CFG;
+
 require_once($CFG->dirroot.'/calendar/lib.php');
 require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
@@ -21,12 +23,31 @@ require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/datalib.php');
 require_once(dirname(__FILE__).'/JWT.php');
+
 if( file_exists(dirname(__FILE__).'/config.php') ) {
     require_once(dirname(__FILE__).'/config.php');
     if( isset($BIGBLUEBUTTONBN_CFG) ) {
         $CFG = (object) array_merge((array)$CFG, (array)$BIGBLUEBUTTONBN_CFG);
     }
+} else {
+    $BIGBLUEBUTTONBN_CFG = new stdClass();
 }
+/*
+ * SENDNOTIFICATIONS: Feature temporary removed due issues with the performance in Moodle
+ */
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
+/*
+ * Remove this block when restored
+ */
+
+/*
+ * DURATIIONCOMPENSATION: Feature removed by configuration
+ */
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled = 0;
+/*
+ * Remove this block when restored
+ */
+
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
@@ -128,8 +149,8 @@ function bigbluebuttonbn_delete_instance($id) {
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     
     $modPW = $bigbluebuttonbn->moderatorpass;
-    $url = trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/';
-    $shared_secret = trim($CFG->bigbluebuttonbn_shared_secret);
+    $url = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret) )
     //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
@@ -377,7 +398,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     // Now that an id was assigned, generate and set the meetingid property based on 
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
     if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
-        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.trim($CFG->bigbluebuttonbn_shared_secret));
+        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
         $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     } else {
@@ -675,3 +696,12 @@ function bigbluebuttonbn_get_context_course($id) {
 
     return $context;
 }
+
+function bigbluebuttonbn_get_cfg_server_url() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? trim(trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url),'/').'/': (isset($CFG->bigbluebuttonbn_server_url)? trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/': 'http://test-install.blindsidenetworks.com/bigbluebutton/'));
+}
+
+function bigbluebuttonbn_get_cfg_shared_secret() {
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret): (isset($CFG->bigbluebuttonbn_shared_secret)? trim($CFG->bigbluebuttonbn_shared_secret): '8cd8ef52e8e101574e400365b55e11a6'));
+}
+

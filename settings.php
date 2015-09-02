@@ -11,13 +11,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $BIGBLUEBUTTONBN_CFG;
+
 require_once(dirname(__FILE__).'/locallib.php');
-if( file_exists(dirname(__FILE__).'/config.php') ) {
-    include(dirname(__FILE__).'/config.php');
-    if( isset($BIGBLUEBUTTONBN_CFG) ) {
-        $CFG = (object) array_merge((array)$CFG, (array)$BIGBLUEBUTTONBN_CFG);
-    }
-}
 
 if ($ADMIN->fulltree) {
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url) || 
@@ -180,25 +176,30 @@ if ($ADMIN->fulltree) {
                 0));
     }
 
-    //$settings->add( new admin_setting_heading('config_scheduled',
-    //        get_string('config_scheduled', 'bigbluebuttonbn'),
-    //        get_string('config_scheduled_description', 'bigbluebuttonbn')));
-    //// calculated duration for 'scheduled session' feature
-    //$settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
-    //        get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
-    //        get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
-    //        1));
-    //// compensatory time for 'scheduled session' feature
-    //$settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
-    //        get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
-    //        get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
-    //        10, PARAM_INT));
-    //// pre-opening time for 'scheduled session' feature
-    //$settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
-    //        get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
-    //        get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
-    //        10, PARAM_INT));
-    
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled) ) {
+      $settings->add( new admin_setting_heading('config_scheduled',
+              get_string('config_scheduled', 'bigbluebuttonbn'),
+              get_string('config_scheduled_description', 'bigbluebuttonbn')));
+
+      // calculated duration for 'scheduled session' feature
+      $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
+              get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
+              get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
+              1));
+
+      // compensatory time for 'scheduled session' feature
+      $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
+              get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
+              get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
+              10, PARAM_INT));
+
+      // pre-opening time for 'scheduled session' feature
+      $settings->add(new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
+              get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
+              get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
+              10, PARAM_INT));
+    }
+      
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default) ) {
         $settings->add( new admin_setting_heading('bigbluebuttonbn_permission',
                 get_string('config_permission', 'bigbluebuttonbn'),
@@ -214,6 +215,7 @@ if ($ADMIN->fulltree) {
                 array_keys($owner), array_merge($owner, $roles)));
     }
 
+    //// Configuration for "send notifications" feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled) ) {
         $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
                 get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
@@ -226,5 +228,4 @@ if ($ADMIN->fulltree) {
                 get_string('config_feature_sendnotifications_enabled_description', 'bigbluebuttonbn'),
                 1));
     }
-
 }

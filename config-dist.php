@@ -118,8 +118,8 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable = 1;
 
 // When the 'wait for moderator' capability is enabled, the ping interval
 // is used for pooling the status of the server. Its value is expresed 
-// in seconds. The default values is 10 secs.
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval = 10;
+// in seconds. The default values is 15 secs.
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval = 15;
 
 // When the 'wait for moderator' capability is enabled, the ping interval
 // is used for pooling the status of the server. But for reducing the
@@ -183,7 +183,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable = 0;
 // When the value is set to 1 (checked) the 'notification sending'
 // capability can be used by the user creating or editing the room or
 // activity.
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 1;
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!
