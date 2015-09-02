@@ -45,7 +45,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $waitformoderator_default = bigbluebuttonbn_get_cfg_waitformoderator_default();
         $waitformoderator_editable = bigbluebuttonbn_get_cfg_waitformoderator_editable();
         $userlimit_default = bigbluebuttonbn_get_cfg_userlimit_default();
-        $userlimit_editable = bigbluebuttonbn_get_cfg_userlimit_enabled();
+        $userlimit_editable = bigbluebuttonbn_get_cfg_userlimit_editable();
         $preuploadpresentation_enabled = bigbluebuttonbn_get_cfg_preuploadpresentation_enabled();
         $sendnotifications_enabled = bigbluebuttonbn_get_cfg_sendnotifications_enabled(); 
 
@@ -76,9 +76,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
-
-        $mform->addElement('checkbox', 'newwindow', get_string('mod_form_field_newwindow', 'bigbluebuttonbn'));
-        $mform->setDefault( 'newwindow', 0 );
 
         $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
         $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');

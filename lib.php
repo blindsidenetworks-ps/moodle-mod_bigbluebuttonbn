@@ -332,18 +332,10 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 
     $info = new cached_cm_info();
     $info->name = $bigbluebuttonbn->name;
-    //$info->intro = $bigbluebuttonbn->intro;
 
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
         $info->content = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
-    }
-
-    if ( $bigbluebuttonbn->newwindow == 1 ) {
-        $viewurl = new moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $coursemodule->id));
-        $info->onclick = "window.open('". $viewurl->out(false)."'); return false;";
-        //$fullurl = "$CFG->wwwroot/mod/bigbluebuttonbn/view.php?id=$coursemodule->id";
-        //$info->onclick = "window.open('$fullurl'); return false;";
     }
 
     return $info;
