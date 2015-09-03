@@ -163,7 +163,7 @@ function bigbluebutton_bbb_view_close_window() {
 }
 
 function bigbluebutton_bbb_view_close_window_manually() {
-    echo 'This tab/window must be closed manually';
+    echo get_string('view_message_tab_close', 'bigbluebuttonbn');
 }
 
 function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn) {
