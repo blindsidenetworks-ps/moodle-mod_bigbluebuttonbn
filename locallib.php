@@ -911,16 +911,16 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
                 //For backward compatibility
                 if( isset($recording['meta_contextactivity']) ) {
                     $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
-                } if( isset($recording['meta_bn-recording-name']) ) {
-                    $meta_activity = str_replace('"', '\"', $recording['meta_bn-recording-name']);
+                } if( isset($recording['meta_bbb-recording-name']) ) {
+                    $meta_activity = str_replace('"', '\"', $recording['meta_bbb-recording-name']);
                 } else {
                     $meta_activity = str_replace('"', '\"', $recording['meetingName']);
                 }
 
                 if( isset($recording['meta_contextactivitydescription']) ) {
                     $meta_description = str_replace('"', '\"', $recording['meta_contextactivitydescription']);
-                } else if( isset($recording['meta_bn-recording-description']) ) {
-                    $meta_description = str_replace('"', '\"', $recording['meta_bn-recording-description']);
+                } else if( isset($recording['meta_bbb-recording-description']) ) {
+                    $meta_description = str_replace('"', '\"', $recording['meta_bbb-recording-description']);
                 } else {
                     $meta_description = '';
                 }

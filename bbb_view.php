@@ -71,14 +71,14 @@ switch (strtolower($action)) {
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                     /// Prepare the metadata
                     $metadata = array("meta_bn-origin" => $bbbsession['origin'],
-                            "meta_bn-origin-version" => $bbbsession['originVersion'],
-                            "meta_bn-origin-server-name" => $bbbsession['originServerName'],
-                            "meta_bn-origin-server-common-name" => $bbbsession['originServerCommonName'],
-                            "meta_bn-origin-tag" => $bbbsession['originTag'],
-                            "meta_bn-context" => $bbbsession['context'],
-                            "meta_bn-recording-name" => (isset($name) && $name != '')? $name: $bbbsession['contextActivityName'],
-                            "meta_bn-recording-description" => (isset($description) && $description != '')? $description: $bbbsession['contextActivityDescription'],
-                            "meta_bn-recording-tags" => (isset($tags) && $tags != '')? $tags: $bbbsession['contextActivityTags'],
+                            "meta_bbb-origin-version" => $bbbsession['originVersion'],
+                            "meta_bbb-origin-server-name" => $bbbsession['originServerName'],
+                            "meta_bbb-origin-server-common-name" => $bbbsession['originServerCommonName'],
+                            "meta_bbb-origin-tag" => $bbbsession['originTag'],
+                            "meta_bbb-context" => $bbbsession['context'],
+                            "meta_bbb-recording-name" => (isset($name) && $name != '')? $name: $bbbsession['contextActivityName'],
+                            "meta_bbb-recording-description" => (isset($description) && $description != '')? $description: $bbbsession['contextActivityDescription'],
+                            "meta_bbb-recording-tags" => (isset($tags) && $tags != '')? $tags: $bbbsession['contextActivityTags'],
                             "meta_bn-recording-ready-url" => $bbbsession['recordingReadyURL'],
                     );
 
