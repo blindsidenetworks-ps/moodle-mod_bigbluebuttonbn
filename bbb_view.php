@@ -39,8 +39,10 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->blocks->show_only_fake_blocks();
 
-if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession))
+if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    require_login($course, true, $cm);
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
 switch (strtolower($action)) {
     case 'logout':
         if ( isset($bbbsession) && !is_null($bbbsession) ) {
@@ -58,12 +60,7 @@ switch (strtolower($action)) {
         }
         break;
     case 'join':
-        require_login($course, true, $cm);
-
-        if ( !isset($bbbsession) || is_null($bbbsession) ) {
-            print_error( 'view_error_unable_join', 'bigbluebuttonbn' );
-
-        } else {
+        if ( isset($bbbsession) && !is_null($bbbsession) ) {
             //See if the session is in progress
             if( bigbluebuttonbn_isMeetingRunning( $bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'] ) ) {
                 /// Since the meeting is already running, we just join the session
@@ -146,6 +143,9 @@ switch (strtolower($action)) {
                     header('Location: '.$bbbsession['logoutURL'] );
                 }
             }
+
+        } else {
+            print_error( 'view_error_unable_join', 'bigbluebuttonbn' );
         }
         break;
     default:
