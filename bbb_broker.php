@@ -155,12 +155,6 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':
-                    header("HTTP/1.0 501 Not implemented. Feature temporary removed due issues with the performance in Moodle");
-                    return;
-                    /*
-                     * SENDNOTIFICATIONS: Feature temporary removed due issues with the performance in Moodle
-                     */
-                    /*
                     //Decodes the received JWT string
                     try {
                         $decoded_parameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
@@ -196,7 +190,6 @@ if ( empty($error) ) {
                         header("HTTP/1.0 503 Service Unavailable. ".$error);
                         return;
                     }
-                    */
                     break;
                 case 'moodle_notify':
                     break;

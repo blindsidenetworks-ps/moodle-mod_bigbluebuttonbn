@@ -32,13 +32,6 @@ if( file_exists(dirname(__FILE__).'/config.php') ) {
 } else {
     $BIGBLUEBUTTONBN_CFG = new stdClass();
 }
-/*
- * SENDNOTIFICATIONS: Feature temporary removed due issues with the performance in Moodle
- */
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
-/*
- * Remove this block when restored
- */
 
 /*
  * DURATIIONCOMPENSATION: Feature removed by configuration
