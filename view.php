@@ -293,6 +293,8 @@ function bigbluebuttonbn_view_joining($bbbsession){
           '  <div class="yui3-widget-bd">'.
           '    <form>'.
           '      <fieldset>'.
+          '        <input type="hidden" name="join" id="meeting_join_url" value="">'.
+          '        <input type="hidden" name="message" id="meeting_message" value="">'.
           '        <div>'.
           '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'.
           '          <input type="text" name="name" id="recording_name" placeholder="">'.

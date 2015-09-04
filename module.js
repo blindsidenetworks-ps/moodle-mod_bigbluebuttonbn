@@ -38,6 +38,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
 	        plugins      : [Y.Plugin.Drag]
         });
 
+        // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
         bigbluebuttonbn_panel.addButton({
             value  : bigbluebuttonbn.locales.modal_button,
             section: Y.WidgetStdMod.FOOTER,
@@ -46,34 +47,29 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
                 bigbluebuttonbn_panel.hide();
 
                 //var nameField = Y.DOM.byId('recording_name');
+                var joinField = Y.one('#meeting_join_url');
+                var messageField = Y.one('#meeting_message');
                 var nameField = Y.one('#recording_name');
                 var descriptionField  = Y.one('#recording_description');
                 var tagsField = Y.one('#recording_tags');
-                // Define the apply function - this will be called when 'Apply' is
-                // pressed on the modal form.
+
+                //Gatter the fields thay will be passed as metaparameters to the bbb server
                 var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                bigbluebuttonbn_dataSource.sendRequest({
-                    request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
-                    callback : {
-                        success : function(e) {
-                            if (e.data.running) {
-                                alert('The meeting is already running, the data typed will not affect the values for this session.');
-                            } else {
-                                var join_url = e.data.status.join_url + '&name=' + name + '&description=' + description + '&tags=' + tags;
-                                M.mod_bigbluebuttonbn.broker_executeJoin(join_url, e.data.status.message);
-                            }
-                        },
-                        failure : function(e) {
-                            console.log(e);
-                        }
-                    }
-                });
 
+                // Prepare the new join_url
+                var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
+
+                // Executes the join
+                M.mod_bigbluebuttonbn.broker_executeJoin(join_url, messageField.get('value'));
+
+                // Clean values in case the for is used again
                 nameField.set('value', '');
                 descriptionField.set('value', '');
                 tagsField.set('value', '');
+                joinField.set('value', '');
+                messageField.set('value', '');
             }
         });
 
@@ -117,11 +113,9 @@ M.mod_bigbluebuttonbn.view_clean = function() {
 }
 
 M.mod_bigbluebuttonbn.view_remote_update = function(delay) {
-	console.info('running update');
 	setTimeout(function() {
 		M.mod_bigbluebuttonbn.view_clean();
 		M.mod_bigbluebuttonbn.view_update();
-		console.info('update has been run');
 	}, delay);
 }
 
@@ -321,6 +315,9 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_ta
                     if (e.data.running) {
                         M.mod_bigbluebuttonbn.broker_executeJoin(join_url, e.data.status.message);
                     } else {
+                        Y.one('#meeting_join_url').set('value', join_url);
+                        Y.one('#meeting_message').set('value', e.data.status.message);
+
                         YUI().use('panel', function (Y) {
                             bigbluebuttonbn_panel.show();
                         });
