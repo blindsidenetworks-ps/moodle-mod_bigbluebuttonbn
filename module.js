@@ -179,13 +179,14 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
     var msg_attendees_in = '';
 
     if (typeof moderators != 'undefined' && typeof participants != 'undefined') {
+        var viewers = participants - moderators;
         if( participants > 1 ) {
             var viewers = participants - moderators;
             msg_attendees_in += bigbluebuttonbn.locales.session_has_users + ' <b>' + moderators + '</b> ' + (moderators == 1? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.moderators) + ' and ';
             msg_attendees_in += '<b>' + viewers + '</b> ' + (viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
 
         } else {
-            if( participants > 0 ) {
+            if( viewers > 0 ) {
                 msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';	
             } else if ( moderators > 0 ) {
                 msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';	
