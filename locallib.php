@@ -740,7 +740,7 @@ function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm)
         }
         error_log('logging '.$event);
         $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-        add_to_log($course->id, 'bigbluebuttonbn', $event, '', $bigbluebuttonbn->id, $cm->id);
+        add_to_log($course->id, 'bigbluebuttonbn', $event, '', $bigbluebuttonbn->name, $cm->id);
 
     } else {
         //This is valid after v2.7
