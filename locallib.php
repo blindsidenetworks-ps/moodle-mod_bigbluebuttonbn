@@ -695,12 +695,53 @@ function bigbluebuttonbn_random_password( $length = 8 ) {
     return $password;
 }
 
-function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm) {
+function bigbluebuttonbn_get_moodle_version_major() {
     global $CFG;
 
-    if ( $CFG->version < '2014051200' ) {
+    $version_array = explode('.', $CFG->version);
+    return $version_array[0];
+}
+function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm) {
+    global $DB;
+
+    $version_major = bigbluebuttonbn_get_moodle_version_major();
+    if ( $version_major < '2014051200' ) {
         //This is valid before v2.7
-        add_to_log($course->id, 'bigbluebuttonbn', $event_type, '', $bigbluebuttonbn->name, $cm->id);
+        switch ($event_type) {
+            case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
+                $event = 'join';
+                break;
+            case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
+                $event = 'create';
+                break;
+            case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
+                $event = 'end';
+                break;
+            case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
+                $event = 'left';
+                break;
+            case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
+                $event = 'publish';
+                break;
+            case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
+                $event = 'unpublish';
+                break;
+            case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
+                $event = 'delete';
+                break;
+            case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
+                $event = 'view';
+                break;
+            case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
+                $event = 'view all';
+                break;
+            default:
+                return;
+        }
+        error_log('logging '.$event);
+        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+        add_to_log($course->id, 'bigbluebuttonbn', $event, '', $bigbluebuttonbn->id, $cm->id);
+
     } else {
         //This is valid after v2.7
         $context = context_module::instance($cm->id);

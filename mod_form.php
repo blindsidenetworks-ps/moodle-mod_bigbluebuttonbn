@@ -67,7 +67,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        if ( $CFG->version < '2015051100' ) {
+        $version_major = bigbluebuttonbn_get_moodle_version_major();
+        if ( $version_major < '2015051100' ) {
             //This is valid before v2.9
             $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         } else {

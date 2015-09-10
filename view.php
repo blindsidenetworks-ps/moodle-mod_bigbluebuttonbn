@@ -30,7 +30,8 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-if ( $CFG->version < '2013111800' ) {
+$version_major = bigbluebuttonbn_get_moodle_version_major();
+if ( $version_major < '2013111800' ) {
     //This is valid before v2.6
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;

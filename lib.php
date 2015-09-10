@@ -303,7 +303,7 @@ function bigbluebuttonbn_get_view_actions() {
  * @return array
  */
 function bigbluebuttonbn_get_post_actions() {
-    return array('update', 'add');
+    return array('update', 'add', 'create', 'join', 'end', 'left', 'publish', 'unpublish', 'delete');
 }
 
 /**
@@ -657,7 +657,8 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
 function bigbluebuttonbn_get_context_module($id) {
     global $CFG;
 
-    if ( $CFG->version < '2013111800' ) {
+    $version_major = bigbluebuttonbn_get_moodle_version_major();
+    if ( $version_major < '2013111800' ) {
         //This is valid before v2.6
         $context = get_context_instance(CONTEXT_MODULE, $id);
     } else {
@@ -671,7 +672,8 @@ function bigbluebuttonbn_get_context_module($id) {
 function bigbluebuttonbn_get_context_course($id) {
     global $CFG;
 
-    if ( $CFG->version < '2013111800' ) {
+    $version_major = bigbluebuttonbn_get_moodle_version_major();
+    if ( $version_major < '2013111800' ) {
         //This is valid before v2.6
         $context = get_context_instance(CONTEXT_COURSE, $id);
     } else {
