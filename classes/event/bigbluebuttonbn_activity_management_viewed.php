@@ -47,8 +47,8 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return(array($this->courseid, 'bigbluebuttonbn', 'view',
-                'view.php?pageid=' . $this->objectid, $this->objectid, $this->contextinstanceid));
+        return(array($this->courseid, 'bigbluebuttonbn', 'activity management viewed',
+                'view.php?pageid=' . $this->objectid, get_string('event_activity_viewed_all', 'bigbluebuttonbn'), $this->contextinstanceid));
     }
 
     /**

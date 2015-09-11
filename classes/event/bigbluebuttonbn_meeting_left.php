@@ -48,8 +48,8 @@ class bigbluebuttonbn_meeting_left extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return(array($this->courseid, 'bigbluebuttonbn', 'view',
-                'view.php?pageid=' . $this->objectid, $this->objectid, $this->contextinstanceid));
+        return(array($this->courseid, 'bigbluebuttonbn', 'meeting left',
+                'view.php?pageid=' . $this->objectid, get_string('event_meeting_left', 'bigbluebuttonbn'), $this->contextinstanceid));
     }
 
     /**

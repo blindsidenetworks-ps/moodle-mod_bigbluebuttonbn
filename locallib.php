@@ -701,83 +701,94 @@ function bigbluebuttonbn_get_moodle_version_major() {
     $version_array = explode('.', $CFG->version);
     return $version_array[0];
 }
-function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm) {
+
+function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $context, $cm) {
+    $context = context_module::instance($cm->id);
+    $event_properties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
+
+    switch ($event_type) {
+        case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_ended::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_published::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_unpublished::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_deleted::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create($event_properties);
+            break;
+    }
+
+    $event->trigger();
+}
+
+function bigbluebuttonbn_event_log_legacy($event_type, $bigbluebuttonbn, $context, $cm) {
     global $DB;
+
+    switch ($event_type) {
+        case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
+            $event = 'join';
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
+            $event = 'create';
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
+            $event = 'end';
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
+            $event = 'left';
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
+            $event = 'publish';
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
+            $event = 'unpublish';
+            break;
+        case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
+            $event = 'delete';
+            break;
+        case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
+            $event = 'view';
+            break;
+        case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
+            $event = 'view all';
+            break;
+        default:
+            return;
+    }
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+
+    add_to_log($course->id, 'bigbluebuttonbn', $event, '', $bigbluebuttonbn->name, $cm->id);
+}
+
+function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm) {
+    global $CFG;
 
     $version_major = bigbluebuttonbn_get_moodle_version_major();
     if ( $version_major < '2014051200' ) {
         //This is valid before v2.7
-        switch ($event_type) {
-            case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
-                $event = 'join';
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
-                $event = 'create';
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
-                $event = 'end';
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
-                $event = 'left';
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
-                $event = 'publish';
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
-                $event = 'unpublish';
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
-                $event = 'delete';
-                break;
-            case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
-                $event = 'view';
-                break;
-            case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
-                $event = 'view all';
-                break;
-            default:
-                return;
-        }
-        error_log('logging '.$event);
-        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-        add_to_log($course->id, 'bigbluebuttonbn', $event, '', $bigbluebuttonbn->name, $cm->id);
+        bigbluebuttonbn_event_log_legacy($event_type, $bigbluebuttonbn, $context, $cm);
 
     } else {
         //This is valid after v2.7
-        $context = context_module::instance($cm->id);
-        $event_properties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
-
-        switch ($event_type) {
-            case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_ended::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_published::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_unpublished::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_deleted::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($event_properties);
-                break;
-            case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
-                $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create($event_properties);
-                break;
-        }
-
-        $event->trigger();
+        bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $context, $cm);
     }
 }
 

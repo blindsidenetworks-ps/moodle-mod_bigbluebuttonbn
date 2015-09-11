@@ -49,8 +49,8 @@ class bigbluebuttonbn_recording_deleted extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return(array($this->courseid, 'bigbluebuttonbn', 'view',
-                'view.php?pageid=' . $this->objectid, $this->objectid, $this->contextinstanceid));
+        return(array($this->courseid, 'bigbluebuttonbn', 'recording deleted',
+                'view.php?pageid=' . $this->objectid, get_string('event_recording_deleted', 'bigbluebuttonbn'), $this->contextinstanceid));
     }
 
     /**

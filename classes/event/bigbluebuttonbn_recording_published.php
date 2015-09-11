@@ -49,8 +49,8 @@ class bigbluebuttonbn_recording_published extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return(array($this->courseid, 'bigbluebuttonbn', 'view',
-                'view.php?pageid=' . $this->objectid, $this->objectid, $this->contextinstanceid));
+        return(array($this->courseid, 'bigbluebuttonbn', 'recording published',
+                'view.php?pageid=' . $this->objectid, get_string('event_recording_published', 'bigbluebuttonbn'), $this->contextinstanceid));
     }
 
     /**
