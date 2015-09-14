@@ -921,6 +921,153 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     return $error;
 }
 
+function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
+    global $OUTPUT, $CFG, $USER;
+
+    $row = null;
+
+    if ( $bbbsession['administrator'] || $bbbsession['moderator'] || $recording['published'] == 'true' ) {
+        $length = 0;
+        $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
+        $endTime = $endTime - ($endTime % 1000);
+        $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
+        $startTime = $startTime - ($startTime % 1000);
+        $duration = intval(($endTime - $startTime) / 60000);
+
+        //$meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
+        //For backward compatibility
+        if( isset($recording['meta_contextactivity']) ) {
+            $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
+        } if( isset($recording['meta_bbb-recording-name']) ) {
+            $meta_activity = str_replace('"', '\"', $recording['meta_bbb-recording-name']);
+        } else {
+            $meta_activity = str_replace('"', '\"', $recording['meetingName']);
+        }
+
+        if( isset($recording['meta_contextactivitydescription']) ) {
+            $meta_description = str_replace('"', '\"', $recording['meta_contextactivitydescription']);
+        } else if( isset($recording['meta_bbb-recording-description']) ) {
+            $meta_description = str_replace('"', '\"', $recording['meta_bbb-recording-description']);
+        } else {
+            $meta_description = '';
+        }
+
+        $actionbar = '';
+        $params['id'] = $bbbsession['cm']->id;
+        $params['recordingid'] = $recording['recordID'];
+        if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+            $url = '#';
+            $action = null;
+
+            ///Set action [show|hide]
+            if ( $recording['published'] == 'true' ){
+                $manage_tag = 'hide';
+                $manage_action = 'unpublish';
+            } else {
+                $manage_tag = 'show';
+                $manage_action = 'publish';
+            }
+
+            if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
+                //With icon for publish/unpublish
+                $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
+                $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
+                $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
+                $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
+
+                //With icon for delete
+                $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
+                $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
+                $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
+                $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
+
+            } else {
+                //With text for publish/unpublish
+                $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
+                $actionbar .= "&nbsp;";
+
+                //With text for delete
+                $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
+            }
+        }
+
+        $recording_types = '';
+        foreach ( $recording['playbacks'] as $playback ) {
+            if ($recording['published'] == 'true') {
+                $recording_types .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
+            } else {
+                $recording_types .= $playback['type'].'&#32;';
+            }
+        }
+
+        //Make sure the startTime is timestamp
+        if( !is_numeric($recording['startTime']) ){
+            $date = new DateTime($recording['startTime']);
+            $recording['startTime'] = date_timestamp_get($date);
+        } else {
+            $recording['startTime'] = $recording['startTime'] / 1000;
+        }
+        //Set corresponding format
+        $format = get_string('strftimerecentfull', 'langconfig');
+        if( isset($format) ) {
+            $formatedStartDate = userdate($recording['startTime'], $format);
+        } else {
+            $format = '%a %h %d, %Y %H:%M:%S %Z';
+            $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
+        }
+
+        $row = new stdClass();
+        $row->recording = $recording_types;
+        $row->activity = $meta_activity;
+        $row->description = $meta_description;
+        $row->date = $formatedStartDate;
+        $row->duration = $duration;
+        if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+            $row->actionbar = $actionbar;
+        }
+    }
+    return $row;
+}
+
+function bigbluebuttonbn_get_recording_columns($bbbsession, $recordings) {
+    ///Set strings to show
+    $view_recording_recording = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $view_recording_activity = get_string('view_recording_activity', 'bigbluebuttonbn');
+    $view_recording_description = get_string('view_recording_description', 'bigbluebuttonbn');
+    $view_recording_date = get_string('view_recording_date', 'bigbluebuttonbn');
+    $view_recording_duration = get_string('view_recording_duration', 'bigbluebuttonbn');
+    $view_recording_actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
+
+    ///Initialize table headers
+    $recordingsbn_columns = array(
+        array("key" =>"recording", "label" => $view_recording_recording, "width" => "125px", "allowHTML" => true),
+        array("key" =>"activity", "label" => $view_recording_activity, "sortable" => true, "width" => "175px"),
+        array("key" =>"description", "label" => $view_recording_description, "sortable" => true, "width" => "250px"),
+        array("key" =>"date", "label" => $view_recording_date, "sortable" => true, "width" => "220px"),
+        array("key" =>"duration", "label" => $view_recording_duration, "width" => "50px")
+        );
+
+    if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+        array_push($recordingsbn_columns, array("key" =>"actionbar", "label" => $view_recording_actionbar, "width" => "75px", "allowHTML" => true));
+    }
+
+    return $recordingsbn_columns;
+}
+
+function bigbluebuttonbn_get_recording_data($bbbsession, $recordings) {
+    $table_data = array();
+
+    ///Build table content
+    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+        foreach ( $recordings as $recording ) {
+            $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
+            array_push($table_data, $row);
+        }
+    }
+
+    return $table_data;
+}
+
 function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     global $OUTPUT, $CFG;
 
@@ -951,107 +1098,18 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     ///Build table content
     if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
         foreach ( $recordings as $recording ){
-            if ( $bbbsession['administrator'] || $bbbsession['moderator'] || $recording['published'] == 'true' ) {
-                $length = 0;
-                $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
-                $endTime = $endTime - ($endTime % 1000);
-                $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
-                $startTime = $startTime - ($startTime % 1000);
-                $duration = intval(($endTime - $startTime) / 60000);
+            $row = new html_table_row();
+            $row->id = 'recording-td-'.$recording['recordID'];
 
-                //$meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
-                //For backward compatibility
-                if( isset($recording['meta_contextactivity']) ) {
-                    $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
-                } if( isset($recording['meta_bbb-recording-name']) ) {
-                    $meta_activity = str_replace('"', '\"', $recording['meta_bbb-recording-name']);
-                } else {
-                    $meta_activity = str_replace('"', '\"', $recording['meetingName']);
-                }
-
-                if( isset($recording['meta_contextactivitydescription']) ) {
-                    $meta_description = str_replace('"', '\"', $recording['meta_contextactivitydescription']);
-                } else if( isset($recording['meta_bbb-recording-description']) ) {
-                    $meta_description = str_replace('"', '\"', $recording['meta_bbb-recording-description']);
-                } else {
-                    $meta_description = '';
-                }
-
-                $actionbar = '';
-                $params['id'] = $bbbsession['cm']->id;
-                $params['recordingid'] = $recording['recordID'];
-                if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
-                    $url = '#';
-                    $action = null;
-
-                    ///Set action [show|hide]
-                    if ( $recording['published'] == 'true' ){
-                        $manage_tag = 'hide';
-                        $manage_action = 'unpublish';
-                    } else {
-                        $manage_tag = 'show';
-                        $manage_action = 'publish';
-                    }
-
-                    if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
-                        //With icon for publish/unpublish
-                        $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
-                        $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
-                        $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
-                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
-
-                        //With icon for delete
-                        $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
-                        $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
-                        $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_delete_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
-                        $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
-
-                    } else {
-                        //With text for publish/unpublish
-                        $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
-                        $actionbar .= "&nbsp;";
-
-                        //With text for delete
-                        $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => 'if(confirm("Are you sure to delete?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
-                    }
-                }
-
-                $type = '';
-                foreach ( $recording['playbacks'] as $playback ) {
-                    if ($recording['published'] == 'true') {
-                        $type .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
-                    } else {
-                        $type .= $playback['type'].'&#32;';
-                    }
-                }
-
-                //Make sure the startTime is timestamp
-                if( !is_numeric($recording['startTime']) ){
-                    $date = new DateTime($recording['startTime']);
-                    $recording['startTime'] = date_timestamp_get($date);
-                } else {
-                    $recording['startTime'] = $recording['startTime'] / 1000;
-                }
-                //Set corresponding format
-                $format = get_string('strftimerecentfull', 'langconfig');
-                if( isset($format) ) {
-                    $formatedStartDate = userdate($recording['startTime'], $format);
-                } else {
-                    $format = '%a %h %d, %Y %H:%M:%S %Z';
-                    $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
-                }
-
-                $row = new html_table_row();
-                $row->id = 'recording-td-'.$recording['recordID'];
-                if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
-                    $row->cells = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
-                    //$table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration, $actionbar );
-                } else {
-                    $row->cells = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
-                    //$table->data[] = array ($type, $meta_activity, $meta_description, str_replace(" ", "&nbsp;", $formatedStartDate), $duration);
-                }
-                array_push($table->data, $row);
+            $row_data = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
+            $row_data->date = str_replace(" ", "&nbsp;", $row_data->date);
+            if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+                $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration, $row_data->actionbar );
+            } else {
+                $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration );
             }
+
+            array_push($table->data, $row);
         }
     }
 
