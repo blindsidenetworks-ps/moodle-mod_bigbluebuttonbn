@@ -81,7 +81,7 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
 }
 
 $bbbsession['userlimit'] = intval($bigbluebuttonbn->userlimit);
-$bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
+$bbbsession['voicebridge'] = ($bigbluebuttonbn->voicebridge > 0)? 70000 + $bigbluebuttonbn->voicebridge: $bigbluebuttonbn->voicebridge;
 $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
 if( $bigbluebuttonbn->record )
