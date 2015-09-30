@@ -1087,7 +1087,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
     $table->data = array();
 
     ///Initialize table headers
-    if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+    if ( $bbbsession['managerecordings'] ) {
         $table->head  = array ($view_recording_recording, $view_recording_activity, $view_recording_description, $view_recording_date, $view_recording_duration, $view_recording_actionbar);
         $table->align = array ('left', 'left', 'left', 'left', 'center', 'left');
     } else {
@@ -1103,7 +1103,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
 
             $row_data = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
             $row_data->date = str_replace(" ", "&nbsp;", $row_data->date);
-            if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+            if ( $bbbsession['managerecordings'] ) {
                 $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration, $row_data->actionbar );
             } else {
                 $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration );

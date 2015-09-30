@@ -64,6 +64,7 @@ if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == 
     $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'], $bigbluebuttonbn->participants);
 }
 $bbbsession['administrator'] = has_capability('moodle/category:manage', $context);
+$bbbsession['managerecordings'] = ($bbbsession['administrator'] || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
 
 //BigBlueButton server data
 $bbbsession['endpoint'] = bigbluebuttonbn_get_cfg_server_url();

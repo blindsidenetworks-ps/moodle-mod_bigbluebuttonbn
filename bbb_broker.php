@@ -138,24 +138,33 @@ if ( empty($error) ) {
                     }
                     break;
                 case 'recording_publish':
-                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
-                    // Moodle event logger: Create an event for recording published
-                    if( isset($bigbluebuttonbn) )
-                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    if( $bbbsession['managerecordings'] ) {
+                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                        // Moodle event logger: Create an event for recording published
+                        if( isset($bigbluebuttonbn) ) {
+                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                        }
+                    }
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_unpublish':
-                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
-                    // Moodle event logger: Create an event for recording unpublished
-                    if( isset($bigbluebuttonbn) )
-                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+                    if( $bbbsession['managerecordings'] ) {
+                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                        // Moodle event logger: Create an event for recording unpublished
+                        if( isset($bigbluebuttonbn) ) {
+                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+                        }
+                    }
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_delete':
-                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
-                    // Moodle event logger: Create an event for recording deleted
-                    if( isset($bigbluebuttonbn) )
-                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                    if( $bbbsession['managerecordings'] ) {
+                        $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                        // Moodle event logger: Create an event for recording deleted
+                        if( isset($bigbluebuttonbn) ) {
+                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                        }
+                    }
                     echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':

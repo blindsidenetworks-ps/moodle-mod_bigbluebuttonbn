@@ -51,6 +51,18 @@ $capabilities = array(
                         'editingteacher' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW
                 )
-        )
+        ),
 
+        //
+        // Ability to manage recordings
+        'mod/bigbluebuttonbn:managerecordings' => array(
+                'captype' => 'read',
+                'contextlevel' => CONTEXT_MODULE,
+                'legacy' => array(
+                        'manager' => CAP_ALLOW,
+                        //'coursecreator' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW
+                )
+        )
 );
