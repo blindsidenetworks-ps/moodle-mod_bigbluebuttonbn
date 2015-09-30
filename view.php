@@ -12,16 +12,16 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$b  = optional_param('n', 0, PARAM_INT);  // bigbluebuttonbn instance ID
-$group  = optional_param('group', 0, PARAM_INT);  // bigbluebuttonbn group ID
+$id = required_param('id', PARAM_INT);              // Course Module ID, or
+$b  = optional_param('n', 0, PARAM_INT);            // bigbluebuttonbn instance ID
+$group  = optional_param('group', 0, PARAM_INT);    // group instance ID
 
 if ($id) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
 } elseif ($b) {
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $n), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $b), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
@@ -35,12 +35,12 @@ if ( $version_major < '2013111800' ) {
     //This is valid before v2.6
     $module = $DB->get_record('modules', array('name' => 'bigbluebuttonbn'));
     $module_version = $module->version;
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 } else {
     //This is valid after v2.6
     $module_version = get_config('mod_bigbluebuttonbn', 'version');
-    $context = context_module::instance($cm->id);
 }
+$context = bigbluebuttonbn_get_context_module($cm->id);
+
 
 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $context, $cm);
 

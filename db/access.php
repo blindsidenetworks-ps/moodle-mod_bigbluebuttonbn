@@ -43,7 +43,7 @@ $capabilities = array(
         //
         // Ability to moderate a meeting
         'mod/bigbluebuttonbn:moderate' => array(
-                'captype' => 'write',
+                'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(
                         'manager' => CAP_ALLOW,
