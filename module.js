@@ -346,7 +346,7 @@ M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, meetingid) {
     console.info('Action: ' + action);
     var id = bigbluebuttonbn_dataSource.sendRequest({
-        request : "action=recording_" + action + "&id=" + recordingid + "&bigbluebuttonbn=" + bigbluebuttonbn.bigbluebuttonbnid,
+        request : "action=recording_" + action + "&id=" + recordingid,
         callback : {
             success : function(e) {
                 if( action == 'delete') {
