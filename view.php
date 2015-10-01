@@ -47,16 +47,16 @@ bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn,
 ////////////////////////////////////////////////
 /////  BigBlueButton Session Setup Starts  /////
 ////////////////////////////////////////////////
-//BigBluebuttonBN activity data
+// BigBluebuttonBN activity data
 $bbbsession['bigbluebuttonbnid'] = $bigbluebuttonbn->id;
 $bbbsession['bigbluebuttonbntype'] = $bigbluebuttonbn->type;
 
-//User data
+// User data
 $bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
 $bbbsession['userID'] = $USER->id;
 $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 
-//User roles
+// User roles
 if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]" ){
     //The room that is being used comes from a previous version
     $bbbsession['moderator'] = has_capability('mod/bigbluebuttonbn:moderate', $context);
@@ -66,15 +66,15 @@ if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == 
 $bbbsession['administrator'] = has_capability('moodle/category:manage', $context);
 $bbbsession['managerecordings'] = ($bbbsession['administrator'] || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
 
-//BigBlueButton server data
+// BigBlueButton server data
 $bbbsession['endpoint'] = bigbluebuttonbn_get_cfg_server_url();
 $bbbsession['shared_secret'] = bigbluebuttonbn_get_cfg_shared_secret();
 
-//Server data
+// Server data
 $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
 $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 
-//Database info related to the activity
+// Database info related to the activity
 $bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
@@ -92,12 +92,12 @@ $bbbsession['tagging'] = $bigbluebuttonbn->tagging;
 $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
 $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
 
-//Additional info related to the course
+// Additional info related to the course
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['courseid'] = $course->id;
 $bbbsession['cm'] = $cm;
 
-//Metadata
+// Metadata (origin)
 $bbbsession['origin'] = "Moodle";
 $bbbsession['originVersion'] = $CFG->release;
 $parsedUrl = parse_url($CFG->wwwroot);
@@ -106,14 +106,11 @@ $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
 $bbbsession['context'] = $course->fullname;
-$bbbsession['contextActivityName'] = $bigbluebuttonbn->name;
-$bbbsession['contextActivityDescription'] = "";
-$bbbsession['contextActivityTags'] = "";
-////////////////////////////////////////
+////////////////////////////////////////////////
 /////   BigBlueButton Session Setup Ends   /////
-////////////////////////////////////////
+////////////////////////////////////////////////
 
-//Validates if the BigBlueButton server is running
+// Validates if the BigBlueButton server is running
 $serverVersion = bigbluebuttonbn_getServerVersion($bbbsession['endpoint']);
 if ( !isset($serverVersion) ) { //Server is not working
     if ( $bbbsession['administrator'] )
@@ -138,7 +135,7 @@ if ( !isset($serverVersion) ) { //Server is not working
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-/// Print the page header
+// Print the page header
 $PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
@@ -167,56 +164,59 @@ if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     exit;
 }
 
-/// find out current groups mode
-if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
-    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
-    $bbbsession['meetingname'] = $bigbluebuttonbn->name;
-} else {                                        // Separate groups mode
-    //If doesnt have group
-    $bbbsession['group'] = (!$group)?groups_get_activity_group($cm): $group;
-    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
-    if( $bbbsession['group'] > 0 )
-        $group_name = groups_get_group_name($bbbsession['group']);
-    else
-        $group_name = get_string('allparticipants');
-    $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';    
-}
-
-//Operation URLs
+// Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.'&bn='.$bbbsession['bigbluebuttonbnid'];
 $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready';
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbnid'];
-
-$jwt_token = new stdClass();
-$jwt_token->meeting_id = $bbbsession['meetingid'];
-$jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
-$jwt = JWT::encode($jwt_token, $jwt_key);
 
 $bigbluebuttonbn_view = '';
 
 // Output starts here
 echo $OUTPUT->header();
 
-if (groups_get_activity_groupmode($cm) != 0) {  //It is in groups mode
-    echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
-    echo $OUTPUT->box_end();
-}
-
-echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
-echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
-
 echo $OUTPUT->box_start('generalbox boxaligncenter');
 $now = time();
 if (!$bigbluebuttonbn->openingtime ) {
     if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
         //GO JOINING
-        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+        /// find out current groups mode
+        $bbbsession['group'] = isset($group)? $group: groups_get_activity_group($cm);
+        error_log("Group param ".$bbbsession['group'].", Group set ".groups_get_activity_group($cm));
+        if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
+            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+            $bbbsession['meetingname'] = $bigbluebuttonbn->name;
+        } else {                                        // Separate or visible groups mode
+            echo $OUTPUT->box_start('generalbox boxaligncenter');
+            echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
+            echo $OUTPUT->box_end();
+            groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+
+            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+            if( $bbbsession['group'] > 0 )
+                $group_name = groups_get_group_name($bbbsession['group']);
+            else
+                $group_name = get_string('allparticipants');
+            $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
+        }
+
+        // Metadata (context)
+        $bbbsession['context'] = $course->fullname;
+        $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
+        $bbbsession['contextActivityDescription'] = "";
+        $bbbsession['contextActivityTags'] = "";
+
+        $jwt_token = new stdClass();
+        $jwt_token->meeting_id = $bbbsession['meetingid'];
+        $jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
+        $jwt = JWT::encode($jwt_token, $jwt_key);
+
+        echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
+        echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
+
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'join';
-
         bigbluebuttonbn_view_joining($bbbsession);
 
     } else {
@@ -238,11 +238,42 @@ if (!$bigbluebuttonbn->openingtime ) {
 
 } else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
-    groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+    /// find out current groups mode
+    $bbbsession['group'] = isset($group)? $group: groups_get_activity_group($cm);
+    if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
+        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+        $bbbsession['meetingname'] = $bigbluebuttonbn->name;
+    } else {                                        // Separate or visible groups mode
+        echo $OUTPUT->box_start('generalbox boxaligncenter');
+        echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
+        echo $OUTPUT->box_end();
+        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
+
+        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+        if( $bbbsession['group'] > 0 )
+            $group_name = groups_get_group_name($bbbsession['group']);
+        else
+            $group_name = get_string('allparticipants');
+        $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
+    }
+
+    // Metadata (context)
+    $bbbsession['context'] = $course->fullname;
+    $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
+    $bbbsession['contextActivityDescription'] = "";
+    $bbbsession['contextActivityTags'] = "";
+
+    $jwt_token = new stdClass();
+    $jwt_token->meeting_id = $bbbsession['meetingid'];
+    $jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
+    $jwt = JWT::encode($jwt_token, $jwt_key);
+
+    echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
+    echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
+
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
-
     bigbluebuttonbn_view_joining($bbbsession);
 
 } else {
@@ -255,7 +286,6 @@ if (!$bigbluebuttonbn->openingtime ) {
 }
 
 echo $OUTPUT->box_end();
-
 
 
 //JavaScript variables
@@ -283,6 +313,7 @@ echo $OUTPUT->footer();
 
 
 function bigbluebuttonbn_view_joining($bbbsession){
+    error_log(json_encode($bbbsession));
     global $CFG, $DB, $OUTPUT;
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
