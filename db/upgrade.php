@@ -217,5 +217,33 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
     }
 
+    if ($result && $oldversion < 2015080600) {
+        // Update the bigbluebuttonbn table
+        $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field description
+        $field = new xmldb_field('description');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Change welcome, allow null
+        $field = new xmldb_field('welcome');
+        $field->set_attributes(XMLDB_TYPE_TEXT, null, null, null, null, null, null, null, 'type');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->change_field_notnull($table, $field, $continue=true, $feedback=true);
+        }
+
+        // Update the bigbluebuttonbn_log table
+        $table = new xmldb_table('bigbluebuttonbn_log');
+        //// Change welcome, allow null
+        $field = new xmldb_field('userid');
+        //$field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'bigbluebuttonbnid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'bigbluebuttonbnid');
+        if( $dbman->field_exists($table, $field) ) {
+            $dbman->change_field_notnull($table, $field, $continue=true, $feedback=true);
+        }
+
+        upgrade_mod_savepoint(true, 2015080600, 'bigbluebuttonbn');
+    }
+
     return $result;
 }
