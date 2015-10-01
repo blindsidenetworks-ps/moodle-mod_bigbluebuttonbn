@@ -525,7 +525,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     if( sizeof($args) > 1 ) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
-        $presentation_nonce_key = sha1($bigbluebuttonbn->id);
+        $presentation_nonce_key = sha1($bigbluebuttonbn->meetingid);
         $presentation_nonce = $cache->get($presentation_nonce_key);
         $presentation_nonce_value = $presentation_nonce['value'];
         $presentation_nonce_counter = $presentation_nonce['counter'];
