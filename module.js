@@ -384,6 +384,8 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                             link_action_current_onclick = link_action_current_onclick.replace('publish', 'unpublish');
                                             link_action.setAttribute('onclick', link_action_current_onclick);
                                             console.info(action + " completed");
+                                        } else {
+                                            console.info(action + " in process");
                                         }
                                     } else {
                                         if (e.data.published == 'false') {
@@ -396,6 +398,8 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                             link_action_current_onclick = link_action_current_onclick.replace('unpublish', 'publish');
                                             link_action.setAttribute('onclick', link_action_current_onclick);
                                             console.info(action + " completed");
+                                        } else {
+                                            console.info(action + " in process");
                                         }
                                     }
                                 } else {
