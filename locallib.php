@@ -926,7 +926,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
 
     $row = null;
 
-    if ( $bbbsession['administrator'] || $bbbsession['moderator'] || $recording['published'] == 'true' ) {
+    if ( $bbbsession['managerecordings'] || $recording['published'] == 'true' ) {
         $length = 0;
         $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
         $endTime = $endTime - ($endTime % 1000);
@@ -955,7 +955,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
         $actionbar = '';
         $params['id'] = $bbbsession['cm']->id;
         $params['recordingid'] = $recording['recordID'];
-        if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+        if ( $bbbsession['managerecordings'] ) {
             $url = '#';
             $action = null;
 
@@ -1022,7 +1022,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
         $row->description = $meta_description;
         $row->date = $formatedStartDate;
         $row->duration = $duration;
-        if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+        if ( $bbbsession['managerecordings'] ) {
             $row->actionbar = $actionbar;
         }
     }
@@ -1186,6 +1186,16 @@ function bigbluebuttonbn_get_locales_for_ui() {
             'userlimit_reached' => get_string('view_error_userlimit_reached', 'bigbluebuttonbn'),
     );
     return $locales;
+}
+
+function bigbluebuttonbn_get_cfg_server_url_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url: (isset($CFG->bigbluebuttonbn_server_url)? $CFG->bigbluebuttonbn_server_url: (isset($CFG->BigBlueButtonBNServerURL)? $CFG->BigBlueButtonBNServerURL: 'http://test-install.blindsidenetworks.com/bigbluebutton/')));
+}
+
+function bigbluebuttonbn_get_cfg_shared_secret_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret: (isset($CFG->bigbluebuttonbn_shared_secret)? $CFG->bigbluebuttonbn_shared_secret: (isset($CFG->BigBlueButtonBNSecuritySalt)? $CFG->BigBlueButtonBNSecuritySalt: '8cd8ef52e8e101574e400365b55e11a6')));
 }
 
 function bigbluebuttonbn_get_cfg_voicebridge_editable() {

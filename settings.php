@@ -27,13 +27,13 @@ if ($ADMIN->fulltree) {
         $settings->add( new admin_setting_configtext( 'bigbluebuttonbn_server_url',
                 get_string( 'config_server_url', 'bigbluebuttonbn' ),
                 get_string( 'config_server_url_description', 'bigbluebuttonbn' ),
-                'http://test-install.blindsidenetworks.com/bigbluebutton/'));
+                bigbluebuttonbn_get_cfg_server_url_default()));
     }
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) ) {
         $settings->add( new admin_setting_configtext( 'bigbluebuttonbn_shared_secret',
                 get_string( 'config_shared_secret', 'bigbluebuttonbn' ),
                 get_string( 'config_shared_secret_description', 'bigbluebuttonbn' ),
-                '8cd8ef52e8e101574e400365b55e11a6'));
+                bigbluebuttonbn_get_cfg_shared_secret_default()));
     }
 
     //// Configuration for recording feature
