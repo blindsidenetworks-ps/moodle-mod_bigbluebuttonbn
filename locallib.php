@@ -1047,7 +1047,7 @@ function bigbluebuttonbn_get_recording_columns($bbbsession, $recordings) {
         array("key" =>"duration", "label" => $view_recording_duration, "width" => "50px")
         );
 
-    if ( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+    if ( $bbbsession['managerecordings'] ) {
         array_push($recordingsbn_columns, array("key" =>"actionbar", "label" => $view_recording_actionbar, "width" => "75px", "allowHTML" => true));
     }
 
