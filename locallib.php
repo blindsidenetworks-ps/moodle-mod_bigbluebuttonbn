@@ -1008,13 +1008,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
             $recording['startTime'] = $recording['startTime'] / 1000;
         }
         //Set corresponding format
-        $format = get_string('strftimerecentfull', 'langconfig');
-        if( isset($format) ) {
-            $formatedStartDate = userdate($recording['startTime'], $format);
-        } else {
-            $format = '%a %h %d, %Y %H:%M:%S %Z';
-            $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone) );
-        }
+        $format = '%a %h %d, %Y %H:%M:%S %Z';
+        $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone));
 
         $row = new stdClass();
         $row->recording = $recording_types;
@@ -1026,6 +1021,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
             $row->actionbar = $actionbar;
         }
     }
+
     return $row;
 }
 
