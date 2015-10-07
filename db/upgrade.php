@@ -217,7 +217,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015080600) {
+    if ($result && $oldversion < 2015080605) {
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
         //// Drop field description
@@ -242,7 +242,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
             $dbman->change_field_notnull($table, $field, $continue=true, $feedback=true);
         }
 
-        upgrade_mod_savepoint(true, 2015080600, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
 
     return $result;

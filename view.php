@@ -149,7 +149,7 @@ if( $bigbluebuttonbn->newwindow == 1 ) {
 }
 
 // Validate if the user is in a role allowed to join
-if ( !has_capability('mod/bigbluebuttonbn:join', $context) ) {
+if ( !has_capability('moodle/category:manage', $context) && !has_capability('mod/bigbluebuttonbn:join', $context) ) {
     echo $OUTPUT->header();
     if (isguestuser()) {
         echo $OUTPUT->confirm('<p>'.get_string('view_noguests', 'bigbluebuttonbn').'</p>'.get_string('liketologin'),
