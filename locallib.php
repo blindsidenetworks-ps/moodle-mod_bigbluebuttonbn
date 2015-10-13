@@ -1057,7 +1057,9 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings) {
     if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
         foreach ( $recordings as $recording ) {
             $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
-            array_push($table_data, $row);
+            if( $row != null ) {
+                array_push($table_data, $row);
+            }
         }
     }
 
@@ -1098,14 +1100,16 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
             $row->id = 'recording-td-'.$recording['recordID'];
 
             $row_data = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
-            $row_data->date = str_replace(" ", "&nbsp;", $row_data->date);
-            if ( $bbbsession['managerecordings'] ) {
-                $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration, $row_data->actionbar );
-            } else {
-                $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration );
-            }
+            if( $row_data != null ) {
+                $row_data->date = str_replace(" ", "&nbsp;", $row_data->date);
+                if ( $bbbsession['managerecordings'] ) {
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration, $row_data->actionbar );
+                } else {
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration );
+                }
 
-            array_push($table->data, $row);
+                array_push($table->data, $row);
+            }
         }
     }
 
