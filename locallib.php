@@ -991,14 +991,15 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
             }
         }
 
-        $recording_types = '';
-        foreach ( $recording['playbacks'] as $playback ) {
-            if ($recording['published'] == 'true') {
-                $recording_types .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
-            } else {
-                $recording_types .= $playback['type'].'&#32;';
-            }
+        if ($recording['published'] == 'true') {
+            $recording_types = '<div id="playbacks-'.$recording['recordID'].'">';
+        } else {
+            $recording_types = '<div id="playbacks-'.$recording['recordID'].'" hidden>';
         }
+        foreach ( $recording['playbacks'] as $playback ) {
+            $recording_types .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
+        }
+        $recording_types .= '</div>';
 
         //Make sure the startTime is timestamp
         if( !is_numeric($recording['startTime']) ){
