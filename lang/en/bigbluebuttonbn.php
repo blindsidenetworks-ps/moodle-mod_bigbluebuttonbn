@@ -176,6 +176,7 @@ $string['mod_form_field_notification_created_help'] = 'Send a notification to us
 $string['mod_form_field_notification_modified_help'] = 'Send a notification to users enrolled to let them know that this activity has been modified';
 $string['mod_form_field_notification_msg_created'] = 'created';
 $string['mod_form_field_notification_msg_modified'] = 'modified';
+$string['mod_form_field_notification_msg_at'] = 'at';
 
 
 $string['modulename'] = 'BigBlueButtonBN';

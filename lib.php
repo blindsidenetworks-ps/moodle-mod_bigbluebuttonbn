@@ -389,6 +389,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     } else {
         $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
     }
+    $at = get_string('mod_form_field_notification_msg_at', 'bigbluebuttonbn');
 
     // Add evento to the calendar when if openingtime is set
     if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
@@ -437,11 +438,11 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
             $msg->activity_description = trim($bigbluebuttonbn->intro);
         $msg->activity_openingtime = "";
         if ($bigbluebuttonbn->openingtime) {
-            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' at '.calendar_time_representation($bigbluebuttonbn->openingtime);
+            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->openingtime);
         }
         $msg->activity_closingtime = "";
         if ($bigbluebuttonbn->closingtime ) {
-            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' at '.calendar_time_representation($bigbluebuttonbn->closingtime);
+            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->closingtime);
         }
         $msg->activity_owner = $USER->firstname.' '.$USER->lastname;
 
