@@ -280,31 +280,6 @@ function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SAL
     return $recording;
 }
 
-function bigbluebuttonbn_getCapabilitiesArray($URL, $SALT) {
-    //$xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCapabilitiesURL( $URL, $SALT ) );
-    //// Mocking the getCapabilities
-    $response = "<response><returncode>SUCCESS</returncode><capabilities><capability><name>extended_ui</name><endpoint>http://192.168.23.6:3000/api/v1/extended_ui</endpoint></capability></capabilities></response>";
-    $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
-    ////
-
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The capabilities were returned
-        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-
-    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-        foreach ($xml->capabilities->capability as $capability) {
-            $capabilities[] = array( 'name' => (string)$capability->name, 'endpoint' => (string)$capability->endpoint );
-
-        }
-        return $capabilities;
-
-    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-
-    } else { //If the server is unreachable, then prompts the user of the necessary action
-        return null;
-    }
-}
-
 function bigbluebuttonbn_recordingBuildSorter($a, $b){
     if( $a['startTime'] < $b['startTime']) return -1;
     else if( $a['startTime'] == $b['startTime']) return 0;
@@ -1161,6 +1136,16 @@ function bigbluebuttonbn_server_offers($capability_name){
     return $capability_offered;
 }
 
+function bigbluebuttonbn_server_offers_bn_capabilities(){
+    //Validates if the server may have extended capabilities
+    $parse = parse_url(bigbluebuttonbn_get_cfg_server_url());
+    $host = $parse['host'];
+    $host_ends = explode(".", $host);
+    $host_ends_length = count($host_ends);
+
+    return ( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' &&  $host_ends[$host_ends_length -2] == 'blindsidenetworks' );
+}
+
 function bigbluebuttonbn_get_locales_for_ui() {
     $locales = array(
             'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
@@ -1267,6 +1252,11 @@ function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled() {
 function bigbluebuttonbn_get_cfg_sendnotifications_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled: (isset($CFG->bigbluebuttonbn_sendnotifications_enabled)? $CFG->bigbluebuttonbn_sendnotifications_enabled: false));
+}
+
+function bigbluebuttonbn_get_cfg_recordingready_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled: (isset($CFG->bigbluebuttonbn_recordingready_enabled)? $CFG->bigbluebuttonbn_recordingready_enabled: false));
 }
 
 function bigbluebuttonbn_get_cfg_moderator_default() {

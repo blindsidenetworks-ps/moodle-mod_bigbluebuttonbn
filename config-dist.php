@@ -188,3 +188,14 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!
 
+////////////  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS  ////////////
+//=========================================================================
+// 10. CONFIGURATION FOR "RECORDING READY" FEATURE
+//=========================================================================
+// When the value is set to 1 (checked) the 'notify users when recording ready'
+// capability is enabled, meaning that a message will be sent to all enrolled 
+// users in a course when a recording is ready
+#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
+
+// There is no php closing tag in this file,
+// it is intentional because it prevents trailing whitespace problems!

@@ -228,4 +228,21 @@ if ($ADMIN->fulltree) {
                 get_string('config_feature_sendnotifications_enabled_description', 'bigbluebuttonbn'),
                 1));
     }
+
+    //// Configuration for extended BN capabilities
+    if( bigbluebuttonbn_server_offers_bn_capabilities() ) {
+        //// Configuration for 'notify users when recording ready' feature
+        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ) {
+            $settings->add( new admin_setting_heading('bigbluebuttonbn_extended_capabilities',
+                    get_string('config_extended_capabilities', 'bigbluebuttonbn'),
+                    get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
+        }
+        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ) {
+            // UI for 'notify users when recording ready' feature
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
+                    get_string('config_extended_feature_recordingready_enabled', 'bigbluebuttonbn'),
+                    get_string('config_extended_feature_recordingready_enabled_description', 'bigbluebuttonbn'),
+                    0));
+        }
+    }
 }

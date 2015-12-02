@@ -79,8 +79,11 @@ switch (strtolower($action)) {
                             "meta_bbb-recording-name" => (isset($name) && $name != '')? $name: $bbbsession['contextActivityName'],
                             "meta_bbb-recording-description" => (isset($description) && $description != '')? $description: $bbbsession['contextActivityDescription'],
                             "meta_bbb-recording-tags" => (isset($tags) && $tags != '')? $tags: $bbbsession['contextActivityTags'],
-                            "meta_bn-recording-ready-url" => $bbbsession['recordingReadyURL'],
                     );
+
+                    if ( bigbluebuttonbn_server_offers_bn_capabilities() && bigbluebuttonbn_get_cfg_recordingready_enabled() ) {
+                        $metadata["meta_bn-recording-ready-url"] = $bbbsession['recordingReadyURL'];
+                    }
 
                     /// Set the duration for the meeting
                     if ( bigbluebuttonbn_get_cfg_scheduled_duration_enabled() ) {

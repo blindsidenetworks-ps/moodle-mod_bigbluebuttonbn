@@ -110,6 +110,8 @@ $string['config_extended_capabilities'] = 'Configuration for extended capabiliti
 $string['config_extended_capabilities_description'] = 'Configuration for extended capabilities when the BigBlueButton server offers them.';
 $string['config_extended_feature_uidelegation_enabled'] = 'UI delegation is enabled';
 $string['config_extended_feature_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
+$string['config_extended_feature_recordingready_enabled'] = 'Notifications when recording ready enabled';
+$string['config_extended_feature_recordingready_enabled_description'] = 'Notifications when recording ready feature is enabled.';
 
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';

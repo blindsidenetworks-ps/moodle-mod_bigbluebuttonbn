@@ -181,7 +181,6 @@ if (!$bigbluebuttonbn->openingtime ) {
         //GO JOINING
         /// find out current groups mode
         $bbbsession['group'] = isset($group)? $group: groups_get_activity_group($cm);
-        error_log("Group param ".$bbbsession['group'].", Group set ".groups_get_activity_group($cm));
         if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
             $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
             $bbbsession['meetingname'] = $bigbluebuttonbn->name;
@@ -312,7 +311,6 @@ echo $OUTPUT->footer();
 
 
 function bigbluebuttonbn_view_joining($bbbsession){
-    error_log(json_encode($bbbsession));
     global $CFG, $DB, $OUTPUT;
 
     echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
