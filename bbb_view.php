@@ -75,7 +75,7 @@ switch (strtolower($action)) {
                             "meta_bbb-origin-server-name" => $bbbsession['originServerName'],
                             "meta_bbb-origin-server-common-name" => $bbbsession['originServerCommonName'],
                             "meta_bbb-origin-tag" => $bbbsession['originTag'],
-                            "meta_bbb-context" => $bbbsession['context'],
+                            "meta_bbb-context" => $bbbsession['course']->fullname,
                             "meta_bbb-recording-name" => (isset($name) && $name != '')? $name: $bbbsession['contextActivityName'],
                             "meta_bbb-recording-description" => (isset($description) && $description != '')? $description: $bbbsession['contextActivityDescription'],
                             "meta_bbb-recording-tags" => (isset($tags) && $tags != '')? $tags: $bbbsession['contextActivityTags'],

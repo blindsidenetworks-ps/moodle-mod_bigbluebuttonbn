@@ -93,9 +93,11 @@ $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
 $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
 
 // Additional info related to the course
+$bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
-$bbbsession['courseid'] = $course->id;
+$bbbsession['course']->id = $course->id;
 $bbbsession['cm'] = $cm;
+$bbbsession['context'] = $context;
 
 // Metadata (origin)
 $bbbsession['origin'] = "Moodle";
@@ -180,17 +182,33 @@ if (!$bigbluebuttonbn->openingtime ) {
     if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
         //GO JOINING
         /// find out current groups mode
-        $bbbsession['group'] = isset($group)? $group: groups_get_activity_group($cm);
-        if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
-            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+        $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+        if ($groupmode == NOGROUPS ) {  //No groups mode
+            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'];
             $bbbsession['meetingname'] = $bigbluebuttonbn->name;
         } else {                                        // Separate or visible groups mode
             echo $OUTPUT->box_start('generalbox boxaligncenter');
             echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
             echo $OUTPUT->box_end();
-            groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
 
-            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+            $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
+            if ($groupmode == SEPARATEGROUPS ) {
+                groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
+                if( $bbbsession['group'] == 0 ) {
+                    if ( $bbbsession['administrator'] ) {
+                        $my_groups = groups_get_all_groups($bbbsession['course']->id);
+                    } else {
+                        $my_groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+                    }
+                    $current_group = current($my_groups);
+                    $bbbsession['group'] = $current_group->id;
+                }
+
+            } else {
+                groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
+            }
+
+            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
             if( $bbbsession['group'] > 0 )
                 $group_name = groups_get_group_name($bbbsession['group']);
             else
@@ -199,7 +217,6 @@ if (!$bigbluebuttonbn->openingtime ) {
         }
 
         // Metadata (context)
-        $bbbsession['context'] = $course->fullname;
         $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
         $bbbsession['contextActivityDescription'] = "";
         $bbbsession['contextActivityTags'] = "";
@@ -212,7 +229,7 @@ if (!$bigbluebuttonbn->openingtime ) {
         echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
         echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
         $bigbluebuttonbn_view = 'join';
         bigbluebuttonbn_view_joining($bbbsession);
@@ -237,17 +254,36 @@ if (!$bigbluebuttonbn->openingtime ) {
 } else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
     //GO JOINING
     /// find out current groups mode
-    $bbbsession['group'] = isset($group)? $group: groups_get_activity_group($cm);
-    if (groups_get_activity_groupmode($cm) == 0) {  //No groups mode
-        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'];
+    $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+    if ($groupmode == NOGROUPS ) {  //No groups mode
+        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'];
         $bbbsession['meetingname'] = $bigbluebuttonbn->name;
+
     } else {                                        // Separate or visible groups mode
         echo $OUTPUT->box_start('generalbox boxaligncenter');
         echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
         echo $OUTPUT->box_end();
-        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id);
 
-        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['courseid'].'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
+        $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
+        error_log($bbbsession['group']);
+
+        if ($groupmode == SEPARATEGROUPS ) {
+            groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
+            if( $bbbsession['group'] == 0 ) {
+                if ( $bbbsession['administrator'] ) {
+                    $my_groups = groups_get_all_groups($bbbsession['course']->id);
+                } else {
+                    $my_groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+                }
+                $current_group = current($my_groups);
+                $bbbsession['group'] = $current_group->id;
+            }
+
+        } else {
+            groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
+        }
+
+        $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
         if( $bbbsession['group'] > 0 )
             $group_name = groups_get_group_name($bbbsession['group']);
         else
@@ -256,7 +292,6 @@ if (!$bigbluebuttonbn->openingtime ) {
     }
 
     // Metadata (context)
-    $bbbsession['context'] = $course->fullname;
     $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
     $bbbsession['contextActivityDescription'] = "";
     $bbbsession['contextActivityTags'] = "";
@@ -269,7 +304,7 @@ if (!$bigbluebuttonbn->openingtime ) {
     echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
     echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
     bigbluebuttonbn_view_joining($bbbsession);
@@ -348,6 +383,8 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo $OUTPUT->box_end();
 
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
+        #$meetingIDs = $bbbsession['meetingidRoot'].','.$bbbsession['meetingidRoot'].'[0],'.$bbbsession['meetingid'];
+        #$recordings = bigbluebuttonbn_getRecordingsArray($meetingIDs, $bbbsession['endpoint'], $bbbsession['shared_secret']);
         $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
         if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
             $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
@@ -400,7 +437,9 @@ function bigbluebuttonbn_view_after($bbbsession) {
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
         echo '<h4>'.get_string('view_section_title_recordings', 'bigbluebuttonbn').'</h4>';
 
-        $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        $meetingIDs = array($bbbsession['meetingidRoot'], $bbbsession['meetingidRoot'].'[0]', $bbbsession['meetingid']);
+        $recordings = bigbluebuttonbn_getRecordingsArray($meetingIDs, $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        #$recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
         if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
             $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
         }

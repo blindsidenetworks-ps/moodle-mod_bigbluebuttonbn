@@ -42,7 +42,7 @@ function bigbluebuttonbn_log(array $bbbsession, $event) {
     $log = new stdClass();
     
     $log->meetingid = $bbbsession['meetingid'];
-    $log->courseid = $bbbsession['courseid']; 
+    $log->courseid = $bbbsession['course']->id;
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
     $log->userid = $bbbsession['userID'];
     $log->timecreated = time();
@@ -117,6 +117,7 @@ function bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID=null ) {
         $params = "meetingID=".urlencode($meetingID);
     }
 
+    error_log($base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT));
     return ($base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT) );
 }
 
