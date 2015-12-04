@@ -178,80 +178,23 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->box_start('generalbox boxaligncenter');
 $now = time();
-if (!$bigbluebuttonbn->openingtime ) {
-    if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime){
-        //GO JOINING
-        /// find out current groups mode
-        $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
-        if ($groupmode == NOGROUPS ) {  //No groups mode
-            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'];
-            $bbbsession['meetingname'] = $bigbluebuttonbn->name;
-        } else {                                        // Separate or visible groups mode
-            echo $OUTPUT->box_start('generalbox boxaligncenter');
-            echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
-            echo $OUTPUT->box_end();
 
-            $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
-            if ($groupmode == SEPARATEGROUPS ) {
-                groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
-                if( $bbbsession['group'] == 0 ) {
-                    if ( $bbbsession['administrator'] ) {
-                        $my_groups = groups_get_all_groups($bbbsession['course']->id);
-                    } else {
-                        $my_groups = groups_get_activity_allowed_groups($bbbsession['cm']);
-                    }
-                    $current_group = current($my_groups);
-                    $bbbsession['group'] = $current_group->id;
-                }
-
-            } else {
-                groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
-            }
-
-            $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbnid'].'['.$bbbsession['group'].']';
-            if( $bbbsession['group'] > 0 )
-                $group_name = groups_get_group_name($bbbsession['group']);
-            else
-                $group_name = get_string('allparticipants');
-            $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
-        }
-
-        // Metadata (context)
-        $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
-        $bbbsession['contextActivityDescription'] = "";
-        $bbbsession['contextActivityTags'] = "";
-
-        $jwt_token = new stdClass();
-        $jwt_token->meeting_id = $bbbsession['meetingid'];
-        $jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
-        $jwt = JWT::encode($jwt_token, $jwt_key);
-
-        echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
-        echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
-
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
-        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-        $bigbluebuttonbn_view = 'join';
-        bigbluebuttonbn_view_joining($bbbsession);
-
-    } else {
-        //CALLING AFTER
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-        $bigbluebuttonbn_view = 'after';
-
-        bigbluebuttonbn_view_after($bbbsession);
-    }
-
-//} else if ( $now < ($bigbluebuttonbn->openingtime - intval(bigbluebuttonbn_get_cfg_scheduled_pre_opening()) * 60) ){
-} else if ( $now < ($bigbluebuttonbn->openingtime ) ) {
+if ($bigbluebuttonbn->openingtime && $now < $bigbluebuttonbn->openingtime ) {
     //CALLING BEFORE
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'before';
 
     bigbluebuttonbn_view_before($bbbsession);
 
-} else if (!$bigbluebuttonbn->closingtime || $now <= $bigbluebuttonbn->closingtime ) {
+} else if ($bigbluebuttonbn->closingtime && $now > $bigbluebuttonbn->closingtime){
+    //CALLING AFTER
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+    $bigbluebuttonbn_view = 'after';
+
+    bigbluebuttonbn_view_after($bbbsession);
+
+} else {
     //GO JOINING
     /// find out current groups mode
     $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
@@ -265,8 +208,6 @@ if (!$bigbluebuttonbn->openingtime ) {
         echo $OUTPUT->box_end();
 
         $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
-        error_log($bbbsession['group']);
-
         if ($groupmode == SEPARATEGROUPS ) {
             groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
             if( $bbbsession['group'] == 0 ) {
@@ -296,11 +237,6 @@ if (!$bigbluebuttonbn->openingtime ) {
     $bbbsession['contextActivityDescription'] = "";
     $bbbsession['contextActivityTags'] = "";
 
-    $jwt_token = new stdClass();
-    $jwt_token->meeting_id = $bbbsession['meetingid'];
-    $jwt_key = bigbluebuttonbn_get_cfg_shared_secret();
-    $jwt = JWT::encode($jwt_token, $jwt_key);
-
     echo $OUTPUT->heading($bigbluebuttonbn->name, 3);
     echo $OUTPUT->heading($bigbluebuttonbn->intro, 5);
 
@@ -308,14 +244,6 @@ if (!$bigbluebuttonbn->openingtime ) {
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
     bigbluebuttonbn_view_joining($bbbsession);
-
-} else {
-    //CALLING AFTER
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-    $bigbluebuttonbn_view = 'after';
-
-    bigbluebuttonbn_view_after($bbbsession);
 }
 
 echo $OUTPUT->box_end();
@@ -405,7 +333,7 @@ function bigbluebuttonbn_view_joining($bbbsession){
 
 function bigbluebuttonbn_view_before( $bbbsession ){
     global $CFG, $DB, $OUTPUT;
-    
+
     echo $OUTPUT->heading(get_string('view_message_conference_not_started', 'bigbluebuttonbn'), 3);
 
     echo '<table>';
