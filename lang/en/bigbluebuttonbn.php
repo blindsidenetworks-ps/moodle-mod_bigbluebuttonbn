@@ -260,7 +260,7 @@ $string['view_message_conference_has_ended'] = 'This conference has ended.';
 $string['view_message_tab_close'] = 'This tab/window must be closed manually';
 
 
-$string['view_groups_selection_warning'] = 'There is a conference room for each group and you have access to more than one. Be sure to select the correct one.';
+$string['view_groups_selection_warning'] = 'There is a conference room for each group. If you have access to more than one be sure to select the correct one.';
 //$string['view_groups_selection_message'] = 'Select the group you want to participate.';
 //$string['view_groups_selection_button'] = 'Select';
 $string['view_conference_action_join'] = 'Join session';

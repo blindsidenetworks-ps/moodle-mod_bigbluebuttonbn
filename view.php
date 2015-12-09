@@ -184,7 +184,7 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
 
 } else {                                        // Separate or visible groups mode
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo "<br>".get_string('view_groups_selection_warning', 'bigbluebuttonbn');
+    echo '<br><div class="alert alert-warning">'.get_string('view_groups_selection_warning', 'bigbluebuttonbn').'</div>';
     echo $OUTPUT->box_end();
 
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
