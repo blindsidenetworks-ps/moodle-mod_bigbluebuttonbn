@@ -107,6 +107,10 @@ $bbbsession['originServerName'] = $parsedUrl['host'];
 $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
+// Metadata (context)
+$bbbsession['contextActivityName'] = "";
+$bbbsession['contextActivityDescription'] = "";
+$bbbsession['contextActivityTags'] = "";
 ////////////////////////////////////////////////
 /////   BigBlueButton Session Setup Ends   /////
 ////////////////////////////////////////////////
@@ -211,11 +215,15 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
         $group_name = get_string('allparticipants');
     $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
 }
+// Metadata (contextActivityName updated after meeting name is assigned)
+$bbbsession['contextActivityName'] = $bbbsession['meetingname'];
+
+// Initialize session variable used across views
+$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
 $now = time();
 if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime ) {
     //CALLING BEFORE
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'before';
 
     bigbluebuttonbn_view_before($bbbsession);
@@ -223,7 +231,6 @@ if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtim
 } else if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
     //CALLING AFTER
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'after';
 
     bigbluebuttonbn_view_after($bbbsession);
@@ -231,13 +238,7 @@ if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtim
 } else {
     //GO JOINING
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     $bigbluebuttonbn_view = 'join';
-
-    // Metadata (context)
-    $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
-    $bbbsession['contextActivityDescription'] = "";
-    $bbbsession['contextActivityTags'] = "";
 
     bigbluebuttonbn_view_joining($bbbsession);
 
