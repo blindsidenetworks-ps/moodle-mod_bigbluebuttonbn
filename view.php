@@ -218,28 +218,31 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
 // Metadata (contextActivityName updated after meeting name is assigned)
 $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
 
-// Initialize session variable used across views
-$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-
 $now = time();
 if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime ) {
     //CALLING BEFORE
     $bigbluebuttonbn_view = 'before';
 
+    // Initialize session variable used across views
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     bigbluebuttonbn_view_before($bbbsession);
 
 } else if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
     //CALLING AFTER
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
     $bigbluebuttonbn_view = 'after';
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
 
+    // Initialize session variable used across views
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     bigbluebuttonbn_view_after($bbbsession);
 
 } else {
     //GO JOINING
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     $bigbluebuttonbn_view = 'join';
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
 
+    // Initialize session variable used across views
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     bigbluebuttonbn_view_joining($bbbsession);
 
     //JavaScript variables
