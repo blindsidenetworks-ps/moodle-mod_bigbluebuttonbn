@@ -96,7 +96,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn'));
             $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
             $mform->setType('wait', PARAM_INT);
-            $mform->setDefault( 'wait', 1 );
+            $mform->setDefault( 'wait', $waitformoderator_default );
             $mform->setAdvanced('wait');
         } else {
             $mform->addElement('hidden', 'wait', $waitformoderator_default );
@@ -125,7 +125,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
             if ( $recording_tagging_editable ) {
                 $mform->addElement('checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn'));
-                $mform->setDefault('record', $recording_tagging_default);
+                $mform->setDefault('tagging', $recording_tagging_default);
                 $mform->setAdvanced('tagging');
             } else {
                 $mform->addElement('hidden', 'tagging', $recording_tagging_default );
