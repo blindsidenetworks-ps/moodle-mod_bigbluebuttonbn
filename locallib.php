@@ -642,7 +642,6 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
                 $cache->set($presentation_nonce_key, array( "value" => $presentation_nonce_value, "counter" => 0 ));
 
                 //The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather the file
-                //$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
                 $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $presentation_nonce_value, $file->get_filepath(), $file->get_filename());
             } else {
                 $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
