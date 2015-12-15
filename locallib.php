@@ -588,12 +588,13 @@ function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
 function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
     global $DB;
     $is_unique = true;
-    $table = "bigbluebuttonbn";
-    //$select = "voicebridge = ".$voicebridge." AND (closingtime = 0 OR closingtime > ".time().")";
-    $select = "voicebridge = ".$voicebridge;
-    if( $id ) $select .= " AND id <> ".$id; 
-    if ( $rooms = $DB->get_records_select($table, $select)  ) {
-        $is_unique = false;
+    if( $voicebridge != 0 ) {
+        $table = "bigbluebuttonbn";
+        $select = "voicebridge = ".$voicebridge;
+        if( $id ) $select .= " AND id <> ".$id;
+        if ( $rooms = $DB->get_records_select($table, $select)  ) {
+            $is_unique = false;
+        }
     }
 
     return $is_unique;
