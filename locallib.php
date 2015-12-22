@@ -1139,12 +1139,12 @@ function bigbluebuttonbn_server_offers($capability_name){
 
 function bigbluebuttonbn_server_offers_bn_capabilities(){
     //Validates if the server may have extended capabilities
-    $parse = parse_url(bigbluebuttonbn_get_cfg_server_url());
-    $host = $parse['host'];
+    $parsed_url = parse_url(bigbluebuttonbn_get_cfg_server_url());
+    $host = isset($parsed_url['host']) ? $parsed_url['host'] : '';
     $host_ends = explode(".", $host);
     $host_ends_length = count($host_ends);
 
-    return ( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' &&  $host_ends[$host_ends_length -2] == 'blindsidenetworks' );
+    return ( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' && $host_ends[$host_ends_length -2] == 'blindsidenetworks' );
 }
 
 function bigbluebuttonbn_get_locales_for_ui() {
