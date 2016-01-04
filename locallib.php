@@ -977,22 +977,16 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
         }
         $recording_types .= '</div>';
 
-        //Make sure the startTime is timestamp
-        if( !is_numeric($recording['startTime']) ){
-            $date = new DateTime($recording['startTime']);
-            $recording['startTime'] = date_timestamp_get($date);
-        } else {
-            $recording['startTime'] = $recording['startTime'] / 1000;
-        }
         //Set corresponding format
         $format = '%a %h %d, %Y %H:%M:%S %Z';
-        $formatedStartDate = userdate($recording['startTime'], $format, usertimezone($USER->timezone));
+        $formattedStartDate = userdate($startTime / 1000, $format, usertimezone($USER->timezone));
 
         $row = new stdClass();
         $row->recording = $recording_types;
         $row->activity = $meta_activity;
         $row->description = $meta_description;
-        $row->date = $formatedStartDate;
+        $row->date = floatval($recording['startTime']);
+        $row->date_formatted = $formattedStartDate;
         $row->duration = $duration;
         if ( $bbbsession['managerecordings'] ) {
             $row->actionbar = $actionbar;
@@ -1078,11 +1072,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings) {
 
             $row_data = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
             if( $row_data != null ) {
-                $row_data->date = str_replace(" ", "&nbsp;", $row_data->date);
+                $row_data->date_formatted = str_replace(" ", "&nbsp;", $row_data->date_formatted);
                 if ( $bbbsession['managerecordings'] ) {
-                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration, $row_data->actionbar );
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration, $row_data->actionbar );
                 } else {
-                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date, $row_data->duration );
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration );
                 }
 
                 array_push($table->data, $row);
