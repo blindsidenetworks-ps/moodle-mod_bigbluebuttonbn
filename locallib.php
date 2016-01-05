@@ -973,7 +973,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording) {
             $recording_types = '<div id="playbacks-'.$recording['recordID'].'" hidden>';
         }
         foreach ( $recording['playbacks'] as $playback ) {
-            $recording_types .= $OUTPUT->action_link($playback['url'], $playback['type'], null, array('title' => $playback['type'], 'target' => '_new') ).'&#32;';
+            $recording_types .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), 'target' => '_new') ).'&#32;';
         }
         $recording_types .= '</div>';
 

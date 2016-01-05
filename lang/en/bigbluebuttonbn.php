@@ -34,6 +34,8 @@ $string['config_feature_recording_default'] = 'Recording feature enabled by defa
 $string['config_feature_recording_default_description'] = 'If enabled the sessions created in BigBlueButton will have recording capabilities.';
 $string['config_feature_recording_editable'] = 'Recording feature can be edited';
 $string['config_feature_recording_editable_description'] = 'If checked the interface includes an option for enable and disable the recording feature.';
+$string['config_feature_recording_icons_enabled'] = 'Icons for recording management';
+$string['config_feature_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 
 
 $string['config_feature_recordingtagging'] = 'Configuration for "Recording tagging" feature';
@@ -42,9 +44,13 @@ $string['config_feature_recordingtagging_default'] = 'Recording tagging enabled 
 $string['config_feature_recordingtagging_default_description'] = 'Recording tagging feature is enabled by default when a new room or conference is added.<br>When this feature is enabled an intermediate page that allows to input a description and tags for the BigBlueButton session is shown to the first moderator joining. The description and tags are afterwards used to identify the recording in the list.';
 $string['config_feature_recordingtagging_editable'] = 'Recording tagging feature can be edited';
 $string['config_feature_recordingtagging_editable_description'] = 'Recording tagging value by default can be edited when the room or conference is added or updated.';
-$string['config_feature_recording_icons_enabled'] = 'Icons for recording management';
-$string['config_feature_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 
+$string['config_feature_importrecordings'] = 'Configuration for "Import recordings" feature';
+$string['config_feature_importrecordings_description'] = 'These settings are feature specific';
+$string['config_feature_importrecordings_default'] = 'Import recordings enabled by default';
+$string['config_feature_importrecordings_default_description'] = 'Import recordings feature is enabled by default when a new room or conference is added.';
+$string['config_feature_importrecordings_editable'] = 'Import recordings feature can be edited';
+$string['config_feature_importrecordings_editable_description'] = 'Import recordings value by default can be edited when the room or conference is added or updated.';
 
 $string['config_feature_waitformoderator'] = 'Configuration for "Wait for moderator" feature';
 $string['config_feature_waitformoderator_description'] = 'These settings are feature specific';
@@ -223,6 +229,8 @@ $string['view_recording_list_date'] = 'Date';
 $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
+$string['view_recording_format_presentation'] = 'Presentation';
+$string['view_recording_format_video'] = 'Video';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
