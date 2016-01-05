@@ -36,7 +36,7 @@ if ($ADMIN->fulltree) {
                 bigbluebuttonbn_get_cfg_shared_secret_default()));
     }
 
-    //// Configuration for recording feature
+    //// Configuration for 'recording' feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default) || 
         !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable) || 
         !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled) ) {
@@ -66,7 +66,7 @@ if ($ADMIN->fulltree) {
                 1));
     }
     
-    //// Configuration for recording feature
+    //// Configuration for 'recording tagging' feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default) || 
         !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable) ) {
         $settings->add( new admin_setting_heading('bigbluebuttonbn_recordingtagging',
@@ -87,6 +87,29 @@ if ($ADMIN->fulltree) {
                 get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
                 1));
     }
+
+    //// Configuration for 'import recordings' feature
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default) ||
+        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable) ) {
+        $settings->add( new admin_setting_heading('bigbluebuttonbn_importrecordings',
+                get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
+                get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
+    }
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default) ) {
+        // default value for 'import recordings' feature
+        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_default',
+                get_string('config_feature_importrecordings_default', 'bigbluebuttonbn'),
+                get_string('config_feature_importrecordings_default_description', 'bigbluebuttonbn'),
+                0));
+    }
+    // UI for 'import recordings' feature
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable) ) {
+        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_editable',
+                get_string('config_feature_importrecordings_editable', 'bigbluebuttonbn'),
+                get_string('config_feature_importrecordings_editable_description', 'bigbluebuttonbn'),
+                0));
+    }
+
 
     //// Configuration for wait for moderator feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default) ||

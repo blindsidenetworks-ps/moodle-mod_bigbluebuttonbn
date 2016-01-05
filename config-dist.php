@@ -96,6 +96,25 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default = 0;
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable = 1;
 
 
+//=========================================================================
+// 4. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
+//=========================================================================
+// The "Import recordings" feature should only be used by Administrators
+// or Teachers (or anyone with edition capabilities in the
+// course). When this feature is enabled and the meeting can be recorded, 
+// a button will be shown in the intermediate page that will allow importing
+// recordings from a different activity even from a different course.
+// 
+// When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+// activities will have the 'import recordings' capability enabled by
+// default.
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default = 0;
+
+// When the value is set to 1 (checked) the import recordings capability
+// can be enabled/disabled by the user creating or editing the room or
+// activity.
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable = 0;
+
 
 //=========================================================================
 // 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
