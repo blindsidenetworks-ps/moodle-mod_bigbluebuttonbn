@@ -89,27 +89,18 @@ if ($ADMIN->fulltree) {
     }
 
     //// Configuration for 'import recordings' feature
-    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable) ) {
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled) ) {
         $settings->add( new admin_setting_heading('bigbluebuttonbn_importrecordings',
                 get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
                 get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
     }
-    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default) ) {
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled) ) {
         // default value for 'import recordings' feature
-        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_default',
-                get_string('config_feature_importrecordings_default', 'bigbluebuttonbn'),
-                get_string('config_feature_importrecordings_default_description', 'bigbluebuttonbn'),
+        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
+                get_string('config_feature_importrecordings_enabled', 'bigbluebuttonbn'),
+                get_string('config_feature_importrecordings_enabled_description', 'bigbluebuttonbn'),
                 0));
     }
-    // UI for 'import recordings' feature
-    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable) ) {
-        $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_editable',
-                get_string('config_feature_importrecordings_editable', 'bigbluebuttonbn'),
-                get_string('config_feature_importrecordings_editable_description', 'bigbluebuttonbn'),
-                0));
-    }
-
 
     //// Configuration for wait for moderator feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default) ||

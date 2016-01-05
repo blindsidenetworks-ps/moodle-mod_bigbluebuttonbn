@@ -1209,6 +1209,11 @@ function bigbluebuttonbn_get_cfg_recording_icons_enabled() {
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled: (isset($CFG->bigbluebuttonbn_recording_icons_enabled)? $CFG->bigbluebuttonbn_recording_icons_enabled: true));
 }
 
+function bigbluebuttonbn_get_cfg_importrecordings_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled: (isset($CFG->bigbluebuttonbn_importrecordings_enabled)? $CFG->bigbluebuttonbn_importrecordings_enabled: false));
+}
+
 function bigbluebuttonbn_get_cfg_waitformoderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default: (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false));

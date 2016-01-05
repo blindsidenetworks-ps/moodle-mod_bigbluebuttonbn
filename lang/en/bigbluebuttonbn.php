@@ -37,7 +37,6 @@ $string['config_feature_recording_editable_description'] = 'If checked the inter
 $string['config_feature_recording_icons_enabled'] = 'Icons for recording management';
 $string['config_feature_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 
-
 $string['config_feature_recordingtagging'] = 'Configuration for "Recording tagging" feature';
 $string['config_feature_recordingtagging_description'] = 'These settings are feature specific';
 $string['config_feature_recordingtagging_default'] = 'Recording tagging enabled by default';
@@ -47,10 +46,8 @@ $string['config_feature_recordingtagging_editable_description'] = 'Recording tag
 
 $string['config_feature_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_feature_importrecordings_description'] = 'These settings are feature specific';
-$string['config_feature_importrecordings_default'] = 'Import recordings enabled by default';
-$string['config_feature_importrecordings_default_description'] = 'Import recordings feature is enabled by default when a new room or conference is added.';
-$string['config_feature_importrecordings_editable'] = 'Import recordings feature can be edited';
-$string['config_feature_importrecordings_editable_description'] = 'Import recordings value by default can be edited when the room or conference is added or updated.';
+$string['config_feature_importrecordings_enabled'] = 'Import recordings enabled';
+$string['config_feature_importrecordings_enabled_description'] = 'When this and the recording feature are enabled, it is possible to import recordings from different courses into an activity.';
 
 $string['config_feature_waitformoderator'] = 'Configuration for "Wait for moderator" feature';
 $string['config_feature_waitformoderator_description'] = 'These settings are feature specific';
@@ -229,6 +226,7 @@ $string['view_recording_list_date'] = 'Date';
 $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
+$string['view_recording_button_import'] = 'Import recording links';
 $string['view_recording_format_presentation'] = 'Presentation';
 $string['view_recording_format_video'] = 'Video';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
