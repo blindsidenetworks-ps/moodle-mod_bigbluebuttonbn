@@ -280,7 +280,7 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo $OUTPUT->box_end();
     if( $bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator']) ){
         echo ''.
-          '<div id="panelContent">'.
+          '<div id="panelContent" class="hidden">'.
           '  <div class="yui3-widget-bd">'.
           '    <form>'.
           '      <fieldset>'.
