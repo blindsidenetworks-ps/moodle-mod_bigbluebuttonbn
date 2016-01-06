@@ -363,5 +363,11 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         } else {
             print_string('view_message_norecordings', 'bigbluebuttonbn');
         }
+
+        $importrecordings_default = bigbluebuttonbn_get_cfg_importrecordings_enabled();
+        if ($importrecordings_default) {
+            echo '<br><span id="import_recording_links_button"><input type="button" value="'.get_string('view_recording_button_import', 'bigbluebuttonbn').'"></span><br>';
+            echo '<span id="import_recording_links_table"></span>';
+        }
     }
 }
