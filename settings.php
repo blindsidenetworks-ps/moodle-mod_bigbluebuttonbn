@@ -148,8 +148,7 @@ if ($ADMIN->fulltree) {
         if (extension_loaded('curl')) {
             $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
                 get_string('config_feature_preuploadpresentation', 'bigbluebuttonbn'),
-                get_string('config_feature_preuploadpresentation_description', 'bigbluebuttonbn').'<br><br>'.
-                get_string('config_warning_curl_not_installed', 'bigbluebuttonbn')
+                get_string('config_feature_preuploadpresentation_description', 'bigbluebuttonbn')
                 ));
 
             // UI for 'preupload presentation' feature
