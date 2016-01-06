@@ -34,7 +34,7 @@ if( file_exists(dirname(__FILE__).'/config.php') ) {
 }
 
 /*
- * DURATIIONCOMPENSATION: Feature removed by configuration
+ * DURATIONCOMPENSATION: Feature removed by configuration
  */
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled = 0;
 /*
