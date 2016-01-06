@@ -1246,7 +1246,12 @@ function bigbluebuttonbn_get_cfg_userlimit_editable() {
 
 function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled: (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false));
+    if (extension_loaded('curl')) {
+        // This feature only works if curl is installed
+        return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled: (isset($CFG->bigbluebuttonbn_preuploadpresentation_enabled)? $CFG->bigbluebuttonbn_preuploadpresentation_enabled: false));
+    } else {
+        return false;
+    }
 }
 
 function bigbluebuttonbn_get_cfg_sendnotifications_enabled() {

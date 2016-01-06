@@ -308,6 +308,9 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
 
 M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_tag) {
     if( can_tag ) {
+        var panelContent = Y.one('#panelContent');
+        panelContent.removeClass('hidden');
+
         bigbluebuttonbn_dataSource.sendRequest({
             request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
             callback : {
