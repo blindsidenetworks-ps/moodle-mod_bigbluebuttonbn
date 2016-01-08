@@ -51,14 +51,13 @@ $output = '';
 $output .= '<h4>Import recording links</h4>';
 
 $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
-$name = 'import_recording_links_select';
 $selected = bigbluebuttonbn_selected_course($options, $tc);
-$attributes = null;
-//$output .= html_writer::select($options, $name, $selected, true, $attributes);
 if( empty($options) ) {
     $output .= html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
+
 } else {
-    $output .= html_writer::tag('div', html_writer::select($options, $name, $selected, true));
+    //$output .= html_writer::select($options, $name, $selected, true, $attributes);
+    $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected, true));
 
     $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
     if( empty($recordings) ) {
@@ -67,6 +66,19 @@ if( empty($options) ) {
         $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table' ,'name'=>'import_recording_links_table']);
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings);
     }
+
+    $jsvars = array(
+            'bn' => $bn,
+            'tc' => $selected
+    );
+    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
+
+    $jsmodule = array(
+            'name'     => 'mod_bigbluebuttonbn',
+            'fullpath' => '/mod/bigbluebuttonbn/import_module.js',
+            'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
+    );
+    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.import_view_init', array(), false, $jsmodule);
 }
 
 echo $output;

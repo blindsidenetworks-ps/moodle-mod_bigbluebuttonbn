@@ -225,43 +225,35 @@ M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
 
 
 M.mod_bigbluebuttonbn.view_clean_status_bar = function() {
-    var status_bar_span = Y.one('#status_bar_span');
-    status_bar_span.remove();
+    Y.one('#status_bar_span').remove();
 }
 
 M.mod_bigbluebuttonbn.view_clean_control_panel = function() {
-    var control_panel_div = Y.one('#control_panel_div');
-    control_panel_div.remove();
+    Y.one('#control_panel_div').remove();
 }
 
 M.mod_bigbluebuttonbn.view_clean_join_button = function() {
-    var join_button = Y.one('#join_button');
-    join_button.setContent('');
+    Y.one('#join_button').setContent('');
 }
 
 M.mod_bigbluebuttonbn.view_hide_join_button = function() {
-    var join_button = Y.one('#join_button');
-    Y.DOM.setStyle(join_button, 'visibility', 'hidden');
+    Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'hidden');
 }
 
 M.mod_bigbluebuttonbn.view_show_join_button = function() {
-    var join_button = Y.one('#join_button');
-    Y.DOM.setStyle(join_button, 'visibility', 'shown');
+    Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'shown');
 }
 
 M.mod_bigbluebuttonbn.view_clean_end_button = function() {
-    var end_button = Y.one('#end_button');
-    end_button.setContent('');
+    Y.one('#end_button').setContent('');
 }
 
 M.mod_bigbluebuttonbn.view_hide_end_button = function() {
-    var end_button = Y.one('#end_button');
-    Y.DOM.setStyle(end_button, 'visibility', 'hidden');
+    Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'hidden');
 }
 
 M.mod_bigbluebuttonbn.view_show_end_button = function() {
-    var end_button = Y.one('#end_button');
-    Y.DOM.setStyle(end_button, 'visibility', 'shown');
+    Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'shown');
 }
 
 M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
@@ -308,8 +300,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
 
 M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_tag) {
     if( can_tag ) {
-        var panelContent = Y.one('#panelContent');
-        panelContent.removeClass('hidden');
+        Y.one('#panelContent').removeClass('hidden');
 
         bigbluebuttonbn_dataSource.sendRequest({
             request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
