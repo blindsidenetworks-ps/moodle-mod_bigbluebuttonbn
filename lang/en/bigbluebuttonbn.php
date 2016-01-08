@@ -191,6 +191,7 @@ $string['view_error_unable_join'] = 'Unable to join the meeting. Please check th
 $string['view_error_create'] = 'The BigBlueButton server responded with an error message, the meeting could not be created.';
 $string['view_error_max_concurrent'] = 'Number of concurrent meetings allowed has been reached.';
 $string['view_error_userlimit_reached'] = 'The number of users allowed in a meeting has been reached.';
+$string['view_error_url_missing_parameters'] = 'There are parameters missing in this URL';
 $string['view_groups_selection_join'] = 'Join';
 $string['view_groups_selection'] = 'Select the group you want to join and confirm the action';
 $string['view_login_moderator'] = 'Logging in as moderator ...';

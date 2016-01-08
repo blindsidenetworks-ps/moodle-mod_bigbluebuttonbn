@@ -11,19 +11,15 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$id = optional_param('id', 0, PARAM_INT);  // course_module ID, or
-$bn = optional_param('bn', 0, PARAM_INT);  // bigbluebuttonbn instance ID
+$bn = required_param('bn', PARAM_INT);  // bigbluebuttonbn instance ID
+$tc = optional_param('tc', 0, PARAM_INT);  // target course ID
 
-if ($id) {
-    $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
-} elseif ($bn) {
+if ($bn) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error('You must specify a course_module ID or a BigBlueButtonBN instance ID');
+    print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
 
 $context = bigbluebuttonbn_get_context_module($cm->id);
@@ -56,7 +52,7 @@ $output .= '<h4>Import recording links</h4>';
 
 $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
 $name = 'import_recording_links_select';
-$selected = array_keys($options)[0];
+$selected = bigbluebuttonbn_selected_course($options, $tc);
 $attributes = null;
 $output .= html_writer::start_tag('div');
 //$output .= html_writer::select($options, $name, $selected, true, $attributes);
@@ -71,3 +67,12 @@ echo $output;
 
 
 echo $OUTPUT->footer();
+
+function bigbluebuttonbn_selected_course($options, $tc=0) {
+    if(array_key_exists($tc, $options)) {
+        $selected = $tc;
+    } else {
+        $selected = array_keys($options)[0];
+    }
+    return $selected;
+}
