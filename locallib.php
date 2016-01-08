@@ -1295,7 +1295,9 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     }
     $courses_for_select = [];
     foreach($courses as $course) {
-        $courses_for_select[$course->id] = $course->fullname;
+        if( $course->id != $bbbsession['course']->id ) {
+            $courses_for_select[$course->id] = $course->fullname;
+        }
     }
 
     return $courses_for_select;
