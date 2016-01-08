@@ -56,15 +56,17 @@ $selected = bigbluebuttonbn_selected_course($options, $tc);
 $attributes = null;
 //$output .= html_writer::select($options, $name, $selected, true, $attributes);
 if( empty($options) ) {
-    $output .= html_writer::start_tag('div');
-    $output .= get_string('view_error_import_no_courses', 'bigbluebuttonbn');
-    $output .= html_writer::end_tag('div');
+    $output .= html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
 } else {
-    $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
-
     $output .= html_writer::tag('div', html_writer::select($options, $name, $selected, true));
-    $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table' ,'name'=>'import_recording_links_table']);
-    $output .= bigbluebutton_output_recording_table($bbbsession, $recordings);
+
+    $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
+    if( empty($recordings) ) {
+        $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
+    } else {
+        $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table' ,'name'=>'import_recording_links_table']);
+        $output .= bigbluebutton_output_recording_table($bbbsession, $recordings);
+    }
 }
 
 echo $output;

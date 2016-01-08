@@ -193,6 +193,7 @@ $string['view_error_max_concurrent'] = 'Number of concurrent meetings allowed ha
 $string['view_error_userlimit_reached'] = 'The number of users allowed in a meeting has been reached.';
 $string['view_error_url_missing_parameters'] = 'There are parameters missing in this URL';
 $string['view_error_import_no_courses'] = 'No courses to look up for recordings';
+$string['view_error_import_no_recordings'] = 'No recordings in this course that can be imported';
 $string['view_groups_selection_join'] = 'Join';
 $string['view_groups_selection'] = 'Select the group you want to join and confirm the action';
 $string['view_login_moderator'] = 'Logging in as moderator ...';

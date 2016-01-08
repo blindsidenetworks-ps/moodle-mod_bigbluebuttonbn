@@ -1368,7 +1368,7 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings) {
         $output .= '</div>'."\n";
 
     } else {
-        $output .= get_string('view_message_norecordings', 'bigbluebuttonbn');
+        $output .= get_string('view_message_norecordings', 'bigbluebuttonbn').'<br>'."\n";
     }
 
     return $output;
