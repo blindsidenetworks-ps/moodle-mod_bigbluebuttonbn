@@ -145,7 +145,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot.'/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
-$PAGE->set_heading($course->shortname);
+$PAGE->set_heading($course->fullname);
 
 if( $bigbluebuttonbn->newwindow == 1 ) {
     $PAGE->blocks->show_only_fake_blocks();
@@ -346,26 +346,16 @@ function bigbluebuttonbn_view_after($bbbsession) {
 }
 
 function bigbluebuttonbn_view_recordings($bbbsession) {
+    global $CFG;
+
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
         echo '<h4>'.get_string('view_section_title_recordings', 'bigbluebuttonbn').'</h4>';
 
         $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
-        if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
-            $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
-        }
-
-        if( isset($table->data) ) {
-            //Print the table
-            echo '<div id="bigbluebuttonbn_html_table">'."\n";
-            echo html_writer::table($table)."\n";
-            echo '</div>'."\n";
-
-        } else {
-            print_string('view_message_norecordings', 'bigbluebuttonbn');
-        }
+        echo bigbluebutton_output_recording_table($bbbsession, $recordings);
 
         if ( $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled() ) {
-            echo '<br><span id="import_recording_links_button"><input type="button" value="'.get_string('view_recording_button_import', 'bigbluebuttonbn').'"></span><br>';
+            echo '<br><span id="import_recording_links_button"><input type="button" value="'.get_string('view_recording_button_import', 'bigbluebuttonbn').'" onclick="window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.$bbbsession['bigbluebuttonbnid'].'\'"></span><br>';
             echo '<span id="import_recording_links_table"></span>';
         }
     }

@@ -1283,3 +1283,91 @@ function bigbluebuttonbn_get_cfg_scheduled_pre_opening() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening: (isset($CFG->bigbluebuttonbn_scheduled_pre_opening)? $CFG->bigbluebuttonbn_scheduled_pre_opening: 10));
 }
+
+function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
+
+    if( $bbbsession['administrator'] ) {
+        $courses = get_courses('all', 'c.id ASC', 'c.id,c.shortname,c.fullname');
+        //It includes the name of the site as a course (category 0), so remove the first one
+        unset($courses["1"]);
+    } else {
+        $courses = enrol_get_users_courses($bbbsession['userID'], false, 'id,shortname,fullname');
+    }
+    $courses_for_select = [];
+    foreach($courses as $course) {
+        $courses_for_select[$course->id] = $course->fullname;
+    }
+
+    return $courses_for_select;
+}
+
+function bigbluebuttonbn_getRecordedMeetings($courseID) {
+    global $DB;
+
+    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'event' => 'Create'));
+
+    //Remove duplicates
+    $unique_records = array();
+    foreach ($records as $key => $record) {
+        $record_key = $record->meetingid.','.$record->courseid.','.$record->bigbluebuttonbnid.','.$record->meta;
+        if( array_search($record_key, $unique_records) === false ) {
+            array_push($unique_records, $record_key);
+        } else {
+            unset($records[$key]);
+        }
+    }
+
+    //Remove the ones with record=false
+    foreach ($records as $key => $record) {
+        $meta = json_decode($record->meta);
+        if ( !$meta->record ) {
+            unset($records[$key]);
+        }
+    }
+
+    return $records;
+}
+
+function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
+
+    $meetingID='';
+    $results = bigbluebuttonbn_getRecordedMeetings($courseID);
+    if( $results ) {
+        //Eliminates duplicates
+        $mIDs = array();
+        foreach ($results as $result) {
+            $mIDs[$result->meetingid] = $result->meetingid;
+        }
+        //Generates the meetingID string
+        foreach ($mIDs as $mID) {
+            if (strlen($meetingID) > 0) $meetingID .= ',';
+            $meetingID .= $mID;
+        }
+    }
+
+    $recordings = array();
+    if ( $meetingID != '' ) {
+        $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT);
+    }
+    return $recordings;
+}
+
+function bigbluebutton_output_recording_table($bbbsession, $recordings) {
+
+    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+        $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings);
+    }
+
+    $output = '';
+    if( isset($table->data) ) {
+        //Print the table
+        $output .= '<div id="bigbluebuttonbn_html_table">'."\n";
+        $output .= html_writer::table($table)."\n";
+        $output .= '</div>'."\n";
+
+    } else {
+        $output .= get_string('view_message_norecordings', 'bigbluebuttonbn');
+    }
+
+    return $output;
+}
