@@ -265,6 +265,7 @@ $string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
 $string['view_recording_delete_confirmation'] = 'Are you sure to delete this recording?';
+$string['view_recording_import_confirmation'] = 'Are you sure to import this recording?';
 $string['view_recording_actionbar'] = 'Toolbar';
 $string['view_recording_activity'] = 'Activity';
 $string['view_recording_course'] = 'Course';
