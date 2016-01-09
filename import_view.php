@@ -77,7 +77,7 @@ if( empty($options) ) {
 
     $jsmodule = array(
             'name'     => 'mod_bigbluebuttonbn',
-            'fullpath' => '/mod/bigbluebuttonbn/import_module.js',
+            'fullpath' => '/mod/bigbluebuttonbn/module.js',
             'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
     );
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.import_view_init', array(), false, $jsmodule);

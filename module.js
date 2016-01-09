@@ -17,10 +17,15 @@ var bigbluebuttonbn_dataSource;
 var bigbluebuttonbn_ping_interval_id;
 var bigbluebuttonbn_panel;
 
-M.mod_bigbluebuttonbn.view_init = function(Y) {
+M.mod_bigbluebuttonbn.datasource_init = function(Y) {
     bigbluebuttonbn_dataSource = new Y.DataSource.Get({
         source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
     });
+};
+
+M.mod_bigbluebuttonbn.view_init = function(Y) {
+	// Init general datasource
+	M.mod_bigbluebuttonbn.datasource_init(Y);
 
     if (bigbluebuttonbn.action == 'before') {
     } else if (bigbluebuttonbn.action == 'after') {
@@ -75,6 +80,16 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
 
         M.mod_bigbluebuttonbn.view_update();
     }
+};
+
+M.mod_bigbluebuttonbn.import_view_init = function(Y) {
+	// Init general datasource
+	M.mod_bigbluebuttonbn.datasource_init(Y);
+
+    // Init event listener for course selector
+    Y.one('#menuimport_recording_links_select').on('change', function () {
+        Y.config.win.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/import_view.php?bn=' + bigbluebuttonbn.bn + '&tc=' + bigbluebuttonbn.tc;
+    });
 };
 
 M.mod_bigbluebuttonbn.view_update = function() {
@@ -344,8 +359,11 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
         callback : {
             success : function(e) {
                 if( action == 'delete') {
-                    var recording_td = Y.one('#recording-td-' + recordingid);
-                    recording_td.remove();
+                    Y.one('#recording-td-' + recordingid).remove();
+
+                } else if( action == 'import') {
+                    Y.one('#recording-td-' + recordingid).remove();
+
                 } else if( action == 'publish' || action == 'unpublish' ) {
                     var btn_action = Y.one('#recording-btn-' + action + '-' + recordingid);
                     var btn_action_src_current = btn_action.getAttribute('src');

@@ -978,8 +978,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     //With icon for import
                     $icon_attributes = array('id' => 'recording-btn-import-'.$recording['recordID']);
                     $icon = new pix_icon('i/import', get_string('import'), 'moodle', $icon_attributes);
-                    error_log(json_encode($icon));
-                    $link_attributes = array('id' => 'recording-link-import-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_import_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
+                    $link_attributes = array('id' => 'recording-link-import-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_import_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("import", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {

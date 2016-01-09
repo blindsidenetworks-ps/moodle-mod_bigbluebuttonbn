@@ -47,7 +47,7 @@ if( empty($params['action']) ) {
         }
     }
 }
-
+error_log("EXECUTING BROKER");
 header('Content-Type: application/json; charset=utf-8');
 if ( empty($error) ) {
 
@@ -203,6 +203,17 @@ if ( empty($error) ) {
                         header("HTTP/1.0 503 Service Unavailable. ".$error);
                         return;
                     }
+                    break;
+                case 'recording_import':
+                    error_log("Execute import");
+                    if( $bbbsession['managerecordings'] ) {
+                        //$meeting_info = bigbluebuttonbn_bbb_broker_do_import_recording($params['id']);
+                        //// Moodle event logger: Create an event for recording deleted
+                        //if( isset($bigbluebuttonbn) ) {
+                        //    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
+                        //}
+                    }
+                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'moodle_notify':
                     break;
