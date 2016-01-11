@@ -205,13 +205,15 @@ if ( empty($error) ) {
                     }
                     break;
                 case 'recording_import':
-                    error_log("Execute import");
                     if( $bbbsession['managerecordings'] ) {
-                        //$meeting_info = bigbluebuttonbn_bbb_broker_do_import_recording($params['id']);
-                        //// Moodle event logger: Create an event for recording deleted
-                        //if( isset($bigbluebuttonbn) ) {
-                        //    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
-                        //}
+                        $importrecordings = $SESSION->bigbluebuttonbn_importrecordings;
+                        $overrides['meetingid'] = $importrecordings[$params['id']]['meetingID'];
+                        $meta = '{"recording":"'.json_encode($importrecordings[$params['id']]).'",""}';
+                        bigbluebuttonbn_log($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
+                        // Moodle event logger: Create an event for recording imported
+                        if( isset($bigbluebuttonbn) ) {
+                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
+                        }
                     }
                     echo $params['callback'].'({ "status": "true" });';
                     break;

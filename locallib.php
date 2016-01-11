@@ -30,25 +30,30 @@ const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
 const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
 const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
+const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
 const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
 
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = "Create";
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = "Join";
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";
+const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = "Import";
 
-function bigbluebuttonbn_log(array $bbbsession, $event) {
+function bigbluebuttonbn_log(array $bbbsession, $event, array $overrides = [], $meta = NULL ) {
     global $DB;
 
     $log = new stdClass();
     
-    $log->meetingid = $bbbsession['meetingid'];
-    $log->courseid = $bbbsession['course']->id;
-    $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
-    $log->userid = $bbbsession['userID'];
-    $log->timecreated = time();
     $log->event = $event;
-    if( $event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE)
-        $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
+    $log->meetingid = isset($overrides['meetingid'])? $overrides['meetingid']: $bbbsession['meetingid'];
+    $log->courseid = isset($overrides['courseid'])? $overrides['courseid']: $bbbsession['course']->id;
+    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid'])? $overrides['bigbluebuttonbnid']: $bbbsession['bigbluebuttonbnid'];
+    $log->userid = isset($overrides['userid'])? $overrides['userid']: $bbbsession['userID'];
+    $log->timecreated = isset($overrides['timecreated'])? $overrides['timecreated']: time();
+    if ( isset($meta) ) {
+        $log->meta = $meta;
+    } else if( $event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
+            $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
+    }
 
     $returnid = $DB->insert_record('bigbluebuttonbn_log', $log);
 }
@@ -116,8 +121,6 @@ function bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID=null ) {
     } else {
         $params = "meetingID=".urlencode($meetingID);
     }
-
-    error_log($base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT));
     return ($base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT) );
 }
 
@@ -241,6 +244,16 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     }
 
     return $recordings;
+}
+
+function bigbluebuttonbn_index_recordings($recordings, $index_key='recordID') {
+    $indexed_recordings = array();
+
+    foreach ($recordings as $recording) {
+        $indexed_recordings[$recording[$index_key]] = $recording;
+    }
+
+    return $indexed_recordings;
 }
 
 function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SALT ) {
@@ -869,6 +882,7 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
             case 'recording_publish':
             case 'recording_unpublish':
             case 'recording_delete':
+            case 'recording_import':
                 if ( !isset($params['id']) ) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The recordingID must be specified.');
                 }
@@ -1327,7 +1341,7 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
 function bigbluebuttonbn_getRecordedMeetings($courseID) {
     global $DB;
 
-    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'event' => 'Create'));
+    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'event' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
 
     //Remove duplicates
     $unique_records = array();

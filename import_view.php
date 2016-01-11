@@ -60,6 +60,7 @@ if( empty($options) ) {
     $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected, true));
 
     $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
+    $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
     //exclude the ones that are already imported
     $recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($selected, $recordings);
     if( empty($recordings) ) {
