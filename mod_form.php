@@ -17,7 +17,6 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
-
         global $CFG, $DB, $USER, $BIGBLUEBUTTONBN_CFG;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
@@ -141,7 +140,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->setDefault('notification', 0);
         }
         $mform->setType('notification', PARAM_INT);
-
         //-------------------------------------------------------------------------------
         // First block ends here
         //-------------------------------------------------------------------------------
@@ -293,14 +291,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     function data_preprocessing(&$default_values) {
         if ($this->current->instance) {
             // Editing existing instance - copy existing files into draft area.
-            $draftitemid = file_get_submitted_draft_itemid('presentation');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
-            $default_values['presentation'] = $draftitemid;
+            try {
+                $draftitemid = file_get_submitted_draft_itemid('presentation');
+                file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
+                $default_values['presentation'] = $draftitemid;
+            } catch (Exception $e){
+                error_log("Presentation could not be loaded: ".$e->getMessage());
+                return NULL;
+            }
         }
     }
 
     function validation($data, $files) {
-
         $errors = parent::validation($data, $files);
 
         if ( isset($data['openingtime']) && isset($data['closingtime']) ) {
