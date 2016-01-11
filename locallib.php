@@ -46,7 +46,7 @@ function bigbluebuttonbn_log(array $bbbsession, $event, array $overrides = [], $
     $log->event = $event;
     $log->meetingid = isset($overrides['meetingid'])? $overrides['meetingid']: $bbbsession['meetingid'];
     $log->courseid = isset($overrides['courseid'])? $overrides['courseid']: $bbbsession['course']->id;
-    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid'])? $overrides['bigbluebuttonbnid']: $bbbsession['bigbluebuttonbnid'];
+    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid'])? $overrides['bigbluebuttonbnid']: $bbbsession['bigbluebuttonbn']->id;
     $log->userid = isset($overrides['userid'])? $overrides['userid']: $bbbsession['userID'];
     $log->timecreated = isset($overrides['timecreated'])? $overrides['timecreated']: time();
     if ( isset($meta) ) {
@@ -600,6 +600,7 @@ function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
 
 function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
     global $DB;
+
     $is_unique = true;
     if( $voicebridge != 0 ) {
         $table = "bigbluebuttonbn";
@@ -850,6 +851,26 @@ function bigbluebuttonbn_bbb_broker_do_publish_recording($recordingid, $publish=
     bigbluebuttonbn_doPublishRecordings($recordingid, ($publish)? 'true': 'false', $endpoint, $shared_secret);
 }
 
+function bigbluebuttonbn_bbb_broker_do_publish_recording_imported($recordingid, $courseID, $bigbluebuttonbnID, $publish=true){
+    global $DB;
+
+    //Locate the record to be updated
+    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'event' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+
+    $recordings_imported = array();
+    foreach ($records as $key => $record) {
+        $meta = json_decode($record->meta, true);
+        if( $recordingid == $meta['recording']['recordID'] ) {
+            // Found, prepare data for the update
+            $meta['recording']['published'] = ($publish)? 'true': 'false';
+            $records[$key]->meta = json_encode($meta);
+
+            // Proceed with the update
+            $DB->update_record("bigbluebuttonbn_log", $records[$key]);
+        }
+    }
+}
+
 function bigbluebuttonbn_bbb_broker_do_delete_recording($recordingid){
     global $CFG;
 
@@ -942,10 +963,29 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
             $meta_description = '';
         }
 
+        //Set recording_types
+        if ($recording['published'] == 'true') {
+            $recording_types = '<div id="playbacks-'.$recording['recordID'].'">';
+        } else {
+            $recording_types = '<div id="playbacks-'.$recording['recordID'].'" hidden>';
+        }
+        foreach ( $recording['playbacks'] as $playback ) {
+            $recording_types .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), 'target' => '_new') ).'&#32;';
+        }
+        $recording_types .= '</div>';
+
+        //Initialize variables for styling text
+        $head = $tail = '';
+
+        //Set actionbar, if user is allowed to manage recordings
         $actionbar = '';
-        $params['id'] = $bbbsession['cm']->id;
-        $params['recordingid'] = $recording['recordID'];
         if ( $bbbsession['managerecordings'] ) {
+            // Set style for imported links
+            if( isset($recording['imported']) ) {
+                $head = '<i>';
+                $tail = '</i>';
+            }
+
             $url = '#';
             $action = null;
 
@@ -1002,27 +1042,17 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
             }
         }
 
-        if ($recording['published'] == 'true') {
-            $recording_types = '<div id="playbacks-'.$recording['recordID'].'">';
-        } else {
-            $recording_types = '<div id="playbacks-'.$recording['recordID'].'" hidden>';
-        }
-        foreach ( $recording['playbacks'] as $playback ) {
-            $recording_types .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), 'target' => '_new') ).'&#32;';
-        }
-        $recording_types .= '</div>';
-
         //Set corresponding format
         $format = '%a %h %d, %Y %H:%M:%S %Z';
         $formattedStartDate = userdate($startTime / 1000, $format, usertimezone($USER->timezone));
 
         $row = new stdClass();
-        $row->recording = $recording_types;
-        $row->activity = $meta_activity;
-        $row->description = $meta_description;
+        $row->recording = "{$head}{$recording_types}{$tail}";
+        $row->activity = "{$head}{$meta_activity}{$tail}";
+        $row->description = "{$head}{$meta_description}{$tail}";
         $row->date = floatval($recording['startTime']);
-        $row->date_formatted = $formattedStartDate;
-        $row->duration = $duration;
+        $row->date_formatted = "{$head}{$formattedStartDate}{$tail}";
+        $row->duration = "{$head}{$duration}{$tail}";
         if ( $bbbsession['managerecordings'] ) {
             $row->actionbar = $actionbar;
         }
@@ -1366,8 +1396,7 @@ function bigbluebuttonbn_getRecordedMeetings($courseID) {
 }
 
 function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
-
-    $meetingID='';
+    $meetingID = '';
     $results = bigbluebuttonbn_getRecordedMeetings($courseID);
     if( $results ) {
         //Eliminates duplicates
@@ -1387,6 +1416,19 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
         $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT);
     }
     return $recordings;
+}
+
+function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID) {
+    global $DB;
+
+    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'event' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+
+    $recordings_imported = array();
+    foreach ($records as $key => $record) {
+        $meta = json_decode($record->meta, true);
+        $recordings_imported[] = $meta['recording'];
+    }
+    return $recordings_imported;
 }
 
 function bigbluebuttonbn_import_exlcude_recordings_already_imported($selected, $recordings) {

@@ -15,8 +15,8 @@ global $PAGE, $USER, $CFG, $SESSION, $DB;
 
 $params['action']  = optional_param('action', '', PARAM_TEXT);
 $params['callback'] = optional_param('callback', '', PARAM_TEXT);
-$params['id'] = optional_param('id', '', PARAM_TEXT);
-$params['idx'] = optional_param('idx', '', PARAM_TEXT);
+$params['id'] = optional_param('id', '', PARAM_TEXT);    //recordID, the BBB recordID
+$params['idx'] = optional_param('idx', '', PARAM_TEXT);  //meetingID, the BBB meetingID
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
@@ -47,7 +47,7 @@ if( empty($params['action']) ) {
         }
     }
 }
-error_log("EXECUTING BROKER");
+
 header('Content-Type: application/json; charset=utf-8');
 if ( empty($error) ) {
 
@@ -130,42 +130,114 @@ if ( empty($error) ) {
                 case 'recording_list':
                     break;
                 case 'recording_info':
-                    $recording = bigbluebuttonbn_getRecordingArray($params['id'], $params['idx'], $endpoint, $shared_secret);
-                    if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
-                        echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
+                    if( $bbbsession['managerecordings'] ) {
+                        error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
+                        //Retrieve the array of imported recordings
+                        $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($importrecordings[$params['id']]) ) {
+                            //Look up for an update on the imported recording
+                            $recording = $importrecordings[$params['id']];
+                            if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
+                                echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
+                            } else {
+                                echo $params['callback'].'({ "status": "false" });';
+                            }
+
+                        // As the recordingid was not identified as imported recording link, look up for a real recording
+                        } else {
+                            $recording = bigbluebuttonbn_getRecordingArray($params['id'], $params['idx'], $endpoint, $shared_secret);
+                            if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
+                                echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
+                            } else {
+                                echo $params['callback'].'({ "status": "false" });';
+                            }
+                        }
+
                     } else {
-                        echo $params['callback'].'({ "status": "false" });';
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
                 case 'recording_publish':
                     if( $bbbsession['managerecordings'] ) {
-                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                        error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
+                        //Retrieve the array of imported recordings
+                        $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($importrecordings[$params['id']]) ) {
+                            // Execute publish on imported recording link
+                            error_log("PUBLISHING IMPORTED RECORDING LINK");
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
+                        } else {
+                            // As the recordingid was not identified as imported recording link, execute publish on a real recording
+                            error_log("PUBLISHING RECORDING");
+                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                        }
+
                         // Moodle event logger: Create an event for recording published
                         if( isset($bigbluebuttonbn) ) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
                         }
+                        echo $params['callback'].'({ "status": "true" });';
+
+                    } else {
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
-                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_unpublish':
                     if( $bbbsession['managerecordings'] ) {
-                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                        error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
+                        //Retrieve the array of imported recordings
+                        $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($importrecordings[$params['id']]) ) {
+                            // Execute unpublish on imported recording link
+                            error_log("UNPUBLISHING IMPORTED RECORDING LINK");
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
+                        } else {
+                            error_log("UNPUBLISHING RECORDING");
+                            // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
+                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                        }
+
                         // Moodle event logger: Create an event for recording unpublished
                         if( isset($bigbluebuttonbn) ) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                         }
+                        echo $params['callback'].'({ "status": "true" });';
+
+                    } else {
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
-                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_delete':
                     if( $bbbsession['managerecordings'] ) {
-                        $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                        error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
+                        //Retrieve the array of imported recordings
+                        $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($importrecordings[$params['id']]) ) {
+                            // Execute unpublish on imported recording link
+                            error_log("DELETE IMPORTED RECORDING LINK");
+                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                        } else {
+                            // As the recordingid was not identified as imported recording link, execute delete on a real recording
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                        }
+
                         // Moodle event logger: Create an event for recording deleted
                         if( isset($bigbluebuttonbn) ) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
                         }
+                        echo $params['callback'].'({ "status": "true" });';
+
+                    } else {
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
-                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'recording_ready':
                     //Decodes the received JWT string
@@ -207,15 +279,23 @@ if ( empty($error) ) {
                 case 'recording_import':
                     if( $bbbsession['managerecordings'] ) {
                         $importrecordings = $SESSION->bigbluebuttonbn_importrecordings;
-                        $overrides['meetingid'] = $importrecordings[$params['id']]['meetingID'];
-                        $meta = '{"recording":"'.json_encode($importrecordings[$params['id']]).'",""}';
-                        bigbluebuttonbn_log($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
-                        // Moodle event logger: Create an event for recording imported
-                        if( isset($bigbluebuttonbn) ) {
-                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
+                        if( isset($importrecordings[$params['id']]) ) {
+                            $importrecordings[$params['id']]['imported'] = true;
+                            $overrides['meetingid'] = $importrecordings[$params['id']]['meetingID'];
+                            $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
+                            bigbluebuttonbn_log($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
+                            // Moodle event logger: Create an event for recording imported
+                            if( isset($bigbluebuttonbn) ) {
+                                bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
+                            }
+                            echo $params['callback'].'({ "status": "true" });';
+                        } else {
+                            $error = "Recording {$params['id']} could not be found. It can not be imported";
+                            error_log($error);
+                            header("HTTP/1.0 404 Not found. ".$error);
+                            return;
                         }
                     }
-                    echo $params['callback'].'({ "status": "true" });';
                     break;
                 case 'moodle_notify':
                     break;
