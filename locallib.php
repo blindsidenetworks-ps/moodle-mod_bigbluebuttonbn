@@ -880,6 +880,22 @@ function bigbluebuttonbn_bbb_broker_do_delete_recording($recordingid){
     bigbluebuttonbn_doDeleteRecordings($recordingid, $endpoint, $shared_secret);
 }
 
+function bigbluebuttonbn_bbb_broker_do_delete_recording_imported($recordingid, $courseID, $bigbluebuttonbnID){
+    global $DB;
+
+    //Locate the record to be updated
+    $records = $DB->get_records('bigbluebuttonbn_log', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'event' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+
+    $recordings_imported = array();
+    foreach ($records as $key => $record) {
+        $meta = json_decode($record->meta, true);
+        if( $recordingid == $meta['recording']['recordID'] ) {
+            // Execute delete
+            $DB->delete_records("bigbluebuttonbn_log", array('id' => $key));
+        }
+    }
+}
+
 function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
     $error = '';
 

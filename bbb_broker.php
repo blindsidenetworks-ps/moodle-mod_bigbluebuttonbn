@@ -237,11 +237,21 @@ if ( empty($error) ) {
                         if( isset($recordings_indexed[$params['id']]) ) {
                             // Execute unpublish on imported recording link
                             error_log("DELETING IMPORTED RECORDING LINK");
-                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                            bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute delete on a real recording
                             error_log("DELETING RECORDING");
-                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                            // First: Delete imported links associated to the recording 
+                            $recordings_imported = bigbluebuttonbn_getRecordingsImportedAllInstances($params['id']);
+
+                            if( count($recordings_imported) > 0 ) {
+                                foreach ($recordings_imported as $key => $record) {
+                                    // Execute delete
+                                    $DB->delete_records("bigbluebuttonbn_log", array('id' => $key));
+                                }
+                            }
+                            // Second: Execute the real delete
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                         }
 
                         // Moodle event logger: Create an event for recording deleted
