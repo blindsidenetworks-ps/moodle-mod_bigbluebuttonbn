@@ -11,7 +11,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$bn = required_param('bn', PARAM_INT);  // bigbluebuttonbn instance ID
+$bn = required_param('bn', PARAM_INT);     // bigbluebuttonbn instance ID
 $tc = optional_param('tc', 0, PARAM_INT);  // target course ID
 
 if ($bn) {
@@ -24,10 +24,13 @@ if ($bn) {
 
 $context = bigbluebuttonbn_get_context_module($cm->id);
 
+require_login($course, true, $cm);
+
 if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    require_login($course, true, $cm);
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
+
+$output = '';
 
 /// Print the page header
 $PAGE->set_context($context);
@@ -37,16 +40,8 @@ $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('incourse');
 
-// Create view object which collects all the information the renderer will need.
-//$viewobj = new mod_bigbluebuttonbn_view_object();
 
-$output = $PAGE->get_renderer('mod_bigbluebuttonbn');
-
-echo $OUTPUT->header();
-
-//echo $output->view_page($course, $bigbluebuttonbn, $cm, $context, $viewobj);
-
-$output = '';
+$output .= $OUTPUT->header();
 
 $output .= '<h4>Import recording links</h4>';
 
@@ -56,13 +51,13 @@ if( empty($options) ) {
     $output .= html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
 
 } else {
-    //$output .= html_writer::select($options, $name, $selected, true, $attributes);
     $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected, true));
 
     $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
-    $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
     //exclude the ones that are already imported
-    $recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($selected, $recordings);
+    $recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
+    //store remaining recordings (indexed) in a session variable
+    $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
     if( empty($recordings) ) {
         $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     } else {
@@ -84,10 +79,10 @@ if( empty($options) ) {
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.import_view_init', array(), false, $jsmodule);
 }
 
+$output .= $OUTPUT->footer();
+
+// finally, render the output
 echo $output;
-
-
-echo $OUTPUT->footer();
 
 function bigbluebuttonbn_selected_course($options, $tc=0) {
     if( empty($options) ) {

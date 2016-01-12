@@ -1472,8 +1472,16 @@ function bigbluebuttonbn_import_get_recordings_imported($records) {
     return $recordings_imported;
 }
 
-function bigbluebuttonbn_import_exlcude_recordings_already_imported($selected, $recordings) {
-    error_log("DONT FORGET TO EXCLUDE THE ONES ALREADY IMPORTED");
+function bigbluebuttonbn_import_exlcude_recordings_already_imported($courseID, $bigbluebuttonbnID, $recordings) {
+
+    $recordings_already_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID);
+    $recordings_already_imported_indexed = bigbluebuttonbn_index_recordings($recordings_already_imported);
+
+    foreach ($recordings as $key => $recording) {
+        if( isset($recordings_already_imported_indexed[$recording['recordID']]) ) {
+            unset($recordings[$key]);
+        }
+    }
     return $recordings;
 }
 

@@ -39,8 +39,9 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->blocks->show_only_fake_blocks();
 
+require_login($course, true, $cm);
+
 if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    require_login($course, true, $cm);
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 switch (strtolower($action)) {
