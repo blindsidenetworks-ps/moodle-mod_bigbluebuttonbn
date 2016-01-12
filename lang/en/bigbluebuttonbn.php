@@ -264,8 +264,11 @@ $string['view_conference_action_end'] = 'End session';
 $string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
-$string['view_recording_delete_confirmation'] = 'Are you sure to delete this recording?';
-$string['view_recording_import_confirmation'] = 'Are you sure to import this recording?';
+$string['view_recording_delete_confirmation'] = 'Are you sure to delete this recording';
+$string['view_recording_delete_confirmation_warning'] = 'This recording has {$a} link(s) associated that was(were) imported in other course(s) or activity(ies). If you delete this recording the link(s) will also be removed';
+$string['view_recording_unpublish_confirmation'] = 'Are you sure to unpublish this recording';
+$string['view_recording_unpublish_confirmation_warning'] = 'This recording has {$a} link(s) associated that was(were) imported in other course(s) or activity(ies). If you unpublish this recording the link(s) will also be unpublished';
+$string['view_recording_import_confirmation'] = 'Are you sure to import this recording';
 $string['view_recording_actionbar'] = 'Toolbar';
 $string['view_recording_activity'] = 'Activity';
 $string['view_recording_course'] = 'Course';

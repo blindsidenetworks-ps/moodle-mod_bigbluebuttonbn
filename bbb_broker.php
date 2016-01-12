@@ -134,10 +134,10 @@ if ( empty($error) ) {
                         error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
                         //Retrieve the array of imported recordings
                         $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
-                        if( isset($importrecordings[$params['id']]) ) {
+                        $recordings_indexed = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($recordings_indexed[$params['id']]) ) {
                             //Look up for an update on the imported recording
-                            $recording = $importrecordings[$params['id']];
+                            $recording = $recordings_indexed[$params['id']];
                             if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
                                 echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
                             } else {
@@ -162,17 +162,17 @@ if ( empty($error) ) {
                 case 'recording_publish':
                     if( $bbbsession['managerecordings'] ) {
                         error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
-                        //Retrieve the array of imported recordings
+                        //Retrieve the array of imported recordings for the current course and activity
                         $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
-                        if( isset($importrecordings[$params['id']]) ) {
+                        $recordings_indexed = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($recordings_indexed[$params['id']]) ) {
                             // Execute publish on imported recording link
                             error_log("PUBLISHING IMPORTED RECORDING LINK");
                             $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute publish on a real recording
                             error_log("PUBLISHING RECORDING");
-                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
                         }
 
                         // Moodle event logger: Create an event for recording published
@@ -189,17 +189,32 @@ if ( empty($error) ) {
                 case 'recording_unpublish':
                     if( $bbbsession['managerecordings'] ) {
                         error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
-                        //Retrieve the array of imported recordings
+                        //Retrieve the array of imported recordings for the current course and activity
                         $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
-                        if( isset($importrecordings[$params['id']]) ) {
+                        $recordings_indexed = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($recordings_indexed[$params['id']]) ) {
                             // Execute unpublish on imported recording link
                             error_log("UNPUBLISHING IMPORTED RECORDING LINK");
                             $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
                         } else {
-                            error_log("UNPUBLISHING RECORDING");
                             // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
-                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                            error_log("UNPUBLISHING RECORDING");
+                            // First: Unpublish imported links associated to the recording 
+                            $recordings_imported = bigbluebuttonbn_getRecordingsImportedAllInstances($params['id']);
+
+                            if( count($recordings_imported) > 0 ) {
+                                foreach ($recordings_imported as $key => $record) {
+                                    $meta = json_decode($record->meta, true);
+                                    // Prepare data for the update
+                                    $meta['recording']['published'] = 'false';
+                                    $recordings_imported[$key]->meta = json_encode($meta);
+
+                                    // Proceed with the update
+                                    $DB->update_record("bigbluebuttonbn_log", $recordings_imported[$key]);
+                                }
+                            }
+                            // Second: Execute the real unpublish
+                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
                         }
 
                         // Moodle event logger: Create an event for recording unpublished
@@ -218,14 +233,15 @@ if ( empty($error) ) {
                         error_log("LOOKINGUP FOR IMPORTED RECORDING LINK");
                         //Retrieve the array of imported recordings
                         $recordings = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-                        $importrecordings = bigbluebuttonbn_index_recordings($recordings);
-                        if( isset($importrecordings[$params['id']]) ) {
+                        $recordings_indexed = bigbluebuttonbn_index_recordings($recordings);
+                        if( isset($recordings_indexed[$params['id']]) ) {
                             // Execute unpublish on imported recording link
-                            error_log("DELETE IMPORTED RECORDING LINK");
+                            error_log("DELETING IMPORTED RECORDING LINK");
                             //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute delete on a real recording
-                            $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                            error_log("DELETING RECORDING");
+                            //$meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                         }
 
                         // Moodle event logger: Create an event for recording deleted
