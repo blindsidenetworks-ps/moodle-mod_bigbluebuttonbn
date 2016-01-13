@@ -66,8 +66,9 @@ if( empty($options) ) {
     }
 
     $jsvars = array(
-            'bn' => $bn,
-            'tc' => $selected
+        'bn' => $bn,
+        'tc' => $selected,
+        'locales' => bigbluebuttonbn_get_locales_for_ui()
     );
     $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
 

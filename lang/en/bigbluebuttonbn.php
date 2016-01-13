@@ -264,11 +264,16 @@ $string['view_conference_action_end'] = 'End session';
 $string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
-$string['view_recording_delete_confirmation'] = 'Are you sure to delete this recording';
-$string['view_recording_delete_confirmation_warning'] = 'This recording has {$a} link(s) associated that was(were) imported in other course(s) or activity(ies). If you delete this recording the link(s) will also be removed';
-$string['view_recording_unpublish_confirmation'] = 'Are you sure to unpublish this recording';
-$string['view_recording_unpublish_confirmation_warning'] = 'This recording has {$a} link(s) associated that was(were) imported in other course(s) or activity(ies). If you unpublish this recording the link(s) will also be unpublished';
-$string['view_recording_import_confirmation'] = 'Are you sure to import this recording';
+$string['view_recording'] = 'recording';
+$string['view_recording_link'] = 'link pointing to a recording';
+$string['view_recording_link_warning'] = 'This is a link pointing to a recording that was created in a different course or activity';
+$string['view_recording_delete_confirmation'] = 'Are you sure to delete this {$a}?';
+$string['view_recording_delete_confirmation_warning_s'] = 'This recording has {$a} link associated that was imported in a different course or activity. If the recording is deleted that link will also be removed';
+$string['view_recording_delete_confirmation_warning_p'] = 'This recording has {$a} links associated that were imported in different courses or activities. If the recording is deleted those links will also be removed';
+$string['view_recording_unpublish_confirmation'] = 'Are you sure to unpublish this {$a}?';
+$string['view_recording_unpublish_confirmation_warning_s'] = 'This recording has {$a} link associated that was imported in a different course or activity. If the recording is unpublished that link will also be unpublished';
+$string['view_recording_unpublish_confirmation_warning_p'] = 'This recording has {$a} links associated that were imported in different courses or activities. If the recording is unpublished those links will also be unpublished';
+$string['view_recording_import_confirmation'] = 'Are you sure to import this recording?';
 $string['view_recording_actionbar'] = 'Toolbar';
 $string['view_recording_activity'] = 'Activity';
 $string['view_recording_course'] = 'Course';

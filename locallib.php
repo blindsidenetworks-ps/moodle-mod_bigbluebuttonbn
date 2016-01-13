@@ -1018,68 +1018,58 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                 if ( $recording['published'] == 'true' ){
                     $manage_tag = 'hide';
                     $manage_action = 'unpublish';
-
-                    if( $recordings_imported_count > 0 ) {
-                        $view_recording_unpublish_confirmation  = get_string('view_recording_unpublish_confirmation_warning', 'bigbluebuttonbn', $recordings_imported_count).'. ';
-                        $view_recording_unpublish_confirmation .= get_string('view_recording_unpublish_confirmation', 'bigbluebuttonbn');
-                        $onclick = 'if(confirm("'.$view_recording_unpublish_confirmation.'")) M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
-                    } else {
-                        $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
-                    }
-
                 } else {
                     $manage_tag = 'show';
                     $manage_action = 'publish';
-
-                    $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
                 }
+                $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
 
                 if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                     //With icon for publish/unpublish
                     $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
                     $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
-                    $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick);
+                    $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {
                     //With text for publish/unpublish
-                    $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => $onclick) );
+                    $link_attributes = array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, $link_attributes);
                     $actionbar .= "&nbsp;";
                 }
             }
 
             if (in_array("deleting", $tools)) {
-                $view_recording_delete_confirmation = '';
-                if( $recordings_imported_count > 0 ) {
-                    $view_recording_delete_confirmation .= get_string('view_recording_delete_confirmation_warning', 'bigbluebuttonbn', $recordings_imported_count).'. ';
-                }
-                $view_recording_delete_confirmation .= get_string('view_recording_delete_confirmation', 'bigbluebuttonbn');
-                $onclick = 'if(confirm("'.$view_recording_delete_confirmation.'?")) M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
+                $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("delete", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
 
                 if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                     //With icon for delete
                     $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
                     $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
-                    $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick);
+                    $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {
                     //With text for delete
-                    $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick) );
+                    $link_attributes = array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, $link_attributes);
                 }
             }
 
             if (in_array("importing", $tools)) {
+                $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("import", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
+
                 if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                     //With icon for import
                     $icon_attributes = array('id' => 'recording-btn-import-'.$recording['recordID']);
                     $icon = new pix_icon('i/import', get_string('import'), 'moodle', $icon_attributes);
-                    $link_attributes = array('id' => 'recording-link-import-'.$recording['recordID'], 'onclick' => 'if(confirm("'.get_string('view_recording_import_confirmation', 'bigbluebuttonbn').'?")) M.mod_bigbluebuttonbn.broker_manageRecording("import", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");');
+                    $link_attributes = array('id' => 'recording-link-import-'.$recording['recordID'], 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {
                     //With text for import
-                    $actionbar .= $OUTPUT->action_link($url, get_string('import'), $action, array('title' => get_string('import'), 'class' => 'btn btn-xs btn-danger', 'onclick' => 'if(confirm("' + get_string('view_recording_import_confirmation') + '")) M.mod_bigbluebuttonbn.broker_manageRecording("import", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");') );
+                    $link_attributes = array('title' => get_string('import'), 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick);
+                    $actionbar .= $OUTPUT->action_link($url, get_string('import'), $action, $link_attributes);
                 }
             }
         }
@@ -1176,6 +1166,12 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools) {
         foreach ( $recordings as $recording ){
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
+            if ( isset($recording['imported']) ) {
+                $row->attributes['data-imported'] = 'true';
+                $row->attributes['title'] = get_string('view_recording_link_warning', 'bigbluebuttonbn');
+            } else {
+                $row->attributes['data-imported'] = 'false';
+            }
 
             $row_data = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
             if( $row_data != null ) {
@@ -1272,6 +1268,16 @@ function bigbluebuttonbn_get_locales_for_ui() {
             'modal_title' => get_string('view_recording_modal_title', 'bigbluebuttonbn'),
             'modal_button' => get_string('view_recording_modal_button', 'bigbluebuttonbn'),
             'userlimit_reached' => get_string('view_error_userlimit_reached', 'bigbluebuttonbn'),
+            'recording' => get_string('view_recording', 'bigbluebuttonbn'),
+            'recording_link' => get_string('view_recording_link', 'bigbluebuttonbn'),
+            'recording_link_warning' => get_string('view_recording_link_warning', 'bigbluebuttonbn'),
+            'unpublish_confirmation' => get_string('view_recording_unpublish_confirmation', 'bigbluebuttonbn'),
+            'unpublish_confirmation_warning_s' => get_string('view_recording_unpublish_confirmation_warning_s', 'bigbluebuttonbn'),
+            'unpublish_confirmation_warning_p' => get_string('view_recording_unpublish_confirmation_warning_p', 'bigbluebuttonbn'),
+            'delete_confirmation' => get_string('view_recording_delete_confirmation', 'bigbluebuttonbn'),
+            'delete_confirmation_warning_s' => get_string('view_recording_delete_confirmation_warning_s', 'bigbluebuttonbn'),
+            'delete_confirmation_warning_p' => get_string('view_recording_delete_confirmation_warning_p', 'bigbluebuttonbn'),
+            'import_confirmation' => get_string('view_recording_import_confirmation', 'bigbluebuttonbn'),
     );
     return $locales;
 }
