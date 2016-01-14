@@ -1134,7 +1134,7 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings) {
     return $table_data;
 }
 
-function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools) {
+function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools=['publishing','deleting']) {
     global $OUTPUT, $CFG;
 
     ///Set strings to show
