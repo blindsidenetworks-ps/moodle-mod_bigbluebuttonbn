@@ -348,7 +348,7 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
     global $CFG;
 
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
-        $output = '<h4>'.get_string('view_section_title_recordings', 'bigbluebuttonbn').'</h4>'."\n";
+        $output = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn') );
 
         // Get actual recordings
         $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
@@ -360,8 +360,10 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings)."\n";
 
         if ( $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled() ) {
-            $output .= '<br><span id="import_recording_links_button"><input type="button" value="'.get_string('view_recording_button_import', 'bigbluebuttonbn').'" onclick="window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.$bbbsession['bigbluebuttonbn']->id.'\'"></span><br>'."\n";
-            $output .= '<span id="import_recording_links_table"></span>'."\n";
+            $button_import_recordings = html_writer::tag( 'input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.$bbbsession['bigbluebuttonbn']->id.'\'') );
+            $output .= html_writer::start_tag('br');
+            $output .= html_writer::tag('span', $button_import_recordings, ['id'=>"import_recording_links_button"]);
+            $output .= html_writer::tag('span', '', ['id'=>"import_recording_links_table"]);
         }
 
         echo $output;

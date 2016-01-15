@@ -193,7 +193,7 @@ $string['view_error_max_concurrent'] = 'Number of concurrent meetings allowed ha
 $string['view_error_userlimit_reached'] = 'The number of users allowed in a meeting has been reached.';
 $string['view_error_url_missing_parameters'] = 'There are parameters missing in this URL';
 $string['view_error_import_no_courses'] = 'No courses to look up for recordings';
-$string['view_error_import_no_recordings'] = 'No recordings in this course that can be imported';
+$string['view_error_import_no_recordings'] = 'No recordings in this course for importing';
 $string['view_groups_selection_join'] = 'Join';
 $string['view_groups_selection'] = 'Select the group you want to join and confirm the action';
 $string['view_login_moderator'] = 'Logging in as moderator ...';
@@ -217,6 +217,7 @@ $string['view_recording_list_description'] = 'Description';
 $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_recording_button_import'] = 'Import recording links';
+$string['view_recording_button_return'] = 'Go back';
 $string['view_recording_format_presentation'] = 'presentation';
 $string['view_recording_format_video'] = 'video';
 $string['view_wait'] = 'The virtual class has not yet started.  Waiting until a moderator joins ...';
@@ -265,7 +266,7 @@ $string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
 $string['view_recording'] = 'recording';
-$string['view_recording_link'] = 'link pointing to a recording';
+$string['view_recording_link'] = 'imported link';
 $string['view_recording_link_warning'] = 'This is a link pointing to a recording that was created in a different course or activity';
 $string['view_recording_delete_confirmation'] = 'Are you sure to delete this {$a}?';
 $string['view_recording_delete_confirmation_warning_s'] = 'This recording has {$a} link associated that was imported in a different course or activity. If the recording is deleted that link will also be removed';

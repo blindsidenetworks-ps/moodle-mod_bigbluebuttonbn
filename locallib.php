@@ -982,15 +982,15 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         if ( $bbbsession['managerecordings'] ) {
             // Set style for imported links
             if( isset($recording['imported']) ) {
+                $recordings_imported_count = 0;
+                $tag_tail = ' '.get_string('view_recording_link', 'bigbluebuttonbn');
                 $head = '<i>';
                 $tail = '</i>';
 
-                $recordings_imported_count = 0;
-
             } else {
                 $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedAllInstancesArray($recording['recordID']);
-
                 $recordings_imported_count = count($recordings_imported_array);
+                $tag_tail = '';
             }
 
             $url = '#';
@@ -1011,14 +1011,14 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                 if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                     //With icon for publish/unpublish
                     $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
-                    $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag), 'moodle', $icon_attributes);
+                    $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag).$tag_tail, 'moodle', $icon_attributes);
                     $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {
                     //With text for publish/unpublish
-                    $link_attributes = array('title' => get_string($manage_tag), 'class' => 'btn btn-xs', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
-                    $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag), $action, $link_attributes);
+                    $link_attributes = array('title' => get_string($manage_tag).$tag_tail, 'class' => 'btn btn-xs', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag).$tag_tail, $action, $link_attributes);
                     $actionbar .= "&nbsp;";
                 }
             }
@@ -1029,14 +1029,14 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                 if ( bigbluebuttonbn_get_cfg_recording_icons_enabled() ) {
                     //With icon for delete
                     $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
-                    $icon = new pix_icon('t/delete', get_string('delete'), 'moodle', $icon_attributes);
+                    $icon = new pix_icon('t/delete', get_string('delete').$tag_tail, 'moodle', $icon_attributes);
                     $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
 
                 } else {
                     //With text for delete
-                    $link_attributes = array('title' => get_string('delete'), 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
-                    $actionbar .= $OUTPUT->action_link($url, get_string('delete'), $action, $link_attributes);
+                    $link_attributes = array('title' => get_string('delete').$tag_tail, 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $actionbar .= $OUTPUT->action_link($url, get_string('delete').$tag_tail, $action, $link_attributes);
                 }
             }
 
