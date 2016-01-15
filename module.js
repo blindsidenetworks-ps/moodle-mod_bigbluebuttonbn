@@ -83,12 +83,12 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
 };
 
 M.mod_bigbluebuttonbn.import_view_init = function(Y) {
-	// Init general datasource
-	M.mod_bigbluebuttonbn.datasource_init(Y);
+    // Init general datasource
+    M.mod_bigbluebuttonbn.datasource_init(Y);
 
     // Init event listener for course selector
     Y.one('#menuimport_recording_links_select').on('change', function () {
-        Y.config.win.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/import_view.php?bn=' + bigbluebuttonbn.bn + '&tc=' + bigbluebuttonbn.tc;
+        Y.config.win.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/import_view.php?bn=' + bigbluebuttonbn.bn + '&tc=' + this.get('value');
     });
 };
 
