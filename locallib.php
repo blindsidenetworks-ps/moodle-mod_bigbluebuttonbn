@@ -206,7 +206,7 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
 function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
-    if( is_array($meetingIDs) ) {
+    if ( is_array($meetingIDs) ) {
         // getRecordings is executes using a method POST (supported only on BBB 1.0 and later)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
     } else {
@@ -214,21 +214,18 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingIDs ) );
     }
 
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-
-    } else if($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)){ //If there were meetings already created
-        foreach ($xml->recordings->recording as $recording) {
+    if ( $xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings) ) { //If there were meetings already created
+        foreach ( $xml->recordings->recording as $recording ) {
             $playbackArray = array();
-            foreach ( $recording->playback->format as $format ){
+            foreach ( $recording->playback->format as $format ) {
                 $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
             }
 
             //Add the metadata to the recordings array
             $metadataArray = array();
             $metadata = get_object_vars($recording->metadata);
-            foreach ($metadata as $key => $value) {
-                if(is_object($value)) $value = '';
+            foreach ( $metadata as $key => $value ) {
+                if ( is_object($value) ) $value = '';
                 $metadataArray['meta_'.$key] = $value;
             }
 
@@ -236,11 +233,6 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
         }
 
         usort($recordings, 'bigbluebuttonbn_recordingBuildSorter');
-
-    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-
-    } else { //If the server is unreachable, then prompts the user of the necessary action
     }
 
     return $recordings;
@@ -261,10 +253,7 @@ function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SAL
 
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
 
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-        $recordings = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-
-    } else if($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)){ //If there were meetings already created
+    if ( $xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings) ) { //If there were meetings already created
         foreach ($xml->recordings->recording as $recording) {
             if( $recording->recordID == $recordingID ) {
                 $playbackArray = array();
@@ -284,11 +273,6 @@ function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SAL
                 break;
             }
         }
-
-    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-        $recording = array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-
-    } else { //If the server is unreachable, then prompts the user of the necessary action
     }
 
     return $recording;
@@ -1493,7 +1477,7 @@ function bigbluebuttonbn_import_exlcude_recordings_already_imported($courseID, $
 
 function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=['publishing','deleting']) {
 
-    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+    if ( isset($recordings) && !empty($recordings) ) {  // There are recordings for this meeting
         $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools);
     }
 
