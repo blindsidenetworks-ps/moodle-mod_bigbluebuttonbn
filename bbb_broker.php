@@ -48,7 +48,7 @@ if( empty($params['action']) ) {
     }
 }
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/javascript; charset=utf-8');
 if ( empty($error) ) {
 
     if (!isloggedin() && $PAGE->course->id == SITEID) {
