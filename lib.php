@@ -74,7 +74,6 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($data, $mform) {
     global $DB, $CFG;
 
-    $draftitemid = $data->presentation;
     $context = bigbluebuttonbn_get_context_module($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
@@ -83,7 +82,10 @@ function bigbluebuttonbn_add_instance($data, $mform) {
     $bigbluebuttonbn_id = $DB->insert_record('bigbluebuttonbn', $data);
     $data->id = $bigbluebuttonbn_id;
 
-    bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draftitemid);
+    if( isset($data->presentation) ) {
+        $draftitemid = $data->presentation;
+        bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draftitemid);
+    }
 
     bigbluebuttonbn_process_post_save($data);
 
