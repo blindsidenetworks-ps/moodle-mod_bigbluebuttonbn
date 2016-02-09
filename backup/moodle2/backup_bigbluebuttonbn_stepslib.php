@@ -16,8 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod
- * @subpackage bigbluebuttonbn
+ * @package    mod_bigbluebuttonbn
+ * @subpackage backup-moodle2
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,25 +32,38 @@
 class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
-
-        // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
-            'course', 'name', 'intro', 'introformat', 'meetingid', 'moderatorpass', 'viewerpass', 'wait', 'record', 'tagging', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated', 'timemodified', 'presentation', 'participants'));
+                           'course', 'name', 'intro', 'introformat', 'meetingid',
+                           'moderatorpass', 'viewerpass', 'wait', 'record', 'tagging',
+                           'welcome', 'voicebridge', 'openingtime', 'closingtime',
+                           'timecreated', 'timemodified', 'presentation', 'participants',
+                           'userlimit'));
+
+        $logs = new backup_nested_element('logs');
+
+        $log = new backup_nested_element('log', array('id'), array(
+                'userid', 'timecreated', 'meetingid', 'log', 'meta'));
 
         // Build the tree
-        // (love this)
+        $bigbluebuttonbn->add_child($logs);
+            $logs->add_child($log);
 
         // Define sources
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
 
+        // User related logs only happen if we are including user info
+        if ($userinfo) {
+            $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid'=>backup::VAR_PARENTID));
+        }
+
         // Define id annotations
-        // (none)
+        $log->annotate_ids('user', 'userid');
 
         // Define file annotations
-        // (none)
+        $bigbluebuttonbn->annotate_files('mod_bigbluebuttonbn', 'intro', null); // bigbluebuttonbn_intro area don't use itemid
 
         // Return the root element (bigbluebuttonbn), wrapped into standard activity structure
         return $this->prepare_activity_structure($bigbluebuttonbn);

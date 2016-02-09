@@ -41,16 +41,15 @@ function bigbluebuttonbn_log(array $bbbsession, $event) {
 
     $log = new stdClass();
     
-    $log->meetingid = $bbbsession['meetingid'];
-    $log->courseid = $bbbsession['course']->id;
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
     $log->userid = $bbbsession['userID'];
+    $log->meetingid = $bbbsession['meetingid'];
     $log->timecreated = time();
-    $log->event = $event;
+    $log->log = $event;
     if( $event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE)
         $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
 
-    $returnid = $DB->insert_record('bigbluebuttonbn_log', $log);
+    $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log);
 }
 
  ////////////////////////////
