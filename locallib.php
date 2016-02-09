@@ -42,20 +42,19 @@ function bigbluebuttonbn_log(array $bbbsession, $event, array $overrides = [], $
     global $DB;
 
     $log = new stdClass();
-    
-    $log->event = $event;
-    $log->meetingid = isset($overrides['meetingid'])? $overrides['meetingid']: $bbbsession['meetingid'];
-    $log->courseid = isset($overrides['courseid'])? $overrides['courseid']: $bbbsession['course']->id;
+
     $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid'])? $overrides['bigbluebuttonbnid']: $bbbsession['bigbluebuttonbn']->id;
     $log->userid = isset($overrides['userid'])? $overrides['userid']: $bbbsession['userID'];
+    $log->meetingid = isset($overrides['meetingid'])? $overrides['meetingid']: $bbbsession['meetingid'];
     $log->timecreated = isset($overrides['timecreated'])? $overrides['timecreated']: time();
+    $log->log = $event;
     if ( isset($meta) ) {
         $log->meta = $meta;
     } else if( $event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
-            $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
+        $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
     }
 
-    $returnid = $DB->insert_record('bigbluebuttonbn_log', $log);
+    $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log);
 }
 
  ////////////////////////////
@@ -313,36 +312,34 @@ function bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $URL, $SALT ) {
     else { //If the server is unreachable, then prompts the user of the necessary action
         return null;
     }
-
 }
 
 function bigbluebuttonbn_isMeetingRunning( $meetingID, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
-    
-    if( $xml && $xml->returncode == 'SUCCESS' )
+    if ( $xml && $xml->returncode == 'SUCCESS' ) {
         return ( ( $xml->running == 'true' ) ? true : false);
-    else
+    } else {
         return ( false );
+    }
 }
 
 
 function bigbluebuttonbn_getServerVersion( $URL ){
-    $base_url_record = $URL."api";
-
-    $xml = bigbluebuttonbn_wrap_xml_load_file( $base_url_record );
-    if( $xml && $xml->returncode == 'SUCCESS' )
+    $xml = bigbluebuttonbn_wrap_xml_load_file( $URL."api" );
+    if ( $xml && $xml->returncode == 'SUCCESS' ) {
         return $xml->version;
-    else
+    } else {
         return NULL;
-
+    }
 }
 
 function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
-    if( $xml && $xml->returncode == 'SUCCESS')
+    if ( $xml && $xml->returncode == 'SUCCESS') {
         return ( str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML())));
-    else
+    } else {
         return 'false';
+    }
 }
 
 function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null) {
@@ -371,14 +368,15 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
             $response = $c->get($url);
         }
 
-        if($response) {
+        if ($response) {
             $previous = libxml_use_internal_errors(true);
             try {
                 $xml = new SimpleXMLElement($response, LIBXML_NOCDATA);
                 return $xml;
             } catch (Exception $e){
                 libxml_use_internal_errors($previous);
-                error_log("The XML response is not correct on wrap_simplexml_load_file: ".$e->getMessage());
+                error_log("The XML response is not correct on wrap_simplexml_load_file");
+                error_log($response);
                 return NULL;
             }
         } else {

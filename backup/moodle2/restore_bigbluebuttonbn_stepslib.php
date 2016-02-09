@@ -34,8 +34,13 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     protected function define_structure() {
 
         $paths = array();
-        $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
+        $userinfo = $this->get_setting_value('userinfo');
 
+        $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('bigbluebuttonbn_log', '/activity/bigbluebuttonbn/logs/log');
+        }
+        
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
@@ -47,13 +52,32 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+        
         // insert the bigbluebuttonbn record
         $newitemid = $DB->insert_record('bigbluebuttonbn', $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
+    protected function process_bigbluebuttonbn_log($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->meetingid = $data->meetingid;
+        $data->event = $data->event;
+        $data->meta = $data->meta;
+
+        $newitemid = $DB->insert_record('bigbluebuttonbn_logs', $data);
+        $this->set_mapping('bigbluebuttonbn_log', $oldid, $newitemid); // because of decode
+    }
+
     protected function after_execute() {
         // Add bigbluebuttonbn related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files('mod_bigbluebuttonbn', 'intro', null);
     }
 }
