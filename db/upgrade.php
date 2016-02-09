@@ -245,7 +245,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2015011300) {
+    if ($result && $oldversion < 2016011301) {
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
 
@@ -278,7 +278,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
             $dbman->rename_table($table, 'bigbluebuttonbn_logs', $continue=true, $feedback=true);
         }
 
-        upgrade_mod_savepoint(true, 2015011300, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2016011301, 'bigbluebuttonbn');
     }
 
     return $result;
