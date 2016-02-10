@@ -424,8 +424,6 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         /// Build the message_body
         $msg->action = $action;
         $msg->activity_type = "";
-        if( isset($bigbluebuttonbn->type) && $bigbluebuttonbn->type != 0 )
-            $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
         $msg->activity_title = $bigbluebuttonbn->name;
         $message_text = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>';
 

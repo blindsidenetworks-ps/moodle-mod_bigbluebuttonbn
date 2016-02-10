@@ -38,7 +38,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
 
         $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
         if ($userinfo) {
-            $paths[] = new restore_path_element('bigbluebuttonbn_log', '/activity/bigbluebuttonbn/logs/log');
+            $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
         }
         
         // Return the paths wrapped into standard activity structure
@@ -60,7 +60,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $this->apply_activity_instance($newitemid);
     }
 
-    protected function process_bigbluebuttonbn_log($data) {
+    protected function process_bigbluebuttonbn_logs($data) {
         global $DB;
 
         $data = (object)$data;
@@ -73,7 +73,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $data->meta = $data->meta;
 
         $newitemid = $DB->insert_record('bigbluebuttonbn_logs', $data);
-        $this->set_mapping('bigbluebuttonbn_log', $oldid, $newitemid); // because of decode
+        $this->set_mapping('bigbluebuttonbn_logs', $oldid, $newitemid); // because of decode
     }
 
     protected function after_execute() {

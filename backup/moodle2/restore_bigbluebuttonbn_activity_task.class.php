@@ -55,7 +55,7 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task {
         $contents = array();
 
         $contents[] = new restore_decode_content('bigbluebuttonbn', array('intro'), 'bigbluebuttonbn');
-        $contents[] = new restore_decode_content('bigbluebuttonbn_logs', array('log'), 'bigbluebuttonbn_log');
+        $contents[] = new restore_decode_content('bigbluebuttonbn_logs', array('log'), 'bigbluebuttonbn_logs');
         
         return $contents;
     }

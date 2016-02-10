@@ -206,7 +206,7 @@ if ( empty($error) ) {
                                     $recordings_imported[$key]->meta = json_encode($meta);
 
                                     // Proceed with the update
-                                    $DB->update_record("bigbluebuttonbn_log", $recordings_imported[$key]);
+                                    $DB->update_record("bigbluebuttonbn_logs", $recordings_imported[$key]);
                                 }
                             }
                             // Second: Execute the real unpublish
@@ -240,7 +240,7 @@ if ( empty($error) ) {
                             if( count($recordings_imported) > 0 ) {
                                 foreach ($recordings_imported as $key => $record) {
                                     // Execute delete
-                                    $DB->delete_records("bigbluebuttonbn_log", array('id' => $key));
+                                    $DB->delete_records("bigbluebuttonbn_logs", array('id' => $key));
                                 }
                             }
                             // Second: Execute the real delete
@@ -302,7 +302,7 @@ if ( empty($error) ) {
                             $importrecordings[$params['id']]['imported'] = true;
                             $overrides['meetingid'] = $importrecordings[$params['id']]['meetingID'];
                             $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
-                            bigbluebuttonbn_log($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
+                            bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
                             // Moodle event logger: Create an event for recording imported
                             if( isset($bigbluebuttonbn) ) {
                                 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);

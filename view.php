@@ -250,7 +250,6 @@ if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtim
         'action' => $bigbluebuttonbn_view,
         'meetingid' => $bbbsession['meetingid'],
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-        'bigbluebuttonbntype' => $bbbsession['bigbluebuttonbn']->type,
         'ping_interval' => ($waitformoderator_ping_interval > 0? $waitformoderator_ping_interval * 1000: 15000),
         'userlimit' => $bbbsession['userlimit'],
         'locales' => bigbluebuttonbn_get_locales_for_ui()
