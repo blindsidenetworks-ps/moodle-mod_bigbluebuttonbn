@@ -26,6 +26,9 @@ $string['config_server_url'] = 'BigBlueButton Server URL';
 $string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 $string['config_shared_secret'] = 'BigBlueButton Shared Secret';
 $string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_detect_mobile'] = 'Detect Mobile Clients';
+$string['config_detect_mobile_description'] = 'Try to detect if the conference is being accessed from a mobile device and redirect to mobile client';
+
 
 $string['config_feature_recording'] = 'Configuration for "Recording" feature';
 $string['config_feature_recording_description'] = 'These settings are feature specific';
@@ -301,3 +304,8 @@ $string['email_body_recording_ready_for'] = 'Recording for';
 $string['email_body_recording_ready_is_ready'] = 'is ready';
 $string['email_footer_sent_by'] = 'This automatic notification message was sent by';
 $string['email_footer_sent_from'] = 'from the course';
+
+$string['mobile_apps_view_title'] = 'Mobile Access';
+$string['mobile_apps_view_description'] = 'If the Bigbluebutton Mobile Client is not installed you can do it by clicking on the button below:';
+$string['mobile_apps_view_apple'] = 'Click here to download the Android client';
+$string['mobile_apps_view_google'] = 'Click here to download the Apple iOS (iPad, iPhone) client';

@@ -180,6 +180,12 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigblu
             $password = $bbbsession['viewerPW'];
         }
         $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $password, $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['userID']);
+
+        // Mobile detection
+        if ($bbbsession['detectmobile'] && $bbbsession['ismobilesession']) {
+          $join_url = preg_replace('/http[s]?:\/\//i', 'bigbluebutton://', $join_url);
+        }
+
         //// Moodle event logger: Create an event for meeting joined
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
         /// Internal logger: Instert a record with the meeting created
