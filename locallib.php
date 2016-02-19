@@ -1439,25 +1439,31 @@ function bigbluebuttonbn_getRecordedMeetings($courseID) {
 }
 
 function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
+    $recordings = array();
+
+    // Load the meetingIDs to be used in the getRecordings request 
     $meetingID = '';
-    $results = bigbluebuttonbn_getRecordedMeetings($courseID);
-    if( $results ) {
-        //Eliminates duplicates
-        $mIDs = array();
-        foreach ($results as $result) {
-            $mIDs[$result->meetingid] = $result->meetingid;
-        }
-        //Generates the meetingID string
-        foreach ($mIDs as $mID) {
-            if (strlen($meetingID) > 0) $meetingID .= ',';
-            $meetingID .= $mID;
+    if ( is_numeric($courseID) ) {
+        $results = bigbluebuttonbn_getRecordedMeetings($courseID);
+        if( $results ) {
+            //Eliminates duplicates
+            $mIDs = array();
+            foreach ($results as $result) {
+                $mIDs[$result->meetingid] = $result->meetingid;
+            }
+            //Generates the meetingID string
+            foreach ($mIDs as $mID) {
+                if (strlen($meetingID) > 0) $meetingID .= ',';
+                $meetingID .= $mID;
+            }
         }
     }
 
-    $recordings = array();
+    // If there were meetingIDs excecute the getRecordings request 
     if ( $meetingID != '' ) {
         $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT);
     }
+
     return $recordings;
 }
 
