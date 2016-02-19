@@ -1518,9 +1518,9 @@ function bigbluebuttonbn_getRecordingsImportedArray($bigbluebuttonbnID) {
 }
 
 function bigbluebuttonbn_getRecordingsImportedAllInstances($recordID) {
-    global $DB;
+    global $DB, $CFG;
 
-    $recordings_imported = $DB->get_records_sql('SELECT * FROM mdl_bigbluebuttonbn_logs WHERE log=? AND '.$DB->sql_like('meta', '?'), array( BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%'.$recordID.'%' ));
+    $recordings_imported = $DB->get_records_sql('SELECT * FROM '.$CFG->prefix.'bigbluebuttonbn_logs WHERE log=? AND '.$DB->sql_like('meta', '?'), array( BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%'.$recordID.'%' ));
     return $recordings_imported;
 }
 
@@ -1532,5 +1532,6 @@ function bigbluebuttonbn_getRecordingsImportedAllInstancesArray($recordID) {
 
 function bigbluebuttonbn_debugdisplay() {
     global $CFG;
+
     return (bool)$CFG->debugdisplay;
 }
