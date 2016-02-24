@@ -166,10 +166,11 @@ if ( empty($error) ) {
                         $status = true;
                         //Retrieve the array of imported recordings for the current course and activity
                         $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['bigbluebuttonbn']->id);
-                        $recordings_indexed = bigbluebuttonbn_index_recordings($recordings_imported);
-                        if( isset($recordings_indexed[$params['id']]) ) {
-                            $recordings = bigbluebuttonbn_getRecordingsArray($params['id'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
-                            $recording = current($recordings);
+                        $recordings_imported_indexed = bigbluebuttonbn_index_recordings($recordings_imported);
+                        if( isset($recordings_imported_indexed[$params['id']]) ) {
+                            $recordings = bigbluebuttonbn_getRecordingsArray($recordings_imported_indexed[$params['id']]['meetingID'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+                            $recordings_indexed = bigbluebuttonbn_index_recordings($recordings);
+                            $recording = $recordings_indexed[$params['id']];
                             if ( $recording['published'] === 'true' ) {
                                 // Only if the physical recording is published, execute publish on imported recording link
                                 $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);

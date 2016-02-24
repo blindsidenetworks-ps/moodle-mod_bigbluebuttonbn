@@ -1416,11 +1416,9 @@ function bigbluebuttonbn_getRecordedMeetings($courseID) {
             $select .= "bigbluebuttonbnid=".$bigbluebuttonbn->id;
         }
         $select .= ") AND log='Create'";
-        if ( bigbluebuttonbn_debugdisplay() ) error_log($select);
 
         //Execute select for loading records based on existent bigbluebuttonbns
         $records = $DB->get_records_select($table, $select);
-        if ( bigbluebuttonbn_debugdisplay() ) error_log(json_encode($records));
 
         //Remove duplicates
         $unique_records = array();
