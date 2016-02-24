@@ -94,7 +94,6 @@ $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
 // Additional info related to the course
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
-$bbbsession['course']->id = $course->id;
 $bbbsession['cm'] = $cm;
 $bbbsession['context'] = $context;
 
@@ -352,7 +351,8 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         // Get actual recordings
         $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
         // Get recording links
-        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['bigbluebuttonbn']->id);
+        error_log(json_encode($recordings_imported));
         // Merge the recordings
         $recordings = array_merge( $recordings, $recordings_imported );
         // Render the table
