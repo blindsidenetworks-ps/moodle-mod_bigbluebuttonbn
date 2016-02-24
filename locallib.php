@@ -1402,36 +1402,43 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
 function bigbluebuttonbn_getRecordedMeetings($courseID) {
     global $DB;
 
+    $records = Array();
+
     $bigbluebuttonbns = $DB->get_records('bigbluebuttonbn', array('course' => $courseID));
 
-    //Prepare select for loading records based on existent bigbluebuttonbns
-    $table = 'bigbluebuttonbn_logs';
-    $select = "";
-    foreach ($bigbluebuttonbns as $key => $bigbluebuttonbn) {
-        $select .= strlen($select) == 0? "": " OR ";
-        $select .= "bigbluebuttonbnid=".$bigbluebuttonbn->id;
-    }
-    $select .= strlen($select) == 0? "log='Create'": " AND log='Create'";
+    if ( !empty($bigbluebuttonbns) ) {
+        $table = 'bigbluebuttonbn_logs';
 
-    //Execute select for loading records based on existent bigbluebuttonbns
-    $records = $DB->get_records_select($table,$select);
-
-    //Remove duplicates
-    $unique_records = array();
-    foreach ($records as $key => $record) {
-        $record_key = $record->meetingid.','.$record->bigbluebuttonbnid.','.$record->meta;
-        if( array_search($record_key, $unique_records) === false ) {
-            array_push($unique_records, $record_key);
-        } else {
-            unset($records[$key]);
+        //Prepare select for loading records based on existent bigbluebuttonbns
+        $select = "";
+        foreach ($bigbluebuttonbns as $key => $bigbluebuttonbn) {
+            $select .= strlen($select) == 0? "(": " OR ";
+            $select .= "bigbluebuttonbnid=".$bigbluebuttonbn->id;
         }
-    }
+        $select .= ") AND log='Create'";
+        if ( bigbluebuttonbn_debugdisplay() ) error_log($select);
 
-    //Remove the ones with record=false
-    foreach ($records as $key => $record) {
-        $meta = json_decode($record->meta);
-        if ( !$meta || !$meta->record ) {
-            unset($records[$key]);
+        //Execute select for loading records based on existent bigbluebuttonbns
+        $records = $DB->get_records_select($table, $select);
+        if ( bigbluebuttonbn_debugdisplay() ) error_log(json_encode($records));
+
+        //Remove duplicates
+        $unique_records = array();
+        foreach ($records as $key => $record) {
+            $record_key = $record->meetingid.','.$record->bigbluebuttonbnid.','.$record->meta;
+            if( array_search($record_key, $unique_records) === false ) {
+                array_push($unique_records, $record_key);
+            } else {
+                unset($records[$key]);
+            }
+        }
+
+        //Remove the ones with record=false
+        foreach ($records as $key => $record) {
+            $meta = json_decode($record->meta);
+            if ( !$meta || !$meta->record ) {
+                unset($records[$key]);
+            }
         }
     }
 
