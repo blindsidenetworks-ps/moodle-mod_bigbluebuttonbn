@@ -270,6 +270,7 @@ $string['view_recording_link_warning'] = 'This is a link pointing to a recording
 $string['view_recording_delete_confirmation'] = 'Are you sure to delete this {$a}?';
 $string['view_recording_delete_confirmation_warning_s'] = 'This recording has {$a} link associated that was imported in a different course or activity. If the recording is deleted that link will also be removed';
 $string['view_recording_delete_confirmation_warning_p'] = 'This recording has {$a} links associated that were imported in different courses or activities. If the recording is deleted those links will also be removed';
+$string['view_recording_publish_link_error'] = 'This link can not be re-published because the physical recording is unpublished';
 $string['view_recording_unpublish_confirmation'] = 'Are you sure to unpublish this {$a}?';
 $string['view_recording_unpublish_confirmation_warning_s'] = 'This recording has {$a} link associated that was imported in a different course or activity. If the recording is unpublished that link will also be unpublished';
 $string['view_recording_unpublish_confirmation_warning_p'] = 'This recording has {$a} links associated that were imported in different courses or activities. If the recording is unpublished those links will also be unpublished';
