@@ -1600,3 +1600,13 @@ function bigbluebuttonbn_debugdisplay() {
 
     return (bool)$CFG->debugdisplay;
 }
+
+function bigbluebuttonbn_html2text($html, $len) {
+    $text = strip_tags($html);
+    $text = str_replace("&nbsp;", ' ', $text);
+    if( strlen($text) > $len )
+        $text = substr($text, 0, $len)."...";
+    else
+        $text = substr($text, 0, $len);
+    return $text;
+}
