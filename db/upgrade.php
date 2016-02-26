@@ -245,7 +245,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2016011302) {
+    if ( $result && $oldversion < 2016011305 ) {
         // Update the bigbluebuttonbn table
         $table = new xmldb_table('bigbluebuttonbn');
 
@@ -266,13 +266,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         // Update the bigbluebuttonbn_logs table
         $table = new xmldb_table('bigbluebuttonbn_logs');
 
-        // Define field 'courseid' to be droped from bigbluebuttonbn_logs
-        $field = new xmldb_field('courseid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        if ( $dbman->field_exists($table, $field) ) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-
         // Define field 'event' to be renamed
         $field = new xmldb_field('event');
         $field->set_attributes(XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
@@ -280,7 +273,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
             $dbman->rename_field($table, $field, 'log', $continue=true, $feedback=true);
         }
 
-        upgrade_mod_savepoint(true, 2016011302, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
     return $result;

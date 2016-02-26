@@ -43,6 +43,11 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled = 0;
  * Remove this block when restored
  */
 
+const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = "Create";
+const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = "Join";
+const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";
+const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = "Import";
+const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = "Delete";
 
 function bigbluebuttonbn_supports($feature) {
     switch($feature) {
@@ -126,7 +131,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
  * @return boolean Success/Failure
  */
 function bigbluebuttonbn_delete_instance($id) {
-    global $CFG, $DB;
+    global $CFG, $DB, $USER;
 
     if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
@@ -137,12 +142,12 @@ function bigbluebuttonbn_delete_instance($id) {
     //
     // End the session associated with this instance (if it's running)
     //
-    $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
-    
-    $modPW = $bigbluebuttonbn->moderatorpass;
-    $url = bigbluebuttonbn_get_cfg_server_url();
-    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
-
+    //$meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    //
+    //$modPW = $bigbluebuttonbn->moderatorpass;
+    //$url = bigbluebuttonbn_get_cfg_server_url();
+    //$shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
+    //
     //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret) )
     //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
 
@@ -151,6 +156,34 @@ function bigbluebuttonbn_delete_instance($id) {
     }
 
     if (! $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id))) {
+        $result = false;
+    }
+
+    $log = new stdClass();
+
+    $log->meetingid = $bigbluebuttonbn->meetingid;
+    $log->courseid = $bigbluebuttonbn->course;
+    $log->bigbluebuttonbnid = $bigbluebuttonbn->id;
+    $log->userid = $USER->id;
+    $log->timecreated = time();
+    $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
+
+    $logs = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
+    error_log(json_encode($logs));
+    $has_recordings = 'false';
+    if (! empty($logs) ) {
+        error_log("IS not empty");
+        foreach ( $logs as $l ) {
+            error_log(json_encode($l));
+            $meta = json_decode($l->meta);
+            if ( $meta->record ) {
+                $has_recordings = 'true';
+            }
+        }
+    }
+    $log->meta = "{\"has_recordings\":{$has_recordings}}";
+
+    if (! $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log)) {
         $result = false;
     }
 

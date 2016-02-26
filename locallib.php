@@ -33,16 +33,12 @@ const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
 const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
 const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
 
-const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = "Create";
-const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = "Join";
-const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";
-const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = "Import";
-
 function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = NULL ) {
     global $DB;
 
     $log = new stdClass();
 
+    $log->courseid = isset($overrides['courseid'])? $overrides['courseid']: $bbbsession['course']->id;
     $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid'])? $overrides['bigbluebuttonbnid']: $bbbsession['bigbluebuttonbn']->id;
     $log->userid = isset($overrides['userid'])? $overrides['userid']: $bbbsession['userID'];
     $log->meetingid = isset($overrides['meetingid'])? $overrides['meetingid']: $bbbsession['meetingid'];
@@ -1399,6 +1395,64 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     return $courses_for_select;
 }
 
+function bigbluebuttonbn_getRecordedMeetings_old($courseID) {
+    global $DB;
+
+    $records = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
+
+    //Remove duplicates
+    $unique_records = array();
+    foreach ($records as $key => $record) {
+        if (array_key_exists($record->meetingid, $unique_records) ) {
+            unset($records[$key]);
+        } else {
+            $meta = json_decode($record->meta);
+            if ( !$meta->record ) {
+                unset($records[$key]);
+            } else {
+                array_push($unique_records, $record->meetingid);
+            }
+        }
+    }
+
+    return $records;
+}
+
+function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID) {
+    global $DB;
+
+    $records_deleted = array();
+
+    $bigbluebuttonbns_deleted = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_DELETE));
+
+    foreach ($bigbluebuttonbns_deleted as $key => $bigbluebuttonbn_deleted) {
+        $records = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
+
+        if( !empty($records) ) {
+            //Remove duplicates
+            $unique_records = array();
+            foreach ($records as $key => $record) {
+                if (array_key_exists($record->meetingid, $unique_records) ) {
+                    unset($records[$key]);
+                } else {
+                    $meta = json_decode($record->meta);
+                    if ( !$meta->record ) {
+                        unset($records[$key]);
+                    } else if ( $bigbluebuttonbn_deleted->meetingid != substr($record->meetingid, 0, strlen($bigbluebuttonbn_deleted->meetingid))) {
+                        unset($records[$key]);
+                    } else {
+                        array_push($unique_records, $record->meetingid);
+                    }
+                }
+            }
+
+            $records_deleted = array_merge($records_deleted, $records);
+        }
+    }
+
+    return $records_deleted;
+}
+
 function bigbluebuttonbn_getRecordedMeetings($courseID) {
     global $DB;
 
@@ -1415,7 +1469,7 @@ function bigbluebuttonbn_getRecordedMeetings($courseID) {
             $select .= strlen($select) == 0? "(": " OR ";
             $select .= "bigbluebuttonbnid=".$bigbluebuttonbn->id;
         }
-        $select .= ") AND log='Create'";
+        $select .= ") AND log='".BIGBLUEBUTTONBN_LOG_EVENT_CREATE."'";
 
         //Execute select for loading records based on existent bigbluebuttonbns
         $records = $DB->get_records_select($table, $select);
