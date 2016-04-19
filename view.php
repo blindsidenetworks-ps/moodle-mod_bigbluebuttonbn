@@ -11,6 +11,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(__FILE__).'/mobile_detect.php');
 
 $id = required_param('id', PARAM_INT);              // Course Module ID, or
 $b  = optional_param('n', 0, PARAM_INT);            // bigbluebuttonbn instance ID
@@ -111,6 +112,11 @@ $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
 $bbbsession['contextActivityName'] = "";
 $bbbsession['contextActivityDescription'] = "";
 $bbbsession['contextActivityTags'] = "";
+
+// Mobile Detection
+$bbbsession['detectmobile'] = $CFG->bigbluebuttonbn_detect_mobile;
+$bbbsession['ismobilesession'] = bigbluebutton_is_device_for_mobile_client();
+
 ////////////////////////////////////////////////
 /////   BigBlueButton Session Setup Ends   /////
 ////////////////////////////////////////////////
@@ -308,6 +314,14 @@ function bigbluebuttonbn_view_joining($bbbsession){
     echo '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>';
     echo $OUTPUT->box_end();
 
+    // Show mobile client options if mobile is detected
+    if ($bbbsession['ismobilesession'])
+    {
+        echo $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
+        include 'mobile_apps_view.php';
+        echo $OUTPUT->box_end();
+    }
+
     bigbluebuttonbn_view_recordings($bbbsession);
 }
 
@@ -364,4 +378,9 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
             print_string('view_message_norecordings', 'bigbluebuttonbn');
         }
     }
+}
+
+function bigbluebutton_is_device_for_mobile_client(){
+  $detect = new Mobile_Detect;
+  return $detect->isAndroidOS() || $detect->isiOS();
 }
