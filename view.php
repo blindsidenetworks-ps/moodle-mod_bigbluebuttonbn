@@ -52,7 +52,7 @@ $bbbsession['bigbluebuttonbnid'] = $bigbluebuttonbn->id;
 $bbbsession['bigbluebuttonbntype'] = $bigbluebuttonbn->type;
 
 // User data
-$bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
+$bbbsession['username'] = fullname($USER);
 $bbbsession['userID'] = $USER->id;
 $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 
