@@ -39,8 +39,9 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->blocks->show_only_fake_blocks();
 
+require_login($course, true, $cm);
+
 if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    require_login($course, true, $cm);
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 switch (strtolower($action)) {
@@ -138,7 +139,7 @@ switch (strtolower($action)) {
                         /// Moodle event logger: Create an event for meeting created
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
                         /// Internal logger: Instert a record with the meeting created
-                        bigbluebuttonbn_log($bbbsession, 'Create');
+                        bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
                         /// Since the meeting is already running, we just join the session
                         bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn);
                     }
@@ -184,7 +185,7 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigblu
         //// Moodle event logger: Create an event for meeting joined
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
         /// Internal logger: Instert a record with the meeting created
-        bigbluebuttonbn_log($bbbsession, 'Join');
+        bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_JOIN);
         //// Before executing the redirect, increment the number of participants
         bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']) );
         //// Execute the redirect

@@ -17,7 +17,6 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
-
         global $CFG, $DB, $USER, $BIGBLUEBUTTONBN_CFG;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
@@ -85,33 +84,31 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         if ( $voicebridge_editable ) {
             $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
-            $mform->setType('voicebridge', PARAM_INT);
             $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'), 'numeric', '####', 'server');
             $mform->setDefault( 'voicebridge', 0 );
             $mform->addHelpButton('voicebridge', 'mod_form_field_voicebridge', 'bigbluebuttonbn');
             $mform->setAdvanced('voicebridge');
         }
+        $mform->setType('voicebridge', PARAM_INT);
 
         if ( $waitformoderator_editable ) {
             $mform->addElement('checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn'));
             $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
-            $mform->setType('wait', PARAM_INT);
             $mform->setDefault( 'wait', $waitformoderator_default );
             $mform->setAdvanced('wait');
         } else {
             $mform->addElement('hidden', 'wait', $waitformoderator_default );
-            $mform->setType('wait', PARAM_INT);
         }
+        $mform->setType('wait', PARAM_INT);
 
         if ( $userlimit_editable ) {
             $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit','bigbluebuttonbn'), 'maxlength="3" size="5"' );
             $mform->addHelpButton('userlimit', 'mod_form_field_userlimit', 'bigbluebuttonbn');
             $mform->setDefault( 'userlimit', $userlimit_default );
-            $mform->setType('userlimit', PARAM_TEXT);
         } else {
             $mform->addElement('hidden', 'userlimit', $userlimit_default );
-            $mform->setType('userlimit', PARAM_INT);
         }
+        $mform->setType('userlimit', PARAM_TEXT);
 
         if ( floatval($serverVersion) >= 0.8 ) {
             if ( $recording_editable ) {
@@ -142,6 +139,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
             $mform->setDefault('notification', 0);
         }
+        $mform->setType('notification', PARAM_INT);
         //-------------------------------------------------------------------------------
         // First block ends here
         //-------------------------------------------------------------------------------
@@ -293,14 +291,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     function data_preprocessing(&$default_values) {
         if ($this->current->instance) {
             // Editing existing instance - copy existing files into draft area.
-            $draftitemid = file_get_submitted_draft_itemid('presentation');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
-            $default_values['presentation'] = $draftitemid;
+            try {
+                $draftitemid = file_get_submitted_draft_itemid('presentation');
+                file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
+                $default_values['presentation'] = $draftitemid;
+            } catch (Exception $e){
+                error_log("Presentation could not be loaded: ".$e->getMessage());
+                return NULL;
+            }
         }
     }
 
     function validation($data, $files) {
-
         $errors = parent::validation($data, $files);
 
         if ( isset($data['openingtime']) && isset($data['closingtime']) ) {
