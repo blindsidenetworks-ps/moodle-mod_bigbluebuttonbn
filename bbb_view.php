@@ -106,6 +106,7 @@ switch (strtolower($action)) {
                             $bbbsession['record']? 'true': 'false',
                             $durationtime,
                             $bbbsession['voicebridge'],
+                            $bbbsession['userlimit'],
                             $metadata,
                             $bbbsession['presentation']['name'],
                             $bbbsession['presentation']['url']

@@ -1,7 +1,7 @@
 <?php
 /**
  * Internal library of functions for module BigBlueButtonBN.
- * 
+ *
  * @package   mod
  * @subpackage bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
@@ -40,7 +40,7 @@ function bigbluebuttonbn_log(array $bbbsession, $event) {
     global $DB;
 
     $log = new stdClass();
-    
+
     $log->meetingid = $bbbsession['meetingid'];
     $log->courseid = $bbbsession['course']->id;
     $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbnid'];
@@ -62,7 +62,7 @@ function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL ) {
     return ($url_join.$params.'&checksum='.sha1("join".$params.$SALT) );
 }
 
-function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $maxParticipants=0, $metadata=array() ) {
     $url_create = $URL."api/create?";
 
     $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&logoutURL='.urlencode($logoutURL).'&record='.$record;
@@ -74,6 +74,10 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
     $duration = intval($duration);
     if( $duration > 0 )
         $params .= '&duration='.$duration;
+
+    $maxParticipants = intval($maxParticipants);
+    if( $maxParticipants > 0 )
+        $params .= '&maxParticipants='.$maxParticipants;
 
     if( trim( $welcome ) )
         $params .= '&welcome='.urlencode($welcome);
@@ -137,21 +141,23 @@ function bigbluebuttonbn_getCapabilitiesURL($URL, $SALT) {
     return ( $base_url.$params.'&checksum='.sha1("getCapabilities".$params.$SALT));
 }
 
-function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
+function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $maxParticipants=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
+    $create_meeting_url = bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $maxParticipants, $metadata);
     if( !is_null($presentation_name) && !is_null($presentation_url) ) {
-        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata),
+        $xml = bigbluebuttonbn_wrap_xml_load_file( $create_meeting_url,
                 BIGBLUEBUTTONBN_METHOD_POST,
                 "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".$presentation_url."' /></module></modules>"
                 );
     } else {
-        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata) );
+        $xml = bigbluebuttonbn_wrap_xml_load_file( $create_meeting_url );
     }
 
-    if( $xml ) {
-        if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
-        else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
-    }
-    else {
+    if ( $xml ) {
+        if ($xml->meetingID)
+          return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
+        else
+          return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
+    } else {
         return null;
     }
 }
@@ -345,6 +351,7 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
 }
 
 function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null) {
+    error_log("Request to: ".$url);
     if (extension_loaded('curl')) {
         $c = new curl();
         $c->setopt( Array( "SSL_VERIFYPEER" => true));
@@ -377,8 +384,8 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
                 return $xml;
             } catch (Exception $e){
                 libxml_use_internal_errors($previous);
-                error_log("The XML response is not correct on wrap_simplexml_load_file");
-                error_log($response);
+                $error = 'Caught exception: '.$e->getMessage();
+                error_log($error);
                 return NULL;
             }
         } else {
@@ -635,7 +642,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
                 //Create the nonce component for granting a temporary public access
                 $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
                 $presentation_nonce_key = sha1($id);
-                $presentation_nonce_value = bigbluebuttonbn_generate_nonce(); 
+                $presentation_nonce_value = bigbluebuttonbn_generate_nonce();
                 $cache->set($presentation_nonce_key, array( "value" => $presentation_nonce_value, "counter" => 0 ));
 
                 //The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather the file
@@ -772,7 +779,7 @@ function bigbluebuttonbn_bbb_broker_get_recordings($meetingid, $password, $force
     $endpoint = bigbluebuttonbn_get_cfg_server_url();
     $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
     $cache_ttl = bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl();
-    
+
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
 }
 
@@ -1096,7 +1103,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
         $msg->activity_type = bigbluebuttonbn_get_predefinedprofile_name($bigbluebuttonbn->type);
     $msg->activity_title = $bigbluebuttonbn->name;
     $message_text = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-    
+
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }
 
@@ -1178,7 +1185,7 @@ function bigbluebuttonbn_get_cfg_shared_secret_default() {
 
 function bigbluebuttonbn_get_cfg_voicebridge_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable: (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false));    
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable: (isset($CFG->bigbluebuttonbn_voicebridge_editable)? $CFG->bigbluebuttonbn_voicebridge_editable: false));
 }
 
 function bigbluebuttonbn_get_cfg_recording_default() {
