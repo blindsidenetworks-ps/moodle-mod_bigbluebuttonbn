@@ -56,9 +56,9 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
  ////////////////////////////
 //  BigBlueButton API Calls  //
  ////////////////////////////
-function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL ) {
+function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL, $logoutURL ) {
     $url_join = $URL."api/join?";
-    $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW);
+    $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
     $url = $url_join.$params.'&checksum='.sha1("join".$params.$SALT);
     return $url;
 }

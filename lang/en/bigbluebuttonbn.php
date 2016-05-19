@@ -188,6 +188,7 @@ $string['view_error_no_group'] = 'There are no groups configured yet. Please set
 $string['view_error_unable_join_student'] = 'Unable to connect to the BigBlueButton server. Please contact your Teacher or the Administrator.';
 $string['view_error_unable_join_teacher'] = 'Unable to connect to the BigBlueButton server. Please contact the Administrator.';
 $string['view_error_unable_join'] = 'Unable to join the meeting. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['view_error_bigbluebutton'] = 'BigBlueButton responded with errors. {$a}';
 $string['view_error_create'] = 'The BigBlueButton server responded with an error message, the meeting could not be created.';
 $string['view_error_max_concurrent'] = 'Number of concurrent meetings allowed has been reached.';
 $string['view_error_userlimit_reached'] = 'The number of users allowed in a meeting has been reached.';
