@@ -936,7 +936,7 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     return $error;
 }
 
-function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=[]) {
+function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=["publishing", "deleting"]) {
     global $OUTPUT, $CFG, $USER;
 
     $row = null;
@@ -1106,13 +1106,13 @@ function bigbluebuttonbn_get_recording_columns($bbbsession, $recordings) {
     return $recordingsbn_columns;
 }
 
-function bigbluebuttonbn_get_recording_data($bbbsession, $recordings) {
+function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools=["publishing", "deleting"]) {
     $table_data = array();
 
     ///Build table content
     if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
         foreach ( $recordings as $recording ) {
-            $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording);
+            $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
             if( $row != null ) {
                 array_push($table_data, $row);
             }

@@ -242,8 +242,8 @@ if ( empty($error) ) {
                         echo "{$params['callback']}({$callback_response_data});";
                         
                     } else {
-                        error_log("ERROR: User not authorized to execute end command");
-                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
+                        error_log("ERROR: User not authorized to execute unpublish command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute unpublish command");
                     }
                     break;
                 case 'recording_delete':
@@ -279,8 +279,8 @@ if ( empty($error) ) {
                         echo "{$params['callback']}({$callback_response_data});";
                         
                     } else {
-                        error_log("ERROR: User not authorized to execute end command");
-                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
+                        error_log("ERROR: User not authorized to execute delete command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute delete command");
                     }
                     break;
                 case 'recording_ready':

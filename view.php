@@ -350,7 +350,6 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
         // Get recording links
         $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['bigbluebuttonbn']->id);
-        error_log(json_encode($recordings_imported));
         // Merge the recordings
         $recordings = array_merge( $recordings, $recordings_imported );
         // Render the table

@@ -36,11 +36,11 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
             headerContent: bigbluebuttonbn.locales.modal_title,
             width        : 250,
             zIndex       : 5,
-	        centered     : true,
-	        modal        : true,
-	        visible      : false,
-	        render       : true,
-	        plugins      : [Y.Plugin.Drag]
+            centered     : true,
+            modal        : true,
+            visible      : false,
+            render       : true,
+            plugins      : [Y.Plugin.Drag]
         });
 
         // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
