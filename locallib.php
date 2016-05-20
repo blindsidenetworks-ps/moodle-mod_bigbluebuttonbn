@@ -1545,7 +1545,7 @@ function bigbluebuttonbn_import_get_recordings_imported($records) {
 }
 
 function bigbluebuttonbn_import_exlcude_recordings_already_imported($courseID, $bigbluebuttonbnID, $recordings) {
-    $recordings_already_imported = bigbluebuttonbn_getRecordingsImportedArray($bigbluebuttonbnID);
+    $recordings_already_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID);
     $recordings_already_imported_indexed = bigbluebuttonbn_index_recordings($recordings_already_imported);
 
     foreach ($recordings as $key => $recording) {
@@ -1576,15 +1576,21 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=[
     return $output;
 }
 
-function bigbluebuttonbn_getRecordingsImported($bigbluebuttonbnID) {
+function bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID) {
     global $DB;
 
-    $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbnID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+    if ( $bigbluebuttonbnID != NULL ) {
+        // Fetch only those related to the $courseID and $bigbluebuttonbnID requested
+        $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+    } else {
+      // Fetch all the ones corresponding to the $courseID requested
+      $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+    }
     return $recordings_imported;
 }
 
-function bigbluebuttonbn_getRecordingsImportedArray($bigbluebuttonbnID) {
-    $recordings_imported = bigbluebuttonbn_getRecordingsImported($bigbluebuttonbnID);
+function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID) {
+    $recordings_imported = bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID);
     $recordings_imported_array = bigbluebuttonbn_import_get_recordings_imported($recordings_imported);
     return $recordings_imported_array;
 }
