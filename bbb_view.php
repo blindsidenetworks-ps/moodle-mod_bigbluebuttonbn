@@ -207,7 +207,7 @@ function bigbluebutton_bbb_view_errors($sErrors, $id) {
     $errors = (array) json_decode(urldecode($sErrors));
     $msgErrors = "";
     foreach ($errors as $error) {
-        $msgErrors .= html_writer::tag('p', $error->{"message"}) . "\n";
+        $msgErrors .= html_writer::tag('p', $error->{"message"}, array('class' => 'alert alert-danger')) . "\n";
     }
 
     echo $OUTPUT->header();
