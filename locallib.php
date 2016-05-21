@@ -968,10 +968,17 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         }
 
         //Set recording_types
-        if ($recording['published'] == 'true') {
-            $recording_types = '<div id="playbacks-'.$recording['recordID'].'">';
+        if ( isset($recording['imported']) ) {
+            $attributes = 'data-imported="true" title='.get_string('view_recording_link_warning', 'bigbluebuttonbn');
         } else {
-            $recording_types = '<div id="playbacks-'.$recording['recordID'].'" hidden>';
+            $attributes = 'data-imported="false"';
+        }
+
+        $recording_types = '';
+        if ($recording['published'] == 'true') {
+            $recording_types .= '<div id="playbacks-'.$recording['recordID'].'" '.$attributes.'>';
+        } else {
+            $recording_types .= '<div id="playbacks-'.$recording['recordID'].'" '.$attributes.'" hidden>';
         }
         foreach ( $recording['playbacks'] as $playback ) {
             $recording_types .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'), 'target' => '_new') ).'&#32;';

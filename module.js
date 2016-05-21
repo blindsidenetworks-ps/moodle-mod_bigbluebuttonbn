@@ -357,7 +357,7 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
 
     var confirmation = '';
     var confirmation_warning = '';
-    var is_imported_link = Y.one('#recording-td-' + recordingid).get('dataset').imported;
+    var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported;
 
     if( action == 'unpublish' ) {
         //if it has associated links imported in a different course/activity, show a confirmation dialog
