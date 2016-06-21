@@ -1409,29 +1409,6 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     return $courses_for_select;
 }
 
-function bigbluebuttonbn_getRecordedMeetings_old($courseID) {
-    global $DB;
-
-    $records = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
-
-    //Remove duplicates
-    $unique_records = array();
-    foreach ($records as $key => $record) {
-        if (array_key_exists($record->meetingid, $unique_records) ) {
-            unset($records[$key]);
-        } else {
-            $meta = json_decode($record->meta);
-            if ( !$meta->record ) {
-                unset($records[$key]);
-            } else {
-                array_push($unique_records, $record->meetingid);
-            }
-        }
-    }
-
-    return $records;
-}
-
 function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID) {
     global $DB;
 
