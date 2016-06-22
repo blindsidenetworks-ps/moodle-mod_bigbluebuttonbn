@@ -23,15 +23,15 @@ const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
 const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
-const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
-const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
-const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
 const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
-const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
-const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
+const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
+const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
+const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
+const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
 const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
 const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
-const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
+const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 
 function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = NULL ) {
     global $DB;
