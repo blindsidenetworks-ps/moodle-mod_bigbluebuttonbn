@@ -65,12 +65,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
 
         $data = (object)$data;
         $oldid = $data->id;
+        // Apply modifications
         $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timecreated = $this->apply_date_offset($data->timecreated);
-        $data->meetingid = $data->meetingid;
-        $data->event = $data->event;
-        $data->meta = $data->meta;
 
         $newitemid = $DB->insert_record('bigbluebuttonbn_logs', $data);
         $this->set_mapping('bigbluebuttonbn_logs', $oldid, $newitemid); // because of decode

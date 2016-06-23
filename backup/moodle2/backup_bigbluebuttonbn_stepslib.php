@@ -45,7 +45,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         $logs = new backup_nested_element('logs');
 
         $log = new backup_nested_element('log', array('id'), array(
-                'userid', 'timecreated', 'meetingid', 'log', 'meta'));
+                'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta'));
 
         // Build the tree
         $bigbluebuttonbn->add_child($logs);
