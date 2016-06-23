@@ -177,8 +177,8 @@ echo $OUTPUT->header();
 /// find out current groups mode
 $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
 if ($groupmode == NOGROUPS ) {  //No groups mode
-    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id;
-    $bbbsession['meetingname'] = $bigbluebuttonbn->name;
+    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
 
 } else {                                        // Separate or visible groups mode
     echo $OUTPUT->box_start('generalbox boxaligncenter');
@@ -202,12 +202,12 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
         groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
     }
 
-    $bbbsession['meetingid'] = $bigbluebuttonbn->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
+    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
     if( $bbbsession['group'] > 0 )
         $group_name = groups_get_group_name($bbbsession['group']);
     else
         $group_name = get_string('allparticipants');
-    $bbbsession['meetingname'] = $bigbluebuttonbn->name.' ('.$group_name.')';
+    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$group_name.')';
 }
 // Metadata (context)
 $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
@@ -346,8 +346,34 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
     if( isset($bbbsession['record']) && $bbbsession['record'] ) {
         $output = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn') );
 
+        $meetingID='';
+        $results = bigbluebuttonbn_getRecordedMeetings($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+
+        //if( $recordingsbn->include_deleted_activities ) {
+        //    $results_deleted = bigbluebuttonbn_getRecordedMeetingsDeleted($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+        //    $results = array_merge($results, $results_deleted);
+        //}
+
+        if( $results ){
+            //Eliminates duplicates
+            $mIDs = array();
+            foreach ($results as $result) {
+                $mIDs[$result->meetingid] = $result->meetingid;
+            }
+            //Generates the meetingID string
+            foreach ($mIDs as $mID) {
+                if (strlen($meetingID) > 0) $meetingID .= ',';
+                $meetingID .= $mID;
+            }
+        }
+
         // Get actual recordings
-        $recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        //$recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        if ( $meetingID != '' ) {
+            $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $bbbsession['endpoint'], $bbbsession['shared_secret']);
+        } else {
+            $recordings = Array();
+        }
         // Get recording links
         $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
         // Merge the recordings

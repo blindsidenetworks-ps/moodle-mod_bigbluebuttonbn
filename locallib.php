@@ -1409,12 +1409,17 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     return $courses_for_select;
 }
 
-function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID) {
+function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID, $bigbluebuttonbnID=NULL) {
     global $DB;
 
     $records_deleted = array();
 
-    $bigbluebuttonbns_deleted = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_DELETE));
+    $filter = array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_DELETE );
+    if ( $bigbluebuttonbnID != NULL ) {
+        $filter['id'] = $bigbluebuttonbnID;
+    }
+
+    $bigbluebuttonbns_deleted = $DB->get_records('bigbluebuttonbn_logs', $filter);
 
     foreach ($bigbluebuttonbns_deleted as $key => $bigbluebuttonbn_deleted) {
         $records = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
@@ -1444,12 +1449,16 @@ function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID) {
     return $records_deleted;
 }
 
-function bigbluebuttonbn_getRecordedMeetings($courseID) {
+function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID=NULL) {
     global $DB;
 
     $records = Array();
 
-    $bigbluebuttonbns = $DB->get_records('bigbluebuttonbn', array('course' => $courseID));
+    $filter = array('course' => $courseID);
+    if ( $bigbluebuttonbnID != NULL ) {
+        $filter['id'] = $bigbluebuttonbnID;
+    }
+    $bigbluebuttonbns = $DB->get_records('bigbluebuttonbn', $filter);
 
     if ( !empty($bigbluebuttonbns) ) {
         $table = 'bigbluebuttonbn_logs';
