@@ -38,8 +38,8 @@ class bigbluebuttonbn_meeting_ended extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "A bigbluebutton meeting for the bigbluebuttonbn activity with id '$this->contextinstanceid' for " .
-        "the course id '$this->objectid' has been forcibly ended by the user with id '$this->userid'.";
+        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
+        return get_string('event_meeting_ended_description', 'bigbluebuttonbn', $a);
     }
 
     /**

@@ -39,8 +39,8 @@ class bigbluebuttonbn_recording_published extends \core\event\base {
      */
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
-        return "The user with id '$this->userid' has published a recording with id '$rid' for " .
-        "the course id '$this->contextinstanceid'.";
+        $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
+        return get_string('event_recording_published_description', 'bigbluebuttonbn', $a);
     }
 
     /**

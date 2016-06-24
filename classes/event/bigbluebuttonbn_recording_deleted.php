@@ -39,8 +39,8 @@ class bigbluebuttonbn_recording_deleted extends \core\event\base {
      */
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
-        return "The user with id '$this->userid' has deleted a recording with id '$rid' for " .
-        "the course id '$this->contextinstanceid'.";
+        $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
+        return get_string('event_recording_deleted_description', 'bigbluebuttonbn', $a);
     }
 
     /**
