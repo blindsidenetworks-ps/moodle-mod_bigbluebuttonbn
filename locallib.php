@@ -1564,20 +1564,20 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=[
     return $output;
 }
 
-function bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID) {
+function bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID=NULL) {
     global $DB;
 
     if ( $bigbluebuttonbnID != NULL ) {
         // Fetch only those related to the $courseID and $bigbluebuttonbnID requested
         $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
     } else {
-      // Fetch all the ones corresponding to the $courseID requested
-      $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+        // Fetch all the ones corresponding to the $courseID requested
+        $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
     }
     return $recordings_imported;
 }
 
-function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID) {
+function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID=NULL) {
     $recordings_imported = bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID);
     $recordings_imported_array = bigbluebuttonbn_import_get_recordings_imported($recordings_imported);
     return $recordings_imported_array;
