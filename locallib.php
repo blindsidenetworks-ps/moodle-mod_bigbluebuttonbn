@@ -221,7 +221,7 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
         foreach ( $xml->recordings->recording as $recording ) {
             $playbackArray = array();
             foreach ( $recording->playback->format as $format ) {
-                $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
+                $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url, 'length' => (string) $format->length );
             }
 
             //Add the metadata to the recordings array
@@ -943,13 +943,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
 
     if ( $bbbsession['managerecordings'] || $recording['published'] == 'true' ) {
         $length = 0;
-        $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
-        $endTime = $endTime - ($endTime % 1000);
-        $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
-        $startTime = $startTime - ($startTime % 1000);
-        $duration = intval(($endTime - $startTime) / 60000);
+        $duration = intval(array_values($recording['playbacks'])[0]['length']);
 
-        //$meta_course = isset($recording['meta_context'])?str_replace('"', '\"', $recording['meta_context']):'';
         //For backward compatibility
         if( isset($recording['meta_contextactivity']) ) {
             $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
