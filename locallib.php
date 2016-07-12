@@ -943,6 +943,10 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
 
     if ( $bbbsession['managerecordings'] || $recording['published'] == 'true' ) {
         $length = 0;
+        $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
+        $startTime = $startTime - ($startTime % 1000);
+        $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
+        $endTime = $endTime - ($endTime % 1000);
         $duration = intval(array_values($recording['playbacks'])[0]['length']);
 
         //For backward compatibility
