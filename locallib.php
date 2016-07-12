@@ -996,7 +996,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                 $tag_tail = ' '.get_string('view_recording_link', 'bigbluebuttonbn');
                 $head = '<i>';
                 $tail = '</i>';
-
             } else {
                 $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedAllInstancesArray($recording['recordID']);
                 $recordings_imported_count = count($recordings_imported_array);
@@ -1005,7 +1004,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
 
             $url = '#';
             $action = null;
-
 
             if (in_array("publishing", $tools)) {
                 ///Set action [show|hide]
@@ -1024,7 +1022,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag).$tag_tail, 'moodle', $icon_attributes);
                     $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
-
                 } else {
                     //With text for publish/unpublish
                     $link_attributes = array('title' => get_string($manage_tag).$tag_tail, 'class' => 'btn btn-xs', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
@@ -1042,7 +1039,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     $icon = new pix_icon('t/delete', get_string('delete').$tag_tail, 'moodle', $icon_attributes);
                     $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
-
                 } else {
                     //With text for delete
                     $link_attributes = array('title' => get_string('delete').$tag_tail, 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
@@ -1059,7 +1055,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     $icon = new pix_icon('i/import', get_string('import'), 'moodle', $icon_attributes);
                     $link_attributes = array('id' => 'recording-link-import-'.$recording['recordID'], 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
-
                 } else {
                     //With text for import
                     $link_attributes = array('title' => get_string('import'), 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick);
@@ -1078,7 +1073,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         $row->description = "{$head}{$meta_description}{$tail}";
         $row->date = floatval($recording['startTime']);
         $row->date_formatted = "{$head}{$formattedStartDate}{$tail}";
-        $row->duration = "{$head}{$duration}{$tail}";
+        $row->duration = "{$duration}";
+        $row->duration_formatted = "{$head}{$duration}{$tail}";
         if ( $bbbsession['managerecordings'] ) {
             $row->actionbar = $actionbar;
         }
@@ -1099,9 +1095,9 @@ function bigbluebuttonbn_get_recording_columns($bbbsession, $recordings) {
     ///Initialize table headers
     $recordingsbn_columns = array(
         array("key" =>"recording", "label" => $view_recording_recording, "width" => "125px", "allowHTML" => true),
-        array("key" =>"activity", "label" => $view_recording_activity, "sortable" => true, "width" => "175px"),
-        array("key" =>"description", "label" => $view_recording_description, "sortable" => true, "width" => "250px"),
-        array("key" =>"date", "label" => $view_recording_date, "sortable" => true, "width" => "220px"),
+        array("key" =>"activity", "label" => $view_recording_activity, "sortable" => true, "width" => "175px", "allowHTML" => true),
+        array("key" =>"description", "label" => $view_recording_description, "sortable" => true, "width" => "250px", "allowHTML" => true),
+        array("key" =>"date", "label" => $view_recording_date, "sortable" => true, "width" => "220px", "allowHTML" => true),
         array("key" =>"duration", "label" => $view_recording_duration, "width" => "50px")
         );
 
@@ -1171,9 +1167,9 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools=['
             if( $row_data != null ) {
                 $row_data->date_formatted = str_replace(" ", "&nbsp;", $row_data->date_formatted);
                 if ( $bbbsession['managerecordings'] ) {
-                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration, $row_data->actionbar );
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration_formatted, $row_data->actionbar );
                 } else {
-                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration );
+                    $row->cells = array ($row_data->recording, $row_data->activity, $row_data->description, $row_data->date_formatted, $row_data->duration_formatted );
                 }
 
                 array_push($table->data, $row);
