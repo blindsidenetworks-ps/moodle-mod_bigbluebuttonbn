@@ -106,14 +106,12 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable = 1;
 // recordings from a different activity even from a different course.
 // 
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
-// activities will have the 'import recordings' capability enabled by
-// default.
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_default = 0;
+// activities will have the 'import recordings' capability enabled.
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled = 0;
 
 // When the value is set to 1 (checked) the import recordings capability
-// can be enabled/disabled by the user creating or editing the room or
-// activity.
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_editable = 0;
+// can import recordings from deleted activities.
+$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled = 0;
 
 
 //=========================================================================

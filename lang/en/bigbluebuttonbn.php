@@ -47,6 +47,8 @@ $string['config_feature_importrecordings'] = 'Configuration for "Import recordin
 $string['config_feature_importrecordings_description'] = 'These settings are feature specific';
 $string['config_feature_importrecordings_enabled'] = 'Import recordings enabled';
 $string['config_feature_importrecordings_enabled_description'] = 'When this and the recording feature are enabled, it is possible to import recordings from different courses into an activity.';
+$string['config_feature_importrecordings_from_deleted_activities_enabled'] = 'Import recordings from deleted activities enabled';
+$string['config_feature_importrecordings_from_deleted_activities_enabled_description'] = 'When this and the import recording feature are enabled, it is possible to import recordings from activities that are no longer in the course.';
 
 $string['config_feature_waitformoderator'] = 'Configuration for "Wait for moderator" feature';
 $string['config_feature_waitformoderator_description'] = 'These settings are feature specific';

@@ -1315,6 +1315,11 @@ function bigbluebuttonbn_get_cfg_importrecordings_enabled() {
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled: (isset($CFG->bigbluebuttonbn_importrecordings_enabled)? $CFG->bigbluebuttonbn_importrecordings_enabled: false));
 }
 
+function bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled: (isset($CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled)? $CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled: false));
+}
+
 function bigbluebuttonbn_get_cfg_waitformoderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default: (isset($CFG->bigbluebuttonbn_waitformoderator_default)? $CFG->bigbluebuttonbn_waitformoderator_default: false));
@@ -1499,6 +1504,12 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
     $meetingID = '';
     if ( is_numeric($courseID) ) {
         $results = bigbluebuttonbn_getRecordedMeetings($courseID);
+
+        if( bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled() ) {
+            $results_deleted = bigbluebuttonbn_getRecordedMeetingsDeleted($courseID);
+            $results = array_merge($results, $results_deleted);
+        }
+
         if( $results ) {
             //Eliminates duplicates
             $mIDs = array();
