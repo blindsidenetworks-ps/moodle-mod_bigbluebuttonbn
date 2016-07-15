@@ -219,20 +219,7 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
 
     if ( $xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings) ) { //If there were meetings already created
         foreach ( $xml->recordings->recording as $recording ) {
-            $playbackArray = array();
-            foreach ( $recording->playback->format as $format ) {
-                $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url, 'length' => (string) $format->length );
-            }
-
-            //Add the metadata to the recordings array
-            $metadataArray = array();
-            $metadata = get_object_vars($recording->metadata);
-            foreach ( $metadata as $key => $value ) {
-                if ( is_object($value) ) $value = '';
-                $metadataArray['meta_'.$key] = $value;
-            }
-
-            $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+            $recordings[] = bigbluebuttonbn_getRecordingArrayRow($recording);
         }
 
         usort($recordings, 'bigbluebuttonbn_recordingBuildSorter');
@@ -252,33 +239,41 @@ function bigbluebuttonbn_index_recordings($recordings, $index_key='recordID') {
 }
 
 function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SALT ) {
-    $recording = array();
+    $recordingArray = array();
 
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
 
     if ( $xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings) ) { //If there were meetings already created
         foreach ($xml->recordings->recording as $recording) {
             if( $recording->recordID == $recordingID ) {
-                $playbackArray = array();
-                foreach ( $recording->playback->format as $format ){
-                    $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
-                }
-
-                //Add the metadata to the recordings array
-                $metadataArray = array();
-                $metadata = get_object_vars($recording->metadata);
-                foreach ($metadata as $key => $value) {
-                    if(is_object($value)) $value = '';
-                    $metadataArray['meta_'.$key] = $value;
-                }
-
-                $recording = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+                $recordingArray = bigbluebuttonbn_getRecordingArrayRow($recording);
                 break;
             }
         }
     }
 
-    return $recording;
+    return $recordingArray;
+}
+
+function bigbluebuttonbn_getRecordingArrayRow( $recording ) {
+    $recordingArrayRow = array();
+
+    $playbackArray = array();
+    foreach ( $recording->playback->format as $format ) {
+        $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url, 'length' => (string) $format->length );
+    }
+
+    //Add the metadata to the recordings array
+    $metadataArray = array();
+    $metadata = get_object_vars($recording->metadata);
+    foreach ( $metadata as $key => $value ) {
+        if ( is_object($value) ) $value = '';
+        $metadataArray['meta_'.$key] = $value;
+    }
+
+    $recordingArrayRow = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+
+    return $recordingArrayRow;
 }
 
 function bigbluebuttonbn_recordingBuildSorter($a, $b){
