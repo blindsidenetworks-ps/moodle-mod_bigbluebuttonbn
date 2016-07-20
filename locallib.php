@@ -164,7 +164,24 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
     }
 }
 
-function bigbluebuttonbn_getMeetingsArray($meetingID, $URL, $SALT ) {
+function bigbluebuttonbn_getMeetingArray( $meetingID, $URL, $SALT ) {
+    $meetings = bigbluebuttonbn_getMeetingsArray( $URL, $SALT );
+    if( $meetings ) {
+        foreach ( $meetings as $meeting ) {
+            if ( $meeting['meetingID'] == $meetingID ) {
+                return $meeting;
+            }
+        }
+    }
+    return null;
+}
+
+function bigbluebuttonbn_getMeetings( $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL($URL, $SALT) );
+    return $xml;
+}
+
+function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL($URL, $SALT) );
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
@@ -793,7 +810,7 @@ function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
     return $meeting_running;
 }
 
-function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $forced=false) {
+function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password=null, $forced=false) {
     global $CFG;
 
     $meeting_info = array();
@@ -808,8 +825,20 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
         //Use the value in the cache
         $meeting_info = json_decode($result['meeting_info']);
     } else {
+        if ( $password == null ) {
+            if( isset($result) ) {
+                $moderatorPW = $result['meeting_info']['moderatorPW'];
+            } else {
+                $meeting = bigbluebuttonbn_getMeetingArray( $meetingid, $endpoint, $shared_secret );
+                if ( $meeting ) {
+                    $moderatorPW = $meeting['moderatorPW'];
+                }
+            }
+        } else {
+            $moderatorPW = $password;
+        }
         //Ping again and refresh the cache
-        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
+        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $moderatorPW, $endpoint, $shared_secret );
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
     }
 

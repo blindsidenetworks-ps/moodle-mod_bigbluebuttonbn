@@ -143,7 +143,7 @@ switch (strtolower($action)) {
                     } else { ///////////////Everything is ok /////////////////////
                         /// Moodle event logger: Create an event for meeting created
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
-                        /// Internal logger: Instert a record with the meeting created
+                        /// Internal logger: Insert a record with the meeting created
                         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
                         /// Since the meeting is already running, we just join the session
                         bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn);
