@@ -133,7 +133,7 @@ function bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID=null ) {
 }
 
 function bigbluebuttonbn_getDeleteRecordingsURL( $recordID, $URL, $SALT ) {
-    $url_delete = $URL."api/rdings?";
+    $url_delete = $URL."api/deleteRecordings?";
     $params = 'recordID='.urlencode($recordID);
     $url = $url_delete.$params.'&checksum='.sha1("deleteRecordings".$params.$SALT);
     return $url;

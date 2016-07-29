@@ -33,7 +33,7 @@ if( empty($params['action']) ) {
 
     if( empty($error) && $params['action'] != "recording_ready" ) {
 
-        if ($params['bigbluebuttonbn'] != 0) {
+        if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
             $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
             $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
@@ -131,6 +131,19 @@ if ( empty($error) ) {
                     }
                     break;
                 case 'recording_list':
+                    if( $bbbsession['managerecordings'] ) {
+                        if ( isset($params['id']) && $params['id'] != '' ) {
+                            $id = $params['id'];
+                        } else {
+                            $id = $params['idx'];
+                        }
+                        $recordings = bigbluebuttonbn_getRecordingsArray($id, $endpoint, $shared_secret);
+                        if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // Recording(s) was(were) found
+                            echo $params['callback'].'({"status": true, "recordings": '.json_encode($recordings).'});';
+                        } else {
+                            echo $params['callback'].'({"status": false});';
+                        }
+                    }
                     break;
                 case 'recording_info':
                     if( $bbbsession['managerecordings'] ) {
@@ -277,7 +290,7 @@ if ( empty($error) ) {
                         $callback_response['status'] = "true";
                         $callback_response_data = json_encode($callback_response);
                         echo "{$params['callback']}({$callback_response_data});";
-                        
+
                     } else {
                         error_log("ERROR: User not authorized to execute delete command");
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute delete command");
@@ -359,6 +372,7 @@ if ( empty($error) ) {
     }
 
 } else {
+    error_log(json_encode($error));
     header("HTTP/1.0 400 Bad Request. ".$error);
     return;
 }
