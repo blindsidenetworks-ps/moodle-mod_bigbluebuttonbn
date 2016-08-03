@@ -56,9 +56,12 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
  ////////////////////////////
 //  BigBlueButton API Calls  //
  ////////////////////////////
-function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL, $logoutURL ) {
+function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL, $logoutURL, $configToken=null ) {
     $url_join = $URL."api/join?";
     $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
+    if ( $configToken ) {
+        $params .= '&configToken='.$configToken;
+    }
     $url = $url_join.$params.'&checksum='.sha1("join".$params.$SALT);
     return $url;
 }
@@ -143,6 +146,23 @@ function bigbluebuttonbn_getPublishRecordingsURL( $recordID, $set, $URL, $SALT )
     return $url;
 }
 
+function bigbluebuttonbn_getUpdateRecordingsURL( $recordID, $URL, $SALT, $metadata=array() ) {
+    $url_update = $URL."api/updateRecordings?";
+    $params = 'recordID='.$recordID.$meta;
+    foreach ($metadata as $key => $value) {
+        $params .= '&'.$key.'='.urlencode($value);
+    }
+    $url = $url_update.$params.'&checksum='.sha1("updateRecordings".$params.$SALT);
+    return $url;
+}
+
+function bigbluebuttonbn_getDefaultConfigXMLURL( $URL, $SALT ) {
+    $url_default_config = $URL."api/getDefaultConfigXML?";
+    $params = '';
+    $url = $url_default_config.$params.'&checksum='.sha1("getDefaultConfigXML".$params.$SALT);
+    return $url;
+}
+
 function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $maxParticipants=0, $metadata=array(), $presentation_name=null, $presentation_url=null ) {
     $create_meeting_url = bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $maxParticipants, $metadata);
     if( !is_null($presentation_name) && !is_null($presentation_url) ) {
@@ -164,7 +184,24 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
     }
 }
 
-function bigbluebuttonbn_getMeetingsArray($meetingID, $URL, $SALT ) {
+function bigbluebuttonbn_getMeetingArray( $meetingID, $URL, $SALT ) {
+    $meetings = bigbluebuttonbn_getMeetingsArray( $URL, $SALT );
+    if( $meetings ) {
+        foreach ( $meetings as $meeting ) {
+            if ( $meeting['meetingID'] == $meetingID ) {
+                return $meeting;
+            }
+        }
+    }
+    return null;
+}
+
+function bigbluebuttonbn_getMeetings( $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL($URL, $SALT) );
+    return $xml;
+}
+
+function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL($URL, $SALT) );
 
     if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
@@ -206,6 +243,17 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT ) 
     }
 }
 
+function bigbluebuttonbn_getRecordings( $meetingIDs, $URL, $SALT ) {
+    if ( is_array($meetingIDs) ) {
+        // getRecordings is executes using a method POST (supported only on BBB 1.0 and later)
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
+    } else {
+        // getRecordings is executes using a method GET supported by any version of BBB
+        $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingIDs ) );
+    }
+    return $xml;
+}
+
 function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
@@ -226,6 +274,17 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     }
 
     return $recordings;
+}
+
+function bigbluebuttonbn_getDefaultConfigXML( $URL, $SALT ) {
+    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getDefaultConfigXMLURL($URL, $SALT) );
+    return $xml;
+}
+
+function bigbluebuttonbn_getDefaultConfigXMLArray( $URL, $SALT ) {
+    $default_config_xml = bigbluebuttonbn_getDefaultConfigXML( $URL, $SALT );
+    $default_config_xml_array = (array) $default_config_xml;
+    return $default_config_xml_array;
 }
 
 function bigbluebuttonbn_index_recordings($recordings, $index_key='recordID') {
@@ -341,7 +400,7 @@ function bigbluebuttonbn_getMeetingXML( $meetingID, $URL, $SALT ) {
     }
 }
 
-function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null) {
+function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD_GET, $data=null, $content_type='text/xml') {
     if ( bigbluebuttonbn_debugdisplay() ) error_log("Request to: ".$url);
 
     if (extension_loaded('curl')) {
@@ -351,7 +410,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
             if( !is_null($data) ) {
                 if( !is_array($data) ) {
                     $options['CURLOPT_HTTPHEADER'] = array(
-                            'Content-Type: text/xml',
+                            'Content-Type: '.$content_type,
                             'Content-Length: '.strlen($data),
                             'Content-Language: en-US'
                         );
@@ -793,7 +852,7 @@ function bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info) {
     return $meeting_running;
 }
 
-function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $forced=false) {
+function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password=null, $forced=false) {
     global $CFG;
 
     $meeting_info = array();
@@ -808,8 +867,20 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password, $for
         //Use the value in the cache
         $meeting_info = json_decode($result['meeting_info']);
     } else {
+        if ( $password == null ) {
+            if( isset($result) ) {
+                $moderatorPW = $result['meeting_info']['moderatorPW'];
+            } else {
+                $meeting = bigbluebuttonbn_getMeetingArray( $meetingid, $endpoint, $shared_secret );
+                if ( $meeting ) {
+                    $moderatorPW = $meeting['moderatorPW'];
+                }
+            }
+        } else {
+            $moderatorPW = $password;
+        }
         //Ping again and refresh the cache
-        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $password, $endpoint, $shared_secret );
+        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo( $meetingid, $moderatorPW, $endpoint, $shared_secret );
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info) ));
     }
 
@@ -929,6 +1000,39 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg='') {
     }
 
     return $error;
+}
+
+function bigbluebuttonbn_setConfigXMLParams( $meetingID, $configXML, $URL, $SALT ) {
+    $params = 'configXML='.urlencode($configXML).'&meetingID='.urlencode($meetingID);
+    $config_xml_params = $params.'&checksum='.sha1("setConfigXML".$params.$SALT);
+    return $config_xml_params;
+}
+
+function bigbluebuttonbn_setConfigXML( $meetingID, $configXML, $URL, $SALT ) {
+    $url_default_config = $URL."api/setConfigXML?";
+    $config_xml_params = bigbluebuttonbn_setConfigXMLParams( $meetingID, $configXML, $URL, $SALT );
+    $xml = bigbluebuttonbn_wrap_xml_load_file($url_default_config, BIGBLUEBUTTONBN_METHOD_POST, $config_xml_params, 'application/x-www-form-urlencoded');
+    return $xml;
+}
+
+function bigbluebuttonbn_setConfigXMLArray( $meetingID, $configXML, $URL, $SALT ) {
+    $config_xml = bigbluebuttonbn_setConfigXML( $meetingID, $configXML, $URL, $SALT );
+    $config_xml_array = (array) $config_xml;
+    return $config_xml_array;
+}
+
+function bigbluebuttonbn_bbb_broker_set_config_xml($meetingID, $configXML) {
+    $config_token = null;
+
+    $endpoint = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
+
+    $config_xml_array = bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML, $endpoint, $shared_secret);
+    if ( $config_xml_array['returncode'] == 'SUCCESS' ) {
+        $config_token = $config_xml_array['configToken'];
+    }
+
+    return $config_token;
 }
 
 function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=["publishing", "deleting"]) {
