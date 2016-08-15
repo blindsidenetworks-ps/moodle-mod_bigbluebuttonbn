@@ -449,7 +449,9 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
         try {
             $xml = simplexml_load_file($url,'SimpleXMLElement', LIBXML_NOCDATA);
             return $xml;
-        } catch  (Exception $e){
+        } catch (Exception $e){
+            $error = 'Caught exception: '.$e->getMessage();
+            error_log($error);
             libxml_use_internal_errors($previous);
             return NULL;
         }
@@ -1029,7 +1031,10 @@ function bigbluebuttonbn_bbb_broker_set_config_xml($meetingID, $configXML) {
 
     $config_xml_array = bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML, $endpoint, $shared_secret);
     if ( $config_xml_array['returncode'] == 'SUCCESS' ) {
+        error_log(json_encode($config_xml_array));
         $config_token = $config_xml_array['configToken'];
+    } else {
+        error_log("BigBlueButton was not able to set the custom config.xml file");
     }
 
     return $config_token;
