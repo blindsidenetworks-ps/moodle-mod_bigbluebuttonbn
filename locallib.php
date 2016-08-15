@@ -1041,12 +1041,13 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
     $row = null;
 
     if ( $bbbsession['managerecordings'] || $recording['published'] == 'true' ) {
-        $length = 0;
         $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
         $startTime = $startTime - ($startTime % 1000);
         $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
         $endTime = $endTime - ($endTime % 1000);
-        $duration = intval(array_values($recording['playbacks'])[0]['length']);
+        $first_playback = array_values($recording['playbacks'])[0];
+        $length = isset($first_playback['length'])? $first_playback['length']: 0;
+        $duration = intval($length);
 
         //For backward compatibility
         if( isset($recording['meta_contextactivity']) ) {
