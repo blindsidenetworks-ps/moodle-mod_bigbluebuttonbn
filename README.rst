@@ -5,22 +5,23 @@ BigBlueButton is an open source web conferencing system that enables universitie
 These instructions describe how to install the BigBlueButtonBN Activity Module for Moodle.  This module is developed and supported by Blindside Networks, the company that started the BigBlueButton project in 2007.
 
 With the latest version of this plugin you can
-	- Create links in any course that can be used to create sessions in a BigBlueButton server 
+	- Create links in any course that can be used to create rooms/sessions in a BigBlueButton server 
 	- Specify join open/close dates that will appear in the Moodle calendar
 	- Create a custom welcome messages that appears in the chat window when users join the session
 	- Launch BigBlueButton in its own tab or window
 	- Assign the role uses will have in BigBlueButton (moderator, viewer) per user or role in Moodle
-	- Preupload presentations
+	- Pre-upload presentations
 	- Monitor the active sessions for the course and end any session (eject all users)
 	- Record and playback your lectures
-	- Access and manage recorded lectures, and more.
+	- Access and manage recorded lectures
+  - Import recording links from a different course, and more.
 
 
 Note that on previous versions of Moodle you will need to use the specific version of this plugin. 
 
     - For Moodle 1.9 use version 1.0.9 (2013071000).
     - For Moodle 2.0, 2.1, 2.2, 2.3, 2.4 and 2.5 use version 1.1.1 (2015062101)
-    - For Moodle 2.6+ use version 2.0.0 (20150806xx).
+    - For Moodle 2.6+ use version 2.1.1 (2016051905).
 
 
 Prerequisites
@@ -42,46 +43,14 @@ For information on how to setup your own BigBlueButton server see
 
 Obtaining the source
 ====================
-This GitHub repostiory at
+This GitHub repository at
 
   https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn
 
-contains the latest source. We recomend to download the latest snapshot from the Moodle Plugin Database.
+contains the latest source. We recommend to download the latest snapshot from the Moodle Plugin Database.
 
-Installation
-============
 
-These instructions assume your Moodle server is installed at /var/www/moodle.
-
-1.  Copy bigbluebuttonbn.zip  to /var/www/moodle/mod
-
-2.  Enter the following commands
-
-	cd /var/www/moodle/mod
-    	sudo unzip bigbluebuttonbn.zip
-
-    This will create the directory
-
-        ./bigbluebuttonbn
-
-3.  Login to your moodle site as administrator
-
-	Moodle will detect the new module and prompt you to Upgrade.
-
-4.  Click the 'Upgrade' button.  
-
-	The activity module will install mod_bigbluebuttonbn.
-
-5.  Click the 'Continue' button. 
-
-	You'll be prompted to configure the activity module.
-
-6.  Enter the URL and salt (security key) to your BigBlueButton server (or use the default values for testing).
-7.  Click the 'Save Changes' button.
-
-At this point, you can enter any course, turn editing on, and add a BigBlueButtonBN activity link to the class.
-
-Note: You will want to install the RecordingsBN activity module to access recordings as well.
+Note: You may want to install the RecordingsBN activity module to access recordings as well.
 
 For a video overview of installing and using this plugin,
 
