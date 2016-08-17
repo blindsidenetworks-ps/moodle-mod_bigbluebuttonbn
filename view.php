@@ -80,7 +80,7 @@ if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
     $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
 }
 
-$bbbsession['userlimit'] = intval($bigbluebuttonbn->userlimit);
+$bbbsession['userlimit'] = bigbluebuttonbn_get_cfg_userlimit_editable()? intval($bigbluebuttonbn->userlimit): intval(bigbluebuttonbn_get_cfg_userlimit_default());
 $bbbsession['voicebridge'] = ($bigbluebuttonbn->voicebridge > 0)? 70000 + $bigbluebuttonbn->voicebridge: $bigbluebuttonbn->voicebridge;
 $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
