@@ -1169,8 +1169,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         }
 
         //Set corresponding format
-        $format = '%a %h %d, %Y %H:%M:%S %Z';
-        $formattedStartDate = userdate($startTime / 1000, $format, usertimezone($USER->timezone));
+        $dateformat = get_string('strftimerecentfull', 'langconfig').' %Z';
+        $formattedStartDate = userdate($startTime / 1000, $dateformat, usertimezone($USER->timezone));
 
         $row = new stdClass();
         $row->recording = "{$head}{$recording_types}{$tail}";
