@@ -31,7 +31,7 @@ if( empty($params['action']) ) {
 } else {
     $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 
-    if( empty($error) && $params['action'] != "recording_ready" ) {
+    if( empty($error) && $params['action'] != "recording_ready" && $params['action'] != "meeting_events" ) {
 
         if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
@@ -358,7 +358,31 @@ if ( empty($error) ) {
                         }
                     }
                     break;
-                case 'moodle_notify':
+                case 'meeting_events':
+                    //Decodes the received JWT string
+                    try {
+                        $decoded_parameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
+
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 400 Bad Request. ".$error);
+                        return;
+                    }
+
+                    // Lookup the bigbluebuttonbn activity corresponding to the meeting_id received
+                    try {
+                        $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
+                        $meeting_id_elements = explode("-", $meeting_id_elements[0]);
+                        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
+
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 410 Gone. ".$error);
+                        return;
+                    }
+                    error_log("We start storing the events here");
                     break;
                 case 'moodle_event':
                     break;

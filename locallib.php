@@ -59,10 +59,10 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
 function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL, $logoutURL, $configToken=null, $userId=null ) {
     $url_join = $URL."api/join?";
     $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
-    if ( $userId ) {
-        $params .= "&userID=".urlencode($userID);
+    if ( !is_null($userId) ) {
+        $params .= "&userID=".urlencode($userId);
     }
-    if ( $configToken ) {
+    if ( !is_null($configToken) ) {
         $params .= '&configToken='.$configToken;
     }
     $url = $url_join.$params.'&checksum='.sha1("join".$params.$SALT);
@@ -984,6 +984,7 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
                 }
                 break;
             case 'recording_ready':
+            case 'meeting_events':
                 if( empty($params['signed_parameters']) ) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'A JWT encoded string must be included as [signed_parameters].');
                 }
