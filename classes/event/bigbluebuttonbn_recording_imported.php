@@ -29,7 +29,7 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_imported', 'mod_bigbluebuttonbn');
+        return "Recording imported";
     }
 
     /**
@@ -39,8 +39,7 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
      */
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
-        $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
-        return get_string('event_recording_imported_description', 'bigbluebuttonbn', $a);
+        return "The user with id '{$this->userid}' has imported a recording with id '{$rid}' into the course id '{$this->courseid}'.";
     }
 
     /**
@@ -50,7 +49,7 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return(array($this->courseid, 'bigbluebuttonbn', 'recording imported',
-                'view.php?pageid=' . $this->objectid, get_string('event_recording_imported', 'bigbluebuttonbn'), $this->contextinstanceid));
+                'view.php?pageid=' . $this->objectid, "Recording imported", $this->contextinstanceid));
     }
 
     /**

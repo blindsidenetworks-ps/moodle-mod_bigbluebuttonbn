@@ -29,7 +29,7 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_unpublished', 'mod_bigbluebuttonbn');
+        return "Recording unpublished";
     }
 
     /**
@@ -39,8 +39,7 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base {
      */
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
-        $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
-        return get_string('event_recording_unpublished_description', 'bigbluebuttonbn', $a);
+        return "The user with id '{$this->userid}' has unpublished a recording with id '{$rid}' in the course id '{$this->contextinstanceid}'.";
     }
 
     /**
@@ -50,7 +49,7 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return(array($this->courseid, 'bigbluebuttonbn', 'recording unpublished',
-                'view.php?pageid=' . $this->objectid, get_string('event_recording_unpublished', 'bigbluebuttonbn'), $this->contextinstanceid));
+                'view.php?pageid=' . $this->objectid, "Recording unpublished", $this->contextinstanceid));
     }
 
     /**

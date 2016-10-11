@@ -1,3 +1,7 @@
+2.2 (2016080100)
+Bug: Removed localization from events so the messages in the logs are always in English.
+Enhancement: Included the parameter userID as part of the join request.
+
 2.1.2 (2016051906)
 Bug: Fixed version format for recording list so it works for formats used in non western countries.
 Bug: Fixed issue with user limit not being correctly enforced when default limit was updated and edition was not allowed. (This bug only affected sites making use of the user limit feature)
@@ -25,7 +29,7 @@ Bug: backup/restore were not working on logs
 Bug: Added missing event
 
 2.1.0-b2 (2016051901)
-Fixed bug: Fix for action management not working in recordings.
+Bug: Fix for action management not working in recordings.
 
 2.1.0-b1 (2016051900)
 Enhancement: Links to recordings can now be imported into a room/activity from a different course room/activity.
@@ -46,8 +50,8 @@ Bug: When for security reasons either the webserver or the proxy ahead of the we
 Bug: When using localization in a language different than English, the recording table produced for RecordingsBN showed an 'Invalid date' message.
 
 2.0.1 (2015080608)
-Fixed bug: Adding a presentation file while creating a new BigBlueButtonBN activity failed. Only after editing the activity and adding a presentation file again would let the feature work.
-Fixed bug: A warning message was shown in the logs when joining a session
+Bug: Adding a presentation file while creating a new BigBlueButtonBN activity failed. Only after editing the activity and adding a presentation file again would let the feature work.
+Bug: Fixed warning message was shown in the logs when joining a session
 
 1.0.7 (April 8, 2012)
 Enhancement: Added Spanish and French.

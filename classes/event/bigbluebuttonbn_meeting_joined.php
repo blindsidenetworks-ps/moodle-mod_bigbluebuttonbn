@@ -29,7 +29,7 @@ class bigbluebuttonbn_meeting_joined extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_meeting_joined', 'mod_bigbluebuttonbn');
+        return "BigBlueButtonBN meeting joined";
     }
 
     /**
@@ -38,8 +38,7 @@ class bigbluebuttonbn_meeting_joined extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
-        return get_string('event_meeting_joined_description', 'bigbluebuttonbn', $a);
+        return "The user with id '{$this->userid}' has joined a bigbluebutton meeting for the bigbluebuttonbn activity with id '{$this->objectid}' for the course id '{$this->contextinstanceid}'.";
     }
 
     /**
@@ -49,7 +48,7 @@ class bigbluebuttonbn_meeting_joined extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return(array($this->courseid, 'bigbluebuttonbn', 'meeting joined',
-                'view.php?pageid=' . $this->objectid, get_string('event_meeting_joined', 'bigbluebuttonbn'), $this->contextinstanceid));
+                'view.php?pageid=' . $this->objectid, "BigBlueButtonBN meeting joined", $this->contextinstanceid));
     }
 
     /**

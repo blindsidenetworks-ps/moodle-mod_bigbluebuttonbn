@@ -29,7 +29,7 @@ class bigbluebuttonbn_activity_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_activity_viewed', 'mod_bigbluebuttonbn');
+        return "BigBlueButtonBN activity viewed";
     }
 
     /**
@@ -49,7 +49,7 @@ class bigbluebuttonbn_activity_viewed extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return(array($this->courseid, 'bigbluebuttonbn', 'activity viewed',
-                'view.php?pageid=' . $this->objectid, get_string('event_activity_viewed', 'bigbluebuttonbn'), $this->contextinstanceid));
+                'view.php?pageid=' . $this->objectid, "BigBlueButtonBN activity viewed", $this->contextinstanceid));
     }
 
     /**
