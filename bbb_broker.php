@@ -382,9 +382,20 @@ if ( empty($error) ) {
                         header("HTTP/1.0 410 Gone. ".$error);
                         return;
                     }
-                    error_log("We start storing the events here");
-                    break;
-                case 'moodle_event':
+
+                    // Store the events
+                    try {
+                        error_log("We start storing the events here");
+                        error_log(json_encode($decoded_parameters->events));
+                        //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                        header("HTTP/1.0 202 Accepted");
+                        return;
+                    } catch (Exception $e) {
+                        $error = 'Caught exception: '.$e->getMessage();
+                        error_log($error);
+                        header("HTTP/1.0 503 Service Unavailable. ".$error);
+                        return;
+                    }
                     break;
             }
 
