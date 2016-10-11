@@ -31,7 +31,7 @@ if( empty($params['action']) ) {
 } else {
     $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 
-    if( empty($error) && $params['action'] != "recording_ready" && $params['action'] != "meeting_events" ) {
+    if( empty($error) ) {
 
         if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
@@ -308,30 +308,28 @@ if ( empty($error) ) {
                         return;
                     }
 
-                    // Lookup the bigbluebuttonbn activity corresponding to the meeting_id received
-                    try {
-                        $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
-                        $meeting_id_elements = explode("-", $meeting_id_elements[0]);
-                        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
+                    // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
+                    $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
+                    if( isset($bigbluebuttonbn)  && $bigbluebuttonbn->meetingid == $meeting_id_elements[0] ) {
+                        // Sends the messages
+                        try {
+                            bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                            header("HTTP/1.0 202 Accepted");
+                            return;
+                        } catch (Exception $e) {
+                            $error = 'Caught exception: '.$e->getMessage();
+                            error_log($error);
+                            header("HTTP/1.0 503 Service Unavailable. ".$error);
+                            return;
+                        }
 
-                    } catch (Exception $e) {
+                    } else {
                         $error = 'Caught exception: '.$e->getMessage();
                         error_log($error);
                         header("HTTP/1.0 410 Gone. ".$error);
                         return;
                     }
 
-                    // Sends the messages
-                    try {
-                        bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
-                        header("HTTP/1.0 202 Accepted");
-                        return;
-                    } catch (Exception $e) {
-                        $error = 'Caught exception: '.$e->getMessage();
-                        error_log($error);
-                        header("HTTP/1.0 503 Service Unavailable. ".$error);
-                        return;
-                    }
                     break;
                 case 'recording_import':
                     if( $bbbsession['managerecordings'] ) {
@@ -370,30 +368,27 @@ if ( empty($error) ) {
                         return;
                     }
 
-                    // Lookup the bigbluebuttonbn activity corresponding to the meeting_id received
-                    try {
-                        $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
-                        $meeting_id_elements = explode("-", $meeting_id_elements[0]);
-                        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $meeting_id_elements[2]), '*', MUST_EXIST);
+                    // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
+                    $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
+                    if( isset($bigbluebuttonbn)  && $bigbluebuttonbn->meetingid == $meeting_id_elements[0] ) {
+                        // Store the events
+                        try {
+                            error_log("We start storing the events here");
+                            error_log(json_encode($decoded_parameters->events));
+                            //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                            header("HTTP/1.0 202 Accepted");
+                            return;
+                        } catch (Exception $e) {
+                            $error = 'Caught exception: '.$e->getMessage();
+                            error_log($error);
+                            header("HTTP/1.0 503 Service Unavailable. ".$error);
+                            return;
+                        }
 
-                    } catch (Exception $e) {
+                    } else {
                         $error = 'Caught exception: '.$e->getMessage();
                         error_log($error);
                         header("HTTP/1.0 410 Gone. ".$error);
-                        return;
-                    }
-
-                    // Store the events
-                    try {
-                        error_log("We start storing the events here");
-                        error_log(json_encode($decoded_parameters->events));
-                        //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
-                        header("HTTP/1.0 202 Accepted");
-                        return;
-                    } catch (Exception $e) {
-                        $error = 'Caught exception: '.$e->getMessage();
-                        error_log($error);
-                        header("HTTP/1.0 503 Service Unavailable. ".$error);
                         return;
                     }
                     break;
