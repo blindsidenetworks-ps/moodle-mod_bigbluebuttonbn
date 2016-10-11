@@ -25,14 +25,13 @@ $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
 $error = '';
 
-if( empty($params['action']) ) {
+if ( empty($params['action']) ) {
     $error = bigbluebuttonbn_bbb_broker_add_error($error, "Parameter [action] was not included");
 
 } else {
     $error = bigbluebuttonbn_bbb_broker_validate_parameters($params);
 
     if( empty($error) ) {
-
         if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
             $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -40,10 +39,12 @@ if( empty($params['action']) ) {
             $context = bigbluebuttonbn_get_context_module($cm->id);
         }
 
-        if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
-            $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-        } else {
-            $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
+        if ( $params['action'] != "recording_ready" && $params['action'] != "meeting_events" ) {
+            if ( isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession) ) {
+                $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+            } else {
+                $error = bigbluebuttonbn_bbb_broker_add_error($error, "No session variable set");
+            }
         }
     }
 }
@@ -374,7 +375,9 @@ if ( empty($error) ) {
                         // Store the events
                         try {
                             error_log("We start storing the events here");
-                            error_log(json_encode($decoded_parameters->events));
+                            foreach ($decoded_parameters->events as $event) {
+                                error_log(json_encode($event));
+                            }
                             //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
                             header("HTTP/1.0 202 Accepted");
                             return;

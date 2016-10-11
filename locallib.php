@@ -1481,7 +1481,7 @@ function bigbluebuttonbn_get_cfg_recordingready_enabled() {
 
 function bigbluebuttonbn_get_cfg_meetingevents_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled: (isset($CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled)? $CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled: false));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled: (isset($CFG->bigbluebuttonbn_meetingevents_enabled)? $CFG->bigbluebuttonbn_meetingevents_enabled: false));
 }
 
 function bigbluebuttonbn_get_cfg_moderator_default() {
