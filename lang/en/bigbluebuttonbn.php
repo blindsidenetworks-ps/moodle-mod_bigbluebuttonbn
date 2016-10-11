@@ -103,6 +103,8 @@ $string['config_extended_feature_uidelegation_enabled'] = 'UI delegation is enab
 $string['config_extended_feature_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
 $string['config_extended_feature_recordingready_enabled'] = 'Notifications when recording ready enabled';
 $string['config_extended_feature_recordingready_enabled_description'] = 'Notifications when recording ready feature is enabled.';
+$string['config_extended_feature_meetingevents_enabled'] = 'Register meeting events';
+$string['config_extended_feature_meetingevents_enabled_description'] = 'Register meeting events feature is enabled.';
 
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
 

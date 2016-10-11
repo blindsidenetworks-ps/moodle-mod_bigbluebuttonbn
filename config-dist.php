@@ -214,5 +214,14 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 // users in a course when a recording is ready
 #$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
 
+//=========================================================================
+// 11. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
+//=========================================================================
+// When the value is set to 1 (checked) the 'register meeting events'
+// capability is enabled, meaning that once a recording is processed by BigBlueButton
+// a message containing the events from the live session will be sent to Moodle.
+// These avents are added to the logging system and used for reports
+#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled = 0;
+
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!

@@ -267,16 +267,27 @@ if ($ADMIN->fulltree) {
     //// Configuration for extended BN capabilities
     if( bigbluebuttonbn_server_offers_bn_capabilities() ) {
         //// Configuration for 'notify users when recording ready' feature
-        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ) {
+        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ||
+            !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled) ) {
             $settings->add( new admin_setting_heading('bigbluebuttonbn_extended_capabilities',
                     get_string('config_extended_capabilities', 'bigbluebuttonbn'),
                     get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
 
             // UI for 'notify users when recording ready' feature
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
+            if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ) {
+                $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
                     get_string('config_extended_feature_recordingready_enabled', 'bigbluebuttonbn'),
                     get_string('config_extended_feature_recordingready_enabled_description', 'bigbluebuttonbn'),
                     0));
+            }
+
+            // UI for 'register meeting events' feature
+            if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled) ) {
+                $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_meetingevents_enabled',
+                        get_string('config_extended_feature_meetingevents_enabled', 'bigbluebuttonbn'),
+                        get_string('config_extended_feature_meetingevents_enabled_description', 'bigbluebuttonbn'),
+                        0));
+            }
         }
     }
 }

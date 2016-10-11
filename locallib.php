@@ -1479,6 +1479,11 @@ function bigbluebuttonbn_get_cfg_recordingready_enabled() {
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled: (isset($CFG->bigbluebuttonbn_recordingready_enabled)? $CFG->bigbluebuttonbn_recordingready_enabled: false));
 }
 
+function bigbluebuttonbn_get_cfg_meetingevents_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled: (isset($CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled)? $CFG->bigbluebuttonbn_get_cfg_meetingevents_enabled: false));
+}
+
 function bigbluebuttonbn_get_cfg_moderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: 'owner'));
