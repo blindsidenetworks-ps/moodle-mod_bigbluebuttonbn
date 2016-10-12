@@ -28,6 +28,7 @@ const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
 const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
 const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
 const BIGBLUEBUTTON_EVENT_MEETING_LEFT = "meeting_left";
+const BIGBLUEBUTTON_EVENT_MEETING_EVENT = "meeting_event";
 const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
 const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
 const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
@@ -739,7 +740,7 @@ function bigbluebuttonbn_get_moodle_version_major() {
     return $version_array[0];
 }
 
-function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $context, $cm) {
+function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $context, $cm, $timecreated=NULL, $userid=NULL, $event_subtype=NULL) {
     $context = context_module::instance($cm->id);
     $event_properties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
 
@@ -770,6 +771,12 @@ function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $cont
             break;
         case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
             $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create($event_properties);
+            break;
+        case BIGBLUEBUTTON_EVENT_MEETING_EVENT:
+            $event_properties["userid"] = $userid;
+            $event_properties["timecreated"] = $timecreated;
+            $event_properties["other"] = $event_subtype;
+            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_event::create($event_properties);
             break;
     }
 
@@ -824,8 +831,18 @@ function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $context, $cm)
         bigbluebuttonbn_event_log_legacy($event_type, $bigbluebuttonbn, $context, $cm);
 
     } else {
-        //This is valid after v2.7
+        //This is valid only after v2.7
         bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $context, $cm);
+    }
+}
+
+function bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $context, $cm) {
+    global $CFG;
+
+    $version_major = bigbluebuttonbn_get_moodle_version_major();
+    if ( $version_major >= '2014051200' ) {
+        //This is valid only after v2.7
+        bigbluebuttonbn_event_log_standard(BIGBLUEBUTTON_EVENT_MEETING_EVENT, $bigbluebuttonbn, $context, $cm, $event->timestamp, $event->user, $event->event);
     }
 }
 
@@ -988,6 +1005,8 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
                 if( empty($params['signed_parameters']) ) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'A JWT encoded string must be included as [signed_parameters].');
                 }
+                break;
+            case 'moodle_event':
                 break;
             default:
                 $error = bigbluebuttonbn_bbb_broker_add_error($error, 'Action '.$params['action'].' can not be performed.');

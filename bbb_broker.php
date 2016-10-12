@@ -311,6 +311,7 @@ if ( empty($error) ) {
 
                     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
                     $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
+                    $meeting_id_elements = explode("-", $meeting_id_elements[0]);
                     if( isset($bigbluebuttonbn)  && $bigbluebuttonbn->meetingid == $meeting_id_elements[0] ) {
                         // Sends the messages
                         try {
@@ -371,29 +372,33 @@ if ( empty($error) ) {
 
                     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
                     $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
-                    if( isset($bigbluebuttonbn)  && $bigbluebuttonbn->meetingid == $meeting_id_elements[0] ) {
+                    $meeting_id_elements = explode("-", $meeting_id_elements[0]);
+                    if( isset($bigbluebuttonbn) && $bigbluebuttonbn->meetingid == $meeting_id_elements[0] ) {
                         // Store the events
                         try {
                             error_log("We start storing the events here");
                             foreach ($decoded_parameters->events as $event) {
-                                error_log(json_encode($event));
+                                error_log($event->event);
+                                bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $context, $cm);
                             }
                             //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
                             header("HTTP/1.0 202 Accepted");
                             return;
                         } catch (Exception $e) {
-                            $error = 'Caught exception: '.$e->getMessage();
+                            $error = "Caught exception: {$e->getMessage()}";
                             error_log($error);
-                            header("HTTP/1.0 503 Service Unavailable. ".$error);
+                            header("HTTP/1.0 503 Service Unavailable. {$error}");
                             return;
                         }
 
                     } else {
-                        $error = 'Caught exception: '.$e->getMessage();
+                        $error = "Activity with meetingID '{$meeting_id_elements[0]}' was not found";
                         error_log($error);
-                        header("HTTP/1.0 410 Gone. ".$error);
+                        header("HTTP/1.0 410 Gone. {$error}");
                         return;
                     }
+                    break;
+                case 'moodle_event':
                     break;
             }
 
