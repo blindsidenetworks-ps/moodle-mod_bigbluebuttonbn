@@ -337,6 +337,45 @@ function bigbluebuttonbn_get_post_actions() {
     return array('update', 'add', 'create', 'join', 'end', 'left', 'publish', 'unpublish', 'delete');
 }
 
+
+/**
+ * @global object
+ * @global object
+ * @param array $courses
+ * @param array $htmlarray Passed by reference
+ */
+function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
+    global $USER, $CFG;
+
+    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
+        return array();
+    }
+
+    if (!$bigbluebuttonbns = get_all_instances_in_courses('bigbluebuttonbn', $courses)) {
+        return;
+    }
+
+    $strbigbluebuttonbn = get_string('modulename', 'bigbluebuttonbn');
+    $strnextsession  = get_string('nextsession', 'bigbluebuttonbn');
+
+    foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
+        if ($bigbluebuttonbn->openingtime and $bigbluebuttonbn->closingtime) {  // A bigbluebuttonbn is scheduled.
+            $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
+                   $strbigbluebuttonbn.': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
+                   ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
+                   $bigbluebuttonbn->name.'</a></div>';
+            $str .= '<div class="info">'.$strnextsession.': '.userdate($bigbluebuttonbn->openingtime).'</div></div>';
+
+            if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
+                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = $str;
+            } else {
+                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= $str;
+            }
+        }
+    }
+}
+
+
 /**
  * Given a course_module object, this function returns any
  * "extra" information that may be needed when printing
