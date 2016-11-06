@@ -105,7 +105,7 @@ $bbbsession['originServerName'] = $parsedUrl['host'];
 $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.$module_version.')';
-////////////////////////////////////////////////
+////////////////////////////////////////////////contextActivityTags
 /////   BigBlueButton Session Setup Ends   /////
 ////////////////////////////////////////////////
 
@@ -203,7 +203,7 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
 // Metadata (context)
 $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
 $bbbsession['contextActivityDescription'] = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
-$bbbsession['contextActivityTags'] = "";
+$bbbsession['contextActivityTags'] = bigbluebuttonbn_get_tags($cm->id); // Same as $id
 
 $now = time();
 if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime ) {

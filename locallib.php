@@ -1755,3 +1755,12 @@ function bigbluebuttonbn_html2text($html, $len) {
         $text = substr($text, 0, $len);
     return $text;
 }
+
+function bigbluebuttonbn_get_tags($id) {
+    $tags = "";
+    $tags_array = core_tag_tag::get_item_tags_array('core', 'course_modules', $id);
+    foreach ( $tags_array as $key => $value ) {
+        $tags .= ($tags == "")? $value: ",".$value;
+    }
+    return $tags;
+}
