@@ -76,7 +76,7 @@ switch (strtolower($action)) {
                 // If user is administrator, moderator or if is viewer and no waiting is required
                 if( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                     /// Prepare the metadata
-                    $metadata = array("meta_bn-origin" => $bbbsession['origin'],
+                    $metadata = array("meta_bbb-origin" => $bbbsession['origin'],
                             "meta_bbb-origin-version" => $bbbsession['originVersion'],
                             "meta_bbb-origin-server-name" => $bbbsession['originServerName'],
                             "meta_bbb-origin-server-common-name" => $bbbsession['originServerCommonName'],
