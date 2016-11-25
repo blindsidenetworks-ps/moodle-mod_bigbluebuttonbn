@@ -105,7 +105,7 @@ M.mod_bigbluebuttonbn.view_update = function() {
                 //if( e.data.info.participantCount < bigbluebuttonbn.userlimit){}
                 Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.view_init_status_bar(e.data.status.message));
                 Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.view_init_control_panel(e.data));
-                if(typeof e.data.status.can_join != 'undefined' && e.data.status.can_join ) {
+                if(typeof e.data.status.can_join != 'undefined' ) {
                     Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.view_init_join_button(e.data.status));
                 }
                 if(typeof e.data.status.can_end != 'undefined' && e.data.status.can_end ) {
@@ -219,7 +219,8 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     if (status.can_join) {
         Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_joinNow(\'' + status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress + '\', ' + status.can_tag + ');');
     } else {
-        Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_waitModerator(\'' + status.join_url +'\');');
+        Y.DOM.setAttribute(join_button_input, 'disabled', true);
+        M.mod_bigbluebuttonbn.broker_waitModerator(status.join_url);
     }
 
     return join_button_input;
@@ -273,27 +274,14 @@ M.mod_bigbluebuttonbn.view_show_end_button = function() {
 
 M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
     /// Show the spinning wheel
-    var control_panel = Y.one('#control_panel');
-    //// clean the current content
-    M.mod_bigbluebuttonbn.view_clean_control_panel();
-    //// create a new div
-    var control_panel_div = Y.DOM.create('<div>');
-    Y.DOM.setAttribute(control_panel_div, 'id', 'control_panel_div');
-    Y.DOM.setAttribute(control_panel_div, 'align', 'center');
+    var status_bar_span = Y.one('#status_bar_span');
     //// create a img element
     var spinning_wheel = Y.DOM.create('<img>');
     Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
-    Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing64.gif');
-    Y.DOM.setAttribute(spinning_wheel, 'align', 'center');
+    Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing16.gif');
     //// add the spinning wheel
-    Y.DOM.addHTML(control_panel_div, spinning_wheel);
-    Y.DOM.addHTML(control_panel_div, '<br><br>');
-    Y.DOM.addHTML(control_panel_div, bigbluebuttonbn.locales.wait_for_moderator);
-    //// add the new div
-    Y.DOM.addHTML(control_panel, control_panel_div);
-
-    /// Hide the button
-    M.mod_bigbluebuttonbn.view_hide_join_button();
+    Y.DOM.addHTML(status_bar_span, '&nbsp;');
+    Y.DOM.addHTML(status_bar_span, spinning_wheel);
 
     /// Start the ping
     bigbluebuttonbn_ping_interval_id = bigbluebuttonbn_dataSource.setInterval(bigbluebuttonbn.ping_interval, {
@@ -302,7 +290,8 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
             success : function(e) {
                 if (e.data.running) {
                     clearInterval(bigbluebuttonbn_ping_interval_id);
-                    M.mod_bigbluebuttonbn.broker_joinNow(join_url, e.data.status.message, false);
+                    M.mod_bigbluebuttonbn.view_clean();
+                    M.mod_bigbluebuttonbn.view_update();
                 }
             },
             failure : function(e) {

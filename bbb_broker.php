@@ -89,9 +89,9 @@ if ( empty($error) ) {
 
                     } else {
                         // If user is administrator, moderator or if is viewer and no waiting is required
+                        $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
                         if ( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
                             $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-                            $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
                             $can_join = true;
 
                         } else {
@@ -99,7 +99,6 @@ if ( empty($error) ) {
                             if ( $bbbsession['wait'] ) {
                                 $initial_message .= ' '.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
                             }
-                            $join_button_text = get_string('view_conference_action_lineup', 'bigbluebuttonbn');
                             $can_join = false;
                         }
 

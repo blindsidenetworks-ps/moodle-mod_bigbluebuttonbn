@@ -253,7 +253,7 @@ $string['view_message_room_ready'] = 'This room is ready.';
 $string['view_message_room_open'] = 'This room is open.';
 $string['view_message_conference_room_ready'] = 'This conference room is ready. You can join the session now.';
 $string['view_message_conference_not_started'] = 'This conference has not started yet.';
-$string['view_message_conference_wait_for_moderator'] = 'Waiting for a moderator to join.';
+$string['view_message_conference_wait_for_moderator'] = 'Waiting for a moderator for being able to join.';
 $string['view_message_conference_in_progress'] = 'This conference is in progress.';
 $string['view_message_conference_has_ended'] = 'This conference has ended.';
 $string['view_message_tab_close'] = 'This tab/window must be closed manually';
@@ -264,7 +264,6 @@ $string['view_groups_selection_warning'] = 'There is a conference room for each 
 //$string['view_groups_selection_button'] = 'Select';
 $string['view_conference_action_join'] = 'Join session';
 $string['view_conference_action_end'] = 'End session';
-$string['view_conference_action_lineup'] = 'Line up for joining session';
 
 
 $string['view_recording'] = 'recording';
