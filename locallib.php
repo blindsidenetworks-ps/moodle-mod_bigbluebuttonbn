@@ -976,18 +976,18 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
     $error = '';
 
     if ( !isset($params['callback']) ) {
-        $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'This call must include a javascript callback.');
+        $error = bigbluebuttonbn_bbb_broker_add_error($error, 'This call must include a javascript callback.');
     }
 
     if ( !isset($params['action']) ) {
-        $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'Action parameter must be included.');
+        $error = bigbluebuttonbn_bbb_broker_add_error($error, 'Action parameter must be included.');
     } else {
         switch ( strtolower($params['action']) ){
             case 'server_ping':
             case 'meeting_info':
             case 'meeting_end':
                 if ( !isset($params['id']) ) {
-                    $error = $bigbluebuttonbn_bbb_broker_add_error($error, 'The meetingID must be specified.');
+                    $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The meetingID must be specified.');
                 }
                 break;
             case 'recording_list':

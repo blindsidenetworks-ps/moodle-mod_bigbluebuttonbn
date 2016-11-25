@@ -5,6 +5,7 @@ Enhancement: Included the parameter userID as part of the join request.
 2.1.2 (2016051906)
 Bug: Fixed version format for recording list so it works for formats used in non western countries.
 Bug: Fixed issue with user limit not being correctly enforced when default limit was updated and edition was not allowed. (This bug only affected sites making use of the user limit feature)
+Bug: Fixed issue in "wait for moderator" feature. The only way to enable the join session was to refresh the page manually.
 
 2.1.1 (2016051905)
 Bug: Fixed issue with database upgrade when updating from versions older than 2.1.x. (This bug only affected users upgrading directly from 1.x to 2.1.0).
