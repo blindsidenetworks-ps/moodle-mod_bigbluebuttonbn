@@ -22,7 +22,8 @@ Note that on previous versions of Moodle you will need to use the specific versi
 
 - For Moodle 1.9 use version 1.0.9 (2013071000).
 - For Moodle 2.0, 2.1, 2.2, 2.3, 2.4 and 2.5 use version 1.1.1 (2015062101)
-- For Moodle 2.6+ use version 2.1.1 (2016051905).
+- For Moodle 2.6 use version 2.0.4 (2015080611).
+- For Moodle 2.7+ use version 2.1.2 (2016051906).
 
 
 Prerequisites
