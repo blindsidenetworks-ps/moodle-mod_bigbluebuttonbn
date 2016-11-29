@@ -51,7 +51,7 @@ bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn,
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 
 // User data
-$bbbsession['username'] = get_string('fullnamedisplay', 'moodle', $USER);
+$bbbsession['username'] = fullname($USER);
 $bbbsession['userID'] = $USER->id;
 $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
 
