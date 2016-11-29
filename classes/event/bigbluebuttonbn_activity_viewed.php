@@ -4,7 +4,7 @@
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2014 Blindside Networks Inc.
+ * @copyright 2014-2016 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -38,8 +38,9 @@ class bigbluebuttonbn_activity_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the bigbluebuttonbn activity with id '$this->contextinstanceid' for " .
-        "the course id '$this->objectid'.";
+        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
+        return "The user with id '$a->userid' viewed the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for " .
+        "the course id '$a->courseid'.";
     }
 
     /**
@@ -59,5 +60,9 @@ class bigbluebuttonbn_activity_viewed extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }
 }

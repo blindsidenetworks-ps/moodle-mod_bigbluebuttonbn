@@ -173,7 +173,6 @@ $string['mod_form_field_notification_created_help'] = 'Send a notification to us
 $string['mod_form_field_notification_modified_help'] = 'Send a notification to users enrolled to let them know that this activity has been modified';
 $string['mod_form_field_notification_msg_created'] = 'created';
 $string['mod_form_field_notification_msg_modified'] = 'modified';
-$string['mod_form_field_notification_msg_at'] = 'at';
 
 
 $string['modulename'] = 'BigBlueButtonBN';
@@ -301,21 +300,13 @@ $string['event_activity_modified'] = 'BigBlueButtonBN activity modified';
 $string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
 $string['event_activity_viewed_all'] = 'BigBlueButtonBN activity management viewed';
 $string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
-$string['event_meeting_created_description'] = 'The user with id \'{$a->userid}\' created a bigbluebutton meeting for the bigbluebuttonbn activity with id \'{$a->bigbluebuttonbnid}\' for the course id {$a->courseid}.';
 $string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibly ended';
-$string['event_meeting_ended_description'] = 'A bigbluebutton meeting for the bigbluebuttonbn activity with id \'{$a->bigbluebuttonbnid}\' for the course id \'{$a->courseid}\' has been forcibly ended by the user with id \'{$a->userid}\'.';
 $string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
-$string['event_meeting_joined_description'] = 'The user with id \'{$a->userid}\' has joined a bigbluebutton meeting for the bigbluebuttonbn activity with id \'{$a->bigbluebuttonbnid}\' for the course id \'{$a->courseid}\'.';
 $string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
-$string['event_meeting_left_description'] = 'The user with id \'{$a->userid}\' has left a bigbluebutton meeting for the bigbluebuttonbn activity with id \'{$a->bigbluebuttonbnid}\' for the course id \'$this->courseid\'.';
 $string['event_recording_deleted'] = 'Recording deleted';
-$string['event_recording_deleted_description'] = 'The user with id \'{$a->userid}\' has deleted a recording with id \'{$a->recordingid}\' from the course id \'{$a->courseid}\'.';
 $string['event_recording_imported'] = 'Recording imported';
-$string['event_recording_imported_description'] = 'The user with id \'{$a->userid}\' has imported a recording with id \'{$a->recordingid}\' into the course id \'{$a->courseid}\'.';
 $string['event_recording_published'] = 'Recording published';
-$string['event_recording_published_description'] = 'The user with id \'{$a->userid}\' has published a recording with id \'{$a->recordingid}\' in the course id \'{$a->courseid\'}.';
 $string['event_recording_unpublished'] = 'Recording unpublished';
-$string['event_recording_unpublished_description'] = 'The user with id \'{$a->userid}\' has unpublished a recording with id \'{$a->recordingid}\' in the course id \'{$a->courseid\'}.';
 
 $string['predefined_profile_default'] = 'Default';
 $string['predefined_profile_classroom'] = 'Classroom';
@@ -324,15 +315,15 @@ $string['predefined_profile_collaborationroom'] = 'Collaboration room';
 $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 
-$string['email_title_notification_has_been'] = 'has been';
-$string['email_body_notification_meeting_has_been'] = 'has been';
-$string['email_body_notification_meeting_details'] = 'Details';
-$string['email_body_notification_meeting_title'] = 'Title';
-$string['email_body_notification_meeting_description'] = 'Description';
-$string['email_body_notification_meeting_start_date'] = 'Start date';
-$string['email_body_notification_meeting_end_date'] = 'End date';
-$string['email_body_notification_meeting_by'] = 'by';
-$string['email_body_recording_ready_for'] = 'Recording for';
-$string['email_body_recording_ready_is_ready'] = 'is ready';
-$string['email_footer_sent_by'] = 'This automatic notification message was sent by';
-$string['email_footer_sent_from'] = 'from the course';
+$string['email_date'] = '{$a->day} at {$a->time}';
+$string['email_footer'] = '<p><hr/><br/>This automatic notification message was sent by {$a->user_name}({$a->user_email}) '.
+        'from the course {$a->course_name}</p>';
+$string['email_body_notification'] = '<p>{$a->activity_type} &quot;{$a->activity_title}&quot; has been {$a->action}</p>'.
+        '<p><b>{$a->activity_title}</b> Details: '.
+        '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
+        '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>{$a->activity_title}</td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">Description: </td><td>{$a->activity_description}</td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">Start date: </td><td>{$a->activity_openingtime}</td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">End date: </td><td>{$a->activity_closingtime}</td></tr>'.
+        '<tr><td style="font-weight:bold;color:#555;">{$a->action} by: </td><td>{$a->activity_owner}</td></tr></tbody></table></p>';
+$string['email_body_recording'] = '<p>Recording for {$a->activity_type} &quot;{$a->activity_title}&quot; is ready</p>';

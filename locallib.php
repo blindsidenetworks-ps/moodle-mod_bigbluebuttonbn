@@ -1071,8 +1071,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
     if ( $bbbsession['managerecordings'] || $recording['published'] == 'true' ) {
         $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
         $startTime = $startTime - ($startTime % 1000);
-        $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
-        $endTime = $endTime - ($endTime % 1000);
         $first_playback = array_values($recording['playbacks'])[0];
         $length = isset($first_playback['length'])? $first_playback['length']: 0;
         $duration = intval($length);
@@ -1317,8 +1315,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     /// Build the message_body
     $msg->activity_type = "";
     $msg->activity_title = $bigbluebuttonbn->name;
-    $message_text = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-
+    $message_text = get_string('email_body_recording', 'bigbluebuttonbn', $msg);
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }
 

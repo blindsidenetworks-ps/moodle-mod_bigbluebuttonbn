@@ -1,10 +1,10 @@
 <?php
 /**
- * The mod_bigbluebuttonbn viewed event.
+ * The mod_bigbluebuttonbn recording imported event.
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2014-2015 Blindside Networks Inc.
+ * @copyright 2014-2016 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -39,7 +39,8 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
      */
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
-        return "The user with id '{$this->userid}' has imported a recording with id '{$rid}' into the course id '{$this->courseid}'.";
+        $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
+        return "The user with id '$a->userid' has imported a recording with id '$a->recordingid' into the course id '$a->courseid'.";
     }
 
     /**
@@ -59,5 +60,9 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }
 }
