@@ -40,7 +40,7 @@ class bigbluebuttonbn_recording_imported extends \core\event\base {
     public function get_description() {
         $rid = isset($this->other['rid'])? $this->other['rid']: '';
         $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
-        return get_string('event_recording_imported_description', 'bigbluebuttonbn', $a);
+        return "The user with id '$a->userid' has imported a recording with id '$a->recordingid' into the course id '$a->courseid'.";
     }
 
     /**

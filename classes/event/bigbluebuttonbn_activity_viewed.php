@@ -38,8 +38,9 @@ class bigbluebuttonbn_activity_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the bigbluebuttonbn activity with id '$this->contextinstanceid' for " .
-        "the course id '$this->objectid'.";
+        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
+        return "The user with id '$a->userid' viewed the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for " .
+        "the course id '$a->courseid'.";
     }
 
     /**

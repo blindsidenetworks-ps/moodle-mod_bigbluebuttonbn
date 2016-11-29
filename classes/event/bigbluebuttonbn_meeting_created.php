@@ -39,7 +39,7 @@ class bigbluebuttonbn_meeting_created extends \core\event\base {
      */
     public function get_description() {
         $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
-        return get_string('event_meeting_created_description', 'bigbluebuttonbn', $a);
+        return "The user with id '$a->userid' created a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id '$a->courseid'.";
     }
 
     /**
