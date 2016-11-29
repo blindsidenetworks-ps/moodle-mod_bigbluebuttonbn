@@ -21,9 +21,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
+        $bigbluebuttonbn = null;
         if ($course_id) {
             $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
-            $bigbluebuttonbn = null;
         } else if ($course_module_id) {
             $cm = get_coursemodule_from_id('bigbluebuttonbn', $course_module_id, 0, false, MUST_EXIST);
             $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -154,13 +154,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
             $filemanager_options = array();
             $filemanager_options['accepted_types'] = '*';
-            $filemanager_options['maxbytes'] = 0; //$this->course->maxbytes;
+            $filemanager_options['maxbytes'] = 0;
             $filemanager_options['subdirs'] = 0;
             $filemanager_options['maxfiles'] = 1;
             $filemanager_options['mainfile'] = true;
 
             $mform->addElement('filemanager', 'presentation', get_string('selectfiles'), null, $filemanager_options);
-            //$mform->addHelpButton('presentation', 'mod_form_field_presentation', 'bigbluebuttonbn');
         }
         //-------------------------------------------------------------------------------
         // Second block ends here
@@ -225,7 +224,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 }
                 $participant_selectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participant_selectiontype, 'bigbluebuttonbn').':</i></b>&nbsp;';
             }
-            $participant_role = get_string('mod_form_field_participant_bbb_role_'.$participant['role'], 'bigbluebuttonbn');
 
             $html_participant_selection .= ''.
                 '      <tr id="participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'].'">'."\n".

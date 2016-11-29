@@ -349,11 +349,6 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         $meetingID='';
         $results = bigbluebuttonbn_getRecordedMeetings($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
 
-        //if( $recordingsbn->include_deleted_activities ) {
-        //    $results_deleted = bigbluebuttonbn_getRecordedMeetingsDeleted($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-        //    $results = array_merge($results, $results_deleted);
-        //}
-
         if( $results ){
             //Eliminates duplicates
             $mIDs = array();
@@ -368,7 +363,6 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         }
 
         // Get actual recordings
-        //$recordings = bigbluebuttonbn_getRecordingsArray($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret']);
         if ( $meetingID != '' ) {
             $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $bbbsession['endpoint'], $bbbsession['shared_secret']);
         } else {
