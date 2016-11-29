@@ -38,7 +38,8 @@ class bigbluebuttonbn_meeting_event extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' triggered action {$this->other} in a bigbluebutton meeting for the bigbluebuttonbn activity with id '{$this->objectid}' for the course id '$this->contextinstanceid'.";
+        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid, 'action' => $this->other);
+        return "The user with id '$a->userid' triggered action $a->action in a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id '$a->courseid'.";
     }
 
     /**
@@ -58,5 +59,9 @@ class bigbluebuttonbn_meeting_event extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }
 }
