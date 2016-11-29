@@ -1,10 +1,10 @@
 <?php
 /**
- * The mod_bigbluebuttonbn viewed event.
+ * The mod_bigbluebuttonbn meeting left event.
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2014 Blindside Networks Inc.
+ * @copyright 2014-2016 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -39,7 +39,7 @@ class bigbluebuttonbn_meeting_left extends \core\event\base {
      */
     public function get_description() {
         $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
-        return "The user with id '$a->userid' has left a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id \'$this->courseid\'.";
+        return "The user with id '$a->userid' has left a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id '$a->courseid'.";
     }
 
     /**

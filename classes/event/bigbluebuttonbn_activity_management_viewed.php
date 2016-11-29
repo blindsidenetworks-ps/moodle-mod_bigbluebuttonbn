@@ -4,7 +4,7 @@
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2014-2015 Blindside Networks Inc.
+ * @copyright 2014-2016 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
