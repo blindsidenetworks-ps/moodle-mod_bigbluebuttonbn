@@ -704,12 +704,11 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
         if( $user->id != $sender->id ){
-            error_log("Sending msg to ".$user->firstname." ".$user->lastname.".");
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
-                error_log("Msg sent to ".$user->firstname." ".$user->lastname.".");
+                error_log("Msg to ".$msg->user_name." was sent.");
             } else {
-                error_log("Msg was NOT sent.");
+                error_log("Msg to ".$msg->user_name." was NOT sent.");
             }
         }
     }
