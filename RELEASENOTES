@@ -1,3 +1,6 @@
+2.1.3 (2016051907)
+Bug: Fixed issue with course logs not being backup/restore.
+
 2.1.2 (2016051906)
 Bug: Fixed version format for recording list so it works for formats used in non western countries.
 Bug: Fixed issue with user limit not being correctly enforced when default limit was updated and edition was not allowed. (This bug only affected sites making use of the user limit feature)

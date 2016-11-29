@@ -59,4 +59,8 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base {
     public function get_url() {
         return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
     }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+    }
 }
