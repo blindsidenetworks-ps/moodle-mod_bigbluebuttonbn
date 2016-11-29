@@ -1,6 +1,7 @@
 2.1.3 (2016051907)
 Bug: Fixed issue with course logs not being backup/restore.
 Bug: Fixed issue with localized event description affecting multi-language sites.
+Bug: Fixed issue with activities not shown in the dashboard block in Moodle 3.x.
 
 2.1.2 (2016051906)
 Bug: Fixed version format for recording list so it works for formats used in non western countries.
