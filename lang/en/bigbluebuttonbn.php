@@ -171,6 +171,7 @@ $string['mod_form_field_notification_created_help'] = 'Send a notification to us
 $string['mod_form_field_notification_modified_help'] = 'Send a notification to users enrolled to let them know that this activity has been modified';
 $string['mod_form_field_notification_msg_created'] = 'created';
 $string['mod_form_field_notification_msg_modified'] = 'modified';
+$string['mod_form_field_notification_msg_at'] = 'at';
 
 
 $string['modulename'] = 'BigBlueButtonBN';
@@ -313,15 +314,15 @@ $string['predefined_profile_collaborationroom'] = 'Collaboration room';
 $string['predefined_profile_scheduledsession'] = 'Scheduled session';
 
 
-$string['email_date'] = '{$a->day} at {$a->time}';
-$string['email_footer'] = '<p><hr/><br/>This automatic notification message was sent by {$a->user_name}({$a->user_email}) '.
-        'from the course {$a->course_name}</p>';
-$string['email_body_notification'] = '<p>{$a->activity_type} &quot;{$a->activity_title}&quot; has been {$a->action}</p>'.
-        '<p><b>{$a->activity_title}</b> Details: '.
-        '<table border="0" style="margin: 5px 0 0 20px"><tbody>'.
-        '<tr><td style="font-weight:bold;color:#555;">Title: </td><td>{$a->activity_title}</td></tr>'.
-        '<tr><td style="font-weight:bold;color:#555;">Description: </td><td>{$a->activity_description}</td></tr>'.
-        '<tr><td style="font-weight:bold;color:#555;">Start date: </td><td>{$a->activity_openingtime}</td></tr>'.
-        '<tr><td style="font-weight:bold;color:#555;">End date: </td><td>{$a->activity_closingtime}</td></tr>'.
-        '<tr><td style="font-weight:bold;color:#555;">{$a->action} by: </td><td>{$a->activity_owner}</td></tr></tbody></table></p>';
-$string['email_body_recording'] = '<p>Recording for {$a->activity_type} &quot;{$a->activity_title}&quot; is ready</p>';
+$string['email_title_notification_has_been'] = 'has been';
+$string['email_body_notification_meeting_has_been'] = 'has been';
+$string['email_body_notification_meeting_details'] = 'Details';
+$string['email_body_notification_meeting_title'] = 'Title';
+$string['email_body_notification_meeting_description'] = 'Description';
+$string['email_body_notification_meeting_start_date'] = 'Start date';
+$string['email_body_notification_meeting_end_date'] = 'End date';
+$string['email_body_notification_meeting_by'] = 'by';
+$string['email_body_recording_ready_for'] = 'Recording for';
+$string['email_body_recording_ready_is_ready'] = 'is ready';
+$string['email_footer_sent_by'] = 'This automatic notification message was sent by';
+$string['email_footer_sent_from'] = 'from the course';
