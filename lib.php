@@ -512,7 +512,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         if ($bigbluebuttonbn->closingtime ) {
             $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->closingtime);
         }
-        $msg->activity_owner = $USER->firstname.' '.$USER->lastname;
+        $msg->activity_owner = fullname($USER);
 
         $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':';
         $message_text .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>';
@@ -703,7 +703,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
 
     //Complete message
     $msg = new stdClass();
-    $msg->user_name = $sender->firstname.' '.$sender->lastname;
+    $msg->user_name = fullname($sender);
     $msg->user_email = $sender->email;
     $msg->course_name = "$course->fullname";
     $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
