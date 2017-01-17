@@ -77,7 +77,7 @@ $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
 $bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
 $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
 if( !isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-    $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn'); 
+    $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
 }
 
 $bbbsession['userlimit'] = bigbluebuttonbn_get_cfg_userlimit_editable()? intval($bigbluebuttonbn->userlimit): intval(bigbluebuttonbn_get_cfg_userlimit_default());
@@ -154,7 +154,7 @@ if ( !has_capability('moodle/category:manage', $context) && !has_capability('mod
     if (isguestuser()) {
         echo $OUTPUT->confirm('<p>'.get_string('view_noguests', 'bigbluebuttonbn').'</p>'.get_string('liketologin'),
             get_login_url(), $CFG->wwwroot.'/course/view.php?id='.$course->id);
-    } else { 
+    } else {
         echo $OUTPUT->confirm('<p>'.get_string('view_nojoin', 'bigbluebuttonbn').'</p>'.get_string('liketologin'),
             get_login_url(), $CFG->wwwroot.'/course/view.php?id='.$course->id);
     }
@@ -240,26 +240,27 @@ if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtim
     // Initialize session variable used across views
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
     bigbluebuttonbn_view_joining($bbbsession);
-
-    //JavaScript variables
-    $waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
-    $jsVars = array(
-        'action' => $bigbluebuttonbn_view,
-        'meetingid' => $bbbsession['meetingid'],
-        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-        'ping_interval' => ($waitformoderator_ping_interval > 0? $waitformoderator_ping_interval * 1000: 15000),
-        'userlimit' => $bbbsession['userlimit'],
-        'locales' => bigbluebuttonbn_get_locales_for_ui()
-    );
-    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
-
-    $jsmodule = array(
-        'name'     => 'mod_bigbluebuttonbn',
-        'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-    );
-    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
 }
+
+//JavaScript variables
+$waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
+$jsVars = array(
+    'action' => $bigbluebuttonbn_view,
+    'meetingid' => $bbbsession['meetingid'],
+    'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
+    'ping_interval' => ($waitformoderator_ping_interval > 0? $waitformoderator_ping_interval * 1000: 15000),
+    'userlimit' => $bbbsession['userlimit'],
+    'locales' => bigbluebuttonbn_get_locales_for_ui()
+);
+$PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
+
+$jsmodule = array(
+    'name'     => 'mod_bigbluebuttonbn',
+    'fullpath' => '/mod/bigbluebuttonbn/module.js',
+    'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
+);
+$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
+
 
 // Finish the page
 echo $OUTPUT->footer();
