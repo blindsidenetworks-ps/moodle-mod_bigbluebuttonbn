@@ -1,3 +1,7 @@
+2.1.5 (2016051909)
+Bug: Fixed issue with actions for recording managment not working in instances with schedule
+Bug: Standarized output in intermediate page for activities not started/ended
+
 2.1.4 (2016051908)
 Bug: Reverted changes made to the language strings in previous release.
 
@@ -63,7 +67,7 @@ Enhancement: Added Spanish and French.
 Enhancement: Synced API calls with BigBlueButton 0.8-beta-4.
 
 1.0.6 (October 31, 2011)
-Enhancement: Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php 
+Enhancement: Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php
 
 1.0.5 (October 19, 2011)
 Enhancement: Extended supported languages
