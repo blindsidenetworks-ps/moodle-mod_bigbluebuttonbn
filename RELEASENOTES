@@ -1,6 +1,7 @@
 2.1.5 (2016051909)
-Bug: Fixed issue with actions for recording managment not working in instances with schedule
+Bug: Fixed issue with actions for recording managment not working in instances with schedule (CONTRIB-6654)
 Bug: Standarized output in intermediate page for activities not started/ended
+Bug: Fixed issue with past BBB sessions listed as upcoming in the course overview block (CONTRIB-6650)
 
 2.1.4 (2016051908)
 Bug: Reverted changes made to the language strings in previous release.
