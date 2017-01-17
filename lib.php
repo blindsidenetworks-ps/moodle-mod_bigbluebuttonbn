@@ -355,14 +355,11 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
         return;
     }
 
-    $strbigbluebuttonbn = get_string('modulename', 'bigbluebuttonbn');
-    $strnextsession  = get_string('nextsession', 'bigbluebuttonbn');
-
     foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $now = time();
         if ( $bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
             $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
-                 $strbigbluebuttonbn.': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
+                 get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
                  ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
                  $bigbluebuttonbn->name.'</a></div>';
             if ( $bigbluebuttonbn->openingtime > $now ) {
