@@ -182,7 +182,9 @@ Using BigBlueButtonBN you can specify for the title, description, calendar entry
 
 To view later recordings, add a RecordingsBN resource to this course.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
-$string['nextsession'] = 'Next scheduled session';
+$string['starts_at'] = 'Starts';
+$string['started_at'] = 'Started';
+$string['ends_at'] = 'Ends';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Server Name';

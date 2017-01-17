@@ -1,7 +1,7 @@
 <?php
 /**
  * Library calls for Moodle and BigBlueButton.
- * 
+ *
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -359,12 +359,18 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
     $strnextsession  = get_string('nextsession', 'bigbluebuttonbn');
 
     foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
-        if ($bigbluebuttonbn->openingtime and $bigbluebuttonbn->closingtime) {  // A bigbluebuttonbn is scheduled.
+        $now = time();
+        if ( $bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
             $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
-                   $strbigbluebuttonbn.': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
-                   ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
-                   $bigbluebuttonbn->name.'</a></div>';
-            $str .= '<div class="info">'.$strnextsession.': '.userdate($bigbluebuttonbn->openingtime).'</div></div>';
+                 $strbigbluebuttonbn.': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
+                 ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
+                 $bigbluebuttonbn->name.'</a></div>';
+            if ( $bigbluebuttonbn->openingtime > $now ) {
+                $str .= '<div class="info">'.get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
+            } else {
+                $str .= '<div class="info">'.get_string('started_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
+            }
+            $str .= '<div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime).'</div></div>';
 
             if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
                 $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = $str;
@@ -450,7 +456,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     global $DB, $CFG, $USER;
 
-    // Now that an id was assigned, generate and set the meetingid property based on 
+    // Now that an id was assigned, generate and set the meetingid property based on
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
     if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
         $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
@@ -708,7 +714,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $msg->course_name = "$course->fullname";
     $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
     $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-    
+
     $users = bigbluebuttonbn_get_users($context);
     foreach( $users as $user ) {
         if( $user->id != $sender->id ){
@@ -761,4 +767,3 @@ function bigbluebuttonbn_get_cfg_shared_secret() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret): (isset($CFG->bigbluebuttonbn_shared_secret)? trim($CFG->bigbluebuttonbn_shared_secret): '8cd8ef52e8e101574e400365b55e11a6'));
 }
-
