@@ -8,7 +8,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 /**
  * This function is initialized from PHP
- * 
+ *
  * @param {Object}
  *            Y YUI instance
  */
@@ -27,9 +27,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
 	// Init general datasource
 	M.mod_bigbluebuttonbn.datasource_init(Y);
 
-    if (bigbluebuttonbn.action == 'before') {
-    } else if (bigbluebuttonbn.action == 'after') {
-    } else if (bigbluebuttonbn.action == 'join') {
+    if (bigbluebuttonbn.action == 'join') {
 	    // Create the main modal form.
         bigbluebuttonbn_panel = new Y.Panel({
             srcNode      : '#panelContent',
@@ -177,7 +175,7 @@ M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
     var participants = parseInt(participantCount);
     var msg_users_joined = '<b>' + participants + '</b> ';
     if( participants == 1 ) {
-        msg_users_joined += bigbluebuttonbn.locales.user + ' ' + bigbluebuttonbn.locales.has_joined + '.'; 
+        msg_users_joined += bigbluebuttonbn.locales.user + ' ' + bigbluebuttonbn.locales.has_joined + '.';
     } else {
         msg_users_joined += bigbluebuttonbn.locales.users + ' ' + bigbluebuttonbn.locales.have_joined + '.';
     }
@@ -196,9 +194,9 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
 
         } else {
             if( viewers > 0 ) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';	
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';
             } else if ( moderators > 0 ) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';	
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';
             }
         }
 

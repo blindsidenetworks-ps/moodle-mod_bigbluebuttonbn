@@ -169,8 +169,6 @@ $bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?acti
 $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready';
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.'&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
 
-$bigbluebuttonbn_view = '';
-
 // Output starts here
 echo $OUTPUT->header();
 
@@ -214,33 +212,26 @@ $bbbsession['contextActivityName'] = $bbbsession['meetingname'];
 $bbbsession['contextActivityDescription'] = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
 $bbbsession['contextActivityTags'] = "";
 
+$bigbluebuttonbn_view = '';
 $now = time();
 if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime ) {
     //CALLING BEFORE
     $bigbluebuttonbn_view = 'before';
-
-    // Initialize session variable used across views
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-    bigbluebuttonbn_view_before($bbbsession);
 
 } else if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
     //CALLING AFTER
     $bigbluebuttonbn_view = 'after';
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
 
-    // Initialize session variable used across views
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-    bigbluebuttonbn_view_after($bbbsession);
-
 } else {
     //GO JOINING
     $bigbluebuttonbn_view = 'join';
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
-
-    // Initialize session variable used across views
-    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-    bigbluebuttonbn_view_joining($bbbsession);
 }
+
+// Initialize session variable used across views
+$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+bigbluebuttonbn_view_joining($bbbsession);
 
 //JavaScript variables
 $waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
