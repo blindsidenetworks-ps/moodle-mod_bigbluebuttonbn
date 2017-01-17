@@ -1258,6 +1258,8 @@ function bigbluebuttonbn_get_locales_for_ui() {
             'delete_confirmation_warning_s' => get_string('view_recording_delete_confirmation_warning_s', 'bigbluebuttonbn'),
             'delete_confirmation_warning_p' => get_string('view_recording_delete_confirmation_warning_p', 'bigbluebuttonbn'),
             'import_confirmation' => get_string('view_recording_import_confirmation', 'bigbluebuttonbn'),
+            'conference_ended' => get_string('view_message_conference_has_ended', 'bigbluebuttonbn'),
+            'conference_not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
     );
     return $locales;
 }

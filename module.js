@@ -26,8 +26,7 @@ M.mod_bigbluebuttonbn.datasource_init = function(Y) {
 M.mod_bigbluebuttonbn.view_init = function(Y) {
 	// Init general datasource
 	M.mod_bigbluebuttonbn.datasource_init(Y);
-
-    if (bigbluebuttonbn.action == 'join') {
+    if (bigbluebuttonbn.activity === 'open') {
 	    // Create the main modal form.
         bigbluebuttonbn_panel = new Y.Panel({
             srcNode      : '#panelContent',
@@ -77,6 +76,16 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         });
 
         M.mod_bigbluebuttonbn.view_update();
+    } else {
+        if (bigbluebuttonbn.activity === 'ended') {
+            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+              bigbluebuttonbn.locales.conference_ended
+            ));
+        } else {
+            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+              [bigbluebuttonbn.locales.conference_ended, bigbluebuttonbn.opening, bigbluebuttonbn.closing]
+            ));
+        }
     }
 };
 
@@ -135,8 +144,18 @@ M.mod_bigbluebuttonbn.view_remote_update = function(delay) {
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
 
-    Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
-    Y.DOM.setText(status_bar_span, status_message);
+    if (status_message.constructor === Array) {
+        for (var message in status_message) {
+            var status_bar_span_span = Y.DOM.create('<span>');
+            Y.DOM.setAttribute(status_bar_span_span, 'id', 'status_bar_span_span');
+            Y.DOM.setText(status_bar_span_span, status_message[message]);
+            Y.DOM.addHTML(status_bar_span, status_bar_span_span);
+            Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
+        }
+    } else {
+        Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
+        Y.DOM.setText(status_bar_span, status_message);
+    }
 
     return(status_bar_span);
 }
