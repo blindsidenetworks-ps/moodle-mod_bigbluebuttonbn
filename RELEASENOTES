@@ -3,6 +3,7 @@ Bug: Fixed issue with actions for recording managment not working in instances w
 Bug: Standarized output in intermediate page for activities not started/ended
 Bug: Fixed issue with past BBB sessions listed as upcoming in the course overview block (CONTRIB-6650)
 Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created (CONTRIB-6652)
+Bug: Fixed issue with default bigbluebutton server settings (CONTRIB-6630)
 
 2.1.4 (2016051908)
 Bug: Reverted changes made to the language strings in previous release.

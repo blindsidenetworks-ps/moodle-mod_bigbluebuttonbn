@@ -43,6 +43,9 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled = 0;
  * Remove this block when restored
  */
 
+const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = "http://test-install.blindsidenetworks.com/bigbluebutton/";
+const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = "8cd8ef52e8e101574e400365b55e11a6";
+
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = "Create";
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = "Join";
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";

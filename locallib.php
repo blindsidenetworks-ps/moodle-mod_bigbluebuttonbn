@@ -1284,12 +1284,12 @@ function bigbluebuttonbn_get_locales_for_ui() {
 
 function bigbluebuttonbn_get_cfg_server_url_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url: (isset($CFG->bigbluebuttonbn_server_url)? $CFG->bigbluebuttonbn_server_url: (isset($CFG->BigBlueButtonBNServerURL)? $CFG->BigBlueButtonBNServerURL: 'http://test-install.blindsidenetworks.com/bigbluebutton/')));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url: (isset($CFG->bigbluebuttonbn_server_url)? $CFG->bigbluebuttonbn_server_url: (isset($CFG->BigBlueButtonBNServerURL)? $CFG->BigBlueButtonBNServerURL: BIGBLUEBUTTONBN_DEFAULT_SERVER_URL)));
 }
 
 function bigbluebuttonbn_get_cfg_shared_secret_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret: (isset($CFG->bigbluebuttonbn_shared_secret)? $CFG->bigbluebuttonbn_shared_secret: (isset($CFG->BigBlueButtonBNSecuritySalt)? $CFG->BigBlueButtonBNSecuritySalt: '8cd8ef52e8e101574e400365b55e11a6')));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret: (isset($CFG->bigbluebuttonbn_shared_secret)? $CFG->bigbluebuttonbn_shared_secret: (isset($CFG->BigBlueButtonBNSecuritySalt)? $CFG->BigBlueButtonBNSecuritySalt: BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)));
 }
 
 function bigbluebuttonbn_get_cfg_voicebridge_editable() {
