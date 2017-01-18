@@ -174,7 +174,7 @@ echo $OUTPUT->header();
 
 /// find out current groups mode
 $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
-if ($groupmode == NOGROUPS ) {  //No groups mode
+if ( $groupmode == NOGROUPS ) {  //No groups mode
     $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id;
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
 
@@ -184,27 +184,26 @@ if ($groupmode == NOGROUPS ) {  //No groups mode
     echo $OUTPUT->box_end();
 
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
-    if ($groupmode == SEPARATEGROUPS ) {
+    $groups = groups_get_all_groups($bbbsession['course']->id);
+    if ( $groupmode == SEPARATEGROUPS && sizeof($groups) > 0 ) {
         groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
         if( $bbbsession['group'] == 0 ) {
-            if ( $bbbsession['administrator'] ) {
-                $my_groups = groups_get_all_groups($bbbsession['course']->id);
-            } else {
-                $my_groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+            if ( !$bbbsession['administrator'] ) {
+                $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
             }
-            $current_group = current($my_groups);
+            $current_group = current($groups);
             $bbbsession['group'] = $current_group->id;
         }
-
     } else {
         groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
     }
 
     $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
-    if( $bbbsession['group'] > 0 )
+    if ( $bbbsession['group'] > 0 ) {
         $group_name = groups_get_group_name($bbbsession['group']);
-    else
+    } else {
         $group_name = get_string('allparticipants');
+    }
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$group_name.')';
 }
 // Metadata (context)
