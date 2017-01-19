@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Version for BigBlueButtonBN Moodle Activity Module.
  *
@@ -11,9 +11,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2016051908;
+$plugin->version  = 2016051909;
 $plugin->requires = 2013111800;
 $plugin->cron     = 0;
 $plugin->component = 'mod_bigbluebuttonbn';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release  = '2.1.4';
+$plugin->release  = '2.1.5';
