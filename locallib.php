@@ -215,10 +215,10 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
     if ( is_array($meetingIDs) ) {
-        // getRecordings is executes using a method POST (supported only on BBB 1.0 and later)
+        // getRecordings is executed using a method POST (supported only on BBB 1.0 and later)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
     } else {
-        // getRecordings is executes using a method GET supported by any version of BBB
+        // getRecordings is executed using a method GET (supported by all versions of BBB)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingIDs ) );
     }
 
@@ -1513,7 +1513,6 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
     $recordings = array();
 
     // Load the meetingIDs to be used in the getRecordings request
-    $meetingID = '';
     if ( is_numeric($courseID) ) {
         $results = bigbluebuttonbn_getRecordedMeetings($courseID);
 
@@ -1523,24 +1522,22 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
         }
 
         if( $results ) {
-            //Eliminates duplicates
             $mIDs = array();
+            //Eliminates duplicates
             foreach ($results as $result) {
                 $mIDs[$result->meetingid] = $result->meetingid;
             }
-            //Generates the meetingID string
-            foreach ($mIDs as $mID) {
-                if (strlen($meetingID) > 0) {
-                    $meetingID .= ',';
+
+            // If there are mIDs excecute a paginated getRecordings request
+            if ( !empty($mIDs) ) {
+                $pages = floor(sizeof($mIDs) / 25) + 1;
+                for ( $page = 1; $page <= $pages; $page++ ) {
+                    $meetingIDs = array_slice($mIDs, ($page-1)*25, 25);
+                    $fetched_recordings = bigbluebuttonbn_getRecordingsArray(implode(',', $meetingIDs), $URL, $SALT);
+                    $recordings = array_merge($recordings, $fetched_recordings);
                 }
-                $meetingID .= $mID;
             }
         }
-    }
-
-    // If there were meetingIDs excecute the getRecordings request
-    if ( $meetingID != '' ) {
-        $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT);
     }
 
     return $recordings;
