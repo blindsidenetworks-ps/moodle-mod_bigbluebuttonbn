@@ -183,19 +183,14 @@ if ( $groupmode == NOGROUPS ) {  //No groups mode
     echo '<br><div class="alert alert-warning">'.get_string('view_groups_selection_warning', 'bigbluebuttonbn').'</div>';
     echo $OUTPUT->box_end();
 
-    $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
-    $groups = groups_get_all_groups($bbbsession['course']->id);
+    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
     if ( $groupmode == SEPARATEGROUPS && sizeof($groups) > 0 ) {
-        groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, true);
-        if( $bbbsession['group'] == 0 ) {
-            if ( !$bbbsession['administrator'] ) {
-                $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
-            }
-            $current_group = current($groups);
-            $bbbsession['group'] = $current_group->id;
-        }
+        $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+        $current_group = current($groups);
+        $bbbsession['group'] = $current_group->id;
     } else {
-        groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
+        $groups = groups_get_all_groups($bbbsession['course']->id);
+        $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
     }
 
     $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.$bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
