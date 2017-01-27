@@ -8,11 +8,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
-$bn = required_param('bn', PARAM_INT);     // bigbluebuttonbn instance ID
-$tc = optional_param('tc', 0, PARAM_INT);  // target course ID
+$bn = required_param('bn', PARAM_INT); // bigbluebuttonbn instance ID
+$tc = optional_param('tc', 0, PARAM_INT); // target course ID
 
 if ($bn) {
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
@@ -26,7 +26,7 @@ $context = bigbluebuttonbn_get_context_module($cm->id);
 
 require_login($course, true, $cm);
 
-if ( isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
+if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
@@ -47,7 +47,7 @@ $output .= '<h4>Import recording links</h4>';
 
 $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
 $selected = bigbluebuttonbn_selected_course($options, $tc);
-if( empty($options) ) {
+if (empty($options)) {
     $output .= html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
 
 } else {
@@ -58,14 +58,14 @@ if( empty($options) ) {
     $recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
     //store remaining recordings (indexed) in a session variable
     $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
-    if( empty($recordings) ) {
+    if (empty($recordings)) {
         $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     } else {
-        $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table' ,'name'=>'import_recording_links_table']);
+        $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table', 'name'=>'import_recording_links_table']);
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['importing']);
     }
     $output .= html_writer::start_tag('br');
-    $output .= html_writer::tag( 'input', '', array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'), 'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\'') );
+    $output .= html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id . '\''));
 
     $jsvars = array(
         'bn' => $bn,
@@ -87,10 +87,10 @@ $output .= $OUTPUT->footer();
 // finally, render the output
 echo $output;
 
-function bigbluebuttonbn_selected_course($options, $tc='') {
-    if( empty($options) ) {
+function bigbluebuttonbn_selected_course($options, $tc = '') {
+    if (empty($options)) {
         $selected = '';
-    } else if(array_key_exists($tc, $options)) {
+    } else if (array_key_exists($tc, $options)) {
         $selected = $tc;
     } else {
         $selected = '';
