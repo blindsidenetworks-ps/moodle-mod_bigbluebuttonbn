@@ -84,8 +84,9 @@ $bbbsession['userlimit'] = bigbluebuttonbn_get_cfg_userlimit_editable() ? intval
 $bbbsession['voicebridge'] = ($bigbluebuttonbn->voicebridge > 0) ? 70000 + $bigbluebuttonbn->voicebridge : $bigbluebuttonbn->voicebridge;
 $bbbsession['wait'] = $bigbluebuttonbn->wait;
 $bbbsession['record'] = $bigbluebuttonbn->record;
-if ($bigbluebuttonbn->record)
+if ($bigbluebuttonbn->record) {
     $bbbsession['welcome'] .= '<br><br>' . get_string('bbbrecordwarning', 'bigbluebuttonbn');
+}
 $bbbsession['tagging'] = $bigbluebuttonbn->tagging;
 
 $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
@@ -112,21 +113,23 @@ $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn (' . $module_version . ')
 // Validates if the BigBlueButton server is running
 $serverVersion = bigbluebuttonbn_getServerVersion($bbbsession['endpoint']);
 if (!isset($serverVersion)) { //Server is not working
-    if ($bbbsession['administrator'])
-        print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
-    else if ($bbbsession['moderator'])
-        print_error('view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
-    else
-        print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
-} else {
+    if ($bbbsession['administrator']) {
+            print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+    } else if ($bbbsession['moderator']) {
+            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
+    } else {
+            print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
+    }
+    } else {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getMeetingsURL($bbbsession['endpoint'], $bbbsession['shared_secret']));
     if (!isset($xml) || !isset($xml->returncode) || $xml->returncode == 'FAILED') { // The shared secret is wrong
-        if ($bbbsession['administrator'])
-            print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
-        else if ($bbbsession['moderator'])
-            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
-        else
-            print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
+        if ($bbbsession['administrator']) {
+                    print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+        } else if ($bbbsession['moderator']) {
+                    print_error('view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
+        } else {
+                    print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
+        }
     }
 }
 
@@ -283,28 +286,28 @@ function bigbluebuttonbn_view_joining($bbbsession) {
 
     if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
         echo '' .
-          '<div id="panelContent" class="hidden">' . "\n" .
-          '  <div class="yui3-widget-bd">' . "\n" .
-          '    <form>' . "\n" .
-          '      <fieldset>' . "\n" .
-          '        <input type="hidden" name="join" id="meeting_join_url" value="">' . "\n" .
-          '        <input type="hidden" name="message" id="meeting_message" value="">' . "\n" .
-          '        <div>' . "\n" .
-          '          <label for="name">' . get_string('view_recording_name', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
-          '          <input type="text" name="name" id="recording_name" placeholder="">' . "\n" .
-          '        </div><br>' . "\n" .
-          '        <div>' . "\n" .
-          '          <label for="description">' . get_string('view_recording_description', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
-          '          <input type="text" name="description" id="recording_description" value="" placeholder="">' . "\n" .
-          '        </div><br>' . "\n" .
-          '        <div>' . "\n" .
-          '          <label for="tags">' . get_string('view_recording_tags', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
-          '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">' . "\n" .
-          '        </div>' . "\n" .
-          '      </fieldset>' . "\n" .
-          '    </form>' . "\n" .
-          '  </div>' . "\n" .
-          '</div>';
+            '<div id="panelContent" class="hidden">' . "\n" .
+            '  <div class="yui3-widget-bd">' . "\n" .
+            '    <form>' . "\n" .
+            '      <fieldset>' . "\n" .
+            '        <input type="hidden" name="join" id="meeting_join_url" value="">' . "\n" .
+            '        <input type="hidden" name="message" id="meeting_message" value="">' . "\n" .
+            '        <div>' . "\n" .
+            '          <label for="name">' . get_string('view_recording_name', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
+            '          <input type="text" name="name" id="recording_name" placeholder="">' . "\n" .
+            '        </div><br>' . "\n" .
+            '        <div>' . "\n" .
+            '          <label for="description">' . get_string('view_recording_description', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
+            '          <input type="text" name="description" id="recording_description" value="" placeholder="">' . "\n" .
+            '        </div><br>' . "\n" .
+            '        <div>' . "\n" .
+            '          <label for="tags">' . get_string('view_recording_tags', 'bigbluebuttonbn') . '</label><br/>' . "\n" .
+            '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">' . "\n" .
+            '        </div>' . "\n" .
+            '      </fieldset>' . "\n" .
+            '    </form>' . "\n" .
+            '  </div>' . "\n" .
+            '</div>';
     }
 }
 
@@ -316,8 +319,8 @@ function bigbluebuttonbn_view_ended($bbbsession) {
         $icon = new pix_icon($bbbsession['presentation']['icon'], $bbbsession['presentation']['mimetype_description']);
 
         echo '<h4>' . get_string('view_section_title_presentation', 'bigbluebuttonbn') . '</h4>' .
-             '' . $OUTPUT->action_icon($bbbsession['presentation']['url'], $icon, null, array(), false) . '' .
-             '' . $OUTPUT->action_link($bbbsession['presentation']['url'], $bbbsession['presentation']['name'], null, $attributes) . '<br><br>';
+                '' . $OUTPUT->action_icon($bbbsession['presentation']['url'], $icon, null, array(), false) . '' .
+                '' . $OUTPUT->action_link($bbbsession['presentation']['url'], $bbbsession['presentation']['name'], null, $attributes) . '<br><br>';
     }
 }
 
@@ -338,7 +341,9 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
             }
             //Generates the meetingID string
             foreach ($mIDs as $mID) {
-                if (strlen($meetingID) > 0) $meetingID .= ',';
+                if (strlen($meetingID) > 0) {
+                    $meetingID .= ',';
+                }
                 $meetingID .= $mID;
             }
         }
