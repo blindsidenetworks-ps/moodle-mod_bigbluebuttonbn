@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Version for BigBlueButtonBN Moodle Activity Module.
  *

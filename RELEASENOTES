@@ -1,6 +1,19 @@
 2.2 (2016080100)
 Enhancement: Included the parameter userID as part of the join request.
 
+2.1.6 (2016051910)
+Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created. (CONTRIB-6652)
+
+2.1.5 (2016051909)
+Bug: Fixed issue with actions for recording managment not working in instances with schedule. (CONTRIB-6654)
+Bug: Standarized output in intermediate page for activities not started/ended.
+Bug: Fixed issue with past BBB sessions listed as upcoming in the course overview block. (CONTRIB-6650)
+Bug: Fixed issue with default bigbluebutton server settings. (CONTRIB-6630)
+Bug: Rework to prevent potental issue with recordings not fetched when the course has too many groups.
+
+2.1.4 (2016051908)
+Bug: Reverted changes made to the language strings in previous release.
+
 2.1.3 (2016051907)
 Bug: Fixed issue with course logs not being backup/restore.
 Bug: Fixed issue with localized event description affecting multi-language sites.
@@ -63,7 +76,7 @@ Enhancement: Added Spanish and French.
 Enhancement: Synced API calls with BigBlueButton 0.8-beta-4.
 
 1.0.6 (October 31, 2011)
-Enhancement: Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php 
+Enhancement: Extended supported languages (ru), fixed a bug in bigbluebuttonbn/index.php
 
 1.0.5 (October 19, 2011)
 Enhancement: Extended supported languages

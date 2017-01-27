@@ -8,7 +8,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 /**
  * This function is initialized from PHP
- * 
+ *
  * @param {Object}
  *            Y YUI instance
  */
@@ -26,10 +26,7 @@ M.mod_bigbluebuttonbn.datasource_init = function(Y) {
 M.mod_bigbluebuttonbn.view_init = function(Y) {
 	// Init general datasource
 	M.mod_bigbluebuttonbn.datasource_init(Y);
-
-    if (bigbluebuttonbn.action == 'before') {
-    } else if (bigbluebuttonbn.action == 'after') {
-    } else if (bigbluebuttonbn.action == 'join') {
+    if (bigbluebuttonbn.activity === 'open') {
 	    // Create the main modal form.
         bigbluebuttonbn_panel = new Y.Panel({
             srcNode      : '#panelContent',
@@ -79,6 +76,16 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         });
 
         M.mod_bigbluebuttonbn.view_update();
+    } else {
+        if (bigbluebuttonbn.activity === 'ended') {
+            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+              bigbluebuttonbn.locales.conference_ended
+            ));
+        } else {
+            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+              [bigbluebuttonbn.locales.conference_ended, bigbluebuttonbn.opening, bigbluebuttonbn.closing]
+            ));
+        }
     }
 };
 
@@ -137,8 +144,18 @@ M.mod_bigbluebuttonbn.view_remote_update = function(delay) {
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
 
-    Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
-    Y.DOM.setText(status_bar_span, status_message);
+    if (status_message.constructor === Array) {
+        for (var message in status_message) {
+            var status_bar_span_span = Y.DOM.create('<span>');
+            Y.DOM.setAttribute(status_bar_span_span, 'id', 'status_bar_span_span');
+            Y.DOM.setText(status_bar_span_span, status_message[message]);
+            Y.DOM.addHTML(status_bar_span, status_bar_span_span);
+            Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
+        }
+    } else {
+        Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
+        Y.DOM.setText(status_bar_span, status_message);
+    }
 
     return(status_bar_span);
 }
@@ -177,7 +194,7 @@ M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
     var participants = parseInt(participantCount);
     var msg_users_joined = '<b>' + participants + '</b> ';
     if( participants == 1 ) {
-        msg_users_joined += bigbluebuttonbn.locales.user + ' ' + bigbluebuttonbn.locales.has_joined + '.'; 
+        msg_users_joined += bigbluebuttonbn.locales.user + ' ' + bigbluebuttonbn.locales.has_joined + '.';
     } else {
         msg_users_joined += bigbluebuttonbn.locales.users + ' ' + bigbluebuttonbn.locales.have_joined + '.';
     }
@@ -196,9 +213,9 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
 
         } else {
             if( viewers > 0 ) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';	
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';
             } else if ( moderators > 0 ) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';	
+                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';
             }
         }
 

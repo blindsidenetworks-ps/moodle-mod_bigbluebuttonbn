@@ -76,19 +76,23 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
     $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&logoutURL='.urlencode($logoutURL).'&record='.$record;
 
     $voiceBridge = intval($voiceBridge);
-    if ( $voiceBridge > 0 && $voiceBridge < 79999)
+    if ( $voiceBridge > 0 && $voiceBridge < 79999) {
         $params .= '&voiceBridge='.$voiceBridge;
+    }
 
     $duration = intval($duration);
-    if( $duration > 0 )
+    if( $duration > 0 ) {
         $params .= '&duration='.$duration;
+    }
 
     $maxParticipants = intval($maxParticipants);
-    if( $maxParticipants > 0 )
+    if( $maxParticipants > 0 ) {
         $params .= '&maxParticipants='.$maxParticipants;
+    }
 
-    if( trim( $welcome ) )
+    if( trim( $welcome ) ) {
         $params .= '&welcome='.urlencode($welcome);
+    }
 
     foreach ($metadata as $key => $value) {
         $params .= '&'.$key.'='.urlencode($value);
@@ -179,10 +183,11 @@ function bigbluebuttonbn_getCreateMeetingArray( $username, $meetingID, $welcomeS
     }
 
     if ( $xml ) {
-        if ($xml->meetingID)
+        if ($xml->meetingID) {
             return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
-        else
+        } else {
             return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
+        }
     } else {
         return null;
     }
@@ -208,10 +213,10 @@ function bigbluebuttonbn_getMeetings( $URL, $SALT ) {
 function bigbluebuttonbn_getMeetingsArray( $URL, $SALT ) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getMeetingsURL($URL, $SALT) );
 
-    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
+    if ( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {    //The meetings were returned
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
 
-    } else if($xml && $xml->returncode == 'SUCCESS'){                    //If there were meetings already created
+    } else if($xml && $xml->returncode == 'SUCCESS') {                    //If there were meetings already created
         foreach ($xml->meetings->meeting as $meeting) {
             $meetings[] = array( 'meetingID' => $meeting->meetingID, 'moderatorPW' => $meeting->moderatorPW, 'attendeePW' => $meeting->attendeePW, 'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded, 'running' => $meeting->running );
         }
@@ -262,10 +267,10 @@ function bigbluebuttonbn_getRecordingsArray( $meetingIDs, $URL, $SALT ) {
     $recordings = array();
 
     if ( is_array($meetingIDs) ) {
-        // getRecordings is executes using a method POST (supported only on BBB 1.0 and later)
+        // getRecordings is executed using a method POST (supported only on BBB 1.0 and later)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT ), BIGBLUEBUTTONBN_METHOD_POST, $meetingIDs );
     } else {
-        // getRecordings is executes using a method GET supported by any version of BBB
+        // getRecordings is executed using a method GET (supported by all versions of BBB)
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingIDs ) );
     }
 
@@ -319,7 +324,6 @@ function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SAL
 }
 
 function bigbluebuttonbn_getRecordingArrayRow( $recording ) {
-    $recordingArrayRow = array();
 
     $playbackArray = array();
     foreach ( $recording->playback->format as $format ) {
@@ -330,7 +334,9 @@ function bigbluebuttonbn_getRecordingArrayRow( $recording ) {
     $metadataArray = array();
     $metadata = get_object_vars($recording->metadata);
     foreach ( $metadata as $key => $value ) {
-        if ( is_object($value) ) $value = '';
+        if ( is_object($value) ) {
+            $value = '';
+        }
         $metadataArray['meta_'.$key] = $value;
     }
 
@@ -340,17 +346,22 @@ function bigbluebuttonbn_getRecordingArrayRow( $recording ) {
 }
 
 function bigbluebuttonbn_recordingBuildSorter($a, $b){
-    if( $a['startTime'] < $b['startTime']) return -1;
-    else if( $a['startTime'] == $b['startTime']) return 0;
-    else return 1;
+    if ( $a['startTime'] < $b['startTime'] ) {
+        return -1;
+    } else if ( $a['startTime'] == $b['startTime']) {
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 function bigbluebuttonbn_doDeleteRecordings( $recordIDs, $URL, $SALT ) {
     $ids = 	explode(",", $recordIDs);
     foreach( $ids as $id){
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getDeleteRecordingsURL($id, $URL, $SALT) );
-        if( $xml && $xml->returncode != 'SUCCESS' )
+        if( $xml && $xml->returncode != 'SUCCESS' ) {
             return false;
+        }
     }
     return true;
 }
@@ -359,8 +370,9 @@ function bigbluebuttonbn_doPublishRecordings( $recordIDs, $set, $URL, $SALT ) {
     $ids = 	explode(",", $recordIDs);
     foreach( $ids as $id){
         $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getPublishRecordingsURL($id, $set, $URL, $SALT) );
-        if( $xml && $xml->returncode != 'SUCCESS' )
+        if( $xml && $xml->returncode != 'SUCCESS' ) {
             return false;
+        }
     }
     return true;
 }
@@ -595,8 +607,9 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
         // Iterate looking for all configuration
         foreach($participant_list as $participant){
             if( $participant->selectiontype == 'all' ) {
-                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                     return true;
+                }
             }
         }
 
@@ -607,8 +620,9 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
                 foreach( $roles as $role ) {
                     $db_moodle_role = bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role->roleid);
                     if( $participant->selectionid == $db_moodle_role->shortname ) {
-                        if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                        if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                             return true;
+                        }
                     }
                 }
             }
@@ -618,8 +632,9 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
         foreach($participant_list as $participant){
             if( $participant->selectiontype == 'user' ) {
                 if( $participant->selectionid == $user ) {
-                    if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR )
+                    if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                         return true;
+                    }
                 }
             }
         }
@@ -638,7 +653,7 @@ function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
 
 function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
     $key = $defaultKey;
-    if ( $messageKey == "checksumError" ){
+    if ( $messageKey == "checksumError" ) {
         $key = 'index_error_checksum';
     } else if ( $messageKey == 'maxConcurrent' ) {
         $key = 'view_error_max_concurrent';
@@ -650,10 +665,12 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id=null) {
     global $DB;
 
     $is_unique = true;
-    if( $voicebridge != 0 ) {
+    if ( $voicebridge != 0 ) {
         $table = "bigbluebuttonbn";
         $select = "voicebridge = ".$voicebridge;
-        if( $id ) $select .= " AND id <> ".$id;
+        if ( $id ) {
+            $select .= " AND id <> ".$id;
+        }
         if ( $rooms = $DB->get_records_select($table, $select)  ) {
             $is_unique = false;
         }
@@ -667,7 +684,7 @@ function bigbluebuttonbn_get_duration($openingtime, $closingtime) {
 
     $duration = 0;
     $now = time();
-    if( $closingtime > 0 && $now < $closingtime ) {
+    if ( $closingtime > 0 && $now < $closingtime ) {
         $duration = ceil(($closingtime - $now)/60);
         $compensation_time = intval(bigbluebuttonbn_get_cfg_scheduled_duration_compensation());
         $duration = intval($duration) + $compensation_time;
@@ -682,7 +699,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id=nul
     $presentation_icon = null;
     $presentation_mimetype_description = null;
 
-    if( !empty($presentation) ) {
+    if ( !empty($presentation) ) {
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0, 'itemid, filepath, filename', false);
         if (count($files) < 1) {
@@ -1315,7 +1332,8 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     /// Build the message_body
     $msg->activity_type = "";
     $msg->activity_title = $bigbluebuttonbn->name;
-    $message_text = get_string('email_body_recording', 'bigbluebuttonbn', $msg);
+    $message_text = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
+
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }
 
@@ -1338,8 +1356,9 @@ function bigbluebuttonbn_server_offers($capability_name){
         $capabilities = bigbluebuttonbn_getCapabilitiesArray( $endpoint, $shared_secret );
         if( $capabilities ) {
             foreach ($capabilities as $capability) {
-                if( $capability["name"] == $capability_name)
+                if ( $capability["name"] == $capability_name) {
                     $capability_offered = $capability;
+                }
             }
         }
     }
@@ -1391,18 +1410,20 @@ function bigbluebuttonbn_get_locales_for_ui() {
             'delete_confirmation_warning_s' => get_string('view_recording_delete_confirmation_warning_s', 'bigbluebuttonbn'),
             'delete_confirmation_warning_p' => get_string('view_recording_delete_confirmation_warning_p', 'bigbluebuttonbn'),
             'import_confirmation' => get_string('view_recording_import_confirmation', 'bigbluebuttonbn'),
+            'conference_ended' => get_string('view_message_conference_has_ended', 'bigbluebuttonbn'),
+            'conference_not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
     );
     return $locales;
 }
 
 function bigbluebuttonbn_get_cfg_server_url_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url: (isset($CFG->bigbluebuttonbn_server_url)? $CFG->bigbluebuttonbn_server_url: (isset($CFG->BigBlueButtonBNServerURL)? $CFG->BigBlueButtonBNServerURL: 'http://test-install.blindsidenetworks.com/bigbluebutton/')));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url: (isset($CFG->bigbluebuttonbn_server_url)? $CFG->bigbluebuttonbn_server_url: (isset($CFG->BigBlueButtonBNServerURL)? $CFG->BigBlueButtonBNServerURL: BIGBLUEBUTTONBN_DEFAULT_SERVER_URL)));
 }
 
 function bigbluebuttonbn_get_cfg_shared_secret_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret: (isset($CFG->bigbluebuttonbn_shared_secret)? $CFG->bigbluebuttonbn_shared_secret: (isset($CFG->BigBlueButtonBNSecuritySalt)? $CFG->BigBlueButtonBNSecuritySalt: '8cd8ef52e8e101574e400365b55e11a6')));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret: (isset($CFG->bigbluebuttonbn_shared_secret)? $CFG->bigbluebuttonbn_shared_secret: (isset($CFG->BigBlueButtonBNSecuritySalt)? $CFG->BigBlueButtonBNSecuritySalt: BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)));
 }
 
 function bigbluebuttonbn_get_cfg_voicebridge_editable() {
@@ -1631,7 +1652,6 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
     $recordings = array();
 
     // Load the meetingIDs to be used in the getRecordings request
-    $meetingID = '';
     if ( is_numeric($courseID) ) {
         $results = bigbluebuttonbn_getRecordedMeetings($courseID);
 
@@ -1641,22 +1661,22 @@ function bigbluebuttonbn_getRecordingsArrayByCourse($courseID, $URL, $SALT) {
         }
 
         if( $results ) {
-            //Eliminates duplicates
             $mIDs = array();
+            //Eliminates duplicates
             foreach ($results as $result) {
                 $mIDs[$result->meetingid] = $result->meetingid;
             }
-            //Generates the meetingID string
-            foreach ($mIDs as $mID) {
-                if (strlen($meetingID) > 0) $meetingID .= ',';
-                $meetingID .= $mID;
+
+            // If there are mIDs excecute a paginated getRecordings request
+            if ( !empty($mIDs) ) {
+                $pages = floor(sizeof($mIDs) / 25) + 1;
+                for ( $page = 1; $page <= $pages; $page++ ) {
+                    $meetingIDs = array_slice($mIDs, ($page-1)*25, 25);
+                    $fetched_recordings = bigbluebuttonbn_getRecordingsArray(implode(',', $meetingIDs), $URL, $SALT);
+                    $recordings = array_merge($recordings, $fetched_recordings);
+                }
             }
         }
-    }
-
-    // If there were meetingIDs excecute the getRecordings request
-    if ( $meetingID != '' ) {
-        $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $URL, $SALT);
     }
 
     return $recordings;
@@ -1746,10 +1766,11 @@ function bigbluebuttonbn_debugdisplay() {
 function bigbluebuttonbn_html2text($html, $len) {
     $text = strip_tags($html);
     $text = str_replace("&nbsp;", ' ', $text);
-    if( strlen($text) > $len )
+    if( strlen($text) > $len ) {
         $text = substr($text, 0, $len)."...";
-    else
+    } else {
         $text = substr($text, 0, $len);
+    }
     return $text;
 }
 
