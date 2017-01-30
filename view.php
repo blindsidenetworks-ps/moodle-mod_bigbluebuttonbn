@@ -177,7 +177,7 @@ if ($groupmode == NOGROUPS) {  //No groups mode
     echo $OUTPUT->box_end();
 
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id);
-    if ($groupmode == SEPARATEGROUPS && sizeof($groups) > 0) {
+    if ($groupmode == SEPARATEGROUPS) {
         $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
         $current_group = current($groups);
         $bbbsession['group'] = $current_group->id;
@@ -354,8 +354,8 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         if ($bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $button_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
             $output .= html_writer::start_tag('br');
-            $output .= html_writer::tag('span', $button_import_recordings, ['id'=>"import_recording_links_button"]);
-            $output .= html_writer::tag('span', '', ['id'=>"import_recording_links_table"]);
+            $output .= html_writer::tag('span', $button_import_recordings, array('id'=>"import_recording_links_button"));
+            $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));
         }
 
         echo $output;

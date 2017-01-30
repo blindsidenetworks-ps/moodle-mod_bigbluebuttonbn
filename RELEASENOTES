@@ -1,5 +1,6 @@
 2.2 (2016080100)
 Enhancement: Included the parameter userID as part of the join request.
+Enhancement: Added preview thumbnails to recordings.
 
 2.1.6 (2016051910)
 Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created. (CONTRIB-6652)
