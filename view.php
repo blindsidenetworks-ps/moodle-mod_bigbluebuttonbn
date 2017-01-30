@@ -241,7 +241,6 @@ $jsmodule = array(
 );
 $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
 
-
 // Finish the page
 echo $OUTPUT->footer();
 
@@ -357,6 +356,10 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
             $output .= html_writer::tag('span', $button_import_recordings, array('id'=>"import_recording_links_button"));
             $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));
         }
+
+        $output .= html_writer::empty_tag('br');
+        $output .= html_writer::empty_tag('br');
+        $output .= html_writer::empty_tag('br');
 
         echo $output;
     }

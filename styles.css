@@ -1,0 +1,11 @@
+.img-thumbnail{
+}
+
+.img-thumbnail:hover{
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
+  padding: 4px;
+  width: 25%;
+  height: 25%;
+}

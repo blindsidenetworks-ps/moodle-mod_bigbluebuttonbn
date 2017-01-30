@@ -296,6 +296,7 @@ $string['view_recording_name'] = 'Name';
 $string['view_recording_tags'] = 'Tags';
 $string['view_recording_playback'] = 'Playback';
 $string['view_recording_preview'] = 'Preview';
+$string['view_recording_preview_help'] = 'Hover over an image to view it in full size';
 $string['view_recording_modal_button'] = 'Apply';
 $string['view_recording_modal_title'] = 'Set values for recording';
 

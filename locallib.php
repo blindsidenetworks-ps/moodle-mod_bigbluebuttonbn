@@ -1115,20 +1115,22 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
 
         //For backward compatibility
         if (isset($recording['meta_contextactivity'])) {
-            $meta_activity = str_replace('"', '\"', $recording['meta_contextactivity']);
+            $meta_activity = htmlentities($recording['meta_contextactivity']);
         } if (isset($recording['meta_bbb-recording-name'])) {
-            $meta_activity = str_replace('"', '\"', $recording['meta_bbb-recording-name']);
+            $meta_activity = htmlentities($recording['meta_bbb-recording-name']);
         } else {
-            $meta_activity = str_replace('"', '\"', $recording['meetingName']);
+            $meta_activity = htmlentities($recording['meetingName']);
         }
 
-        if (isset($recording['meta_contextactivitydescription'])) {
-            $meta_description = str_replace('"', '\"', $recording['meta_contextactivitydescription']);
-        } else if (isset($recording['meta_bbb-recording-description'])) {
-            $meta_description = str_replace('"', '\"', $recording['meta_bbb-recording-description']);
+        $meta_description = html_writer::start_tag('div', array('class' => 'col-md-20'));
+        if (isset($recording['meta_contextactivitydescription']) && trim($recording['meta_contextactivitydescription']) != '') {
+            $meta_description .= htmlentities($recording['meta_contextactivitydescription']);
+        } else if (isset($recording['meta_bbb-recording-description']) && trim($recording['meta_bbb-recording-description']) != '') {
+            $meta_description .= htmlentities($recording['meta_bbb-recording-description']);
         } else {
-            $meta_description = '';
+            $meta_description .= htmlentities('');
         }
+        $meta_description .= html_writer::end_tag('div');
 
         //Set recording_types
         if (isset($recording['imported'])) {
@@ -1153,11 +1155,12 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         $recording_preview = '';
         foreach ($recording['playbacks'] as $playback) {
             if (isset($playback['preview'])) {
-                error_log(json_encode($playback['preview']));
                 foreach ($playback['preview'] as $image) {
-                    $recording_preview .= html_writer::empty_tag('img', array('src' => $image['url'], 'width' => 44, 'height' => 34));
-                    $recording_preview .= '&nbsp;';
+                    $recording_preview .= html_writer::empty_tag('img', array('src' => $image['url'], 'width' => 66, 'height' => 51, 'class' => 'img-thumbnail'));
                 }
+                $recording_preview .= html_writer::empty_tag('br');
+                $recording_preview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-muted small'));
+                break;
             }
         }
 
