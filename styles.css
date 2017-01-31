@@ -1,11 +1,13 @@
-.img-thumbnail{
+.thumbnail {
+  padding: 4px;
+  width: 66px;
+  height: 51px;
 }
 
-.img-thumbnail:hover{
+.thumbnail:hover {
   display: inline-block;
   position: absolute;
-  z-index: 1;
-  padding: 4px;
-  width: 25%;
-  height: 25%;
+  z-index: 99999;
+  width: auto;
+  height: auto;
 }

@@ -1150,13 +1150,12 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         }
         $recording_types .= '</div>';
 
-        //HERE
         //Set recording_preview
         $recording_preview = '';
         foreach ($recording['playbacks'] as $playback) {
             if (isset($playback['preview'])) {
                 foreach ($playback['preview'] as $image) {
-                    $recording_preview .= html_writer::empty_tag('img', array('src' => $image['url'], 'width' => 66, 'height' => 51, 'class' => 'img-thumbnail'));
+                    $recording_preview .= html_writer::empty_tag('img', array('src' => $image['url'], 'class' => 'thumbnail'));
                 }
                 $recording_preview .= html_writer::empty_tag('br');
                 $recording_preview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-muted small'));
