@@ -158,6 +158,10 @@ $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?acti
 
 // Output starts here
 echo $OUTPUT->header();
+/// Shows version as a comment
+echo '
+<!-- moodle-mod_bigbluebuttonbn ('.$module_version.') -->'."\n";
+
 
 /// find out current groups mode
 $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
@@ -313,34 +317,8 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
     if (isset($bbbsession['record']) && $bbbsession['record']) {
         $output = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
 
-        $meetingID = '';
-        $results = bigbluebuttonbn_getRecordedMeetings($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-
-        if ($results) {
-            //Eliminates duplicates
-            $mIDs = array();
-            foreach ($results as $result) {
-                $mIDs[$result->meetingid] = $result->meetingid;
-            }
-            //Generates the meetingID string
-            foreach ($mIDs as $mID) {
-                if (strlen($meetingID) > 0) {
-                    $meetingID .= ',';
-                }
-                $meetingID .= $mID;
-            }
-        }
-
-        // Get actual recordings
-        if ($meetingID != '') {
-            $recordings = bigbluebuttonbn_getRecordingsArray($meetingID, $bbbsession['endpoint'], $bbbsession['shared_secret']);
-        } else {
-            $recordings = Array();
-        }
-        // Get recording links
-        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-        // Merge the recordings
-        $recordings = array_merge($recordings, $recordings_imported);
+        // Get recordings
+        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
         // Render the table
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
 
@@ -351,9 +329,7 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
             $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));
         }
 
-        $output .= html_writer::empty_tag('br');
-        $output .= html_writer::empty_tag('br');
-        $output .= html_writer::empty_tag('br');
+        $output .= html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
 
         echo $output;
     }
