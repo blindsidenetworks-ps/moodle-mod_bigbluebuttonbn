@@ -1,6 +1,6 @@
 <?php
 /**
- * View for BigBlueButton interaction  
+ * View for BigBlueButton interaction
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -53,9 +53,14 @@ if( empty($options) ) {
 } else {
     $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected));
 
-    $recordings = bigbluebuttonbn_getRecordingsArrayByCourse($selected, $bbbsession['endpoint'], $bbbsession['shared_secret']);
+    //get course recordings
+    if ($bbbsession['course']->id == $selected) {
+        $recordings = bigbluebuttonbn_get_recordings($selected, $bbbsession['bigbluebuttonbn']->id, false, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
+    } else {
+        $recordings = bigbluebuttonbn_get_recordings($selected, null, null, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
+    }
     //exclude the ones that are already imported
-    $recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
+    //$recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
     //store remaining recordings (indexed) in a session variable
     $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
     if( empty($recordings) ) {

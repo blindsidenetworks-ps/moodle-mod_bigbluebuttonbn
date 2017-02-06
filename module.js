@@ -440,6 +440,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                 request : "action=recording_info&id=" + recordingid + "&idx=" + meetingid,
                                 callback : {
                                     success : function(e) {
+                                        console.info(e);
                                         if (e.data.status == 'true') {
                                             if (action == 'publish') {
                                                 if (e.data.published == 'true') {

@@ -134,6 +134,10 @@ function bigbluebuttonbn_update_instance($data, $mform) {
  * @return boolean Success/Failure
  */
 function bigbluebuttonbn_delete_instance($id) {
+    error_log("*******************************************************************************");
+    error_log("*******************************************************************************");
+    error_log("*******************************************************************************");
+    error_log("*******************************************************************************");
     global $CFG, $DB, $USER;
 
     if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
@@ -187,7 +191,10 @@ function bigbluebuttonbn_delete_instance($id) {
     $log->meta = "{\"has_recordings\":{$has_recordings}}";
 
     if (! $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log)) {
+        error_log("It could not be saved");
         $result = false;
+    } else {
+        error_log("It was saved");
     }
 
     return $result;
