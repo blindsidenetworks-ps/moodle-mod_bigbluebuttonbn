@@ -395,7 +395,7 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if ( !$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat, newwindow')) {
+    if ( !$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
         return NULL;
     }
 
@@ -433,8 +433,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->timemodified = time();
     }
 
-    if (! isset($bigbluebuttonbn->newwindow))
-        $bigbluebuttonbn->newwindow = 0;
     if (! isset($bigbluebuttonbn->wait))
         $bigbluebuttonbn->wait = 0;
     if (! isset($bigbluebuttonbn->record))
