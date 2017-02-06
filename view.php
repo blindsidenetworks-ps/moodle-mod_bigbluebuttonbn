@@ -132,13 +132,7 @@ $PAGE->set_url($CFG->wwwroot . '/mod/bigbluebuttonbn/view.php', array('id' => $c
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
-
-if ($bigbluebuttonbn->newwindow == 1) {
-    $PAGE->blocks->show_only_fake_blocks();
-
-} else {
-    $PAGE->set_pagelayout('incourse');
-}
+$PAGE->set_pagelayout('incourse');
 
 // Validate if the user is in a role allowed to join
 if (!has_capability('moodle/category:manage', $context) && !has_capability('mod/bigbluebuttonbn:join', $context)) {
