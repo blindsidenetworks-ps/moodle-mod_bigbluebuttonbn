@@ -37,8 +37,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $userinfo = $this->get_setting_value('userinfo');
 
         $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
+
+        $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
+
         if ($userinfo) {
-            $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
         }
 
         // Return the paths wrapped into standard activity structure
