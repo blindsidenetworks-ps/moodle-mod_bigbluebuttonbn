@@ -244,9 +244,10 @@ function bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $URL, $SALT) {
 }
 
 function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID=NULL, $subset=TRUE, $include_deleted=FALSE) {
+    error_log("------------------------ bigbluebuttonbn_get_recordings ------------------------");
     global $DB;
 
-    // Set meetings that must be processed
+    // Gather the bigbluebuttonbnids whose meetingids should be included in the getRecordings request
     if ($bigbluebuttonbnID == NULL) {
         $select = "course = '{$courseID}'";
     } else if ($subset) {
@@ -256,33 +257,39 @@ function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID=NULL, $sub
     }
     $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
 
+    // Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in the getRecordings request
     if ($include_deleted) {
+        error_log("------------------------ bigbluebuttonbn_get_recordings include_deleted ------------------------");
         if ($bigbluebuttonbnID == NULL) {
             $select = "courseid = '{$courseID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
         } else if ($subset) {
             $select = "bigbluebuttonbnid = '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
         } else {
-            $select = "bigbluebuttonbnid <> '{$bigbluebuttonbnID}' AND courseid = '{$courseID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
+            $select = "courseid = '{$courseID}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
         }
+        error_log($select);
         $bigbluebuttonbns_deleted = $DB->get_records_select_menu('bigbluebuttonbn_logs', $select, null, 'bigbluebuttonbnid', 'bigbluebuttonbnid, meetingid');
         if (!empty($bigbluebuttonbns_deleted)) {
+            error_log("------------------------ merging bigbluebuttonbns_deleted ------------------------");
+            // Merge bigbluebuttonbnis from deleted instances, only keys are relevant. Artimetic merge is used in order to keep the keys
             $bigbluebuttonbns += $bigbluebuttonbns_deleted;
+        } else {
+            error_log("------------------------ nothing to merge from bigbluebuttonbns_deleted ------------------------");
         }
+    } else {
+        error_log("------------------------ bigbluebuttonbn_get_recordings don't include_deleted ------------------------");
     }
-    error_log(json_encode($bigbluebuttonbns));
 
+    // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true
     if (!empty($bigbluebuttonbns)) {
         //Prepare select for loading records based on existent bigbluebuttonbns
-        $select = "(bigbluebuttonbnid=".implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)).")";
+        $select  = "select distinct meetingid, bigbluebuttonbnid from {bigbluebuttonbn_logs} where ";
+        $select .= "(bigbluebuttonbnid=".implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)).")";
         //Include only Create events and exclude those with record not true
         $select .= " AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_CREATE."' AND meta like '%record%' AND meta like '%true%'";
+        error_log($select);
         //Execute select for loading records based on existent bigbluebuttonbns
-        $records = $DB->get_records_sql_menu('select distinct meetingid,bigbluebuttonbnid from {bigbluebuttonbn_logs} where '.$select);
-    } else {
-        $records = array();
-    }
-
-    if ($records) {
+        $records = $DB->get_records_sql_menu($select);
         // Get actual recordings
         $recordings = bigbluebuttonbn_getRecordingsArray(array_keys($records));
     } else {
@@ -290,14 +297,67 @@ function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID=NULL, $sub
     }
 
     // Get recording links
-    $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID);
-    // Merge the recordings
-    $recordings += $recordings_imported;
+    error_log("------------------------ bigbluebuttonbn_getRecordingsImportedArray ------------------------");
+    $records_imported = bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID, $subset, $include_deleted);
 
+    if (!empty($records_imported)) {
+        $recordings_imported = array();
+        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($records_imported);
+    } else {
+        error_log("---------------------- Nothing imported ---------------------------");
+        $recordings_imported = array();
+    }
+
+    error_log("------------------------ END ------------------------");
+    return array_merge($recordings, $recordings_imported);
+}
+
+function bigbluebuttonbn_unset_existent_recordings_already_imported($courseID, $bigbluebuttonbnID, $recordings) {
+    $records_imported = bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID);
+    $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($records_imported);
+    $recordings_imported_array_indexed = bigbluebuttonbn_index_recordings($recordings_imported_array);
+
+    foreach ($recordings as $key => $recording) {
+        if (isset($recordings_imported_array_indexed[$recording['recordID']])) {
+            unset($recordings[$key]);
+        }
+    }
     return $recordings;
 }
 
-function bigbluebuttonbn_getRecordingsArray($meetingIDs, $URL=NULL, $SALT=NULL) {
+function bigbluebuttonbn_unset_imported_recordings_already_existent($recordings) {
+    $actual_recordings = array();
+    $imported_recordings = array();
+
+    foreach ($recordings as $recording) {
+        if (isset($recording["imported"])) {
+            $imported_recordings[$recording["recordID"]] = $recording;
+        } else {
+            $actual_recordings[$recording["recordID"]] = $recording;
+        }
+    }
+
+    foreach ($imported_recordings as $key => $imported_recording) {
+        if (isset($actual_recordings[$key])) {
+            unset($imported_recordings[$key]);
+        }
+    }
+
+    return array_values(array_merge($actual_recordings, $imported_recordings));
+}
+
+/**
+ * helper function to retrieve recordings from a BigBlueButton server
+ *
+ * @param string or array $meetingIDs                an array or string containing a list of meetingIDs "mid1,mid2,mid3" or array("mid1","mid2","mid3")
+ * @param string or array $recordingIDs              an array or string containing a list of $recordingIDs "rid1,rid2,rid3" or array("rid1","rid2","rid3") to be used as a filter
+ * @param string $URL
+ * @param string $SALT
+ *
+ * @return sequential array containing the actual recordings, each recording is a non sequential associative array itself
+ */
+
+function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs=NULL, $URL=NULL, $SALT=NULL) {
     $recordings = array();
 
     $endpoint = is_null($URL) ? bigbluebuttonbn_get_cfg_server_url() : $URL;
@@ -306,7 +366,7 @@ function bigbluebuttonbn_getRecordingsArray($meetingIDs, $URL=NULL, $SALT=NULL) 
     if (is_array($meetingIDs)) {
         $meetingIDsArray = $meetingIDs;
     } else {
-        $meetingIDsArray = explode(",", $recordIDs);
+        $meetingIDsArray = explode(",", $meetingIDs);
     }
 
     // If $meetingIDsArray is not empty a paginated getRecordings request is executed
@@ -327,8 +387,69 @@ function bigbluebuttonbn_getRecordingsArray($meetingIDs, $URL=NULL, $SALT=NULL) 
         }
     }
 
+    // Filter recordings based on recordingIDs
+    if (!is_null($recordingIDs)) {
+        if (is_array($recordingIDs)) {
+            $recordingIDsArray = $recordingIDs;
+        } else {
+            $recordingIDsArray = explode(",", $recordingIDs);
+        }
+
+        foreach ($recordings as $key => $recording) {
+            if ( !in_array($recording['recordID'], $recordingIDsArray) ) {
+                unset($recordings[$key]);
+            }
+        }
+    }
+
     return $recordings;
 }
+
+function bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID=NULL, $subset=TRUE, $include_deleted=FALSE) {
+    global $DB;
+
+    if ($bigbluebuttonbnID == NULL) {
+        $select = "courseid = '{$courseID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+    } else if ($subset) {
+        $select = "bigbluebuttonbnid = '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+    } else {
+        $select = "courseid = '{$courseID}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+    }
+
+    $recordings_imported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
+
+    return array_merge(array(), $recordings_imported);
+}
+
+/**
+ * helper function to transform recordings coming from the database as they were imported in a bigbluebuttonbn instance
+ * to a sequential array containing the actual recordings
+ *
+ * @param array $records_imported                the array may be sequential which means that a group of recordings was passed or not sequential, which means that only one recording was passed
+ *
+ * @return sequential array containing the actual recordings, each recording is a non sequential associative array itself
+ */
+
+function bigbluebuttonbn_getRecordingsImportedArray($records_imported) {
+
+    $recordings_imported = array();
+    // Check if array is sequential already
+    if (array() === $records_imported || array_keys($records_imported) != range(0, count($arr) - 1) ) {
+        // if it's, lets assume that the array contains correct recording records as retrieved from the database
+        $recordings_imported = $records_imported;
+    } else {
+        // if it's, lets assume that the parameter contains a single record and convert it to a sequential array format
+        $recordings_imported = array($records_imported);
+    }
+
+    $recordings_imported_array = array();
+    foreach ($recordings_imported as $key => $recording_imported) {
+        $meta = json_decode($recording_imported->meta, true);
+        array_push($recordings_imported_array, $meta['recording']);
+    }
+    return $recordings_imported_array;
+}
+
 
 function bigbluebuttonbn_getDefaultConfigXML( $URL, $SALT) {
     $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getDefaultConfigXMLURL($URL, $SALT) );
@@ -349,23 +470,6 @@ function bigbluebuttonbn_index_recordings($recordings, $index_key='recordID') {
     }
 
     return $indexed_recordings;
-}
-
-function bigbluebuttonbn_getRecordingArray( $recordingID, $meetingID, $URL, $SALT) {
-    $recordingArray = array();
-
-    $xml = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getRecordingsURL( $URL, $SALT, $meetingID ) );
-
-    if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) { //If there were meetings already created
-        foreach ($xml->recordings->recording as $recording) {
-            if ($recording->recordID == $recordingID) {
-                $recordingArray = bigbluebuttonbn_getRecordingArrayRow($recording);
-                break;
-            }
-        }
-    }
-
-    return $recordingArray;
 }
 
 function bigbluebuttonbn_getRecordingArrayRow($recording) {
@@ -1216,13 +1320,10 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
         if ($bbbsession['managerecordings']) {
             // Set style for imported links
             if (isset($recording['imported'])) {
-                $recordings_imported_count = 0;
                 $tag_tail = ' '.get_string('view_recording_link', 'bigbluebuttonbn');
                 $head = '<i>';
                 $tail = '</i>';
             } else {
-                $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedAllInstancesArray($recording['recordID']);
-                $recordings_imported_count = count($recordings_imported_array);
                 $tag_tail = '';
             }
 
@@ -1244,11 +1345,11 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     //With icon for publish/unpublish
                     $icon_attributes = array('id' => 'recording-btn-'.$manage_action.'-'.$recording['recordID']);
                     $icon = new pix_icon('t/'.$manage_tag, get_string($manage_tag).$tag_tail, 'moodle', $icon_attributes);
-                    $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $link_attributes = array('id' => 'recording-link-'.$manage_action.'-'.$recording['recordID'], 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
                 } else {
                     //With text for publish/unpublish
-                    $link_attributes = array('title' => get_string($manage_tag).$tag_tail, 'class' => 'btn btn-xs', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $link_attributes = array('title' => get_string($manage_tag).$tag_tail, 'class' => 'btn btn-xs', 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_link($url, get_string($manage_tag).$tag_tail, $action, $link_attributes);
                     $actionbar .= "&nbsp;";
                 }
@@ -1730,29 +1831,6 @@ function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID=NULL)
     return $records;
 }
 
-function bigbluebuttonbn_import_get_recordings_imported($records) {
-    $recordings_imported = array();
-
-    foreach ($records as $key => $record) {
-        $meta = json_decode($record->meta, true);
-        $recordings_imported[] = $meta['recording'];
-    }
-
-    return $recordings_imported;
-}
-
-function bigbluebuttonbn_import_exlcude_recordings_already_imported($courseID, $bigbluebuttonbnID, $recordings) {
-    $recordings_already_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID);
-    $recordings_already_imported_indexed = bigbluebuttonbn_index_recordings($recordings_already_imported);
-
-    foreach ($recordings as $key => $recording) {
-        if (isset($recordings_already_imported_indexed[$recording['recordID']])) {
-            unset($recordings[$key]);
-        }
-    }
-    return $recordings;
-}
-
 function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=['publishing','deleting']) {
 
     if (isset($recordings) && !empty($recordings)) {  // There are recordings for this meeting
@@ -1773,35 +1851,16 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=[
     return $output;
 }
 
-function bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID=NULL) {
-    global $DB;
-
-    if ($bigbluebuttonbnID != NULL) {
-        // Fetch only those related to the $courseID and $bigbluebuttonbnID requested
-        $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'bigbluebuttonbnid' => $bigbluebuttonbnID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
-    } else {
-        // Fetch all the ones corresponding to the $courseID requested
-        $recordings_imported = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
-    }
-    return $recordings_imported;
-}
-
-function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID=NULL) {
-    $recordings_imported = bigbluebuttonbn_getRecordingsImported($courseID, $bigbluebuttonbnID);
-    $recordings_imported_array = bigbluebuttonbn_import_get_recordings_imported($recordings_imported);
-    return $recordings_imported_array;
-}
-
 function bigbluebuttonbn_getRecordingsImportedAllInstances($recordID) {
     global $DB, $CFG;
 
-    $recordings_imported = $DB->get_records_sql('SELECT * FROM '.$CFG->prefix.'bigbluebuttonbn_logs WHERE log=? AND '.$DB->sql_like('meta', '?'), array( BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%'.$recordID.'%' ));
+    $recordings_imported = $DB->get_records_sql('SELECT * FROM {bigbluebuttonbn_logs} WHERE log=? AND '.$DB->sql_like('meta', '?'), array( BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%'.$recordID.'%' ));
     return $recordings_imported;
 }
 
 function bigbluebuttonbn_getRecordingsImportedAllInstancesArray($recordID) {
     $recordings_imported = bigbluebuttonbn_getRecordingsImportedAllInstances($recordID);
-    $recordings_imported_array = bigbluebuttonbn_import_get_recordings_imported($recordings_imported);
+    $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($recordings_imported);
     return $recordings_imported_array;
 }
 

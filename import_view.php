@@ -59,15 +59,21 @@ if( empty($options) ) {
     } else {
         $recordings = bigbluebuttonbn_get_recordings($selected, null, null, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     }
-    //exclude the ones that are already imported
-    //$recordings = bigbluebuttonbn_import_exlcude_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
-    //store remaining recordings (indexed) in a session variable
-    $SESSION->bigbluebuttonbn_importrecordings = bigbluebuttonbn_index_recordings($recordings);
-    if( empty($recordings) ) {
-        $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
-    } else {
+    if (!empty($recordings)) {
+        //exclude the ones that are already imported
+        $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
+        //index recordings
+        $recordings = bigbluebuttonbn_index_recordings($recordings);
+    }
+    //store recordings (indexed) in a session variable
+    $SESSION->bigbluebuttonbn_importrecordings = $recordings;
+
+    // proceed with rendering
+    if (!empty($recordings)) {
         $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table' ,'name'=>'import_recording_links_table']);
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['importing']);
+    } else {
+        $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     }
     $output .= html_writer::start_tag('br');
     $output .= html_writer::tag( 'input', '', array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'), 'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\'') );

@@ -4,6 +4,8 @@ Enhancement: Added preview thumbnails to recordings.
 
 2.1.6 (2016051910)
 Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created. (CONTRIB-6652)
+Bug: Fixed issue with references to recordings and imported links duplicated when a backup is restored in a different course.
+Bug: Fixed issue with references to recordings and imported links not being properly restored when using the option import from backups.
 
 2.1.5 (2016051909)
 Bug: Fixed issue with actions for recording managment not working in instances with schedule. (CONTRIB-6654)
