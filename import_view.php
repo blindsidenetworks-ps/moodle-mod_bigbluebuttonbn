@@ -62,8 +62,6 @@ if( empty($options) ) {
     if (!empty($recordings)) {
         //exclude the ones that are already imported
         $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $recordings);
-        //index recordings
-        $recordings = bigbluebuttonbn_index_recordings($recordings);
     }
     //store recordings (indexed) in a session variable
     $SESSION->bigbluebuttonbn_importrecordings = $recordings;
