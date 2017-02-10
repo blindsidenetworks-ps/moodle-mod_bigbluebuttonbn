@@ -57,11 +57,11 @@ if( empty($options) ) {
     if ($course->id == $selected) {
         $recordings = bigbluebuttonbn_get_recordings($selected, $bigbluebuttonbn->id, false, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     } else {
-        $recordings = bigbluebuttonbn_get_recordings($selected, null, null, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
+        $recordings = bigbluebuttonbn_get_recordings($selected, null, false, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     }
     if (!empty($recordings)) {
         //exclude the ones that are already imported
-        $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($course->id, $bigbluebuttonbn->id, $recordings);
+        $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $course->id, $bigbluebuttonbn->id, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     }
     //store recordings (indexed) in a session variable
     $SESSION->bigbluebuttonbn_importrecordings = $recordings;

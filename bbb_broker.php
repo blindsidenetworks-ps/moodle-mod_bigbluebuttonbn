@@ -145,11 +145,10 @@ if ( empty($error) ) {
                 case 'recording_info':
                     if( $bbbsession['managerecordings'] ) {
                         //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImported($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($recordings_imported);
-                        if( isset($recordings_imported_array[$params['id']]) ) {
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
+                        if( isset($recordings_imported[$params['id']]) ) {
                             //Look up for an update on the imported recording
-                            $recording = $recordings_imported_array[$params['id']];
+                            $recording = $recordings_imported[$params['id']];
                             if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
                                 echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
                             } else {
@@ -175,11 +174,10 @@ if ( empty($error) ) {
                     if( $bbbsession['managerecordings'] ) {
                         $status = true;
                         //Retrieve the array of imported recordings for the current course and activity
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImported($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($recordings_imported);
-                        if( isset($recordings_imported_array[$params['id']]) ) {
-                            $recordings = bigbluebuttonbn_getRecordingsArray($recordings_imported_array[$params['id']]['meetingID']);
-                            $recording = $recordings_imported_array[$params['id']];
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
+                        if( isset($recordings_imported[$params['id']]) ) {
+                            $recordings = bigbluebuttonbn_getRecordingsArray($recordings_imported[$params['id']]['meetingID']);
+                            $recording = $recordings_imported[$params['id']];
                             if ( $recording['published'] === 'true' ) {
                                 // Only if the physical recording is published, execute publish on imported recording link
                                 $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
@@ -216,17 +214,16 @@ if ( empty($error) ) {
                 case 'recording_unpublish':
                     if( $bbbsession['managerecordings'] ) {
                         //Retrieve the array of imported recordings for the current course and activity
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImported($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($recordings_imported);
-                        if( isset($recordings_imported_array[$params['id']]) ) {
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
+                        if( isset($recordings_imported[$params['id']]) ) {
                             // Execute unpublish on imported recording link
                             $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
                             // First: Unpublish imported links associated to the recording
-                            $recordings_imported_all = bigbluebuttonbn_getRecordingsImportedAllInstances($params['id']);
+                            $recordings_imported_all = bigbluebuttonbn_get_count_recording_imported_instances($params['id']);
 
-                            if( count($recordings_imported_all) > 0 ) {
+                            if ($recordings_imported_all > 0) {
                                 foreach ($recordings_imported_all as $key => $record) {
                                     $meta = json_decode($record->meta, true);
                                     // Prepare data for the update
@@ -258,17 +255,16 @@ if ( empty($error) ) {
                 case 'recording_delete':
                     if( $bbbsession['managerecordings'] ) {
                         //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImported($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        $recordings_imported_array = bigbluebuttonbn_getRecordingsImportedArray($recordings_imported);
-                        if( isset($recordings_imported_array[$params['id']]) ) {
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
+                        if( isset($recordings_imported[$params['id']]) ) {
                             // Execute unpublish on imported recording link
                             bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute delete on a real recording
                             // First: Delete imported links associated to the recording
-                            $recordings_imported_all = bigbluebuttonbn_getRecordingsImportedAllInstances($params['id']);
+                            $recordings_imported_all = bigbluebuttonbn_get_count_recording_imported_instances($params['id']);
 
-                            if( count($recordings_imported_all) > 0 ) {
+                            if ($recordings_imported_all > 0) {
                                 foreach ($recordings_imported_all as $key => $record) {
                                     // Execute delete
                                     $DB->delete_records("bigbluebuttonbn_logs", array('id' => $key));
