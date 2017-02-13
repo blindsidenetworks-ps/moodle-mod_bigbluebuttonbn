@@ -113,6 +113,68 @@ if ($ADMIN->fulltree) {
         }
     }
 
+    //// Configuration for 'show recordings' feature
+    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_enabled) ||
+        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_from_deleted_activities_enabled) ) {
+        $settings->add( new admin_setting_heading('bigbluebuttonbn_importrecordings',
+                get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
+                get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
+
+        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_enabled) ) {
+            // default value for 'import recordings' feature
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
+                    get_string('config_feature_importrecordings_enabled', 'bigbluebuttonbn'),
+                    get_string('config_feature_importrecordings_enabled_description', 'bigbluebuttonbn'),
+                    0));
+        }
+        if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_from_deleted_activities_enabled) ) {
+            // consider deleted activities for 'import recordings' feature
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_from_deleted_activities_enabled',
+                    get_string('config_feature_importrecordings_from_deleted_activities_enabled', 'bigbluebuttonbn'),
+                    get_string('config_feature_importrecordings_from_deleted_activities_enabled_description', 'bigbluebuttonbn'),
+                    0));
+        }
+    }
+
+
+    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default) ||
+        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable) ||
+        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default) ||
+        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable)) {
+            $settings->add( new admin_setting_heading('bigbluebuttonbn_recordings',
+                    get_string('config_feature_recordings', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_description', 'bigbluebuttonbn')));
+
+        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default)) {
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_html_default',
+                    get_string('config_feature_recordings_html_default', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_html_default_description', 'bigbluebuttonbn'),
+                    1));
+        }
+        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable)) {
+            // UI for 'recording' feature
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_html_editable',
+                    get_string('config_feature_recordings_html_editable', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_html_editable_description', 'bigbluebuttonbn'),
+                    0));
+        }
+
+        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default)) {
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_default',
+                    get_string('config_feature_recordings_deleted_activities_default', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_deleted_activities_default_description', 'bigbluebuttonbn'),
+                    1));
+        }
+        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable)) {
+            // UI for 'recording' feature
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_editable',
+                    get_string('config_feature_recordings_deleted_activities_editable', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_deleted_activities_editable_description', 'bigbluebuttonbn'),
+                    0));
+        }
+    }
+
+
     //// Configuration for wait for moderator feature
     if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default) ||
         !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable) ||

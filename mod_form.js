@@ -52,7 +52,7 @@ bigbluebuttonbn_participant_add = function() {
     var participant_selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
     var participant_selection = document.getElementById('bigbluebuttonbn_participant_selection');
 
-    //Lookup to see if it has been added already 
+    //Lookup to see if it has been added already
     var found = false;
     for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
         if( bigbluebuttonbn_participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn_participant_list[i].selectionid == participant_selection.value ){
@@ -77,7 +77,7 @@ bigbluebuttonbn_participant_add = function() {
         cell1.width = "125px";
         if( participant_selection_type.value == 'all' )
             cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + '</i></b>';
-        else    
+        else
             cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + ':&nbsp;</i></b>';
         var cell2 = row.insertCell(2);
         if( participant_selection_type.value == 'all' )
@@ -125,7 +125,90 @@ bigbluebuttonbn_select_disable = function(id) {
 bigbluebuttonbn_select_add_option = function(id, text, value) {
     var select = document.getElementById(id);
     var option = document.createElement('option');
-    option.text = text; 
+    option.text = text;
     option.value = value;
     select.add(option , 0);
+}
+
+bigbluebuttonbn_update_instance_type_profile = function(instanceprofile) {
+    console.info("bigbluebuttonbn_update_instance_type_profile");
+    var selected_type = Y.one('#id_type option:checked');
+    console.info(selected_type);
+    console.info(selected_type.get('value'));
+    console.info(selected_type.get('text'));
+    var features = bigbluebuttonbn_instance_type_profiles[selected_type.get('value')].features;
+    console.info(features);
+
+
+    // Show room settings validation
+    var fieldset_showroom = Y.DOM.byId('id_room');
+    if( features.includes('all') || features.includes('showroom') ) {
+        console.debug('feature showroom enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_showroom, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_showroom, 'display', 'block');
+    } else {
+        console.debug('feature showroom disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_showroom, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_showroom, 'display', 'none');
+    }
+
+    // Show recordings settings validation
+    var fieldset_showrecordings = Y.DOM.byId('id_recordings');
+    if( features.includes('all') || features.includes('showrecordings') ) {
+        console.debug('feature showrecordings enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_showrecordings, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_showrecordings, 'display', 'block');
+    } else {
+        console.debug('feature showrecordings disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_showrecordings, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_showrecordings, 'display', 'none');
+    }
+
+    // Preuploadpresentation feature validation
+    var fieldset_preuploadpresentation = Y.DOM.byId('id_preuploadpresentation');
+    if( features.includes('all') || features.includes('permissions') ) {
+        console.debug('feature preuploadpresentation enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_preuploadpresentation, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'block');
+    } else {
+        console.debug('feature preuploadpresentation disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_preuploadpresentation, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'none');
+    }
+
+    // Participants feature validation
+    var fieldset_permissions = Y.DOM.byId('id_permissions');
+    if( features.includes('all') || features.includes('permissions') ) {
+        console.debug('feature permissions enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_permissions, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_permissions, 'display', 'block');
+    } else {
+        console.debug('feature permissions disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_permissions, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_permissions, 'display', 'none');
+    }
+
+    // Schedule feature validation
+    var fieldset_schedule = Y.DOM.byId('id_schedule');
+    if( features.includes('all') || features.includes('schedule') ) {
+        console.debug('feature schedule enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_schedule, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_schedule, 'display', 'block');
+    } else {
+        console.debug('feature schedule disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_schedule, 'visibility', 'visible');
+        Y.DOM.setStyle(fieldset_schedule, 'display', 'none');
+    }
+
+    // Groups feature validation
+    var fieldset_groups = Y.DOM.byId('id_modstandardelshdr');
+    if( features.includes('all') || features.includes('groups') ) {
+        console.debug('feature groups enabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_groups, 'visibility', 'shown');
+        Y.DOM.setStyle(fieldset_groups, 'display', 'block');
+    } else {
+        console.debug('feature groups disabled for ' + selected_type.get('text') );
+        //Y.DOM.setStyle(fieldset_groups, 'visibility', 'hidden');
+        Y.DOM.setStyle(fieldset_groups, 'display', 'none');
+    }
 }

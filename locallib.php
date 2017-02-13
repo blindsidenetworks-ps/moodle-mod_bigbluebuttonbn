@@ -18,6 +18,9 @@ require_once(dirname(__FILE__).'/lib.php');
 
 const BIGBLUEBUTTONBN_FORCED = true;
 
+const BIGBLUEBUTTONBN_TYPE_ROOM = 0;
+const BIGBLUEBUTTONBN_TYPE_RECORDING = 1;
+
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
@@ -1244,11 +1247,11 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools=
                     //With icon for delete
                     $icon_attributes = array('id' => 'recording-btn-delete-'.$recording['recordID']);
                     $icon = new pix_icon('t/delete', get_string('delete').$tag_tail, 'moodle', $icon_attributes);
-                    $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $link_attributes = array('id' => 'recording-link-delete-'.$recording['recordID'], 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_icon($url, $icon, $action, $link_attributes, false);
                 } else {
                     //With text for delete
-                    $link_attributes = array('title' => get_string('delete').$tag_tail, 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick, 'data-links' => $recordings_imported_count);
+                    $link_attributes = array('title' => get_string('delete').$tag_tail, 'class' => 'btn btn-xs btn-danger', 'onclick' => $onclick);
                     $actionbar .= $OUTPUT->action_link($url, get_string('delete').$tag_tail, $action, $link_attributes);
                 }
             }
@@ -1608,6 +1611,26 @@ function bigbluebuttonbn_get_cfg_scheduled_pre_opening() {
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening: (isset($CFG->bigbluebuttonbn_scheduled_pre_opening)? $CFG->bigbluebuttonbn_scheduled_pre_opening: 10));
 }
 
+function bigbluebuttonbn_get_cfg_recordings_html_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default: (isset($CFG->bigbluebuttonbn_recordings_html_default)? $CFG->bigbluebuttonbn_recordings_html_default: false));
+}
+
+function bigbluebuttonbn_get_cfg_recordings_html_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable: (isset($CFG->bigbluebuttonbn_recordings_html_editable)? $CFG->bigbluebuttonbn_recordings_html_editable: false));
+}
+
+function bigbluebuttonbn_get_cfg_recordings_deleted_activities_default() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default: (isset($CFG->bigbluebuttonbn_recordings_deleted_activities_default)? $CFG->bigbluebuttonbn_recordings_deleted_activities_default: false));
+}
+
+function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable: (isset($CFG->bigbluebuttonbn_recordings_deleted_activities_editable)? $CFG->bigbluebuttonbn_recordings_deleted_activities_editable: false));
+}
+
 function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
 
     if ($bbbsession['administrator']) {
@@ -1832,4 +1855,27 @@ function bigbluebuttonbn_get_count_recording_imported_instances($recordID) {
     $count_recordings_imported = $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, "%recordID%", "%{$recordID}%"));
 
     return $count_recordings_imported;
+}
+
+function bigbluebuttonbn_get_instance_type_profiles() {
+
+    $instanceprofiles = array(
+            array('id' => 0, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'), 'features' => array('all')),
+            array('id' => 1, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'), 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording', 'recordingtagging', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
+            array('id' => 2, 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'))
+    );
+
+    return $instanceprofiles;
+}
+
+function bigbluebuttonbn_get_instance_types_array($_instanceprofiles=NULL) {
+    $instanceprofiles = is_null($_instanceprofiles) || empty($_instanceprofiles) ? bigbluebuttonbn_get_instanceprofiles() : $_instanceprofiles;
+
+    $instanceprofiles_display_array = array();
+
+    foreach($instanceprofiles as $instanceprofile) {
+        $instanceprofiles_display_array += array("{$instanceprofile['id']}" => $instanceprofile['name']);
+    }
+
+    return $instanceprofiles_display_array;
 }

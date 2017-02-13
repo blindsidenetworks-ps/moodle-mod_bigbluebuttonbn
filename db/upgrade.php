@@ -281,5 +281,35 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
+    if ($result && $oldversion < 2016080106) {
+        // Update the bigbluebuttonbn table
+        $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field newwindow
+        $field = new xmldb_field('newwindow');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field type
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field recordings_html
+        $field = new xmldb_field('recordings_html');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+        //// Add field recordings_deleted_activities
+        $field = new xmldb_field('recordings_deleted_activities');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field, $continue=true, $feedback=true);
+        }
+
+        upgrade_mod_savepoint(true, 2016080106, 'bigbluebuttonbn');
+    }
+
     return $result;
 }

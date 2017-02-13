@@ -44,6 +44,19 @@ $string['config_feature_recordingtagging_default_description'] = 'Recording tagg
 $string['config_feature_recordingtagging_editable'] = 'Recording tagging feature can be edited';
 $string['config_feature_recordingtagging_editable_description'] = 'Recording tagging value by default can be edited when the room or conference is added or updated.';
 
+$string['config_feature_recordings'] = 'Configuration for "Show recordings" feature';
+$string['config_feature_recordings_description'] = 'These settings are feature specific';
+$string['config_feature_recordings_general'] = 'Show recording settings';
+$string['config_feature_recordings_general_description'] = 'These settings are used only when showing recordings';
+$string['config_feature_recordings_html_default'] = 'UI as html is enabled by default';
+$string['config_feature_recordings_html_default_description'] = 'If enabled the recording table is shown in plain HTML by default.';
+$string['config_feature_recordings_html_editable'] = 'UI as html feature can be edited';
+$string['config_feature_recordings_html_editable_description'] = 'UI as html value by default can be edited when the recordingbn is added or updated.';
+$string['config_feature_recordings_deleted_activities_default'] = 'Include recordings from deleted activities enabled by default';
+$string['config_feature_recordings_deleted_activities_default_description'] = 'If enabled the recording table will include the recordings belonging to deleted activities if there is any.';
+$string['config_feature_recordings_deleted_activities_editable'] = 'Include recordings from deleted activities feature can be edited';
+$string['config_feature_recordings_deleted_activities_editable_description'] = 'Include recordings from deleted activities by default can be edited when the recordingbn is added or updated.';
+
 $string['config_feature_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_feature_importrecordings_description'] = 'These settings are feature specific';
 $string['config_feature_importrecordings_enabled'] = 'Import recordings enabled';
@@ -127,6 +140,8 @@ $string['index_heading_users'] = 'Users';
 $string['index_heading_viewer'] = 'Viewers';
 $string['index_heading'] = 'BigBlueButton Rooms';
 $string['mod_form_block_general'] = 'General settings';
+$string['mod_form_block_room'] = 'Activity/Room settings';
+$string['mod_form_block_recordings'] = 'Recording settings';
 $string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_participants'] = 'Participants';
 $string['mod_form_block_schedule'] = 'Schedule for session';
@@ -164,8 +179,8 @@ $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
-$string['mod_form_field_predefinedprofile'] = 'Predefined profile';
-$string['mod_form_field_predefinedprofile_help'] = 'Predefined profile';
+$string['mod_form_field_instanceprofiles'] = 'Predefined type';
+$string['mod_form_field_instanceprofiles_help'] = 'Predefined type';
 $string['mod_form_field_notification'] = 'Send notification';
 $string['mod_form_field_notification_help'] = 'Send a notification to users enrolled to let them know that this activity has been created or modified';
 $string['mod_form_field_notification_created_help'] = 'Send a notification to users enrolled to let them know that this activity has been created';
@@ -173,6 +188,8 @@ $string['mod_form_field_notification_modified_help'] = 'Send a notification to u
 $string['mod_form_field_notification_msg_created'] = 'created';
 $string['mod_form_field_notification_msg_modified'] = 'modified';
 $string['mod_form_field_notification_msg_at'] = 'at';
+$string['mod_form_field_recordings_html'] = 'Show the table in plain html';
+$string['mod_form_field_recordings_deleted_activities'] = 'Include recordings from deleted activities';
 
 
 $string['modulename'] = 'BigBlueButtonBN';
@@ -313,12 +330,9 @@ $string['event_recording_imported'] = 'Recording imported';
 $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
 
-$string['predefined_profile_default'] = 'Default';
-$string['predefined_profile_classroom'] = 'Classroom';
-$string['predefined_profile_conferenceroom'] = 'Conference room';
-$string['predefined_profile_collaborationroom'] = 'Collaboration room';
-$string['predefined_profile_scheduledsession'] = 'Scheduled session';
-
+$string['instance_type_default'] = 'Room/Activity with recordings';
+$string['instance_type_room_only'] = 'Room only';
+$string['instance_type_recording_only'] = 'Recordings only';
 
 $string['email_title_notification_has_been'] = 'has been';
 $string['email_body_notification_meeting_has_been'] = 'has been';
