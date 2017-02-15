@@ -179,8 +179,8 @@ $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
-$string['mod_form_field_instanceprofiles'] = 'Predefined type';
-$string['mod_form_field_instanceprofiles_help'] = 'Predefined type';
+$string['mod_form_field_instanceprofiles'] = 'Instance type';
+$string['mod_form_field_instanceprofiles_help'] = 'Select the type for this BigBlueButtonBN instance.';
 $string['mod_form_field_notification'] = 'Send notification';
 $string['mod_form_field_notification_help'] = 'Send a notification to users enrolled to let them know that this activity has been created or modified';
 $string['mod_form_field_notification_created_help'] = 'Send a notification to users enrolled to let them know that this activity has been created';
@@ -331,7 +331,7 @@ $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
 
 $string['instance_type_default'] = 'Room/Activity with recordings';
-$string['instance_type_room_only'] = 'Room only';
+$string['instance_type_room_only'] = 'Room/Activity only';
 $string['instance_type_recording_only'] = 'Recordings only';
 
 $string['email_title_notification_has_been'] = 'has been';

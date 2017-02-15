@@ -134,10 +134,6 @@ function bigbluebuttonbn_update_instance($data, $mform) {
  * @return boolean Success/Failure
  */
 function bigbluebuttonbn_delete_instance($id) {
-    error_log("*******************************************************************************");
-    error_log("*******************************************************************************");
-    error_log("*******************************************************************************");
-    error_log("*******************************************************************************");
     global $CFG, $DB, $USER;
 
     if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {

@@ -328,7 +328,7 @@ function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnI
     $records_imported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
     // Check if array is sequential already
-    if (array() === $records_imported || array_keys($records_imported) != range(0, count($arr) - 1) ) {
+    if (array() === $records_imported || array_keys($records_imported) != range(0, count($records_imported) - 1) ) {
         // if it's, lets assume that the array contains correct recording records as retrieved from the database
         $recordings_imported = $records_imported;
     } else {
@@ -1446,7 +1446,7 @@ function bigbluebuttonbn_server_offers_bn_capabilities(){
     return ( $host_ends_length > 0 && $host_ends[$host_ends_length -1] == 'com' && $host_ends[$host_ends_length -2] == 'blindsidenetworks' );
 }
 
-function bigbluebuttonbn_get_locales_for_ui() {
+function bigbluebuttonbn_get_locales_for_view() {
     $locales = array(
             'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
             'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'),
