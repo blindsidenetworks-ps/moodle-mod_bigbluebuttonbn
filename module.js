@@ -24,68 +24,75 @@ M.mod_bigbluebuttonbn.datasource_init = function(Y) {
 };
 
 M.mod_bigbluebuttonbn.view_init = function(Y) {
-	// Init general datasource
-	M.mod_bigbluebuttonbn.datasource_init(Y);
-    if (bigbluebuttonbn.activity === 'open') {
-	    // Create the main modal form.
-        bigbluebuttonbn_panel = new Y.Panel({
-            srcNode      : '#panelContent',
-            headerContent: bigbluebuttonbn.locales.modal_title,
-            width        : 250,
-            zIndex       : 5,
-            centered     : true,
-            modal        : true,
-            visible      : false,
-            render       : true,
-            plugins      : [Y.Plugin.Drag]
-        });
+    // Init general datasource
+    if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showroom') ) {
+        M.mod_bigbluebuttonbn.datasource_init(Y);
 
-        // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
-        bigbluebuttonbn_panel.addButton({
-            value  : bigbluebuttonbn.locales.modal_button,
-            section: Y.WidgetStdMod.FOOTER,
-            action : function (e) {
-                e.preventDefault();
-                bigbluebuttonbn_panel.hide();
+        if (bigbluebuttonbn.activity === 'open') {
+            // Create the main modal form.
+            bigbluebuttonbn_panel = new Y.Panel({
+                srcNode      : '#panelContent',
+                headerContent: bigbluebuttonbn.locales.modal_title,
+                width        : 250,
+                zIndex       : 5,
+                centered     : true,
+                modal        : true,
+                visible      : false,
+                render       : true,
+                plugins      : [Y.Plugin.Drag]
+            });
 
-                //var nameField = Y.DOM.byId('recording_name');
-                var joinField = Y.one('#meeting_join_url');
-                var messageField = Y.one('#meeting_message');
-                var nameField = Y.one('#recording_name');
-                var descriptionField  = Y.one('#recording_description');
-                var tagsField = Y.one('#recording_tags');
+            // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
+            bigbluebuttonbn_panel.addButton({
+                value  : bigbluebuttonbn.locales.modal_button,
+                section: Y.WidgetStdMod.FOOTER,
+                action : function (e) {
+                    e.preventDefault();
+                    bigbluebuttonbn_panel.hide();
 
-                //Gatter the fields thay will be passed as metaparameters to the bbb server
-                var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    //var nameField = Y.DOM.byId('recording_name');
+                    var joinField = Y.one('#meeting_join_url');
+                    var messageField = Y.one('#meeting_message');
+                    var nameField = Y.one('#recording_name');
+                    var descriptionField  = Y.one('#recording_description');
+                    var tagsField = Y.one('#recording_tags');
 
-                // Prepare the new join_url
-                var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
+                    //Gatter the fields thay will be passed as metaparameters to the bbb server
+                    var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-                // Executes the join
-                M.mod_bigbluebuttonbn.broker_executeJoin(join_url, messageField.get('value'));
+                    // Prepare the new join_url
+                    var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
 
-                // Clean values in case the for is used again
-                nameField.set('value', '');
-                descriptionField.set('value', '');
-                tagsField.set('value', '');
-                joinField.set('value', '');
-                messageField.set('value', '');
-            }
-        });
+                    // Executes the join
+                    M.mod_bigbluebuttonbn.broker_executeJoin(join_url, messageField.get('value'));
 
-        M.mod_bigbluebuttonbn.view_update();
-    } else {
-        if (bigbluebuttonbn.activity === 'ended') {
-            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
-              bigbluebuttonbn.locales.conference_ended
-            ));
+                    // Clean values in case the for is used again
+                    nameField.set('value', '');
+                    descriptionField.set('value', '');
+                    tagsField.set('value', '');
+                    joinField.set('value', '');
+                    messageField.set('value', '');
+                }
+            });
+
+            M.mod_bigbluebuttonbn.view_update();
         } else {
-            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
-              [bigbluebuttonbn.locales.conference_ended, bigbluebuttonbn.opening, bigbluebuttonbn.closing]
-            ));
+            if (bigbluebuttonbn.activity === 'ended') {
+                Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+                    bigbluebuttonbn.locales.conference_ended
+                ));
+            } else {
+                Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
+                    [bigbluebuttonbn.locales.conference_ended, bigbluebuttonbn.opening, bigbluebuttonbn.closing]
+                ));
+            }
         }
+    }
+
+    if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings') ) {
+        M.mod_bigbluebuttonbn.datatable_init(Y);
     }
 };
 
@@ -531,8 +538,23 @@ M.mod_bigbluebuttonbn.view_windowClose = function() {
     window.close();
 };
 
-M.mod_bigbluebuttonbn.recordingsbn_init = function(Y) {
-    bigbluebuttonbn_dataSource = new Y.DataSource.Get({
-        source : M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+M.mod_bigbluebuttonbn.datatable_init = function(Y) {
+    console.info("datatable_init: stats");
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    for(var i = 0; i < bigbluebuttonbn.data.length; i++){
+        var date = new Date(bigbluebuttonbn.data[i].date);
+        bigbluebuttonbn.data[i].date = date.toLocaleDateString(bigbluebuttonbn.locale, options);
+    }
+
+    console.info("datatable_init: step 1");
+    YUI().use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
+        console.info("datatable_init: step 2");
+        var table = new Y.DataTable({
+            width:  "900px",
+            columns: bigbluebuttonbn.columns,
+            data: bigbluebuttonbn.data,
+            rowsPerPage: 10,
+            paginatorLocation: ['header', 'footer']
+        }).render('#bigbluebuttonbn_yui_table');
     });
 };

@@ -1744,13 +1744,10 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools=[
 
     $output = '';
     if (isset($table->data)) {
-        //Print the table
-        $output .= '<div id="bigbluebuttonbn_html_table">'."\n";
-        $output .= html_writer::table($table)."\n";
-        $output .= '</div>'."\n";
-
+        //Render the table
+        $output .= html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_html_table'));
     } else {
-        $output .= get_string('view_message_norecordings', 'bigbluebuttonbn').'<br>'."\n";
+        $output .= html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '', array('id' => 'bigbluebuttonbn_html_table'));
     }
 
     return $output;

@@ -217,33 +217,11 @@ if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtim
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 bigbluebuttonbn_view($bbbsession, $bigbluebuttonbn_activity);
 
-//JavaScript variables
-$waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
-$jsVars = array(
-    'activity' => $bigbluebuttonbn_activity,
-    'meetingid' => $bbbsession['meetingid'],
-    'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-    'ping_interval' => ($waitformoderator_ping_interval > 0 ? $waitformoderator_ping_interval * 1000 : 15000),
-    'userlimit' => $bbbsession['userlimit'],
-    'locales' => bigbluebuttonbn_get_locales_for_view(),
-    'opening' => ($bbbsession['openingtime']) ? get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']) : '',
-    'closing' => ($bbbsession['closingtime']) ? get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']) : ''
-);
-
-$PAGE->requires->data_for_js('bigbluebuttonbn', $jsVars);
-
-$jsmodule = array(
-    'name'     => 'mod_bigbluebuttonbn',
-    'fullpath' => '/mod/bigbluebuttonbn/module.js',
-    'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-);
-$PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
-
 // Finish the page
 echo $OUTPUT->footer();
 
 function bigbluebuttonbn_view($bbbsession, $activity) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB, $OUTPUT, $PAGE;
 
     $instance_type_profiles = bigbluebuttonbn_get_instance_type_profiles();
     $features = isset($bbbsession['bigbluebuttonbn']->type) ? $instance_type_profiles[$bbbsession['bigbluebuttonbn']->type]['features'] : $instance_type_profiles[0]['features'];
@@ -251,10 +229,36 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
     $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
 
+    //JavaScript variables
+    $waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
+    list($lang, $locale_encoder) = explode('.', get_string('locale', 'core_langconfig'));
+    list($locale_code, $locale_sub_code) = explode('_', $lang);
+    $jsvars = array(
+        'activity' => $activity,
+        'locales' => bigbluebuttonbn_get_locales_for_view(),
+        'locale' => $locale_code,
+        'profile_features' => $features
+    );
+    $jsdependences = array();
+
     $output  = $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
+
     if ($showroom) {
+        //JavaScript variables for room
+        $jsvars += array(
+            'meetingid' => $bbbsession['meetingid'],
+            'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
+            'ping_interval' => ($waitformoderator_ping_interval > 0 ? $waitformoderator_ping_interval * 1000 : 15000),
+            'userlimit' => $bbbsession['userlimit'],
+            'opening' => ($bbbsession['openingtime']) ? get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']) : '',
+            'closing' => ($bbbsession['closingtime']) ? get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']) : ''
+        );
+
+        //JavaScript dependences for room
+        $jsdependences += array('datasource-get', 'datasource-jsonschema', 'datasource-polling');
+
         $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
         $output .= '<br><span id="status_bar"></span><br>';
         $output .= '<span id="control_panel"></span>';
@@ -281,10 +285,33 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
 
     if ($showrecordings) {
         // Get recordings
-        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL);
+        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, FALSE, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
 
-        // Render the table
-        $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
+        if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+            //If there are meetings with recordings load the data to the table
+            if( $bbbsession['bigbluebuttonbn']->recordings_html ) {
+                // Render a plain html table
+                $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
+
+            } else {
+                // Render a YUI table
+                $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
+
+                //JavaScript variables for recordings with YUI
+                $recordingsbn_columns = bigbluebuttonbn_get_recording_columns($bbbsession, $recordings);
+                $recordingsbn_data = bigbluebuttonbn_get_recording_data($bbbsession, $recordings);
+                $jsvars += array(
+                        'columns' => $recordingsbn_columns,
+                        'data' => $recordingsbn_data
+                );
+
+                //JavaScript dependences for recordings with YUI
+                $jsdependences += array('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number');
+            }
+        } else {
+            //There are no recordings to be shown.
+            $output .= html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '', array('id' => 'bigbluebuttonbn_html_table'));
+        }
 
         if ($importrecordings && $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $button_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
@@ -297,6 +324,17 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $output .= html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
 
     echo $output;
+
+    //Require aggregated JavaScript variables
+    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
+
+    //Require JavaScript module
+    $jsmodule = array(
+        'name'     => 'mod_bigbluebuttonbn',
+        'fullpath' => '/mod/bigbluebuttonbn/module.js',
+        'requires' => $jsdependences,
+    );
+    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
 }
 
 function bigbluebuttonbn_view_joining($bbbsession) {

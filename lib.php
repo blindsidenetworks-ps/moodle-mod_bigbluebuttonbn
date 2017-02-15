@@ -436,12 +436,21 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->timemodified = time();
     }
 
-    if (! isset($bigbluebuttonbn->wait))
+    if (!isset($bigbluebuttonbn->wait)) {
         $bigbluebuttonbn->wait = 0;
-    if (! isset($bigbluebuttonbn->record))
+    }
+    if (!isset($bigbluebuttonbn->record)) {
         $bigbluebuttonbn->record = 0;
-    if (! isset($bigbluebuttonbn->tagging))
+    }
+    if (!isset($bigbluebuttonbn->tagging)) {
         $bigbluebuttonbn->tagging = 0;
+    }
+    if (!isset($bigbluebuttonbn->recordings_deleted_activities)) {
+        $bigbluebuttonbn->recordings_deleted_activities = 0;
+    }
+    if (!isset($bigbluebuttonbn->recordings_html)) {
+        $bigbluebuttonbn->recordings_html = 0;
+    }
 
     $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
 }
