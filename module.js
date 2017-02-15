@@ -23,6 +23,37 @@ M.mod_bigbluebuttonbn.datasource_init = function(Y) {
     });
 };
 
+M.mod_bigbluebuttonbn.datatable_init = function(Y) {
+    console.info("datatable_init: stats");
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    for(var i = 0; i < bigbluebuttonbn.data.length; i++){
+        var date = new Date(bigbluebuttonbn.data[i].date);
+        bigbluebuttonbn.data[i].date = date.toLocaleDateString(bigbluebuttonbn.locale, options);
+    }
+
+    console.info("datatable_init: step 1");
+    YUI().use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
+        console.info("datatable_init: step 2");
+        var table = new Y.DataTable({
+            width:  "900px",
+            columns: bigbluebuttonbn.columns,
+            data: bigbluebuttonbn.data,
+            rowsPerPage: 10,
+            paginatorLocation: ['header', 'footer']
+        }).render('#bigbluebuttonbn_yui_table');
+    });
+};
+
+M.mod_bigbluebuttonbn.import_view_init = function(Y) {
+    // Init general datasource
+    M.mod_bigbluebuttonbn.datasource_init(Y);
+
+    // Init event listener for course selector
+    Y.one('#menuimport_recording_links_select').on('change', function () {
+        Y.config.win.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/import_view.php?bn=' + bigbluebuttonbn.bn + '&tc=' + this.get('value');
+    });
+};
+
 M.mod_bigbluebuttonbn.view_init = function(Y) {
     // Init general datasource
     if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showroom') ) {
@@ -94,16 +125,6 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
     if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings') ) {
         M.mod_bigbluebuttonbn.datatable_init(Y);
     }
-};
-
-M.mod_bigbluebuttonbn.import_view_init = function(Y) {
-    // Init general datasource
-    M.mod_bigbluebuttonbn.datasource_init(Y);
-
-    // Init event listener for course selector
-    Y.one('#menuimport_recording_links_select').on('change', function () {
-        Y.config.win.location = M.cfg.wwwroot + '/mod/bigbluebuttonbn/import_view.php?bn=' + bigbluebuttonbn.bn + '&tc=' + this.get('value');
-    });
 };
 
 M.mod_bigbluebuttonbn.view_update = function() {
@@ -536,25 +557,4 @@ M.mod_bigbluebuttonbn.view_windowClose = function() {
         opener.M.mod_bigbluebuttonbn.view_remote_update(5000);
     };
     window.close();
-};
-
-M.mod_bigbluebuttonbn.datatable_init = function(Y) {
-    console.info("datatable_init: stats");
-    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    for(var i = 0; i < bigbluebuttonbn.data.length; i++){
-        var date = new Date(bigbluebuttonbn.data[i].date);
-        bigbluebuttonbn.data[i].date = date.toLocaleDateString(bigbluebuttonbn.locale, options);
-    }
-
-    console.info("datatable_init: step 1");
-    YUI().use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
-        console.info("datatable_init: step 2");
-        var table = new Y.DataTable({
-            width:  "900px",
-            columns: bigbluebuttonbn.columns,
-            data: bigbluebuttonbn.data,
-            rowsPerPage: 10,
-            paginatorLocation: ['header', 'footer']
-        }).render('#bigbluebuttonbn_yui_table');
-    });
 };
