@@ -298,11 +298,9 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
                 $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
 
                 //JavaScript variables for recordings with YUI
-                $recordingsbn_columns = bigbluebuttonbn_get_recording_columns($bbbsession, $recordings);
-                $recordingsbn_data = bigbluebuttonbn_get_recording_data($bbbsession, $recordings);
                 $jsvars += array(
-                        'columns' => $recordingsbn_columns,
-                        'data' => $recordingsbn_data
+                        'columns' => bigbluebuttonbn_get_recording_columns($bbbsession, $recordings),
+                        'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings)
                 );
 
                 //JavaScript dependences for recordings with YUI
@@ -314,7 +312,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         }
 
         if ($importrecordings && $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
-            $button_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
+            $button_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'class' => 'btn btn-secondary', 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
             $output .= html_writer::start_tag('br');
             $output .= html_writer::tag('span', $button_import_recordings, array('id'=>"import_recording_links_button"));
             $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));

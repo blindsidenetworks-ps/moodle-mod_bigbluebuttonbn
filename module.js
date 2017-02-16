@@ -24,16 +24,13 @@ M.mod_bigbluebuttonbn.datasource_init = function(Y) {
 };
 
 M.mod_bigbluebuttonbn.datatable_init = function(Y) {
-    console.info("datatable_init: stats");
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     for(var i = 0; i < bigbluebuttonbn.data.length; i++){
         var date = new Date(bigbluebuttonbn.data[i].date);
         bigbluebuttonbn.data[i].date = date.toLocaleDateString(bigbluebuttonbn.locale, options);
     }
 
-    console.info("datatable_init: step 1");
-    YUI().use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
-        console.info("datatable_init: step 2");
+    YUI({lang:bigbluebuttonbn.locale}).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
         var table = new Y.DataTable({
             width:  "900px",
             columns: bigbluebuttonbn.columns,
@@ -361,7 +358,7 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_ta
                         Y.one('#meeting_join_url').set('value', join_url);
                         Y.one('#meeting_message').set('value', e.data.status.message);
 
-                        YUI().use('panel', function (Y) {
+                        YUI({lang:bigbluebuttonbn.locale}).use('panel', function (Y) {
                             bigbluebuttonbn_panel.show();
                         });
                     }
