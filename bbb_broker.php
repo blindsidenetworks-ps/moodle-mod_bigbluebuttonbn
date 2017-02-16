@@ -11,6 +11,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
+use \Firebase\JWT\JWT;
+
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
 $params['action']  = optional_param('action', '', PARAM_TEXT);
