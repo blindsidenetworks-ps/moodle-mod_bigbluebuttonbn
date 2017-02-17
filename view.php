@@ -239,7 +239,9 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         'locale' => $locale_code,
         'profile_features' => $features
     );
-    $jsdependences = array();
+    //JavaScript dependences
+    $jsdependences = array('datasource-get', 'datasource-jsonschema', 'datasource-polling');
+
 
     $output  = $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
@@ -255,9 +257,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
             'opening' => ($bbbsession['openingtime']) ? get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']) : '',
             'closing' => ($bbbsession['closingtime']) ? get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']) : ''
         );
-
-        //JavaScript dependences for room
-        $jsdependences += array('datasource-get', 'datasource-jsonschema', 'datasource-polling');
 
         $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
         $output .= '<br><span id="status_bar"></span><br>';
@@ -285,9 +284,14 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
 
     if ($showrecordings) {
         // Get recordings
-        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, FALSE, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
 
         if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+            //JavaScript variables for recordings
+            $jsvars += array(
+                  'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
+            );
+
             //If there are meetings with recordings load the data to the table
             if( $bbbsession['bigbluebuttonbn']->recordings_html ) {
                 // Render a plain html table

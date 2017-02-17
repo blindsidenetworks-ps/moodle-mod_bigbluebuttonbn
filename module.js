@@ -53,8 +53,9 @@ M.mod_bigbluebuttonbn.import_view_init = function(Y) {
 
 M.mod_bigbluebuttonbn.view_init = function(Y) {
     // Init general datasource
+    M.mod_bigbluebuttonbn.datasource_init(Y);
+
     if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showroom') ) {
-        M.mod_bigbluebuttonbn.datasource_init(Y);
 
         if (bigbluebuttonbn.activity === 'open') {
             // Create the main modal form.
@@ -119,7 +120,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         }
     }
 
-    if ( bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings') ) {
+    if (bigbluebuttonbn.recordings_html == false && (bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings'))) {
         M.mod_bigbluebuttonbn.datatable_init(Y);
     }
 };
