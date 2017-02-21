@@ -1854,6 +1854,15 @@ function bigbluebuttonbn_get_count_recording_imported_instances($recordID) {
     return $count_recordings_imported;
 }
 
+function bigbluebuttonbn_get_recording_imported_instances($recordID) {
+    global $DB;
+
+    $sql  = "SELECT * FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?";
+    $recordings_imported = $DB->get_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, "%recordID%", "%{$recordID}%"));
+
+    return $recordings_imported;
+}
+
 function bigbluebuttonbn_get_instance_type_profiles() {
 
     $instanceprofiles = array(

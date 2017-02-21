@@ -235,6 +235,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     list($locale_code, $locale_sub_code) = explode('_', $lang);
     $jsvars = array(
         'activity' => $activity,
+        'ping_interval' => ($waitformoderator_ping_interval > 0 ? $waitformoderator_ping_interval * 1000 : 15000),
         'locales' => bigbluebuttonbn_get_locales_for_view(),
         'locale' => $locale_code,
         'profile_features' => $features
@@ -252,7 +253,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         $jsvars += array(
             'meetingid' => $bbbsession['meetingid'],
             'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-            'ping_interval' => ($waitformoderator_ping_interval > 0 ? $waitformoderator_ping_interval * 1000 : 15000),
             'userlimit' => $bbbsession['userlimit'],
             'opening' => ($bbbsession['openingtime']) ? get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']) : '',
             'closing' => ($bbbsession['closingtime']) ? get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']) : ''
@@ -289,7 +289,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
             //JavaScript variables for recordings
             $jsvars += array(
-                  'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
+                'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
             );
 
             //If there are meetings with recordings load the data to the table

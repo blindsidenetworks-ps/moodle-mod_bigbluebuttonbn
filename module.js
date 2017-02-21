@@ -436,7 +436,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
     console.info('Action: ' + action);
 
     //Before sending the request, let's process a verification
-    if( M.mod_bigbluebuttonbn.broker_actionVerification(action, recordingid, meetingid) ) {
+    if (M.mod_bigbluebuttonbn.broker_actionVerification(action, recordingid, meetingid)) {
         var id = bigbluebuttonbn_dataSource.sendRequest({
             request : "action=recording_" + action + "&id=" + recordingid,
             callback : {
@@ -448,6 +448,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                         Y.one('#recording-td-' + recordingid).remove();
 
                     } else if( action == 'publish' || action == 'unpublish' ) {
+                        console.info(e);
                         if (e.data.status == 'true') {
                             console.info(action + " requested");
 

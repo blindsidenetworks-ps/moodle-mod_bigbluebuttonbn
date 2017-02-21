@@ -58,51 +58,54 @@ if ( empty($error) ) {
     }
     $hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
 
-    if( !$hascourseaccess ){
+    if (!$hascourseaccess) {
         header("HTTP/1.0 401 Unauthorized");
         return;
     } else {
+        $instance_type_profiles = bigbluebuttonbn_get_instance_type_profiles();
+        $features = isset($bbbsession['bigbluebuttonbn']->type) ? $instance_type_profiles[$bbbsession['bigbluebuttonbn']->type]['features'] : $instance_type_profiles[0]['features'];
+        $showroom = (in_array('all', $features) || in_array('showroom', $features));
+        $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
+        $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
+
         try {
-            switch ( strtolower($params['action']) ){
+            switch (strtolower($params['action'])) {
                 case 'meeting_info':
                     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW']);
                     $meeting_running = bigbluebuttonbn_bbb_broker_is_meeting_running($meeting_info);
 
                     $status_can_end = '';
                     $status_can_tag = '';
-                    if( $meeting_running ) {
+                    if ($meeting_running) {
                         $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
-                        if( $bbbsession['userlimit'] == 0 || $meeting_info->participantCount < $bbbsession['userlimit'] ) {
+                        if ($bbbsession['userlimit'] == 0 || $meeting_info->participantCount < $bbbsession['userlimit']) {
                             $initial_message = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
                             $can_join = true;
-
                         } else {
                             $initial_message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
                             $can_join = false;
                         }
 
-                        if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+                        if ($bbbsession['administrator'] || $bbbsession['moderator']) {
                             $end_button_text = get_string('view_conference_action_end', 'bigbluebuttonbn');
                             $can_end = true;
                             $status_can_end = '"can_end": true, "end_button_text": "'.$end_button_text.'", ';
                         }
-
                     } else {
                         // If user is administrator, moderator or if is viewer and no waiting is required
                         $join_button_text = get_string('view_conference_action_join', 'bigbluebuttonbn');
-                        if ( $bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait'] ) {
+                        if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
                             $initial_message = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
                             $can_join = true;
-
                         } else {
                             $initial_message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
-                            if ( $bbbsession['wait'] ) {
+                            if ($bbbsession['wait']) {
                                 $initial_message .= ' '.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
                             }
                             $can_join = false;
                         }
 
-                        if( $bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator']) ) {
+                        if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
                             $can_tag = true;
 
                         } else {
@@ -114,12 +117,13 @@ if ( empty($error) ) {
                     echo $params['callback'].'({ "running": '.($meeting_running? 'true':'false').', "info": '.json_encode($meeting_info).', "status": {"can_join": '.($can_join? 'true':'false').',"join_url": "'.$bbbsession['joinURL'].'","join_button_text": "'.$join_button_text.'", '.$status_can_end.$status_can_tag.'"message": "'.$initial_message.'"} });';
                     break;
                 case 'meeting_end':
-                    if( $bbbsession['administrator'] || $bbbsession['moderator'] ) {
+                    if ($bbbsession['administrator'] || $bbbsession['moderator']) {
                         //Execute the end command
                         $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
                         // Moodle event logger: Create an event for meeting ended
-                        if( isset($bigbluebuttonbn) )
+                        if (isset($bigbluebuttonbn)) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
+                        }
                         // Update the cache
                         $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
 
@@ -129,77 +133,129 @@ if ( empty($error) ) {
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
+/*
                 case 'recording_list':
-                    if( $bbbsession['managerecordings'] ) {
-                        if ( isset($params['id']) && $params['id'] != '' ) {
+                    if ($bbbsession['managerecordings']) {
+                        if (isset($params['id']) && $params['id'] != '') {
                             $id = $params['id'];
                         } else {
                             $id = $params['idx'];
                         }
                         $recordings = bigbluebuttonbn_getRecordingsArray($id);
-                        if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // Recording(s) was(were) found
+                        if (isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // Recording(s) was(were) found
                             echo $params['callback'].'({"status": true, "recordings": '.json_encode($recordings).'});';
                         } else {
                             echo $params['callback'].'({"status": false});';
                         }
                     }
                     break;
+*/
+                case 'recording_links':
+                    if ($bbbsession['managerecordings']) {
+                        if (isset($params['id']) && $params['id'] != '') {
+                            $recordings_imported_all = bigbluebuttonbn_get_recording_imported_instances($params['id']);
+                            echo $params['callback'].'({ "status": "true", "links": '.count($recordings_imported_all).'});';
+                        } else {
+                            echo $params['callback'].'({"status": "false"});';
+                        }
+                    } else {
+                        error_log("ERROR: User not authorized to execute end command");
+                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
+                    }
+                    break;
                 case 'recording_info':
-                    if( $bbbsession['managerecordings'] ) {
+                    error_log("****************** RECORDING INFO: ");
+                    if ($bbbsession['managerecordings']) {
                         //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        if( isset($recordings_imported[$params['id']]) ) {
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+                        error_log("****************** RECORDINGS IMPORTED: ".json_encode($recordings_imported));
+                        if (isset($recordings_imported[$params['id']])) {
+                            error_log("****************** IT IS IMPORTED: ");
                             //Look up for an update on the imported recording
                             $recording = $recordings_imported[$params['id']];
-                            if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
+                            if (isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
                                 echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
                             } else {
                                 echo $params['callback'].'({ "status": "false" });';
                             }
-
                         // As the recordingid was not identified as imported recording link, look up for a real recording
                         } else {
-                            $recording = bigbluebuttonbn_getRecordingsArray($params['id'], $params['idx']);
-                            if ( isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
-                                echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
+                            error_log("****************** IT IS NOT IMPORTED: ".$params['id']."::".$params['idx']);
+                            $recording = bigbluebuttonbn_getRecordingsArray($params['idx'],$params['id']);
+                            if (isset($recording) && !empty($recording) && array_key_exists($params['id'], $recording)) {  // The recording was found
+                                echo $params['callback'].'({ "status": "true", "published": "'.$recording[$params['id']]['published'].'"});';
                             } else {
-                                echo $params['callback'].'({ "status": "false" });';
+                                echo $params['callback'].'({"status": "false"});';
                             }
                         }
-
                     } else {
                         error_log("ERROR: User not authorized to execute end command");
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
                 case 'recording_publish':
-                    if( $bbbsession['managerecordings'] ) {
+                case 'recording_unpublish':
+                    if ($bbbsession['managerecordings']) {
+                        $publish = (strtolower($params['action']) === 'recording_publish');
                         $status = true;
                         //Retrieve the array of imported recordings for the current course and activity
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        if( isset($recordings_imported[$params['id']]) ) {
-                            $recordings = bigbluebuttonbn_getRecordingsArray($recordings_imported[$params['id']]['meetingID']);
-                            $recording = $recordings_imported[$params['id']];
-                            if ( $recording['published'] === 'true' ) {
-                                // Only if the physical recording is published, execute publish on imported recording link
-                                $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
-                            } else {
-                                // Send a message telling that it could not be unpublished
-                                $status = false;
-                            }
-                        } else {
-                            // As the recordingid was not identified as imported recording link, execute publish on a real recording
-                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+                        error_log("****************** RECORDINGS IMPORTED: ".json_encode($recordings_imported));
+                        switch (strtolower($params['action'])) {
+                            case 'recording_publish':
+                                if (isset($recordings_imported[$params['id']])) {
+                                    error_log("****************** PUBLISH IMPORTED: ".$params['id']);
+                                    // Execute publish on imported recording link
+                                    $recordings = bigbluebuttonbn_getRecordingsArray($recordings_imported[$params['id']]['meetingID'], $recordings_imported[$params['id']]['recordID']);
+                                    if ($recordings[$params['id']]['published'] === 'true') {
+                                        // Only if the physical recording is published, execute publish on imported recording link
+                                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $publish);
+                                    } else {
+                                        // Send a message telling that it could not be unpublished
+                                        $status = false;
+                                    }
+                                } else {
+                                    error_log("****************** PUBLISH NOT IMPORTED: ".$params['id']);
+                                    // As the recordingid was not identified as imported recording link, execute publish on a real recording
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], $publish);
+                                }
+                                break;
+                            case 'recording_unpublish':
+                                if (isset($recordings_imported[$params['id']])) {
+                                    error_log("****************** UNPUBLISH IMPORTED: ".$params['id']);
+                                    // Execute unpublish on imported recording link
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
+                                } else {
+                                    error_log("****************** UNPUBLISH NOT IMPORTED: ".$params['id']);
+                                    // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
+                                    // First: Unpublish imported links associated to the recording
+                                    $recordings_imported_all = bigbluebuttonbn_get_recording_imported_instances($params['id']);
+
+                                    if ($recordings_imported_all > 0) {
+                                        foreach ($recordings_imported_all as $key => $record) {
+                                            $meta = json_decode($record->meta, true);
+                                            // Prepare data for the update
+                                            $meta['recording']['published'] = 'false';
+                                            $recordings_imported_all[$key]->meta = json_encode($meta);
+
+                                            // Proceed with the update
+                                            $DB->update_record("bigbluebuttonbn_logs", $recordings_imported_all[$key]);
+                                        }
+                                    }
+                                    // Second: Execute the real unpublish
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], $publish);
+                                }
+                                break;
+                            case 'recording_delete':
+                                break;
                         }
 
-                        if ( $status ) {
+                        if ($status) {
                             $callback_response['status'] = "true";
-
                             // Moodle event logger: Create an event for recording published
                             if( isset($bigbluebuttonbn) ) {
-                                bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                                bigbluebuttonbn_event_log($publish ? BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED : BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                             }
-
                         } else {
                             $callback_response['status'] = "false";
                             $callback_response['message'] = get_string('view_recording_publish_link_error', 'bigbluebuttonbn');
@@ -207,64 +263,22 @@ if ( empty($error) ) {
 
                         $callback_response_data = json_encode($callback_response);
                         echo "{$params['callback']}({$callback_response_data});";
-
                     } else {
                         error_log("ERROR: User not authorized to execute publish command");
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute publish command");
                     }
                     break;
-                case 'recording_unpublish':
-                    if( $bbbsession['managerecordings'] ) {
-                        //Retrieve the array of imported recordings for the current course and activity
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
-                        if( isset($recordings_imported[$params['id']]) ) {
-                            // Execute unpublish on imported recording link
-                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
-                        } else {
-                            // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
-                            // First: Unpublish imported links associated to the recording
-                            $recordings_imported_all = bigbluebuttonbn_get_count_recording_imported_instances($params['id']);
-
-                            if ($recordings_imported_all > 0) {
-                                foreach ($recordings_imported_all as $key => $record) {
-                                    $meta = json_decode($record->meta, true);
-                                    // Prepare data for the update
-                                    $meta['recording']['published'] = 'false';
-                                    $recordings_imported_all[$key]->meta = json_encode($meta);
-
-                                    // Proceed with the update
-                                    $DB->update_record("bigbluebuttonbn_logs", $recordings_imported_all[$key]);
-                                }
-                            }
-                            // Second: Execute the real unpublish
-                            $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
-                        }
-
-                        // Moodle event logger: Create an event for recording unpublished
-                        if( isset($bigbluebuttonbn) ) {
-                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
-                        }
-
-                        $callback_response['status'] = "true";
-                        $callback_response_data = json_encode($callback_response);
-                        echo "{$params['callback']}({$callback_response_data});";
-
-                    } else {
-                        error_log("ERROR: User not authorized to execute unpublish command");
-                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute unpublish command");
-                    }
-                    break;
                 case 'recording_delete':
                     if( $bbbsession['managerecordings'] ) {
                         //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, isset($bbbsession['bigbluebuttonbn'])?$bbbsession['bigbluebuttonbn']->id: NULL);
+                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
                         if( isset($recordings_imported[$params['id']]) ) {
                             // Execute unpublish on imported recording link
                             bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
                         } else {
                             // As the recordingid was not identified as imported recording link, execute delete on a real recording
                             // First: Delete imported links associated to the recording
-                            $recordings_imported_all = bigbluebuttonbn_get_count_recording_imported_instances($params['id']);
+                            $recordings_imported_all = bigbluebuttonbn_get_recording_imported_instances($params['id']);
 
                             if ($recordings_imported_all > 0) {
                                 foreach ($recordings_imported_all as $key => $record) {
