@@ -1064,6 +1064,7 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
                 break;
             case 'recording_list':
             case 'recording_info':
+            case 'recording_links':
             case 'recording_publish':
             case 'recording_unpublish':
             case 'recording_delete':
