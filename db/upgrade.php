@@ -281,5 +281,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
+    if ($result && $oldversion < 2016051910) {
+        // Update the bigbluebuttonbn table
+        $table = new xmldb_table('bigbluebuttonbn');
+        //// Drop field newwindow
+        $field = new xmldb_field('newwindow');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+        }
+
+        upgrade_mod_savepoint(true, 2016051910, 'bigbluebuttonbn');
+    }
+
     return $result;
 }
