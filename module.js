@@ -385,7 +385,6 @@ M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
 };
 
 M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, meetingid, callback) {
-    console.info("broker_actionVerification");
     var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
     var data = {'id':recordingid};
 
@@ -394,7 +393,6 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
             request : 'action=recording_links&id=' + recordingid,
             callback : {
                 success : function(e) {
-                    console.info(e.data);
                     if (e.data.status) {
                         data['links'] = e.data.links;
                         if (e.data.links == 0) {
@@ -448,7 +446,6 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                             Y.one('#recording-td-' + recordingid).remove();
 
                         } else if( action == 'publish' || action == 'unpublish' ) {
-                            console.info(e);
                             if (e.data.status == 'true') {
                                 console.info(action + " requested");
 
@@ -467,7 +464,6 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                     request : "action=recording_info&id=" + recordingid + "&idx=" + meetingid,
                                     callback : {
                                         success : function(e) {
-                                            console.info(e);
                                             if (e.data.status == 'true') {
                                                 if (action == 'publish') {
                                                     if (e.data.published == 'true') {

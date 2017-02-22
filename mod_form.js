@@ -160,21 +160,25 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
         var row = participant_list_table.insertRow(participant_list_table.rows.length);
         row.id = "participant_list_tr_" + participant_selection_type.value + "-" + participant_selection.value;
         var cell0 = row.insertCell(0);
-        cell0.width = "20px";
-        cell0.innerHTML = '<a onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" title="' + bigbluebuttonbn_strings.remove + '">x</a>';
+        cell0.width = "125px";
+        if( participant_selection_type.value == 'all' )
+            cell0.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + '</i></b>';
+        else
+            cell0.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + ':&nbsp;</i></b>';
         var cell1 = row.insertCell(1);
-        cell1.width = "125px";
         if( participant_selection_type.value == 'all' )
-            cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + '</i></b>';
+            cell1.innerHTML = '';
         else
-            cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + ':&nbsp;</i></b>';
+            cell1.innerHTML = participant_selection.options[participant_selection.selectedIndex].text;
         var cell2 = row.insertCell(2);
-        if( participant_selection_type.value == 'all' )
-            cell2.innerHTML = '';
-        else
-            cell2.innerHTML = participant_selection.options[participant_selection.selectedIndex].text;
+        cell2.innerHTML = '<i>&nbsp;' + bigbluebuttonbn_strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn_strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn_strings.moderator + '</option></select>';
         var cell3 = row.insertCell(3);
-        cell3.innerHTML = '<i>&nbsp;' + bigbluebuttonbn_strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn_strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn_strings.moderator + '</option></select>';
+        cell3.width = "20px";
+        if (bigbluebuttonbn.icons_enabled) {
+            cell3.innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;"><img class="btn icon smallicon" alt="' + bigbluebuttonbn_strings.remove + '" title="' + bigbluebuttonbn_strings.remove + '" src="' + bigbluebuttonbn.pix_icon_delete + '"></img></a>';
+        } else {
+            cell3.innerHTML = '<a onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" title="' + bigbluebuttonbn_strings.remove + '">x</a>';
+        }
     }
 
     M.mod_bigbluebuttonbn.mod_form_participant_list_update();

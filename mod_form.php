@@ -51,6 +51,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $recordings_html_editable = bigbluebuttonbn_get_cfg_recordings_html_editable();
         $recordings_deleted_activities_default = bigbluebuttonbn_get_cfg_recordings_deleted_activities_default();
         $recordings_deleted_activities_editable = bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable();
+        $recording_icons_enabled = bigbluebuttonbn_get_cfg_recording_icons_enabled();
+        $pix_icon_delete_url = "".$OUTPUT->pix_url('t/delete', 'moodle');
 
         $instance_type_enabled = true;
 
@@ -289,15 +291,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             );
             $col3 = new html_table_cell();
             $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
-            if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
+            if ($recording_icons_enabled) {
                 //With icon for delete
-                $icon = new pix_icon('t/delete', get_string('delete'), 'moodle');
-                $actionbar = $OUTPUT->action_icon('#', $icon, null, array('onclick' => $onclick), false);
+                $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon', 'title' => get_string('delete'), 'alt' => get_string('delete'), 'src' => $pix_icon_delete_url));
+                $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon', 'onclick' => $onclick, 'title' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')));
             } else {
                 //With text for delete
-                $actionbar = '<b>x</b>';
+                $col3->text = html_writer::tag('a', '<b>x</b>', array('class' => 'btn action_icon', 'onclick' => $onclick, 'title' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')));
             }
-            $col3->text = html_writer::tag('a', $actionbar, array('href' => '#', 'class' => 'action_icon', 'onclick' => $onclick, 'title' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')));
 
             $row->cells = array($col0, $col1, $col2, $col3);
             array_push($table->data, $row);
@@ -319,7 +320,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $bigbluebuttonbn_strings = array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
                                           "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
                                           "moderator" => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
-                                          "remove" => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
+                                          //"remove" => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
+                                          "remove" => get_string('delete')
                                     );
         $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_strings = '.json_encode($bigbluebuttonbn_strings).'; </script>');
         $mform->addElement('html', "\n\n");
@@ -354,6 +356,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $jsvars = array(
             'instance_type_profiles' => $instance_type_profiles,
+            'icons_enabled' => $recording_icons_enabled,
+            'pix_icon_delete' => $pix_icon_delete_url
         );
         $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
         $jsmodule = array(
