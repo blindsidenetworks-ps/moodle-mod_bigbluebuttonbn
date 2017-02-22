@@ -384,17 +384,17 @@ M.mod_bigbluebuttonbn.broker_executeJoin = function(join_url, status_message) {
     }, 15000);
 };
 
-M.mod_bigbluebuttonbn.broker_actionVerification2 = function(action, recordingid, meetingid, callback) {
-    console.info("broker_actionVerification2");
+M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, meetingid, callback) {
+    console.info("broker_actionVerification");
     var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
+    var data = {'id':recordingid};
 
-    if (action === 'unpublish' && !is_imported_link) {
+    if (!is_imported_link && (action === 'unpublish' || action === 'delete')) {
         var id = bigbluebuttonbn_dataSource.sendRequest({
             request : 'action=recording_links&id=' + recordingid,
             callback : {
                 success : function(e) {
                     console.info(e.data);
-                    var data = {'id':recordingid};
                     if (e.data.status) {
                         data['links'] = e.data.links;
                         if (e.data.links == 0) {
@@ -402,11 +402,11 @@ M.mod_bigbluebuttonbn.broker_actionVerification2 = function(action, recordingid,
                         } else {
                             var confirmation_warning;
                             if (e.data.links == 1) {
-                                confirmation_warning = bigbluebuttonbn.locales.unpublish_confirmation_warning_s.replace("{$a}", e.data.links) + '. ';
+                                confirmation_warning = bigbluebuttonbn.locales[action + "_confirmation_warning_s"].replace("{$a}", e.data.links) + '. ';
                             } else if( e.data.links > 1 ) {
-                                confirmation_warning = bigbluebuttonbn.locales.unpublish_confirmation_warning_p.replace("{$a}", e.data.links) + '. ';
+                                confirmation_warning = bigbluebuttonbn.locales[action + "_confirmation_warning_p"].replace("{$a}", e.data.links) + '. ';
                             }
-                            var confirmation = bigbluebuttonbn.locales.unpublish_confirmation.replace("{$a}", is_imported_link ? bigbluebuttonbn.locales.recording_link : bigbluebuttonbn.locales.recording);
+                            var confirmation = bigbluebuttonbn.locales[action + "_confirmation"].replace("{$a}", is_imported_link ? bigbluebuttonbn.locales.recording_link : bigbluebuttonbn.locales.recording);
 
                             data['confirmed'] = confirm(confirmation_warning + '\n\n' + confirmation);
                         }
@@ -417,68 +417,25 @@ M.mod_bigbluebuttonbn.broker_actionVerification2 = function(action, recordingid,
                 },
                 failure : function(e) {
                     console.log(e.error.message);
-                    callback({'id':recordingid, 'error': e.error.message});
+                    data['error'] =  e.error.message;
+                    callback(data);
                 }
             }
         });
+    } else if (action === 'import') {
+        data['confirmed'] = confirm(bigbluebuttonbn.locales.import_confirmation);
+        callback(data);
     } else {
-        callback({'id':recordingid, 'confirmed': true});
+        data['confirmed'] = true;
+        callback(data);
     }
-};
-
-M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, meetingid) {
-    var actionVerification = false;
-
-    var confirmation = '';
-    var confirmation_warning = '';
-    var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported;
-
-    if( action == 'unpublish' ) {
-        //if it has associated links imported in a different course/activity, show a confirmation dialog
-        var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-
-        if( associated_links == 0 ) {
-        	actionVerification = true
-
-        } else {
-            if( associated_links == 1 ) {
-                confirmation_warning = bigbluebuttonbn.locales.unpublish_confirmation_warning_s.replace("{$a}", associated_links) + '. ';
-            } else if( associated_links > 1 ) {
-                confirmation_warning = bigbluebuttonbn.locales.unpublish_confirmation_warning_p.replace("{$a}", associated_links) + '. ';
-            }
-            confirmation = bigbluebuttonbn.locales.unpublish_confirmation.replace("{$a}", is_imported_link == 'true'? bigbluebuttonbn.locales.recording_link: bigbluebuttonbn.locales.recording);
-
-            actionVerification = confirm(confirmation_warning + '\n\n' + confirmation);
-        }
-
-    } else if( action == 'delete' ) {
-        //if it has associated links imported in a different course/activity, show a confirmation dialog
-        var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-
-        if( associated_links == 1 ) {
-            confirmation_warning = bigbluebuttonbn.locales.delete_confirmation_warning_s.replace("{$a}", associated_links) + '. ';
-        } else if( associated_links > 1 ) {
-            confirmation_warning = bigbluebuttonbn.locales.delete_confirmation_warning_p.replace("{$a}", associated_links) + '. ';
-        }
-        confirmation = bigbluebuttonbn.locales.delete_confirmation.replace("{$a}", is_imported_link == 'true'? bigbluebuttonbn.locales.recording_link: bigbluebuttonbn.locales.recording);
-
-        actionVerification = confirm(confirmation_warning + '\n\n' + confirmation);
-
-    } else if( action == 'import' ) {
-    	actionVerification = confirm(bigbluebuttonbn.locales.import_confirmation);
-
-    } else {
-        actionVerification = true;
-    }
-
-    return actionVerification;
 };
 
 M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, meetingid) {
     console.info('Action: ' + action);
 
     //Before sending the request, let's process a verification
-    M.mod_bigbluebuttonbn.broker_actionVerification2(action, recordingid, meetingid, function(data) {
+    M.mod_bigbluebuttonbn.broker_actionVerification(action, recordingid, meetingid, function(data) {
         if (data.confirmed) {
             var id = bigbluebuttonbn_dataSource.sendRequest({
                 request : "action=recording_" + action + "&id=" + recordingid,

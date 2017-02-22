@@ -150,12 +150,12 @@ if ( empty($error) ) {
                     error_log("****************** RECORDING INFO: ");
                     if ($bbbsession['managerecordings']) {
                         //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
-                        error_log("****************** RECORDINGS IMPORTED: ".json_encode($recordings_imported));
-                        if (isset($recordings_imported[$params['id']])) {
+                        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+                        error_log("****************** RECORDINGS: MERGED".json_encode($recordings));
+                        if (isset($recordings[$params['id']])) {
                             error_log("****************** IT IS IMPORTED: ");
                             //Look up for an update on the imported recording
-                            $recording = $recordings_imported[$params['id']];
+                            $recording = $recordings[$params['id']];
                             if (isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
                                 echo $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
                             } else {
