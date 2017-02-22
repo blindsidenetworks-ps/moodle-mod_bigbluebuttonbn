@@ -178,8 +178,8 @@ if ( empty($error) ) {
                     break;
                 case 'recording_publish':
                 case 'recording_unpublish':
+                case 'recording_delete':
                     if ($bbbsession['managerecordings']) {
-                        $publish = (strtolower($params['action']) === 'recording_publish');
                         $status = true;
                         // Retrieve array of recordings that includes real and imported
                         $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
@@ -193,7 +193,7 @@ if ( empty($error) ) {
                                     if ($real_recordings[$params['id']]['published'] === 'true') {
                                         // Only if the physical recording is published, execute publish on imported recording link
                                         error_log("PUBLISHING");
-                                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, $publish);
+                                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
                                     } else {
                                         // Send a message telling that it could not be published
                                         error_log("IT WONT BE PUBLISHED");
@@ -202,7 +202,18 @@ if ( empty($error) ) {
                                 } else {
                                     error_log("****************** PUBLISH NOT IMPORTED: ".$params['id']);
                                     // As the recordingid was not identified as imported recording link, execute publish on a real recording
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], $publish);
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                                }
+
+                                if ($status) {
+                                    $callback_response['status'] = "true";
+                                    // Moodle event logger: Create an event for recording published
+                                    if( isset($bigbluebuttonbn) ) {
+                                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                                    }
+                                } else {
+                                    $callback_response['status'] = "false";
+                                    $callback_response['message'] = get_string('view_recording_publish_link_error', 'bigbluebuttonbn');
                                 }
                                 break;
                             case 'recording_unpublish':
@@ -228,22 +239,42 @@ if ( empty($error) ) {
                                         }
                                     }
                                     // Second: Execute the real unpublish
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], $publish);
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                                }
+
+                                $callback_response['status'] = "true";
+                                // Moodle event logger: Create an event for recording unpublished
+                                if( isset($bigbluebuttonbn) ) {
+                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
                                 }
                                 break;
                             case 'recording_delete':
-                                break;
-                        }
+                                if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+                                    error_log("****************** DELETING IMPORTED: ".$params['id']);
+                                    // Execute delete on imported recording link
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                                } else {
+                                    error_log("****************** DELETE NOT IMPORTED: ".$params['id']);
+                                    // As the recordingid was not identified as imported recording link, execute delete on a real recording
+                                    // First: Delete imported links associated to the recording
+                                    $recordings_imported_all = bigbluebuttonbn_get_recording_imported_instances($params['id']);
 
-                        if ($status) {
-                            $callback_response['status'] = "true";
-                            // Moodle event logger: Create an event for recording published
-                            if( isset($bigbluebuttonbn) ) {
-                                bigbluebuttonbn_event_log($publish ? BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED : BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
-                            }
-                        } else {
-                            $callback_response['status'] = "false";
-                            $callback_response['message'] = get_string('view_recording_publish_link_error', 'bigbluebuttonbn');
+                                    if ($recordings_imported_all > 0) {
+                                        foreach ($recordings_imported_all as $key => $record) {
+                                            // Execute delete
+                                            $DB->delete_records("bigbluebuttonbn_logs", array('id' => $key));
+                                        }
+                                    }
+                                    // Second: Execute the real delete
+                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                                }
+
+                                $callback_response['status'] = "true";
+                                // Moodle event logger: Create an event for recording deleted
+                                if( isset($bigbluebuttonbn) ) {
+                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                                }
+                                break;
                         }
 
                         $callback_response_data = json_encode($callback_response);
@@ -251,42 +282,6 @@ if ( empty($error) ) {
                     } else {
                         error_log("ERROR: User not authorized to execute publish command");
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute publish command");
-                    }
-                    break;
-                case 'recording_delete':
-                    if( $bbbsession['managerecordings'] ) {
-                        //Retrieve the array of imported recordings
-                        $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
-                        if( isset($recordings_imported[$params['id']]) ) {
-                            // Execute unpublish on imported recording link
-                            bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
-                        } else {
-                            // As the recordingid was not identified as imported recording link, execute delete on a real recording
-                            // First: Delete imported links associated to the recording
-                            $recordings_imported_all = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-
-                            if ($recordings_imported_all > 0) {
-                                foreach ($recordings_imported_all as $key => $record) {
-                                    // Execute delete
-                                    $DB->delete_records("bigbluebuttonbn_logs", array('id' => $key));
-                                }
-                            }
-                            // Second: Execute the real delete
-                            $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
-                        }
-
-                        // Moodle event logger: Create an event for recording deleted
-                        if( isset($bigbluebuttonbn) ) {
-                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
-                        }
-
-                        $callback_response['status'] = "true";
-                        $callback_response_data = json_encode($callback_response);
-                        echo "{$params['callback']}({$callback_response_data});";
-
-                    } else {
-                        error_log("ERROR: User not authorized to execute delete command");
-                        header("HTTP/1.0 401 Unauthorized. User not authorized to execute delete command");
                     }
                     break;
                 case 'recording_ready':
