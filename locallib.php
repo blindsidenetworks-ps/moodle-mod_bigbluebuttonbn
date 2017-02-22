@@ -1062,7 +1062,6 @@ function bigbluebuttonbn_bbb_broker_validate_parameters($params) {
                     $error = bigbluebuttonbn_bbb_broker_add_error($error, 'The meetingID must be specified.');
                 }
                 break;
-            case 'recording_list':
             case 'recording_info':
             case 'recording_links':
             case 'recording_publish':
