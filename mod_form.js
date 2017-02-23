@@ -100,7 +100,7 @@ M.mod_bigbluebuttonbn.mod_form_participant_selection_set = function() {
     var type = document.getElementById('bigbluebuttonbn_participant_selection_type');
     for( var i = 0; i < type.options.length; i++ ){
         if( type.options[i].selected ) {
-            var options = bigbluebuttonbn_participant_selection[type.options[i].value];
+            var options = bigbluebuttonbn.participant_selection[type.options[i].value];
             for( var j = 0; j < options.length; j++ ) {
                 M.mod_bigbluebuttonbn.mod_form_select_add_option('bigbluebuttonbn_participant_selection', options[j].name, options[j].id);
             }
@@ -116,14 +116,14 @@ M.mod_bigbluebuttonbn.mod_form_participant_selection_set = function() {
 
 M.mod_bigbluebuttonbn.mod_form_participant_list_update = function() {
     var participant_list = document.getElementsByName('participants')[0];
-    participant_list.value = JSON.stringify(bigbluebuttonbn_participant_list).replace(/"/g, '&quot;');
+    participant_list.value = JSON.stringify(bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_remove = function(type, id) {
     //Remove from memory
-    for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
-        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id == ''? null: id) ){
-            bigbluebuttonbn_participant_list.splice(i, 1);
+    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
+        if( bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id == ''? null: id) ){
+            bigbluebuttonbn.participant_list.splice(i, 1);
         }
     }
 
@@ -143,8 +143,8 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
 
     //Lookup to see if it has been added already
     var found = false;
-    for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
-        if( bigbluebuttonbn_participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn_participant_list[i].selectionid == participant_selection.value ){
+    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
+        if( bigbluebuttonbn.participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn.participant_list[i].selectionid == participant_selection.value ){
             found = true;
         }
     }
@@ -153,7 +153,7 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
     if( !found ){
         // Add it to memory
         var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer"};
-        bigbluebuttonbn_participant_list.push(participant);
+        bigbluebuttonbn.participant_list.push(participant);
 
         // Add it to the form
         var participant_list_table = document.getElementById('participant_list_table');
@@ -171,13 +171,13 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
         else
             cell1.innerHTML = participant_selection.options[participant_selection.selectedIndex].text;
         var cell2 = row.insertCell(2);
-        cell2.innerHTML = '<i>&nbsp;' + bigbluebuttonbn_strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn_strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn_strings.moderator + '</option></select>';
+        cell2.innerHTML = '<i>&nbsp;' + bigbluebuttonbn.strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn.strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn.strings.moderator + '</option></select>';
         var cell3 = row.insertCell(3);
         cell3.width = "20px";
         if (bigbluebuttonbn.icons_enabled) {
-            cell3.innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;"><img class="btn icon smallicon" alt="' + bigbluebuttonbn_strings.remove + '" title="' + bigbluebuttonbn_strings.remove + '" src="' + bigbluebuttonbn.pix_icon_delete + '"></img></a>';
+            cell3.innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;"><img class="btn icon smallicon" alt="' + bigbluebuttonbn.strings.remove + '" title="' + bigbluebuttonbn.strings.remove + '" src="' + bigbluebuttonbn.pix_icon_delete + '"></img></a>';
         } else {
-            cell3.innerHTML = '<a onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" title="' + bigbluebuttonbn_strings.remove + '">x</a>';
+            cell3.innerHTML = '<a onclick="M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" title="' + bigbluebuttonbn.strings.remove + '">x</a>';
         }
     }
 
@@ -187,9 +187,9 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
 M.mod_bigbluebuttonbn.mod_form_participant_list_role_update = function(type, id) {
     // Update in memory
     var participant_list_role_selection = document.getElementById('participant_list_role_' + type + '-' + id);
-    for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
-        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id == ''? null: id) ){
-            bigbluebuttonbn_participant_list[i].role = participant_list_role_selection.value;
+    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
+        if( bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id == ''? null: id) ){
+            bigbluebuttonbn.participant_list[i].role = participant_list_role_selection.value;
             //participant_list_role_selection.options[participant_list_role_selection.selectedIndex].text
         }
     }

@@ -73,6 +73,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
 
+        $jsvars = array(
+            'instance_type_profiles' => $instance_type_profiles,
+            'icons_enabled' => $recording_icons_enabled,
+            'pix_icon_delete' => $pix_icon_delete_url
+        );
+
         //-------------------------------------------------------------------------------
         // First block starts here
         //-------------------------------------------------------------------------------
@@ -210,6 +216,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Fourth block starts here
         //-------------------------------------------------------------------------------
+        $strings['as'] = get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn');
+        $strings['viewer'] = get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn');
+        $strings['moderator'] = get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn');
+        $strings['remove'] = get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn');
+        $jsvars['strings'] = $strings;
+
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');
 
@@ -293,11 +305,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
             if ($recording_icons_enabled) {
                 //With icon for delete
-                $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon', 'title' => get_string('delete'), 'alt' => get_string('delete'), 'src' => $pix_icon_delete_url));
-                $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon', 'onclick' => $onclick, 'title' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')));
+                $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon', 'title' => $strings['remove'], 'alt' => $strings['remove'], 'src' => $pix_icon_delete_url));
+                $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon', 'onclick' => $onclick, 'title' => $strings['remove']));
             } else {
                 //With text for delete
-                $col3->text = html_writer::tag('a', '<b>x</b>', array('class' => 'btn action_icon', 'onclick' => $onclick, 'title' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')));
+                $col3->text = html_writer::tag('a', '<b>x</b>', array('class' => 'btn action_icon', 'onclick' => $onclick, 'title' => $strings['remove']));
             }
 
             $row->cells = array($col0, $col1, $col2, $col3);
@@ -305,26 +317,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         // Render elements for participant list
-        $html_my_participant_list = html_writer::tag('div',
+        $html_participant_list = html_writer::tag('div',
             html_writer::label(get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), 'bigbluebuttonbn_participant_list').
             html_writer::table($table)
         );
 
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'my_participant_list', '', $html_my_participant_list);
+        $mform->addElement('static', 'participant_list', '', $html_participant_list);
         $mform->addElement('html', "\n\n");
 
         // Add data
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}; </script>');
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participant_list).'; </script>');
-        $bigbluebuttonbn_strings = array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
-                                          "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
-                                          "moderator" => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
-                                          //"remove" => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
-                                          "remove" => get_string('delete')
-                                    );
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_strings = '.json_encode($bigbluebuttonbn_strings).'; </script>');
-        $mform->addElement('html', "\n\n");
+        $jsvars['participant_selection'] = json_decode('{"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}');
+        $jsvars['participant_list'] = $participant_list;
         //-------------------------------------------------------------------------------
         // Fourth block ends here
         //-------------------------------------------------------------------------------
@@ -354,11 +358,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // add standard buttons, common to all modules
         $this->add_action_buttons();
 
-        $jsvars = array(
-            'instance_type_profiles' => $instance_type_profiles,
-            'icons_enabled' => $recording_icons_enabled,
-            'pix_icon_delete' => $pix_icon_delete_url
-        );
         $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
         $jsmodule = array(
             'name'     => 'mod_bigbluebuttonbn',
