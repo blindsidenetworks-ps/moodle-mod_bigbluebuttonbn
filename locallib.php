@@ -18,8 +18,9 @@ require_once(dirname(__FILE__).'/lib.php');
 
 const BIGBLUEBUTTONBN_FORCED = true;
 
-const BIGBLUEBUTTONBN_TYPE_ROOM = 0;
-const BIGBLUEBUTTONBN_TYPE_RECORDING = 1;
+const BIGBLUEBUTTONBN_TYPE_ALL = 0;
+const BIGBLUEBUTTONBN_TYPE_ROOM_ONLY = 1;
+const BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY = 2;
 
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
@@ -1868,9 +1869,9 @@ function bigbluebuttonbn_get_recording_imported_instances($recordID) {
 function bigbluebuttonbn_get_instance_type_profiles() {
 
     $instanceprofiles = array(
-            array('id' => 0, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'), 'features' => array('all')),
-            array('id' => 1, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'), 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording', 'recordingtagging', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
-            array('id' => 2, 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'))
+            array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'), 'features' => array('all')),
+            array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'), 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording', 'recordingtagging', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
+            array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'))
     );
 
     return $instanceprofiles;
