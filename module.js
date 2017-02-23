@@ -32,7 +32,7 @@ M.mod_bigbluebuttonbn.datatable_init = function(Y) {
 
     YUI({lang:bigbluebuttonbn.locale}).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function (Y) {
         var table = new Y.DataTable({
-            width:  "900px",
+            width:  "1075px",
             columns: bigbluebuttonbn.columns,
             data: bigbluebuttonbn.data,
             rowsPerPage: 10,

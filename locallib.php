@@ -1299,21 +1299,23 @@ function bigbluebuttonbn_get_recording_columns($bbbsession, $recordings) {
     $view_recording_recording = get_string('view_recording_recording', 'bigbluebuttonbn');
     $view_recording_activity = get_string('view_recording_activity', 'bigbluebuttonbn');
     $view_recording_description = get_string('view_recording_description', 'bigbluebuttonbn');
+    $view_recording_preview = get_string('view_recording_preview', 'bigbluebuttonbn');
     $view_recording_date = get_string('view_recording_date', 'bigbluebuttonbn');
     $view_recording_duration = get_string('view_recording_duration', 'bigbluebuttonbn');
     $view_recording_actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
 
     ///Initialize table headers
     $recordingsbn_columns = array(
-        array("key" =>"recording", "label" => $view_recording_recording, "width" => "125px", "allowHTML" => true),
-        array("key" =>"activity", "label" => $view_recording_activity, "sortable" => true, "width" => "175px", "allowHTML" => true),
-        array("key" =>"description", "label" => $view_recording_description, "sortable" => true, "width" => "250px", "allowHTML" => true),
-        array("key" =>"date", "label" => $view_recording_date, "sortable" => true, "width" => "220px", "allowHTML" => true),
-        array("key" =>"duration", "label" => $view_recording_duration, "width" => "50px")
+        array("key" => "recording", "label" => $view_recording_recording, "width" => "125px", "allowHTML" => true),
+        array("key" => "activity", "label" => $view_recording_activity, "sortable" => true, "width" => "175px", "allowHTML" => true),
+        array("key" => "description", "label" => $view_recording_description, "width" => "250px", "sortable" => true, "width" => "250px", "allowHTML" => true),
+        array("key" => "preview", "label" => $view_recording_preview, "width" => "250px","allowHTML" => true),
+        array("key" => "date", "label" => $view_recording_date, "sortable" => true, "width" => "225px", "allowHTML" => true),
+        array("key" => "duration", "label" => $view_recording_duration, "width" => "50px")
         );
 
     if ($bbbsession['managerecordings']) {
-        array_push($recordingsbn_columns, array("key" =>"actionbar", "label" => $view_recording_actionbar, "width" => "75px", "allowHTML" => true));
+        array_push($recordingsbn_columns, array("key" =>"actionbar", "label" => $view_recording_actionbar, "width" => "100px", "allowHTML" => true));
     }
 
     return $recordingsbn_columns;
