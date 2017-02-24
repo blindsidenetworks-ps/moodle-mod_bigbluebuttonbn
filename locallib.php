@@ -530,6 +530,26 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
     }
 }
 
+function bigbluebuttonbn_get_user_roles($context, $userid) {
+    global $DB;
+
+    $user_roles = array();
+    $user_roles = get_user_roles($context, $userid);
+    if ($user_roles) {
+        $where = '';
+        foreach ($user_roles as $key => $value){
+            $where .= (empty($where) ? ' WHERE' : ' AND').' id='.$value->roleid;
+        }
+        $user_roles = $DB->get_records_sql('SELECT * FROM {role}'.$where);
+    }
+    return $user_roles;
+}
+
+function bigbluebuttonbn_get_guest_role(context $context = null) {
+    $guest_role = get_guest_role();
+    return array($guest_role->id => $guest_role);
+}
+
 function bigbluebuttonbn_get_roles(context $context = null) {
     $roles = role_get_names($context);
     $roles_array = array();

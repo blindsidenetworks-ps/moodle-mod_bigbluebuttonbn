@@ -54,11 +54,11 @@ $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 $bbbsession['username'] = fullname($USER);
 $bbbsession['userID'] = $USER->id;
 if (isguestuser()) {
-    $guest_role = get_guest_role();
-    $bbbsession['roles'] = array($guest_role->id => $guest_role);
+    $bbbsession['roles'] = bigbluebuttonbn_get_guest_role();
 } else {
-    $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
+    $bbbsession['roles'] = bigbluebuttonbn_get_user_roles($context, $USER->id);
 }
+
 // User roles
 if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]") {
     //The room that is being used comes from a previous version
