@@ -53,8 +53,12 @@ $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 // User data
 $bbbsession['username'] = fullname($USER);
 $bbbsession['userID'] = $USER->id;
-$bbbsession['roles'] = get_user_roles($context, $USER->id, true);
-
+if (isguestuser()) {
+    $guest_role = get_guest_role();
+    $bbbsession['roles'] = array($guest_role->id => $guest_role);
+} else {
+    $bbbsession['roles'] = get_user_roles($context, $USER->id, true);
+}
 // User roles
 if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]") {
     //The room that is being used comes from a previous version
@@ -62,7 +66,7 @@ if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == 
 } else {
     $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'], $bigbluebuttonbn->participants);
 }
-$bbbsession['administrator'] = has_capability('moodle/category:manage', $context);
+$bbbsession['administrator'] = is_siteadmin($bbbsession['userID']); //has_capability('moodle/category:manage', $context);
 $bbbsession['managerecordings'] = ($bbbsession['administrator'] || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
 
 // BigBlueButton server data

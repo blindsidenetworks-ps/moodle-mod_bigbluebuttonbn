@@ -12,10 +12,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-        
+
         'mod/bigbluebuttonbn:addinstance' => array(
                 'riskbitmask' => RISK_XSS,
-        
+
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => array(
@@ -37,19 +37,6 @@ $capabilities = array(
                         'editingteacher' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW,
                         'student' => CAP_ALLOW
-                )
-        ),
-
-        //
-        // Ability to moderate a meeting
-        'mod/bigbluebuttonbn:moderate' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'manager' => CAP_ALLOW,
-                        //'coursecreator' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW
                 )
         ),
 

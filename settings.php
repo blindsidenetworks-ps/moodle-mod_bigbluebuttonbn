@@ -241,6 +241,9 @@ if ($ADMIN->fulltree) {
                 get_string('config_feature_preuploadpresentation_enabled', 'bigbluebuttonbn'),
                 get_string('config_feature_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
                 0));
+
+            // Default file for 'preupload presentation' feature
+
         } else {
             $settings->add( new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
                 get_string('config_feature_preuploadpresentation', 'bigbluebuttonbn'),
@@ -305,7 +308,7 @@ if ($ADMIN->fulltree) {
                 get_string('config_permission_description', 'bigbluebuttonbn')));
 
         // UI for 'permissions' feature
-        $roles = bigbluebuttonbn_get_roles('all', 'array');
+        $roles = bigbluebuttonbn_get_roles();
         $owner = array('owner' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $settings->add(new admin_setting_configmultiselect('bigbluebuttonbn_moderator_default',
                 get_string('config_permission_moderator_default', 'bigbluebuttonbn'),

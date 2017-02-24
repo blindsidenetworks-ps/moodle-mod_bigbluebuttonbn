@@ -262,7 +262,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         // Data for participant list
         /// Data required for "Add participant" and initial "Participant list" setup
-        $roles = bigbluebuttonbn_get_roles();
+        $roles = bigbluebuttonbn_get_roles($context);
         $users = bigbluebuttonbn_get_users($context);
         /// Declare the table
         $table = new html_table();
@@ -273,11 +273,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $participant_selectionid = '';
             $participant_selectiontype = $participant['selectiontype'];
             if ($participant_selectiontype == 'role') {
-                $participant_selectionid = bigbluebuttonbn_get_role_name($participant['selectionid']);
+                $participant_selectionid = $roles[$participant['selectionid']];
             } else {
                 foreach($users as $user){
                     if( $user->id == $participant['selectionid']) {
-                        $participant_selectionid = $user->firstname.' '.$user->lastname;
+                        $participant_selectionid = fullname($user);
                         break;
                     }
                 }
@@ -333,7 +333,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
 
         // Add data
-        $jsvars['participant_selection'] = json_decode('{"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}');
+        $jsvars['participant_selection'] = json_decode('{"all": [], "role": '.json_encode(bigbluebuttonbn_get_roles_select($roles)).', "user": '.json_encode(bigbluebuttonbn_get_users_select($users)).'}');
         $jsvars['participant_list'] = $participant_list;
         //-------------------------------------------------------------------------------
         // Fourth block ends here
