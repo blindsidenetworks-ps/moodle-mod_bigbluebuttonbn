@@ -55,6 +55,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $pix_icon_delete_url = "".$OUTPUT->pix_url('t/delete', 'moodle');
 
         $instance_type_enabled = true;
+        $instance_type_default = BIGBLUEBUTTONBN_TYPE_ALL;
 
         //Validates if the BigBlueButton server is running
         $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
@@ -66,11 +67,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $current_activity =& $this->current;
 
         $instance_type_profiles = bigbluebuttonbn_get_instance_type_profiles();
-        $initial_profile = isset($current_activity->type) ? $instance_type_profiles[$current_activity->type]['features'] : $instance_type_profiles[0]['features'];
 
         if( $instance_type_enabled ) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'), bigbluebuttonbn_get_instance_types_array($instance_type_profiles), array("onchange" => "M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile(this);") );
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
+        } else {
+            $mform->addElement('hidden', 'type', $instance_type_default);
         }
 
         $jsvars = array(
@@ -85,7 +87,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
 
         $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"');
-        $mform->setType('name', PARAM_TEXT);
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEANHTML);
+        }
         $mform->addRule('name', null, 'required', null, 'client');
 
         $version_major = bigbluebuttonbn_get_moodle_version_major();
