@@ -53,7 +53,11 @@ $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 // User data
 $bbbsession['username'] = fullname($USER);
 $bbbsession['userID'] = $USER->id;
-$bbbsession['roles'] = get_user_roles($context, $USER->id, true);
+if (isguestuser()) {
+    $bbbsession['roles'] = bigbluebuttonbn_get_guest_role();
+} else {
+    $bbbsession['roles'] = bigbluebuttonbn_get_user_roles($context, $USER->id);
+}
 
 // User roles
 if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]") {

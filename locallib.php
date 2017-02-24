@@ -409,6 +409,26 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
     }
 }
 
+function bigbluebuttonbn_get_user_roles($context, $userid) {
+    global $DB;
+
+    $user_roles = array();
+    $user_roles = get_user_roles($context, $userid);
+    if ($user_roles) {
+        $where = '';
+        foreach ($user_roles as $key => $value){
+            $where .= (empty($where) ? ' WHERE' : ' AND').' id='.$value->roleid;
+        }
+        $user_roles = $DB->get_records_sql('SELECT * FROM {role}'.$where);
+    }
+    return $user_roles;
+}
+
+function bigbluebuttonbn_get_guest_role(context $context = null) {
+    $guest_role = get_guest_role();
+    return array($guest_role->id => $guest_role);
+}
+
 function bigbluebuttonbn_get_role_name($role_shortname){
     $role = bigbluebuttonbn_get_db_moodle_roles($role_shortname);
     if( $role != null && $role->name != "") {
@@ -553,7 +573,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
         foreach($participant_list as $participant){
             if( $participant->selectiontype == 'role' ) {
                 foreach( $roles as $role ) {
-                    $db_moodle_role = bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role->roleid);
+                    $db_moodle_role = bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role->id);
                     if( $participant->selectionid == $db_moodle_role->shortname ) {
                         if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                             return true;
