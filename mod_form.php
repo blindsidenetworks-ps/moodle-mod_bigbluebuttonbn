@@ -21,19 +21,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
-        $bigbluebuttonbn = null;
         if ($course_id) {
             $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
-        } else if ($course_module_id) {
+            $bigbluebuttonbn = null;
+        } else {
             $cm = get_coursemodule_from_id('bigbluebuttonbn', $course_module_id, 0, false, MUST_EXIST);
             $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
         }
 
         $context = bigbluebuttonbn_get_context_course($course->id);
-
-        //BigBlueButton server data
-        $endpoint = bigbluebuttonbn_get_cfg_server_url();
 
         //UI configuration options
         $voicebridge_editable = bigbluebuttonbn_get_cfg_voicebridge_editable();
@@ -58,6 +55,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $instance_type_default = BIGBLUEBUTTONBN_TYPE_ALL;
 
         //Validates if the BigBlueButton server is running
+        $endpoint = bigbluebuttonbn_get_cfg_server_url();
         $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
         if (!isset($serverVersion)) {
             print_error('general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
