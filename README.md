@@ -1,3 +1,6 @@
+[![Build Status](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/badges/build.png?b=master)](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/build-status/master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/?branch=master)
+
 BigBlueButtonBN Activity Module for Moodle
 ==========================================
 BigBlueButton is an open source web conferencing system that enables universities and colleges to deliver a high-quality learning experience to remote students.  
@@ -6,7 +9,7 @@ These instructions describe how to install the BigBlueButtonBN Activity Module f
 
 With the latest version of this plugin you can
 
-- Create links in any course that can be used to create rooms/sessions in a BigBlueButton server 
+- Create links in any course that can be used to create rooms/sessions in a BigBlueButton server
 - Specify join open/close dates that will appear in the Moodle calendar
 - Create a custom welcome messages that appears in the chat window when users join the session
 - Launch BigBlueButton in its own tab or window
@@ -18,7 +21,7 @@ With the latest version of this plugin you can
 - Import recording links from a different course, and more.
 
 
-Note that on previous versions of Moodle you will need to use the specific version of this plugin. 
+Note that on previous versions of Moodle you will need to use the specific version of this plugin.
 
 - For Moodle 1.9 use version 1.0.9 (2013071000).
 - For Moodle 2.0, 2.1, 2.2, 2.3, 2.4 and 2.5 use version 1.1.1 (2015062101)
