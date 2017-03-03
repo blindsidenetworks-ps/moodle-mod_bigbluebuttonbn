@@ -361,17 +361,17 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
 
     foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $now = time();
-        if ( $bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
-            $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
-                    get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
-                    ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
-                    $bigbluebuttonbn->name.'</a></div>';
-            if ( $bigbluebuttonbn->openingtime > $now ) {
-                $str .= '<div class="info">'.get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
+        if ($bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
+            $str = '<div class="bigbluebuttonbn overview"><div class="name">' .
+                    get_string('modulename', 'bigbluebuttonbn') . ': <a ' . ($bigbluebuttonbn->visible ? '' : ' class="dimmed"') .
+                    ' href="' . $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bigbluebuttonbn->coursemodule . '">' .
+                    $bigbluebuttonbn->name . '</a></div>';
+            if ($bigbluebuttonbn->openingtime > $now) {
+                $str .= '<div class="info">' . get_string('starts_at', 'bigbluebuttonbn') . ': ' . userdate($bigbluebuttonbn->openingtime) . '</div>';
             } else {
-                $str .= '<div class="info">'.get_string('started_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
+                $str .= '<div class="info">' . get_string('started_at', 'bigbluebuttonbn') . ': ' . userdate($bigbluebuttonbn->openingtime) . '</div>';
             }
-            $str .= '<div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime).'</div></div>';
+            $str .= '<div class="info">' . get_string('ends_at', 'bigbluebuttonbn') . ': ' . userdate($bigbluebuttonbn->closingtime) . '</div></div>';
 
             if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
                 $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = $str;
@@ -511,36 +511,36 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $msg->action = $action;
         $msg->activity_type = "";
         $msg->activity_title = $bigbluebuttonbn->name;
-        $message_text = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>';
+        $message_text = '<p>' . $msg->activity_type . ' &quot;' . $msg->activity_title . '&quot; ' . get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn') . ' ' . $msg->action . '.</p>';
 
         /// Add the meeting details to the message_body
         $msg->action = ucfirst($action);
         $msg->activity_description = "";
-        if( !empty($bigbluebuttonbn->intro) ) {
+        if (!empty($bigbluebuttonbn->intro)) {
                     $msg->activity_description = trim($bigbluebuttonbn->intro);
         }
         $msg->activity_openingtime = "";
         if ($bigbluebuttonbn->openingtime) {
-            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->openingtime);
+            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime) . ' ' . $at . ' ' . calendar_time_representation($bigbluebuttonbn->openingtime);
         }
         $msg->activity_closingtime = "";
         if ($bigbluebuttonbn->closingtime) {
-            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->closingtime);
+            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime) . ' ' . $at . ' ' . calendar_time_representation($bigbluebuttonbn->closingtime);
         }
         $msg->activity_owner = fullname($USER);
 
-        $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':';
+        $message_text .= '<p><b>' . $msg->activity_title . '</b> ' . get_string('email_body_notification_meeting_details', 'bigbluebuttonbn') . ':';
         $message_text .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_title.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_description.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_openingtime.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_closingtime.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_owner.'</td></tr></tbody></table></p>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">' . get_string('email_body_notification_meeting_title', 'bigbluebuttonbn') . ': </td><td>';
+        $message_text .= $msg->activity_title . '</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">' . get_string('email_body_notification_meeting_description', 'bigbluebuttonbn') . ': </td><td>';
+        $message_text .= $msg->activity_description . '</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">' . get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn') . ': </td><td>';
+        $message_text .= $msg->activity_openingtime . '</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">' . get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn') . ': </td><td>';
+        $message_text .= $msg->activity_closingtime . '</td></tr>';
+        $message_text .= '<tr><td style="font-weight:bold;color:#555;">' . $msg->action . ' ' . get_string('email_body_notification_meeting_by', 'bigbluebuttonbn') . ': </td><td>';
+        $message_text .= $msg->activity_owner . '</td></tr></tbody></table></p>';
 
         // Send notification to all users enrolled
         bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
@@ -673,10 +673,10 @@ function bigbluebuttonbn_get_file_areas() {
  * @package  mod_bigbluebuttonbn
  * @return array a list of available roles
  */
-function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
+function bigbluebuttonbn_get_db_moodle_roles($rolename = 'all') {
     global $DB;
 
-    if( $rolename != 'all') {
+    if ($rolename != 'all') {
             $roles = $DB->get_record('role', array('shortname' => $rolename));
     } else {
             $roles = $DB->get_records('role', array());
@@ -714,7 +714,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message =
 
 function bigbluebuttonbn_get_context($id, $context_type) {
     $version_major = bigbluebuttonbn_get_moodle_version_major();
-    if ( $version_major < '2013111800' ) {
+    if ($version_major < '2013111800') {
         //This is valid before v2.6
         $context = get_context_instance($context_type, $id);
     } else {
