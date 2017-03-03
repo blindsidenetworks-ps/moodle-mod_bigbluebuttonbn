@@ -277,8 +277,8 @@ if ($ADMIN->fulltree) {
     }
 
     //// Configuration for "scheduled duration" feature
-    if( !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled) ) {
-        $settings->add( new admin_setting_heading('config_scheduled',
+    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled)) {
+        $settings->add(new admin_setting_heading('config_scheduled',
                 get_string('config_scheduled', 'bigbluebuttonbn'),
                 get_string('config_scheduled_description', 'bigbluebuttonbn')));
 

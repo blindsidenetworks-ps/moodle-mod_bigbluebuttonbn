@@ -82,19 +82,19 @@ if ($submit === 'end') {
     }
     $administrator = has_capability('moodle/category:manage', $context);
 
-    if( $moderator || $administrator ) {
+    if ($moderator || $administrator) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
 
         echo get_string('index_ending', 'bigbluebuttonbn');
 
-        $meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
+        $meetingID = $bigbluebuttonbn->meetingid . '-' . $course->id . '-' . $bigbluebuttonbn->id;
         $modPW = $bigbluebuttonbn->moderatorpass;
-        if( $g != '0'  ) {
-            $getArray = bigbluebuttonbn_wrap_xml_load_file( bigbluebuttonbn_getEndMeetingURL( $meetingID.'['.$g.']', $modPW, $endpoint, $shared_secret ) );
+        if ($g != '0') {
+            $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID . '[' . $g . ']', $modPW, $endpoint, $shared_secret));
         } else {
-            $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL( $meetingID, $modPW, $endpoint, $shared_secret ));
+            $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW, $endpoint, $shared_secret));
         }
-        redirect('index.php?id='.$id);
+        redirect('index.php?id=' . $id);
     }
 }
 
