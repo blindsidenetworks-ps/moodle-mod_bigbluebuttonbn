@@ -54,14 +54,14 @@ class backup_bigbluebuttonbn_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/bigbluebuttonbn','#');
+        $base = preg_quote($CFG->wwwroot . '/mod/bigbluebuttonbn', '#');
 
         //Link to the list of bigbluebuttonbns
-        $pattern = "#(".$base."\/index.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/index.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@BIGBLUEBUTTONBNINDEX*$2@$', $content);
 
         //Link to bigbluebuttonbn view by moduleid
-        $pattern = "#(".$base."\/view.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/view.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@BIGBLUEBUTTONBNVIEWBYID*$2@$', $content);
 
         return $content;

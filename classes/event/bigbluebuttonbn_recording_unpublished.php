@@ -38,7 +38,7 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $rid = isset($this->other['rid'])? $this->other['rid']: '';
+        $rid = isset($this->other['rid']) ? $this->other['rid'] : '';
         $a = (object) array('userid' => $this->userid, 'recordingid' => $rid, 'courseid' => $this->contextinstanceid);
         return "The user with id '$a->userid' has unpublished a recording with id '$a->recordingid' in the course id '$a->courseid'.";
     }

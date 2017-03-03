@@ -37,7 +37,7 @@ class ShopwareInstaller extends BaseInstaller
      */
     private function correctPluginName($vars)
     {
-        $camelCasedName = preg_replace_callback('/(-[a-z])/', function ($matches) {
+        $camelCasedName = preg_replace_callback('/(-[a-z])/', function($matches) {
             return strtoupper($matches[0][1]);
         }, $vars['name']);
 

@@ -13,23 +13,23 @@ defined('MOODLE_INTERNAL') || die;
 
 global $BIGBLUEBUTTONBN_CFG, $CFG;
 
-require_once($CFG->dirroot.'/calendar/lib.php');
-require_once($CFG->dirroot.'/message/lib.php');
-require_once($CFG->dirroot.'/mod/lti/OAuth.php');
-require_once($CFG->libdir.'/accesslib.php');
-require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->libdir.'/datalib.php');
-require_once($CFG->libdir.'/coursecatlib.php');
-require_once($CFG->libdir.'/enrollib.php');
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
+require_once($CFG->dirroot . '/message/lib.php');
+require_once($CFG->dirroot . '/mod/lti/OAuth.php');
+require_once($CFG->libdir . '/accesslib.php');
+require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->libdir . '/datalib.php');
+require_once($CFG->libdir . '/coursecatlib.php');
+require_once($CFG->libdir . '/enrollib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/formslib.php');
 
-require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+require_once(dirname(__FILE__) . '/vendor/firebase/php-jwt/src/JWT.php');
 
-if( file_exists(dirname(__FILE__).'/config.php') ) {
-    require_once(dirname(__FILE__).'/config.php');
-    if( isset($BIGBLUEBUTTONBN_CFG) ) {
-        $CFG = (object) array_merge((array)$CFG, (array)$BIGBLUEBUTTONBN_CFG);
+if (file_exists(dirname(__FILE__) . '/config.php')) {
+    require_once(dirname(__FILE__) . '/config.php');
+    if (isset($BIGBLUEBUTTONBN_CFG)) {
+        $CFG = (object) array_merge((array) $CFG, (array) $BIGBLUEBUTTONBN_CFG);
     }
 } else {
     $BIGBLUEBUTTONBN_CFG = new stdClass();
@@ -53,7 +53,7 @@ const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = "Import";
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = "Delete";
 
 function bigbluebuttonbn_supports($feature) {
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_IDNUMBER:                return true;
         case FEATURE_GROUPS:                  return true;
         case FEATURE_GROUPINGS:               return true;
@@ -82,7 +82,7 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($data, $mform) {
     global $DB, $CFG;
 
-    $draftitemid = isset($data->presentation)? $data->presentation: null;
+    $draftitemid = isset($data->presentation) ? $data->presentation : null;
     $context = bigbluebuttonbn_get_context_module($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
@@ -103,14 +103,13 @@ function bigbluebuttonbn_add_instance($data, $mform) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $bigbluebuttonbn An object from the form in mod_form.php
  * @return boolean Success/Fail
  */
 function bigbluebuttonbn_update_instance($data, $mform) {
     global $DB, $CFG;
 
     $data->id = $data->instance;
-    $draftitemid = isset($data->presentation)? $data->presentation: null;
+    $draftitemid = isset($data->presentation) ? $data->presentation : null;
     $context = bigbluebuttonbn_get_context_module($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
@@ -136,7 +135,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
 function bigbluebuttonbn_delete_instance($id) {
     global $CFG, $DB, $USER;
 
-    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
+    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
     }
 
@@ -145,20 +144,20 @@ function bigbluebuttonbn_delete_instance($id) {
     //
     // End the session associated with this instance (if it's running)
     //
-    $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    $meetingID = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id;
     $modPW = $bigbluebuttonbn->moderatorpass;
     $url = bigbluebuttonbn_get_cfg_server_url();
     $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
     if (bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret)) {
-        bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
+        bigbluebuttonbn_doEndMeeting($meetingID, $modPW, $url, $shared_secret);
     }
 
-    if (! $DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
+    if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         $result = false;
     }
 
-    if (! $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id))) {
+    if (!$DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id))) {
         $result = false;
     }
 
@@ -174,19 +173,19 @@ function bigbluebuttonbn_delete_instance($id) {
     $logs = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
     error_log(json_encode($logs));
     $has_recordings = 'false';
-    if (! empty($logs) ) {
+    if (!empty($logs)) {
         error_log("IS not empty");
-        foreach ( $logs as $l ) {
+        foreach ($logs as $l) {
             error_log(json_encode($l));
             $meta = json_decode($l->meta);
-            if ( $meta->record ) {
+            if ($meta->record) {
                 $has_recordings = 'true';
             }
         }
     }
     $log->meta = "{\"has_recordings\":{$has_recordings}}";
 
-    if (! $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log)) {
+    if (!$returnid = $DB->insert_record('bigbluebuttonbn_logs', $log)) {
         error_log("It could not be saved");
         $result = false;
     } else {
@@ -203,7 +202,7 @@ function bigbluebuttonbn_delete_instance($id) {
  * $return->time = the time they did it
  * $return->info = a short text description
  *
- * @return null
+ * @return boolean
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
     return true;
@@ -227,7 +226,7 @@ function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
  * @return boolean
  */
 function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false
+    return false; //  True if anything was printed, otherwise false
 }
 
 /**
@@ -242,12 +241,11 @@ function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart) 
  * @param int $groupid defaults to 0
  * @return void adds items into $activities and increases $index
  */
-function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
 }
 
 /**
  * Prints single activity item prepared by {@see recordingsbn_get_recent_mod_activity()}
-
  * @return void
  */
 function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
@@ -260,7 +258,7 @@ function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail
  *
  * @return boolean
  **/
-function bigbluebuttonbn_cron () {
+function bigbluebuttonbn_cron() {
     return true;
 }
 
@@ -271,7 +269,7 @@ function bigbluebuttonbn_cron () {
  * See other modules as example.
  *
  * @param int $bigbluebuttonbnid ID of an instance of this module
- * @return mixed boolean/array of students
+ * @return boolean boolean/array of students
  */
 function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
     return false;
@@ -279,7 +277,7 @@ function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
 
 /**
  * Returns all other caps used in module
- * @return array
+ * @return string[]
  */
 function bigbluebuttonbn_get_extra_capabilities() {
     return array('moodle/site:accessallgroups');
@@ -296,7 +294,7 @@ function bigbluebuttonbn_get_extra_capabilities() {
  * as reference.
  *
  * @param int $bigbluebuttonbnid ID of an instance of this module
- * @return mixed
+ * @return boolean
  */
 function bigbluebuttonbn_scale_used($bigbluebuttonbnid, $scaleid) {
     $return = false;
@@ -329,7 +327,7 @@ function bigbluebuttonbn_reset_userdata($data) {
 
 /**
  * List of view style log actions
- * @return array
+ * @return string[]
  */
 function bigbluebuttonbn_get_view_actions() {
     return array('view', 'view all');
@@ -337,7 +335,7 @@ function bigbluebuttonbn_get_view_actions() {
 
 /**
  * List of update style log actions
- * @return array
+ * @return string[]
  */
 function bigbluebuttonbn_get_post_actions() {
     return array('update', 'add', 'create', 'join', 'end', 'left', 'publish', 'unpublish', 'delete');
@@ -365,9 +363,9 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
         $now = time();
         if ( $bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
             $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
-                 get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
-                 ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
-                 $bigbluebuttonbn->name.'</a></div>';
+                    get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
+                    ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
+                    $bigbluebuttonbn->name.'</a></div>';
             if ( $bigbluebuttonbn->openingtime > $now ) {
                 $str .= '<div class="info">'.get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
             } else {
@@ -393,12 +391,12 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
  *
  * @global object
  * @param object $coursemodule
- * @return object|null
+ * @return null|cached_cm_info
  */
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if ( !$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
+    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
         return NULL;
     }
 
@@ -424,10 +422,10 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     global $DB, $CFG;
 
-    if ( !isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated ) {
+    if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
         $bigbluebuttonbn->timecreated = time();
         //Assign password only if it is a new activity
-        if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
+        if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
             $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
             $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
         }
@@ -468,8 +466,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
 
     // Now that an id was assigned, generate and set the meetingid property based on
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
-    if( isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add) ) {
-        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
+    if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
+        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot . $bigbluebuttonbn->id . bigbluebuttonbn_get_cfg_shared_secret());
         $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     } else {
@@ -478,7 +476,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     $at = get_string('mod_form_field_notification_msg_at', 'bigbluebuttonbn');
 
     // Add evento to the calendar when if openingtime is set
-    if ( isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime ){
+    if (isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime) {
         $event = new stdClass();
         $event->name        = $bigbluebuttonbn->name;
         $event->courseid    = $bigbluebuttonbn->course;
@@ -488,13 +486,13 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $event->instance    = $bigbluebuttonbn->id;
         $event->timestart   = $bigbluebuttonbn->openingtime;
 
-        if ( $bigbluebuttonbn->closingtime ){
+        if ($bigbluebuttonbn->closingtime) {
             $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
         } else {
             $event->durationtime = 0;
         }
 
-        if ( $event->id = $DB->get_field('event', 'id', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id)) ) {
+        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id))) {
             $calendarevent = calendar_event::load($event->id);
             $calendarevent->update($event);
         } else {
@@ -505,7 +503,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         $DB->delete_records('event', array('modulename'=>'bigbluebuttonbn', 'instance'=>$bigbluebuttonbn->id));
     }
 
-    if( isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification ) {
+    if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
         // Prepare message
         $msg = new stdClass();
 
@@ -518,8 +516,9 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         /// Add the meeting details to the message_body
         $msg->action = ucfirst($action);
         $msg->activity_description = "";
-        if( !empty($bigbluebuttonbn->intro) )
-            $msg->activity_description = trim($bigbluebuttonbn->intro);
+        if( !empty($bigbluebuttonbn->intro) ) {
+                    $msg->activity_description = trim($bigbluebuttonbn->intro);
+        }
         $msg->activity_openingtime = "";
         if ($bigbluebuttonbn->openingtime) {
             $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->openingtime);
@@ -590,9 +589,9 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draft
  * @param array $args extra arguments
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @return bool false if file not found, does not return if found - justsend the file
+ * @return false|null false if file not found, does not return if found - justsend the file
  */
-function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
     global $CFG, $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -608,21 +607,21 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
-    if( sizeof($args) > 1 ) {
+    if (sizeof($args) > 1) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $presentation_nonce_key = sha1($bigbluebuttonbn->id);
         $presentation_nonce = $cache->get($presentation_nonce_key);
         $presentation_nonce_value = $presentation_nonce['value'];
         $presentation_nonce_counter = $presentation_nonce['counter'];
 
-        if( $args["0"] != $presentation_nonce_value ) {
+        if ($args["0"] != $presentation_nonce_value) {
             return false;
         }
 
         //The nonce value is actually used twice because BigBlueButton reads the file two times
         $presentation_nonce_counter += 1;
-        if( $presentation_nonce_counter < 2 ) {
-            $cache->set($presentation_nonce_key, array( "value" => $presentation_nonce_value, "counter" => $presentation_nonce_counter ));
+        if ($presentation_nonce_counter < 2) {
+            $cache->set($presentation_nonce_key, array("value" => $presentation_nonce_value, "counter" => $presentation_nonce_counter));
         } else {
             $cache->delete($presentation_nonce_key);
         }
@@ -640,7 +639,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
     }
 
     if ($filearea === 'presentation') {
-        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
+        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/" . $filename;
     } else {
         return false;
     }
@@ -677,15 +676,16 @@ function bigbluebuttonbn_get_file_areas() {
 function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
     global $DB;
 
-    if( $rolename != 'all')
-        $roles = $DB->get_record('role', array('shortname' => $rolename));
-    else
-        $roles = $DB->get_records('role', array());
+    if( $rolename != 'all') {
+            $roles = $DB->get_record('role', array('shortname' => $rolename));
+    } else {
+            $roles = $DB->get_records('role', array());
+    }
 
     return $roles;
 }
 
-function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="") {
+function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message = "") {
     global $CFG, $DB;
 
     $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
@@ -696,33 +696,33 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $msg->user_name = fullname($sender);
     $msg->user_email = $sender->email;
     $msg->course_name = "$course->fullname";
-    $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
-    $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
+    $message .= '<p><hr/><br/>' . get_string('email_footer_sent_by', 'bigbluebuttonbn') . ' ' . $msg->user_name . '(' . $msg->user_email . ') ';
+    $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn') . ' ' . $msg->course_name . '.</p>';
 
     $users = bigbluebuttonbn_get_users($context);
-    foreach( $users as $user ) {
-        if( $user->id != $sender->id ){
+    foreach ($users as $user) {
+        if ($user->id != $sender->id) {
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
-                error_log("Msg to ".$msg->user_name." was sent.");
+                error_log("Msg to " . $msg->user_name . " was sent.");
             } else {
-                error_log("Msg to ".$msg->user_name." was NOT sent.");
+                error_log("Msg to " . $msg->user_name . " was NOT sent.");
             }
         }
     }
 }
 
 function bigbluebuttonbn_get_context($id, $context_type) {
-  $version_major = bigbluebuttonbn_get_moodle_version_major();
-  if ( $version_major < '2013111800' ) {
-      //This is valid before v2.6
-      $context = get_context_instance($context_type, $id);
-  } else {
-      //This is valid after v2.6
-      $context = context_module::instance($id);
-  }
+    $version_major = bigbluebuttonbn_get_moodle_version_major();
+    if ( $version_major < '2013111800' ) {
+        //This is valid before v2.6
+        $context = get_context_instance($context_type, $id);
+    } else {
+        //This is valid after v2.6
+        $context = context_module::instance($id);
+    }
 
-  return $context;
+    return $context;
 }
 
 function bigbluebuttonbn_get_context_module($id) {
@@ -735,10 +735,10 @@ function bigbluebuttonbn_get_context_course($id) {
 
 function bigbluebuttonbn_get_cfg_server_url() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)? trim(trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url),'/').'/': (isset($CFG->bigbluebuttonbn_server_url)? trim(trim($CFG->bigbluebuttonbn_server_url),'/').'/': 'http://test-install.blindsidenetworks.com/bigbluebutton/'));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url) ? trim(trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url), '/') . '/' : (isset($CFG->bigbluebuttonbn_server_url) ? trim(trim($CFG->bigbluebuttonbn_server_url), '/') . '/' : 'http://test-install.blindsidenetworks.com/bigbluebutton/'));
 }
 
 function bigbluebuttonbn_get_cfg_shared_secret() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret): (isset($CFG->bigbluebuttonbn_shared_secret)? trim($CFG->bigbluebuttonbn_shared_secret): '8cd8ef52e8e101574e400365b55e11a6'));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) ? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) : (isset($CFG->bigbluebuttonbn_shared_secret) ? trim($CFG->bigbluebuttonbn_shared_secret) : '8cd8ef52e8e101574e400365b55e11a6'));
 }
