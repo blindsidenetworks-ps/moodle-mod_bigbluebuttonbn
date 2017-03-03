@@ -109,7 +109,7 @@ class Installer extends LibraryInstaller
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         if (!$repo->hasPackage($package)) {
-            throw new \InvalidArgumentException('Package is not installed: '.$package);
+            throw new \InvalidArgumentException('Package is not installed: ' . $package);
         }
 
         $repo->removePackage($package);
@@ -174,7 +174,7 @@ class Installer extends LibraryInstaller
             $pattern = $locations ? '(' . implode('|', $locations) . ')' : false;
         }
 
-        return $pattern ? : '(\w+)';
+        return $pattern ?: '(\w+)';
     }
 
     /**

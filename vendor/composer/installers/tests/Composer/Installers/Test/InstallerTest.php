@@ -438,11 +438,11 @@ class InstallerTest extends TestCase
         $consumerPackage = new RootPackage('drupal/drupal', '1.0.0', '1.0.0');
         $this->composer->setPackage($consumerPackage);
         $consumerPackage->setExtra(array(
-          'installer-paths' => array(
+            'installer-paths' => array(
             'modules/custom/{$name}/' => array(
-              'vendor:penyaskito'
+                'vendor:penyaskito'
             ),
-          ),
+            ),
         ));
         $result = $installer->getInstallPath($package);
         $this->assertEquals('modules/custom/my_module/', $result);
@@ -485,7 +485,7 @@ class InstallerTest extends TestCase
         $package = new Package('foo', '1.0.0', '1.0.0');
 
         $installer = $this->getMock('Composer\Installers\Installer', array('getInstallPath'), array($this->io, $this->composer));
-        $installer->expects($this->once())->method('getInstallPath')->with($package)->will($this->returnValue(sys_get_temp_dir().'/foo'));
+        $installer->expects($this->once())->method('getInstallPath')->with($package)->will($this->returnValue(sys_get_temp_dir() . '/foo'));
 
         $repo = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
         $repo->expects($this->once())->method('hasPackage')->with($package)->will($this->returnValue(true));

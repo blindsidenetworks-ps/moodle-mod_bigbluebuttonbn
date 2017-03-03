@@ -11,8 +11,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/locallib.php');
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
@@ -52,24 +52,24 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $recordings_deleted_activities_default = bigbluebuttonbn_get_cfg_recordings_deleted_activities_default();
         $recordings_deleted_activities_editable = bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable();
         $recording_icons_enabled = bigbluebuttonbn_get_cfg_recording_icons_enabled();
-        $pix_icon_delete_url = "".$OUTPUT->pix_url('t/delete', 'moodle');
+        $pix_icon_delete_url = "" . $OUTPUT->pix_url('t/delete', 'moodle');
 
         $instance_type_enabled = true;
         $instance_type_default = BIGBLUEBUTTONBN_TYPE_ALL;
 
         //Validates if the BigBlueButton server is running
         $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
-        if ( !isset($serverVersion) ) {
-            print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
+        if (!isset($serverVersion)) {
+            print_error('general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
         }
 
-        $mform =& $this->_form;
-        $current_activity =& $this->current;
+        $mform = & $this->_form;
+        $current_activity = & $this->current;
 
         $instance_type_profiles = bigbluebuttonbn_get_instance_type_profiles();
 
-        if( $instance_type_enabled ) {
-            $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'), bigbluebuttonbn_get_instance_types_array($instance_type_profiles), array("onchange" => "M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile(this);") );
+        if ($instance_type_enabled) {
+            $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'), bigbluebuttonbn_get_instance_types_array($instance_type_profiles), array("onchange" => "M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile(this);"));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         } else {
             $mform->addElement('hidden', 'type', $instance_type_default);
@@ -86,7 +86,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
 
-        $mform->addElement('text', 'name', get_string('mod_form_field_name','bigbluebuttonbn'), 'maxlength="64" size="32"');
+        $mform->addElement('text', 'name', get_string('mod_form_field_name', 'bigbluebuttonbn'), 'maxlength="64" size="32"');
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -95,7 +95,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
 
         $version_major = bigbluebuttonbn_get_moodle_version_major();
-        if ( $version_major < '2015051100' ) {
+        if ($version_major < '2015051100') {
             //This is valid before v2.9
             $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         } else {
@@ -105,7 +105,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
 
-        if ( $sendnotifications_enabled ) {
+        if ($sendnotifications_enabled) {
             $mform->addElement('checkbox', 'notification', get_string('mod_form_field_notification', 'bigbluebuttonbn'));
             if ($this->current->instance) {
                 $mform->addHelpButton('notification', 'mod_form_field_notification', 'bigbluebuttonbn');
@@ -125,50 +125,50 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         if ($voicebridge_editable || $waitformoderator_editable || $userlimit_editable || $recording_editable || $recording_tagging_editable) {
             $room_settings = $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
-            $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome','bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
+            $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome', 'bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
             $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
             $mform->setType('welcome', PARAM_TEXT);
 
             if ($voicebridge_editable) {
-                $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge','bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
+                $mform->addElement('text', 'voicebridge', get_string('mod_form_field_voicebridge', 'bigbluebuttonbn'), array('maxlength'=>4, 'size'=>6));
                 $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'), 'numeric', '####', 'server');
-                $mform->setDefault( 'voicebridge', 0 );
+                $mform->setDefault('voicebridge', 0);
                 $mform->addHelpButton('voicebridge', 'mod_form_field_voicebridge', 'bigbluebuttonbn');
             }
             $mform->setType('voicebridge', PARAM_INT);
 
-            if ( $waitformoderator_editable ) {
+            if ($waitformoderator_editable) {
                 $mform->addElement('checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn'));
                 $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
-                $mform->setDefault( 'wait', $waitformoderator_default );
+                $mform->setDefault('wait', $waitformoderator_default);
             } else {
-                $mform->addElement('hidden', 'wait', $waitformoderator_default );
+                $mform->addElement('hidden', 'wait', $waitformoderator_default);
             }
             $mform->setType('wait', PARAM_INT);
 
-            if ( $userlimit_editable ) {
-                $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit','bigbluebuttonbn'), 'maxlength="3" size="5"' );
+            if ($userlimit_editable) {
+                $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit', 'bigbluebuttonbn'), 'maxlength="3" size="5"');
                 $mform->addHelpButton('userlimit', 'mod_form_field_userlimit', 'bigbluebuttonbn');
-                $mform->setDefault( 'userlimit', $userlimit_default );
+                $mform->setDefault('userlimit', $userlimit_default);
             } else {
-                $mform->addElement('hidden', 'userlimit', $userlimit_default );
+                $mform->addElement('hidden', 'userlimit', $userlimit_default);
             }
             $mform->setType('userlimit', PARAM_TEXT);
 
-            if ( floatval($serverVersion) >= 0.8 ) {
-                if ( $recording_editable ) {
+            if (floatval($serverVersion) >= 0.8) {
+                if ($recording_editable) {
                     $mform->addElement('checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn'));
-                    $mform->setDefault( 'record', $recording_default );
+                    $mform->setDefault('record', $recording_default);
                 } else {
                     $mform->addElement('hidden', 'record', $recording_default);
                 }
                 $mform->setType('record', PARAM_INT);
 
-                if ( $recording_tagging_editable ) {
+                if ($recording_tagging_editable) {
                     $mform->addElement('checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn'));
                     $mform->setDefault('tagging', $recording_tagging_default);
                 } else {
-                    $mform->addElement('hidden', 'tagging', $recording_tagging_default );
+                    $mform->addElement('hidden', 'tagging', $recording_tagging_default);
                 }
                 $mform->setType('tagging', PARAM_INT);
             }
@@ -179,7 +179,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
             if ($recordings_html_editable) {
                 $mform->addElement('checkbox', 'recordings_html', get_string('mod_form_field_recordings_html', 'bigbluebuttonbn'));
-                $mform->setDefault( 'recordings_html', $recordings_html_default );
+                $mform->setDefault('recordings_html', $recordings_html_default);
             } else {
                 $mform->addElement('hidden', 'recordings_html', $recordings_html_default);
             }
@@ -187,7 +187,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
             if ($recordings_deleted_activities_editable) {
                 $mform->addElement('checkbox', 'recordings_deleted_activities', get_string('mod_form_field_recordings_deleted_activities', 'bigbluebuttonbn'));
-                $mform->setDefault( 'recordings_deleted_activities', $recordings_html_default );
+                $mform->setDefault('recordings_deleted_activities', $recordings_html_default);
             } else {
                 $mform->addElement('hidden', 'recordings_deleted_activities', $recordings_deleted_activities_default);
             }
@@ -238,9 +238,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         // Data for participant selection
         $participant_selection_type_options = [
-          'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
-          'role' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
-          'user' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn')
+            'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
+            'role' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
+            'user' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn')
         ];
         $participant_selection_type_selected = 'all';
         $participant_selection_options = ['all' => '---------------'];
@@ -248,11 +248,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         // Render elements for participant selection
         $html_my_participant_selection = html_writer::tag('div',
-            html_writer::select($participant_selection_type_options, 'bigbluebuttonbn_participant_selection_type', $participant_selection_type_selected, array(), array('id' => 'bigbluebuttonbn_participant_selection_type', 'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_selection_set(); return 0;')).
-            '&nbsp;&nbsp;'.
-            html_writer::select($participant_selection_options, 'bigbluebuttonbn_participant_selection', $participant_selection_selected, array(), array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')).
-            '&nbsp;&nbsp;'.
-            '<input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').'" class="btn btn-secondary" type="button" id="id_addselectionid" onclick="M.mod_bigbluebuttonbn.mod_form_participant_add(); return 0;" />'
+            html_writer::select($participant_selection_type_options, 'bigbluebuttonbn_participant_selection_type', $participant_selection_type_selected, array(), array('id' => 'bigbluebuttonbn_participant_selection_type', 'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_selection_set(); return 0;')) .
+            '&nbsp;&nbsp;' .
+            html_writer::select($participant_selection_options, 'bigbluebuttonbn_participant_selection', $participant_selection_selected, array(), array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')) .
+            '&nbsp;&nbsp;' .
+            '<input value="' . get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn') . '" class="btn btn-secondary" type="button" id="id_addselectionid" onclick="M.mod_bigbluebuttonbn.mod_form_participant_add(); return 0;" />'
         );
 
         $mform->addElement('html', "\n\n");
@@ -275,17 +275,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if ($participant_selectiontype == 'role') {
                 $participant_selectionid = $roles[$participant['selectionid']];
             } else {
-                foreach($users as $user){
-                    if( $user->id == $participant['selectionid']) {
+                foreach ($users as $user) {
+                    if ($user->id == $participant['selectionid']) {
                         $participant_selectionid = fullname($user);
                         break;
                     }
                 }
             }
-            $participant_selectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participant_selectiontype, 'bigbluebuttonbn').'</i></b>';
+            $participant_selectiontype = '<b><i>' . get_string('mod_form_field_participant_list_type_' . $participant_selectiontype, 'bigbluebuttonbn') . '</i></b>';
 
             $row = new html_table_row();
-            $row->id = 'participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'];
+            $row->id = 'participant_list_tr_' . $participant['selectiontype'] . '-' . $participant['selectionid'];
 
             $col0 = new html_table_cell();
             $col0->text = $participant_selectiontype;
@@ -293,22 +293,22 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $col1->text = $participant_selectionid;
             $col2 = new html_table_cell();
             $options = [
-                BIGBLUEBUTTONBN_ROLE_VIEWER => get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn'),
-                BIGBLUEBUTTONBN_ROLE_MODERATOR => get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn')
+                BIGBLUEBUTTONBN_ROLE_VIEWER => get_string('mod_form_field_participant_bbb_role_' . BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn'),
+                BIGBLUEBUTTONBN_ROLE_MODERATOR => get_string('mod_form_field_participant_bbb_role_' . BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn')
             ];
             $option_selected = $participant['role'];
-            $col2->text = html_writer::tag('i', '&nbsp;'.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn').'&nbsp;'.
+            $col2->text = html_writer::tag('i', '&nbsp;' . get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn') . '&nbsp;' .
                 html_writer::select($options,
-                    'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
+                    'participant_list_role_' . $participant['selectiontype'] . '-' . $participant['selectionid'],
                     $option_selected,
                     array(),
-                    array('id' => 'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
-                        'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;'
+                    array('id' => 'participant_list_role_' . $participant['selectiontype'] . '-' . $participant['selectionid'],
+                        'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' . $participant['selectiontype'] . '\', \'' . $participant['selectionid'] . '\'); return 0;'
                     )
                 )
             );
             $col3 = new html_table_cell();
-            $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
+            $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' . $participant['selectiontype'] . '\', \'' . $participant['selectionid'] . '\'); return 0;';
             if ($recording_icons_enabled) {
                 //With icon for delete
                 $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon', 'title' => $strings['remove'], 'alt' => $strings['remove'], 'src' => $pix_icon_delete_url));
@@ -324,7 +324,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         // Render elements for participant list
         $html_participant_list = html_writer::tag('div',
-            html_writer::label(get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), 'bigbluebuttonbn_participant_list').
+            html_writer::label(get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), 'bigbluebuttonbn_participant_list') .
             html_writer::table($table)
         );
 
@@ -333,7 +333,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
 
         // Add data
-        $jsvars['participant_selection'] = json_decode('{"all": [], "role": '.json_encode(bigbluebuttonbn_get_roles_select($roles)).', "user": '.json_encode(bigbluebuttonbn_get_users_select($users)).'}');
+        $jsvars['participant_selection'] = json_decode('{"all": [], "role": ' . json_encode(bigbluebuttonbn_get_roles_select($roles)) . ', "user": ' . json_encode(bigbluebuttonbn_get_users_select($users)) . '}');
         $jsvars['participant_list'] = $participant_list;
         //-------------------------------------------------------------------------------
         // Fourth block ends here
@@ -344,8 +344,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Fifth block starts here
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
-        if (isset($current_activity->openingtime) && $current_activity->openingtime != 0 || isset($current_activity->closingtime) && $current_activity->closingtime != 0)
-            $mform->setExpanded('schedule');
+        if (isset($current_activity->openingtime) && $current_activity->openingtime != 0 || isset($current_activity->closingtime) && $current_activity->closingtime != 0) {
+                    $mform->setExpanded('schedule');
+        }
 
         $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('openingtime', 0);
@@ -379,8 +380,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $draftitemid = file_get_submitted_draft_itemid('presentation');
                 file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
                 $default_values['presentation'] = $draftitemid;
-            } catch (Exception $e){
-                error_log("Presentation could not be loaded: ".$e->getMessage());
+            } catch (Exception $e) {
+                error_log("Presentation could not be loaded: " . $e->getMessage());
                 return NULL;
             }
         }
@@ -389,14 +390,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ( isset($data['openingtime']) && isset($data['closingtime']) ) {
-            if ( $data['openingtime'] != 0 && $data['closingtime'] != 0 && $data['closingtime'] < $data['openingtime']) {
+        if (isset($data['openingtime']) && isset($data['closingtime'])) {
+            if ($data['openingtime'] != 0 && $data['closingtime'] != 0 && $data['closingtime'] < $data['openingtime']) {
                 $errors['closingtime'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
             }
         }
 
-        if ( isset($data['voicebridge']) ) {
-            if ( !bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
+        if (isset($data['voicebridge'])) {
+            if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
                 $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
             }
         }

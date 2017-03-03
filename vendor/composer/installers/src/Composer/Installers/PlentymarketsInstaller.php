@@ -22,7 +22,7 @@ class PlentymarketsInstaller extends BaseInstaller
                 unset($vars['name'][$key]);
             }
         }
-        $vars['name'] = implode("",$vars['name']);
+        $vars['name'] = implode("", $vars['name']);
 
         return $vars;
     }

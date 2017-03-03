@@ -156,7 +156,7 @@ if (!has_capability('moodle/category:manage', $context) && !has_capability('mod/
 // Operation URLs
 $bbbsession['courseURL'] = $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course;
 $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id=' . $id . '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
+$bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
 $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
 $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $id . '&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
 
@@ -164,7 +164,7 @@ $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?acti
 echo $OUTPUT->header();
 /// Shows version as a comment
 echo '
-<!-- moodle-mod_bigbluebuttonbn ('.$module_version.') -->'."\n";
+<!-- moodle-mod_bigbluebuttonbn ('.$module_version . ') -->' . "\n";
 
 
 /// find out current groups mode
@@ -289,14 +289,14 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         // Get recordings
         $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
 
-        if ( isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+        if (isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
             //JavaScript variables for recordings
             $jsvars += array(
                 'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
             );
 
             //If there are meetings with recordings load the data to the table
-            if( $bbbsession['bigbluebuttonbn']->recordings_html ) {
+            if ($bbbsession['bigbluebuttonbn']->recordings_html) {
                 // Render a plain html table
                 $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
 
@@ -326,7 +326,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         }
     }
 
-    $output .= html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
+    $output .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . html_writer::empty_tag('br');
 
     echo $output;
 

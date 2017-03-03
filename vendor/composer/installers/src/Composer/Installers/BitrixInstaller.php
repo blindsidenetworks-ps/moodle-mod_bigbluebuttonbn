@@ -26,9 +26,9 @@ use Composer\Util\Filesystem;
 class BitrixInstaller extends BaseInstaller
 {
     protected $locations = array(
-        'module'    => '{$bitrix_dir}/modules/{$name}/',    // deprecated, remove on the major release (Backward compatibility will be broken)
+        'module'    => '{$bitrix_dir}/modules/{$name}/', // deprecated, remove on the major release (Backward compatibility will be broken)
         'component' => '{$bitrix_dir}/components/{$name}/', // deprecated, remove on the major release (Backward compatibility will be broken)
-        'theme'     => '{$bitrix_dir}/templates/{$name}/',  // deprecated, remove on the major release (Backward compatibility will be broken)
+        'theme'     => '{$bitrix_dir}/templates/{$name}/', // deprecated, remove on the major release (Backward compatibility will be broken)
         'd7-module'    => '{$bitrix_dir}/modules/{$vendor}.{$name}/',
         'd7-component' => '{$bitrix_dir}/components/{$vendor}/{$name}/',
         'd7-template'     => '{$bitrix_dir}/templates/{$vendor}_{$name}/',
@@ -41,6 +41,7 @@ class BitrixInstaller extends BaseInstaller
 
     /**
      * {@inheritdoc}
+     * @param string $vars
      */
     public function inflectPackageVars($vars)
     {
