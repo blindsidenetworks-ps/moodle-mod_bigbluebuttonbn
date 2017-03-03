@@ -38,7 +38,7 @@ class bigbluebuttonbn_meeting_event extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid, 'action' => $this->other);
+        $a = (object)array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid, 'action' => $this->other);
         return "The user with id '$a->userid' triggered action $a->action in a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id '$a->courseid'.";
     }
 

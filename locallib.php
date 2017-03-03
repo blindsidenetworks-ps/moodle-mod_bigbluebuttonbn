@@ -120,6 +120,10 @@ function bigbluebuttonbn_getMeetingInfoURL($meetingID, $modPW, $URL, $SALT) {
     return $url;
 }
 
+/**
+ * @param string $URL
+ * @param string $SALT
+ */
 function bigbluebuttonbn_getMeetingsURL($URL, $SALT) {
     $base_url = $URL."api/getMeetings?";
     $url = $base_url.'&checksum='.sha1("getMeetings".$SALT);
@@ -131,9 +135,9 @@ function bigbluebuttonbn_getMeetingsURL($URL, $SALT) {
  * @param string $SALT
  */
 function bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW, $URL, $SALT) {
-    $base_url = $URL."api/end?";
-    $params = 'meetingID='.urlencode($meetingID).'&password='.urlencode($modPW);
-    $url = $base_url.$params.'&checksum='.sha1("end".$params.$SALT);
+    $base_url = $URL . "api/end?";
+    $params = 'meetingID=' . urlencode($meetingID) . '&password=' . urlencode($modPW);
+    $url = $base_url . $params . '&checksum=' . sha1("end" . $params . $SALT);
     return $url;
 }
 
@@ -143,9 +147,9 @@ function bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW, $URL, $SALT) {
  * @param string $SALT
  */
 function bigbluebuttonbn_getRecordingsURL($meetingID, $URL, $SALT) {
-    $base_url_record = $URL."api/getRecordings?";
-    $params = "meetingID=".urlencode($meetingID);
-    $url = $base_url_record.$params."&checksum=".sha1("getRecordings".$params.$SALT);
+    $base_url_record = $URL . "api/getRecordings?";
+    $params = "meetingID=" . urlencode($meetingID);
+    $url = $base_url_record . $params . "&checksum=" . sha1("getRecordings" . $params . $SALT);
     return $url;
 }
 
@@ -154,9 +158,9 @@ function bigbluebuttonbn_getRecordingsURL($meetingID, $URL, $SALT) {
  * @param string $SALT
  */
 function bigbluebuttonbn_getDeleteRecordingsURL($recordID, $URL, $SALT) {
-    $url_delete = $URL."api/deleteRecordings?";
-    $params = 'recordID='.urlencode($recordID);
-    $url = $url_delete.$params.'&checksum='.sha1("deleteRecordings".$params.$SALT);
+    $url_delete = $URL . "api/deleteRecordings?";
+    $params = 'recordID=' . urlencode($recordID);
+    $url = $url_delete . $params . '&checksum=' . sha1("deleteRecordings" . $params . $SALT);
     return $url;
 }
 
@@ -166,45 +170,45 @@ function bigbluebuttonbn_getDeleteRecordingsURL($recordID, $URL, $SALT) {
  * @param string $SALT
  */
 function bigbluebuttonbn_getPublishRecordingsURL($recordID, $set, $URL, $SALT) {
-    $url_publish = $URL."api/publishRecordings?";
-    $params = 'recordID='.$recordID."&publish=".$set;
-    $url = $url_publish.$params.'&checksum='.sha1("publishRecordings".$params.$SALT);
+    $url_publish = $URL . "api/publishRecordings?";
+    $params = 'recordID=' . $recordID . "&publish=" . $set;
+    $url = $url_publish . $params . '&checksum=' . sha1("publishRecordings" . $params . $SALT);
     return $url;
 }
 
-function bigbluebuttonbn_getUpdateRecordingsURL($recordID, $URL, $SALT, $metadata=array()) {
-    $url_update = $URL."api/updateRecordings?";
-    $params = 'recordID='.$recordID.$meta;
+function bigbluebuttonbn_getUpdateRecordingsURL($recordID, $URL, $SALT, $metadata = array()) {
+    $url_update = $URL . "api/updateRecordings?";
+    $params = 'recordID=' . $recordID . $meta;
     foreach ($metadata as $key => $value) {
-        $params .= '&'.$key.'='.urlencode($value);
+        $params .= '&' . $key . '=' . urlencode($value);
     }
-    $url = $url_update.$params.'&checksum='.sha1("updateRecordings".$params.$SALT);
+    $url = $url_update . $params . '&checksum=' . sha1("updateRecordings" . $params . $SALT);
     return $url;
 }
 
 function bigbluebuttonbn_getDefaultConfigXMLURL($URL, $SALT) {
-    $url_default_config = $URL."api/getDefaultConfigXML?";
+    $url_default_config = $URL . "api/getDefaultConfigXML?";
     $params = '';
-    $url = $url_default_config.$params.'&checksum='.sha1("getDefaultConfigXML".$params.$SALT);
+    $url = $url_default_config . $params . '&checksum=' . sha1("getDefaultConfigXML" . $params . $SALT);
     return $url;
 }
 
-function bigbluebuttonbn_getCreateMeetingArray($username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $maxParticipants=0, $metadata=array(), $presentation_name=NULL, $presentation_url=NULL) {
+function bigbluebuttonbn_getCreateMeetingArray($username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0, $metadata = array(), $presentation_name = NULL, $presentation_url = NULL) {
     $create_meeting_url = bigbluebuttonbn_getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $maxParticipants, $metadata);
     if (!is_null($presentation_name) && !is_null($presentation_url)) {
-        $xml = bigbluebuttonbn_wrap_xml_load_file( $create_meeting_url,
+        $xml = bigbluebuttonbn_wrap_xml_load_file($create_meeting_url,
                 BIGBLUEBUTTONBN_METHOD_POST,
-                "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".$presentation_url."' /></module></modules>"
+                "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" . $presentation_url . "' /></module></modules>"
                 );
     } else {
-        $xml = bigbluebuttonbn_wrap_xml_load_file( $create_meeting_url );
+        $xml = bigbluebuttonbn_wrap_xml_load_file($create_meeting_url);
     }
 
     if ($xml) {
         if ($xml->meetingID) {
-            return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
+            return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded);
         } else {
-            return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
+            return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
         }
     } else {
         return null;
@@ -383,7 +387,7 @@ function bigbluebuttonbn_getDefaultConfigXML($URL, $SALT) {
 
 function bigbluebuttonbn_getDefaultConfigXMLArray($URL, $SALT) {
     $default_config_xml = bigbluebuttonbn_getDefaultConfigXML($URL, $SALT);
-    $default_config_xml_array = (array) $default_config_xml;
+    $default_config_xml_array = (array)$default_config_xml;
     return $default_config_xml_array;
 }
 
@@ -392,18 +396,18 @@ function bigbluebuttonbn_getRecordingArrayValue($recording) {
     //Add formats
     $playbackArray = array();
     foreach ($recording->playback->format as $format) {
-        $playbackArray[(string) $format->type] = array('type' => (string) $format->type, 'url' => (string) $format->url, 'length' => (string) $format->length);
+        $playbackArray[(string)$format->type] = array('type' => (string)$format->type, 'url' => (string)$format->url, 'length' => (string)$format->length);
         //Add preview per format when existing
         if ($format->preview) {
             $imagesArray = array();
             foreach ($format->preview->images->image as $image) {
-                $imageArray = array('url' => (string) $image);
+                $imageArray = array('url' => (string)$image);
                 foreach ($image->attributes() as $attKey => $attValue) {
-                    $imageArray[$attKey] = (string) $attValue;
+                    $imageArray[$attKey] = (string)$attValue;
                 }
                 array_push($imagesArray, $imageArray);
             }
-            $playbackArray[(string) $format->type]['preview'] = $imagesArray;
+            $playbackArray[(string)$format->type]['preview'] = $imagesArray;
         }
     }
 
@@ -417,7 +421,7 @@ function bigbluebuttonbn_getRecordingArrayValue($recording) {
         $metadataArray['meta_' . $key] = $value;
     }
 
-    $recordingArrayValue = array('recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray) + $metadataArray;
+    $recordingArrayValue = array('recordID' => (string)$recording->recordID, 'meetingID' => (string)$recording->meetingID, 'meetingName' => (string)$recording->name, 'published' => (string)$recording->published, 'startTime' => (string)$recording->startTime, 'endTime' => (string)$recording->endTime, 'playbacks' => $playbackArray) + $metadataArray;
 
     return $recordingArrayValue;
 }
@@ -985,7 +989,7 @@ function bigbluebuttonbn_bbb_broker_get_meeting_info($meetingid, $password = NUL
             $moderatorPW = $password;
         }
         //Ping again and refresh the cache
-        $meeting_info = (array) bigbluebuttonbn_getMeetingInfo($meetingid, $moderatorPW, $endpoint, $shared_secret);
+        $meeting_info = (array)bigbluebuttonbn_getMeetingInfo($meetingid, $moderatorPW, $endpoint, $shared_secret);
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info)));
     }
 
@@ -1112,6 +1116,10 @@ function bigbluebuttonbn_bbb_broker_add_error($org_msg, $new_msg = '') {
     return $error;
 }
 
+/**
+ * @param string $URL
+ * @param string $SALT
+ */
 function bigbluebuttonbn_setConfigXMLParams( $meetingID, $configXML, $URL, $SALT) {
     $params = 'configXML='.urlencode($configXML).'&meetingID='.urlencode($meetingID);
     $config_xml_params = $params.'&checksum='.sha1("setConfigXML".$params.$SALT);
@@ -1122,9 +1130,9 @@ function bigbluebuttonbn_setConfigXMLParams( $meetingID, $configXML, $URL, $SALT
  * @param string $URL
  * @param string $SALT
  */
-function bigbluebuttonbn_setConfigXML( $meetingID, $configXML, $URL, $SALT) {
-    $url_default_config = $URL."api/setConfigXML?";
-    $config_xml_params = bigbluebuttonbn_setConfigXMLParams( $meetingID, $configXML, $URL, $SALT );
+function bigbluebuttonbn_setConfigXML($meetingID, $configXML, $URL, $SALT) {
+    $url_default_config = $URL . "api/setConfigXML?";
+    $config_xml_params = bigbluebuttonbn_setConfigXMLParams($meetingID, $configXML, $URL, $SALT);
     $xml = bigbluebuttonbn_wrap_xml_load_file($url_default_config, BIGBLUEBUTTONBN_METHOD_POST, $config_xml_params, 'application/x-www-form-urlencoded');
     return $xml;
 }
@@ -1135,7 +1143,7 @@ function bigbluebuttonbn_setConfigXML( $meetingID, $configXML, $URL, $SALT) {
  */
 function bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML, $URL, $SALT) {
     $config_xml = bigbluebuttonbn_setConfigXML($meetingID, $configXML, $URL, $SALT);
-    $config_xml_array = (array) $config_xml;
+    $config_xml_array = (array)$config_xml;
     return $config_xml_array;
 }
 
@@ -1782,7 +1790,7 @@ function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools =
 function bigbluebuttonbn_debugdisplay() {
     global $CFG;
 
-    return (bool) $CFG->debugdisplay;
+    return (bool)$CFG->debugdisplay;
 }
 
 function bigbluebuttonbn_html2text($html, $len) {

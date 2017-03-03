@@ -38,7 +38,7 @@ class bigbluebuttonbn_meeting_left extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $a = (object) array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
+        $a = (object)array('userid' => $this->userid, 'bigbluebuttonbnid' => $this->objectid, 'courseid' => $this->contextinstanceid);
         return "The user with id '$a->userid' has left a bigbluebutton meeting for the bigbluebuttonbn activity with id '$a->bigbluebuttonbnid' for the course id '$a->courseid'.";
     }
 
