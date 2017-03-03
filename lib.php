@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '/vendor/firebase/php-jwt/src/JWT.php');
 if (file_exists(dirname(__FILE__) . '/config.php')) {
     require_once(dirname(__FILE__) . '/config.php');
     if (isset($BIGBLUEBUTTONBN_CFG)) {
-        $CFG = (object) array_merge((array) $CFG, (array) $BIGBLUEBUTTONBN_CFG);
+        $CFG = (object)array_merge((array)$CFG, (array)$BIGBLUEBUTTONBN_CFG);
     }
 } else {
     $BIGBLUEBUTTONBN_CFG = new stdClass();

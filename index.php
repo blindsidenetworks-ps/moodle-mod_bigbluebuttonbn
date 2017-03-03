@@ -111,7 +111,7 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     $administrator = has_capability('moodle/category:manage', $context);
 
     if (groups_get_activity_groupmode($cm) > 0) {
-        $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, ($administrator || $moderator), $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
+        $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, ($administrator || $moderator), $course, $bigbluebuttonbn, (object)array('id'=>0, 'name'=>get_string('allparticipants')));
         $groups = groups_get_activity_allowed_groups($cm);
         if (isset($groups)) {
             foreach ($groups as $group) {
