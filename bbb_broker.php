@@ -119,13 +119,13 @@ if ( empty($error) ) {
                 case 'meeting_end':
                     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
                         //Execute the end command
-                        $meeting_info = bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
+                        bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
                         // Moodle event logger: Create an event for meeting ended
                         if (isset($bigbluebuttonbn)) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
                         }
                         // Update the cache
-                        $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
+                        bigbluebuttonbn_bbb_broker_get_meeting_info($params['id'], $bbbsession['modPW'], true);
 
                         echo $params['callback'].'({ "status": true });';
                     } else {
@@ -186,14 +186,14 @@ if ( empty($error) ) {
                                     $real_recordings = bigbluebuttonbn_getRecordingsArray($recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
                                     if ($real_recordings[$params['id']]['published'] === 'true') {
                                         // Only if the physical recording is published, execute publish on imported recording link
-                                        $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
+                                        bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, true);
                                     } else {
                                         // Send a message telling that it could not be published
                                         $status = false;
                                     }
                                 } else {
                                     // As the recordingid was not identified as imported recording link, execute publish on a real recording
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
+                                    bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], true);
                                 }
 
                                 if ($status) {
@@ -210,7 +210,7 @@ if ( empty($error) ) {
                             case 'recording_unpublish':
                                 if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
                                     // Execute unpublish on imported recording link
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
+                                    bigbluebuttonbn_bbb_broker_do_publish_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id, false);
                                 } else {
                                     // As the recordingid was not identified as imported recording link, execute unpublish on a real recording
                                     // First: Unpublish imported links associated to the recording
@@ -228,7 +228,7 @@ if ( empty($error) ) {
                                         }
                                     }
                                     // Second: Execute the real unpublish
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
+                                    bigbluebuttonbn_bbb_broker_do_publish_recording($params['id'], false);
                                 }
 
                                 $callback_response['status'] = "true";
@@ -240,7 +240,7 @@ if ( empty($error) ) {
                             case 'recording_delete':
                                 if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
                                     // Execute delete on imported recording link
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
+                                    bigbluebuttonbn_bbb_broker_do_delete_recording_imported($params['id'], $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id);
                                 } else {
                                     // As the recordingid was not identified as imported recording link, execute delete on a real recording
                                     // First: Delete imported links associated to the recording
@@ -253,7 +253,7 @@ if ( empty($error) ) {
                                         }
                                     }
                                     // Second: Execute the real delete
-                                    $meeting_info = bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
+                                    bigbluebuttonbn_bbb_broker_do_delete_recording($params['id']);
                                 }
 
                                 $callback_response['status'] = "true";

@@ -16,7 +16,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
-    function definition() {
+    public function definition() {
         global $BIGBLUEBUTTONBN_CFG, $CFG, $DB, $OUTPUT, $PAGE, $USER;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
@@ -372,7 +372,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.mod_form_init', array(), false, $jsmodule);
     }
 
-    function data_preprocessing(&$default_values) {
+    public function data_preprocessing(&$default_values) {
         if ($this->current->instance) {
             // Editing existing instance - copy existing files into draft area.
             try {
@@ -386,7 +386,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         if ( isset($data['openingtime']) && isset($data['closingtime']) ) {

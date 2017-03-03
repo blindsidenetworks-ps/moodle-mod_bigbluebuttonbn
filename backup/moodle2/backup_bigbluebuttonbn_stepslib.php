@@ -55,10 +55,6 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
         $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid'=>backup::VAR_PARENTID));
 
-        // User related logs only happen if we are including user info
-        if ($userinfo) {
-        }
-
         // Define id annotations
         $log->annotate_ids('user', 'userid');
 

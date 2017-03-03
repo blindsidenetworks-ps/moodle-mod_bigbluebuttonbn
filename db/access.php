@@ -20,7 +20,6 @@ $capabilities = array(
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => array(
                         'manager' => CAP_ALLOW,
-                        //'coursecreator' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW
                 ),
                 'clonepermissionsfrom' => 'moodle/course:manageactivities'
@@ -33,7 +32,6 @@ $capabilities = array(
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(
                         'manager' => CAP_ALLOW,
-                        //'coursecreator' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW,
                         'student' => CAP_ALLOW
@@ -47,7 +45,6 @@ $capabilities = array(
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(
                         'manager' => CAP_ALLOW,
-                        //'coursecreator' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW
                 )

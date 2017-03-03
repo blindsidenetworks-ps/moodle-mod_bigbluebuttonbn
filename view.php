@@ -235,8 +235,9 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
 
     //JavaScript variables
     $waitformoderator_ping_interval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
-    list($lang, $locale_encoder) = explode('.', get_string('locale', 'core_langconfig'));
-    list($locale_code, $locale_sub_code) = explode('_', $lang);
+    $lang = get_string('locale', 'core_langconfig');
+    $locale = substr($lang, 0, strpos($lang, "."));
+    $locale_code = substr($locale, 0, strpos($locale, "_"));
     $jsvars = array(
         'activity' => $activity,
         'ping_interval' => ($waitformoderator_ping_interval > 0 ? $waitformoderator_ping_interval * 1000 : 15000),
@@ -271,9 +272,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
         $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>' . "\n";
         $output .= $OUTPUT->box_end();
 
-        if ($activity == 'not_started') {
-            // Do nothing
-        } else {
+        if ($activity != 'not_started') {
             if ($activity == 'ended') {
                 bigbluebuttonbn_view_ended($bbbsession);
             } else {

@@ -55,7 +55,7 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
         $log->meta = '{"record":'.($bbbsession['record']? 'true': 'false').'}';
     }
 
-    $returnid = $DB->insert_record('bigbluebuttonbn_logs', $log);
+    $DB->insert_record('bigbluebuttonbn_logs', $log);
 }
 
  ////////////////////////////
@@ -106,14 +106,14 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
     return $url;
 }
 
-function bigbluebuttonbn_getIsMeetingRunningURL( $meetingID, $URL, $SALT) {
+function bigbluebuttonbn_getIsMeetingRunningURL($meetingID, $URL, $SALT) {
     $base_url = $URL."api/isMeetingRunning?";
     $params = 'meetingID='.urlencode($meetingID);
     $url = $base_url.$params.'&checksum='.sha1("isMeetingRunning".$params.$SALT);
     return $url;
 }
 
-function bigbluebuttonbn_getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT) {
+function bigbluebuttonbn_getMeetingInfoURL($meetingID, $modPW, $URL, $SALT) {
     $base_url = $URL."api/getMeetingInfo?";
     $params = 'meetingID='.urlencode($meetingID).'&password='.urlencode($modPW);
     $url = $base_url.$params.'&checksum='.sha1("getMeetingInfo".$params.$SALT);
@@ -1762,11 +1762,7 @@ function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID=NULL, $sub
         if (!empty($bigbluebuttonbns_deleted)) {
             // Merge bigbluebuttonbnis from deleted instances, only keys are relevant. Artimetic merge is used in order to keep the keys
             $bigbluebuttonbns += $bigbluebuttonbns_deleted;
-        } else {
-            // There is nothing to merge. Do nothing
         }
-    } else {
-        // Deleted should not be included. Do nothing
     }
 
     // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true

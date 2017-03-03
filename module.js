@@ -1,17 +1,19 @@
 /**
- * @package   mod_bigbluebuttonbn
+ * JavaScript library for the bigbluebuttonbn module.
+ *
+ * @package    mod
+ * @subpackage bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2012-2015 Blindside Networks Inc.
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright  2012-2016 Blindside Networks Inc.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/** global: M */
+/** global: Y */
+/** global: bigbluebuttonbn */
+
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
-/**
- * This function is initialized from PHP
- *
- * @param {Object}
- *            Y YUI instance
- */
 
 var bigbluebuttonbn_dataSource;
 var bigbluebuttonbn_ping_interval_id;
@@ -147,7 +149,7 @@ M.mod_bigbluebuttonbn.view_update = function() {
 
             },
             failure : function(e) {
-                console.log(e);
+                console.error(e);
             }
         }
     });
@@ -339,7 +341,7 @@ M.mod_bigbluebuttonbn.broker_waitModerator = function(join_url) {
             },
             failure : function(e) {
                 clearInterval(bigbluebuttonbn_ping_interval_id);
-                console.log(e);
+                console.error(e);
             }
         }
     });
@@ -365,7 +367,7 @@ M.mod_bigbluebuttonbn.broker_joinNow = function(join_url, status_message, can_ta
                     }
                 },
                 failure : function(e) {
-                    console.log(e);
+                    console.error(e);
                 }
             }
         });
@@ -389,7 +391,7 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
     var data = {'id':recordingid};
 
     if (!is_imported_link && (action === 'unpublish' || action === 'delete')) {
-        var id = bigbluebuttonbn_dataSource.sendRequest({
+        bigbluebuttonbn_dataSource.sendRequest({
             request : 'action=recording_links&id=' + recordingid,
             callback : {
                 success : function(e) {
@@ -401,7 +403,7 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
                             var confirmation_warning;
                             if (e.data.links == 1) {
                                 confirmation_warning = bigbluebuttonbn.locales[action + "_confirmation_warning_s"].replace("{$a}", e.data.links) + '. ';
-                            } else if( e.data.links > 1 ) {
+                            } else {
                                 confirmation_warning = bigbluebuttonbn.locales[action + "_confirmation_warning_p"].replace("{$a}", e.data.links) + '. ';
                             }
                             var confirmation = bigbluebuttonbn.locales[action + "_confirmation"].replace("{$a}", is_imported_link ? bigbluebuttonbn.locales.recording_link : bigbluebuttonbn.locales.recording);
@@ -414,7 +416,7 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
                     callback(data);
                 },
                 failure : function(e) {
-                    console.log(e.error.message);
+                    console.error(e.error.message);
                     data['error'] =  e.error.message;
                     callback(data);
                 }
@@ -435,7 +437,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
     //Before sending the request, let's process a verification
     M.mod_bigbluebuttonbn.broker_actionVerification(action, recordingid, meetingid, function(data) {
         if (data.confirmed) {
-            var id = bigbluebuttonbn_dataSource.sendRequest({
+            bigbluebuttonbn_dataSource.sendRequest({
                 request : "action=recording_" + action + "&id=" + recordingid,
                 callback : {
                     success : function(e) {
@@ -503,7 +505,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                         },
                                         failure : function(e) {
                                             clearInterval(bigbluebuttonbn_ping_interval_id);
-                                            console.log(e);
+                                            console.error(e);
                                         }
                                     }
                                 });
@@ -514,10 +516,7 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                         }
                     },
                     failure : function(e) {
-                        console.log(e);
-                    },
-                    completed : function(e) {
-                        console.log(e);
+                        console.error(e);
                     }
                 }
             });
@@ -525,12 +524,9 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
     });
 };
 
-M.mod_bigbluebuttonbn.broker_updateRecording = function(action, recordingid) {
-};
-
 M.mod_bigbluebuttonbn.broker_endMeeting = function() {
     console.info('End Meeting');
-    var id = bigbluebuttonbn_dataSource.sendRequest({
+    bigbluebuttonbn_dataSource.sendRequest({
         request : 'action=meeting_end&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
         callback : {
             success : function(e) {
@@ -542,14 +538,15 @@ M.mod_bigbluebuttonbn.broker_endMeeting = function() {
                 }
             },
             failure : function(e) {
-                console.log(e.error.message);
+                console.error(e.error.message);
             }
         }
     });
 };
 
 M.mod_bigbluebuttonbn.view_windowClose = function() {
-    window.onunload = function (e) {
+    window.onunload = function () {
+        /** global: opener */
         opener.M.mod_bigbluebuttonbn.view_remote_update(5000);
     };
     window.close();

@@ -1,7 +1,7 @@
 <?php
 /**
  * View all BigBlueButton instances in this course.
- * 
+ *
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -66,7 +66,8 @@ if ($submit === 'end') {
     //
     // A request to end the meeting
     //
-    if (! $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $a), '*', MUST_EXIST) ) {
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $a), '*', MUST_EXIST);
+    if (!$bigbluebuttonbn) {
         print_error("BigBlueButton ID $a is incorrect");
     }
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -101,7 +102,7 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
 
     //User roles
-    if( $bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]" ){
+    if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == "" || $bigbluebuttonbn->participants == "[]"){
         //The room that is being used comes from a previous version
         $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
     } else {
@@ -109,7 +110,7 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     }
     $administrator = has_capability('moodle/category:manage', $context);
 
-    if ( groups_get_activity_groupmode($cm) > 0 ){
+    if (groups_get_activity_groupmode($cm) > 0) {
         $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, ($administrator || $moderator), $course, $bigbluebuttonbn, (object) array('id'=>0, 'name'=>get_string('allparticipants')));
         $groups = groups_get_activity_allowed_groups($cm);
         if( isset($groups)) {
@@ -131,26 +132,22 @@ echo $OUTPUT->footer();
 
 /// Functions
 function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null ){
-    $joinURL = null;
     $group = "-";
     $users = "-";
-    $running = "-";
     $actions = "-";
     $viewerList = "-";
     $moderatorList = "-";
     $recording = "-";
 
-    if ( !$bigbluebuttonbn->visible ) {
-        // Nothing to do
-    } else {
+    if ($bigbluebuttonbn->visible) {
+
         $modPW = $bigbluebuttonbn->moderatorpass;
-        $attPW = $bigbluebuttonbn->viewerpass;
 
         $meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
         //
         // Output Users in the meeting
         //
-        if( $groupObj == null ){
+        if ($groupObj == null) {
             $meetingInfo = bigbluebuttonbn_getMeetingInfoArray( $meetingID, $modPW, $endpoint, $shared_secret );
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'">'.format_string($bigbluebuttonbn->name).'</a>';
         } else {
@@ -158,7 +155,7 @@ function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $cours
             $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.'&group='.$groupObj->id.'">'.format_string($bigbluebuttonbn->name).'</a>';
             $group = $groupObj->name;
         }
-        
+
         if (!$meetingInfo) {
             //
             // The server was unreachable
@@ -176,11 +173,7 @@ function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $cours
                 return;
             }
 
-            if ($meetingInfo['messageKey'] == "notFound" || $meetingInfo['messageKey'] == "invalidMeetingId") {
-                //
-                // The meeting does not exist yet on the BigBlueButton server.  This is OK.
-                //
-            } else {
+            if ($meetingInfo['messageKey'] != "notFound" && $meetingInfo['messageKey'] != "invalidMeetingId") {
                 //
                 // There was an error
                 //
@@ -191,32 +184,32 @@ function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $cours
             // The meeting info was returned
             //
             if ($meetingInfo['running'] == 'true') {
-                if ( $moderator ) {
+                if ($moderator) {
                     if( $groupObj == null ) {
                         $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
                     } else {
                         $actions = '<form name="form1" method="post" action=""><INPUT type="hidden" name="id" value="'.$course->id.'"><INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'"><INPUT type="hidden" name="g" value="'.$groupObj->id.'"><INPUT type="submit" name="submit" value="end" onclick="return confirm(\''. get_string('index_confirm_end', 'bigbluebuttonbn' ).'\')"></form>';
                     }
                 }
-                if ( isset($meetingInfo['recording']) && $meetingInfo['recording'] == 'true' ){ // if it has been set when meeting created, set the variable on/off
+                if (isset($meetingInfo['recording']) && $meetingInfo['recording'] == 'true') { // if it has been set when meeting created, set the variable on/off
                     $recording = get_string('index_enabled', 'bigbluebuttonbn' );
                 }
-                 
+
                 $xml = $meetingInfo['attendees'];
-                if (count( $xml ) && count( $xml->attendee ) ) {
+                if (count( $xml ) && count( $xml->attendee )) {
                     $users = count( $xml->attendee );
                     $viewer_count = 0;
                     $moderator_count = 0;
-                    foreach ( $xml->attendee as $attendee ) {
-                        if ($attendee->role == "MODERATOR" ) {
-                            if ( $viewer_count++ > 0 ) {
+                    foreach ($xml->attendee as $attendee) {
+                        if ($attendee->role == "MODERATOR") {
+                            if ($viewer_count++ > 0) {
                                 $moderatorList .= ", ";
                             } else {
                                 $moderatorList = "";
                             }
                             $moderatorList .= $attendee->fullName;
                         } else {
-                            if ( $moderator_count++ > 0 ) {
+                            if ($moderator_count++ > 0) {
                                 $viewerList .= ", ";
                             } else {
                                 $viewerList = "";

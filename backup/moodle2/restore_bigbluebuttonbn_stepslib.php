@@ -39,9 +39,6 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
         $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
 
-        if ($userinfo) {
-        }
-
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
@@ -50,7 +47,6 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
@@ -65,7 +61,6 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         // Apply modifications
         $data->courseid = $this->get_mappingid('course', $data->courseid);
         $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
@@ -75,7 +70,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         // insert the bigbluebuttonbn_logs record
         $newitemid = $DB->insert_record('bigbluebuttonbn_logs', $data);
         // immediately after inserting associated record, call this
-        $this->set_mapping('bigbluebuttonbn_logs', $oldid, $newitemid); // because of decode
+        $this->set_mapping('bigbluebuttonbn_logs', $data->id, $newitemid); // because of decode
     }
 
     protected function after_execute() {

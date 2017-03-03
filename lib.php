@@ -64,7 +64,6 @@ function bigbluebuttonbn_supports($feature) {
         case FEATURE_GRADE_HAS_GRADE:         return false;
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_SHOW_DESCRIPTION:        return true;
-        // case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
 
         default: return null;
     }
@@ -76,7 +75,8 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $bigbluebuttonbn An object from the form in mod_form.php
+ * @param object $data An object from the form in mod_form.php
+ * @param object $mform An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data, $mform) {
@@ -145,14 +145,14 @@ function bigbluebuttonbn_delete_instance($id) {
     //
     // End the session associated with this instance (if it's running)
     //
-    //$meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
-    //
-    //$modPW = $bigbluebuttonbn->moderatorpass;
-    //$url = bigbluebuttonbn_get_cfg_server_url();
-    //$shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
-    //
-    //if( bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret) )
-    //    $getArray = bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
+    $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    $modPW = $bigbluebuttonbn->moderatorpass;
+    $url = bigbluebuttonbn_get_cfg_server_url();
+    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
+
+    if (bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret)) {
+        bigbluebuttonbn_doEndMeeting( $meetingID, $modPW, $url, $shared_secret );
+    }
 
     if (! $DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         $result = false;
@@ -525,7 +525,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
             $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->openingtime);
         }
         $msg->activity_closingtime = "";
-        if ($bigbluebuttonbn->closingtime ) {
+        if ($bigbluebuttonbn->closingtime) {
             $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->closingtime);
         }
         $msg->activity_owner = fullname($USER);
@@ -712,34 +712,25 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     }
 }
 
+function bigbluebuttonbn_get_context($id, $context_type) {
+  $version_major = bigbluebuttonbn_get_moodle_version_major();
+  if ( $version_major < '2013111800' ) {
+      //This is valid before v2.6
+      $context = get_context_instance($context_type, $id);
+  } else {
+      //This is valid after v2.6
+      $context = context_module::instance($id);
+  }
+
+  return $context;
+}
+
 function bigbluebuttonbn_get_context_module($id) {
-    global $CFG;
-
-    $version_major = bigbluebuttonbn_get_moodle_version_major();
-    if ( $version_major < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_MODULE, $id);
-    } else {
-        //This is valid after v2.6
-        $context = context_module::instance($id);
-    }
-
-    return $context;
+    return bigbluebuttonbn_get_context($id, CONTEXT_MODULE);
 }
 
 function bigbluebuttonbn_get_context_course($id) {
-    global $CFG;
-
-    $version_major = bigbluebuttonbn_get_moodle_version_major();
-    if ( $version_major < '2013111800' ) {
-        //This is valid before v2.6
-        $context = get_context_instance(CONTEXT_COURSE, $id);
-    } else {
-        //This is valid after v2.6
-        $context = context_course::instance($id);
-    }
-
-    return $context;
+    return bigbluebuttonbn_get_context($id, CONTEXT_COURSE);
 }
 
 function bigbluebuttonbn_get_cfg_server_url() {

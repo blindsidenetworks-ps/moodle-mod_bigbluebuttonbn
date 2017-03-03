@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Upgrade logic.
  *
@@ -13,303 +12,98 @@
 function xmldb_bigbluebuttonbn_upgrade($oldversion=0) {
 
     global $CFG, $THEME, $DB;
+
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
-    $result = true;
+    $table_bigbluebuttonbn = new xmldb_table('bigbluebuttonbn');
 
-    if ($result && $oldversion < 2012040200) {
-        // Define field intro to be droped from bigbluebuttonbn
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, 'medium', null, null, null, null,'name');
-
-        // Drop field intro
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        // Define field introformat to be droped from bigbluebuttonbn
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('introformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
-
-        // Drop field introformat
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        // Once we reach this point, we can store the new version and consider the module
-        // upgraded to the version 2012040200 so the next time this block is skipped
-        upgrade_mod_savepoint(true, 2012040200, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2012062705) {
-
-        // Define table bigbluebuttonbn_log to be created
-        $table = new xmldb_table('bigbluebuttonbn_log');
-
-        // Adding fields to table bigbluebuttonbn_log
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('meetingid', XMLDB_TYPE_CHAR, '256', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        $table->add_field('bigbluebuttonbnid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        $table->add_field('record', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('event', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
-
-        // Adding keys to table bigbluebuttonbn_log
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-
-        // Conditionally launch create table for bigbluebuttonbn_log
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // bigbluebuttonbn savepoint reached
-        upgrade_mod_savepoint(true, 2012062705, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2012100100) {
-
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('welcome');
-        $field->set_attributes(XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null, null, 'type');
-
-        $dbman->change_field_type($table, $field, $continue=true, $feedback=true);
-
-        upgrade_mod_savepoint(true, 2012100100, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2014050100) {
-
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('allmoderators');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        upgrade_mod_savepoint(true, 2014050100, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2014070420) {
-
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('participants', XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        upgrade_mod_savepoint(true, 2014070420, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2014101004) {
-
-        $table = new xmldb_table('bigbluebuttonbn');
-        $field = new xmldb_field('participants');
-        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
-
-        $dbman->change_field_type($table, $field, $continue=true, $feedback=true);
-
-        upgrade_mod_savepoint(true, 2014101004, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2015063000) {
-        // Update the bigbluebuttonbn table
-        $table = new xmldb_table('bigbluebuttonbn');
-        //// Drop field timeduration
-        $field = new xmldb_field('timeduration');
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Drop field allmoderators
-        $field = new xmldb_field('allmoderators');
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field intro
-        $field = new xmldb_field('intro');
-        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field introformat
-        $field = new xmldb_field('introformat');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1, 'intro');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field tagging
-        $field = new xmldb_field('tagging');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'record');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field presentation
-        $field = new xmldb_field('presentation');
-        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'timemodified');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field type
-        $field = new xmldb_field('type');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'course');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Rename field timeavailable
-        $field = new xmldb_field('timeavailable');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->rename_field($table, $field, 'openingtime', $continue=true, $feedback=true);
-        }
-        //// Rename field timedue
-        $field = new xmldb_field('timedue');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->rename_field($table, $field, 'closingtime', $continue=true, $feedback=true);
-        }
-        //// Add field timecreated
-        $field = new xmldb_field('timecreated');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'closingtime');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field userlimit
-        $field = new xmldb_field('userlimit');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        // Update the bigbluebuttonbn_log table
-        $table = new xmldb_table('bigbluebuttonbn_log');
-        //// Add field userid
-        $field = new xmldb_field('userid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'bigbluebuttonbnid');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Add field meta
-        $field = new xmldb_field('meta');
-        $field->set_attributes(XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'event');
-        if( !$dbman->field_exists($table, $field) ) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
-        //// Drop field recording
-        $field = new xmldb_field('record');
-        if( $dbman->field_exists($table, $field) ) {
-            //// Migrate data in field recording to new format in meta
-            $meta = new \stdClass();
-
-            // Record => true.
-            $meta->record = true;
-            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 1));
-
-            // Record => false.
-            $meta->record = false;
-            $DB->set_field('bigbluebuttonbn_log', 'meta', json_encode($meta), array('event' => 'Create', 'record' => 0));
-
-            // Drop field recording
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
-
-        upgrade_mod_savepoint(true, 2015063000, 'bigbluebuttonbn');
-    }
-
-    if ($result && $oldversion < 2015080605) {
-        // Update the bigbluebuttonbn table
-        $table = new xmldb_table('bigbluebuttonbn');
+    if ($oldversion < 2015080605) {
         //// Drop field description
-        $field = new xmldb_field('description');
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
+        xmldb_bigbluebuttonbn_drop_field($dbman, $table_bigbluebuttonbn, 'description');
+
         //// Change welcome, allow null
-        $field = new xmldb_field('welcome');
-        $field->set_attributes(XMLDB_TYPE_TEXT, null, null, null, null, null, null, null, 'type');
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->change_field_notnull($table, $field, $continue=true, $feedback=true);
-        }
+        $field_definition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null,'previous' => 'type');
+        xmldb_bigbluebuttonbn_change_field($dbman, $table_bigbluebuttonbn, 'welcome', $field_definition);
 
         // Update the bigbluebuttonbn_log table
-        $table = new xmldb_table('bigbluebuttonbn_log');
-        //// Change welcome, allow null
-        $field = new xmldb_field('userid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'bigbluebuttonbnid');
-        if( $dbman->field_exists($table, $field) ) {
-            $dbman->change_field_notnull($table, $field, $continue=true, $feedback=true);
-        }
+        $table_bigbluebuttonbn_log = new xmldb_table('bigbluebuttonbn_log');
+
+        //// Change userid definition
+        $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null,'previous' => 'bigbluebuttonbnid');
+        xmldb_bigbluebuttonbn_change_field($dbman, $table_bigbluebuttonbn_log, 'userid', $field_definition);
 
         upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
 
-    if ( $result && $oldversion < 2016011305 ) {
-        // Update the bigbluebuttonbn table
-        $table = new xmldb_table('bigbluebuttonbn');
+    if ($oldversion < 2016011305) {
+        //// Define field type to be droped from bigbluebuttonbn
+        xmldb_bigbluebuttonbn_drop_field($dbman, $table_bigbluebuttonbn, 'type');
 
-        // Define field type to be droped from bigbluebuttonbn
-        $field = new xmldb_field('type');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'course');
-        if ( $dbman->field_exists($table, $field) ) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
+        //// Rename table bigbluebuttonbn_log to bigbluebuttonbn_logs
+        xmldb_bigbluebuttonbn_rename_table($dbman, 'bigbluebuttonbn_log', 'bigbluebuttonbn_logs')
 
-        // Define field 'event' to be renamed
-        $field = new xmldb_field('event');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
-
-        // Make sure bigbluebuttonbn_logs table exists
-        $table = new xmldb_table('bigbluebuttonbn_log');
-        // Conditionally rename the table
-        if ($dbman->table_exists($table)) {
-            // Update the bigbluebuttonbn_log table
-            if ( $dbman->field_exists($table, $field) ) {
-                $dbman->rename_field($table, $field, 'log', $continue=true, $feedback=true);
-            }
-            // Rename bigbluebuttonbn_log table to bigbluebuttonbn_logs
-            $dbman->rename_table($table, 'bigbluebuttonbn_logs', $continue=true, $feedback=true);
-        } else {
-            // It was already renamed, select it only
-            $table = new xmldb_table('bigbluebuttonbn_logs');
-            // Update the bigbluebuttonbn_logs table
-            if ( $dbman->field_exists($table, $field) ) {
-                $dbman->rename_field($table, $field, 'log', $continue=true, $feedback=true);
-            }
-        }
+        //// Rename field event to log in table bigbluebuttonbn_logs
+        $table_bigbluebuttonbn_logs = new xmldb_table('bigbluebuttonbn_logs');
+        xmldb_bigbluebuttonbn_rename_field($dbman, $table_bigbluebuttonbn_logs, 'event', 'log');
 
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
-    if ($result && $oldversion < 2016080106) {
-        // Update the bigbluebuttonbn table
-        $table = new xmldb_table('bigbluebuttonbn');
+    if ($oldversion < 2016080106) {
         //// Drop field newwindow
-        $field = new xmldb_field('newwindow');
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field, $continue=true, $feedback=true);
-        }
+        xmldb_bigbluebuttonbn_drop_field($dbman, $table_bigbluebuttonbn, 'newwindow');
+
         //// Add field type
-        $field = new xmldb_field('type');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'id');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
+        $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0,'previous' => 'id');
+        xmldb_bigbluebuttonbn_add_field($dbman, $table_bigbluebuttonbn, 'type', $field_definition);
+
         //// Add field recordings_html
-        $field = new xmldb_field('recordings_html');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
+        $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0,'previous' => null);
+        xmldb_bigbluebuttonbn_add_field($dbman, $table_bigbluebuttonbn, 'recordings_html', $field_definition);
+
         //// Add field recordings_deleted_activities
-        $field = new xmldb_field('recordings_deleted_activities');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field, $continue=true, $feedback=true);
-        }
+        $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1,'previous' => null);
+        xmldb_bigbluebuttonbn_add_field($dbman, $table_bigbluebuttonbn, 'recordings_deleted_activities', $field_definition);
 
         upgrade_mod_savepoint(true, 2016080106, 'bigbluebuttonbn');
     }
 
-    return $result;
+    return true;
+}
+
+function xmldb_bigbluebuttonbn_add_field($dbman, $table, $field_name, $field_definition) {
+    $field = new xmldb_field($field_name);
+    $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field, $continue=true, $feedback=true);
+    }
+}
+
+function xmldb_bigbluebuttonbn_drop_field($dbman, $table, $field_name) {
+    $field = new xmldb_field($field_name);
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+    }
+}
+
+function xmldb_bigbluebuttonbn_change_field($dbman, $table, $field_name, $field_definition) {
+    $field = new xmldb_field($field_name);
+    $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
+    if( $dbman->field_exists($table, $field) ) {
+        $dbman->change_field($table, $field, $continue=true, $feedback=true);
+    }
+}
+
+function xmldb_bigbluebuttonbn_rename_field($dbman, $table, $field_name_old, $field_name_new) {
+    $field = new xmldb_field($field_name_old);
+    if ( $dbman->field_exists($table, $field) ) {
+        $dbman->rename_field($table, $field, $field_name_new, $continue=true, $feedback=true);
+    }
+}
+
+function xmldb_bigbluebuttonbn_rename_table($dbman, $table_name_old, $table_name_new) {
+    $table = new xmldb_table($table_name_old);
+    if ($dbman->table_exists($table)) {
+        $dbman->rename_table($table, $table_name_new, $continue=true, $feedback=true);
+    }
 }
