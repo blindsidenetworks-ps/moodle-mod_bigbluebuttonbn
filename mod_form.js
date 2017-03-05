@@ -12,11 +12,13 @@ M.mod_bigbluebuttonbn.mod_form_init = function(Y) {
 };
 
 M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile = function() {
+    /* global bigbluebuttonbn */
     var selected_type = Y.one('#id_type');
     M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile(bigbluebuttonbn.instance_type_profiles[selected_type.get('value')]);
 };
 
 M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function(instance_type_profile) {
+    /* global bigbluebuttonbn */
     var features = instance_type_profile.features;
 
     // Show room settings validation
@@ -42,7 +44,7 @@ M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function(instance_t
     // Preuploadpresentation feature validation
     var fieldset_preuploadpresentation = Y.DOM.byId('id_preuploadpresentation');
     if (fieldset_preuploadpresentation) {
-        if( features.includes('all') || features.includes('preuploadpresentation') ) {
+        if (features.includes('all') || features.includes('preuploadpresentation')) {
             Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'block');
         } else {
             Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'none');
@@ -52,7 +54,7 @@ M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function(instance_t
     // Participants feature validation
     var fieldset_permissions = Y.DOM.byId('id_permissions');
     if (fieldset_permissions) {
-        if( features.includes('all') || features.includes('permissions') ) {
+        if (features.includes('all') || features.includes('permissions')) {
             Y.DOM.setStyle(fieldset_permissions, 'display', 'block');
         } else {
             Y.DOM.setStyle(fieldset_permissions, 'display', 'none');
@@ -85,16 +87,17 @@ M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function(instance_t
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_selection_set = function() {
+    /* global bigbluebuttonbn */
     M.mod_bigbluebuttonbn.mod_form_select_clear('bigbluebuttonbn_participant_selection');
 
     var type = document.getElementById('bigbluebuttonbn_participant_selection_type');
-    for( var i = 0; i < type.options.length; i++ ){
-        if( type.options[i].selected ) {
+    for (var i = 0; i < type.options.length; i++) {
+        if (type.options[i].selected ) {
             var options = bigbluebuttonbn.participant_selection[type.options[i].value];
-            for( var j = 0; j < options.length; j++ ) {
+            for (var j = 0; j < options.length; j++) {
                 M.mod_bigbluebuttonbn.mod_form_select_add_option('bigbluebuttonbn_participant_selection', options[j].name, options[j].id);
             }
-            if( j == 0){
+            if (j === 0) {
                 M.mod_bigbluebuttonbn.mod_form_select_add_option('bigbluebuttonbn_participant_selection', '---------------', 'all');
                 M.mod_bigbluebuttonbn.mod_form_select_disable('bigbluebuttonbn_participant_selection')
             } else {
@@ -105,22 +108,24 @@ M.mod_bigbluebuttonbn.mod_form_participant_selection_set = function() {
 }
 
 M.mod_bigbluebuttonbn.mod_form_participant_list_update = function() {
+    /* global bigbluebuttonbn */
     var participant_list = document.getElementsByName('participants')[0];
     participant_list.value = JSON.stringify(bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_remove = function(type, id) {
-    //Remove from memory
-    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
-        if( bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id == ''? null: id) ){
+    /* global bigbluebuttonbn */
+    // Remove from memory
+    for (var i = 0; i < bigbluebuttonbn.participant_list.length; i++) {
+        if ( bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id === '' ? null : id)) {
             bigbluebuttonbn.participant_list.splice(i, 1);
         }
     }
 
     //Remove from the form
     var participant_list_table = document.getElementById('participant_list_table');
-    for( var i = 0; i < participant_list_table.rows.length; i++ ){
-        if( participant_list_table.rows[i].id == 'participant_list_tr_' + type + '-' + id  ) {
+    for ( var ii = 0; ii < participant_list_table.rows.length; ii++ ) {
+        if( participant_list_table.rows[ii].id == 'participant_list_tr_' + type + '-' + id  ) {
             participant_list_table.deleteRow(i);
         }
     }
@@ -128,19 +133,20 @@ M.mod_bigbluebuttonbn.mod_form_participant_remove = function(type, id) {
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
+    /* global bigbluebuttonbn */
     var participant_selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
     var participant_selection = document.getElementById('bigbluebuttonbn_participant_selection');
 
     //Lookup to see if it has been added already
     var found = false;
-    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
-        if( bigbluebuttonbn.participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn.participant_list[i].selectionid == participant_selection.value ){
+    for (var i = 0; i < bigbluebuttonbn.participant_list.length; i++) {
+        if (bigbluebuttonbn.participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn.participant_list[i].selectionid == participant_selection.value){
             found = true;
         }
     }
 
     //If not found
-    if( !found ){
+    if (!found) {
         // Add it to memory
         var participant = {"selectiontype": participant_selection_type.value, "selectionid": participant_selection.value, "role": "viewer"};
         bigbluebuttonbn.participant_list.push(participant);
@@ -151,15 +157,17 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
         row.id = "participant_list_tr_" + participant_selection_type.value + "-" + participant_selection.value;
         var cell0 = row.insertCell(0);
         cell0.width = "125px";
-        if( participant_selection_type.value == 'all' )
+        if ( participant_selection_type.value == 'all' ) {
             cell0.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + '</i></b>';
-        else
+        } else {
             cell0.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + ':&nbsp;</i></b>';
+        }
         var cell1 = row.insertCell(1);
-        if( participant_selection_type.value == 'all' )
+        if (participant_selection_type.value == 'all') {
             cell1.innerHTML = '';
-        else
+        } else {
             cell1.innerHTML = participant_selection.options[participant_selection.selectedIndex].text;
+        }
         var cell2 = row.insertCell(2);
         cell2.innerHTML = '<i>&nbsp;' + bigbluebuttonbn.strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn.strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn.strings.moderator + '</option></select>';
         var cell3 = row.insertCell(3);
@@ -175,10 +183,11 @@ M.mod_bigbluebuttonbn.mod_form_participant_add = function() {
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_list_role_update = function(type, id) {
+    /* global bigbluebuttonbn */
     // Update in memory
     var participant_list_role_selection = document.getElementById('participant_list_role_' + type + '-' + id);
-    for( var i = 0; i < bigbluebuttonbn.participant_list.length; i++ ){
-        if( bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id == ''? null: id) ){
+    for (var i = 0; i < bigbluebuttonbn.participant_list.length; i++) {
+        if (bigbluebuttonbn.participant_list[i].selectiontype == type && bigbluebuttonbn.participant_list[i].selectionid == (id === '' ? null : id)) {
             bigbluebuttonbn.participant_list[i].role = participant_list_role_selection.value;
             //participant_list_role_selection.options[participant_list_role_selection.selectedIndex].text
         }
@@ -190,7 +199,7 @@ M.mod_bigbluebuttonbn.mod_form_participant_list_role_update = function(type, id)
 
 M.mod_bigbluebuttonbn.mod_form_select_clear = function(id) {
     var select = document.getElementById(id);
-    while( select.length > 0 ){
+    while (select.length > 0) {
         select.remove(select.length-1);
     }
 }

@@ -122,7 +122,7 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
         }
     }
 
-    if (bigbluebuttonbn.recordings_html == false && (bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings'))) {
+    if (bigbluebuttonbn.recordings_html === false && (bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings'))) {
         M.mod_bigbluebuttonbn.datatable_init(Y);
     }
 };
@@ -153,21 +153,21 @@ M.mod_bigbluebuttonbn.view_update = function() {
             }
         }
     });
-}
+};
 
 M.mod_bigbluebuttonbn.view_clean = function() {
     M.mod_bigbluebuttonbn.view_clean_status_bar();
     M.mod_bigbluebuttonbn.view_clean_control_panel();
     M.mod_bigbluebuttonbn.view_clean_join_button();
     M.mod_bigbluebuttonbn.view_clean_end_button();
-}
+};
 
 M.mod_bigbluebuttonbn.view_remote_update = function(delay) {
 	setTimeout(function() {
 		M.mod_bigbluebuttonbn.view_clean();
 		M.mod_bigbluebuttonbn.view_update();
 	}, delay);
-}
+};
 
 M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     var status_bar_span = Y.DOM.create('<span>');
@@ -186,7 +186,7 @@ M.mod_bigbluebuttonbn.view_init_status_bar = function(status_message) {
     }
 
     return(status_bar_span);
-}
+};
 
 M.mod_bigbluebuttonbn.view_init_control_panel = function(data) {
     var control_panel_div = Y.DOM.create('<div>');
@@ -199,7 +199,7 @@ M.mod_bigbluebuttonbn.view_init_control_panel = function(data) {
     Y.DOM.addHTML(control_panel_div, control_panel_div_html);
 
     return(control_panel_div);
-}
+};
 
 M.mod_bigbluebuttonbn.view_msg_started_at = function (startTime) {
     var start_timestamp = (parseInt(startTime) -  parseInt(startTime) % 1000);
@@ -216,7 +216,7 @@ M.mod_bigbluebuttonbn.view_msg_started_at = function (startTime) {
     var minutes = date.getMinutes();
 
     return bigbluebuttonbn.locales.started_at + ' <b>' + hours + ':' + (minutes<10? '0': '') + minutes + '</b>.';
-}
+};
 
 M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
     var participants = parseInt(participantCount);
@@ -227,7 +227,7 @@ M.mod_bigbluebuttonbn.view_msg_users_joined = function (participantCount) {
         msg_users_joined += bigbluebuttonbn.locales.users + ' ' + bigbluebuttonbn.locales.have_joined + '.';
     }
     return msg_users_joined;
-}
+};
 
 M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants) {
     var msg_attendees_in = '';
@@ -235,7 +235,6 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
     if (typeof moderators != 'undefined' && typeof participants != 'undefined') {
         var viewers = participants - moderators;
         if( participants > 1 ) {
-            var viewers = participants - moderators;
             msg_attendees_in += bigbluebuttonbn.locales.session_has_users + ' <b>' + moderators + '</b> ' + (moderators == 1? bigbluebuttonbn.locales.moderator: bigbluebuttonbn.locales.moderators) + ' and ';
             msg_attendees_in += '<b>' + viewers + '</b> ' + (viewers == 1? bigbluebuttonbn.locales.viewer: bigbluebuttonbn.locales.viewers) + '.';
 
@@ -252,7 +251,7 @@ M.mod_bigbluebuttonbn.view_msg_attendees_in = function (moderators, participants
     }
 
     return msg_attendees_in;
-}
+};
 
 M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     var join_button_input = Y.DOM.create('<input>');
@@ -269,7 +268,7 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     }
 
     return join_button_input;
-}
+};
 
 M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
     var end_button_input = Y.DOM.create('<input>');
@@ -282,32 +281,32 @@ M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
     }
 
     return end_button_input;
-}
+};
 
 
 M.mod_bigbluebuttonbn.view_clean_status_bar = function() {
     Y.one('#status_bar_span').remove();
-}
+};
 
 M.mod_bigbluebuttonbn.view_clean_control_panel = function() {
     Y.one('#control_panel_div').remove();
-}
+};
 
 M.mod_bigbluebuttonbn.view_clean_join_button = function() {
     Y.one('#join_button').setContent('');
-}
+};
 
 M.mod_bigbluebuttonbn.view_hide_join_button = function() {
     Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'hidden');
-}
+};
 
 M.mod_bigbluebuttonbn.view_show_join_button = function() {
     Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'shown');
-}
+};
 
 M.mod_bigbluebuttonbn.view_clean_end_button = function() {
     Y.one('#end_button').setContent('');
-}
+};
 
 M.mod_bigbluebuttonbn.view_hide_end_button = function() {
     Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'hidden');
@@ -396,9 +395,9 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
             callback : {
                 success : function(e) {
                     if (e.data.status) {
-                        data['links'] = e.data.links;
-                        if (e.data.links == 0) {
-                            data['confirmed'] = true;
+                        data.links = e.data.links;
+                        if (e.data.links === 0) {
+                            data.confirmed = true;
                         } else {
                             var confirmation_warning;
                             if (e.data.links == 1) {
@@ -408,25 +407,25 @@ M.mod_bigbluebuttonbn.broker_actionVerification = function(action, recordingid, 
                             }
                             var confirmation = bigbluebuttonbn.locales[action + "_confirmation"].replace("{$a}", is_imported_link ? bigbluebuttonbn.locales.recording_link : bigbluebuttonbn.locales.recording);
 
-                            data['confirmed'] = confirm(confirmation_warning + '\n\n' + confirmation);
+                            data.confirmed = confirm(confirmation_warning + '\n\n' + confirmation);
                         }
                     } else {
-                        data['error'] = 'Big failiure';
+                        data.error = 'Big failiure';
                     }
                     callback(data);
                 },
                 failure : function(e) {
                     console.error(e.error.message);
-                    data['error'] =  e.error.message;
+                    data.error =  e.error.message;
                     callback(data);
                 }
             }
         });
     } else if (action === 'import') {
-        data['confirmed'] = confirm(bigbluebuttonbn.locales.import_confirmation);
+        data.confirmed = confirm(bigbluebuttonbn.locales.import_confirmation);
         callback(data);
     } else {
-        data['confirmed'] = true;
+        data.confirmed = true;
         callback(data);
     }
 };

@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Intermediator for managing actions executed by the BigBlueButton server
  *
@@ -149,9 +164,9 @@ if (empty($error)) {
                 case 'recording_info':
                     if ($bbbsession['managerecordings']) {
                         //Retrieve the array of imported recordings
-                        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+                        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : null, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
                         if (isset($recordings[$params['id']])) {
-                            //Look up for an update on the imported recording
+                            // Look up for an update on the imported recording
                             $recording = $recordings[$params['id']];
                             if (isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {  // The recording was found
                                 echo $params['callback'] . '({ "status": "true", "published": "' . $recording['published'] . '"});';
@@ -178,7 +193,7 @@ if (empty($error)) {
                     if ($bbbsession['managerecordings']) {
                         $status = true;
                         // Retrieve array of recordings that includes real and imported
-                        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : NULL, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+                        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : null, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
                         switch (strtolower($params['action'])) {
                             case 'recording_publish':
                                 if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,7 +31,6 @@
 class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
-        $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
@@ -53,7 +51,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define sources
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
-        $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid'=>backup::VAR_PARENTID));
+        $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
 
         // Define id annotations
         $log->annotate_ids('user', 'userid');

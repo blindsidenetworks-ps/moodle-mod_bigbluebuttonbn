@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Library calls for Moodle and BigBlueButton.
  *
@@ -80,7 +95,7 @@ function bigbluebuttonbn_supports($feature) {
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data, $mform) {
-    global $DB, $CFG;
+    global $DB;
 
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
     $context = bigbluebuttonbn_get_context_module($data->coursemodule);
@@ -106,7 +121,7 @@ function bigbluebuttonbn_add_instance($data, $mform) {
  * @return boolean Success/Fail
  */
 function bigbluebuttonbn_update_instance($data, $mform) {
-    global $DB, $CFG;
+    global $DB;
 
     $data->id = $data->instance;
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
@@ -133,7 +148,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
  * @return boolean Success/Failure
  */
 function bigbluebuttonbn_delete_instance($id) {
-    global $CFG, $DB, $USER;
+    global $DB, $USER;
 
     if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
@@ -185,7 +200,7 @@ function bigbluebuttonbn_delete_instance($id) {
     }
     $log->meta = "{\"has_recordings\":{$has_recordings}}";
 
-    if (!$returnid = $DB->insert_record('bigbluebuttonbn_logs', $log)) {
+    if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
         error_log("It could not be saved");
         $result = false;
     } else {
@@ -349,7 +364,7 @@ function bigbluebuttonbn_get_post_actions() {
  * @param array $htmlarray Passed by reference
  */
 function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG;
+    global $CFG;
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return array();
@@ -394,10 +409,10 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
  * @return null|cached_cm_info
  */
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
-    global $CFG, $DB;
+    global $DB;
 
     if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
-        return NULL;
+        return null;
     }
 
     $info = new cached_cm_info();
@@ -420,7 +435,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
-    global $DB, $CFG;
 
     if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
         $bigbluebuttonbn->timecreated = time();

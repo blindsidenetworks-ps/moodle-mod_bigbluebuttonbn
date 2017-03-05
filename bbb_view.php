@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * View for BigBlueButton interaction  
  *
@@ -147,7 +162,7 @@ switch (strtolower($action)) {
                         } else if ($response['hasBeenForciblyEnded'] == "true") {
                             print_error(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
 
-                        } else { ///////////////Everything is ok /////////////////////
+                        } else { /// Everything is ok
                             /// Moodle event logger: Create an event for meeting created
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
                             /// Internal logger: Insert a record with the meeting created
@@ -209,7 +224,7 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigblu
 }
 
 function bigbluebutton_bbb_view_errors($sErrors, $id) {
-    global $CFG, $OUTPUT, $PAGE;
+    global $CFG, $OUTPUT;
 
     $errors = (array)json_decode(urldecode($sErrors));
     $msgErrors = "";

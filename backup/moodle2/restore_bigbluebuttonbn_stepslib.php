@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -34,7 +33,6 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     protected function define_structure() {
 
         $paths = array();
-        $userinfo = $this->get_setting_value('userinfo');
 
         $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
         $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
