@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     public function definition() {
-        global $BIGBLUEBUTTONBN_CFG, $CFG, $DB, $OUTPUT, $PAGE, $USER;
+        global $CFG, $DB, $OUTPUT, $PAGE;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
@@ -137,7 +137,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Second block starts here
         //-------------------------------------------------------------------------------
         if ($voicebridge_editable || $waitformoderator_editable || $userlimit_editable || $recording_editable || $recording_tagging_editable) {
-            $room_settings = $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
+            $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
             $mform->addElement('textarea', 'welcome', get_string('mod_form_field_welcome', 'bigbluebuttonbn'), 'wrap="virtual" rows="5" cols="60"');
             $mform->addHelpButton('welcome', 'mod_form_field_welcome', 'bigbluebuttonbn');
             $mform->setType('welcome', PARAM_TEXT);

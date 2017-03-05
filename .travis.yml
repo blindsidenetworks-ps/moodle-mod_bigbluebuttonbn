@@ -8,9 +8,9 @@ cache:
 
 php:
  - 5.4
- - 5.5
- - 5.6
- - 7.0
+ #- 5.5
+ #- 5.6
+ #- 7.0
 
 env:
  global:
@@ -31,12 +31,12 @@ install:
 
 script:
   - moodle-plugin-ci phplint
-  - moodle-plugin-ci phpcpd
-  - moodle-plugin-ci phpmd
-  - moodle-plugin-ci codechecker
-  - moodle-plugin-ci csslint
-  - moodle-plugin-ci shifter
-  - moodle-plugin-ci jshint
-  - moodle-plugin-ci validate
-  - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  #- moodle-plugin-ci phpcpd
+  #- moodle-plugin-ci phpmd
+  #- moodle-plugin-ci codechecker
+  #- moodle-plugin-ci csslint
+  #- moodle-plugin-ci shifter
+  #- moodle-plugin-ci jshint
+  #- moodle-plugin-ci validate
+  #- moodle-plugin-ci phpunit
+  #- moodle-plugin-ci behat

@@ -617,7 +617,7 @@ function bigbluebuttonbn_get_user_roles($context, $userid) {
     return $user_roles;
 }
 
-function bigbluebuttonbn_get_guest_role(context $context = null) {
+function bigbluebuttonbn_get_guest_role() {
     $guest_role = get_guest_role();
     return array($guest_role->id => $guest_role);
 }

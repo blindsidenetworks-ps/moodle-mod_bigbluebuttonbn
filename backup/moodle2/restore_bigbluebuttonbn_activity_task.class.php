@@ -55,7 +55,7 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task {
 
         $contents[] = new restore_decode_content('bigbluebuttonbn', array('intro'), 'bigbluebuttonbn');
         $contents[] = new restore_decode_content('bigbluebuttonbn_logs', array('log'), 'bigbluebuttonbn_logs');
-        
+
         return $contents;
     }
 
@@ -79,7 +79,7 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task {
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'update', 'view.php?id={course_module}', '{bigbluebuttonbn}');
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'view', 'view.php?id={course_module}', '{bigbluebuttonbn}');
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'report', 'report.php?id={course_module}', '{bigbluebuttonbn}');
-        
+
         return $rules;
     }
 

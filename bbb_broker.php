@@ -133,7 +133,7 @@ if (empty($error)) {
                     break;
                 case 'meeting_end':
                     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
-                        //Execute the end command
+                        // Execute the end command
                         bigbluebuttonbn_bbb_broker_do_end_meeting($params['id'], $bbbsession['modPW']);
                         // Moodle event logger: Create an event for meeting ended
                         if (isset($bigbluebuttonbn)) {
@@ -163,7 +163,7 @@ if (empty($error)) {
                     break;
                 case 'recording_info':
                     if ($bbbsession['managerecordings']) {
-                        //Retrieve the array of imported recordings
+                        // Retrieve the array of imported recordings
                         $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : null, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
                         if (isset($recordings[$params['id']])) {
                             // Look up for an update on the imported recording
@@ -287,9 +287,9 @@ if (empty($error)) {
                     }
                     break;
                 case 'recording_ready':
-                    //Decodes the received JWT string
+                    // Decodes the received JWT string
                     try {
-                        $decoded_parameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
+                        $decodedParameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
 
                     } catch (Exception $e) {
                         $error = 'Caught exception: ' . $e->getMessage();
@@ -299,9 +299,9 @@ if (empty($error)) {
                     }
 
                     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
-                    $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
-                    $meeting_id_elements = explode("-", $meeting_id_elements[0]);
-                    if (isset($bigbluebuttonbn) && $bigbluebuttonbn->meetingid == $meeting_id_elements[0]) {
+                    $meetingIdElements = explode("[", $decodedParameters->meeting_id);
+                    $meetingIdElements = explode("-", $meetingIdElements[0]);
+                    if (isset($bigbluebuttonbn) && $bigbluebuttonbn->meetingid == $meetingIdElements[0]) {
                         // Sends the messages
                         try {
                             bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
@@ -348,9 +348,9 @@ if (empty($error)) {
                     }
                     break;
                 case 'meeting_events':
-                    //Decodes the received JWT string
+                    // Decodes the received JWT string
                     try {
-                        $decoded_parameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
+                        $decodedParameters = JWT::decode($params['signed_parameters'], $shared_secret, array('HS256'));
 
                     } catch (Exception $e) {
                         $error = 'Caught exception: ' . $e->getMessage();
@@ -360,17 +360,16 @@ if (empty($error)) {
                     }
 
                     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received
-                    $meeting_id_elements = explode("[", $decoded_parameters->meeting_id);
-                    $meeting_id_elements = explode("-", $meeting_id_elements[0]);
-                    if (isset($bigbluebuttonbn) && $bigbluebuttonbn->meetingid == $meeting_id_elements[0]) {
+                    $meetingIdElements = explode("[", $decodedParameters->meeting_id);
+                    $meetingIdElements = explode("-", $meetingIdElements[0]);
+                    if (isset($bigbluebuttonbn) && $bigbluebuttonbn->meetingid == $meetingIdElements[0]) {
                         // Store the events
                         try {
                             error_log("We start storing the events here");
-                            foreach ($decoded_parameters->events as $event) {
+                            foreach ($decodedParameters->events as $event) {
                                 error_log($event->event);
                                 bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $context, $cm);
                             }
-                            //bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
                             header("HTTP/1.0 202 Accepted");
                             return;
                         } catch (Exception $e) {
@@ -381,7 +380,7 @@ if (empty($error)) {
                         }
 
                     } else {
-                        $error = "Activity with meetingID '{$meeting_id_elements[0]}' was not found";
+                        $error = "Activity with meetingID '{$meetingIdElements[0]}' was not found";
                         error_log($error);
                         header("HTTP/1.0 410 Gone. {$error}");
                         return;
