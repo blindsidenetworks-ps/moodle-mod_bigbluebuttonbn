@@ -128,7 +128,7 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $can_moderate = ($administrator || $moderator);
 
         //Add a the data for the bigbluebuttonbn instance
-        $groupObj = (groups_get_activity_groupmode($cm) > 0) ? (object)array('id'=>0, 'name'=>get_string('allparticipants')) : null;
+        $groupObj = (groups_get_activity_groupmode($cm) > 0) ? (object) array('id'=>0, 'name'=>get_string('allparticipants')) : null;
         $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $can_moderate, $course, $bigbluebuttonbn, $groupObj);
 
         //Add a the data for the groups belonging to the bigbluebuttonbn instance, if any
@@ -148,17 +148,6 @@ echo $OUTPUT->footer();
 
 /// Functions
 function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null) {
-    //
-    // Output Users in the meeting
-    //
-    $viewerList = "";
-    $moderatorList = "";
-    $group = "";
-    $users = "";
-    $recording = "";
-    $actions = "";
-
-    $joinURL = '<a href="view.php?id=' . $bigbluebuttonbn->coursemodule . ($groupObj ? '&group=' . $groupObj->id : '') . '">' . format_string($bigbluebuttonbn->name) . '</a>';
 
     $meetingID = $bigbluebuttonbn->meetingid . '-' . $course->id . '-' . $bigbluebuttonbn->id;
     if ($groupObj) {
@@ -174,51 +163,87 @@ function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $cours
         //
         print_error(get_string('index_error_unable_display', 'bigbluebuttonbn'));
         return;
-    }
-
-    if (isset($meetingInfo['messageKey'])) {
+    } else if (isset($meetingInfo['messageKey']) && $meetingInfo['messageKey'] == "checksumError") {
         //
         // There was an error returned
         //
-        if ($meetingInfo['messageKey'] == "checksumError") {
-            print_error(get_string('index_error_checksum', 'bigbluebuttonbn'));
-            return;
-        }
+        print_error(get_string('index_error_checksum', 'bigbluebuttonbn'));
+        return;
+    }
 
-    } else {
-        //
-        // The meeting info was returned
-        //
-        if ($meetingInfo['running'] == 'true') {
-            if ($moderator) {
-                $actions  = '<form name="form1" method="post" action="">' . "/n";
-                $actions .= '  <INPUT type="hidden" name="id" value="' . $course->id . '">' . "/n";
-                $actions .= '  <INPUT type="hidden" name="a" value="' . $bigbluebuttonbn->id . '">' . "/n";
-                if ($groupObj != null) {
-                    $actions .= '  <INPUT type="hidden" name="g" value="' . $groupObj->id . '">' . "/n";
-                }
-                $actions .= '  <INPUT type="submit" name="submit" value="end" onclick="return confirm(\'' . get_string('index_confirm_end', 'bigbluebuttonbn') . '\')">' . "/n";
-                $actions .= '</form>' . "/n";
-            }
+    //
+    // Output Users in the meeting
+    //
+    $joinURL = '<a href="view.php?id=' . $bigbluebuttonbn->coursemodule . ($groupObj ? '&group=' . $groupObj->id : '') . '">' . format_string($bigbluebuttonbn->name) . '</a>';
+    $group = "";
+    $users = "";
+    $viewerList = "";
+    $moderatorList = "";
+    $recording = "";
+    $actions = "";
 
-            if (isset($meetingInfo['recording']) && $meetingInfo['recording'] == 'true') { // if it has been set when meeting created, set the variable on/off
-                $recording = get_string('index_enabled', 'bigbluebuttonbn');
-            }
+    //
+    // The meeting info was returned
+    //
+    if ($meetingInfo['running'] == 'true') {
+        $users = displayBigBlueButtonRoomsUsers($meetingInfo);
+        $viewerList = displayBigBlueButtonRoomsAttendeeList($meetingInfo, "VIEWER");
+        $moderatorList = displayBigBlueButtonRoomsAttendeeList($meetingInfo, "MODERATOR");
+        $recording = displayBigBlueButtonRoomsRecording($meetingInfo);
+        $actions = displayBigBlueButtonRoomsActions($moderator);
+    }
 
-            if (count($meetingInfo['attendees']) && count($meetingInfo['attendees']->attendee)) {
-                $users = count($meetingInfo['attendees']->attendee);
-                $viewer_count = 0;
-                $moderator_count = 0;
-                foreach ($meetingInfo['attendees']->attendee as $attendee) {
-                    if ($attendee->role == "MODERATOR") {
-                        $moderatorList .= ($moderator_count++ > 0 ? ", " : "") . $attendee->fullName; 
-                    } else {
-                        $viewerList .= ($viewer_count++ > 0 ? ", " : "") . $attendee->fullName; 
-                    }
-                }
+    return array($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions);
+}
+
+function displayBigBlueButtonRoomsUsers($meetingInfo) {
+    $users = "";
+
+    if (count($meetingInfo['attendees']) && count($meetingInfo['attendees']->attendee)) {
+        $users = count($meetingInfo['attendees']->attendee);
+    }
+
+    return $users;
+}
+
+function displayBigBlueButtonRoomsAttendeeList($meetingInfo, $role) {
+    $attendeeList = "";
+
+    if (count($meetingInfo['attendees']) && count($meetingInfo['attendees']->attendee)) {
+        $attendee_count = 0;
+        foreach ($meetingInfo['attendees']->attendee as $attendee) {
+            if ($attendee->role == $role) {
+                $attendeeList .= ($attendee_count++ > 0 ? ", " : "") . $attendee->fullName;
             }
         }
     }
 
-    return array($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions);
+    return $attendeeList;
+}
+
+function displayBigBlueButtonRoomsRecording($meetingInfo) {
+    $recording = "";
+
+    if (isset($meetingInfo['recording']) && $meetingInfo['recording'] === 'true') { // if it has been set when meeting created, set the variable on/off
+        $recording = get_string('index_enabled', 'bigbluebuttonbn');
+    }
+
+    return $recording;
+}
+
+function displayBigBlueButtonRoomsActions($moderator, $course, $bigbluebuttonbn, $groupObj = null) {
+    $actions = '';
+
+    if ($moderator) {
+        $actions .= '<form name="form1" method="post" action="">' . "/n";
+        $actions .= '  <INPUT type="hidden" name="id" value="' . $course->id . '">' . "/n";
+        $actions .= '  <INPUT type="hidden" name="a" value="' . $bigbluebuttonbn->id . '">' . "/n";
+        if ($groupObj != null) {
+            $actions .= '  <INPUT type="hidden" name="g" value="' . $groupObj->id . '">' . "/n";
+        }
+        $actions .= '  <INPUT type="submit" name="submit" value="end" onclick="return confirm(\'' . get_string('index_confirm_end', 'bigbluebuttonbn') . '\')">' . "/n";
+        $actions .= '</form>' . "/n";
+    }
+
+    return $actions;
 }

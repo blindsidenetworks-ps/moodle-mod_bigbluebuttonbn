@@ -341,6 +341,10 @@ class ClassLoader
         return $file;
     }
 
+    /**
+     * @param string $class
+     * @param string $ext
+     */
     private function findFileWithExtension($class, $ext)
     {
         // PSR-4 lookup

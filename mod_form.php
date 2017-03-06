@@ -312,9 +312,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if ($recording_icons_enabled) {
                 //With icon for delete
                 $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon',
-                                                                       'title' => $strings['remove'],
-                                                                       'alt' => $strings['remove'],
-                                                                       'src' => $pix_icon_delete_url));
+                                                                        'title' => $strings['remove'],
+                                                                        'alt' => $strings['remove'],
+                                                                        'src' => $pix_icon_delete_url));
                 $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon',
                     'onclick' => $onclick, 'title' => $strings['remove']));
             } else {
@@ -418,13 +418,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     private function add_form_element($mform, $elementType, $elementName, $elementDataType,
-            $elementDescriptionKey, $elementDefaultValue=null) {
+            $elementDescriptionKey, $elementDefaultValue = null) {
         if (!is_null($elementDescriptionKey) && !empty($elementDescriptionKey)) {
-          $mform->addElement($elementType, $elementName, get_string($elementDescriptionKey, 'bigbluebuttonbn'));
-          $mform->addHelpButton($elementName, $elementDescriptionKey, 'bigbluebuttonbn');
-          $mform->setDefault($elementName, $elementDefaultValue);
+            $mform->addElement($elementType, $elementName, get_string($elementDescriptionKey, 'bigbluebuttonbn'));
+            $mform->addHelpButton($elementName, $elementDescriptionKey, 'bigbluebuttonbn');
+            $mform->setDefault($elementName, $elementDefaultValue);
         } else {
-          $mform->addElement($elementType, $elementName, $elementDefaultValue);
+            $mform->addElement($elementType, $elementName, $elementDefaultValue);
         }
         $mform->setType($elementName, $elementDataType);
     }

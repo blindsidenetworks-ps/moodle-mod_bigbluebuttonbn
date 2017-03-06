@@ -44,7 +44,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     protected function process_bigbluebuttonbn($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $data->course = $this->get_courseid();
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
@@ -58,7 +58,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     protected function process_bigbluebuttonbn_logs($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         // Apply modifications
         $data->courseid = $this->get_mappingid('course', $data->courseid);
         $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');

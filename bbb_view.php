@@ -114,9 +114,9 @@ switch (strtolower($action)) {
 
                         /// Set the duration for the meeting
                         if (bigbluebuttonbn_get_cfg_scheduled_duration_enabled()) {
-                            $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
+                            $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
                             if ($durationtime > 0) {
-                                                        $bbbsession['welcome'] .= '<br><br>' . str_replace("%duration%", '' . $durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));
+                                $bbbsession['welcome'] .= '<br><br>' . str_replace("%duration%", '' . $durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));
                             }
                         } else {
                             $durationtime = 0;
@@ -226,7 +226,7 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigblu
 function bigbluebutton_bbb_view_errors($sErrors, $id) {
     global $CFG, $OUTPUT;
 
-    $errors = (array)json_decode(urldecode($sErrors));
+    $errors = (array) json_decode(urldecode($sErrors));
     $msgErrors = "";
     foreach ($errors as $error) {
         $msgErrors .= html_writer::tag('p', $error->{"message"}, array('class' => 'alert alert-danger')) . "\n";

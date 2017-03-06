@@ -67,6 +67,34 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = "Logout";
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = "Import";
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = "Delete";
 
+/*
+function bigbluebuttonbn_features() {
+    $features = array(
+        FEATURE_IDNUMBER                => true,
+        FEATURE_GROUPS                  => true,
+        FEATURE_GROUPINGS               => true,
+        FEATURE_GROUPMEMBERSONLY        => true,
+        FEATURE_MOD_INTRO               => true,
+        FEATURE_BACKUP_MOODLE2          => true,
+        FEATURE_COMPLETION_TRACKS_VIEWS => true,
+        FEATURE_GRADE_HAS_GRADE         => false,
+        FEATURE_GRADE_OUTCOMES          => false,
+        FEATURE_SHOW_DESCRIPTION        => true
+    );
+    return $features;
+}
+
+function bigbluebuttonbn_supports($feature) {
+    $features = bigbluebuttonbn_features();
+    if (in_array($feature, $features)) {
+        return $features[$feature];
+    } else {
+        return null;
+    }
+    return in_array($feature, $features) ? $features[$feature] : false;
+}
+*/
+
 function bigbluebuttonbn_supports($feature) {
     switch ($feature) {
         case FEATURE_IDNUMBER:                return true;
@@ -606,7 +634,7 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draft
  * @return false|null false if file not found, does not return if found - justsend the file
  */
 function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-    global $CFG, $DB;
+    global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
@@ -623,21 +651,21 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     if (sizeof($args) > 1) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
-        $presentation_nonce_key = sha1($bigbluebuttonbn->id);
-        $presentation_nonce = $cache->get($presentation_nonce_key);
-        $presentation_nonce_value = $presentation_nonce['value'];
-        $presentation_nonce_counter = $presentation_nonce['counter'];
+        $nonce_key = sha1($bigbluebuttonbn->id);
+        $presentation_nonce = $cache->get($nonce_key);
+        $nonce_value = $presentation_nonce['value'];
+        $nonce_counter = $presentation_nonce['counter'];
 
-        if ($args["0"] != $presentation_nonce_value) {
+        if ($args["0"] != $nonce_value) {
             return false;
         }
 
         //The nonce value is actually used twice because BigBlueButton reads the file two times
-        $presentation_nonce_counter += 1;
-        if ($presentation_nonce_counter < 2) {
-            $cache->set($presentation_nonce_key, array("value" => $presentation_nonce_value, "counter" => $presentation_nonce_counter));
+        $nonce_counter += 1;
+        if ($nonce_counter < 2) {
+            $cache->set($nonce_key, array("value" => $nonce_value, "counter" => $nonce_counter));
         } else {
-            $cache->delete($presentation_nonce_key);
+            $cache->delete($nonce_key);
         }
 
         $filename = $args["1"];
@@ -700,7 +728,7 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename = 'all') {
 }
 
 function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message = "") {
-    global $CFG, $DB;
+    global $DB;
 
     $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
