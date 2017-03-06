@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * View for BigBlueButton interaction  
+ * View for BigBlueButton interaction
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -71,7 +71,7 @@ switch (strtolower($action)) {
                 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
                 /// Update the cache
-                $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], BIGBLUEBUTTONBN_FORCED);
+                $meeting_info = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], BIGBLUEBUTTONBN_FORCED);
 
                 /// Close the tab or window where BBB was opened
                 bigbluebutton_bbb_view_close_window();
@@ -200,7 +200,7 @@ function bigbluebutton_bbb_view_close_window_manually() {
 
 function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn) {
     //// Update the cache
-    $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
+    $meeting_info = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
     if ($bbbsession['userlimit'] == 0 || intval($meeting_info['participantCount']) < $bbbsession['userlimit']) {
         //// Build the URL
         if ($bbbsession['administrator'] || $bbbsession['moderator']) {
@@ -214,7 +214,7 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigblu
         /// Internal logger: Instert a record with the meeting created
         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_JOIN);
         //// Before executing the redirect, increment the number of participants
-        bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']));
+        bigbluebuttonbn_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']));
         //// Execute the redirect
         header('Location: ' . $join_url);
 

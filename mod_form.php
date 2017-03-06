@@ -151,37 +151,28 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->setType('voicebridge', PARAM_INT);
 
             if ($waitformoderator_editable) {
-                $mform->addElement('checkbox', 'wait', get_string('mod_form_field_wait', 'bigbluebuttonbn'));
-                $mform->addHelpButton('wait', 'mod_form_field_wait', 'bigbluebuttonbn');
-                $mform->setDefault('wait', $waitformoderator_default);
+                add_form_element($mform, 'checkbox', 'wait', PARAM_INT, 'mod_form_field_wait', $waitformoderator_default);
             } else {
-                $mform->addElement('hidden', 'wait', $waitformoderator_default);
+                add_form_element($mform, 'hidden', 'wait', PARAM_INT, null, $waitformoderator_default);
             }
-            $mform->setType('wait', PARAM_INT);
 
             if ($userlimit_editable) {
-                $mform->addElement('text', 'userlimit', get_string('mod_form_field_userlimit', 'bigbluebuttonbn'), 'maxlength="3" size="5"');
-                $mform->addHelpButton('userlimit', 'mod_form_field_userlimit', 'bigbluebuttonbn');
-                $mform->setDefault('userlimit', $userlimit_default);
+                add_form_element($mform, 'text', 'userlimit', PARAM_TEXT, 'mod_form_field_userlimit', $userlimit_default);
             } else {
-                $mform->addElement('hidden', 'userlimit', $userlimit_default);
+                add_form_element($mform, 'hidden', 'userlimit', PARAM_INT, null, $userlimit_default);
             }
-            $mform->setType('userlimit', PARAM_TEXT);
 
             if (floatval($serverVersion) >= 0.8) {
                 if ($recording_editable) {
-                    $mform->addElement('checkbox', 'record', get_string('mod_form_field_record', 'bigbluebuttonbn'));
-                    $mform->setDefault('record', $recording_default);
+                    add_form_element($mform, 'checkbox', 'record', PARAM_INT, 'mod_form_field_record', $recording_default);
                 } else {
-                    $mform->addElement('hidden', 'record', $recording_default);
+                    add_form_element($mform, 'hidden', 'record', PARAM_INT, null, $recording_default);
                 }
-                $mform->setType('record', PARAM_INT);
 
                 if ($recording_tagging_editable) {
-                    $mform->addElement('checkbox', 'tagging', get_string('mod_form_field_recordingtagging', 'bigbluebuttonbn'));
-                    $mform->setDefault('tagging', $recording_tagging_default);
+                    add_form_element($mform, 'checkbox', 'tagging', PARAM_INT, 'mod_form_field_recordingtagging', $recording_tagging_default);
                 } else {
-                    $mform->addElement('hidden', 'tagging', $recording_tagging_default);
+                    add_form_element($mform, 'hidden', 'tagging', PARAM_INT, null, $recording_tagging_default);
                 }
                 $mform->setType('tagging', PARAM_INT);
             }
@@ -191,20 +182,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('header', 'recordings', get_string('mod_form_block_recordings', 'bigbluebuttonbn'));
 
             if ($recordings_html_editable) {
-                $mform->addElement('checkbox', 'recordings_html', get_string('mod_form_field_recordings_html', 'bigbluebuttonbn'));
-                $mform->setDefault('recordings_html', $recordings_html_default);
+                add_form_element($mform, 'checkbox', 'recordings_html', PARAM_INT, 'mod_form_field_recordings_html', $recordings_html_default);
             } else {
-                $mform->addElement('hidden', 'recordings_html', $recordings_html_default);
+                add_form_element($mform, 'hidden', 'recordings_html', PARAM_INT, null, $recordings_html_default);
             }
-            $mform->setType('recordings_html', PARAM_INT);
 
             if ($recordings_deleted_activities_editable) {
-                $mform->addElement('checkbox', 'recordings_deleted_activities', get_string('mod_form_field_recordings_deleted_activities', 'bigbluebuttonbn'));
-                $mform->setDefault('recordings_deleted_activities', $recordings_html_default);
+                add_form_element($mform, 'checkbox', 'recordings_deleted_activities', PARAM_INT, 'mod_form_field_recordings_deleted_activities', $recordings_deleted_activities_default);
             } else {
-                $mform->addElement('hidden', 'recordings_deleted_activities', $recordings_deleted_activities_default);
+                add_form_element($mform, 'hidden', 'recordings_deleted_activities', PARAM_INT, null, $recordings_deleted_activities_default);
             }
-            $mform->setType('recordings_deleted_activities', PARAM_INT);
         }
         //-------------------------------------------------------------------------------
         // Second block ends here
@@ -235,6 +222,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // Fourth block starts here
         //-------------------------------------------------------------------------------
+        $strings = array();
         $strings['as'] = get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn');
         $strings['viewer'] = get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn');
         $strings['moderator'] = get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn');
@@ -313,8 +301,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $col2->text = html_writer::tag('i', '&nbsp;' . get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn') . '&nbsp;' .
                 html_writer::select($options,
                     'participant_list_role_' . $participant['selectiontype'] . '-' . $participant['selectionid'],
-                    $option_selected,
-                    array(),
+                    $option_selected, array(),
                     array('id' => 'participant_list_role_' . $participant['selectiontype'] . '-' . $participant['selectionid'],
                         'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\'' . $participant['selectiontype'] . '\', \'' . $participant['selectionid'] . '\'); return 0;'
                     )
@@ -324,11 +311,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\'' . $participant['selectiontype'] . '\', \'' . $participant['selectionid'] . '\'); return 0;';
             if ($recording_icons_enabled) {
                 //With icon for delete
-                $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon', 'title' => $strings['remove'], 'alt' => $strings['remove'], 'src' => $pix_icon_delete_url));
-                $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon', 'onclick' => $onclick, 'title' => $strings['remove']));
+                $pix_icon_delete = html_writer::tag('img', null, array('class' => 'btn icon smallicon',
+                                                                       'title' => $strings['remove'],
+                                                                       'alt' => $strings['remove'],
+                                                                       'src' => $pix_icon_delete_url));
+                $col3->text = html_writer::tag('a', $pix_icon_delete, array('class' => 'action_icon',
+                    'onclick' => $onclick, 'title' => $strings['remove']));
             } else {
                 //With text for delete
-                $col3->text = html_writer::tag('a', '<b>x</b>', array('class' => 'btn action_icon', 'onclick' => $onclick, 'title' => $strings['remove']));
+                $col3->text = html_writer::tag('a', '<b>x</b>', array('class' => 'btn action_icon',
+                    'onclick' => $onclick, 'title' => $strings['remove']));
             }
 
             $row->cells = array($col0, $col1, $col2, $col3);
@@ -346,7 +338,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
 
         // Add data
-        $jsvars['participant_selection'] = json_decode('{"all": [], "role": ' . json_encode(bigbluebuttonbn_get_roles_select($roles)) . ', "user": ' . json_encode(bigbluebuttonbn_get_users_select($users)) . '}');
+        $jsvars['participant_selection'] = json_decode('{"all": [], "role": ' .
+            json_encode(bigbluebuttonbn_get_roles_select($roles)) . ', "user": ' .
+            json_encode(bigbluebuttonbn_get_users_select($users)) . '}');
         $jsvars['participant_list'] = $participant_list;
         //-------------------------------------------------------------------------------
         // Fourth block ends here
@@ -357,13 +351,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Fifth block starts here
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
-        if (isset($current_activity->openingtime) && $current_activity->openingtime != 0 || isset($current_activity->closingtime) && $current_activity->closingtime != 0) {
-                    $mform->setExpanded('schedule');
+        if (isset($current_activity->openingtime) && $current_activity->openingtime != 0 ||
+            isset($current_activity->closingtime) && $current_activity->closingtime != 0) {
+            $mform->setExpanded('schedule');
         }
 
-        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
+            array('optional' => true));
         $mform->setDefault('openingtime', 0);
-        $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
+            array('optional' => true));
         $mform->setDefault('closingtime', 0);
         //-------------------------------------------------------------------------------
         // Fifth block ends here
@@ -391,7 +388,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             // Editing existing instance - copy existing files into draft area.
             try {
                 $draftitemid = file_get_submitted_draft_itemid('presentation');
-                file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
+                file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
+                    array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true)
+                );
                 $default_values['presentation'] = $draftitemid;
             } catch (Exception $e) {
                 error_log("Presentation could not be loaded: " . $e->getMessage());
@@ -416,5 +415,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         return $errors;
+    }
+
+    private function add_form_element($mform, $elementType, $elementName, $elementDataType,
+            $elementDescriptionKey, $elementDefaultValue=null) {
+        if (!is_null($elementDescriptionKey) && !empty($elementDescriptionKey)) {
+          $mform->addElement($elementType, $elementName, get_string($elementDescriptionKey, 'bigbluebuttonbn'));
+          $mform->addHelpButton($elementName, $elementDescriptionKey, 'bigbluebuttonbn');
+          $mform->setDefault($elementName, $elementDefaultValue);
+        } else {
+          $mform->addElement($elementType, $elementName, $elementDefaultValue);
+        }
+        $mform->setType($elementName, $elementDataType);
     }
 }

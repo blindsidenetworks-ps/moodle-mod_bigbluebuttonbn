@@ -36,11 +36,11 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 
         //// Change welcome, allow null
         $field_definition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type');
-        xmldb_bigbluebuttonbn_change_field($dbman, 'bigbluebuttonbn', 'welcome', $field_definition);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'welcome', $field_definition);
 
         //// Change userid definition in bigbluebuttonbn_log
         $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'bigbluebuttonbnid');
-        xmldb_bigbluebuttonbn_change_field($dbman, 'bigbluebuttonbn_log', 'userid', $field_definition);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_log', 'userid', $field_definition);
 
         upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
@@ -64,15 +64,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 
         //// Add field type
         $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn', 'type', $field_definition);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type', $field_definition);
 
         //// Add field recordings_html
         $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn', 'recordings_html', $field_definition);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_html', $field_definition);
 
         //// Add field recordings_deleted_activities
         $field_definition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => XMLDB_UNSIGNED, 'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn', 'recordings_deleted_activities', $field_definition);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted_activities', $field_definition);
 
         upgrade_mod_savepoint(true, 2016080106, 'bigbluebuttonbn');
     }
@@ -80,11 +80,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     return true;
 }
 
-function xmldb_bigbluebuttonbn_add_field($dbman, $table_name, $field_name, $field_definition) {
+function xmldb_bigbluebuttonbn_add_change_field($dbman, $table_name, $field_name, $field_definition) {
     $table = new xmldb_table($table_name);
     $field = new xmldb_field($field_name);
     $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
-    if (!$dbman->field_exists($table, $field)) {
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->change_field($table, $field, true, true);
+    } else {
         $dbman->add_field($table, $field, true, true);
     }
 }
@@ -94,15 +96,6 @@ function xmldb_bigbluebuttonbn_drop_field($dbman, $table_name, $field_name) {
     $field = new xmldb_field($field_name);
     if ($dbman->field_exists($table, $field)) {
         $dbman->drop_field($table, $field, true, true);
-    }
-}
-
-function xmldb_bigbluebuttonbn_change_field($dbman, $table_name, $field_name, $field_definition) {
-    $table = new xmldb_table($table_name);
-    $field = new xmldb_field($field_name);
-    $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
-    if ($dbman->field_exists($table, $field)) {
-        $dbman->change_field($table, $field, true, true);
     }
 }
 

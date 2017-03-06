@@ -16,7 +16,7 @@ env:
  global:
   - MOODLE_BRANCH=MOODLE_30_STABLE
  matrix:
-  - DB=pgsql
+  #- DB=pgsql
   - DB=mysqli
 
 before_install:
@@ -31,12 +31,12 @@ install:
 
 script:
   - moodle-plugin-ci phplint
-  #- moodle-plugin-ci phpcpd
-  #- moodle-plugin-ci phpmd
-  #- moodle-plugin-ci codechecker
-  #- moodle-plugin-ci csslint
-  #- moodle-plugin-ci shifter
-  #- moodle-plugin-ci jshint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  #- moodle-plugin-ci codechecker #Failing
+  - moodle-plugin-ci csslint
+  - moodle-plugin-ci shifter
+  - moodle-plugin-ci jshint
   #- moodle-plugin-ci validate
   #- moodle-plugin-ci phpunit
   #- moodle-plugin-ci behat
