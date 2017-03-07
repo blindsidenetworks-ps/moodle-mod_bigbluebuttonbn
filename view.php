@@ -240,10 +240,11 @@ bigbluebuttonbn_view($bbbsession, $bigbluebuttonbn_activity);
 echo $OUTPUT->footer();
 
 function bigbluebuttonbn_view($bbbsession, $activity) {
-    global $CFG, $OUTPUT, $PAGE;
+    global $OUTPUT, $PAGE;
 
     $type_profiles = bigbluebuttonbn_get_instance_type_profiles();
-    $features = isset($bbbsession['bigbluebuttonbn']->type) ? $type_profiles[$bbbsession['bigbluebuttonbn']->type]['features'] : $type_profiles[0]['features'];
+    $features = isset($bbbsession['bigbluebuttonbn']->type) ?
+      $type_profiles[$bbbsession['bigbluebuttonbn']->type]['features'] : $type_profiles[0]['features'];
     $showroom = (in_array('all', $features) || in_array('showroom', $features));
     $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
     $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
@@ -267,75 +268,13 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
     if ($showroom) {
-        //JavaScript variables for room
-        $jsvars += array(
-            'meetingid' => $bbbsession['meetingid'],
-            'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-            'userlimit' => $bbbsession['userlimit'],
-            'opening' => ($bbbsession['openingtime']) ? get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']) : '',
-            'closing' => ($bbbsession['closingtime']) ? get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']) : ''
-        );
-
-        $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
-        $output .= '<br><span id="status_bar"></span><br>';
-        $output .= '<span id="control_panel"></span>';
-        $output .= $OUTPUT->box_end();
-
-        $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-        $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>' . "\n";
-        $output .= $OUTPUT->box_end();
-
-        if ($activity == 'ended') {
-            bigbluebuttonbn_view_ended($bbbsession);
-        } else {
-            bigbluebuttonbn_view_joining($bbbsession);
-        }
-
-        if ($showrecordings && isset($bbbsession['record']) && $bbbsession['record']) {
-            $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-        }
+        $output .= bigbluebuttonbn_view_show_rooms($bbbsession, $activity, $showrecordings, $jsvars);
     }
 
     if ($showrecordings) {
-        // Get recordings
-        $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : null, $showroom, $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
-
-        if (isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
-            //JavaScript variables for recordings
-            $jsvars += array(
-                'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
-            );
-
-            //If there are meetings with recordings load the data to the table
-            if ($bbbsession['bigbluebuttonbn']->recordings_html) {
-                // Render a plain html table
-                $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
-
-            } else {
-                // Render a YUI table
-                $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
-
-                //JavaScript variables for recordings with YUI
-                $jsvars += array(
-                        'columns' => bigbluebuttonbn_get_recording_columns($bbbsession),
-                        'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings)
-                );
-
-                //JavaScript dependences for recordings with YUI
-                $jsdependences += array('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number');
-            }
-        } else {
-            //There are no recordings to be shown.
-            $output .= html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '', array('id' => 'bigbluebuttonbn_html_table'));
-        }
-
-        if ($importrecordings && $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
-            $btn_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'class' => 'btn btn-secondary', 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
-            $output .= html_writer::start_tag('br');
-            $output .= html_writer::tag('span', $btn_import_recordings, array('id'=>"import_recording_links_button"));
-            $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));
-        }
+        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $importrecordings, $jsvars, $jsdependences);
     }
+  
     $output .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . html_writer::empty_tag('br');
 
     echo $output;
@@ -351,6 +290,112 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     );
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
 }
+
+function bigbluebuttonbn_view_show_rooms($bbbsession, $activity, $showrecordings, &$jsvars) {
+    global $OUTPUT;
+
+    $output = '';
+  
+    //JavaScript variables for room
+    if ($bbbsession['openingtime']) {
+        $openingtime = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['openingtime']);
+    } else {
+        $openingtime = '';
+    }
+    if ($bbbsession['closingtime']) {
+         $closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' . userdate($bbbsession['closingtime']);
+    } else {
+         $closingtime = '';
+    }
+    $jsvars += array(
+        'meetingid' => $bbbsession['meetingid'],
+        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
+        'userlimit' => $bbbsession['userlimit'],
+        'opening' => $openingtime,
+        'closing' => $closingtime
+    );
+
+    $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+    $output .= '<br><span id="status_bar"></span><br>';
+    $output .= '<span id="control_panel"></span>';
+    $output .= $OUTPUT->box_end();
+
+    $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
+    $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>' . "\n";
+    $output .= $OUTPUT->box_end();
+
+    if ($activity == 'ended') {
+        bigbluebuttonbn_view_ended($bbbsession);
+    } else {
+        bigbluebuttonbn_view_joining($bbbsession);
+    }
+
+    if ($showrecordings && isset($bbbsession['record']) && $bbbsession['record']) {
+        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+    }
+
+    return $output;
+}
+
+function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $importrecordings, &$jsvars, &$jsdependences) {
+    $output = '';
+
+    // Get recordings
+    $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, 
+                                                 $showroom ? $bbbsession['bigbluebuttonbn']->id : null,
+                                                 $showroom, 
+                                                 $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+
+    if (isset($recordings) && !empty($recordings) && !array_key_exists('messageKey', $recordings)) {  
+          // There are recordings for this meeting
+          // JavaScript variables for recordings
+          $jsvars += array(
+              'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1'
+          );
+
+          // If there are meetings with recordings load the data to the table
+          if ($bbbsession['bigbluebuttonbn']->recordings_html) {
+              // Render a plain html table
+              $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
+
+          } else {
+              // Render a YUI table
+              $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
+
+              //JavaScript variables for recordings with YUI
+              $jsvars += array(
+                      'columns' => bigbluebuttonbn_get_recording_columns($bbbsession),
+                      'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings)
+              );
+
+              //JavaScript dependences for recordings with YUI
+              $jsdependences += array('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number');
+          }
+    } else {
+        //There are no recordings to be shown.
+        $output .= html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '', array('id' => 'bigbluebuttonbn_html_table'));
+    }
+
+    if ($importrecordings && $bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
+        $output .= bigbluebuttonbn_view_show_imported($bbbsession);
+    }
+
+    return $output;
+}
+
+function bigbluebuttonbn_view_show_imported($bbbsession) {
+    global $CFG;
+  
+    $output = '';
+
+    $btn_import_links = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'class' => 'btn btn-secondary', 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
+    $output .= html_writer::start_tag('br');
+    $output .= html_writer::tag('span', $btn_import_links, array('id'=>"import_recording_links_button"));
+    $output .= html_writer::tag('span', '', array('id'=>"import_recording_links_table"));
+
+    return $output;
+}
+
 
 function bigbluebuttonbn_view_joining($bbbsession) {
 
