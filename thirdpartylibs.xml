@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <libraries>
     <library>
+        <location>vendor/bigbluebutton/bigbluebutton-api-php</location>
+        <name>BigBlueButton-API-PHP</name>
+        <version>1.0</version>
+        <license>LGPL</license>
+        <licenseversion>3</licenseversion>
+    </library>
+    <library>
         <location>vendor/firebase/php-jwt</location>
         <name>PHP-JWT</name>
         <version>4.0.0</version>

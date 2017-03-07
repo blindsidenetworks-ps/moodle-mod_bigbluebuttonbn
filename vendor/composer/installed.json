@@ -152,5 +152,58 @@
         ],
         "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
         "homepage": "https://github.com/firebase/php-jwt"
+    },
+    {
+        "name": "bigbluebutton/bigbluebutton-api-php",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bigbluebutton/bigbluebutton-api-php.git",
+            "reference": "ca35a2af68b2d94d8f76b16870eb1f76cf8a18de"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/bigbluebutton/bigbluebutton-api-php/zipball/ca35a2af68b2d94d8f76b16870eb1f76cf8a18de",
+            "reference": "ca35a2af68b2d94d8f76b16870eb1f76cf8a18de",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "friendsofphp/php-cs-fixer": "~1.10",
+            "fzaninotto/faker": "~1.5.0",
+            "phpunit/phpunit": "~4.0",
+            "satooshi/php-coveralls": "1.*",
+            "squizlabs/php_codesniffer": "2.*"
+        },
+        "time": "2017-03-07 15:55:47",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "BigBlueButton\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GNU Lesser General Public License"
+        ],
+        "authors": [
+            {
+                "name": "Ghazi Triki",
+                "email": "ghazi.nocturne@gmail.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "BigBlueButton PHP API Library for PHP",
+        "homepage": "http://bigbluebutton.org/",
+        "keywords": [
+            "api",
+            "bbb",
+            "bigbluebutton"
+        ]
     }
 ]

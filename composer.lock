@@ -4,9 +4,60 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "53b46b7c6ab74ceea316e43d04824a89",
-    "content-hash": "cb5240961bcc6fb84705789136aee58d",
+    "hash": "e10ab73ae5eaaf98281ebe1bbef47a43",
+    "content-hash": "e3b8986ae56b0612fad22003c1d6e9aa",
     "packages": [
+        {
+            "name": "bigbluebutton/bigbluebutton-api-php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bigbluebutton/bigbluebutton-api-php.git",
+                "reference": "ca35a2af68b2d94d8f76b16870eb1f76cf8a18de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bigbluebutton/bigbluebutton-api-php/zipball/ca35a2af68b2d94d8f76b16870eb1f76cf8a18de",
+                "reference": "ca35a2af68b2d94d8f76b16870eb1f76cf8a18de",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~1.10",
+                "fzaninotto/faker": "~1.5.0",
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "1.*",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BigBlueButton\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GNU Lesser General Public License"
+            ],
+            "authors": [
+                {
+                    "name": "Ghazi Triki",
+                    "email": "ghazi.nocturne@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "BigBlueButton PHP API Library for PHP",
+            "homepage": "http://bigbluebutton.org/",
+            "keywords": [
+                "api",
+                "bbb",
+                "bigbluebutton"
+            ],
+            "time": "2017-03-07 15:55:47"
+        },
         {
             "name": "composer/installers",
             "version": "v1.2.0",
@@ -161,7 +212,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "bigbluebutton/bigbluebutton-api-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
