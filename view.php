@@ -54,7 +54,7 @@ if ($version_major < '2013111800') {
 }
 $context = bigbluebuttonbn_get_context_module($cm->id);
 
-bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $context, $cm);
+bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $cm);
 
 ////////////////////////////////////////////////
 /////  BigBlueButton Session Setup Starts  /////

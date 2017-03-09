@@ -9,11 +9,14 @@
         }
     ],
     "require": {
-        "composer/installers": "~1.0",
         "bigbluebutton/bigbluebutton-api-php": "dev-alpha",
-        "firebase/php-jwt": "^4.0",
+        "firebase/php-jwt": "^4.0"
+    },
+    "require-dev": {
+        "composer/installers": "~1.0",
         "phpunit/phpunit": "4.1.*",
-        "friendsofphp/php-cs-fixer": "~1.10"
+        "friendsofphp/php-cs-fixer": "~1.10",
+        "phpmd/phpmd" : "@stable"
     },
     "extra": {
         "installer-name": "bigbluebuttonbn"

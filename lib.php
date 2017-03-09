@@ -65,7 +65,6 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 
-/*
 function bigbluebuttonbn_features() {
     $features = array(
         FEATURE_IDNUMBER                => true,
@@ -82,6 +81,7 @@ function bigbluebuttonbn_features() {
     return $features;
 }
 
+/*
 function bigbluebuttonbn_supports($feature) {
     $features = bigbluebuttonbn_features();
     if (in_array($feature, $features)) {
@@ -586,14 +586,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn)
         if (!empty($bigbluebuttonbn->intro)) {
             $msg->activity_description = trim($bigbluebuttonbn->intro);
         }
-        $msg->activity_openingtime = '';
-        if ($bigbluebuttonbn->openingtime) {
-            $msg->activity_openingtime = calendar_day_representation($bigbluebuttonbn->openingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->openingtime);
-        }
-        $msg->activity_closingtime = '';
-        if ($bigbluebuttonbn->closingtime) {
-            $msg->activity_closingtime = calendar_day_representation($bigbluebuttonbn->closingtime).' '.$at.' '.calendar_time_representation($bigbluebuttonbn->closingtime);
-        }
+        $msg->activity_openingtime = format_activity_time($bigbluebuttonbn->openingtime);
+        $msg->activity_closingtime = format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($USER);
 
         $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':';

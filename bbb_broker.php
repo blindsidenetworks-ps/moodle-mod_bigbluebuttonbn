@@ -133,7 +133,7 @@ if (empty($error)) {
                         bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
                         // Moodle event logger: Create an event for meeting ended
                         if (isset($bigbluebuttonbn)) {
-                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
+                            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
                         }
                         // Update the cache
                         bigbluebuttonbn_get_meeting_info($params['id'], $bbbsession['modPW'], true);
@@ -211,7 +211,7 @@ if (empty($error)) {
                                     $callback_response['status'] = 'true';
                                     // Moodle event logger: Create an event for recording published
                                     if (isset($bigbluebuttonbn)) {
-                                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $context, $cm);
+                                        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED, $bigbluebuttonbn, $cm);
                                     }
                                 } else {
                                     $callback_response['status'] = 'false';
@@ -245,7 +245,7 @@ if (empty($error)) {
                                 $callback_response['status'] = 'true';
                                 // Moodle event logger: Create an event for recording unpublished
                                 if (isset($bigbluebuttonbn)) {
-                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $context, $cm);
+                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED, $bigbluebuttonbn, $cm);
                                 }
                                 break;
                             case 'recording_delete':
@@ -270,7 +270,7 @@ if (empty($error)) {
                                 $callback_response['status'] = 'true';
                                 // Moodle event logger: Create an event for recording deleted
                                 if (isset($bigbluebuttonbn)) {
-                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $context, $cm);
+                                    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_DELETED, $bigbluebuttonbn, $cm);
                                 }
                                 break;
                         }
@@ -330,7 +330,7 @@ if (empty($error)) {
                             bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
                             // Moodle event logger: Create an event for recording imported
                             if (isset($bigbluebuttonbn)) {
-                                bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $context, $cm);
+                                bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $cm);
                             }
 
                             $callback_response['status'] = 'true';

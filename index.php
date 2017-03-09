@@ -97,7 +97,7 @@ if ($submit === 'end') {
     $administrator = has_capability('moodle/category:manage', $context);
 
     if ($moderator || $administrator) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $context, $cm);
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
 
         echo get_string('index_ending', 'bigbluebuttonbn');
 

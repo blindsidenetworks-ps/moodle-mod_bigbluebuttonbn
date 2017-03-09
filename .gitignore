@@ -11,4 +11,5 @@ vendor/phpunit*/
 vendor/psr/*
 vendor/sebastian/*
 vendor/symfony/*
-_vendor/*
+vendor/pdepend/
+vendor/phpmd/
