@@ -2,3 +2,13 @@
 .project
 .settings*
 deploy*
+
+vendor/bin/*
+vendor/composer/*
+vendor/composer/*
+vendor/friendsofphp/*
+vendor/phpunit*/
+vendor/psr/*
+vendor/sebastian/*
+vendor/symfony/*
+_vendor/*

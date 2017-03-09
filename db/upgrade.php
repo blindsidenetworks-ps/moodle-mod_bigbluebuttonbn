@@ -1,31 +1,29 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-//
+
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Upgrade logic.
  *
- * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2015 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-
-function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
-
+function xmldb_bigbluebuttonbn_upgrade($oldversion = 0)
+{
     global $DB;
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
@@ -80,7 +78,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     return true;
 }
 
-function xmldb_bigbluebuttonbn_add_change_field($dbman, $table_name, $field_name, $field_definition) {
+function xmldb_bigbluebuttonbn_add_change_field($dbman, $table_name, $field_name, $field_definition)
+{
     $table = new xmldb_table($table_name);
     $field = new xmldb_field($field_name);
     $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
@@ -91,7 +90,8 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $table_name, $field_name
     }
 }
 
-function xmldb_bigbluebuttonbn_drop_field($dbman, $table_name, $field_name) {
+function xmldb_bigbluebuttonbn_drop_field($dbman, $table_name, $field_name)
+{
     $table = new xmldb_table($table_name);
     $field = new xmldb_field($field_name);
     if ($dbman->field_exists($table, $field)) {
@@ -99,7 +99,8 @@ function xmldb_bigbluebuttonbn_drop_field($dbman, $table_name, $field_name) {
     }
 }
 
-function xmldb_bigbluebuttonbn_rename_field($dbman, $table_name, $field_name_old, $field_name_new) {
+function xmldb_bigbluebuttonbn_rename_field($dbman, $table_name, $field_name_old, $field_name_new)
+{
     $table = new xmldb_table($table_name);
     $field = new xmldb_field($field_name_old);
     if ($dbman->field_exists($table, $field)) {
@@ -107,7 +108,8 @@ function xmldb_bigbluebuttonbn_rename_field($dbman, $table_name, $field_name_old
     }
 }
 
-function xmldb_bigbluebuttonbn_rename_table($dbman, $table_name_old, $table_name_new) {
+function xmldb_bigbluebuttonbn_rename_table($dbman, $table_name_old, $table_name_new)
+{
     $table = new xmldb_table($table_name_old);
     if ($dbman->table_exists($table)) {
         $dbman->rename_table($table, $table_name_new, true, true);

@@ -1,16 +1,16 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-//
+
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,14 +31,12 @@
 //=========================================================================
 
 /**
- * Configuration file for bigbluebuttonbn
+ * Configuration file for bigbluebuttonbn.
  *
- * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2015 Blindside Networks Inc.
+ * @copyright 2015 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-
 unset($BIGBLUEBUTTONBN_CFG);
 global $BIGBLUEBUTTONBN_CFG;
 $BIGBLUEBUTTONBN_CFG = new stdClass();
@@ -49,8 +47,6 @@ $BIGBLUEBUTTONBN_CFG = new stdClass();
 // will override the parameters already configured (if they were         //
 // configured already)                                                   //
 //=========================================================================
-
-
 
 //=========================================================================
 // 1. GENERAL CONFIGURATION
@@ -64,8 +60,6 @@ $BIGBLUEBUTTONBN_CFG = new stdClass();
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret = '8cd8ef52e8e101574e400365b55e11a6';
 
-
-
 //=========================================================================
 // 2. CONFIGURATION FOR "RECORDING" FEATURE
 //=========================================================================
@@ -76,17 +70,15 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret = '8cd8ef52e8e101574e400365b
 
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
 // activities will have the recording capability enabled by default.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default = 1;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default = 1;
 
 // When the value is set to 1 (checked) the recording capability can be
 // enabled/disabled by the user creating or editing the room or activity.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable = 0;
 
 // When the value is set to 1 (checked) the list of recordings in both
 // bigbluebuttonbn and recordingbn are generated using icons.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled = 1;
-
-
 
 //=========================================================================
 // 3. CONFIGURATION FOR "RECORDING TAGGING" FEATURE
@@ -108,7 +100,6 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default = 0;
 // activity.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable = 1;
 
-
 //=========================================================================
 // 4. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
 //=========================================================================
@@ -117,7 +108,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable = 1;
 // course). When this feature is enabled and the meeting can be recorded,
 // a button will be shown in the intermediate page that will allow importing
 // recordings from a different activity even from a different course.
-//
+
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
 // activities will have the 'import recordings' capability enabled.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled = 0;
@@ -125,7 +116,6 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled = 0;
 // When the value is set to 1 (checked) the import recordings capability
 // can import recordings from deleted activities.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled = 0;
-
 
 //=========================================================================
 // 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
@@ -138,13 +128,12 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_e
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
 // activities will have the 'wait for moderator' capability enabled by
 // default.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default = 0;
 
 // When the value is set to 1 (checked) the 'wait for moderator'
 // capability can be enabled/disabled by the user creating or editing
 // the room or activity.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable = 1;
-
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable = 1;
 
 // When the 'wait for moderator' capability is enabled, the ping interval
 // is used for pooling the status of the server. Its value is expresed
@@ -158,16 +147,12 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval = 15;
 // information gathering. The default value is 60 secs.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl = 60;
 
-
-
 //=========================================================================
 // 5. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
 //=========================================================================
 // A conference voice bridge number can be permanently assigned to a room
 // or activity.
 $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable = 0;
-
-
 
 //=========================================================================
 // 6. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
@@ -188,7 +173,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled = 1;
 
 // The number of users allowed in a session by default when a new room or
 // conference is added. If the number is set to 0, no limit is established.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default = 0;
 
 // When the value is set to 1 (checked) the 'wait for moderator'
 // capability can be enabled/disabled by the user creating or editing
@@ -205,7 +190,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable = 0;
 // Moodle (including the custom parameters). The value used will be the key for the role.
 // [owner|manager|coursecreator|editingteacher|teacher|student|guest|user|frontpage|ANY_CUSTOM_ROLE]
 
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = 'owner';
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = 'owner';
 
 //=========================================================================
 // 9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
@@ -225,7 +210,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 // When the value is set to 1 (checked) the 'notify users when recording ready'
 // capability is enabled, meaning that a message will be sent to all enrolled
 // users in a course when a recording is ready
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
 
 //=========================================================================
 // 11. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
@@ -234,7 +219,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 // capability is enabled, meaning that once a recording is processed by BigBlueButton
 // a message containing the events from the live session will be sent to Moodle.
 // These avents are added to the logging system and used for reports
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled = 0;
 
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!
@@ -245,15 +230,15 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 
 // When the value is set to 1 (checked) the bigbluebuttonbn resources
 // will show the recodings in an html table by default.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default = 0;
 
 // When the value is set to 1 (checked) the 'html ui' capability can be
 // enabled/disabled by the user creating or editing the resource.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable = 0;
 
 // When the value is set to 1 (checked) the bigbluebuttonbn resources
 // will show the recodings belonging to deleted activities as part of the list.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default = 1;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default = 1;
 
 // When the value is set to 1 (checked) the 'include recordings from deleted activities'
 // capability can be enabled/disabled by the user creating or editing the resource.

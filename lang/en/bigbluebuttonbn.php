@@ -1,11 +1,10 @@
 <?php
 /**
- * Language File
+ * Language File.
  *
- * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2015 Blindside Networks Inc.
+ * @copyright 2010-2015 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -18,7 +17,6 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage recordings';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
@@ -190,7 +188,6 @@ $string['mod_form_field_notification_msg_at'] = 'at';
 $string['mod_form_field_recordings_html'] = 'Show the table in plain html';
 $string['mod_form_field_recordings_deleted_activities'] = 'Include recordings from deleted activities';
 
-
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
@@ -268,7 +265,6 @@ $string['view_message_session_no_users'] = 'There are no users in this session';
 $string['view_message_session_has_user'] = 'There is';
 $string['view_message_session_has_users'] = 'There are';
 
-
 $string['view_message_room_closed'] = 'This room is closed.';
 $string['view_message_room_ready'] = 'This room is ready.';
 $string['view_message_room_open'] = 'This room is open.';
@@ -279,11 +275,9 @@ $string['view_message_conference_in_progress'] = 'This conference is in progress
 $string['view_message_conference_has_ended'] = 'This conference has ended.';
 $string['view_message_tab_close'] = 'This tab/window must be closed manually';
 
-
 $string['view_groups_selection_warning'] = 'There is a conference room for each group. If you have access to more than one be sure to select the correct one.';
 $string['view_conference_action_join'] = 'Join session';
 $string['view_conference_action_end'] = 'End session';
-
 
 $string['view_recording'] = 'recording';
 $string['view_recording_link'] = 'imported link';
