@@ -547,9 +547,11 @@ function bigbluebuttonbn_isMeetingRunning($meetingID, $URL, $SALT)
 /**
  * @param string $URL
  */
-function bigbluebuttonbn_getServerVersion($URL)
+function bigbluebuttonbn_getServerVersion($URL = null)
 {
-    $xml = bigbluebuttonbn_wrap_xml_load_file($URL.'api');
+    $endpoint = is_null($URL) ? bigbluebuttonbn_get_cfg_server_url() : $URL;
+
+    $xml = bigbluebuttonbn_wrap_xml_load_file($endpoint.'api');
     if ($xml && $xml->returncode == 'SUCCESS') {
         return $xml->version;
     } else {
@@ -1928,7 +1930,6 @@ function bigbluebuttonbn_get_tags($id)
  *
  * @return associative array containing the recordings indexed by recordID, each recording is also a non sequential associative array itself that corresponds to the actual recording in BBB
  */
-
 function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID = null, $subset = true, $include_deleted = false)
 {
     global $DB;
@@ -2038,10 +2039,16 @@ function bigbluebuttonbn_get_instance_types_array($_instanceprofiles = null)
     return $instanceprofiles_display_array;
 }
 
-function format_activity_time($time)
+function bigbluebuttonbn_format_activity_time($time)
 {
     $activity_time = '';
     if ($time) {
         $activity_time = calendar_day_representation($time).' '.$at.' '.calendar_time_representation($time);
     }
+}
+
+function bigbluebuttonbn_recordings_enabled()
+{
+    return !(isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default) &&
+             isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable));
 }

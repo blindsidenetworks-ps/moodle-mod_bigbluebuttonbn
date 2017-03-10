@@ -3,13 +3,14 @@
 .settings*
 deploy*
 
-vendor/bin/*
-vendor/composer/*
-vendor/composer/*
-vendor/friendsofphp/*
-vendor/phpunit*/
-vendor/psr/*
-vendor/sebastian/*
-vendor/symfony/*
+vendor/bin/
+vendor/composer/
+vendor/composer/
+vendor/friendsofphp/
+vendor/phpunit/
+vendor/psr/
+vendor/sebastian/
+vendor/symfony/
 vendor/pdepend/
 vendor/phpmd/
+vendor/jakub-onderka/
