@@ -264,6 +264,8 @@ $string['view_message_have_joined'] = 'have joined';
 $string['view_message_session_no_users'] = 'There are no users in this session';
 $string['view_message_session_has_user'] = 'There is';
 $string['view_message_session_has_users'] = 'There are';
+$string['view_message_session_for'] = 'the session for';
+$string['view_message_times'] = 'times';
 
 $string['view_message_room_closed'] = 'This room is closed.';
 $string['view_message_room_ready'] = 'This room is ready.';

@@ -65,52 +65,29 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 
-function bigbluebuttonbn_features()
-{
-    $features = array(
-        FEATURE_IDNUMBER => true,
-        FEATURE_GROUPS => true,
-        FEATURE_GROUPINGS => true,
-        FEATURE_GROUPMEMBERSONLY => true,
-        FEATURE_MOD_INTRO => true,
-        FEATURE_BACKUP_MOODLE2 => true,
-        FEATURE_COMPLETION_TRACKS_VIEWS => true,
-        FEATURE_GRADE_HAS_GRADE => false,
-        FEATURE_GRADE_OUTCOMES => false,
-        FEATURE_SHOW_DESCRIPTION => true,
-    );
-
-    return $features;
-}
-
-/*
 function bigbluebuttonbn_supports($feature) {
-    $features = bigbluebuttonbn_features();
-    if (in_array($feature, $features)) {
-        return $features[$feature];
-    } else {
+    if (!$feature) {
         return null;
     }
-    return in_array($feature, $features) ? $features[$feature] : false;
-}
-*/
+ 
+    $features = array(
+        (string) FEATURE_IDNUMBER => true,
+        (string) FEATURE_GROUPS => true,
+        (string) FEATURE_GROUPINGS => true,
+        (string) FEATURE_GROUPMEMBERSONLY => true,
+        (string) FEATURE_MOD_INTRO => true,
+        (string) FEATURE_BACKUP_MOODLE2 => true,
+        (string) FEATURE_COMPLETION_TRACKS_VIEWS => true,
+        (string) FEATURE_GRADE_HAS_GRADE => false,
+        (string) FEATURE_GRADE_OUTCOMES => false,
+        (string) FEATURE_SHOW_DESCRIPTION => true,
+    );
 
-function bigbluebuttonbn_supports($feature)
-{
-    switch ($feature) {
-        case FEATURE_IDNUMBER:                return true;
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-
-        default: return null;
+    if (isset($features[(string) $feature])) {
+        return $features[$feature];
     }
+  
+    return null;
 }
 
 /**
@@ -188,10 +165,7 @@ function bigbluebuttonbn_delete_instance($id)
         return false;
     }
 
-    $result = true;
-
     // End the session associated with this instance (if it's running)
-
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     $modPW = $bigbluebuttonbn->moderatorpass;
     $url = bigbluebuttonbn_get_cfg_server_url();
@@ -201,13 +175,16 @@ function bigbluebuttonbn_delete_instance($id)
         bigbluebuttonbn_doEndMeeting($meetingID, $modPW, $url, $shared_secret);
     }
 
+    // Perform delete
     if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
-        $result = false;
+        return false;
     }
 
     if (!$DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
-        $result = false;
+        return false;
     }
+
+    //bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
 
     $log = new stdClass();
 
@@ -219,12 +196,9 @@ function bigbluebuttonbn_delete_instance($id)
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
 
     $logs = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
-    error_log(json_encode($logs));
     $has_recordings = 'false';
     if (!empty($logs)) {
-        error_log('IS not empty');
         foreach ($logs as $l) {
-            error_log(json_encode($l));
             $meta = json_decode($l->meta);
             if ($meta->record) {
                 $has_recordings = 'true';
@@ -234,10 +208,7 @@ function bigbluebuttonbn_delete_instance($id)
     $log->meta = "{\"has_recordings\":{$has_recordings}}";
 
     if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
-        error_log('It could not be saved');
-        $result = false;
-    } else {
-        error_log('It was saved');
+        return false;
     }
 
     return $result;
@@ -254,7 +225,18 @@ function bigbluebuttonbn_delete_instance($id)
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn)
 {
-    return true;
+    global $DB;
+
+    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
+                                                              'bigbluebuttonbnid' => $bigbluebuttonbn->id,
+                                                              'userid' => $user->id,
+                                                              'log' => 'Join'), '*');
+
+    if ($completed > 0) {
+        return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.get_string('view_message_times', 'bigbluebuttonbn');
+    }
+
+    return '';
 }
 
 /**
@@ -265,7 +247,13 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn)
  */
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)
 {
-    return true;
+    global $DB;
+    $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
+                                                              'bigbluebuttonbnid' => $bigbluebuttonbn->id,
+                                                              'userid' => $user->id,
+                                                              'log' => 'Join'), '*', IGNORE_MULTIPLE);
+
+    return ($completed > 0);
 }
 
 /**
@@ -815,4 +803,36 @@ function bigbluebuttonbn_get_cfg_shared_secret()
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) ? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) : (isset($CFG->bigbluebuttonbn_shared_secret) ? trim($CFG->bigbluebuttonbn_shared_secret) : '8cd8ef52e8e101574e400365b55e11a6');
+}
+
+const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
+const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
+const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
+const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
+const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
+const BIGBLUEBUTTON_EVENT_MEETING_EVENT = 'meeting_event';
+const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
+const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
+const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
+
+function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null)
+{
+    global $DB;
+
+    $log = new stdClass();
+
+    $log->courseid = isset($overrides['courseid']) ? $overrides['courseid'] : $bbbsession['course']->id;
+    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid']) ? $overrides['bigbluebuttonbnid'] : $bbbsession['bigbluebuttonbn']->id;
+    $log->userid = isset($overrides['userid']) ? $overrides['userid'] : $bbbsession['userID'];
+    $log->meetingid = isset($overrides['meetingid']) ? $overrides['meetingid'] : $bbbsession['meetingid'];
+    $log->timecreated = isset($overrides['timecreated']) ? $overrides['timecreated'] : time();
+    $log->log = $event;
+    if (isset($meta)) {
+        $log->meta = $meta;
+    } elseif ($event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
+        $log->meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+    }
+
+    $DB->insert_record('bigbluebuttonbn_logs', $log);
 }
