@@ -1,4 +1,4 @@
-<?php
+bigbluebuttonbn_format_activity_time<?php
 // This file is part of Moodle - http://moodle.org/
 
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,19 +41,19 @@ const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
 //  BigBlueButton API Calls  //
 function bigbluebuttonbn_getJoinURL($meetingID, $userName, $PW, $SALT, $URL, $logoutURL, $configToken = null, $userId = null)
-    {
-        $url_join = $URL.'api/join?';
-        $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
-        if (!is_null($userId)) {
-            $params .= '&userID='.urlencode($userId);
-        }
-        if (!is_null($configToken)) {
-            $params .= '&configToken='.$configToken;
-        }
-        $url = $url_join.$params.'&checksum='.sha1('join'.$params.$SALT);
-
-        return $url;
+{
+    $url_join = $URL.'api/join?';
+    $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
+    if (!is_null($userId)) {
+        $params .= '&userID='.urlencode($userId);
     }
+    if (!is_null($configToken)) {
+        $params .= '&configToken='.$configToken;
+    }
+    $url = $url_join.$params.'&checksum='.sha1('join'.$params.$SALT);
+
+    return $url;
+}
 
 function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0, $metadata = array())
 {
@@ -2009,8 +2009,12 @@ function bigbluebuttonbn_format_activity_time($time)
 {
     $activity_time = '';
     if ($time) {
-        $activity_time = calendar_day_representation($time).' '.$at.' '.calendar_time_representation($time);
+        $activity_time = calendar_day_representation($time).' '.
+          get_string('mod_form_field_notification_msg_at', 'bigbluebuttonbn').' '.
+          calendar_time_representation($time);
     }
+
+    return $activity_time;
 }
 
 function bigbluebuttonbn_recordings_enabled()

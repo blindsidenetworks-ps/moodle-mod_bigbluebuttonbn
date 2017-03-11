@@ -151,6 +151,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         if ($cfg['instance_type_enabled']) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'), bigbluebuttonbn_get_instance_types_array($data['instance_type_profiles']), array('onchange' => 'M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
+
             return;
         }
 
@@ -189,10 +190,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
     public function bigbluebuttonbn_mform_add_block_room_room($mform, $cfg)
     {
         //'wrap="virtual" rows="5" cols="60"'
-        $field = ['type' => 'textarea', 'name' => 'welcome', 'data_type' => PARAM_TEXT, 'description_key' => 'mod_form_field_welcome' ];
+        $field = ['type' => 'textarea', 'name' => 'welcome', 'data_type' => PARAM_TEXT, 'description_key' => 'mod_form_field_welcome'];
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], '', ['wrap' => 'virtual', 'rows' => 5, 'cols' => '60']);
 
-        $field = ['type' => 'hidden', 'name' => 'voicebridge', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'voicebridge', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['voicebridge_editable']) {
             $field['type'] = 'text';
             $field['data_type'] = PARAM_TEXT;
@@ -201,14 +202,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         }
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], 0, ['maxlength' => 4, 'size' => 6]);
 
-        $field = ['type' => 'hidden', 'name' => 'wait', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'wait', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['waitformoderator_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_wait';
         }
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], $cfg['waitformoderator_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'userlimit', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'userlimit', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['userlimit_editable']) {
             $field['type'] = 'text';
             $field['data_type'] = PARAM_TEXT;
@@ -216,14 +217,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         }
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], $cfg['userlimit_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'record', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'record', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['recording_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_record';
         }
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], $cfg['recording_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'tagging', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'tagging', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['recording_tagging_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_recordingtagging';
@@ -233,14 +234,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
 
     public function bigbluebuttonbn_mform_add_block_room_recordings($mform, $cfg)
     {
-        $field = ['type' => 'hidden', 'name' => 'recordings_html', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'recordings_html', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['recordings_html_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_recordings_html';
         }
         bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], $field['description_key'], $cfg['recordings_html_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'recordings_deleted_activities', 'data_type' => PARAM_INT, 'description_key' => null ];
+        $field = ['type' => 'hidden', 'name' => 'recordings_deleted_activities', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['recordings_deleted_activities_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_recordings_deleted_activities';
@@ -348,13 +349,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
             $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
             // With text for delete
             $col3->text = html_writer::tag('a', '<b>x</b>', ['class' => 'btn action_icon',
-                'onclick' => $onclick, 'title' => $data['strings']['remove']]);
+                'onclick' => $onclick, 'title' => $data['strings']['remove'], ]);
             if ($cfg['recording_icons_enabled']) {
                 // With icon for delete
                 $pix_icon_delete = html_writer::tag('img', null, ['class' => 'btn icon smallicon',
-                    'title' => $data['strings']['remove'], 'alt' => $data['strings']['remove'], 'src' => $data['pix_icon_delete_url']]);
+                    'title' => $data['strings']['remove'], 'alt' => $data['strings']['remove'], 'src' => $data['pix_icon_delete_url'], ]);
                 $col3->text = html_writer::tag('a', $pix_icon_delete, ['class' => 'action_icon',
-                    'onclick' => $onclick, 'title' => $data['strings']['remove']]);
+                    'onclick' => $onclick, 'title' => $data['strings']['remove'], ]);
             }
 
             $row->cells = array($col0, $col1, $col2, $col3);
@@ -394,6 +395,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         if ($type === 'hidden') {
             $mform->addElement($type, $name, $defaultValue);
             $mform->setType($name, $dataType);
+
             return;
         }
 
@@ -401,6 +403,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         $mform->addHelpButton($name, $descriptionKey, 'bigbluebuttonbn');
         $mform->setDefault($name, $defaultValue);
         $mform->setType($name, $dataType);
+
         return;
     }
 

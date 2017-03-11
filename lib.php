@@ -65,11 +65,12 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 
-function bigbluebuttonbn_supports($feature) {
+function bigbluebuttonbn_supports($feature)
+{
     if (!$feature) {
         return null;
     }
- 
+
     $features = array(
         (string) FEATURE_IDNUMBER => true,
         (string) FEATURE_GROUPS => true,
@@ -86,7 +87,7 @@ function bigbluebuttonbn_supports($feature) {
     if (isset($features[(string) $feature])) {
         return $features[$feature];
     }
-  
+
     return null;
 }
 
@@ -230,7 +231,7 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn)
     $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
                                                               'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                                                               'userid' => $user->id,
-                                                              'log' => 'Join'), '*');
+                                                              'log' => 'Join', ), '*');
 
     if ($completed > 0) {
         return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.get_string('view_message_times', 'bigbluebuttonbn');
@@ -251,9 +252,9 @@ function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)
     $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
                                                               'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                                                               'userid' => $user->id,
-                                                              'log' => 'Join'), '*', IGNORE_MULTIPLE);
+                                                              'log' => 'Join', ), '*', IGNORE_MULTIPLE);
 
-    return ($completed > 0);
+    return $completed > 0;
 }
 
 /**
@@ -520,82 +521,61 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn)
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn)
 {
-    global $DB, $CFG, $USER;
+    global $DB, $CFG;
+
+    $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
 
     // Now that an id was assigned, generate and set the meetingid property based on
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
         $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
         $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
+
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
-    } else {
-        $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
     }
-    $at = get_string('mod_form_field_notification_msg_at', 'bigbluebuttonbn');
 
-    // Add evento to the calendar when if openingtime is set
-    if (isset($bigbluebuttonbn->openingtime) && $bigbluebuttonbn->openingtime) {
-        $event = new stdClass();
-        $event->name = $bigbluebuttonbn->name;
-        $event->courseid = $bigbluebuttonbn->course;
-        $event->groupid = 0;
-        $event->userid = 0;
-        $event->modulename = 'bigbluebuttonbn';
-        $event->instance = $bigbluebuttonbn->id;
-        $event->timestart = $bigbluebuttonbn->openingtime;
-
-        if ($bigbluebuttonbn->closingtime) {
-            $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
-        } else {
-            $event->durationtime = 0;
-        }
-
-        if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event);
-        } else {
-            calendar_event::create($event);
-        }
-    } else {
-        $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
-    }
+    bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
 
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
-        // Prepare message
-        $msg = new stdClass();
-
-        /// Build the message_body
-        $msg->action = $action;
-        $msg->activity_type = '';
-        $msg->activity_title = $bigbluebuttonbn->name;
-        $message_text = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>';
-
-        /// Add the meeting details to the message_body
-        $msg->action = ucfirst($action);
-        $msg->activity_description = '';
-        if (!empty($bigbluebuttonbn->intro)) {
-            $msg->activity_description = trim($bigbluebuttonbn->intro);
-        }
-        $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
-        $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
-        $msg->activity_owner = fullname($USER);
-
-        $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':';
-        $message_text .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_title.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_description.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_openingtime.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_closingtime.'</td></tr>';
-        $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>';
-        $message_text .= $msg->activity_owner.'</td></tr></tbody></table></p>';
-
-        // Send notification to all users enrolled
-        bigbluebuttonbn_send_notification($USER, $bigbluebuttonbn, $message_text);
+        bigbluebuttonbn_notification_process($bigbluebuttonbn, $action);
     }
+}
+
+function bigbluebuttonbn_process_post_save_event($bigbluebuttonbn)
+{
+    global $DB;
+
+    // Delete evento to the calendar when/if openingtime is NOT set
+    if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
+        $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
+
+        return;
+    }
+
+    // Add evento to the calendar as openingtime is set
+    $event = new stdClass();
+    $event->name = $bigbluebuttonbn->name;
+    $event->courseid = $bigbluebuttonbn->course;
+    $event->groupid = 0;
+    $event->userid = 0;
+    $event->modulename = 'bigbluebuttonbn';
+    $event->instance = $bigbluebuttonbn->id;
+    $event->timestart = $bigbluebuttonbn->openingtime;
+    $event->durationtime = 0;
+
+    if ($bigbluebuttonbn->closingtime) {
+        $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
+    }
+
+    $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
+    if ($event->id) {
+        $calendarevent = calendar_event::load($event->id);
+        $calendarevent->update($event);
+
+        return;
+    }
+
+    calendar_event::create($event);
 }
 
 /**
@@ -739,7 +719,50 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename = 'all')
     return $roles;
 }
 
-function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message = '')
+function bigbluebuttonbn_notification_process($bigbluebuttonbn, $action)
+{
+    global $USER;
+
+    // Prepare message
+    $msg = new stdClass();
+
+    /// Build the message_body
+    $msg->action = $action;
+    $msg->activity_type = '';
+    $msg->activity_title = $bigbluebuttonbn->name;
+
+    /// Add the meeting details to the message_body
+    $msg->action = ucfirst($action);
+    $msg->activity_description = '';
+    if (!empty($bigbluebuttonbn->intro)) {
+        $msg->activity_description = trim($bigbluebuttonbn->intro);
+    }
+    $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
+    $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
+    $msg->activity_owner = fullname($USER);
+
+    // Send notification to all users enrolled
+    bigbluebuttonbn_notification_send($USER, $bigbluebuttonbn, bigbluebuttonbn_notification_msg_html($msg));
+}
+
+function bigbluebuttonbn_notification_msg_html($msg)
+{
+    $message_text = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
+    $message_text .= '<p><b>'.$msg->activity_title.'</b> '.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
+    $message_text .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>'."\n";
+    $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>'."\n";
+    $message_text .= $msg->activity_title.'</td></tr>'."\n";
+    $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>'."\n";
+    $message_text .= $msg->activity_description.'</td></tr>'."\n";
+    $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>'."\n";
+    $message_text .= $msg->activity_openingtime.'</td></tr>'."\n";
+    $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>'."\n";
+    $message_text .= $msg->activity_closingtime.'</td></tr>'."\n";
+    $message_text .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>'."\n";
+    $message_text .= $msg->activity_owner.'</td></tr></tbody></table></p>'."\n";
+}
+
+function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message = '')
 {
     global $DB;
 
