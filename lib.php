@@ -185,8 +185,6 @@ function bigbluebuttonbn_delete_instance($id)
         return false;
     }
 
-    //bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
-
     $log = new stdClass();
 
     $log->meetingid = $bigbluebuttonbn->meetingid;
@@ -212,7 +210,7 @@ function bigbluebuttonbn_delete_instance($id)
         return false;
     }
 
-    return $result;
+    return true;
 }
 
 /**
@@ -258,67 +256,6 @@ function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)
 }
 
 /**
- * Given a course and a time, this module should find recent activity
- * that has occurred in bigbluebuttonbn activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @return bool
- */
-function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart)
-{
-    return false; //  True if anything was printed, otherwise false
-}
-
-/**
- * Returns all activity in bigbluebuttonbn since a given time.
- *
- * @param array $activities sequentially indexed array of objects
- * @param int   $index
- * @param int   $timestart
- * @param int   $courseid
- * @param int   $cmid
- * @param int   $userid     defaults to 0
- * @param int   $groupid    defaults to 0
- */
-function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0)
-{
-}
-
-/**
- * Prints single activity item prepared by {@see recordingsbn_get_recent_mod_activity()}.
- */
-function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames)
-{
-}
-
-/**
- * Function to be run periodically according to the moodle cron
- * This function searches for things that need to be done, such
- * as sending out mail, toggling flags etc ...
- *
- * @return bool
- **/
-function bigbluebuttonbn_cron()
-{
-    return true;
-}
-
-/**
- * Must return an array of user records (all data) who are participants
- * for a given instance of bigbluebuttonbn. Must include every user involved
- * in the instance, independient of his role (student, teacher, admin...)
- * See other modules as example.
- *
- * @param int $bigbluebuttonbnid ID of an instance of this module
- *
- * @return bool boolean/array of students
- */
-function bigbluebuttonbn_get_participants($bigbluebuttonbnid)
-{
-    return false;
-}
-
-/**
  * Returns all other caps used in module.
  *
  * @return string[]
@@ -326,56 +263,6 @@ function bigbluebuttonbn_get_participants($bigbluebuttonbnid)
 function bigbluebuttonbn_get_extra_capabilities()
 {
     return array('moodle/site:accessallgroups');
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Gradebook API                                                              //
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This function returns if a scale is being used by one bigbluebuttonbn
- * if it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
- *
- * @param int $bigbluebuttonbnid ID of an instance of this module
- *
- * @return bool
- */
-function bigbluebuttonbn_scale_used($bigbluebuttonbnid, $scaleid)
-{
-    $return = false;
-
-    return $return;
-}
-
-/**
- * Checks if scale is being used by any instance of bigbluebuttonbn.
- * This function was added in 1.9.
- *
- * This is used to find out if scale used anywhere
- *
- * @param $scaleid int
- *
- * @return bool True if the scale is used by any bigbluebuttonbn
- */
-function bigbluebuttonbn_scale_used_anywhere($scaleid)
-{
-    $return = false;
-
-    return $return;
-}
-
-/**
- * This function is used by the reset_course_userdata function in moodlelib.
- *
- * @param $data the data submitted from the reset course
- *
- * @return array status array
- */
-function bigbluebuttonbn_reset_userdata($data)
-{
-    return array();
 }
 
 /**
@@ -413,29 +300,29 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray)
         return array();
     }
 
-    if (!$bigbluebuttonbns = get_all_instances_in_courses('bigbluebuttonbn', $courses)) {
+    if (!$bigbluebuttonbns = bigbluebuttonbn_process_pre_saveget_all_instances_in_courses('bigbluebuttonbn', $courses)) {
         return;
     }
 
     foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $now = time();
-        if ($bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) { // A bigbluebuttonbn is scheduled.
+        if ($bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) {
+            // A bigbluebuttonbn is scheduled.
+            $start = 'started_at';
+            if ($bigbluebuttonbn->openingtime > $now) {
+                $start = 'starts_at';
+            }
             $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
                     get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
                     ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
                     $bigbluebuttonbn->name.'</a></div>';
-            if ($bigbluebuttonbn->openingtime > $now) {
-                $str .= '<div class="info">'.get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
-            } else {
-                $str .= '<div class="info">'.get_string('started_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
-            }
+            $str .= '<div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
             $str .= '<div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime).'</div></div>';
 
             if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
-                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = $str;
-            } else {
-                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= $str;
+                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = '';
             }
+            $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= $str;
         }
     }
 }
@@ -481,15 +368,14 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule)
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn)
 {
+    $bigbluebuttonbn->timemodified = time();
+
     if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
         $bigbluebuttonbn->timecreated = time();
         //Assign password only if it is a new activity
-        if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-            $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
-            $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
-        }
-    } else {
-        $bigbluebuttonbn->timemodified = time();
+        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->timemodified = null;
     }
 
     if (!isset($bigbluebuttonbn->wait)) {
@@ -626,22 +512,42 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbn_id, $context, $draft
  */
 function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array())
 {
-    global $DB;
-
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
 
-    $fileareas = bigbluebuttonbn_get_file_areas();
-    if (!array_key_exists($filearea, $fileareas)) {
+    if ($filearea !== 'presentation') {
         return false;
     }
 
-    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
+    if (!array_key_exists($filearea, bigbluebuttonbn_get_file_areas())) {
         return false;
     }
+
+    $filename = bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args);
+    if (!$filename) {
+        return false;
+    }
+
+    $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    // finally send the file
+    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+}
+
+function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args)
+{
+    global $DB;
 
     if (sizeof($args) > 1) {
+        if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
+            return;
+        }
+
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $nonce_key = sha1($bigbluebuttonbn->id);
         $presentation_nonce = $cache->get($nonce_key);
@@ -649,7 +555,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         $nonce_counter = $presentation_nonce['counter'];
 
         if ($args['0'] != $nonce_value) {
-            return false;
+            return;
         }
 
         //The nonce value is actually used twice because BigBlueButton reads the file two times
@@ -660,31 +566,18 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
             $cache->delete($nonce_key);
         }
 
-        $filename = $args['1'];
-    } else {
-        require_course_login($course, true, $cm);
+        return $args['1'];
+    }
+      
+    require_course_login($course, true, $cm);
 
-        if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
-            return false;
-        }
-
-        $filename = implode('/', $args);
+    if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
+        return;
     }
 
-    if ($filearea === 'presentation') {
-        $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
-    } else {
-        return false;
-    }
-
-    $fs = get_file_storage();
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-        return false;
-    }
-
-    // finally send the file
-    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+    return implode('/', $args);
 }
+
 
 /**
  * Returns an array of file areas.
@@ -826,36 +719,4 @@ function bigbluebuttonbn_get_cfg_shared_secret()
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) ? trim($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) : (isset($CFG->bigbluebuttonbn_shared_secret) ? trim($CFG->bigbluebuttonbn_shared_secret) : '8cd8ef52e8e101574e400365b55e11a6');
-}
-
-const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
-const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
-const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
-const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
-const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
-const BIGBLUEBUTTON_EVENT_MEETING_EVENT = 'meeting_event';
-const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
-const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
-const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
-const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
-
-function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null)
-{
-    global $DB;
-
-    $log = new stdClass();
-
-    $log->courseid = isset($overrides['courseid']) ? $overrides['courseid'] : $bbbsession['course']->id;
-    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid']) ? $overrides['bigbluebuttonbnid'] : $bbbsession['bigbluebuttonbn']->id;
-    $log->userid = isset($overrides['userid']) ? $overrides['userid'] : $bbbsession['userID'];
-    $log->meetingid = isset($overrides['meetingid']) ? $overrides['meetingid'] : $bbbsession['meetingid'];
-    $log->timecreated = isset($overrides['timecreated']) ? $overrides['timecreated'] : time();
-    $log->log = $event;
-    if (isset($meta)) {
-        $log->meta = $meta;
-    } elseif ($event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
-        $log->meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
-    }
-
-    $DB->insert_record('bigbluebuttonbn_logs', $log);
 }

@@ -39,6 +39,38 @@ const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
 const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
 const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
+const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
+const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
+const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
+const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
+const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
+const BIGBLUEBUTTON_EVENT_MEETING_EVENT = 'meeting_event';
+const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
+const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
+const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
+
+function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null)
+{
+    global $DB;
+
+    $log = new stdClass();
+
+    $log->courseid = isset($overrides['courseid']) ? $overrides['courseid'] : $bbbsession['course']->id;
+    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid']) ? $overrides['bigbluebuttonbnid'] : $bbbsession['bigbluebuttonbn']->id;
+    $log->userid = isset($overrides['userid']) ? $overrides['userid'] : $bbbsession['userID'];
+    $log->meetingid = isset($overrides['meetingid']) ? $overrides['meetingid'] : $bbbsession['meetingid'];
+    $log->timecreated = isset($overrides['timecreated']) ? $overrides['timecreated'] : time();
+    $log->log = $event;
+    if (isset($meta)) {
+        $log->meta = $meta;
+    } elseif ($event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
+        $log->meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+    }
+
+    $DB->insert_record('bigbluebuttonbn_logs', $log);
+}
+
 //  BigBlueButton API Calls  //
 function bigbluebuttonbn_getJoinURL($meetingID, $userName, $PW, $SALT, $URL, $logoutURL, $configToken = null, $userId = null)
 {
