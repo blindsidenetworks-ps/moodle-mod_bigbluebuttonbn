@@ -1762,6 +1762,30 @@ function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable()
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable : (isset($CFG->bigbluebuttonbn_recordings_deleted_activities_editable) ? $CFG->bigbluebuttonbn_recordings_deleted_activities_editable : false);
 }
 
+function bigbluebuttonbn_get_cfg_options()
+{
+    return [
+          'voicebridge_editable' => bigbluebuttonbn_get_cfg_voicebridge_editable(),
+          'recording_default' => bigbluebuttonbn_get_cfg_recording_default(),
+          'recording_editable' => bigbluebuttonbn_get_cfg_recording_editable(),
+          'recording_tagging_default' => bigbluebuttonbn_get_cfg_recording_tagging_default(),
+          'recording_tagging_editable' => bigbluebuttonbn_get_cfg_recording_tagging_editable(),
+          'waitformoderator_default' => bigbluebuttonbn_get_cfg_waitformoderator_default(),
+          'waitformoderator_editable' => bigbluebuttonbn_get_cfg_waitformoderator_editable(),
+          'userlimit_default' => bigbluebuttonbn_get_cfg_userlimit_default(),
+          'userlimit_editable' => bigbluebuttonbn_get_cfg_userlimit_editable(),
+          'preuploadpresentation_enabled' => bigbluebuttonbn_get_cfg_preuploadpresentation_enabled(),
+          'sendnotifications_enabled' => bigbluebuttonbn_get_cfg_sendnotifications_enabled(),
+          'recordings_html_default' => bigbluebuttonbn_get_cfg_recordings_html_default(),
+          'recordings_html_editable' => bigbluebuttonbn_get_cfg_recordings_html_editable(),
+          'recordings_deleted_activities_default' => bigbluebuttonbn_get_cfg_recordings_deleted_activities_default(),
+          'recordings_deleted_activities_editable' => bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable(),
+          'recording_icons_enabled' => bigbluebuttonbn_get_cfg_recording_icons_enabled(),
+          'instance_type_enabled' => bigbluebuttonbn_recordings_enabled(),
+          'instance_type_default' => BIGBLUEBUTTONBN_TYPE_ALL,
+        ];
+}
+
 function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession)
 {
     if ($bbbsession['administrator']) {

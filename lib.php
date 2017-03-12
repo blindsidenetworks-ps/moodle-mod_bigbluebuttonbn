@@ -300,9 +300,7 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray)
         return array();
     }
 
-    if (!$bigbluebuttonbns = bigbluebuttonbn_process_pre_saveget_all_instances_in_courses('bigbluebuttonbn', $courses)) {
-        return;
-    }
+    $bigbluebuttonbns = get_all_instances_in_courses('bigbluebuttonbn', $courses);
 
     foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $now = time();
@@ -312,12 +310,19 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray)
             if ($bigbluebuttonbn->openingtime > $now) {
                 $start = 'starts_at';
             }
-            $str = '<div class="bigbluebuttonbn overview"><div class="name">'.
-                    get_string('modulename', 'bigbluebuttonbn').': <a '.($bigbluebuttonbn->visible ? '' : ' class="dimmed"').
-                    ' href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.'">'.
-                    $bigbluebuttonbn->name.'</a></div>';
-            $str .= '<div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>';
-            $str .= '<div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime).'</div></div>';
+            $classes = '';
+            if ($bigbluebuttonbn->visible) {
+                $classes = 'class="dimmed" ';
+            }
+            $str  = '<div class="bigbluebuttonbn overview">'."\n";
+            $str .= '  <div class="name">'.get_string('modulename', 'bigbluebuttonbn').':&nbsp;'."\n";
+            $str .= '    <a '.$classes.'href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.
+              '">'.$bigbluebuttonbn->name.'</a>'."\n";
+            $str .= '  </div>'."\n";
+            $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>'."\n";
+            $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
+              .'</div>'."\n";
+            $str .= '</div>'."\n";
 
             if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
                 $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = '';
@@ -414,8 +419,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn)
     // Now that an id was assigned, generate and set the meetingid property based on
     // [Moodle Instance + Activity ID + BBB Secret] (but only for new activities)
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-        $bigbluebuttonbn_meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
-        $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn_meetingid, array('id' => $bigbluebuttonbn->id));
+        $meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
+        $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
 
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     }
@@ -568,7 +573,7 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args)
 
         return $args['1'];
     }
-      
+
     require_course_login($course, true, $cm);
 
     if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
@@ -577,7 +582,6 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args)
 
     return implode('/', $args);
 }
-
 
 /**
  * Returns an array of file areas.
