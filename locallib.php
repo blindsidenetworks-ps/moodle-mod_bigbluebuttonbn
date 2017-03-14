@@ -1,16 +1,16 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-
+//
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -19,9 +19,10 @@
  *
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2015 Blindside Networks Inc
+ * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
+
 defined('MOODLE_INTERNAL') || die;
 
 global $BIGBLUEBUTTONBN_CFG, $CFG;
@@ -50,14 +51,14 @@ const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
 const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
 const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 
-function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null)
-{
+function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null) {
     global $DB;
 
     $log = new stdClass();
 
     $log->courseid = isset($overrides['courseid']) ? $overrides['courseid'] : $bbbsession['course']->id;
-    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid']) ? $overrides['bigbluebuttonbnid'] : $bbbsession['bigbluebuttonbn']->id;
+    $log->bigbluebuttonbnid = isset($overrides['bigbluebuttonbnid']) ?
+        $overrides['bigbluebuttonbnid'] : $bbbsession['bigbluebuttonbn']->id;
     $log->userid = isset($overrides['userid']) ? $overrides['userid'] : $bbbsession['userID'];
     $log->meetingid = isset($overrides['meetingid']) ? $overrides['meetingid'] : $bbbsession['meetingid'];
     $log->timecreated = isset($overrides['timecreated']) ? $overrides['timecreated'] : time();
@@ -72,8 +73,7 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
 }
 
 //  BigBlueButton API Calls  //
-function bigbluebuttonbn_getJoinURL($meetingID, $userName, $PW, $logoutURL, $configToken = null, $userId = null)
-{
+function bigbluebuttonbn_getJoinURL($meetingID, $userName, $PW, $logoutURL, $configToken = null, $userId = null) {
     $data = ['meetingID' => $meetingID,
               'fullName' => $userName,
               'password' => $PW,
@@ -90,8 +90,8 @@ function bigbluebuttonbn_getJoinURL($meetingID, $userName, $PW, $logoutURL, $con
     return bigbluebuttonbn_bigbluebutton_action_url('join', $data);
 }
 
-function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0, $metadata = array())
-{
+function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome,
+    $logoutURL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0, $metadata = array()) {
     $data = ['meetingID' => $meetingID,
               'name' => $name,
               'attendeePW' => $attendeePW,
@@ -122,18 +122,15 @@ function bigbluebuttonbn_getCreateMeetingURL($name, $meetingID, $attendeePW, $mo
     return bigbluebuttonbn_bigbluebutton_action_url('create', $data, $metadata);
 }
 
-function bigbluebuttonbn_getIsMeetingRunningURL($meetingID)
-{
+function bigbluebuttonbn_getIsMeetingRunningURL($meetingID) {
     return bigbluebuttonbn_bigbluebutton_action_url('isMeetingRunning', ['meetingID' => $meetingID]);
 }
 
-function bigbluebuttonbn_getMeetingInfoURL($meetingID)
-{
+function bigbluebuttonbn_getMeetingInfoURL($meetingID) {
     return bigbluebuttonbn_bigbluebutton_action_url('getMeetingInfo', ['meetingID' => $meetingID]);
 }
 
-function bigbluebuttonbn_getMeetingsURL()
-{
+function bigbluebuttonbn_getMeetingsURL() {
     return bigbluebuttonbn_bigbluebutton_action_url('getMeetings');
 }
 
@@ -141,24 +138,21 @@ function bigbluebuttonbn_getMeetingsURL()
  * @param string $meetingID
  * @param string $modPW
  */
-function bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW)
-{
+function bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW) {
     return bigbluebuttonbn_bigbluebutton_action_url('end', ['meetingID' => $meetingID, 'password' => $modPW]);
 }
 
 /**
  * @param string $meetingID
  */
-function bigbluebuttonbn_getRecordingsURL($meetingID)
-{
+function bigbluebuttonbn_getRecordingsURL($meetingID) {
     return bigbluebuttonbn_bigbluebutton_action_url('getRecordings', ['meetingID' => $meetingID]);
 }
 
 /**
  * @param string $recordID
  */
-function bigbluebuttonbn_getDeleteRecordingsURL($recordID)
-{
+function bigbluebuttonbn_getDeleteRecordingsURL($recordID) {
     return bigbluebuttonbn_bigbluebutton_action_url('deleteRecordings', ['recordID' => $recordID]);
 }
 
@@ -166,8 +160,7 @@ function bigbluebuttonbn_getDeleteRecordingsURL($recordID)
  * @param string $recordID
  * @param string $publish
  */
-function bigbluebuttonbn_getPublishRecordingsURL($recordID, $publish)
-{
+function bigbluebuttonbn_getPublishRecordingsURL($recordID, $publish) {
     return bigbluebuttonbn_bigbluebutton_action_url('publishRecordings', ['recordID' => $recordID, 'publish' => $publish]);
 }
 
@@ -175,18 +168,15 @@ function bigbluebuttonbn_getPublishRecordingsURL($recordID, $publish)
  * @param string $recordID
  * @param array  $metadata
  */
-function bigbluebuttonbn_getUpdateRecordingsURL($recordID, $metadata = array())
-{
+function bigbluebuttonbn_getUpdateRecordingsURL($recordID, $metadata = array()) {
     return bigbluebuttonbn_bigbluebutton_action_url('updateRecordings', ['recordID' => $recordID], $metadata);
 }
 
-function bigbluebuttonbn_getDefaultConfigXMLURL()
-{
+function bigbluebuttonbn_getDefaultConfigXMLURL() {
     return bigbluebuttonbn_bigbluebutton_action_url('getDefaultConfigXML');
 }
 
-function bigbluebuttonbn_bigbluebutton_action_url($action, $data = array(), $metadata = array())
-{
+function bigbluebuttonbn_bigbluebutton_action_url($action, $data = array(), $metadata = array()) {
     $base_url = bigbluebuttonbn_get_cfg_server_url().'api/'.$action.'?';
 
     $params = '';
@@ -202,8 +192,10 @@ function bigbluebuttonbn_bigbluebutton_action_url($action, $data = array(), $met
     return $base_url.$params.'&checksum='.sha1($action.$params.bigbluebuttonbn_get_cfg_shared_secret());
 }
 
-function bigbluebuttonbn_getCreateMeetingArray($meetingName, $meetingID, $welcomeString, $mPW, $aPW, $logoutURL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0, $metadata = array(), $presentation_name = null, $presentation_url = null)
-{
+function bigbluebuttonbn_getCreateMeetingArray($meetingName, $meetingID, $welcomeString, $mPW, $aPW,
+        $logoutURL, $record = 'false', $duration = 0, $voiceBridge = 0, $maxParticipants = 0,
+        $metadata = array(), $presentation_name = null, $presentation_url = null) {
+
     $create_meeting_url = bigbluebuttonbn_getCreateMeetingURL($meetingName, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $record, $duration, $voiceBridge, $maxParticipants, $metadata);
     $method = BIGBLUEBUTTONBN_METHOD_GET;
     $data = null;
@@ -230,8 +222,7 @@ function bigbluebuttonbn_getCreateMeetingArray($meetingName, $meetingID, $welcom
 /**
  * @param string $meetingID
  */
-function bigbluebuttonbn_getMeetingArray($meetingID)
-{
+function bigbluebuttonbn_getMeetingArray($meetingID) {
     $meetings = bigbluebuttonbn_getMeetingsArray();
     if ($meetings) {
         foreach ($meetings as $meeting) {
@@ -244,12 +235,11 @@ function bigbluebuttonbn_getMeetingArray($meetingID)
     return null;
 }
 
-function bigbluebuttonbn_getMeetingsArray()
-{
+function bigbluebuttonbn_getMeetingsArray() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getMeetingsURL());
 
     if ($xml && $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
-        // Meetings were returned
+        // Meetings were returned.
         $meetings = array();
         foreach ($xml->meetings->meeting as $meeting) {
             $meetings[] = array('meetingID' => $meeting->meetingID,
@@ -263,19 +253,18 @@ function bigbluebuttonbn_getMeetingsArray()
     }
 
     if ($xml) {
-        // Either failutre or success without meetings
+        // Either failutre or success without meetings.
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
     }
 
-    //If the server is unreachable, then prompts the user of the necessary action
+    // If the server is unreachable, then prompts the user of the necessary action.
     return null;
 }
 
 /**
  * @param string $meetingID
  */
-function bigbluebuttonbn_getMeetingInfo($meetingID)
-{
+function bigbluebuttonbn_getMeetingInfo($meetingID) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getMeetingInfoURL($meetingID));
 
     return $xml;
@@ -284,12 +273,11 @@ function bigbluebuttonbn_getMeetingInfo($meetingID)
 /**
  * @param string $meetingID
  */
-function bigbluebuttonbn_getMeetingInfoArray($meetingID)
-{
+function bigbluebuttonbn_getMeetingInfoArray($meetingID) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getMeetingInfoURL($meetingID));
 
     if ($xml && $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
-        // Meeting info was returned
+        // Meeting info was returned.
         return array('returncode' => $xml->returncode,
                      'meetingID' => $xml->meetingID,
                      'moderatorPW' => $xml->moderatorPW,
@@ -307,11 +295,11 @@ function bigbluebuttonbn_getMeetingInfoArray($meetingID)
     }
 
     if ($xml) {
-        // Either failutre or success without meeting info
+        // Either failutre or success without meeting info.
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
     }
 
-    //If the server is unreachable, then prompts the user of the necessary action
+    //I f the server is unreachable, then prompts the user of the necessary action.
     return null;
 }
 
@@ -323,8 +311,7 @@ function bigbluebuttonbn_getMeetingInfoArray($meetingID)
  *
  * @return associative array containing the actual recordings indexed by recordID, each recording is also a non sequential associative array itself
  */
-function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs = null)
-{
+function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs = null) {
     $recordings = array();
 
     $meetingIDsArray = $meetingIDs;
@@ -332,14 +319,15 @@ function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs = null)
         $meetingIDsArray = explode(',', $meetingIDs);
     }
 
-    // If $meetingIDsArray is not empty a paginated getRecordings request is executed
+    // If $meetingIDsArray is not empty a paginated getRecordings request is executed.
     if (!empty($meetingIDsArray)) {
         $pages = floor(sizeof($meetingIDsArray) / 25) + 1;
         for ($page = 1; $page <= $pages; ++$page) {
             $mIDs = array_slice($meetingIDsArray, ($page - 1) * 25, 25);
-            // getRecordings is executed using a method GET (supported by all versions of BBB)
+            // Do getRecordings is executed using a method GET (supported by all versions of BBB).
             $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getRecordingsURL(implode(',', $mIDs)));
-            if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) { //If there were meetings already created
+            if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+                // If there were meetings already created.
                 foreach ($xml->recordings->recording as $recording) {
                     $recording_array_value = bigbluebuttonbn_getRecordingArrayValue($recording);
                     $recordings[$recording_array_value['recordID']] = $recording_array_value;
@@ -349,7 +337,7 @@ function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs = null)
         }
     }
 
-    // Filter recordings based on recordingIDs
+    // Filter recordings based on recordingIDs.
     if (!empty($recordings) && !is_null($recordingIDs)) {
         $recordingIDsArray = $recordingIDs;
         if (!is_array($recordingIDs)) {
@@ -375,8 +363,7 @@ function bigbluebuttonbn_getRecordingsArray($meetingIDs, $recordingIDs = null)
  *
  * @return associative array containing the imported recordings indexed by recordID, each recording is also a non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID = null, $subset = true)
-{
+function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID = null, $subset = true) {
     global $DB;
 
     $select = "courseid = '{$courseID}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
@@ -388,9 +375,9 @@ function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnI
     $records_imported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
     $recordings_imported = $records_imported;
-    // Check if array is not sequential
+    // Check if array is not sequential.
     if (!empty($records_imported) && array_keys($records_imported) !== range(0, count($records_imported) - 1)) {
-        // The response contains a single record and needs to be converted to a sequential array format
+        // The response contains a single record and needs to be converted to a sequential array format.
         $recordings_imported = array($records_imported);
     }
 
@@ -403,28 +390,25 @@ function bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnI
     return $recordings_imported_array;
 }
 
-function bigbluebuttonbn_getDefaultConfigXML()
-{
+function bigbluebuttonbn_getDefaultConfigXML() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getDefaultConfigXMLURL());
 
     return $xml;
 }
 
-function bigbluebuttonbn_getDefaultConfigXMLArray()
-{
+function bigbluebuttonbn_getDefaultConfigXMLArray() {
     $default_config_xml = bigbluebuttonbn_getDefaultConfigXML();
     $default_config_xml_array = (array) $default_config_xml;
 
     return $default_config_xml_array;
 }
 
-function bigbluebuttonbn_getRecordingArrayValue($recording)
-{
-    //Add formats
+function bigbluebuttonbn_getRecordingArrayValue($recording) {
+    // Add formats.
     $playbackArray = array();
     foreach ($recording->playback->format as $format) {
         $playbackArray[(string) $format->type] = array('type' => (string) $format->type, 'url' => (string) $format->url, 'length' => (string) $format->length);
-        //Add preview per format when existing
+        // Add preview per format when existing.
         if ($format->preview) {
             $imagesArray = array();
             foreach ($format->preview->images->image as $image) {
@@ -438,7 +422,7 @@ function bigbluebuttonbn_getRecordingArrayValue($recording)
         }
     }
 
-    //Add the metadata to the recordings array
+    // Add the metadata to the recordings array.
     $metadataArray = array();
     $metadata = get_object_vars($recording->metadata);
     foreach ($metadata as $key => $value) {
@@ -453,8 +437,7 @@ function bigbluebuttonbn_getRecordingArrayValue($recording)
     return $recordingArrayValue;
 }
 
-function bigbluebuttonbn_recordingBuildSorter($a, $b)
-{
+function bigbluebuttonbn_recordingBuildSorter($a, $b) {
     if ($a['startTime'] < $b['startTime']) {
         return -1;
     } elseif ($a['startTime'] == $b['startTime']) {
@@ -467,8 +450,7 @@ function bigbluebuttonbn_recordingBuildSorter($a, $b)
 /**
  * @param string $recordIDs
  */
-function bigbluebuttonbn_doDeleteRecordings($recordIDs)
-{
+function bigbluebuttonbn_doDeleteRecordings($recordIDs) {
     $ids = explode(',', $recordIDs);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getDeleteRecordingsURL($id));
@@ -484,8 +466,7 @@ function bigbluebuttonbn_doDeleteRecordings($recordIDs)
  * @param string $recordIDs
  * @param string $publish
  */
-function bigbluebuttonbn_doPublishRecordings($recordIDs, $publish)
-{
+function bigbluebuttonbn_doPublishRecordings($recordIDs, $publish) {
     $ids = explode(',', $recordIDs);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getPublishRecordingsURL($id, $publish));
@@ -501,23 +482,22 @@ function bigbluebuttonbn_doPublishRecordings($recordIDs, $publish)
  * @param string $meetingID
  * @param string $modPW
  */
-function bigbluebuttonbn_doEndMeeting($meetingID, $modPW)
-{
+function bigbluebuttonbn_doEndMeeting($meetingID, $modPW) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID, $modPW));
 
-    if ($xml) { //If the xml packet returned failure it displays the message to the user
+    if ($xml) {
+        // If the xml packet returned failure it displays the message to the user.
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
     }
 
-    //If the server is unreachable, then prompts the user of the necessary action
+    // If the server is unreachable, then prompts the user of the necessary action.
     return null;
 }
 
 /**
  * @param string $meetingID
  */
-function bigbluebuttonbn_isMeetingRunning($meetingID)
-{
+function bigbluebuttonbn_isMeetingRunning($meetingID) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getIsMeetingRunningURL($meetingID));
     if ($xml && $xml->returncode == 'SUCCESS') {
         return ($xml->running == 'true') ? true : false;
@@ -526,8 +506,7 @@ function bigbluebuttonbn_isMeetingRunning($meetingID)
     return false;
 }
 
-function bigbluebuttonbn_getServerVersion()
-{
+function bigbluebuttonbn_getServerVersion() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_get_cfg_server_url().'api');
     if ($xml && $xml->returncode == 'SUCCESS') {
         return $xml->version;
@@ -536,8 +515,7 @@ function bigbluebuttonbn_getServerVersion()
     return null;
 }
 
-function bigbluebuttonbn_getMeetingXML($meetingID)
-{
+function bigbluebuttonbn_getMeetingXML($meetingID) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getIsMeetingRunningURL($meetingID));
     if ($xml && $xml->returncode == 'SUCCESS') {
         return str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML()));
@@ -550,8 +528,9 @@ function bigbluebuttonbn_getMeetingXML($meetingID)
  * @param string $url
  * @param string $data
  */
-function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METHOD_GET, $data = null, $content_type = 'text/xml')
-{
+function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METHOD_GET,
+    $data = null, $content_type = 'text/xml') {
+
     if (bigbluebuttonbn_debugdisplay()) {
         error_log('Request to: '.$url);
     }
@@ -583,7 +562,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
         }
     }
 
-    // Alternative request non CURL based
+    // Alternative request non CURL based.
     $previous = libxml_use_internal_errors(true);
     try {
         $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
@@ -601,8 +580,8 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     }
 }
 
-function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = BIGBLUEBUTTONBN_METHOD_GET, $data = null, $content_type = 'text/xml')
-{
+function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = BIGBLUEBUTTONBN_METHOD_GET,
+    $data = null, $content_type = 'text/xml') {
     $c = new curl();
     $c->setopt(array('SSL_VERIFYPEER' => true));
     if ($method == BIGBLUEBUTTONBN_METHOD_POST) {
@@ -623,8 +602,7 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = BIGBLUE
     return $c->get($url);
 }
 
-function bigbluebuttonbn_get_user_roles($context, $userid)
-{
+function bigbluebuttonbn_get_user_roles($context, $userid) {
     global $DB;
 
     $user_roles = get_user_roles($context, $userid);
@@ -639,15 +617,13 @@ function bigbluebuttonbn_get_user_roles($context, $userid)
     return $user_roles;
 }
 
-function bigbluebuttonbn_get_guest_role()
-{
+function bigbluebuttonbn_get_guest_role() {
     $guest_role = get_guest_role();
 
     return array($guest_role->id => $guest_role);
 }
 
-function bigbluebuttonbn_get_roles(context $context = null)
-{
+function bigbluebuttonbn_get_roles(context $context = null) {
     $roles = role_get_names($context);
     $roles_array = array();
     foreach ($roles as $role) {
@@ -657,8 +633,7 @@ function bigbluebuttonbn_get_roles(context $context = null)
     return $roles_array;
 }
 
-function bigbluebuttonbn_get_roles_select($roles = array())
-{
+function bigbluebuttonbn_get_roles_select($roles = array()) {
     $roles_array = array();
     foreach ($roles as $key => $value) {
         $roles_array[] = array('id' => $key, 'name' => $value);
@@ -667,8 +642,7 @@ function bigbluebuttonbn_get_roles_select($roles = array())
     return $roles_array;
 }
 
-function bigbluebuttonbn_get_users_select($users)
-{
+function bigbluebuttonbn_get_users_select($users) {
     $users_array = array();
     foreach ($users as $user) {
         $users_array[] = array('id' => $user->id, 'name' => fullname($user));
@@ -677,8 +651,7 @@ function bigbluebuttonbn_get_users_select($users)
     return $users_array;
 }
 
-function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context = null)
-{
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context = null) {
     if ($bigbluebuttonbn == null) {
         return bigbluebuttonbn_get_participant_list_default($context);
     }
@@ -694,8 +667,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context = null)
     return $participant_list_array;
 }
 
-function bigbluebuttonbn_get_participant_list_default($context)
-{
+function bigbluebuttonbn_get_participant_list_default($context) {
     global $USER;
 
     $participant_list_array = array();
@@ -725,27 +697,25 @@ function bigbluebuttonbn_get_participant_list_default($context)
 
     return $participant_list_array;
 }
-function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid = null)
-{
+function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid = null) {
     return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
 }
 
-function bigbluebuttonbn_is_moderator($user, $roles, $participants)
-{
+function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     $participant_list = json_decode($participants);
 
-    // Iterate participant rules
+    // Iterate participant rules.
     foreach ($participant_list as $participant) {
         if ($participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR) {
-            // looks for all configuration
+            // Looks for all configuration.
             if ($participant->selectiontype == 'all') {
                 return true;
             }
-            // looks for users
+            // Looks for users.
             if ($participant->selectiontype == 'user' && $participant->selectionid == $user) {
                 return true;
             }
-            // looks for roles
+            // Looks for roles
             if ($participant->selectiontype == 'role') {
                 foreach ($roles as $role) {
                     if ($participant->selectionid == $role->shortname) {
@@ -759,8 +729,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants)
     return false;
 }
 
-function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null)
-{
+function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null) {
     $key = $defaultKey;
     if ($messageKey == 'checksumError') {
         $key = 'index_error_checksum';
@@ -771,8 +740,7 @@ function bigbluebuttonbn_get_error_key($messageKey, $defaultKey = null)
     return $key;
 }
 
-function bigbluebuttonbn_voicebridge_unique($voicebridge, $id = null)
-{
+function bigbluebuttonbn_voicebridge_unique($voicebridge, $id = null) {
     global $DB;
 
     $is_unique = true;
@@ -790,8 +758,7 @@ function bigbluebuttonbn_voicebridge_unique($voicebridge, $id = null)
     return $is_unique;
 }
 
-function bigbluebuttonbn_get_duration($closingtime)
-{
+function bigbluebuttonbn_get_duration($closingtime) {
     $duration = 0;
     $now = time();
     if ($closingtime > 0 && $now < $closingtime) {
@@ -803,8 +770,7 @@ function bigbluebuttonbn_get_duration($closingtime)
     return $duration;
 }
 
-function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null)
-{
+function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
     $presentation_name = null;
     $presentation_url = null;
     $presentation_icon = null;
@@ -812,7 +778,8 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
 
     if (!empty($presentation)) {
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0, 'itemid, filepath, filename', false);
+        $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
+            'itemid, filepath, filename', false);
         if (count($files) >= 1) {
             $file = reset($files);
             unset($files);
@@ -823,41 +790,42 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
 
             if (!is_null($id)) {
                 //Create the nonce component for granting a temporary public access
-                $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
+                $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn',
+                    'presentation_cache');
                 $presentation_nonce_key = sha1($id);
                 //The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather the file
                 $presentation_nonce_value = bigbluebuttonbn_generate_nonce();
                 $cache->set($presentation_nonce_key, array('value' => $presentation_nonce_value, 'counter' => 0));
             }
-            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $presentation_nonce_value, $file->get_filepath(), $file->get_filename());
+            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
+                $file->get_filearea(), $presentation_nonce_value, $file->get_filepath(), $file->get_filename());
 
             $presentation_url = $url->out(false);
         }
     }
 
-    $presentation_array = array('url' => $presentation_url, 'name' => $presentation_name, 'icon' => $presentation_icon, 'mimetype_description' => $presentation_mimetype_description);
+    $presentation_array = array('url' => $presentation_url, 'name' => $presentation_name,
+                                'icon' => $presentation_icon,
+                                'mimetype_description' => $presentation_mimetype_description);
 
     return $presentation_array;
 }
 
-function bigbluebuttonbn_generate_nonce()
-{
+function bigbluebuttonbn_generate_nonce() {
     $mt = microtime();
     $rand = mt_rand();
 
     return md5($mt.$rand);
 }
 
-function bigbluebuttonbn_random_password($length = 8)
-{
+function bigbluebuttonbn_random_password($length = 8) {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
     $password = substr(str_shuffle($chars), 0, $length);
 
     return $password;
 }
 
-function bigbluebuttonbn_get_moodle_version_major()
-{
+function bigbluebuttonbn_get_moodle_version_major() {
     global $CFG;
 
     $version_array = explode('.', $CFG->version);
@@ -865,8 +833,9 @@ function bigbluebuttonbn_get_moodle_version_major()
     return $version_array[0];
 }
 
-function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $cm, $timecreated = null, $userid = null, $event_subtype = null)
-{
+function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $cm,
+        $timecreated = null, $userid = null, $event_subtype = null) {
+
     $context = context_module::instance($cm->id);
     $event_properties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
 
@@ -905,26 +874,24 @@ function bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $cm, 
             $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_event::create($event_properties);
             break;
     }
+
     if (isset($event)) {
         $event->trigger();
     }
 }
 
-function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $cm)
-{
+function bigbluebuttonbn_event_log($event_type, $bigbluebuttonbn, $cm) {
     bigbluebuttonbn_event_log_standard($event_type, $bigbluebuttonbn, $cm);
 }
 
-function bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm)
-{
+function bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm) {
     bigbluebuttonbn_event_log_standard(BIGBLUEBUTTON_EVENT_MEETING_EVENT, $bigbluebuttonbn, $cm, $event->timestamp, $event->user, $event->event);
 }
 
 /**
  * @param bool $is_moderator
  */
-function bigbluebuttonbn_participant_joined($meetingid, $is_moderator)
-{
+function bigbluebuttonbn_participant_joined($meetingid, $is_moderator) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
     $meeting_info = json_decode($result['meeting_info']);
@@ -935,69 +902,63 @@ function bigbluebuttonbn_participant_joined($meetingid, $is_moderator)
     $cache->set($meetingid, array('creation_time' => $result['creation_time'], 'meeting_info' => json_encode($meeting_info)));
 }
 
-function bigbluebuttonbn_is_meeting_running($meeting_info)
-{
+function bigbluebuttonbn_is_meeting_running($meeting_info) {
     $meeting_running = (isset($meeting_info) && isset($meeting_info->returncode) && $meeting_info->returncode == 'SUCCESS');
 
     return $meeting_running;
 }
 
-function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false)
-{
+function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false) {
     $cache_ttl = bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl();
 
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
     $now = time();
     if (!$forced && isset($result) && $now < ($result['creation_time'] + $cache_ttl)) {
-        //Use the value in the cache
+        // Use the value in the cache.
         return json_decode($result['meeting_info']);
     }
 
-    //Ping again and refresh the cache
+    // Ping again and refresh the cache.
     $meeting_info = (array) bigbluebuttonbn_getMeetingInfo($meetingid);
     $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meeting_info)));
 
     return $meeting_info;
 }
 
-function bigbluebuttonbn_end_meeting($meetingid, $password)
-{
+function bigbluebuttonbn_end_meeting($meetingid, $password) {
     bigbluebuttonbn_doEndMeeting($meetingid, $password);
 }
 
-function bigbluebuttonbn_publish_recording($recordingid, $publish = true)
-{
+function bigbluebuttonbn_publish_recording($recordingid, $publish = true) {
     bigbluebuttonbn_doPublishRecordings($recordingid, ($publish) ? 'true' : 'false');
 }
 
-function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebuttonbnID, $publish = true)
-{
+function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebuttonbnID, $publish = true) {
     global $DB;
 
     //Locate the record to be updated
-    $records = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbnID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
+    $records = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbnID,
+        'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
 
     foreach ($records as $key => $record) {
         $meta = json_decode($record->meta, true);
         if ($recordingid == $meta['recording']['recordID']) {
-            // Found, prepare data for the update
+            // Found, prepare data for the update.
             $meta['recording']['published'] = ($publish) ? 'true' : 'false';
             $records[$key]->meta = json_encode($meta);
 
-            // Proceed with the update
+            // Proceed with the update.
             $DB->update_record('bigbluebuttonbn_logs', $records[$key]);
         }
     }
 }
 
-function bigbluebuttonbn_delete_recording($recordingid)
-{
+function bigbluebuttonbn_delete_recording($recordingid) {
     bigbluebuttonbn_doDeleteRecordings($recordingid);
 }
 
-function bigbluebuttonbn_delete_recording_imported($recordingid, $bigbluebuttonbnID)
-{
+function bigbluebuttonbn_delete_recording_imported($recordingid, $bigbluebuttonbnID) {
     global $DB;
 
     //Locate the record to be updated
@@ -1012,8 +973,7 @@ function bigbluebuttonbn_delete_recording_imported($recordingid, $bigbluebuttonb
     }
 }
 
-function bigbluebuttonbn_validate_parameters($params)
-{
+function bigbluebuttonbn_validate_parameters($params) {
     $error = '';
 
     if (!isset($params['callback'])) {
@@ -1057,8 +1017,7 @@ function bigbluebuttonbn_validate_parameters($params)
     return '';
 }
 
-function bigbluebuttonbn_add_error($org_msg, $new_msg = '')
-{
+function bigbluebuttonbn_add_error($org_msg, $new_msg = '') {
     $error = $org_msg;
 
     if (!empty($new_msg)) {
@@ -1075,8 +1034,7 @@ function bigbluebuttonbn_add_error($org_msg, $new_msg = '')
  * @param string $meetingID
  * @param string $configXML
  */
-function bigbluebuttonbn_setConfigXMLParams($meetingID, $configXML)
-{
+function bigbluebuttonbn_setConfigXMLParams($meetingID, $configXML) {
     $params = 'configXML='.urlencode($configXML).'&meetingID='.urlencode($meetingID);
     $config_xml_params = $params.'&checksum='.sha1('setConfigXML'.$params.bigbluebuttonbn_get_cfg_shared_secret());
 
@@ -1087,8 +1045,7 @@ function bigbluebuttonbn_setConfigXMLParams($meetingID, $configXML)
  * @param string $meetingID
  * @param string $configXML
  */
-function bigbluebuttonbn_setConfigXML($meetingID, $configXML)
-{
+function bigbluebuttonbn_setConfigXML($meetingID, $configXML) {
     $url_default_config = bigbluebuttonbn_get_cfg_server_url().'api/setConfigXML?';
     $config_xml_params = bigbluebuttonbn_setConfigXMLParams($meetingID, $configXML);
     $xml = bigbluebuttonbn_wrap_xml_load_file($url_default_config, BIGBLUEBUTTONBN_METHOD_POST, $config_xml_params, 'application/x-www-form-urlencoded');
@@ -1100,16 +1057,14 @@ function bigbluebuttonbn_setConfigXML($meetingID, $configXML)
  * @param string $meetingID
  * @param string $configXML
  */
-function bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML)
-{
+function bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML) {
     $config_xml = bigbluebuttonbn_setConfigXML($meetingID, $configXML);
     $config_xml_array = (array) $config_xml;
 
     return $config_xml_array;
 }
 
-function bigbluebuttonbn_set_config_xml($meetingID, $configXML)
-{
+function bigbluebuttonbn_set_config_xml($meetingID, $configXML) {
     $config_xml_array = bigbluebuttonbn_setConfigXMLArray($meetingID, $configXML);
     if ($config_xml_array['returncode'] != 'SUCCESS') {
         error_log('BigBlueButton was not able to set the custom config.xml file');
@@ -1120,8 +1075,7 @@ function bigbluebuttonbn_set_config_xml($meetingID, $configXML)
     return $config_xml_array['configToken'];
 }
 
-function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['publishing', 'deleting'])
-{
+function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['publishing', 'deleting']) {
     global $USER;
 
     $row = null;
@@ -1129,31 +1083,31 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     if ($bbbsession['managerecordings'] || $recording['published'] == 'true') {
         $row = new stdClass();
 
-        // Set recording_types
+        // Set recording_types.
         $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording);
 
-        // Set activity name and description
+        // Set activity name and description.
         $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity(recording);
         $row->description = bigbluebuttonbn_get_recording_data_row_meta_description(recording);
 
-        // Set recording_preview
+        // Set recording_preview.
         $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
 
-        // Set date
+        // Set date.
         $startTime = isset($recording['startTime']) ? floatval($recording['startTime']) : 0;
         $startTime = $startTime - ($startTime % 1000);
         $row->date = floatval($recording['startTime']);
 
-        // Set formatted date
+        // Set formatted date.
         $dateformat = get_string('strftimerecentfull', 'langconfig').' %Z';
         $row->date_formatted = userdate($startTime / 1000, $dateformat, usertimezone($USER->timezone));
 
-        // Set formatted duration
+        // Set formatted duration.
         $first_playback = array_values($recording['playbacks'])[0];
         $length = isset($first_playback['length']) ? $first_playback['length'] : 0;
         $row->duration_formatted = $row->duration = intval($length);
 
-        // Set actionbar, if user is allowed to manage recordings
+        // Set actionbar, if user is allowed to manage recordings.
         if ($bbbsession['managerecordings']) {
             $row->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
         }
@@ -1162,12 +1116,11 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     return $row;
 }
 
-function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools)
-{
+function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
 
     if (in_array('publishing', $tools)) {
-        /// Set action [show|hide]
+        // Set action [show|hide].
         $manage_action = 'publish';
         $manage_tag = 'show';
         if ($recording['published'] == 'true') {
@@ -1190,16 +1143,17 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools)
     return $actionbar;
 }
 
-function bigbluebuttonbn_get_recording_data_row_preview($recording)
-{
+function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     $recording_preview = '';
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
             foreach ($playback['preview'] as $image) {
-                $recording_preview .= html_writer::empty_tag('img', array('src' => $image['url'], 'class' => 'thumbnail'));
+                $recording_preview .= html_writer::empty_tag('img',
+                    array('src' => $image['url'], 'class' => 'thumbnail'));
             }
             $recording_preview .= html_writer::empty_tag('br');
-            $recording_preview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-muted small'));
+            $recording_preview .= html_writer::tag('div',
+                get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-muted small'));
             break;
         }
     }
@@ -1207,8 +1161,7 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording)
     return $recording_preview;
 }
 
-function bigbluebuttonbn_get_recording_data_row_types($recording)
-{
+function bigbluebuttonbn_get_recording_data_row_types($recording) {
     global $OUTPUT;
 
     $attributes = 'data-imported="false"';
@@ -1230,8 +1183,7 @@ function bigbluebuttonbn_get_recording_data_row_types($recording)
     return $recording_types;
 }
 
-function bigbluebuttonbn_get_recording_data_row_meta_activity($recording)
-{
+function bigbluebuttonbn_get_recording_data_row_meta_activity($recording) {
     if (isset($recording['meta_contextactivity'])) {
         return htmlentities($recording['meta_contextactivity']);
     } elseif (isset($recording['meta_bbb-recording-name'])) {
@@ -1241,8 +1193,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_activity($recording)
     return htmlentities($recording['meetingName']);
 }
 
-function bigbluebuttonbn_get_recording_data_row_meta_description($recording)
-{
+function bigbluebuttonbn_get_recording_data_row_meta_description($recording) {
     $meta_description = html_writer::start_tag('div', array('class' => 'col-md-20'));
     if (isset($recording['meta_contextactivitydescription']) && trim($recording['meta_contextactivitydescription']) != '') {
         $meta_description .= htmlentities($recording['meta_contextactivitydescription']);
@@ -1254,8 +1205,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording)
     return $meta_description;
 }
 
-function bigbluebuttonbn_actionbar_render($manage_action, $manage_tag, $recording)
-{
+function bigbluebuttonbn_actionbar_render($manage_action, $manage_tag, $recording) {
     global $OUTPUT;
 
     $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manage_action.'", "'.$recording['recordID'].'", "'.$recording['meetingID'].'");';
@@ -1274,9 +1224,8 @@ function bigbluebuttonbn_actionbar_render($manage_action, $manage_tag, $recordin
     return $OUTPUT->action_link('#', get_string($manage_action), null, $link_attributes);
 }
 
-function bigbluebuttonbn_get_recording_columns($bbbsession)
-{
-    ///Set strings to show
+function bigbluebuttonbn_get_recording_columns($bbbsession) {
+    // Set strings to show
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
     $activity = get_string('view_recording_activity', 'bigbluebuttonbn');
     $description = get_string('view_recording_description', 'bigbluebuttonbn');
@@ -1285,7 +1234,7 @@ function bigbluebuttonbn_get_recording_columns($bbbsession)
     $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
     $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
 
-    ///Initialize table headers
+    // Initialize table headers.
     $recordingsbn_columns = array(
         array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true),
         array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true),
@@ -1302,11 +1251,10 @@ function bigbluebuttonbn_get_recording_columns($bbbsession)
     return $recordingsbn_columns;
 }
 
-function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['publishing', 'deleting'])
-{
+function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
     $table_data = array();
 
-    ///Build table content
+    // Build table content.
     if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
         foreach ($recordings as $recording) {
             $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
@@ -1319,9 +1267,8 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
     return $table_data;
 }
 
-function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting'])
-{
-    ///Set strings to show
+function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
+    // Set strings to show.
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
     $description = get_string('view_recording_description', 'bigbluebuttonbn');
     $date = get_string('view_recording_date', 'bigbluebuttonbn');
@@ -1330,11 +1277,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $playback = get_string('view_recording_playback', 'bigbluebuttonbn');
     $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
 
-    ///Declare the table
+    // Declare the table.
     $table = new html_table();
     $table->data = array();
 
-    ///Initialize table headers
+    // Initialize table headers.
     $table->head = array($playback.$recording, $description, $preview, $date, $duration);
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     if ($bbbsession['managerecordings']) {
@@ -1342,8 +1289,9 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->align[] = 'left';
     }
 
-    ///Build table content
-    if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+    // Build table content.
+    if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
+        // There are recordings for this meeting.
         foreach ($recordings as $recording) {
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
@@ -1368,14 +1316,13 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     return $table;
 }
 
-function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn)
-{
+function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $sender = get_admin();
 
-    // Prepare message
+    // Prepare message.
     $msg = new stdClass();
 
-    /// Build the message_body
+    // Build the message_body.
     $msg->activity_type = '';
     $msg->activity_title = $bigbluebuttonbn->name;
     $message_text = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
@@ -1383,9 +1330,8 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn)
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message_text);
 }
 
-function bigbluebuttonbn_server_offers_bn_capabilities()
-{
-    //Validates if the server may have extended capabilities
+function bigbluebuttonbn_server_offers_bn_capabilities() {
+    // Validates if the server may have extended capabilities.
     $parsed_url = parse_url(bigbluebuttonbn_get_cfg_server_url());
     $host = isset($parsed_url['host']) ? $parsed_url['host'] : '';
     $host_ends = explode('.', $host);
@@ -1394,8 +1340,7 @@ function bigbluebuttonbn_server_offers_bn_capabilities()
     return $host_ends_length > 0 && $host_ends[$host_ends_length - 1] == 'com' && $host_ends[$host_ends_length - 2] == 'blindsidenetworks';
 }
 
-function bigbluebuttonbn_get_locales_for_view()
-{
+function bigbluebuttonbn_get_locales_for_view() {
     $locales = array(
             'not_started' => get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
             'wait_for_moderator' => get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'),
@@ -1436,120 +1381,103 @@ function bigbluebuttonbn_get_locales_for_view()
     return $locales;
 }
 
-function bigbluebuttonbn_get_cfg_server_url_default()
-{
+function bigbluebuttonbn_get_cfg_server_url_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url : (isset($CFG->bigbluebuttonbn_server_url) ? $CFG->bigbluebuttonbn_server_url : (isset($CFG->BigBlueButtonBNServerURL) ? $CFG->BigBlueButtonBNServerURL : BIGBLUEBUTTONBN_DEFAULT_SERVER_URL));
 }
 
-function bigbluebuttonbn_get_cfg_shared_secret_default()
-{
+function bigbluebuttonbn_get_cfg_shared_secret_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret : (isset($CFG->bigbluebuttonbn_shared_secret) ? $CFG->bigbluebuttonbn_shared_secret : (isset($CFG->BigBlueButtonBNSecuritySalt) ? $CFG->BigBlueButtonBNSecuritySalt : BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET));
 }
 
-function bigbluebuttonbn_get_cfg_voicebridge_editable()
-{
+function bigbluebuttonbn_get_cfg_voicebridge_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable : (isset($CFG->bigbluebuttonbn_voicebridge_editable) ? $CFG->bigbluebuttonbn_voicebridge_editable : false);
 }
 
-function bigbluebuttonbn_get_cfg_recording_default()
-{
+function bigbluebuttonbn_get_cfg_recording_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default : (isset($CFG->bigbluebuttonbn_recording_default) ? $CFG->bigbluebuttonbn_recording_default : true);
 }
 
-function bigbluebuttonbn_get_cfg_recording_editable()
-{
+function bigbluebuttonbn_get_cfg_recording_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable : (isset($CFG->bigbluebuttonbn_recording_editable) ? $CFG->bigbluebuttonbn_recording_editable : true);
 }
 
-function bigbluebuttonbn_get_cfg_recording_tagging_default()
-{
+function bigbluebuttonbn_get_cfg_recording_tagging_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default : (isset($CFG->bigbluebuttonbn_recordingtagging_default) ? $CFG->bigbluebuttonbn_recordingtagging_default : false);
 }
 
-function bigbluebuttonbn_get_cfg_recording_tagging_editable()
-{
+function bigbluebuttonbn_get_cfg_recording_tagging_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable : (isset($CFG->bigbluebuttonbn_recordingtagging_editable) ? $CFG->bigbluebuttonbn_recordingtagging_editable : false);
 }
 
-function bigbluebuttonbn_get_cfg_recording_icons_enabled()
-{
+function bigbluebuttonbn_get_cfg_recording_icons_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled : (isset($CFG->bigbluebuttonbn_recording_icons_enabled) ? $CFG->bigbluebuttonbn_recording_icons_enabled : true);
 }
 
-function bigbluebuttonbn_get_cfg_importrecordings_enabled()
-{
+function bigbluebuttonbn_get_cfg_importrecordings_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled : (isset($CFG->bigbluebuttonbn_importrecordings_enabled) ? $CFG->bigbluebuttonbn_importrecordings_enabled : false);
 }
 
-function bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled()
-{
+function bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled : (isset($CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled) ? $CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled : false);
 }
 
-function bigbluebuttonbn_get_cfg_waitformoderator_default()
-{
+function bigbluebuttonbn_get_cfg_waitformoderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default : (isset($CFG->bigbluebuttonbn_waitformoderator_default) ? $CFG->bigbluebuttonbn_waitformoderator_default : false);
 }
 
-function bigbluebuttonbn_get_cfg_waitformoderator_editable()
-{
+function bigbluebuttonbn_get_cfg_waitformoderator_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable : (isset($CFG->bigbluebuttonbn_waitformoderator_editable) ? $CFG->bigbluebuttonbn_waitformoderator_editable : true);
 }
 
-function bigbluebuttonbn_get_cfg_waitformoderator_ping_interval()
-{
+function bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval : (isset($CFG->bigbluebuttonbn_waitformoderator_ping_interval) ? $CFG->bigbluebuttonbn_waitformoderator_ping_interval : 15);
 }
 
-function bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl()
-{
+function bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl : (isset($CFG->bigbluebuttonbn_waitformoderator_cache_ttl) ? $CFG->bigbluebuttonbn_waitformoderator_cache_ttl : 60);
 }
 
-function bigbluebuttonbn_get_cfg_userlimit_default()
-{
+function bigbluebuttonbn_get_cfg_userlimit_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default : (isset($CFG->bigbluebuttonbn_userlimit_default) ? $CFG->bigbluebuttonbn_userlimit_default : 0);
 }
 
-function bigbluebuttonbn_get_cfg_userlimit_editable()
-{
+function bigbluebuttonbn_get_cfg_userlimit_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable : (isset($CFG->bigbluebuttonbn_userlimit_editable) ? $CFG->bigbluebuttonbn_userlimit_editable : false);
 }
 
-function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled()
-{
+function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     if (extension_loaded('curl')) {
         // This feature only works if curl is installed
@@ -1559,22 +1487,19 @@ function bigbluebuttonbn_get_cfg_preuploadpresentation_enabled()
     return false;
 }
 
-function bigbluebuttonbn_get_cfg_sendnotifications_enabled()
-{
+function bigbluebuttonbn_get_cfg_sendnotifications_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled : (isset($CFG->bigbluebuttonbn_sendnotifications_enabled) ? $CFG->bigbluebuttonbn_sendnotifications_enabled : false);
 }
 
-function bigbluebuttonbn_get_cfg_recordingready_enabled()
-{
+function bigbluebuttonbn_get_cfg_recordingready_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled : (isset($CFG->bigbluebuttonbn_recordingready_enabled) ? $CFG->bigbluebuttonbn_recordingready_enabled : false);
 }
 
-function bigbluebuttonbn_get_cfg_meetingevents_enabled()
-{
+function bigbluebuttonbn_get_cfg_meetingevents_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled : (isset($CFG->bigbluebuttonbn_meetingevents_enabled) ? $CFG->bigbluebuttonbn_meetingevents_enabled : false);
@@ -1583,64 +1508,55 @@ function bigbluebuttonbn_get_cfg_meetingevents_enabled()
 /**
  * @return string
  */
-function bigbluebuttonbn_get_cfg_moderator_default()
-{
+function bigbluebuttonbn_get_cfg_moderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default : (isset($CFG->bigbluebuttonbn_moderator_default) ? $CFG->bigbluebuttonbn_moderator_default : 'owner');
 }
 
-function bigbluebuttonbn_get_cfg_scheduled_duration_enabled()
-{
+function bigbluebuttonbn_get_cfg_scheduled_duration_enabled() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled : (isset($CFG->bigbluebuttonbn_scheduled_duration_enabled) ? $CFG->bigbluebuttonbn_scheduled_duration_enabled : false);
 }
 
-function bigbluebuttonbn_get_cfg_scheduled_duration_compensation()
-{
+function bigbluebuttonbn_get_cfg_scheduled_duration_compensation() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_compensation : (isset($CFG->bigbluebuttonbn_scheduled_duration_compensation) ? $CFG->bigbluebuttonbn_scheduled_duration_compensation : 10);
 }
 
-function bigbluebuttonbn_get_cfg_scheduled_pre_opening()
-{
+function bigbluebuttonbn_get_cfg_scheduled_pre_opening() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_pre_opening : (isset($CFG->bigbluebuttonbn_scheduled_pre_opening) ? $CFG->bigbluebuttonbn_scheduled_pre_opening : 10);
 }
 
-function bigbluebuttonbn_get_cfg_recordings_html_default()
-{
+function bigbluebuttonbn_get_cfg_recordings_html_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default : (isset($CFG->bigbluebuttonbn_recordings_html_default) ? $CFG->bigbluebuttonbn_recordings_html_default : false);
 }
 
-function bigbluebuttonbn_get_cfg_recordings_html_editable()
-{
+function bigbluebuttonbn_get_cfg_recordings_html_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable : (isset($CFG->bigbluebuttonbn_recordings_html_editable) ? $CFG->bigbluebuttonbn_recordings_html_editable : false);
 }
 
-function bigbluebuttonbn_get_cfg_recordings_deleted_activities_default()
-{
+function bigbluebuttonbn_get_cfg_recordings_deleted_activities_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default : (isset($CFG->bigbluebuttonbn_recordings_deleted_activities_default) ? $CFG->bigbluebuttonbn_recordings_deleted_activities_default : false);
 }
 
-function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable()
-{
+function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
 
     return isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable) ? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable : (isset($CFG->bigbluebuttonbn_recordings_deleted_activities_editable) ? $CFG->bigbluebuttonbn_recordings_deleted_activities_editable : false);
 }
 
-function bigbluebuttonbn_get_cfg_options()
-{
+function bigbluebuttonbn_get_cfg_options() {
     return [
           'voicebridge_editable' => bigbluebuttonbn_get_cfg_voicebridge_editable(),
           'recording_default' => bigbluebuttonbn_get_cfg_recording_default(),
@@ -1663,8 +1579,7 @@ function bigbluebuttonbn_get_cfg_options()
         ];
 }
 
-function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession)
-{
+function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     if ($bbbsession['administrator']) {
         $courses = get_courses('all', 'c.id ASC', 'c.id,c.shortname,c.fullname');
         //It includes the name of the site as a course (category 0), so remove the first one
@@ -1681,8 +1596,7 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession)
     return $courses_for_select;
 }
 
-function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID, $bigbluebuttonbnID = null)
-{
+function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID, $bigbluebuttonbnID = null) {
     global $DB;
 
     $records_deleted = array();
@@ -1695,7 +1609,8 @@ function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID, $bigbluebuttonbnI
     $bigbluebuttonbns_deleted = $DB->get_records('bigbluebuttonbn_logs', $filter);
 
     foreach ($bigbluebuttonbns_deleted as $key => $bigbluebuttonbn_deleted) {
-        $records = $DB->get_records('bigbluebuttonbn_logs', array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
+        $records = $DB->get_records('bigbluebuttonbn_logs',
+            array('courseid' => $courseID, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
 
         if (!empty($records)) {
             //Remove duplicates
@@ -1722,8 +1637,7 @@ function bigbluebuttonbn_getRecordedMeetingsDeleted($courseID, $bigbluebuttonbnI
     return $records_deleted;
 }
 
-function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = null)
-{
+function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = null) {
     global $DB;
 
     $records = array();
@@ -1737,7 +1651,7 @@ function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = nul
     if (!empty($bigbluebuttonbns)) {
         $table = 'bigbluebuttonbn_logs';
 
-        //Prepare select for loading records based on existent bigbluebuttonbns
+        // Prepare select for loading records based on existent bigbluebuttonbns.
         $select = '';
         foreach ($bigbluebuttonbns as $key => $bigbluebuttonbn) {
             $select .= strlen($select) == 0 ? '(' : ' OR ';
@@ -1745,10 +1659,10 @@ function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = nul
         }
         $select .= ") AND log='".BIGBLUEBUTTONBN_LOG_EVENT_CREATE."'";
 
-        //Execute select for loading records based on existent bigbluebuttonbns
+        // Execute select for loading records based on existent bigbluebuttonbns.
         $records = $DB->get_records_select($table, $select);
 
-        //Remove duplicates
+        // Remove duplicates.
         $unique_records = array();
         foreach ($records as $key => $record) {
             $record_key = $record->meetingid.','.$record->bigbluebuttonbnid.','.$record->meta;
@@ -1759,7 +1673,7 @@ function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = nul
             array_push($unique_records, $record_key);
         }
 
-        //Remove the ones with record=false
+        // Remove the ones with record=false.
         foreach ($records as $key => $record) {
             $meta = json_decode($record->meta);
             if (!$meta || !$meta->record) {
@@ -1771,23 +1685,23 @@ function bigbluebuttonbn_getRecordedMeetings($courseID, $bigbluebuttonbnID = nul
     return $records;
 }
 
-function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting'])
-{
-    if (isset($recordings) && !empty($recordings)) {  // There are recordings for this meeting
+function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
+    if (isset($recordings) && !empty($recordings)) {
+        // There are recordings for this meeting.
         $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools);
     }
 
     if (!isset($table) || !isset($table->data)) {
-        // Render a table qith "No recordings"
-        return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '', array('id' => 'bigbluebuttonbn_html_table'));
+        // Render a table qith "No recordings".
+        return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
+            array('id' => 'bigbluebuttonbn_html_table'));
     }
 
-    // Render the table
+    // Render the table.
     return html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_html_table'));
 }
 
-function bigbluebuttonbn_debugdisplay()
-{
+function bigbluebuttonbn_debugdisplay() {
     global $CFG;
 
     return (bool) $CFG->debugdisplay;
@@ -1817,20 +1731,22 @@ function bigbluebuttonbn_get_tags($id)
 }
 
 /**
- * helper function to retrieve recordings from the BigBlueButton. The references are stored as events in bigbluebuttonbn_logs.
+ * helper function to retrieve recordings from the BigBlueButton. The references are stored as events
+ * in bigbluebuttonbn_logs.
  *
  * @param string $courseID
  * @param string $bigbluebuttonbnID
  * @param bool   $subset
  * @param bool   $include_deleted
  *
- * @return associative array containing the recordings indexed by recordID, each recording is also a non sequential associative array itself that corresponds to the actual recording in BBB
+ * @return associative array containing the recordings indexed by recordID, each recording is also a
+ * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID = null, $subset = true, $include_deleted = false)
-{
+function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID = null,
+        $subset = true, $include_deleted = false) {
     global $DB;
 
-    // Gather the bigbluebuttonbnids whose meetingids should be included in the getRecordings request
+    // Gather the bigbluebuttonbnids whose meetingids should be included in the getRecordings request'.
     $select = "id <> '{$bigbluebuttonbnID}' AND course = '{$courseID}'";
     $select_deleted = "courseid = '{$courseID}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnID}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
     if ($bigbluebuttonbnID === null) {
@@ -1842,38 +1758,37 @@ function bigbluebuttonbn_get_recordings($courseID, $bigbluebuttonbnID = null, $s
     }
     $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
 
-    // Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in the getRecordings request
+    // Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in the getRecordings request.
     if ($include_deleted) {
         $bigbluebuttonbns_del = $DB->get_records_select_menu('bigbluebuttonbn_logs', $select_deleted, null, 'bigbluebuttonbnid', 'bigbluebuttonbnid, meetingid');
         if (!empty($bigbluebuttonbns_del)) {
-            // Merge bigbluebuttonbnis from deleted instances, only keys are relevant. Artimetic merge is used in order to keep the keys
+            // Merge bigbluebuttonbnis from deleted instances, only keys are relevant. Artimetic merge is used in order to keep the keys.
             $bigbluebuttonbns += $bigbluebuttonbns_del;
         }
     }
 
-    // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true
+    // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true.
     $recordings = array();
     if (!empty($bigbluebuttonbns)) {
-        //Prepare select for loading records based on existent bigbluebuttonbns
+        // Prepare select for loading records based on existent bigbluebuttonbns.
         $sql = 'SELECT DISTINCT meetingid, bigbluebuttonbnid FROM {bigbluebuttonbn_logs} WHERE ';
         $sql .= '(bigbluebuttonbnid='.implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)).')';
-        //Include only Create events and exclude those with record not true
+        // Include only Create events and exclude those with record not true.
         $sql .= ' AND log = ? AND meta LIKE ? AND meta LIKE ?';
-        //Execute select for loading records based on existent bigbluebuttonbns
+        // Execute select for loading records based on existent bigbluebuttonbns.
         $records = $DB->get_records_sql_menu($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
-        // Get actual recordings
+        // Get actual recordings.
         $recordings = bigbluebuttonbn_getRecordingsArray(array_keys($records));
     }
 
-    // Get recording links
+    // Get recording links.
     $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID, $subset);
 
-    // Perform aritmetic add instead of merge so the imported recordings corresponding to existent recordings are not included
+    // Perform aritmetic add instead of merge so the imported recordings corresponding to existent recordings are not included.
     return $recordings + $recordings_imported;
 }
 
-function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $courseID, $bigbluebuttonbnID)
-{
+function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $courseID, $bigbluebuttonbnID) {
     $recordings_imported = bigbluebuttonbn_getRecordingsImportedArray($courseID, $bigbluebuttonbnID, true);
 
     foreach ($recordings as $key => $recording) {
@@ -1885,8 +1800,7 @@ function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
     return $recordings;
 }
 
-function bigbluebuttonbn_get_count_recording_imported_instances($recordID)
-{
+function bigbluebuttonbn_get_count_recording_imported_instances($recordID) {
     global $DB;
 
     $sql = 'SELECT * FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
@@ -1894,8 +1808,7 @@ function bigbluebuttonbn_get_count_recording_imported_instances($recordID)
     return $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordID}%"));
 }
 
-function bigbluebuttonbn_get_recording_imported_instances($recordID)
-{
+function bigbluebuttonbn_get_recording_imported_instances($recordID) {
     global $DB;
 
     $sql = 'SELECT * FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
@@ -1904,8 +1817,7 @@ function bigbluebuttonbn_get_recording_imported_instances($recordID)
     return $recordings_imported;
 }
 
-function bigbluebuttonbn_get_instance_type_profiles()
-{
+function bigbluebuttonbn_get_instance_type_profiles() {
     $instanceprofiles = array(
             array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'), 'features' => array('all')),
             array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'), 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording', 'recordingtagging', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
@@ -1915,8 +1827,7 @@ function bigbluebuttonbn_get_instance_type_profiles()
     return $instanceprofiles;
 }
 
-function bigbluebuttonbn_get_instance_profiles_array($profiles = null)
-{
+function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
     if (is_null($profiles) || empty($profiles)) {
         $profiles = bigbluebuttonbn_get_instanceprofiles();
     }
@@ -1930,8 +1841,7 @@ function bigbluebuttonbn_get_instance_profiles_array($profiles = null)
     return $profiles_array;
 }
 
-function bigbluebuttonbn_format_activity_time($time)
-{
+function bigbluebuttonbn_format_activity_time($time) {
     $activity_time = '';
     if ($time) {
         $activity_time = calendar_day_representation($time).' '.
@@ -1942,8 +1852,7 @@ function bigbluebuttonbn_format_activity_time($time)
     return $activity_time;
 }
 
-function bigbluebuttonbn_recordings_enabled()
-{
+function bigbluebuttonbn_recordings_enabled() {
     global $BIGBLUEBUTTONBN_CFG;
 
     return !(isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default) &&
