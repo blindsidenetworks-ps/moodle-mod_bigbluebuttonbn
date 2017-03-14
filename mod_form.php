@@ -77,7 +77,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
 
         /// Data required for "Add participant" and initial "Participant list" setup
         $roles = bigbluebuttonbn_get_roles($context);
-        $users = bigbluebuttonbn_get_users($context);
+        $users = get_enrolled_users($context);
 
         // add block 'Schedule'
         bigbluebuttonbn_mform_add_block_participants($mform, $cfg, [

@@ -169,11 +169,9 @@ function bigbluebuttonbn_delete_instance($id)
     // End the session associated with this instance (if it's running)
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     $modPW = $bigbluebuttonbn->moderatorpass;
-    $url = bigbluebuttonbn_get_cfg_server_url();
-    $shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 
-    if (bigbluebuttonbn_isMeetingRunning($meetingID, $url, $shared_secret)) {
-        bigbluebuttonbn_doEndMeeting($meetingID, $modPW, $url, $shared_secret);
+    if (bigbluebuttonbn_isMeetingRunning($meetingID)) {
+        bigbluebuttonbn_doEndMeeting($meetingID, $modPW);
     }
 
     // Perform delete
@@ -314,7 +312,7 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray)
             if ($bigbluebuttonbn->visible) {
                 $classes = 'class="dimmed" ';
             }
-            $str  = '<div class="bigbluebuttonbn overview">'."\n";
+            $str = '<div class="bigbluebuttonbn overview">'."\n";
             $str .= '  <div class="name">'.get_string('modulename', 'bigbluebuttonbn').':&nbsp;'."\n";
             $str .= '    <a '.$classes.'href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.
               '">'.$bigbluebuttonbn->name.'</a>'."\n";
@@ -674,7 +672,7 @@ function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message =
     $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
     $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
 
-    $users = bigbluebuttonbn_get_users($context);
+    $users = get_enrolled_users($context);
     foreach ($users as $user) {
         if ($user->id != $sender->id) {
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
@@ -689,16 +687,7 @@ function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message =
 
 function bigbluebuttonbn_get_context($id, $context_type)
 {
-    $version_major = bigbluebuttonbn_get_moodle_version_major();
-    if ($version_major < '2013111800') {
-        //This is valid before v2.6
-        $context = get_context_instance($context_type, $id);
-    } else {
-        //This is valid after v2.6
-        $context = context_module::instance($id);
-    }
-
-    return $context;
+    return context_module::instance($id);
 }
 
 function bigbluebuttonbn_get_context_module($id)

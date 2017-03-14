@@ -19,7 +19,7 @@
  *
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2015 Blindside Networks Inc
+ * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 require_once dirname(dirname(dirname(__FILE__))).'/config.php';
@@ -29,11 +29,10 @@ $id = required_param('id', PARAM_INT); // Course Module ID, or
 $a = optional_param('a', 0, PARAM_INT); // bigbluebuttonbn instance ID
 $g = optional_param('g', 0, PARAM_INT); // group instance ID
 
-if ($id) {
-    $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
-} else {
+if (!$id) {
     print_error('You must specify a course_module ID or an instance ID');
 }
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course, true);
 
@@ -71,8 +70,6 @@ $table = new html_table();
 $table->head = array($strweek, $heading_name, $heading_group, $heading_users, $heading_viewer, $heading_moderator, $heading_recording, $heading_actions);
 $table->align = array('center', 'left', 'center', 'center', 'center', 'center', 'center');
 
-$endpoint = bigbluebuttonbn_get_cfg_server_url();
-$shared_secret = bigbluebuttonbn_get_cfg_shared_secret();
 $logoutURL = $CFG->wwwroot;
 
 $submit = optional_param('submit', '', PARAM_TEXT);
@@ -103,10 +100,9 @@ if ($submit === 'end') {
 
         $meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
         if ($g != '0') {
-            $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID.'['.$g.']', $bigbluebuttonbn->moderatorpass, $endpoint, $shared_secret));
-        } else {
-            $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID, $bigbluebuttonbn->moderatorpass, $endpoint, $shared_secret));
+            $meetingID .= '['.$g.']';
         }
+        $getArray = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingID, $bigbluebuttonbn->moderatorpass));
         redirect('index.php?id='.$id);
     }
 }
@@ -128,12 +124,12 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
 
         //Add a the data for the bigbluebuttonbn instance
         $groupObj = (groups_get_activity_groupmode($cm) > 0) ? (object) array('id' => 0, 'name' => get_string('allparticipants')) : null;
-        $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $can_moderate, $course, $bigbluebuttonbn, $groupObj);
+        $table->data[] = bigbluebuttonbn_index_display_room($can_moderate, $course, $bigbluebuttonbn, $groupObj);
 
         //Add a the data for the groups belonging to the bigbluebuttonbn instance, if any
         $groups = groups_get_activity_allowed_groups($cm);
         foreach ($groups as $group) {
-            $table->data[] = displayBigBlueButtonRooms($endpoint, $shared_secret, $can_moderate, $course, $bigbluebuttonbn, $group);
+            $table->data[] = bigbluebuttonbn_index_display_room($can_moderate, $course, $bigbluebuttonbn, $group);
         }
     }
 }
@@ -146,36 +142,37 @@ echo html_writer::table($table);
 echo $OUTPUT->footer();
 
 /// Functions
-function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $course, $bigbluebuttonbn, $groupObj = null)
+function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonbn, $groupObj = null)
 {
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
+    $paramGroup = '';
+    $groupName = '';
+
     if ($groupObj) {
         $meetingID .= '['.$groupObj->id.']';
-        $group = $groupObj->name;
+        $paramGroup = '&group='.$groupObj->id;
+        $groupName = $groupObj->name;
     }
 
-    $meetingInfo = bigbluebuttonbn_getMeetingInfoArray($meetingID, $bigbluebuttonbn->moderatorpass, $endpoint, $shared_secret);
+    $meetingInfo = bigbluebuttonbn_getMeetingInfoArray($meetingID);
 
     if (!$meetingInfo) {
-
         // The server was unreachable
-
         print_error(get_string('index_error_unable_display', 'bigbluebuttonbn'));
 
         return;
-    } elseif (isset($meetingInfo['messageKey']) && $meetingInfo['messageKey'] == 'checksumError') {
+    }
 
+    if (isset($meetingInfo['messageKey']) && $meetingInfo['messageKey'] == 'checksumError') {
         // There was an error returned
-
         print_error(get_string('index_error_checksum', 'bigbluebuttonbn'));
 
         return;
     }
 
     // Output Users in the meeting
-
-    $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.($groupObj ? '&group='.$groupObj->id : '').'">'.format_string($bigbluebuttonbn->name).'</a>';
-    $group = '';
+    $joinURL = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.$paramGroup.'">'.format_string($bigbluebuttonbn->name).'</a>';
+    $group = $groupName;
     $users = '';
     $viewerList = '';
     $moderatorList = '';
@@ -183,19 +180,18 @@ function displayBigBlueButtonRooms($endpoint, $shared_secret, $moderator, $cours
     $actions = '';
 
     // The meeting info was returned
-
     if ($meetingInfo['running'] == 'true') {
-        $users = displayBigBlueButtonRoomsUsers($meetingInfo);
-        $viewerList = displayBigBlueButtonRoomsAttendeeList($meetingInfo, 'VIEWER');
-        $moderatorList = displayBigBlueButtonRoomsAttendeeList($meetingInfo, 'MODERATOR');
-        $recording = displayBigBlueButtonRoomsRecording($meetingInfo);
-        $actions = displayBigBlueButtonRoomsActions($moderator);
+        $users = bigbluebuttonbn_index_display_room_users($meetingInfo);
+        $viewerList = bigbluebuttonbn_index_display_room_users_attendee_list($meetingInfo, 'VIEWER');
+        $moderatorList = bigbluebuttonbn_index_display_room_users_attendee_list($meetingInfo, 'MODERATOR');
+        $recording = bigbluebuttonbn_index_display_room_recordings($meetingInfo);
+        $actions = bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupObj);
     }
 
     return array($bigbluebuttonbn->section, $joinURL, $group, $users, $viewerList, $moderatorList, $recording, $actions);
 }
 
-function displayBigBlueButtonRoomsUsers($meetingInfo)
+function bigbluebuttonbn_index_display_room_users($meetingInfo)
 {
     $users = '';
 
@@ -206,7 +202,7 @@ function displayBigBlueButtonRoomsUsers($meetingInfo)
     return $users;
 }
 
-function displayBigBlueButtonRoomsAttendeeList($meetingInfo, $role)
+function bigbluebuttonbn_index_display_room_users_attendee_list($meetingInfo, $role)
 {
     $attendeeList = '';
 
@@ -222,7 +218,7 @@ function displayBigBlueButtonRoomsAttendeeList($meetingInfo, $role)
     return $attendeeList;
 }
 
-function displayBigBlueButtonRoomsRecording($meetingInfo)
+function bigbluebuttonbn_index_display_room_recordings($meetingInfo)
 {
     $recording = '';
 
@@ -233,7 +229,7 @@ function displayBigBlueButtonRoomsRecording($meetingInfo)
     return $recording;
 }
 
-function displayBigBlueButtonRoomsActions($moderator, $course, $bigbluebuttonbn, $groupObj = null)
+function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupObj = null)
 {
     $actions = '';
 

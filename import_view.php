@@ -27,13 +27,15 @@ require_once dirname(__FILE__).'/locallib.php';
 $bn = required_param('bn', PARAM_INT); // bigbluebuttonbn instance ID
 $tc = optional_param('tc', 0, PARAM_INT); // target course ID
 
-if ($bn) {
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-} else {
+if (!$bn) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
+
+    return;
 }
+
+$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 
 $context = bigbluebuttonbn_get_context_module($cm->id);
 

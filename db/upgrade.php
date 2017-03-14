@@ -85,9 +85,11 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $table_name, $field_name
     $field->set_attributes($field_definition['type'], $field_definition['precision'], $field_definition['unsigned'], $field_definition['notnull'], $field_definition['sequence'], $field_definition['default'], $field_definition['previous']);
     if ($dbman->field_exists($table, $field)) {
         $dbman->change_field($table, $field, true, true);
-    } else {
-        $dbman->add_field($table, $field, true, true);
+
+        return;
     }
+
+    $dbman->add_field($table, $field, true, true);
 }
 
 function xmldb_bigbluebuttonbn_drop_field($dbman, $table_name, $field_name)

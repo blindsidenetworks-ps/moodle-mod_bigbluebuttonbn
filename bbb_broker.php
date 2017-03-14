@@ -83,7 +83,7 @@ if (empty($error)) {
         try {
             switch (strtolower($params['action'])) {
                 case 'meeting_info':
-                    $meeting_info = bigbluebuttonbn_get_meeting_info($params['id'], $bbbsession['modPW']);
+                    $meeting_info = bigbluebuttonbn_get_meeting_info($params['id']);
                     $meeting_running = bigbluebuttonbn_is_meeting_running($meeting_info);
 
                     $status_can_end = '';
@@ -136,7 +136,7 @@ if (empty($error)) {
                             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
                         }
                         // Update the cache
-                        bigbluebuttonbn_get_meeting_info($params['id'], $bbbsession['modPW'], true);
+                        bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_FORCED);
 
                         echo $params['callback'].'({ "status": true });';
                     } else {
@@ -366,7 +366,7 @@ if (empty($error)) {
                             error_log('We start storing the events here');
                             foreach ($decodedParameters->events as $event) {
                                 error_log($event->event);
-                                bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $context, $cm);
+                                bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm);
                             }
                             header('HTTP/1.0 202 Accepted');
 
