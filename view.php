@@ -121,7 +121,7 @@ $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigblu
 
 
 // Validates if the BigBlueButton server is running.
-$serverversion = bigbluebuttonbn_get_server_version($bbbsession['endpoint']);
+$serverversion = bigbluebuttonbn_get_server_version();
 if (!isset($serverversion)) {
     // Server is not working.
     if ($bbbsession['administrator']) {

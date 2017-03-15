@@ -158,17 +158,17 @@ function bigbluebuttonbn_bigbluebutton_action_url($action, $data = array(), $met
 
 function bigbluebuttonbn_get_create_meeting_array($meetingname, $meetingid, $welcomestring, $mpw, $apw,
         $logouturl, $record = 'false', $duration = 0, $voicebridge = 0, $maxparticipants = 0,
-        $metadata = array(), $presentationname = null, $presentationurl = null) {
+        $metadata = array(), $pname = null, $purl = null) {
 
     $createmeetingurl = bigbluebuttonbn_get_create_meeting_url($meetingname, $meetingid, $apw, $mpw, $welcomestring,
         $logouturl, $record, $duration, $voicebridge, $maxparticipants, $metadata);
     $method = BIGBLUEBUTTONBN_METHOD_GET;
     $data = null;
 
-    if (!is_null($presentationname) && !is_null($presentationurl)) {
+    if (!is_null($pname) && !is_null($purl)) {
         $method = BIGBLUEBUTTONBN_METHOD_POST;
         $data = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".
-            $presentationurl."' /></module></modules>";
+            $purl."' /></module></modules>";
     }
 
     $xml = bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $data);
@@ -347,7 +347,7 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     }
 
     $recordsimportedarray = array();
-    foreach ($recordingsimported as $key => $recordingimported) {
+    foreach ($recordingsimported as $recordingimported) {
         $meta = json_decode($recordingimported->meta, true);
         $recordsimportedarray[$meta['recording']['recordID']] = $meta['recording'];
     }
@@ -365,9 +365,8 @@ function bigbluebuttonbn_get_default_config_xml() {
 
 function bigbluebuttonbn_get_default_config_xml_array() {
     $defaultconfigxml = bigbluebuttonbn_getDefaultConfigXML();
-    $defaultconfigxmlarray = (array) $defaultconfigxml;
 
-    return $defaultconfigxmlarray;
+    return (array) $defaultconfigxml;
 }
 
 function bigbluebuttonbn_get_recording_array_value($recording) {
@@ -439,7 +438,7 @@ function bigbluebuttonbn_delete_recordings($recordids) {
  * @param string $recordids
  * @param string $publish
  */
-function bigbluebuttonbn_publish_recordings($recordids, $publish) {
+function bigbluebuttonbn_publish_recordings($recordids, $publish = 'true') {
     $ids = explode(',', $recordids);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(
@@ -570,7 +569,7 @@ function bigbluebuttonbn_get_user_roles($context, $userid) {
     $userroles = get_user_roles($context, $userid);
     if ($userroles) {
         $where = '';
-        foreach ($userroles as $key => $value) {
+        foreach ($userroles as $value) {
             $where .= (empty($where) ? ' WHERE' : ' AND').' id='.$value->roleid;
         }
         $userroles = $DB->get_records_sql('SELECT * FROM {role}'.$where);
@@ -733,10 +732,10 @@ function bigbluebuttonbn_get_duration($closingtime) {
 }
 
 function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
-    $presentationname = null;
-    $presentationurl = null;
-    $presentationicon = null;
-    $presentationmimetypedescription = null;
+    $pname = null;
+    $purl = null;
+    $picon = null;
+    $pmimetypedescrip = null;
 
     if (!empty($presentation)) {
         $fs = get_file_storage();
@@ -745,33 +744,33 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
         if (count($files) >= 1) {
             $file = reset($files);
             unset($files);
-            $presentationname = $file->get_filename();
-            $presentationicon = file_file_icon($file, 24);
-            $presentationmimetypedescription = get_mimetype_description($file);
-            $presentationnoncevalue = null;
+            $pname = $file->get_filename();
+            $picon = file_file_icon($file, 24);
+            $pmimetypedescrip = get_mimetype_description($file);
+            $pnoncevalue = null;
 
             if (!is_null($id)) {
                 // Create the nonce component for granting a temporary public access.
                 $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn',
                     'presentation_cache');
-                $presentationnoncekey = sha1($id);
+                $pnoncekey = sha1($id);
                 /* The item id was adapted for granting public access to the presentation once in order
                  * to allow BigBlueButton to gather the file. */
-                $presentationnoncevalue = bigbluebuttonbn_generate_nonce();
-                $cache->set($presentationnoncekey, array('value' => $presentationnoncevalue, 'counter' => 0));
+                $pnoncevalue = bigbluebuttonbn_generate_nonce();
+                $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
             }
             $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
-                $file->get_filearea(), $presentationnoncevalue, $file->get_filepath(), $file->get_filename());
+                $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
 
-            $presentationurl = $url->out(false);
+            $purl = $url->out(false);
         }
     }
 
-    $presentationarray = array('url' => $presentationurl, 'name' => $presentationname,
-                               'icon' => $presentationicon,
-                               'mimetype_description' => $presentationmimetypedescription);
+    $parray = array('url' => $purl, 'name' => $pname,
+                               'icon' => $picon,
+                               'mimetype_description' => $pmimetypedescrip);
 
-    return $presentationarray;
+    return $parray;
 }
 
 function bigbluebuttonbn_generate_nonce() {
@@ -853,6 +852,7 @@ function bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm) {
 }
 
 /**
+ * @param string $meetingid
  * @param bool $ismoderator
  */
 function bigbluebuttonbn_participant_joined($meetingid, $ismoderator) {
@@ -867,6 +867,10 @@ function bigbluebuttonbn_participant_joined($meetingid, $ismoderator) {
         'meeting_info' => json_encode($meetinginfo)));
 }
 
+/**
+ * @param string $meetingid
+ * @param boolean $forced
+ */
 function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false) {
     $cachettl = bigbluebuttonbn_get_cfg_waitformoderator_cache_ttl();
 
@@ -887,6 +891,11 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false) {
     return $meetinginfo;
 }
 
+/**
+ * @param string $recordingid
+ * @param string $bigbluebuttonbnid
+ * @param boolean $publish
+ */
 function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebuttonbnid, $publish = true) {
     global $DB;
 
@@ -1290,17 +1299,15 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
 function bigbluebuttonbn_server_offers_bn_capabilities() {
     // Validates if the server may have extended capabilities.
     $parsedurl = parse_url(bigbluebuttonbn_get_cfg_server_url());
-    $host = isset($parsedurl['host']) ? $parsedurl['host'] : '';
-    $hostends = explode('.', $host);
-    $hostendslength = count($hostends);
-
-    if ($hostendslength > 0 &&
-        $hostends[$hostendslength - 1] == 'com' &&
-        $hostends[$hostendslength - 2] == 'blindsidenetworks') {
-          return true;
+    if (!isset($parsedurl['host'])) {
+        return false;
     }
 
-    return false;
+    $h = $parsedurl['host'];
+    $hends = explode('.', $h);
+    $hendslength = count($hends);
+
+    return ($hends[$hendslength - 1] == 'com' && $hends[$hendslength - 2] == 'blindsidenetworks');
 }
 
 function bigbluebuttonbn_get_locales_for_view() {
@@ -1351,19 +1358,19 @@ function bigbluebuttonbn_get_locales_for_view() {
 /**
  * @return string
  */
-function bigbluebuttonbn_get_cfg_server_url_default() {
+function bigbluebuttonbn_get_cfg_server_url() {
     global $CFG;
 
     if (isset($CFG->bigbluebuttonbn['server_url'])) {
-        return $CFG->bigbluebuttonbn['server_url'];
+        return trim(trim($CFG->bigbluebuttonbn['server_url']), '/').'/';
     }
 
     if (isset($CFG->bigbluebuttonbn_server_url)) {
-        return $CFG->bigbluebuttonbn_server_url;
+        return trim(trim($CFG->bigbluebuttonbn_server_url), '/').'/';
     }
 
     if (isset($CFG->BigBlueButtonBNServerURL)) {
-        return $CFG->BigBlueButtonBNServerURL;
+        return trim(trim($CFG->BigBlueButtonBNServerURL), '/').'/';
     }
 
     return  BIGBLUEBUTTONBN_DEFAULT_SERVER_URL;
@@ -1372,19 +1379,19 @@ function bigbluebuttonbn_get_cfg_server_url_default() {
 /**
  * @return string
  */
-function bigbluebuttonbn_get_cfg_shared_secret_default() {
+function bigbluebuttonbn_get_cfg_shared_secret() {
     global $CFG;
 
     if (isset($CFG->bigbluebuttonbn['shared_secret'])) {
-        return $CFG->bigbluebuttonbn['shared_secret'];
+        return trim($CFG->bigbluebuttonbn['shared_secret']);
     }
 
     if (isset($CFG->bigbluebuttonbn_shared_secret)) {
-        return $CFG->bigbluebuttonbn_shared_secret;
+        return trim($CFG->bigbluebuttonbn_shared_secret);
     }
 
     if (isset($CFG->BigBlueButtonBNSecuritySalt)) {
-        return $CFG->BigBlueButtonBNSecuritySalt;
+        return trim($CFG->BigBlueButtonBNSecuritySalt);
     }
 
     return  BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET;
@@ -1837,7 +1844,7 @@ function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable() {
 }
 
 /**
- * @return array()
+ * @return array
  */
 function bigbluebuttonbn_get_cfg_options() {
     return [

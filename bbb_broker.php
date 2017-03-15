@@ -254,6 +254,9 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
         return;
     }
 
+    $callbackresponse = array();
+    $callbackresponse['status'] = 'false';
+
     // Retrieve array of recordings that includes real and imported.
     $bigbluebuttonbnid = null;
     if ($showroom) {
@@ -261,6 +264,8 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     }
     $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
         $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+
+    // Excecute action.
     switch (strtolower($params['action'])) {
         case 'recording_publish':
             $callbackresponse = bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings);
@@ -287,6 +292,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
 
+    $status = 'true';
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         // Execute publish on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array($recordings[$params['id']]['meetingID'],
@@ -298,8 +304,7 @@ function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $
         }
     } else {
         // As the recordingid was not identified as imported recording link, execute publish on a real recording.
-        $status = 'true';
-        bigbluebuttonbn_publish_recordings($params['id'], true);
+        bigbluebuttonbn_publish_recordings($params['id'], 'true');
     }
 
     $response = array('status' => $status);
@@ -334,7 +339,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
         }
     }
     // Second: Execute the real unpublish.
-    bigbluebuttonbn_publish_recordings($params['id'], false);
+    bigbluebuttonbn_publish_recordings($params['id'], 'false');
     return array('status' => 'true');
 }
 

@@ -34,8 +34,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
         global $CFG, $DB, $OUTPUT, $PAGE;
 
         // Validates if the BigBlueButton server is running.
-        $$serverversion = bigbluebuttonbn_get_server_version();
-        if (is_null($$serverversion)) {
+        $serverversion = bigbluebuttonbn_get_server_version();
+        if (is_null($serverversion)) {
             print_error('general_error_unable_connect', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
         }

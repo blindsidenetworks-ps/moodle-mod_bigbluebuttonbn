@@ -132,8 +132,6 @@ switch (strtolower($action)) {
                     $bbbsession['welcome'],
                     $bbbsession['modPW'],
                     $bbbsession['viewerPW'],
-                    $bbbsession['shared_secret'],
-                    $bbbsession['endpoint'],
                     $bbbsession['logoutURL'],
                     $bbbsession['record'] ? 'true' : 'false',
                     $durationtime,
