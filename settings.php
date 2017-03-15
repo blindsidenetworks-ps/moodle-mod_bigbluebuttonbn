@@ -25,24 +25,24 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-global $BIGBLUEBUTTONBN_CFG;
+global $CFG;
 
-require_once dirname(__FILE__).'/locallib.php';
+require_once(dirname(__FILE__).'/locallib.php');
 
 if ($ADMIN->fulltree) {
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)) {
+    if (!isset($CFG->bigbluebuttonbn['server_url']) ||
+        !isset($CFG->bigbluebuttonbn['shared_secret'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_config_general',
                 get_string('config_general', 'bigbluebuttonbn'),
                 get_string('config_general_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_server_url)) {
+        if (!isset($CFG->bigbluebuttonbn['server_url'])) {
             $settings->add(new admin_setting_configtext('bigbluebuttonbn_server_url',
                     get_string('config_server_url', 'bigbluebuttonbn'),
                     get_string('config_server_url_description', 'bigbluebuttonbn'),
                     BIGBLUEBUTTONBN_DEFAULT_SERVER_URL));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret)) {
+        if (!isset($CFG->bigbluebuttonbn['shared_secret'])) {
             $settings->add(new admin_setting_configtext('bigbluebuttonbn_shared_secret',
                     get_string('config_shared_secret', 'bigbluebuttonbn'),
                     get_string('config_shared_secret_description', 'bigbluebuttonbn'),
@@ -51,28 +51,28 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for 'recording' feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled)) {
+    if (!isset($CFG->bigbluebuttonbn['recording_default']) ||
+        !isset($CFG->bigbluebuttonbn['recording_editable']) ||
+        !isset($CFG->bigbluebuttonbn['recording_icons_enabled'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recording',
                 get_string('config_feature_recording', 'bigbluebuttonbn'),
                 get_string('config_feature_recording_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default)) {
+        if (!isset($CFG->bigbluebuttonbn['recording_default'])) {
             // Default value for 'recording' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_default',
                     get_string('config_feature_recording_default', 'bigbluebuttonbn'),
                     get_string('config_feature_recording_default_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['recording_editable'])) {
             // UI for 'recording' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_editable',
                     get_string('config_feature_recording_editable', 'bigbluebuttonbn'),
                     get_string('config_feature_recording_editable_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_icons_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['recording_icons_enabled'])) {
             // Front panel for 'recording' managment feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recording_icons_enabled',
                     get_string('config_feature_recording_icons_enabled', 'bigbluebuttonbn'),
@@ -82,13 +82,13 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for 'recording tagging' feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable)) {
+    if (!isset($CFG->bigbluebuttonbn['recordingtagging_default']) ||
+        !isset($CFG->bigbluebuttonbn['recordingtagging_editable'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recordingtagging',
                 get_string('config_feature_recordingtagging', 'bigbluebuttonbn'),
                 get_string('config_feature_recordingtagging_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_default)) {
+        if (!isset($CFG->bigbluebuttonbn['recordingtagging_default'])) {
             // Default value for 'recording tagging' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
                     get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
@@ -96,7 +96,7 @@ if ($ADMIN->fulltree) {
                     0));
         }
         // UI for 'recording tagging' feature.
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingtagging_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['recordingtagging_editable'])) {
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
                     get_string('config_feature_recordingtagging_editable', 'bigbluebuttonbn'),
                     get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
@@ -104,21 +104,21 @@ if ($ADMIN->fulltree) {
         }
     }
 
-    // Configuration for 'import recordings' feature
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled)) {
+    // Configuration for 'import recordings' feature.
+    if (!isset($CFG->bigbluebuttonbn['importrecordings_enabled']) ||
+        !isset($CFG->bigbluebuttonbn['importrecordings_from_deleted_activities_enabled'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_importrecordings',
                 get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
                 get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['importrecordings_enabled'])) {
             // Default value for 'import recordings' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
                     get_string('config_feature_importrecordings_enabled', 'bigbluebuttonbn'),
                     get_string('config_feature_importrecordings_enabled_description', 'bigbluebuttonbn'),
                     0));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['importrecordings_from_deleted_activities_enabled'])) {
             // Consider deleted activities for 'import recordings' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_from_deleted_activities_enabled',
                     get_string('config_feature_importrecordings_from_deleted_activities_enabled', 'bigbluebuttonbn'),
@@ -128,20 +128,20 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for 'show recordings' feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_enabled) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_from_deleted_activities_enabled)) {
+    if (!isset($CFG->bigbluebuttonbn['recordings_enabled']) ||
+        !isset($CFG->bigbluebuttonbn['showrecordings_from_deleted_activities_enabled'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_importrecordings',
                 get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
                 get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['showrecordings_enabled'])) {
             // Default value for 'import recordings' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
                     get_string('config_feature_importrecordings_enabled', 'bigbluebuttonbn'),
                     get_string('config_feature_importrecordings_enabled_description', 'bigbluebuttonbn'),
                     0));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_showrecordings_from_deleted_activities_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['showrecordings_from_deleted_activities_enabled'])) {
             // Consider deleted activities for 'import recordings' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_from_deleted_activities_enabled',
                     get_string('config_feature_importrecordings_from_deleted_activities_enabled', 'bigbluebuttonbn'),
@@ -150,21 +150,21 @@ if ($ADMIN->fulltree) {
         }
     }
 
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable)) {
+    if (!isset($CFG->bigbluebuttonbn['recordings_html_default']) ||
+        !isset($CFG->bigbluebuttonbn['recordings_html_editable']) ||
+        !isset($CFG->bigbluebuttonbn['recordings_deleted_activities_default']) ||
+        !isset($CFG->bigbluebuttonbn['recordings_deleted_activities_editable'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recordings',
                     get_string('config_feature_recordings', 'bigbluebuttonbn'),
                     get_string('config_feature_recordings_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_default)) {
+        if (!isset($CFG->bigbluebuttonbn['recordings_html_default'])) {
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_html_default',
                     get_string('config_feature_recordings_html_default', 'bigbluebuttonbn'),
                     get_string('config_feature_recordings_html_default_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_html_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['recordings_html_editable'])) {
             // UI for 'recording' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_html_editable',
                     get_string('config_feature_recordings_html_editable', 'bigbluebuttonbn'),
@@ -172,13 +172,13 @@ if ($ADMIN->fulltree) {
                     0));
         }
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_default)) {
+        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_activities_default'])) {
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_default',
                     get_string('config_feature_recordings_deleted_activities_default', 'bigbluebuttonbn'),
                     get_string('config_feature_recordings_deleted_activities_default_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordings_deleted_activities_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_activities_editable'])) {
             // UI for 'recording' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_editable',
                     get_string('config_feature_recordings_deleted_activities_editable', 'bigbluebuttonbn'),
@@ -188,36 +188,36 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for wait for moderator feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl)) {
+    if (!isset($CFG->bigbluebuttonbn['waitformoderator_default']) ||
+        !isset($CFG->bigbluebuttonbn['waitformoderator_editable']) ||
+        !isset($CFG->bigbluebuttonbn['waitformoderator_ping_interval']) ||
+        !isset($CFG->bigbluebuttonbn['waitformoderator_cache_ttl'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_waitformoderator',
                 get_string('config_feature_waitformoderator', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default)) {
+        if (!isset($CFG->bigbluebuttonbn['waitformoderator_default'])) {
             // Default value for 'wait for moderator' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_default',
                     get_string('config_feature_waitformoderator_default', 'bigbluebuttonbn'),
                     get_string('config_feature_waitformoderator_default_description', 'bigbluebuttonbn'),
                     0));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['waitformoderator_editable'])) {
             // UI for 'wait for moderator' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_editable',
                     get_string('config_feature_waitformoderator_editable', 'bigbluebuttonbn'),
                     get_string('config_feature_waitformoderator_editable_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_ping_interval)) {
+        if (!isset($CFG->bigbluebuttonbn['waitformoderator_ping_interval'])) {
             // Ping interval value for 'wait for moderator' feature.
             $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_ping_interval',
                     get_string('config_feature_waitformoderator_ping_interval', 'bigbluebuttonbn'),
                     get_string('config_feature_waitformoderator_ping_interval_description', 'bigbluebuttonbn'),
                     10, PARAM_INT));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_cache_ttl)) {
+        if (!isset($CFG->bigbluebuttonbn['waitformoderator_cache_ttl'])) {
             // Cache TTL value for 'wait for moderator' feature.
             $settings->add(new admin_setting_configtext('bigbluebuttonbn_waitformoderator_cache_ttl',
                     get_string('config_feature_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
@@ -227,7 +227,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for "static voice bridge" feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_voicebridge_editable)) {
+    if (!isset($CFG->bigbluebuttonbn['voicebridge_editable'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_voicebridge',
                 get_string('config_feature_voicebridge', 'bigbluebuttonbn'),
                 get_string('config_feature_voicebridge_description', 'bigbluebuttonbn')));
@@ -240,7 +240,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for "preupload presentation" feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled)) {
+    if (!isset($CFG->bigbluebuttonbn['preuploadpresentation_enabled'])) {
         // This feature only works if curl is installed.
         if (extension_loaded('curl')) {
             $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
@@ -265,20 +265,20 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for "user limit" feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default) ||
-        !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable)) {
+    if (!isset($CFG->bigbluebuttonbn['userlimit_default']) ||
+        !isset($CFG->bigbluebuttonbn['userlimit_editable'])) {
         $settings->add(new admin_setting_heading('config_userlimit',
                 get_string('config_feature_userlimit', 'bigbluebuttonbn'),
                 get_string('config_feature_userlimit_description', 'bigbluebuttonbn')));
 
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default)) {
+        if (!isset($CFG->bigbluebuttonbn['userlimit_default'])) {
             // Default value for 'user limit' feature.
             $settings->add(new admin_setting_configtext('bigbluebuttonbn_userlimit_default',
                     get_string('config_feature_userlimit_default', 'bigbluebuttonbn'),
                     get_string('config_feature_userlimit_default_description', 'bigbluebuttonbn'),
                     0, PARAM_INT));
         }
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable)) {
+        if (!isset($CFG->bigbluebuttonbn['userlimit_editable'])) {
             // UI for 'user limit' feature.
             $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_userlimit_editable',
                     get_string('config_feature_userlimit_editable', 'bigbluebuttonbn'),
@@ -288,7 +288,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for "scheduled duration" feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled)) {
+    if (!isset($CFG->bigbluebuttonbn['scheduled_duration_enabled'])) {
         $settings->add(new admin_setting_heading('config_scheduled',
                 get_string('config_scheduled', 'bigbluebuttonbn'),
                 get_string('config_scheduled_description', 'bigbluebuttonbn')));
@@ -313,7 +313,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for defining the default role/user that will be moderator on new activities.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)) {
+    if (!isset($CFG->bigbluebuttonbn['moderator_default'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_permission',
                 get_string('config_permission', 'bigbluebuttonbn'),
                 get_string('config_permission_description', 'bigbluebuttonbn')));
@@ -328,7 +328,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for "send notifications" feature.
-    if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled)) {
+    if (!isset($CFG->bigbluebuttonbn['sendnotifications_enabled'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
                 get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
                 get_string('config_feature_sendnotifications_description', 'bigbluebuttonbn')));
@@ -343,14 +343,14 @@ if ($ADMIN->fulltree) {
     // Configuration for extended BN capabilities.
     if (bigbluebuttonbn_server_offers_bn_capabilities()) {
         // Configuration for 'notify users when recording ready' feature.
-        if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled) ||
-            !isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled)) {
+        if (!isset($CFG->bigbluebuttonbn['recordingready_enabled']) ||
+            !isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
             $settings->add(new admin_setting_heading('bigbluebuttonbn_extended_capabilities',
                     get_string('config_extended_capabilities', 'bigbluebuttonbn'),
                     get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
 
             // UI for 'notify users when recording ready' feature.
-            if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled)) {
+            if (!isset($CFG->bigbluebuttonbn['recordingready_enabled'])) {
                 $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
                     get_string('config_extended_feature_recordingready_enabled', 'bigbluebuttonbn'),
                     get_string('config_extended_feature_recordingready_enabled_description', 'bigbluebuttonbn'),
@@ -358,7 +358,7 @@ if ($ADMIN->fulltree) {
             }
 
             // UI for 'register meeting events' feature.
-            if (!isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_meetingevents_enabled)) {
+            if (!isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
                 $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_meetingevents_enabled',
                         get_string('config_extended_feature_meetingevents_enabled', 'bigbluebuttonbn'),
                         get_string('config_extended_feature_meetingevents_enabled_description', 'bigbluebuttonbn'),

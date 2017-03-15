@@ -25,34 +25,46 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-global $BIGBLUEBUTTONBN_CFG, $CFG;
+global $CFG;
 
-require_once $CFG->dirroot.'/calendar/lib.php';
-require_once $CFG->dirroot.'/message/lib.php';
-require_once $CFG->dirroot.'/mod/lti/OAuth.php';
-require_once $CFG->libdir.'/accesslib.php';
-require_once $CFG->libdir.'/completionlib.php';
-require_once $CFG->libdir.'/datalib.php';
-require_once $CFG->libdir.'/coursecatlib.php';
-require_once $CFG->libdir.'/enrollib.php';
-require_once $CFG->libdir.'/filelib.php';
-require_once $CFG->libdir.'/formslib.php';
+require_once($CFG->dirroot.'/calendar/lib.php');
+require_once($CFG->dirroot.'/message/lib.php');
+require_once($CFG->dirroot.'/mod/lti/OAuth.php');
+require_once($CFG->libdir.'/accesslib.php');
+require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->libdir.'/datalib.php');
+require_once($CFG->libdir.'/coursecatlib.php');
+require_once($CFG->libdir.'/enrollib.php');
+require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->libdir.'/formslib.php');
 
-require_once dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php';
+require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+
+if (!isset($CFG->bigbluebuttonbn)) {
+    $CFG->bigbluebuttonbn = array();
+}
 
 if (file_exists(dirname(__FILE__).'/config.php')) {
-    require_once dirname(__FILE__).'/config.php';
+    require_once(dirname(__FILE__).'/config.php');
+    // Old BigBlueButtonBN cfg schema. For backward compatibility.
     if (isset($BIGBLUEBUTTONBN_CFG)) {
-        $CFG = (object) array_merge((array) $CFG, (array) $BIGBLUEBUTTONBN_CFG);
+        foreach ((array) $BIGBLUEBUTTONBN_CFG as $key => $value) {
+            $CFG->bigbluebuttonbn[$key] = $value;
+        }
     }
-} else {
-    $BIGBLUEBUTTONBN_CFG = new stdClass();
+    // New BigBlueButtonBN cfg schema.
+    //foreach ($CFG->bigbluebuttonbn as $key => $value) {
+    //    $cfgkey = 'bigbluebuttonbn_'.$key;
+    //    if (!isset($CFG->$cfgkey)) {
+    //        $CFG->$cfgkey = $value;
+    //    }
+    //}
 }
 
 /*
  * DURATIONCOMPENSATION: Feature removed by configuration
  */
-$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_scheduled_duration_enabled = 0;
+$CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
 /*
  * Remove this block when restored
  */
@@ -108,7 +120,7 @@ function bigbluebuttonbn_add_instance($data, $mform)
     global $DB;
 
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
-    $context = bigbluebuttonbn_get_context_module($data->coursemodule);
+    $context = context_module::instance($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
 
@@ -136,7 +148,7 @@ function bigbluebuttonbn_update_instance($data, $mform)
 
     $data->id = $data->instance;
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
-    $context = bigbluebuttonbn_get_context_module($data->coursemodule);
+    $context = context_module::instance($data->coursemodule);
 
     bigbluebuttonbn_process_pre_save($data);
 
@@ -171,8 +183,8 @@ function bigbluebuttonbn_delete_instance($id)
     $meetingID = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     $modPW = $bigbluebuttonbn->moderatorpass;
 
-    if (bigbluebuttonbn_isMeetingRunning($meetingID)) {
-        bigbluebuttonbn_doEndMeeting($meetingID, $modPW);
+    if (bigbluebuttonbn_is_meeting_running($meetingID)) {
+        bigbluebuttonbn_end_meeting($meetingID, $modPW);
     }
 
     // Perform delete
@@ -305,30 +317,34 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray)
         $now = time();
         if ($bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) {
             // A bigbluebuttonbn is scheduled.
-            $start = 'started_at';
-            if ($bigbluebuttonbn->openingtime > $now) {
-                $start = 'starts_at';
-            }
-            $classes = '';
-            if ($bigbluebuttonbn->visible) {
-                $classes = 'class="dimmed" ';
-            }
-            $str = '<div class="bigbluebuttonbn overview">'."\n";
-            $str .= '  <div class="name">'.get_string('modulename', 'bigbluebuttonbn').':&nbsp;'."\n";
-            $str .= '    <a '.$classes.'href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.
-              '">'.$bigbluebuttonbn->name.'</a>'."\n";
-            $str .= '  </div>'."\n";
-            $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>'."\n";
-            $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
-              .'</div>'."\n";
-            $str .= '</div>'."\n";
-
             if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
                 $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = '';
             }
-            $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= $str;
+            $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= bigbluebuttonbn_print_overview_element($bigbluebuttonbn);
         }
     }
+}
+
+function bigbluebuttonbn_print_overview_element($bigbluebuttonbn) {
+    $start = 'started_at';
+    if ($bigbluebuttonbn->openingtime > $now) {
+        $start = 'starts_at';
+    }
+    $classes = '';
+    if ($bigbluebuttonbn->visible) {
+        $classes = 'class="dimmed" ';
+    }
+    $str = '<div class="bigbluebuttonbn overview">'."\n";
+    $str .= '  <div class="name">'.get_string('modulename', 'bigbluebuttonbn').':&nbsp;'."\n";
+    $str .= '    <a '.$classes.'href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.
+      '">'.$bigbluebuttonbn->name.'</a>'."\n";
+    $str .= '  </div>'."\n";
+    $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).'</div>'."\n";
+    $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
+      .'</div>'."\n";
+    $str .= '</div>'."\n";
+
+    return $str;
 }
 
 /**
@@ -547,7 +563,7 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args)
 {
     global $DB;
 
-    if (sizeof($args) > 1) {
+    if (count($args) > 1) {
         if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
             return;
         }
@@ -662,7 +678,7 @@ function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message =
 {
     global $DB;
 
-    $context = bigbluebuttonbn_get_context_course($bigbluebuttonbn->course);
+    $context = context_course::instance($bigbluebuttonbn->course);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
 
     //Complete message
@@ -678,27 +694,12 @@ function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message =
         if ($user->id != $sender->id) {
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
             if (!empty($messageid)) {
-                error_log('Msg to '.$msg->user_name.' was sent.');
+                debugging('Msg to '.$msg->user_name.' was sent.', DEBUG_DEVELOPER);
             } else {
-                error_log('Msg to '.$msg->user_name.' was NOT sent.');
+                debugging('Msg to '.$msg->user_name.' was NOT sent.', DEBUG_DEVELOPER);
             }
         }
     }
-}
-
-function bigbluebuttonbn_get_context($id, $context_type)
-{
-    return context_module::instance($id);
-}
-
-function bigbluebuttonbn_get_context_module($id)
-{
-    return bigbluebuttonbn_get_context($id, CONTEXT_MODULE);
-}
-
-function bigbluebuttonbn_get_context_course($id)
-{
-    return bigbluebuttonbn_get_context($id, CONTEXT_COURSE);
 }
 
 function bigbluebuttonbn_get_cfg_server_url()

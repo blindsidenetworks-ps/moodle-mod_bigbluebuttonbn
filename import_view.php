@@ -40,7 +40,7 @@ $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', M
 $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 
-$context = bigbluebuttonbn_get_context_module($cm->id);
+$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 

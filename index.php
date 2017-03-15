@@ -39,7 +39,7 @@ $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course, true);
 
-$context = bigbluebuttonbn_get_context_course($course->id);
+$context = context_course::instance($course->id);
 
 /// Print the header
 $PAGE->set_url('/mod/bigbluebuttonbn/index.php', array('id' => $id));
@@ -157,7 +157,7 @@ function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonb
         $groupName = $groupObj->name;
     }
 
-    $meetingInfo = bigbluebuttonbn_getMeetingInfoArray($meetingID);
+    $meetingInfo = bigbluebuttonbn_get_meeting_info_array($meetingID);
 
     if (!$meetingInfo) {
         // The server was unreachable

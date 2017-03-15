@@ -47,7 +47,7 @@ if ($id) {
     print_error('You must specify a course_module ID or a BigBlueButtonBN instance ID');
 }
 
-$context = bigbluebuttonbn_get_context_module($cm->id);
+$context = context_module::instance($cm->id);
 
 // Print the page header.
 $PAGE->set_context($context);
@@ -82,7 +82,7 @@ switch (strtolower($action)) {
     case 'join':
         if (isset($bbbsession) && !is_null($bbbsession)) {
             // See if the session is in progress.
-            if (bigbluebuttonbn_isMeetingRunning($bbbsession['meetingid'])) {
+            if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
                 // Since the meeting is already running, we just join the session.
                 bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $bigbluebuttonbn);
                 break;
@@ -126,7 +126,7 @@ switch (strtolower($action)) {
                 }
             }
             // Execute the create command.
-            $response = bigbluebuttonbn_getCreateMeetingArray(
+            $response = bigbluebuttonbn_get_create_meeting_array(
                     $bbbsession['meetingname'],
                     $bbbsession['meetingid'],
                     $bbbsession['welcome'],
@@ -212,7 +212,7 @@ function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $bigbluebuttonbn)
     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
         $password = $bbbsession['modPW'];
     }
-    $joinurl = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'],
+    $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID']);
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $cm);
