@@ -38,73 +38,39 @@ M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile = function () {
 };
 
 M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function (instance_type_profile) {
-  /* global bigbluebuttonbn */
 
   var features = instance_type_profile.features;
+  var show_all = features.includes('all');
 
   // Show room settings validation
-  var fieldset_showroom = Y.DOM.byId('id_room');
-  if (fieldset_showroom) {
-    if (features.includes('all') || features.includes('showroom')) {
-      Y.DOM.setStyle(fieldset_showroom, 'display', 'block');
-    } else {
-      Y.DOM.setStyle(fieldset_showroom, 'display', 'none');
-    }
-  }
+  M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_room', show_all || features.includes('showroom'));
 
   // Show recordings settings validation
-  var fieldset_showrecordings = Y.DOM.byId('id_recordings');
-  if (fieldset_showrecordings) {
-    if (features.includes('all') || features.includes('showrecordings')) {
-      Y.DOM.setStyle(fieldset_showrecordings, 'display', 'block');
-    } else {
-      Y.DOM.setStyle(fieldset_showrecordings, 'display', 'none');
-    }
-  }
+  M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_recordings', show_all || features.includes('showrecordings'));
 
   // Preuploadpresentation feature validation
-  var fieldset_preuploadpresentation = Y.DOM.byId('id_preuploadpresentation');
-  if (fieldset_preuploadpresentation) {
-    if (features.includes('all') || features.includes('preuploadpresentation')) {
-      Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'block');
-    } else {
-      Y.DOM.setStyle(fieldset_preuploadpresentation, 'display', 'none');
-    }
-  }
+  M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_preuploadpresentation', show_all || features.includes('preuploadpresentation'));
 
   // Participants feature validation
-  var fieldset_permissions = Y.DOM.byId('id_permissions');
-  if (fieldset_permissions) {
-    if (features.includes('all') || features.includes('permissions')) {
-      Y.DOM.setStyle(fieldset_permissions, 'display', 'block');
-    } else {
-      Y.DOM.setStyle(fieldset_permissions, 'display', 'none');
-    }
-  }
+  M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_permissions', show_all || features.includes('permissions'));
 
   // Schedule feature validation
-  var fieldset_schedule = Y.DOM.byId('id_schedule');
-  if (fieldset_schedule) {
-    if (features.includes('all') || features.includes('schedule')) {
-      Y.DOM.setStyle(fieldset_schedule, 'display', 'block');
-    } else {
-      Y.DOM.setStyle(fieldset_schedule, 'display', 'none');
-    }
+  M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_schedule', show_all || features.includes('schedule'));
+};
+
+M.mod_bigbluebuttonbn.mod_form_show_fieldset = function (id, show) {
+  // Show room settings validation
+  var fieldset = Y.DOM.byId(id);
+  if (!fieldset) {
+    return;
   }
 
-  // Groups feature validation
-  /*
-  var fieldset_groups = Y.DOM.byId('id_modstandardelshdr');
-  if( features.includes('all') || features.includes('groups') ) {
-    console.debug('feature groups enabled for ' + instance_type_profile.name);
-    //Y.DOM.setStyle(fieldset_groups, 'visibility', 'shown');
-    Y.DOM.setStyle(fieldset_groups, 'display', 'block');
-  } else {
-    console.debug('feature groups disabled for ' + instance_type_profile.name);
-    //Y.DOM.setStyle(fieldset_groups, 'visibility', 'hidden');
-    Y.DOM.setStyle(fieldset_groups, 'display', 'none');
+  if (show) {
+    Y.DOM.setStyle(fieldset, 'display', 'block');
+    return;
   }
-  */
+
+  Y.DOM.setStyle(fieldset, 'display', 'none');
 };
 
 M.mod_bigbluebuttonbn.mod_form_participant_selection_set = function () {
