@@ -299,16 +299,16 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
         return array();
     }
 
-    $bigbluebuttonbns = get_all_instances_in_courses('bigbluebuttonbn', $courses);
+    $bns = get_all_instances_in_courses('bigbluebuttonbn', $courses);
 
-    foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
+    foreach ($bns as $bn) {
         $now = time();
-        if ($bigbluebuttonbn->openingtime and (!$bigbluebuttonbn->closingtime or $bigbluebuttonbn->closingtime > $now)) {
+        if ($bn->openingtime and (!$bn->closingtime or $bn->closingtime > $now)) {
             // A bigbluebuttonbn is scheduled.
-            if (empty($htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'])) {
-                $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] = '';
+            if (empty($htmlarray[$bn->course]['bigbluebuttonbn'])) {
+                $htmlarray[$bn->course]['bigbluebuttonbn'] = '';
             }
-            $htmlarray[$bigbluebuttonbn->course]['bigbluebuttonbn'] .= bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now);
+            $htmlarray[$bn->course]['bigbluebuttonbn'] = bigbluebuttonbn_print_overview_element($bn, $now);
         }
     }
 }

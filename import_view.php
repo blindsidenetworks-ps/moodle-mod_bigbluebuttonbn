@@ -24,15 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once dirname(dirname(dirname(__FILE__))).'/config.php';
-require_once dirname(__FILE__).'/locallib.php';
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
-$bn = required_param('bn', PARAM_INT); // bigbluebuttonbn instance ID
-$tc = optional_param('tc', 0, PARAM_INT); // target course ID
+$bn = required_param('bn', PARAM_INT);
+$tc = optional_param('tc', 0, PARAM_INT);
 
 if (!$bn) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
-
     return;
 }
 
@@ -50,7 +49,7 @@ if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
 
 $output = '';
 
-/// Print the page header
+// Print the page header.
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
@@ -69,28 +68,34 @@ if (empty($options)) {
 } else {
     $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected));
 
-    //get course recordings
+    // Get course recordings.
     if ($course->id == $selected) {
-        $recordings = bigbluebuttonbn_get_recordings($selected, $bigbluebuttonbn->id, false, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
+        $recordings = bigbluebuttonbn_get_recordings($selected, $bigbluebuttonbn->id, false,
+            bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     } else {
-        $recordings = bigbluebuttonbn_get_recordings($selected, null, false, bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
+        $recordings = bigbluebuttonbn_get_recordings($selected, null, false,
+            bigbluebuttonbn_get_cfg_importrecordings_from_deleted_activities_enabled());
     }
     if (!empty($recordings)) {
-        //exclude the ones that are already imported
-        $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $course->id, $bigbluebuttonbn->id);
+        // Exclude the ones that are already imported.
+        $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
+            $course->id, $bigbluebuttonbn->id);
     }
-    //store recordings (indexed) in a session variable
+    // Store recordings (indexed) in a session variable.
     $SESSION->bigbluebuttonbn_importrecordings = $recordings;
 
-    // proceed with rendering
+    // Proceed with rendering.
     if (!empty($recordings)) {
-        $output .= html_writer::tag('span', '', ['id' => 'import_recording_links_table', 'name' => 'import_recording_links_table']);
+        $output .= html_writer::tag('span', '',
+            ['id' => 'import_recording_links_table', 'name' => 'import_recording_links_table']);
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['importing']);
     } else {
         $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     }
     $output .= html_writer::start_tag('br');
-    $output .= html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'), 'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
+    $output .= html_writer::tag('input', '',
+        array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
+              'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
 
     $jsvars = array(
         'bn' => $bn,
@@ -109,14 +114,13 @@ if (empty($options)) {
 
 $output .= $OUTPUT->footer();
 
-// finally, render the output
+// Finally, render the output.
 echo $output;
 
-function bigbluebuttonbn_selected_course($options, $tc = '')
-{
+function bigbluebuttonbn_selected_course($options, $tc = '') {
     if (empty($options)) {
         $selected = '';
-    } elseif (array_key_exists($tc, $options)) {
+    } else if (array_key_exists($tc, $options)) {
         $selected = $tc;
     } else {
         $selected = '';

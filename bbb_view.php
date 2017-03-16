@@ -95,15 +95,27 @@ switch (strtolower($action)) {
             }
 
             // Prepare the metadata.
+            $bbbrecordingname = $bbbsession['contextActivityName'];
+            if (isset($name) && $name != '') {
+                $bbbrecordingname = $name;
+            }
+            $bbbrecordingdescription = $bbbsession['contextActivityDescription'];
+            if (isset($description) && $description != '') {
+                $bbbrecordingdescription = $description;
+            }
+            $bbbrecordingtags = $bbbsession['contextActivityTags'];
+            if (isset($tags) && $tags != '') {
+                $bbbrecordingtags = $tags;
+            }
             $metadata = array('bbb-origin' => $bbbsession['origin'],
                 'bbb-origin-version' => $bbbsession['originVersion'],
                 'bbb-origin-server-name' => $bbbsession['originServerName'],
                 'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
                 'bbb-origin-tag' => $bbbsession['originTag'],
                 'bbb-context' => $bbbsession['course']->fullname,
-                'bbb-recording-name' => (isset($name) && $name != '') ? $name : $bbbsession['contextActivityName'],
-                'bbb-recording-description' => (isset($description) && $description != '') ? $description : $bbbsession['contextActivityDescription'],
-                'bbb-recording-tags' => (isset($tags) && $tags != '') ? $tags : $bbbsession['contextActivityTags'],
+                'bbb-recording-name' => $bbbrecordingname,
+                'bbb-recording-description' => $bbbrecordingdescription,
+                'bbb-recording-tags' => $bbbrecordingtags,
               );
 
             if (bigbluebuttonbn_server_offers_bn_capabilities()) {

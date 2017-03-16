@@ -269,21 +269,21 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     switch (strtolower($params['action'])) {
         case 'recording_publish':
             $callbackresponse = bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings);
-            $event_log = BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED;
+            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED;
             break;
         case 'recording_unpublish':
             $callbackresponse = bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);;
-            $event_log = BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED;
+            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED;
             break;
         case 'recording_delete':
             $callbackresponse = bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
-            $event_log = BIGBLUEBUTTON_EVENT_RECORDING_DELETED;
+            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_DELETED;
             break;
     }
 
     if (isset($bigbluebuttonbn) && $callbackresponse['status'] === 'true') {
         // Moodle event logger: Create an event for action performed on recording.
-        bigbluebuttonbn_event_log($event_log, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_event_log($eventlog, $bigbluebuttonbn, $cm);
     }
 
     $callbackresponsedata = json_encode($callbackresponse);
