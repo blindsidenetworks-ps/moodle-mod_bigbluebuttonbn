@@ -256,6 +256,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     $callbackresponse = array();
     $callbackresponse['status'] = 'false';
+    $eventlog = null;
 
     // Retrieve array of recordings that includes real and imported.
     $bigbluebuttonbnid = null;

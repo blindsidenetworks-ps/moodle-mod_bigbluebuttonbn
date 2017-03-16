@@ -17,8 +17,8 @@ env:
   #- MOODLE_BRANCH=MOODLE_27_STABLE
   #- MOODLE_BRANCH=MOODLE_28_STABLE
   #- MOODLE_BRANCH=MOODLE_29_STABLE
-  #- MOODLE_BRANCH=MOODLE_30_STABLE
-  - MOODLE_BRANCH=MOODLE_31_STABLE
+  - MOODLE_BRANCH=MOODLE_30_STABLE
+  #- MOODLE_BRANCH=MOODLE_31_STABLE
   #- MOODLE_BRANCH=MOODLE_32_STABLE
  matrix:
   #- DB=pgsql
@@ -38,7 +38,7 @@ script:
   - moodle-plugin-ci phplint
   - moodle-plugin-ci phpcpd
   - moodle-plugin-ci phpmd
-  #- moodle-plugin-ci codechecker #Failing
+  - moodle-plugin-ci codechecker #Failing
   - moodle-plugin-ci csslint
   - moodle-plugin-ci shifter
   - moodle-plugin-ci jshint

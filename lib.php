@@ -38,7 +38,9 @@ require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
 
-require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+if (file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
+    require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+}
 
 if (!isset($CFG->bigbluebuttonbn)) {
     $CFG->bigbluebuttonbn = array();
