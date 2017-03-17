@@ -50,7 +50,8 @@ M.mod_bigbluebuttonbn.mod_form_apply_instance_type_profile = function(instance_t
     M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_recordings', show_all || features.includes('showrecordings'));
 
     // Preuploadpresentation feature validation.
-    M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_preuploadpresentation', show_all || features.includes('preuploadpresentation'));
+    M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_preuploadpresentation', show_all ||
+        features.includes('preuploadpresentation'));
 
     // Participants feature validation.
     M.mod_bigbluebuttonbn.mod_form_show_fieldset('id_permissions', show_all || features.includes('permissions'));
