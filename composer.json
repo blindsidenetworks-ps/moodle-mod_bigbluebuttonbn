@@ -1,13 +1,13 @@
 {
     "name": "blindsidenetworks/moodle-mod_bigbluebuttonbn",
     "type": "moodle-mod",
-    "repositories": [
-        {
+    "repositories": {
+        "bigbluebutton-api-php" : {
             "type": "vcs",
             "url": "https://github.com/jfederico/bigbluebutton-api-php",
             "branches-path": "Branches"
         }
-    ],
+    },
     "require": {
         "bigbluebutton/bigbluebutton-api-php": "dev-alpha",
         "firebase/php-jwt": "^4.0"
@@ -16,10 +16,9 @@
         "composer/installers": "~1.0",
         "phpunit/phpunit": "4.1.*",
         "friendsofphp/php-cs-fixer": "~1.10",
-        "phpmd/phpmd" : "@stable",
-        "jakub-onderka/php-parallel-lint" : "^0.9.2",
-        "jakub-onderka/php-console-highlighter" : "^0.3.2",
-        "squizlabs/php_codesniffer": "2.*"
+        "phpmd/phpmd": "@stable",
+        "jakub-onderka/php-parallel-lint": "^0.9.2",
+        "jakub-onderka/php-console-highlighter": "^0.3.2"
     },
     "extra": {
         "installer-name": "bigbluebuttonbn"

@@ -245,28 +245,33 @@ M.mod_bigbluebuttonbn.view_msg_users_joined = function(participantCount) {
 M.mod_bigbluebuttonbn.view_msg_attendees_in = function(moderators, participants) {
     /* global bigbluebuttonbn */
 
-    var msg_attendees_in = '';
-
-    if (typeof moderators != 'undefined' && typeof participants != 'undefined') {
-        var viewers = participants - moderators;
-        if (participants > 1) {
-            msg_attendees_in += bigbluebuttonbn.locales.session_has_users;
-            msg_attendees_in += ' <b>' + moderators + '</b> ';
-            msg_attendees_in += (moderators == 1 ? bigbluebuttonbn.locales.moderator : bigbluebuttonbn.locales.moderators) + ' and ';
-            msg_attendees_in += '<b>' + viewers + '</b> ';
-            msg_attendees_in += (viewers == 1 ? bigbluebuttonbn.locales.viewer : bigbluebuttonbn.locales.viewers) + '.';
-        } else {
-            if (viewers > 0) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';
-            } else if (moderators > 0) {
-                msg_attendees_in += bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';
-            }
-        }
-    } else {
-        msg_attendees_in = bigbluebuttonbn.locales.session_no_users + '.';
+    if (typeof moderators == 'undefined' && typeof participants == 'undefined') {
+        return bigbluebuttonbn.locales.session_no_users + '.';
     }
 
-    return msg_attendees_in;
+    var viewers = participants - moderators;
+
+    if (participants == 1) {
+        if (viewers > 0) {
+            return bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.viewer + '.';
+        }
+
+        return bigbluebuttonbn.locales.session_has_user + ' <b>1</b> ' + bigbluebuttonbn.locales.moderator + '.';
+    }
+
+    var msg = bigbluebuttonbn.locales.session_has_users;
+
+    var msg_moderators = bigbluebuttonbn.locales.moderators;
+    if (moderators == 1) {
+        msg_moderators = bigbluebuttonbn.locales.moderator;
+    }
+
+    var msg_viewers = bigbluebuttonbn.locales.viewers;
+    if (moderators == 1) {
+        msg_viewers = bigbluebuttonbn.locales.viewer;
+    }
+
+    return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
 };
 
 M.mod_bigbluebuttonbn.view_init_join_button = function(status) {
@@ -279,7 +284,7 @@ M.mod_bigbluebuttonbn.view_init_join_button = function(status) {
     if (status.can_join) {
         var input_html = 'M.mod_bigbluebuttonbn.broker_joinNow(\'';
         input_html += status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress;
-        input_html += '\', ' + status.can_tag + ');'
+        input_html += '\', ' + status.can_tag + ');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
     } else {
         Y.DOM.setAttribute(join_button_input, 'disabled', true);
@@ -524,45 +529,46 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
                                 link_action.setAttribute('onclick', '');
 
                                 // Start pooling until the action has been executed.
-                                bigbluebuttonbn_ping_interval_id = bigbluebuttonbn_dataSource.setInterval(bigbluebuttonbn.ping_interval, {
-                                    request: "action=recording_info&id=" + recordingid + "&idx=" + meetingid,
-                                    callback: {
-                                        success: function(e) {
-                                            if (e.data.status == 'true') {
-                                                if (action == 'publish') {
-                                                    if (e.data.published == 'true') {
-                                                        clearInterval(bigbluebuttonbn_ping_interval_id);
-                                                        btn_action.setAttribute('id', 'recording-btn-unpublish-' + recordingid);
-                                                        link_action.setAttribute('id', 'recording-link-unpublish-' + recordingid);
-                                                        btn_action.setAttribute('src', btn_action_src_url + 'hide');
-                                                        btn_action.setAttribute('alt', bigbluebuttonbn.locales.unpublish);
-                                                        btn_action.setAttribute('title', bigbluebuttonbn.locales.unpublish);
-                                                        link_action.setAttribute('onclick',
-                                                            link_action_current_onclick.replace('publish', 'unpublish'));
-                                                        Y.one('#playbacks-' + recordingid).show();
+                                bigbluebuttonbn_ping_interval_id = bigbluebuttonbn_dataSource.setInterval(
+                                    bigbluebuttonbn.ping_interval, {
+                                        request: "action=recording_info&id=" + recordingid + "&idx=" + meetingid,
+                                        callback: {
+                                            success: function(e) {
+                                                if (e.data.status == 'true') {
+                                                    if (action == 'publish') {
+                                                        if (e.data.published == 'true') {
+                                                            clearInterval(bigbluebuttonbn_ping_interval_id);
+                                                            btn_action.setAttribute('id', 'recording-btn-unpublish-' + recordingid);
+                                                            link_action.setAttribute('id', 'recording-link-unpublish-' + recordingid);
+                                                            btn_action.setAttribute('src', btn_action_src_url + 'hide');
+                                                            btn_action.setAttribute('alt', bigbluebuttonbn.locales.unpublish);
+                                                            btn_action.setAttribute('title', bigbluebuttonbn.locales.unpublish);
+                                                            link_action.setAttribute('onclick',
+                                                                link_action_current_onclick.replace('publish', 'unpublish'));
+                                                            Y.one('#playbacks-' + recordingid).show();
+                                                        }
+                                                    } else {
+                                                        if (e.data.published == 'false') {
+                                                            clearInterval(bigbluebuttonbn_ping_interval_id);
+                                                            btn_action.setAttribute('id', 'recording-btn-publish-' + recordingid);
+                                                            link_action.setAttribute('id', 'recording-link-publish-' + recordingid);
+                                                            btn_action.setAttribute('src', btn_action_src_url + 'show');
+                                                            btn_action.setAttribute('alt', bigbluebuttonbn.locales.publish);
+                                                            btn_action.setAttribute('title', bigbluebuttonbn.locales.publish);
+                                                            link_action.setAttribute('onclick',
+                                                                link_action_current_onclick.replace('unpublish', 'publish'));
+                                                            Y.one('#playbacks-' + recordingid).hide();
+                                                        }
                                                     }
                                                 } else {
-                                                    if (e.data.published == 'false') {
-                                                        clearInterval(bigbluebuttonbn_ping_interval_id);
-                                                        btn_action.setAttribute('id', 'recording-btn-publish-' + recordingid);
-                                                        link_action.setAttribute('id', 'recording-link-publish-' + recordingid);
-                                                        btn_action.setAttribute('src', btn_action_src_url + 'show');
-                                                        btn_action.setAttribute('alt', bigbluebuttonbn.locales.publish);
-                                                        btn_action.setAttribute('title', bigbluebuttonbn.locales.publish);
-                                                        link_action.setAttribute('onclick',
-                                                            link_action_current_onclick.replace('unpublish', 'publish'));
-                                                        Y.one('#playbacks-' + recordingid).hide();
-                                                    }
+                                                    clearInterval(bigbluebuttonbn_ping_interval_id);
                                                 }
-                                            } else {
+                                            },
+                                            failure: function() {
                                                 clearInterval(bigbluebuttonbn_ping_interval_id);
                                             }
-                                        },
-                                        failure: function() {
-                                            clearInterval(bigbluebuttonbn_ping_interval_id);
                                         }
-                                    }
-                                });
+                                    });
 
                             } else {
                                 var alert = new M.core.alert({

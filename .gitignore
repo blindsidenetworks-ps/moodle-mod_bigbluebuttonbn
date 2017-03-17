@@ -6,6 +6,7 @@ deploy*
 vendor/bin/
 vendor/composer/
 vendor/composer/
+vendor/autoload.php
 vendor/friendsofphp/
 vendor/phpunit/
 vendor/psr/
@@ -15,3 +16,10 @@ vendor/pdepend/
 vendor/phpmd/
 vendor/jakub-onderka/
 vendor/squizlabs/
+vendor/moodlerooms/
+vendor/marcj/
+vendor/nikic/
+vendor/stecman/
+vendor/theseer/
+vendor/vlucas/
+moodle-plugin-ci/

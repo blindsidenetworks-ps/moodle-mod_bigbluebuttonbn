@@ -232,20 +232,3 @@ M.mod_bigbluebuttonbn.mod_form_select_add_option = function(id, text, value) {
     option.value = value;
     select.add(option, 0);
 };
-od_bigbluebuttonbn.mod_form_select_enable = function(id) {
-    var select = document.getElementById(id);
-    select.disabled = false;
-};
-
-M.mod_bigbluebuttonbn.mod_form_select_disable = function(id) {
-    var select = document.getElementById(id);
-    select.disabled = true;
-};
-
-M.mod_bigbluebuttonbn.mod_form_select_add_option = function(id, text, value) {
-    var select = document.getElementById(id);
-    var option = document.createElement('option');
-    option.text = text;
-    option.value = value;
-    select.add(option, 0);
-};
