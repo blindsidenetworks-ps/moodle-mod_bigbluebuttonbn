@@ -119,7 +119,6 @@ $bbbsession['originServerUrl'] = $CFG->wwwroot;
 $bbbsession['originServerCommonName'] = '';
 $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
 
-
 // Validates if the BigBlueButton server is running.
 $serverversion = bigbluebuttonbn_get_server_version();
 if (!isset($serverversion)) {

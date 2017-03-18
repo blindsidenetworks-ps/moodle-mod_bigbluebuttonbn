@@ -388,7 +388,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         // Assign password only if it is a new activity.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
-        $bigbluebuttonbn->timemodified = null;
+        $bigbluebuttonbn->timemodified = 0;
     }
 
     if (!isset($bigbluebuttonbn->wait)) {

@@ -140,7 +140,7 @@ function bigbluebuttonbn_get_update_recordings_url($recordid, $metadata = array(
  * @param array  $data
  * @param array  $metadata
  */
-function bigbluebuttonbn_bigbluebutton_action_url($action, $data = array(), $metadata = array()) {
+function bigbluebuttonbn_bigbluebutton_action_url($action = '', $data = array(), $metadata = array()) {
     $baseurl = bigbluebuttonbn_get_cfg_server_url().'api/'.$action.'?';
 
     $params = '';
@@ -486,7 +486,9 @@ function bigbluebuttonbn_is_meeting_running($meetingid) {
 }
 
 function bigbluebuttonbn_get_server_version() {
-    $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_get_cfg_server_url().'api');
+    $xml = bigbluebuttonbn_wrap_xml_load_file(
+        bigbluebuttonbn_bigbluebutton_action_url()
+      );
 
     if ($xml && $xml->returncode == 'SUCCESS') {
         return $xml->version;
@@ -2034,7 +2036,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
 
 function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
     if (is_null($profiles) || empty($profiles)) {
-        $profiles = bigbluebuttonbn_get_instanceprofiles();
+        $profiles = bigbluebuttonbn_get_instance_type_profiles();
     }
 
     $profilesarray = array();
