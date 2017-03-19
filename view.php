@@ -62,13 +62,8 @@ if (isguestuser()) {
 }
 
 // User roles.
-if ($bigbluebuttonbn->participants == null || $bigbluebuttonbn->participants == '' || $bigbluebuttonbn->participants == '[]') {
-    // The room that is being used comes from a previous version.
-    $bbbsession['moderator'] = has_capability('mod/bigbluebuttonbn:moderate', $context);
-} else {
-    $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($bbbsession['userID'], $bbbsession['roles'],
-                                                            $bigbluebuttonbn->participants);
-}
+$bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $bigbluebuttonbn->participants,
+                                                       $bbbsession['userID'], $bbbsession['roles']);
 $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
 $bbbsession['managerecordings'] = ($bbbsession['administrator']
     || has_capability('mod/bigbluebuttonbn:managerecordings', $context));

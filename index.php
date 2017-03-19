@@ -84,14 +84,8 @@ if ($submit === 'end') {
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 
     // User roles.
-    if (empty($bigbluebuttonbn->participants)) {
-        // The room that is being used comes from a previous version.
-        $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
-    } else {
-        $moderator = bigbluebuttonbn_is_moderator($USER->id, get_user_roles($context, $USER->id, true),
-            $bigbluebuttonbn->participants);
-    }
-    $administrator = has_capability('moodle/category:manage', $context);
+    $moderator = bigbluebuttonbn_is_moderator($context, $bigbluebuttonbn->participants);
+    $administrator = is_siteadmin();
 
     if ($moderator || $administrator) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
@@ -112,14 +106,8 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
 
         // User roles.
-        if (empty($bigbluebuttonbn->participants)) {
-            // The room that is being used comes from a previous version.
-            $moderator = has_capability('mod/bigbluebuttonbn:moderate', $context);
-        } else {
-            $moderator = bigbluebuttonbn_is_moderator($USER->id, get_user_roles($context, $USER->id, true),
-                $bigbluebuttonbn->participants);
-        }
-        $administrator = has_capability('moodle/category:manage', $context);
+        $moderator = bigbluebuttonbn_is_moderator($context, $bigbluebuttonbn->participants);
+        $administrator = is_siteadmin();
 
         $canmoderate = ($administrator || $moderator);
 

@@ -596,6 +596,15 @@ function bigbluebuttonbn_get_roles(context $context = null) {
     return $rolesarray;
 }
 
+function bigbluebuttonbn_get_role($shortname) {
+    $roles = role_get_names();
+    foreach ($roles as $role) {
+        if ($role->shortname == $shortname) {
+            return $role;
+        }
+    }
+}
+
 function bigbluebuttonbn_get_roles_select($roles = array()) {
     $rolesarray = array();
     foreach ($roles as $key => $value) {
@@ -660,13 +669,28 @@ function bigbluebuttonbn_get_participant_list_default($context) {
 
     return $participantlistarray;
 }
+
 function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid = null) {
     return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
 }
 
-function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
-    $participantlist = json_decode($participants);
+function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $userroles = null) {
+    global $USER;
 
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+
+    if (empty($userroles)) {
+        $userroles = get_user_roles($context, $userid, true);
+    }
+
+    if (empty($participants)) {
+        // The room that is being used comes from a previous version.
+        return has_capability('mod/bigbluebuttonbn:moderate', $context);
+    }
+
+    $participantlist = json_decode($participants);
     // Iterate participant rules.
     foreach ($participantlist as $participant) {
         if ($participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR) {
@@ -675,15 +699,14 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
                 return true;
             }
             // Looks for users.
-            if ($participant->selectiontype == 'user' && $participant->selectionid == $user) {
+            if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
                 return true;
             }
             // Looks for roles.
             if ($participant->selectiontype == 'role') {
-                foreach ($roles as $role) {
-                    if ($participant->selectionid == $role->shortname) {
-                        return true;
-                    }
+                $role = bigbluebuttonbn_get_role($participant->selectionid);
+                if (array_key_exists($role->id, $userroles)) {
+                    return true;
                 }
             }
         }
