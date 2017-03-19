@@ -77,6 +77,7 @@ const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 
 function bigbluebuttonbn_supports($feature) {
+
     if (!$feature) {
         return null;
     }

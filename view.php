@@ -23,8 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -403,34 +401,33 @@ function bigbluebuttonbn_view_show_imported($bbbsession) {
 }
 
 function bigbluebuttonbn_view_joining($bbbsession) {
-    if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
-        return ''.
-            '<div id="panelContent" class="hidden">'."\n".
-            '  <div class="yui3-widget-bd">'."\n".
-            '    <form>'."\n".
-            '      <fieldset>'."\n".
-            '        <input type="hidden" name="join" id="meeting_join_url" value="">'."\n".
-            '        <input type="hidden" name="message" id="meeting_message" value="">'."\n".
-            '        <div>'."\n".
-            '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'."\n".
-            '          <input type="text" name="name" id="recording_name" placeholder="">'."\n".
-            '        </div><br>'."\n".
-            '        <div>'."\n".
-            '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').
-                '</label><br/>'."\n".
-            '          <input type="text" name="description" id="recording_description" value="" placeholder="">'."\n".
-            '        </div><br>'."\n".
-            '        <div>'."\n".
-            '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'."\n".
-            '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'."\n".
-            '        </div>'."\n".
-            '      </fieldset>'."\n".
-            '    </form>'."\n".
-            '  </div>'."\n".
-            '</div>';
+    if (!$bbbsession['tagging'] || !$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        return '';
     }
 
-    return '';
+    return ''.
+        '<div id="panelContent" class="hidden">'."\n".
+        '  <div class="yui3-widget-bd">'."\n".
+        '    <form>'."\n".
+        '      <fieldset>'."\n".
+        '        <input type="hidden" name="join" id="meeting_join_url" value="">'."\n".
+        '        <input type="hidden" name="message" id="meeting_message" value="">'."\n".
+        '        <div>'."\n".
+        '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'."\n".
+        '          <input type="text" name="name" id="recording_name" placeholder="">'."\n".
+        '        </div><br>'."\n".
+        '        <div>'."\n".
+        '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').'</label><br/>'."\n".
+        '          <input type="text" name="description" id="recording_description" value="" placeholder="">'."\n".
+        '        </div><br>'."\n".
+        '        <div>'."\n".
+        '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'."\n".
+        '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'."\n".
+        '        </div>'."\n".
+        '      </fieldset>'."\n".
+        '    </form>'."\n".
+        '  </div>'."\n".
+        '</div>';
 }
 
 function bigbluebuttonbn_view_ended($bbbsession) {
