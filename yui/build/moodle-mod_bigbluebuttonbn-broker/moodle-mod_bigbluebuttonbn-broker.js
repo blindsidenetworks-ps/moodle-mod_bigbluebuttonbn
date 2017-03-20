@@ -301,4 +301,4 @@ M.mod_bigbluebuttonbn.broker = {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "node"]});
+}, '@VERSION@', {"requires": ["base", "node", "datasource-get", "datasource-jsonschema", "datasource-polling"]});

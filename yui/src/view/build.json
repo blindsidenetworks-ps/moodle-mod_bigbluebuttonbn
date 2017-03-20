@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_bigbluebuttonbn-view",
+    "builds": {
+        "moodle-mod_bigbluebuttonbn-view": {
+            "jsfiles": [
+                "view.js"
+            ]
+        }
+    }
+}

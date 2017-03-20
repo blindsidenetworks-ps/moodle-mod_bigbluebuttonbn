@@ -2,7 +2,10 @@
     "moodle-mod_bigbluebuttonbn-broker": {
         "requires": [
             "base",
-            "node"
+            "node",
+            "datasource-get",
+            "datasource-jsonschema",
+            "datasource-polling"
         ]
     }
 }
