@@ -35,7 +35,6 @@ before_install:
   - composer require --prefer-dist moodlerooms/moodle-coding-standard:dev-master#6a4a63a1f265466417500050ff668a1b927b54ab
   - composer require --prefer-dist moodlerooms/moodle-plugin-ci:dev-master#45e7c2babaebd8068e67ade31116f70a2ab8b596
   - cd ..
-  #- composer config repositories.moodle-plugin-ci vcs '{"type": "vcs", "url": "https://github.com/jfederico/moodle-plugin-ci", "trunk-path": "master"}'
   #- composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^1
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 

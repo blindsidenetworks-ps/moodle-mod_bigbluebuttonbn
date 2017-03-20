@@ -17,9 +17,10 @@
 /**
  * Config all BigBlueButtonBN instances in this course.
  *
+ * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2017 Blindside Networks Inc
+ * @copyright 2010-2017 Blindside Networks Inc.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
@@ -28,8 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__).'/locallib.php');
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
-class mod_bigbluebuttonbn_mod_form extends moodleform_mod
-{
+class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
+
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
 
@@ -57,8 +58,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
                 array('id' => $cm->instance), '*', MUST_EXIST);
         }
 
+
         $context = context_course::instance($course->id);
         $pixicondeleteurl = ''.$OUTPUT->pix_url('t/delete', 'moodle');
+
 
         // UI configuration options.
         $cfg = bigbluebuttonbn_get_cfg_options();
@@ -130,7 +133,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod
                 );
                 $defaultvalues['presentation'] = $draftitemid;
             } catch (Exception $e) {
-                debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
+                //debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
                 return null;
             }
         }

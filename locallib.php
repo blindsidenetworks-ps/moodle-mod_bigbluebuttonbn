@@ -339,17 +339,17 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     }
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
-    $recordingsimported = $recordsimported;
     // Check if array is not sequential.
-    if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
+    //if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
         // The response contains a single record and needs to be converted to a sequential array format.
-        $recordingsimported = array($recordsimported);
-    }
+    //    $recordsimported = array($recordsimported);
+    //}
 
     $recordsimportedarray = array();
-    foreach ($recordingsimported as $recordingimported) {
-        $meta = json_decode($recordingimported->meta, true);
-        $recordsimportedarray[$meta['recording']['recordID']] = $meta['recording'];
+    foreach ($recordsimported as $recordimported) {
+        $meta = json_decode($recordimported->meta, true);
+        $recording = $meta['recording'];
+        $recordsimportedarray[$recording['recordID']] = $recording;
     }
 
     return $recordsimportedarray;
@@ -504,17 +504,17 @@ function bigbluebuttonbn_get_server_version() {
 function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METHOD_GET,
     $data = null, $contenttype = 'text/xml') {
 
-    debugging('Request to: '.$url, DEBUG_DEVELOPER);
+    //debugging('Request to: '.$url, DEBUG_DEVELOPER);
 
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
 
         if (!$response) {
-            debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
+            //debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
             return null;
         }
 
-        debugging('Response: '.$response, DEBUG_DEVELOPER);
+        //debugging('Response: '.$response, DEBUG_DEVELOPER);
 
         $previous = libxml_use_internal_errors(true);
         try {
@@ -524,7 +524,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
         } catch (Exception $e) {
             libxml_use_internal_errors($previous);
             $error = 'Caught exception: '.$e->getMessage();
-            debugging($error, DEBUG_DEVELOPER);
+            //debugging($error, DEBUG_DEVELOPER);
             return null;
         }
     }
@@ -533,11 +533,11 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     $previous = libxml_use_internal_errors(true);
     try {
         $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-        debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
+        //debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
         return $response;
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
-        debugging($error, DEBUG_DEVELOPER);
+        //debugging($error, DEBUG_DEVELOPER);
         libxml_use_internal_errors($previous);
         return null;
     }
@@ -1046,7 +1046,7 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
     $configxml = bigbluebuttonbn_setConfigXML($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
-        debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
+        //debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
         return '';
     }
 
@@ -1065,8 +1065,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
         $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording);
 
         // Set activity name and description.
-        $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity(recording);
-        $row->description = bigbluebuttonbn_get_recording_data_row_meta_description(recording);
+        $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording);
+        $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording);
 
         // Set recording_preview.
         $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
