@@ -284,6 +284,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
 
     // Require JavaScript module.
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
     $jsmodule = array(
         'name' => 'mod_bigbluebuttonbn',
         'fullpath' => '/mod/bigbluebuttonbn/module.js',

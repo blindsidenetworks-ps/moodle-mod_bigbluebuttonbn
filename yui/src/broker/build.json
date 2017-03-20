@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_bigbluebuttonbn-broker",
+    "builds": {
+        "moodle-mod_bigbluebuttonbn-broker": {
+            "jsfiles": [
+                "broker.js"
+            ]
+        }
+    }
+}

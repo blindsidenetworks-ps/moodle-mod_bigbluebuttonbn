@@ -1190,7 +1190,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording) {
 function bigbluebuttonbn_actionbar_render($manageaction, $managetag, $recording) {
     global $OUTPUT;
 
-    $onclick = 'M.mod_bigbluebuttonbn.broker_manageRecording("'.$manageaction.'", "'.
+    $onclick = 'M.mod_bigbluebuttonbn.broker.manageRecording("'.$manageaction.'", "'.
         $recording['recordID'].'", "'.$recording['meetingID'].'");';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $manageaction.
