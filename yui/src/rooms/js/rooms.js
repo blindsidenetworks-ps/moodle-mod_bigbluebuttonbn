@@ -14,6 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /** global: M */
+/** global: Y */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
@@ -30,7 +31,6 @@ M.mod_bigbluebuttonbn.rooms = {
      * @method init
      */
     init: function(bigbluebuttonbn) {
-        console.info("init");
         this.data_source = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
@@ -42,25 +42,19 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     init_room: function() {
-        console.info("init_room");
         if (this.bigbluebuttonbn.activity !== 'open') {
-            var room_state = "Room ended;"
             var status_bar = [this.bigbluebuttonbn.locales.conference_ended];
-            if (bigbluebuttonbn.activity !== 'ended') {
-                room_state = "Room is not open";
+            if (this.bigbluebuttonbn.activity !== 'ended') {
                 status_bar.push(this.bigbluebuttonbn.opening);
                 status_bar.push(this.bigbluebuttonbn.closing);
             }
-            console.info(room_state);
             Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_bar));
             return;
         }
-        console.info("Room open");
         this.init_room_open();
     },
 
     init_room_open: function() {
-        console.info("init_room_open");
         // Create the main modal form.
         this.panel = new Y.Panel({
             srcNode: '#panelContent',
@@ -112,8 +106,6 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     update_room: function() {
-        console.info("update_room");
-
         var status_bar = Y.one('#status_bar');
         var control_panel = Y.one('#control_panel');
         var join_button = Y.one('#join_button');
@@ -121,12 +113,10 @@ M.mod_bigbluebuttonbn.rooms = {
         var qs = 'action=meeting_info';
         qs += '&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        console.info(qs);
         this.data_source.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
-                    console.info("success");
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
                     Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.rooms.init_control_panel(e.data));
                     if (typeof e.data.status.can_join != 'undefined') {
@@ -136,7 +126,7 @@ M.mod_bigbluebuttonbn.rooms = {
                         Y.DOM.addHTML(end_button, this.init_end_button(e.data.status));
                     }
                 },
-                failure: function() {
+                failure: function(e) {
                     console.info("Could not retrieve data: " + e.error.message);
                 }
             }
@@ -181,12 +171,12 @@ M.mod_bigbluebuttonbn.rooms = {
 
     msg_started_at: function(startTime) {
 
-        var start_timestamp = (parseInt(startTime) - parseInt(startTime) % 1000);
+        var start_timestamp = (parseInt(startTime, 10) - parseInt(startTime, 10) % 1000);
         var date = new Date(start_timestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
-
-        return M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
+        var started_at = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.started_at;
+        return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
     msg_attendees_in: function(moderators, participants) {
@@ -226,6 +216,7 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
         Y.DOM.setAttribute(join_button_input, 'type', 'button');
         Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
+        Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
 
         if (status.can_join) {
             var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';

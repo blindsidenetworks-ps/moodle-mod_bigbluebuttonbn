@@ -16,6 +16,7 @@ YUI.add('moodle-mod_bigbluebuttonbn-broker', function (Y, NAME) {
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /** global: M */
+/** global: Y */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
@@ -146,17 +147,14 @@ M.mod_bigbluebuttonbn.broker = {
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            console.info("I am tryig");
             this.data_source.sendRequest({
                 request: "action=recording_import" + "&id=" + recordingid,
                 callback: {
                     success: function(e) {
-                        console.info(e);
-                        console.info("Imported");
                         Y.one('#recording-td-' + recordingid).remove();
                     },
-                    failure: function() {
-                        console.info("Not imported");
+                    failure: function(e) {
+                        console.info("Could not retrieve data: " + e.error.message);
                     }
                 }
             });
@@ -289,8 +287,6 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     pingRecordingObject: function(data) {
-        console.info("ping");
-
         var btn_action = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var btn_action_src_current = btn_action.getAttribute('src');
         var btn_action_src_url = btn_action_src_current.substring(0, btn_action_src_current.length - 4);

@@ -92,7 +92,7 @@ if (empty($options)) {
     }
     $output .= html_writer::start_tag('br');
     $output .= html_writer::tag('input', '',
-        array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
+        array('type' => 'button', 'class' => 'btn btn-secondary', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
 
     // Require aggregated JavaScript variables.

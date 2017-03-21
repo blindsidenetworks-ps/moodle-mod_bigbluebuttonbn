@@ -144,7 +144,6 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     $statuscanend = '"can_end": false';
     $statuscantag = '"can_tag": false';
     if ($meetingrunning) {
-        error_log("Meeting running");
         $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
         $initialmessage = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
         $canjoin = false;
@@ -158,7 +157,6 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
             $statuscanend = '"can_end": true, "endbuttontext": "'.$endbuttontext.'"';
         }
     } else {
-        error_log("Meeting not running");
         // If user is administrator, moderator or if is viewer and no waiting is required.
         $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
         $initialmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
@@ -181,7 +179,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     return $params['callback'].'({"running": '.($meetingrunning ? 'true' : 'false').
                               ',"info": '.json_encode($meetinginfo).
                               ',"status": {'.'"join_url": "'.$bbbsession['joinURL'].'", '.
-                                             '"joinbuttontext": "'.$joinbuttontext.'", '.
+                                             '"join_button_text": "'.$joinbuttontext.'", '.
                                              '"message": "'.$initialmessage.'", '.
                                              $statuscanjoin.', '.
                                              $statuscanend.', '.
