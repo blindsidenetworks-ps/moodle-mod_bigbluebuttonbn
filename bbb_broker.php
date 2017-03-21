@@ -36,102 +36,115 @@ $params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 
-$error = '';
-
 if (empty($params['action'])) {
-    $error = bigbluebuttonbn_add_error($error, 'Parameter [action] was not included');
-} else {
-    $error = bigbluebuttonbn_validate_parameters($params);
-
-    if (empty($error)) {
-        if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
-            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
-            $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-            $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-            $context = context_module::instance($cm->id);
-        }
-
-        if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_events') {
-            if (isset($SESSION->bigbluebuttonbn_bbbsession) && !is_null($SESSION->bigbluebuttonbn_bbbsession)) {
-                $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-            } else {
-                $error = bigbluebuttonbn_add_error($error, 'No session variable set');
-            }
-        }
-    }
+    header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
+    return;
 }
 
-header('Content-Type: application/javascript; charset=utf-8');
-if (empty($error)) {
-    if (!isloggedin() && $PAGE->course->id == SITEID) {
-        $userid = guest_user()->id;
-    } else {
-        $userid = $USER->id;
-    }
-    $hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
-
-    if (!$hascourseaccess) {
-        header('HTTP/1.0 401 Unauthorized');
-
-        return;
-    } else {
-        $instancetypeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-        $features = $instancetypeprofiles[0]['features'];
-        if (isset($bbbsession['bigbluebuttonbn']->type)) {
-            $features = $instancetypeprofiles[$bbbsession['bigbluebuttonbn']->type]['features'];
-        }
-        $showroom = (in_array('all', $features) || in_array('showroom', $features));
-        $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
-        $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
-
-        try {
-            switch (strtolower($params['action'])) {
-                case 'meetinginfo':
-                    bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
-                    break;
-                case 'meeting_end':
-                    bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebuttonbn, $cm);
-                    break;
-                case 'recording_links':
-                    bigbluebuttonbn_broker_recording_links($bbbsession, $params);
-                    break;
-                case 'recording_info':
-                    bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
-                    break;
-                case 'recording_publish':
-                case 'recording_unpublish':
-                case 'recording_delete':
-                    bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm);
-                    break;
-                case 'recording_ready':
-                    bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
-                    break;
-                case 'recording_import':
-                    bigbluebuttonbn_broker_recording_import($bbbsession, $params);
-                    break;
-                case 'meeting_events':
-                    bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm);
-                    break;
-                case 'moodle_event':
-                    break;
-            }
-        } catch (Exception $e) {
-            header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());
-            return;
-        }
-    }
-} else {
+$error = bigbluebuttonbn_validate_parameters($params);
+if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
+    return;
+}
+
+if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
+}
+
+if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_events') {
+    if (!isset($SESSION->bigbluebuttonbn_bbbsession) || is_null($SESSION->bigbluebuttonbn_bbbsession)) {
+        header('HTTP/1.0 400 Bad Request. No session variable set');
+        return;
+    }
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
+
+if (!isloggedin() && $PAGE->course->id == SITEID) {
+    $userid = guest_user()->id;
+} else {
+    $userid = $USER->id;
+}
+$hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
+
+if (!$hascourseaccess) {
+    header('HTTP/1.0 401 Unauthorized');
+    return;
+}
+
+$instancetypeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+$features = $instancetypeprofiles[0]['features'];
+if (isset($bbbsession['bigbluebuttonbn']->type)) {
+    $features = $instancetypeprofiles[$bbbsession['bigbluebuttonbn']->type]['features'];
+}
+$showroom = (in_array('all', $features) || in_array('showroom', $features));
+$showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
+$importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
+
+try {
+    header('Content-Type: application/javascript; charset=utf-8');
+    $a = strtolower($params['action']);
+    if ($a == 'meeting_info') {
+        echo bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
+        return;
+    }
+
+    if ($a == 'meeting_end') {
+        echo bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        return;
+    }
+
+    if ($a == 'recording_links') {
+        echo bigbluebuttonbn_broker_recording_links($bbbsession, $params);
+        return;
+    }
+
+    if ($a == 'recording_info') {
+        echo bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
+        return;
+    }
+
+    if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
+        echo bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        return;
+    }
+
+    if ($a == 'recording_ready') {
+        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
+        return;
+    }
+
+    if ($a == 'recording_import') {
+        echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
+        return;
+    }
+
+    if ($a == 'meeting_events') {
+        bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm);
+        return;
+    }
+
+} catch (Exception $e) {
+    header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());
+    return;
 }
 
 function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
     $meetinginfo = bigbluebuttonbn_get_meeting_info($params['id']);
-    $meetingrunning = bigbluebuttonbn_is_meeting_running($meetinginfo);
 
-    $statuscanend = '';
-    $statuscantag = '';
+    $meetingrunning = false;
+    if ($meetinginfo['returncode'] == 'SUCCESS') {
+        $meetingrunning = bigbluebuttonbn_is_meeting_running($meetinginfo['meetingID']);
+    }
+
+    $statuscanjoin = '"can_join": false';
+    $statuscanend = '"can_end": false';
+    $statuscantag = '"can_tag": false';
     if ($meetingrunning) {
+        error_log("Meeting running");
         $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
         $initialmessage = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
         $canjoin = false;
@@ -145,6 +158,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
             $statuscanend = '"can_end": true, "endbuttontext": "'.$endbuttontext.'"';
         }
     } else {
+        error_log("Meeting not running");
         // If user is administrator, moderator or if is viewer and no waiting is required.
         $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
         $initialmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
@@ -161,17 +175,17 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
         if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
             $cantag = true;
         }
-        $statuscanend = '"can_tag": '.($cantag ? 'true' : 'false');
+        $statuscantag = '"can_tag": '.($cantag ? 'true' : 'false');
     }
     $statuscanjoin = '"can_join": '.($canjoin ? 'true' : 'false');
-    echo $params['callback'].'({"running": '.($meetingrunning ? 'true' : 'false').
+    return $params['callback'].'({"running": '.($meetingrunning ? 'true' : 'false').
                               ',"info": '.json_encode($meetinginfo).
                               ',"status": {'.'"join_url": "'.$bbbsession['joinURL'].'", '.
                                              '"joinbuttontext": "'.$joinbuttontext.'", '.
                                              '"message": "'.$initialmessage.'", '.
                                              $statuscanjoin.', '.
                                              $statuscanend.', '.
-                                             $statuscantag.', '.
+                                             $statuscantag.
                                           '}});';
 }
 
@@ -191,7 +205,7 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebutton
     // Update the cache.
     bigbluebuttonbn_get_meetinginfo($params['id'], BIGBLUEBUTTONBN_FORCED);
 
-    echo $params['callback'].'({ "status": true });';
+    return $params['callback'].'({ "status": true });';
 }
 
 function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
@@ -206,7 +220,7 @@ function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
         $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
         $out = $params['callback'].'({ "status": "true", "links": '.count($importedall).'});';
     }
-    echo $out;
+    return $out;
 }
 
 function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) {
@@ -231,8 +245,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
             // The recording was found.
             $out = $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
         }
-        echo $out;
-        return;
+        return $out;
     }
 
     // As the recordingid was not identified as imported recording link, look up for a real recording.
@@ -242,7 +255,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         // The recording was found.
         $out = $params['callback'].'({ "status": "true", "published": "'.$recording[$params['id']]['published'].'"});';
     }
-    echo $out;
+    return $out;
 }
 
 function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm) {
@@ -286,7 +299,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     }
 
     $callbackresponsedata = json_encode($callbackresponse);
-    echo "{$params['callback']}({$callbackresponsedata});";
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
@@ -339,7 +352,8 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
     }
     // Second: Execute the real unpublish.
     bigbluebuttonbn_publish_recordings($params['id'], 'false');
-    return array('status' => 'true');
+    $response = array('status' => 'true');
+    return $response;
 }
 
 function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings) {
@@ -364,7 +378,8 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
     // Second: Execute the real delete.
     bigbluebuttonbn_delete_recordings($params['id']);
 
-    return array('status' => 'true');
+    $response = array('status' => 'true');
+    return $response;
 }
 
 function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
@@ -425,7 +440,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 
     $callbackresponse['status'] = 'true';
     $callbackresponsedata = json_encode($callbackresponse);
-    echo "{$params['callback']}({$callbackresponsedata});";
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {

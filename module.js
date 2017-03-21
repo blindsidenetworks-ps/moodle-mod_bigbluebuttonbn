@@ -72,69 +72,83 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
     M.mod_bigbluebuttonbn.datasource_init(Y);
 
     if (bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showroom')) {
-
-        if (bigbluebuttonbn.activity === 'open') {
-            // Create the main modal form.
-            bigbluebuttonbn_panel = new Y.Panel({
-                srcNode: '#panelContent',
-                headerContent: bigbluebuttonbn.locales.modal_title,
-                width: 250,
-                zIndex: 5,
-                centered: true,
-                modal: true,
-                visible: false,
-                render: true,
-                plugins: [Y.Plugin.Drag]
-            });
-
-            // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
-            bigbluebuttonbn_panel.addButton({
-                value: bigbluebuttonbn.locales.modal_button,
-                section: Y.WidgetStdMod.FOOTER,
-                action: function(e) {
-                    e.preventDefault();
-                    bigbluebuttonbn_panel.hide();
-
-                    var joinField = Y.one('#meeting_join_url');
-                    var messageField = Y.one('#meeting_message');
-                    var nameField = Y.one('#recording_name');
-                    var descriptionField = Y.one('#recording_description');
-                    var tagsField = Y.one('#recording_tags');
-
-                    // Gatter the fields thay will be passed as metaparameters to the bbb server.
-                    var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-                    // Prepare the new join_url.
-                    var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
-
-                    // Executes the join.
-                    M.mod_bigbluebuttonbn.broker.executeJoin(join_url, messageField.get('value'));
-
-                    // Clean values in case the for is used again.
-                    nameField.set('value', '');
-                    descriptionField.set('value', '');
-                    tagsField.set('value', '');
-                    joinField.set('value', '');
-                    messageField.set('value', '');
-                }
-            });
-
-            M.mod_bigbluebuttonbn.view_update();
-        } else {
-            if (bigbluebuttonbn.activity === 'ended') {
-                Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
-                    bigbluebuttonbn.locales.conference_ended
-                ));
-            } else {
-                Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(
-                    [bigbluebuttonbn.locales.conference_ended, bigbluebuttonbn.opening, bigbluebuttonbn.closing]
-                ));
-            }
-        }
+        M.mod_bigbluebuttonbn.view_init_room();
     }
 
+    M.mod_bigbluebuttonbn.view_init_recordings();
+};
+
+M.mod_bigbluebuttonbn.view_init_room = function(Y) {
+
+    if (bigbluebuttonbn.activity !== 'open') {
+        var room_state = "Room ended;"
+        var status_bar = [bigbluebuttonbn.locales.conference_ended];
+        if (bigbluebuttonbn.activity !== 'ended') {
+            room_state = "Room is not open";
+            status_bar.push(bigbluebuttonbn.opening);
+            status_bar.push(bigbluebuttonbn.closing);
+        }
+        console.info(room_state);
+        Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_bar));
+        return;
+    }
+    console.info("Room open");
+    M.mod_bigbluebuttonbn.view_init_room_open();
+};
+
+M.mod_bigbluebuttonbn.view_init_room_open = function(Y) {
+
+    // Create the main modal form.
+    bigbluebuttonbn_panel = new Y.Panel({
+        srcNode: '#panelContent',
+        headerContent: bigbluebuttonbn.locales.modal_title,
+        width: 250,
+        zIndex: 5,
+        centered: true,
+        modal: true,
+        visible: false,
+        render: true,
+        plugins: [Y.Plugin.Drag]
+    });
+
+    // Define the apply function -  this will be called when 'Apply' is pressed in the modal form.
+    bigbluebuttonbn_panel.addButton({
+        value: bigbluebuttonbn.locales.modal_button,
+        section: Y.WidgetStdMod.FOOTER,
+        action: function(e) {
+            e.preventDefault();
+            bigbluebuttonbn_panel.hide();
+
+            var joinField = Y.one('#meeting_join_url');
+            var messageField = Y.one('#meeting_message');
+            var nameField = Y.one('#recording_name');
+            var descriptionField = Y.one('#recording_description');
+            var tagsField = Y.one('#recording_tags');
+
+            // Gatter the fields thay will be passed as metaparameters to the bbb server.
+            var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // Prepare the new join_url.
+            var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
+
+            // Executes the join.
+            M.mod_bigbluebuttonbn.broker.executeJoin(join_url, messageField.get('value'));
+
+            // Clean values in case the for is used again.
+            nameField.set('value', '');
+            descriptionField.set('value', '');
+            tagsField.set('value', '');
+            joinField.set('value', '');
+            messageField.set('value', '');
+        }
+    });
+
+    M.mod_bigbluebuttonbn.view_update();
+};
+
+M.mod_bigbluebuttonbn.view_init_recordings = function(Y) {
     if (bigbluebuttonbn.recordings_html === false &&
         (bigbluebuttonbn.profile_features.includes('all') || bigbluebuttonbn.profile_features.includes('showrecordings'))) {
         M.mod_bigbluebuttonbn.datatable_init(Y);
@@ -305,7 +319,6 @@ M.mod_bigbluebuttonbn.view_init_end_button = function(status) {
 
     return end_button_input;
 };
-
 
 M.mod_bigbluebuttonbn.view_clean_status_bar = function() {
     Y.one('#status_bar_span').remove();

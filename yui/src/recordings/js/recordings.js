@@ -17,7 +17,7 @@
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
-M.mod_bigbluebuttonbn.view = {
+M.mod_bigbluebuttonbn.recordings = {
 
     data_source: null,
     polling: null,
@@ -32,6 +32,6 @@ M.mod_bigbluebuttonbn.view = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
-    }
+    },
 
 };

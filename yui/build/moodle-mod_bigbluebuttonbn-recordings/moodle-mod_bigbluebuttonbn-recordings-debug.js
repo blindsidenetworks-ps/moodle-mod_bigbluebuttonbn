@@ -1,3 +1,5 @@
+YUI.add('moodle-mod_bigbluebuttonbn-recordings', function (Y, NAME) {
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -17,7 +19,7 @@
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
-M.mod_bigbluebuttonbn.view = {
+M.mod_bigbluebuttonbn.recordings = {
 
     data_source: null,
     polling: null,
@@ -32,6 +34,18 @@ M.mod_bigbluebuttonbn.view = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
-    }
+    },
 
 };
+
+
+}, '@VERSION@', {
+    "requires": [
+        "base",
+        "node",
+        "datasource-get",
+        "datasource-jsonschema",
+        "datasource-polling",
+        "moodle-core-notification"
+    ]
+});

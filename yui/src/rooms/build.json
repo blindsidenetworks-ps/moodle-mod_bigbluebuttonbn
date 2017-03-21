@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_bigbluebuttonbn-rooms",
+    "builds": {
+        "moodle-mod_bigbluebuttonbn-rooms": {
+            "jsfiles": [
+                "rooms.js"
+            ]
+        }
+    }
+}

@@ -264,36 +264,30 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
     if ($showroom) {
-        $output .= bigbluebuttonbn_view_show_rooms($bbbsession, $activity, $showrecordings, $jsvars);
+        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings, $jsvars);
+        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
+            'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
     if ($showrecordings) {
         $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $jsvars, $jsdependences);
-
         if ($importrecordings && $bbbsession['managerecordings'] &&
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $output .= bigbluebuttonbn_view_show_imported($bbbsession);
         }
+        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
+            'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     }
 
     $output .= html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
 
     echo $output;
 
-    // Require aggregated JavaScript variables.
-    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
-
-    // Require JavaScript modules.
-    $jsmodule = array(
-        'name' => 'mod_bigbluebuttonbn',
-        'fullpath' => '/mod/bigbluebuttonbn/module.js',
-        'requires' => $jsdependences,
-    );
-    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-view', 'M.mod_bigbluebuttonbn.view.init', array($jsvars));
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
-function bigbluebuttonbn_view_show_rooms($bbbsession, $activity, $showrecordings, &$jsvars) {
+function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings, &$jsvars) {
     global $OUTPUT;
 
     $output = '';

@@ -69,7 +69,7 @@ switch (strtolower($action)) {
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $cm);
 
             // Update the cache.
-            $meetinginfo = bigbluebuttonbn_get_meetinginfo($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
+            $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
 
             // Close the tab or window where BBB was opened.
             bigbluebutton_bbb_view_close_window();
@@ -206,7 +206,7 @@ function bigbluebutton_bbb_view_close_window_manually() {
 
 function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $bigbluebuttonbn) {
     // Update the cache.
-    $meetinginfo = bigbluebuttonbn_get_meetinginfo($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
+    $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
 
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
         // No more users allowed to join.

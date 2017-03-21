@@ -509,6 +509,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     $data = null, $contenttype = 'text/xml') {
 
     //debugging('Request to: '.$url, DEBUG_DEVELOPER);
+    //error_log('Request to: '.$url);
 
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
@@ -519,6 +520,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
         }
 
         //debugging('Response: '.$response, DEBUG_DEVELOPER);
+        //error_log('Response: '.$response);
 
         $previous = libxml_use_internal_errors(true);
         try {
@@ -908,7 +910,7 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false) {
     $now = time();
     if (!$forced && isset($result) && $now < ($result['creation_time'] + $cachettl)) {
         // Use the value in the cache.
-        return json_decode($result['meeting_info']);
+        return (array) json_decode($result['meeting_info']);
     }
 
     // Ping again and refresh the cache.

@@ -22,6 +22,8 @@ M.mod_bigbluebuttonbn.broker = {
     data_source: null,
     polling: null,
     bigbluebuttonbn: {},
+    panel: null,
+
     /**
      * Initialise the broker code.
      *
@@ -32,6 +34,7 @@ M.mod_bigbluebuttonbn.broker = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
+        //this.panel = M.bigbluebuttonbn.rooms.panel;
     },
 
     waitModerator: function() {
@@ -68,7 +71,6 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     join: function(join_url, status_message, can_tag) {
-        /* global bigbluebuttonbn_panel */
         var qs = '';
 
         if (!can_tag) {
@@ -93,7 +95,7 @@ M.mod_bigbluebuttonbn.broker = {
                         YUI({
                             lang: this.bigbluebuttonbn.locale
                         }).use('panel', function() {
-                            bigbluebuttonbn_panel.show();
+                            this.panel.show();
                         });
                     }
                 }
@@ -182,40 +184,40 @@ M.mod_bigbluebuttonbn.broker = {
 
     recordingPublish: function(recordingid, meetingid) {
         // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recordingConfirmationMessage('publish', recordingid)
-        });
+        //var confirm = new M.core.confirm({
+        //    modal: true,
+        //    centered: true,
+        //    question: this.recordingConfirmationMessage('publish', recordingid)
+        //});
 
         // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            this.data_source.sendRequest({
-                request: "action=recording_publish" + "&id=" + recordingid,
-                callback: {
-                    success: function(e) {
-                        // Y.one('#recording-td-' + recordingid).remove();
-                        if (e.data.status === 'true') {
-                            var ping_data = {
-                                action: 'publish',
-                                meetingid: meetingid,
-                                recordingid: recordingid
-                            };
-                            // Start pooling until the action has been executed.
-                            this.polling = this.data_source.setInterval(
-                                this.bigbluebuttonbn.ping_interval,
-                                M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
-                            );
-                        } else {
-                            var alert = new M.core.alert({
-                                message: e.data.message
-                            });
-                            alert.show();
-                        }
+        //confirm.on('complete-yes', function() {
+        this.data_source.sendRequest({
+            request: "action=recording_publish" + "&id=" + recordingid,
+            callback: {
+                success: function(e) {
+                    // Y.one('#recording-td-' + recordingid).remove();
+                    if (e.data.status === 'true') {
+                        var ping_data = {
+                            action: 'publish',
+                            meetingid: meetingid,
+                            recordingid: recordingid
+                        };
+                        // Start pooling until the action has been executed.
+                        this.polling = this.data_source.setInterval(
+                            this.bigbluebuttonbn.ping_interval,
+                            M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
+                        );
+                    } else {
+                        var alert = new M.core.alert({
+                            message: e.data.message
+                        });
+                        alert.show();
                     }
                 }
-            });
-        }, this);
+            }
+        });
+        //}, this);
     },
 
     recordingUnpublish: function(recordingid, meetingid) {
@@ -258,6 +260,9 @@ M.mod_bigbluebuttonbn.broker = {
 
     recordingConfirmationMessage: function(action, recordingid) {
 
+        if (this.bigbluebuttonbn.locales[action + '_confirmation'] === 'undefined') {
+            return '';
+        }
         var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
         var recording_type = this.bigbluebuttonbn.locales.recording;
         if (is_imported_link) {
@@ -282,6 +287,7 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     pingRecordingObject: function(data) {
+        console.info("ping");
 
         var btn_action = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var btn_action_src_current = btn_action.getAttribute('src');

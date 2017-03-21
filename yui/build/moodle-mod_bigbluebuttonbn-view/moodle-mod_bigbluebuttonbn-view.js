@@ -19,7 +19,24 @@ YUI.add('moodle-mod_bigbluebuttonbn-view', function (Y, NAME) {
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
-M.mod_bigbluebuttonbn.view = {};
+M.mod_bigbluebuttonbn.view = {
+
+    data_source: null,
+    polling: null,
+    bigbluebuttonbn: {},
+    /**
+     * Initialise the broker code.
+     *
+     * @method init
+     */
+    init: function(bigbluebuttonbn) {
+        this.data_source = new Y.DataSource.Get({
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+        });
+        this.bigbluebuttonbn = bigbluebuttonbn;
+    }
+
+};
 
 
 }, '@VERSION@', {"requires": ["base", "node"]});
