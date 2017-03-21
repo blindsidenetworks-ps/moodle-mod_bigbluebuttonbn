@@ -340,10 +340,14 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
     // Check if array is not sequential.
+    //error_log(json_encode($recordsimported));
     //if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
-        // The response contains a single record and needs to be converted to a sequential array format.
-    //    $recordsimported = array($recordsimported);
+    //    // The response contains a single record and needs to be converted to a sequential array format.
+    //    error_log(json_encode((array)$recordsimported));
+    //    $key = array_keys($recordsimported);
+    //    $recordsimported = array($key => $recordsimported[$key]);
     //}
+    //error_log(json_encode($recordsimported));
 
     $recordsimportedarray = array();
     foreach ($recordsimported as $recordimported) {
@@ -1190,7 +1194,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording) {
 function bigbluebuttonbn_actionbar_render($manageaction, $managetag, $recording) {
     global $OUTPUT;
 
-    $onclick = 'M.mod_bigbluebuttonbn.broker.manageRecording("'.$manageaction.'", "'.
+    $onclick = 'M.mod_bigbluebuttonbn.broker.recordingAction("'.$manageaction.'", "'.
         $recording['recordID'].'", "'.$recording['meetingID'].'");';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $manageaction.

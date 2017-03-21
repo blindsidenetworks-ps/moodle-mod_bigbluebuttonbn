@@ -95,6 +95,7 @@ if (empty($options)) {
         array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
 
+    // Require aggregated JavaScript variables.
     $jsvars = array(
         'bn' => $bn,
         'tc' => $selected,
@@ -102,12 +103,14 @@ if (empty($options)) {
     );
     $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
 
+    // Require JavaScript modules.
     $jsmodule = array(
             'name' => 'mod_bigbluebuttonbn',
             'fullpath' => '/mod/bigbluebuttonbn/module.js',
             'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
     );
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.import_view_init', array(), false, $jsmodule);
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
 $output .= $OUTPUT->footer();

@@ -15,9 +15,11 @@ YUI.add('moodle-mod_bigbluebuttonbn-modform', function (Y, NAME) {
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/** global: M */
+
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
-M.mod_bigbluebuttonbn.modform = {
-};
+M.mod_bigbluebuttonbn.modform = {};
+
 
 }, '@VERSION@', {"requires": ["base", "node"]});

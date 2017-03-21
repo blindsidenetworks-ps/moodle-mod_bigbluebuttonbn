@@ -262,65 +262,6 @@ function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     return $completed > 0;
 }
 
-
-/**
- * Given a course and a time, this module should find recent activity
- * that has occurred in bigbluebuttonbn activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @return boolean
- */
-function bigbluebuttonbn_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false
-}
-
-/**
- * Returns all activity in bigbluebuttonbn since a given time
- *
- * @param array $activities sequentially indexed array of objects
- * @param int $index
- * @param int $timestart
- * @param int $courseid
- * @param int $cmid
- * @param int $userid defaults to 0
- * @param int $groupid defaults to 0
- * @return void adds items into $activities and increases $index
- */
-function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
-}
-
-/**
- * Prints single activity item prepared by {@see recordingsbn_get_recent_mod_activity()}
-
- * @return void
- */
-function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
-}
-
-/**
- * Function to be run periodically according to the moodle cron
- * This function searches for things that need to be done, such
- * as sending out mail, toggling flags etc ...
- *
- * @return boolean
- **/
-function bigbluebuttonbn_cron () {
-    return true;
-}
-
-/**
- * Must return an array of user records (all data) who are participants
- * for a given instance of bigbluebuttonbn. Must include every user involved
- * in the instance, independient of his role (student, teacher, admin...)
- * See other modules as example.
- *
- * @param int $bigbluebuttonbnid ID of an instance of this module
- * @return mixed boolean/array of students
- */
-function bigbluebuttonbn_get_participants($bigbluebuttonbnid) {
-    return false;
-}
-
 /**
  * Returns all other caps used in module.
  *

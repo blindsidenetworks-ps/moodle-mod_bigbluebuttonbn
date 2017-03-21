@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/** global: M */
+
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.broker = {
@@ -25,14 +27,14 @@ M.mod_bigbluebuttonbn.broker = {
      *
      * @method init
      */
-    init: function (bigbluebuttonbn) {
+    init: function(bigbluebuttonbn) {
         this.data_source = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
 
-    waitModerator: function () {
+    waitModerator: function() {
 
         // Show the spinning wheel.
         var status_bar_span = Y.one('#status_bar_span');
@@ -51,178 +53,235 @@ M.mod_bigbluebuttonbn.broker = {
         this.polling = this.data_source.setInterval(this.bigbluebuttonbn.ping_interval, {
             request: qs,
             callback: {
-                success: function (e) {
+                success: function(e) {
                     if (e.data.running) {
                         clearInterval(this.polling);
                         M.mod_bigbluebuttonbn.view_clean();
                         M.mod_bigbluebuttonbn.view_update();
                     }
                 },
-                failure: function () {
+                failure: function() {
                     clearInterval(this.polling);
                 }
             }
         });
     },
 
-    joinNow: function (join_url, status_message, can_tag) {
+    join: function(join_url, status_message, can_tag) {
         /* global bigbluebuttonbn_panel */
         var qs = '';
 
-        if (can_tag) {
-            Y.one('#panelContent').removeClass('hidden');
-            qs += 'action=meeting_info';
-            qs += '&id=' + this.bigbluebuttonbn.meetingid;
-            qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-            this.data_source.sendRequest({
-                request: qs,
-                callback: {
-                    success: function (e) {
-                        if (e.data.running) {
-                            M.mod_bigbluebuttonbn.broker.executeJoin(join_url, e.data.status.message);
-                        } else {
-                            Y.one('#meeting_join_url').set('value', join_url);
-                            Y.one('#meeting_message').set('value', e.data.status.message);
+        if (!can_tag) {
+            M.mod_bigbluebuttonbn.broker.joinRedirect(join_url);
+            return;
+        }
 
-                            YUI({
-                                lang: this.bigbluebuttonbn.locale
-                            }).use('panel', function () {
-                                bigbluebuttonbn_panel.show();
-                            });
-                        }
+        Y.one('#panelContent').removeClass('hidden');
+        qs += 'action=meeting_info';
+        qs += '&id=' + this.bigbluebuttonbn.meetingid;
+        qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
+        this.data_source.sendRequest({
+            request: qs,
+            callback: {
+                success: function(e) {
+                    if (e.data.running) {
+                        M.mod_bigbluebuttonbn.broker.joinRedirect(join_url, e.data.status.message);
+                    } else {
+                        Y.one('#meeting_join_url').set('value', join_url);
+                        Y.one('#meeting_message').set('value', e.data.status.message);
+
+                        YUI({
+                            lang: this.bigbluebuttonbn.locale
+                        }).use('panel', function() {
+                            bigbluebuttonbn_panel.show();
+                        });
                     }
                 }
-            });
-
-        } else {
-            M.mod_bigbluebuttonbn.broker.executeJoin(join_url);
-        }
+            }
+        });
     },
 
-    executeJoin: function (join_url) {
+    joinRedirect: function(join_url) {
         window.open(join_url);
         // Update view.
-        setTimeout(function () {
+        setTimeout(function() {
             M.mod_bigbluebuttonbn.view_clean();
             M.mod_bigbluebuttonbn.view_update();
         }, 15000);
     },
 
-    actionVerification: function (action, recordingid, meetingid, callback) {
+    recordingAction: function(action, recordingid, meetingid) {
+        if (action === 'import') {
+            this.recordingImport(recordingid);
+            return;
+        }
 
-        var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
-        var data = {
-            'id': recordingid
-        };
-        var confirm;
+        if (action === 'delete') {
+            this.recordingDelete(recordingid);
+            return;
+        }
 
-        if (!is_imported_link && (action === 'unpublish' || action === 'delete')) {
-            this.data_source.sendRequest({
-                request: 'action=recording_links&id=' + recordingid,
-                callback: {
-                    success: function (e) {
-                        if (e.data.status) {
-                            data.links = e.data.links;
-                            if (e.data.links === 0) {
-                                data.confirmed = true;
-                            } else {
-                                var confirmation_warning = this.bigbluebuttonbn.locales[action + "_confirmation_warning_p"];
-                                if (e.data.links == 1) {
-                                    confirmation_warning = this.bigbluebuttonbn.locales[action + "_confirmation_warning_s"];
-                                }
-                                confirmation_warning = confirmation_warning.replace("{$a}", e.data.links) + '. ';
-                                var recording_type = this.bigbluebuttonbn.locales.recording;
-                                if (is_imported_link) {
-                                    recording_type = this.bigbluebuttonbn.locales.recording_link;
-                                }
-                                var confirmation = this.bigbluebuttonbn.locales[action + "_confirmation"];
-                                confirmation = confirmation.replace("{$a}", recording_type);
+        if (action === 'publish') {
+            this.recordingPublish(recordingid, meetingid);
+            return;
+        }
 
-                                // Create the confirmation dialogue.
-                                confirm = new M.core.confirm({
-                                    modal: true,
-                                    centered: true,
-                                    question: confirmation_warning + '\n\n' + confirmation
-                                });
-
-                                // If it is confirmed.
-                                confirm.on('complete-yes', function (data, callback) {
-                                    data.confirmed = true;
-                                    callback(data);
-                                }, this);
-                            }
-                        } else {
-                            data.error = 'Big failiure';
-                        }
-                        callback(data);
-                    },
-                    failure: function (e) {
-                        data.error = e.error.message;
-                        callback(data);
-                    }
-                }
-            });
-        } else if (action === 'import') {
-            // Create the confirmation dialogue.
-            confirm = new M.core.confirm({
-                modal: true,
-                centered: true,
-                question: this.bigbluebuttonbn.locales.import_confirmation
-            });
-
-            // If it is confirmed.
-            confirm.on('complete-yes', function (data, callback) {
-                data.confirmed = true;
-                callback(data);
-            }, this);
-        } else {
-            data.confirmed = true;
-            callback(data);
+        if (action === 'unpublish') {
+            this.recordingUnpublish(recordingid, meetingid);
+            return;
         }
     },
 
-    manageRecording: function (action, recordingid, meetingid) {
-
-        // Before sending the request, let's process a verification.
-        M.mod_bigbluebuttonbn.broker.actionVerification(action, recordingid, meetingid, function (data) {
-            if (data.confirmed) {
-                this.data_source.sendRequest({
-                    request: "action=recording_" + action + "&id=" + recordingid,
-                    callback: {
-                        success: function (e) {
-                            if (action == 'delete') {
-                                Y.one('#recording-td-' + recordingid).remove();
-
-                            } else if (action == 'import') {
-                                Y.one('#recording-td-' + recordingid).remove();
-
-                            } else if (action == 'publish' || action == 'unpublish') {
-                                if (e.data.status == 'true') {
-                                    var ping_data = {
-                                        action: action,
-                                        meetingid: meetingid,
-                                        recordingid: recordingid
-                                    };
-                                    // Start pooling until the action has been executed.
-                                    this.polling = this.data_source.setInterval(
-                                        this.bigbluebuttonbn.ping_interval,
-                                        M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
-                                    );
-                                } else {
-                                    var alert = new M.core.alert({
-                                        message: e.data.message
-                                    });
-                                    alert.show();
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+    recordingImport: function(recordingid) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recordingConfirmationMessage('import', recordingid)
         });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            console.info("I am tryig");
+            this.data_source.sendRequest({
+                request: "action=recording_import" + "&id=" + recordingid,
+                callback: {
+                    success: function(e) {
+                        console.info(e);
+                        console.info("Imported");
+                        Y.one('#recording-td-' + recordingid).remove();
+                    },
+                    failure: function() {
+                        console.info("Not imported");
+                    }
+                }
+            });
+        }, this);
     },
 
-    pingRecordingObject: function (data) {
+    recordingDelete: function(recordingid) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recordingConfirmationMessage('delete', recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            this.data_source.sendRequest({
+                request: "action=recording_delete" + "&id=" + recordingid,
+                callback: {
+                    success: function() {
+                        Y.one('#recording-td-' + recordingid).remove();
+                    }
+                }
+            });
+        }, this);
+    },
+
+    recordingPublish: function(recordingid, meetingid) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recordingConfirmationMessage('publish', recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            this.data_source.sendRequest({
+                request: "action=recording_publish" + "&id=" + recordingid,
+                callback: {
+                    success: function(e) {
+                        // Y.one('#recording-td-' + recordingid).remove();
+                        if (e.data.status === 'true') {
+                            var ping_data = {
+                                action: 'publish',
+                                meetingid: meetingid,
+                                recordingid: recordingid
+                            };
+                            // Start pooling until the action has been executed.
+                            this.polling = this.data_source.setInterval(
+                                this.bigbluebuttonbn.ping_interval,
+                                M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
+                            );
+                        } else {
+                            var alert = new M.core.alert({
+                                message: e.data.message
+                            });
+                            alert.show();
+                        }
+                    }
+                }
+            });
+        }, this);
+    },
+
+    recordingUnpublish: function(recordingid, meetingid) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recordingConfirmationMessage('unpublish', recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            this.data_source.sendRequest({
+                request: "action=recording_unpublish" + "&id=" + recordingid,
+                callback: {
+                    success: function(e) {
+                        //Y.one('#recording-td-' + recordingid).remove();
+                        if (e.data.status === 'true') {
+                            var ping_data = {
+                                action: 'unpublish',
+                                meetingid: meetingid,
+                                recordingid: recordingid
+                            };
+                            // Start pooling until the action has been executed.
+                            this.polling = this.data_source.setInterval(
+                                this.bigbluebuttonbn.ping_interval,
+                                M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
+                            );
+                        } else {
+                            var alert = new M.core.alert({
+                                message: e.data.message
+                            });
+                            alert.show();
+                        }
+                    }
+                }
+            });
+        }, this);
+    },
+
+    recordingConfirmationMessage: function(action, recordingid) {
+
+        var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
+        var recording_type = this.bigbluebuttonbn.locales.recording;
+        if (is_imported_link) {
+            recording_type = this.bigbluebuttonbn.locales.recording_link;
+        }
+
+        var confirmation = this.bigbluebuttonbn.locales[action + '_confirmation'];
+        confirmation = confirmation.replace("{$a}", recording_type);
+
+        if (action === 'publish' || action === 'delete') {
+            //if it has associated links imported in a different course/activity, show a confirmation dialog
+            var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
+            var confirmation_warning = this.bigbluebuttonbn.locales[action + '_confirmation_warning_p'];
+            if (associated_links == 1) {
+                confirmation_warning = this.bigbluebuttonbn.locales[action + '_confirmation_warning_s'];
+            }
+            confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
+            confirmation = confirmation_warning + '\n\n' + confirmation;
+        }
+
+        return confirmation;
+    },
+
+    pingRecordingObject: function(data) {
 
         var btn_action = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var btn_action_src_current = btn_action.getAttribute('src');
@@ -242,7 +301,7 @@ M.mod_bigbluebuttonbn.broker = {
         return {
             request: "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid,
             callback: {
-                success: function (e) {
+                success: function(e) {
                     if (e.data.status !== 'true') {
                         clearInterval(this.polling);
                         return;
@@ -271,21 +330,21 @@ M.mod_bigbluebuttonbn.broker = {
                         Y.one('#playbacks-' + data.recordingid).hide();
                     }
                 },
-                failure: function () {
+                failure: function() {
                     clearInterval(this.polling);
                 }
             }
         };
     },
 
-    endMeeting: function () {
+    endMeeting: function() {
 
         var qs = 'action=meeting_end&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
         this.data_source.sendRequest({
             request: qs,
             callback: {
-                success: function (e) {
+                success: function(e) {
                     if (e.data.status) {
                         M.mod_bigbluebuttonbn.view_clean_control_panel();
                         M.mod_bigbluebuttonbn.view_hide_join_button();

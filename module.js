@@ -281,7 +281,7 @@ M.mod_bigbluebuttonbn.view_init_join_button = function(status) {
     Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
 
     if (status.can_join) {
-        var input_html = 'M.mod_bigbluebuttonbn.broker.joinNow(\'';
+        var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
         input_html += status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress;
         input_html += '\', ' + status.can_tag + ');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);

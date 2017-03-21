@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -77,7 +75,7 @@ if (empty($error)) {
 
         return;
     } else {
-        $instancetypeprofiles = bigbluebuttonbn_get_instancetypeprofiles();
+        $instancetypeprofiles = bigbluebuttonbn_get_instance_type_profiles();
         $features = $instancetypeprofiles[0]['features'];
         if (isset($bbbsession['bigbluebuttonbn']->type)) {
             $features = $instancetypeprofiles[$bbbsession['bigbluebuttonbn']->type]['features'];
@@ -109,7 +107,7 @@ if (empty($error)) {
                     bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
                     break;
                 case 'recording_import':
-                    bigbluebuttonbn_broker_recording_import($bbbsession, $params, $bigbluebuttonbn, $cm);
+                    bigbluebuttonbn_broker_recording_import($bbbsession, $params);
                     break;
                 case 'meeting_events':
                     bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm);
@@ -128,8 +126,8 @@ if (empty($error)) {
 
 function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
-    $meetinginfo = bigbluebuttonbn_get_meetinginfo($params['id']);
-    $meetingrunning = bigbluebuttonbn_is_meetingrunning($meetinginfo);
+    $meetinginfo = bigbluebuttonbn_get_meeting_info($params['id']);
+    $meetingrunning = bigbluebuttonbn_is_meeting_running($meetinginfo);
 
     $statuscanend = '';
     $statuscantag = '';
@@ -401,7 +399,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     }
 }
 
-function bigbluebuttonbn_broker_recording_import($bbbsession, $params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     global $SESSION;
 
     if (!$bbbsession['managerecordings']) {
@@ -421,8 +419,8 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params, $bigblueb
     $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
     bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
-    if (isset($bigbluebuttonbn)) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bigbluebuttonbn, $cm);
+    if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
     }
 
     $callbackresponse['status'] = 'true';

@@ -283,14 +283,14 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     // Require aggregated JavaScript variables.
     $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
 
-    // Require JavaScript module.
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
+    // Require JavaScript modules.
     $jsmodule = array(
         'name' => 'mod_bigbluebuttonbn',
         'fullpath' => '/mod/bigbluebuttonbn/module.js',
         'requires' => $jsdependences,
     );
     $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.view_init', array(), false, $jsmodule);
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
 function bigbluebuttonbn_view_show_rooms($bbbsession, $activity, $showrecordings, &$jsvars) {
