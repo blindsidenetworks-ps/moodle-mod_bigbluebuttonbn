@@ -153,7 +153,6 @@ function bigbluebutton_bbb_view_close_window_manually() {
 }
 
 function bigbluebutton_bbb_view_create_meeting($bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
-    global $CFG;
 
     // Prepare the metadata.
     $bbbrecordingname = $bbbsession['contextActivityName'];

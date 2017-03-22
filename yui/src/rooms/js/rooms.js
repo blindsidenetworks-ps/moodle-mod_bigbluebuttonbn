@@ -43,7 +43,7 @@ M.mod_bigbluebuttonbn.rooms = {
 
     init_room: function() {
         if (this.bigbluebuttonbn.activity !== 'open') {
-            var status_bar = [this.bigbluebuttonbn.locales.conference_ended];
+            var status_bar = [M.mod_bigbluebuttonbn.locales.strings.conference_ended];
             if (this.bigbluebuttonbn.activity !== 'ended') {
                 status_bar.push(this.bigbluebuttonbn.opening);
                 status_bar.push(this.bigbluebuttonbn.closing);
@@ -58,7 +58,7 @@ M.mod_bigbluebuttonbn.rooms = {
         // Create the main modal form.
         this.panel = new Y.Panel({
             srcNode: '#panelContent',
-            headerContent: this.bigbluebuttonbn.locales.modal_title,
+            headerContent: M.mod_bigbluebuttonbn.locales.strings.modal_title,
             width: 250,
             zIndex: 5,
             centered: true,
@@ -70,7 +70,7 @@ M.mod_bigbluebuttonbn.rooms = {
 
         // Define the apply function - this will be called when 'Apply' is pressed in the modal form.
         this.panel.addButton({
-            value: this.bigbluebuttonbn.locales.modal_button,
+            value: M.mod_bigbluebuttonbn.locales.strings.modal_button,
             section: Y.WidgetStdMod.FOOTER,
             action: function(e) {
                 e.preventDefault();
@@ -172,28 +172,28 @@ M.mod_bigbluebuttonbn.rooms = {
         var date = new Date(start_timestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var started_at = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.started_at;
+        var started_at = M.mod_bigbluebuttonbn.locales.strings.started_at;
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
     msg_attendees_in: function(moderators, participants) {
 
         if (typeof moderators == 'undefined' && typeof participants == 'undefined') {
-            return M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.session_no_users + '.';
+            return M.mod_bigbluebuttonbn.locales.strings.session_no_users + '.';
         }
 
         var viewers = participants - moderators;
 
-        var msg = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.session_has_users;
+        var msg = M.mod_bigbluebuttonbn.locales.strings.session_has_users;
 
-        var msg_moderators = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.moderators;
+        var msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderators;
         if (moderators == 1) {
-            msg_moderators = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.moderator;
+            msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderator;
         }
 
-        var msg_viewers = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.viewers;
+        var msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewers;
         if (moderators == 1) {
-            msg_viewers = M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.viewer;
+            msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewer;
         }
 
         if (participants == 1) {
@@ -222,7 +222,7 @@ M.mod_bigbluebuttonbn.rooms = {
         }
 
         var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
-        input_html += status.join_url + '\', \'' + M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.in_progress;
+        input_html += status.join_url + '\', \'' + M.mod_bigbluebuttonbn.locales.strings.in_progress;
         input_html += '\', ' + status.can_tag + ');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
         return join_button_input;

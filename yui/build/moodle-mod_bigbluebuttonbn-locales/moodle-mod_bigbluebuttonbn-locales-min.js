@@ -1,0 +1,1 @@
+YUI.add("moodle-mod_bigbluebuttonbn-locales",function(e,t){M.mod_bigbluebuttonbn=M.mod_bigbluebuttonbn||{},M.mod_bigbluebuttonbn.locales={strings:{},init:function(e){this.strings=e}}},"@VERSION@",{requires:["base","node"]});

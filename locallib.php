@@ -963,63 +963,6 @@ function bigbluebuttonbn_delete_recording_imported($recordingid, $bigbluebuttonb
     }
 }
 
-function bigbluebuttonbn_validate_parameters($params) {
-    $error = '';
-
-    if (!isset($params['callback'])) {
-        return bigbluebuttonbn_add_error($error, 'This call must include a javascript callback.');
-    }
-
-    if (!isset($params['action'])) {
-        return bigbluebuttonbn_add_error($error, 'Action parameter must be included.');
-    }
-
-    switch (strtolower($params['action'])) {
-        case 'server_ping':
-        case 'meeting_info':
-        case 'meeting_end':
-            if (!isset($params['id'])) {
-                return bigbluebuttonbn_add_error($error, 'The meetingID must be specified.');
-            }
-            break;
-        case 'recording_info':
-        case 'recording_links':
-        case 'recording_publish':
-        case 'recording_unpublish':
-        case 'recording_delete':
-        case 'recording_import':
-            if (!isset($params['id'])) {
-                return bigbluebuttonbn_add_error($error, 'The recordingID must be specified.');
-            }
-            break;
-        case 'recording_ready':
-        case 'meeting_events':
-            if (empty($params['signed_parameters'])) {
-                return bigbluebuttonbn_add_error($error, 'A JWT encoded string must be included as [signed_parameters].');
-            }
-            break;
-        case 'moodle_event':
-            break;
-        default:
-            return bigbluebuttonbn_add_error($error, 'Action '.$params['action'].' can not be performed.');
-    }
-
-    return '';
-}
-
-function bigbluebuttonbn_add_error($oldmsg, $newmsg = '') {
-    $error = $oldmsg;
-
-    if (!empty($newmsg)) {
-        if (!empty($error)) {
-            $error .= ' ';
-        }
-        $error .= $newmsg;
-    }
-
-    return $error;
-}
-
 /**
  * @param string $meetingid
  * @param string $configxml

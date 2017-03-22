@@ -41,7 +41,7 @@ if (empty($params['action'])) {
     return;
 }
 
-$error = bigbluebuttonbn_validate_parameters($params);
+$error = bigbluebuttonbn_broker_validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
     return;
@@ -471,5 +471,45 @@ function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {
     } catch (Exception $e) {
         $error = "Caught exception: {$e->getMessage()}";
         header("HTTP/1.0 503 Service Unavailable. {$error}");
+    }
+}
+
+function bigbluebuttonbn_broker_validate_parameters($params) {
+
+    $required_params = [
+        'server_ping' => ['id' => 'The meetingID must be specified.'],
+        'meeting_info' => ['id' => 'The meetingID must be specified.'],
+        'meeting_end' => ['id'=> 'The meetingID must be specified.'],
+        'recording_info' => ['id' => 'The recordingID must be specified.'],
+        'recording_links' => ['id' => 'The recordingID must be specified.'],
+        'recording_publish' => ['id' => 'The recordingID must be specified.'],
+        'recording_unpublish' => ['id' => 'The recordingID must be specified.'],
+        'recording_delete' => ['id' => 'The recordingID must be specified.'],
+        'recording_import' => ['id' => 'The recordingID must be specified.'],
+        'recording_ready' => [
+            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
+          ],
+        'meeting_events' => [
+            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
+          ]
+      ];
+
+    if (!isset($params['callback'])) {
+        return 'This call must include a javascript callback.';
+    }
+
+    if (!isset($params['action'])) {
+        return 'Action parameter must be included.';
+    }
+
+    $action = strtolower($params['action']);
+    if (!array_key_exists($action, $required_params)) {
+        return 'Action '.$params['action'].' can not be performed.';
+    }
+
+    foreach ($required_params[$action] as $param => $message) {
+        if (!array_key_exists($param, $params) || empty($params[$param])) {
+            return $message;
+        }
     }
 }

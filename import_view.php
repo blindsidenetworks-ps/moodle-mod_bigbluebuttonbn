@@ -95,22 +95,13 @@ if (empty($options)) {
         array('type' => 'button', 'class' => 'btn btn-secondary', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
 
-    // Require aggregated JavaScript variables.
-    $jsvars = array(
-        'bn' => $bn,
-        'tc' => $selected,
-        'locales' => bigbluebuttonbn_get_locales_for_view(),
-    );
-    $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
-
     // Require JavaScript modules.
-    $jsmodule = array(
-            'name' => 'mod_bigbluebuttonbn',
-            'fullpath' => '/mod/bigbluebuttonbn/module.js',
-            'requires' => array('datasource-get', 'datasource-jsonschema', 'datasource-polling'),
-    );
-    $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.import_view_init', array(), false, $jsmodule);
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-locales', 'M.mod_bigbluebuttonbn.locales.init',
+        array('locales' => bigbluebuttonbn_get_locales_for_view()));
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-import', 'M.mod_bigbluebuttonbn.import.init',
+        array('bn' => $bn, 'tc' => $selected));
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init',
+        array());
 }
 
 $output .= $OUTPUT->footer();

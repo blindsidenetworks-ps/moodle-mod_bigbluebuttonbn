@@ -245,15 +245,22 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
     $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
 
+    // JavaScript for locales.
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-locales', 'M.mod_bigbluebuttonbn.locales.init',
+        array('strings' => bigbluebuttonbn_get_locales_for_view())
+      );
+
     // JavaScript variables.
-    $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval();
+    $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() * 1000;
+    if ($pinginterval == 0) {
+        $pinginterval = 15000;
+    }
     $lang = get_string('locale', 'core_langconfig');
     $locale = substr($lang, 0, strpos($lang, '.'));
     $localecode = substr($locale, 0, strpos($locale, '_'));
     $jsvars = array(
         'activity' => $activity,
-        'ping_interval' => ($pinginterval > 0 ? $pinginterval * 1000 : 15000),
-        'locales' => bigbluebuttonbn_get_locales_for_view(),
+        'ping_interval' => $pinginterval,
         'locale' => $localecode,
         'profile_features' => $features,
     );
@@ -275,7 +282,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $output .= bigbluebuttonbn_view_show_imported($bbbsession);
         }
-        error_log(json_encode($jsvars));
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
             'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     }

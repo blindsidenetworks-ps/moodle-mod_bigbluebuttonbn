@@ -185,6 +185,9 @@ M.mod_bigbluebuttonbn.broker = {
         //    centered: true,
         //    question: this.recordingConfirmationMessage('publish', recordingid)
         //});
+        var data_source = this.data_source;
+        var ping_interval = this.ping_interval;
+        var polling = this.polling;
 
         // If it is confirmed.
         //confirm.on('complete-yes', function() {
@@ -200,8 +203,8 @@ M.mod_bigbluebuttonbn.broker = {
                             recordingid: recordingid
                         };
                         // Start pooling until the action has been executed.
-                        this.polling = this.data_source.setInterval(
-                            this.bigbluebuttonbn.ping_interval,
+                        polling = data_source.setInterval(
+                            ping_interval,
                             M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
                         );
                     } else {
@@ -223,14 +226,16 @@ M.mod_bigbluebuttonbn.broker = {
             centered: true,
             question: this.recordingConfirmationMessage('unpublish', recordingid)
         });
+        var data_source = this.data_source;
+        var ping_interval = this.ping_interval;
+        var polling = this.polling;
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.data_source.sendRequest({
+            data_source.sendRequest({
                 request: "action=recording_unpublish" + "&id=" + recordingid,
                 callback: {
                     success: function(e) {
-                        //Y.one('#recording-td-' + recordingid).remove();
                         if (e.data.status === 'true') {
                             var ping_data = {
                                 action: 'unpublish',
@@ -238,8 +243,8 @@ M.mod_bigbluebuttonbn.broker = {
                                 recordingid: recordingid
                             };
                             // Start pooling until the action has been executed.
-                            this.polling = this.data_source.setInterval(
-                                this.bigbluebuttonbn.ping_interval,
+                            polling = data_source.setInterval(
+                                ping_interval,
                                 M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
                             );
                         } else {
@@ -256,24 +261,24 @@ M.mod_bigbluebuttonbn.broker = {
 
     recordingConfirmationMessage: function(action, recordingid) {
 
-        if (this.bigbluebuttonbn.locales[action + '_confirmation'] === 'undefined') {
+        if (M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation'] === 'undefined') {
             return '';
         }
         var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
-        var recording_type = this.bigbluebuttonbn.locales.recording;
+        var recording_type = M.mod_bigbluebuttonbn.locales.strings.recording;
         if (is_imported_link) {
-            recording_type = this.bigbluebuttonbn.locales.recording_link;
+            recording_type = M.mod_bigbluebuttonbn.locales.strings.recording_link;
         }
 
-        var confirmation = this.bigbluebuttonbn.locales[action + '_confirmation'];
+        var confirmation = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation'];
         confirmation = confirmation.replace("{$a}", recording_type);
 
         if (action === 'publish' || action === 'delete') {
             //if it has associated links imported in a different course/activity, show a confirmation dialog
             var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-            var confirmation_warning = this.bigbluebuttonbn.locales[action + '_confirmation_warning_p'];
+            var confirmation_warning = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation_warning_p'];
             if (associated_links == 1) {
-                confirmation_warning = this.bigbluebuttonbn.locales[action + '_confirmation_warning_s'];
+                confirmation_warning = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation_warning_s'];
             }
             confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
             confirmation = confirmation_warning + '\n\n' + confirmation;
@@ -288,11 +293,11 @@ M.mod_bigbluebuttonbn.broker = {
         var btn_action_src_url = btn_action_src_current.substring(0, btn_action_src_current.length - 4);
         btn_action.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
         if (data.action == 'publish') {
-            btn_action.setAttribute('alt', this.bigbluebuttonbn.locales.publishing);
-            btn_action.setAttribute('title', this.bigbluebuttonbn.locales.publishing);
+            btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.publishing);
+            btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.publishing);
         } else {
-            btn_action.setAttribute('alt', this.bigbluebuttonbn.locales.unpublishing);
-            btn_action.setAttribute('title', this.bigbluebuttonbn.locales.unpublishing);
+            btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.unpublishing);
+            btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.unpublishing);
         }
         var link_action = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
         var link_action_current_onclick = link_action.getAttribute('onclick');
@@ -312,8 +317,8 @@ M.mod_bigbluebuttonbn.broker = {
                         btn_action.setAttribute('id', 'recording-btn-unpublish-' + data.recordingid);
                         link_action.setAttribute('id', 'recording-link-unpublish-' + data.recordingid);
                         btn_action.setAttribute('src', btn_action_src_url + 'hide');
-                        btn_action.setAttribute('alt', this.bigbluebuttonbn.locales.unpublish);
-                        btn_action.setAttribute('title', this.bigbluebuttonbn.locales.unpublish);
+                        btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.unpublish);
+                        btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.unpublish);
                         link_action.setAttribute('onclick', link_action_current_onclick.replace('publish', 'unpublish'));
                         Y.one('#playbacks-' + data.recordingid).show();
                         return;
@@ -324,8 +329,8 @@ M.mod_bigbluebuttonbn.broker = {
                         btn_action.setAttribute('id', 'recording-btn-publish-' + data.recordingid);
                         link_action.setAttribute('id', 'recording-link-publish-' + data.recordingid);
                         btn_action.setAttribute('src', btn_action_src_url + 'show');
-                        btn_action.setAttribute('alt', this.bigbluebuttonbn.locales.publish);
-                        btn_action.setAttribute('title', this.bigbluebuttonbn.locales.publish);
+                        btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.publish);
+                        btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.publish);
                         link_action.setAttribute('onclick', link_action_current_onclick.replace('unpublish', 'publish'));
                         Y.one('#playbacks-' + data.recordingid).hide();
                     }

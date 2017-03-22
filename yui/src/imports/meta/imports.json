@@ -1,0 +1,8 @@
+{
+    "moodle-mod_bigbluebuttonbn-imports": {
+        "requires": [
+            "base",
+            "node"
+        ]
+    }
+}
