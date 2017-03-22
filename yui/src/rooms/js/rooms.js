@@ -48,7 +48,7 @@ M.mod_bigbluebuttonbn.rooms = {
                 status_bar.push(this.bigbluebuttonbn.opening);
                 status_bar.push(this.bigbluebuttonbn.closing);
             }
-            Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_bar));
+            Y.DOM.addHTML(Y.one('#status_bar'), this.init_status_bar(status_bar));
             return;
         }
         this.init_room_open();
@@ -123,11 +123,8 @@ M.mod_bigbluebuttonbn.rooms = {
                         Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.rooms.init_join_button(e.data.status));
                     }
                     if (typeof e.data.status.can_end != 'undefined' && e.data.status.can_end) {
-                        Y.DOM.addHTML(end_button, this.init_end_button(e.data.status));
+                        Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.rooms.init_end_button(e.data.status));
                     }
-                },
-                failure: function(e) {
-                    console.info("Could not retrieve data: " + e.error.message);
                 }
             }
         });
@@ -218,16 +215,16 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
         Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
 
-        if (status.can_join) {
-            var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
-            input_html += status.join_url + '\', \'' + M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.in_progress;
-            input_html += '\', ' + status.can_tag + ');';
-            Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
-        } else {
+        if (!status.can_join) {
             Y.DOM.setAttribute(join_button_input, 'disabled', true);
             M.mod_bigbluebuttonbn.broker.waitModerator(status.join_url);
+            return join_button_input;
         }
 
+        var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
+        input_html += status.join_url + '\', \'' + M.mod_bigbluebuttonbn.rooms.bigbluebuttonbn.locales.in_progress;
+        input_html += '\', ' + status.can_tag + ');';
+        Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
         return join_button_input;
     },
 
@@ -237,11 +234,66 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(end_button_input, 'id', 'end_button_input');
         Y.DOM.setAttribute(end_button_input, 'type', 'button');
         Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
+        Y.DOM.setAttribute(end_button_input, 'class', 'btn btn-secondary');
         if (status.can_end) {
             Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.endMeeting();');
         }
 
         return end_button_input;
+    },
+
+    remote_update: function(delay) {
+        setTimeout(function() {
+            M.mod_bigbluebuttonbn.rooms.clean_room();
+            M.mod_bigbluebuttonbn.rooms.update_room();
+        }, delay);
+    },
+
+    clean_room: function() {
+        this.clean_status_bar();
+        this.clean_control_panel();
+        this.clean_join_button();
+        this.clean_end_button();
+    },
+
+    clean_status_bar: function() {
+        Y.one('#status_bar_span').remove();
+    },
+
+    clean_control_panel: function() {
+        Y.one('#control_panel_div').remove();
+    },
+
+    clean_join_button: function() {
+        Y.one('#join_button').setContent('');
+    },
+
+    hide_join_button: function() {
+        Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'hidden');
+    },
+
+    show_join_button: function() {
+        Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'shown');
+    },
+
+    clean_end_button: function() {
+        Y.one('#end_button').setContent('');
+    },
+
+    hide_end_button: function() {
+        Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'hidden');
+    },
+
+    show_end_button: function() {
+        Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'shown');
+    },
+
+    window_close: function() {
+        window.onunload = function() {
+            /* global: opener */
+            opener.M.mod_bigbluebuttonbn.rooms.remote_update(5000);
+        };
+        window.close();
     }
 
 };

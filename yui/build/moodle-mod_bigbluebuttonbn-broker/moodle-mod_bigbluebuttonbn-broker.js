@@ -62,8 +62,8 @@ M.mod_bigbluebuttonbn.broker = {
                 success: function(e) {
                     if (e.data.running) {
                         clearInterval(this.polling);
-                        M.mod_bigbluebuttonbn.view_clean();
-                        M.mod_bigbluebuttonbn.view_update();
+                        M.mod_bigbluebuttonbn.rooms.clean_room();
+                        M.mod_bigbluebuttonbn.rooms.update_room();
                     }
                 },
                 failure: function() {
@@ -89,9 +89,7 @@ M.mod_bigbluebuttonbn.broker = {
             request: qs,
             callback: {
                 success: function(e) {
-                    if (e.data.running) {
-                        M.mod_bigbluebuttonbn.broker.joinRedirect(join_url, e.data.status.message);
-                    } else {
+                    if (!e.data.running) {
                         Y.one('#meeting_join_url').set('value', join_url);
                         Y.one('#meeting_message').set('value', e.data.status.message);
 
@@ -100,7 +98,10 @@ M.mod_bigbluebuttonbn.broker = {
                         }).use('panel', function() {
                             this.panel.show();
                         });
+                        return;
                     }
+
+                    M.mod_bigbluebuttonbn.broker.joinRedirect(join_url, e.data.status.message);
                 }
             }
         });
@@ -110,8 +111,8 @@ M.mod_bigbluebuttonbn.broker = {
         window.open(join_url);
         // Update view.
         setTimeout(function() {
-            M.mod_bigbluebuttonbn.view_clean();
-            M.mod_bigbluebuttonbn.view_update();
+            M.mod_bigbluebuttonbn.rooms.clean_room();
+            M.mod_bigbluebuttonbn.rooms.update_room();
         }, 15000);
     },
 
@@ -150,11 +151,8 @@ M.mod_bigbluebuttonbn.broker = {
             this.data_source.sendRequest({
                 request: "action=recording_import" + "&id=" + recordingid,
                 callback: {
-                    success: function(e) {
+                    success: function() {
                         Y.one('#recording-td-' + recordingid).remove();
-                    },
-                    failure: function(e) {
-                        console.info("Could not retrieve data: " + e.error.message);
                     }
                 }
             });
@@ -350,9 +348,9 @@ M.mod_bigbluebuttonbn.broker = {
             callback: {
                 success: function(e) {
                     if (e.data.status) {
-                        M.mod_bigbluebuttonbn.view_clean_control_panel();
-                        M.mod_bigbluebuttonbn.view_hide_join_button();
-                        M.mod_bigbluebuttonbn.view_hide_end_button();
+                        M.mod_bigbluebuttonbn.rooms.clean_control_panel();
+                        M.mod_bigbluebuttonbn.rooms.hide_join_button();
+                        M.mod_bigbluebuttonbn.rooms.hide_end_button();
                         location.reload();
                     }
                 }

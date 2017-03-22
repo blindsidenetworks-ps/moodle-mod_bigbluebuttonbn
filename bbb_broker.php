@@ -154,7 +154,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
         if ($bbbsession['administrator'] || $bbbsession['moderator']) {
             $endbuttontext = get_string('view_conference_action_end', 'bigbluebuttonbn');
-            $statuscanend = '"can_end": true, "endbuttontext": "'.$endbuttontext.'"';
+            $statuscanend = '"can_end": true, "end_button_text": "'.$endbuttontext.'"';
         }
     } else {
         // If user is administrator, moderator or if is viewer and no waiting is required.

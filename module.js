@@ -81,18 +81,14 @@ M.mod_bigbluebuttonbn.view_init = function(Y) {
 M.mod_bigbluebuttonbn.view_init_room = function(Y) {
 
     if (bigbluebuttonbn.activity !== 'open') {
-        var room_state = "Room ended;"
         var status_bar = [bigbluebuttonbn.locales.conference_ended];
         if (bigbluebuttonbn.activity !== 'ended') {
-            room_state = "Room is not open";
             status_bar.push(bigbluebuttonbn.opening);
             status_bar.push(bigbluebuttonbn.closing);
         }
-        console.info(room_state);
         Y.DOM.addHTML(Y.one('#status_bar'), M.mod_bigbluebuttonbn.view_init_status_bar(status_bar));
         return;
     }
-    console.info("Room open");
     M.mod_bigbluebuttonbn.view_init_room_open();
 };
 

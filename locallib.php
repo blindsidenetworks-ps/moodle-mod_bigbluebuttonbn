@@ -1276,7 +1276,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table->data = array();
 
     // Initialize table headers.
-    $table->head = array($playback.$recording, $description, $preview, $date, $duration);
+    $table->head = array($playback, $recording, $description, $preview, $date, $duration);
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     if ($bbbsession['managerecordings']) {
         $table->head[] = $actionbar;
@@ -1327,7 +1327,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $messagetext);
 }
 
-function bigbluebuttonbn_server_offers_bn_capabilities() {
+function bigbluebuttonbn_is_bn_server() {
     // Validates if the server may have extended capabilities.
     $parsedurl = parse_url(bigbluebuttonbn_get_cfg_server_url());
     if (!isset($parsedurl['host'])) {

@@ -341,7 +341,7 @@ if ($ADMIN->fulltree) {
     }
 
     // Configuration for extended BN capabilities.
-    if (bigbluebuttonbn_server_offers_bn_capabilities()) {
+    if (bigbluebuttonbn_is_bn_server()) {
         // Configuration for 'notify users when recording ready' feature.
         if (!isset($CFG->bigbluebuttonbn['recordingready_enabled']) ||
             !isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
