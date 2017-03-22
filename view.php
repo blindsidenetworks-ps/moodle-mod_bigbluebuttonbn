@@ -275,6 +275,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $output .= bigbluebuttonbn_view_show_imported($bbbsession);
         }
+        error_log(json_encode($jsvars));
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
             'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     }
@@ -283,7 +284,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
 
     echo $output;
 
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-view', 'M.mod_bigbluebuttonbn.view.init', array($jsvars));
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 

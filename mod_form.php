@@ -213,11 +213,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['type'] = 'text';
             $field['data_type'] = PARAM_TEXT;
             $field['description_key'] = 'mod_form_field_voicebridge';
-            $mform->addRule('voicebridge', get_string('mod_form_field_voicebridge_format_error',
-                'bigbluebuttonbn'), 'numeric', '####', 'server');
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], 0, ['maxlength' => 4, 'size' => 6],
+                ['message' => get_string('mod_form_field_voicebridge_format_error', 'bigbluebuttonbn'),
+                 'type' => 'numeric', 'rule' => '####', 'validator' => 'server']
+              );
+        } else {
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], 0, ['maxlength' => 4, 'size' => 6]);
         }
-        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], 0, ['maxlength' => 4, 'size' => 6]);
 
         $field = ['type' => 'hidden', 'name' => 'wait', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['waitformoderator_editable']) {
@@ -427,11 +431,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     private function bigbluebuttonbn_mform_add_element($mform, $type, $name, $datatype,
-            $descriptionkey, $defaultvalue = null, $options = []) {
+            $descriptionkey, $defaultvalue = null, $options = [], $rule = []) {
         if ($type === 'hidden') {
             $mform->addElement($type, $name, $defaultvalue);
             $mform->setType($name, $datatype);
-
             return;
         }
 
@@ -439,10 +442,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if (get_string_manager()->string_exists($descriptionkey.'_help', 'bigbluebuttonbn')) {
             $mform->addHelpButton($name, $descriptionkey, 'bigbluebuttonbn');
         }
+        if (!empty($rule)) {
+            $mform->addRule($name, $rule['message'], $rule['type'], $rule['rule'], $rule['validator']);
+        }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
-
-        return;
     }
 
     private function bigbluebuttonbn_get_participant_selection_strings() {

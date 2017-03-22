@@ -33,6 +33,47 @@ M.mod_bigbluebuttonbn.recordings = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
+
+        if (this.bigbluebuttonbn.profile_features.includes('all') ||
+            this.bigbluebuttonbn.profile_features.includes('showrecordings')) {
+            this.init_recordings();
+        }
     },
+
+    init_recordings: function() {
+        if (this.bigbluebuttonbn.recordings_html === false &&
+            (this.bigbluebuttonbn.profile_features.includes('all') ||
+                this.bigbluebuttonbn.profile_features.includes('showrecordings'))) {
+            this.datatable_init();
+        }
+    },
+
+    datatable_init: function() {
+        var options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        var columns = this.bigbluebuttonbn.columns;
+        var data = this.bigbluebuttonbn.data;
+        for (var i = 0; i < data.length; i++) {
+            var date = new Date(data[i].date);
+            data[i].date = date.toLocaleDateString(this.bigbluebuttonbn.locale, options);
+        }
+
+        YUI({
+            lang: this.bigbluebuttonbn.locale
+        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+            var table = new Y.DataTable({
+                width: "1075px",
+                columns: columns,
+                data: data,
+                rowsPerPage: 10,
+                paginatorLocation: ['header', 'footer']
+            }).render('#bigbluebuttonbn_yui_table');
+            return table;
+        });
+    }
 
 };
