@@ -178,30 +178,30 @@ M.mod_bigbluebuttonbn.rooms = {
 
     msg_attendees_in: function(moderators, participants) {
 
-        if (typeof moderators == 'undefined' && typeof participants == 'undefined') {
+        if (typeof participants == 'undefined' || participants === 0) {
             return M.mod_bigbluebuttonbn.locales.strings.session_no_users + '.';
+        }
+
+        var msg = M.mod_bigbluebuttonbn.locales.strings.session_has_users;
+        var msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderators;
+        var msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewers;
+
+        if (participants == 1) {
+            if (moderators > 0) {
+                return msg + ' <b>1</b> ' + msg_moderators + '.';
+            }
+
+            return msg + ' <b>1</b> ' + msg_viewers + '.';
         }
 
         var viewers = participants - moderators;
 
-        var msg = M.mod_bigbluebuttonbn.locales.strings.session_has_users;
-
-        var msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderators;
         if (moderators == 1) {
             msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderator;
         }
 
-        var msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewers;
         if (moderators == 1) {
             msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewer;
-        }
-
-        if (participants == 1) {
-            if (viewers > 0) {
-                return msg + ' <b>1</b> ' + msg_viewers + '.';
-            }
-
-            return msg + ' <b>1</b> ' + msg_moderators + '.';
         }
 
         return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';

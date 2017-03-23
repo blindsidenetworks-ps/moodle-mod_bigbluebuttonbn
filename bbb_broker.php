@@ -282,7 +282,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
             $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED;
             break;
         case 'recording_unpublish':
-            $callbackresponse = bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);;
+            $callbackresponse = bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);
             $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED;
             break;
         case 'recording_delete':

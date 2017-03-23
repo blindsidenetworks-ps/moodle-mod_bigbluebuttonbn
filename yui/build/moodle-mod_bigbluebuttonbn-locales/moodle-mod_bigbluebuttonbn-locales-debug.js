@@ -28,8 +28,8 @@ M.mod_bigbluebuttonbn.locales = {
      *
      * @method init
      */
-    init: function(data) {
-        this.strings = data;
+    init: function(strings) {
+        this.strings = strings;
     }
 
 };
