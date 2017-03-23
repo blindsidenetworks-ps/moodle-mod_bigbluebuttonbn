@@ -178,7 +178,7 @@ M.mod_bigbluebuttonbn.broker = {
             action: 'publish',
             recordingid: recordingid,
             meetingid: meetingid,
-            goalstate: true
+            goalstate: 'true'
         });
     },
 
@@ -196,7 +196,7 @@ M.mod_bigbluebuttonbn.broker = {
                 action: 'unpublish',
                 recordingid: recordingid,
                 meetingid: meetingid,
-                goalstate: false
+                goalstate: 'false'
             });
         }, this);
     },

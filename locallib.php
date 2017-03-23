@@ -1074,7 +1074,14 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
-    $recordingpreview = '';
+
+    $visibility = '';
+    if ($recording['published'] === 'false') {
+        $visibility = 'hidden ';
+    }
+
+    $recordingpreview = html_writer::start_tag('div',
+        array('id' => 'preview-'.$recording['recordID']));
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
             foreach ($playback['preview'] as $image) {
@@ -1087,6 +1094,7 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
             break;
         }
     }
+    $recordingpreview .= html_writer::end_tag('div');
 
     return $recordingpreview;
 }
@@ -1094,9 +1102,11 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
 function bigbluebuttonbn_get_recording_data_row_types($recording) {
     global $OUTPUT;
 
-    $attributes = 'data-imported="false"';
+    $dataimported = 'false';
+    $title = '';
     if (isset($recording['imported'])) {
-        $attributes = 'data-imported="true" title="'.get_string('view_recording_link_warning', 'bigbluebuttonbn').'"';
+        $dataimported = 'true';
+        $title = get_string('view_recording_link_warning', 'bigbluebuttonbn');
     }
 
     $visibility = '';
@@ -1104,13 +1114,14 @@ function bigbluebuttonbn_get_recording_data_row_types($recording) {
         $visibility = 'hidden ';
     }
 
-    $recordingtypes = '<div id="playbacks-'.$recording['recordID'].'" '.$attributes.' '.$visibility.'>';
+    $recordingtypes = html_writer::start_tag('div',
+        array('id' => 'playbacks-'.$recording['recordID'], 'data-imported' =>  $dataimported, 'title' => $title));
     foreach ($recording['playbacks'] as $playback) {
         $recordingtypes .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'],
             'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'],
             'bigbluebuttonbn'), 'target' => '_new')).'&#32;';
     }
-    $recordingtypes .= '</div>';
+    $recordingtypes .= html_writer::end_tag('div');
 
     return $recordingtypes;
 }
@@ -1118,7 +1129,9 @@ function bigbluebuttonbn_get_recording_data_row_types($recording) {
 function bigbluebuttonbn_get_recording_data_row_meta_activity($recording) {
     if (isset($recording['meta_contextactivity'])) {
         return htmlentities($recording['meta_contextactivity']);
-    } else if (isset($recording['meta_bbb-recording-name'])) {
+    }
+
+    if (isset($recording['meta_bbb-recording-name'])) {
         return htmlentities($recording['meta_bbb-recording-name']);
     }
 

@@ -103,11 +103,13 @@ M.mod_bigbluebuttonbn.recordings = {
         var linkaction = 'show';
         var text = M.mod_bigbluebuttonbn.locales.strings.publish;
         Y.one('#playbacks-' + data.recordingid).hide();
+        Y.one('#preview-' + data.recordingid).hide();
         if (data.action === 'publish') {
             action = 'unpublish';
             linkaction = 'hide';
             text = M.mod_bigbluebuttonbn.locales.strings.unpublish;
             Y.one('#playbacks-' + data.recordingid).show();
+            Y.one('#preview-' + data.recordingid).show();
         }
 
         btn.setAttribute('id', 'recording-btn-' + action + '-' + data.recordingid);
