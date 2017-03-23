@@ -89,7 +89,10 @@ M.mod_bigbluebuttonbn.broker = {
                         Y.one('#meeting_join_url').set('value', join_url);
                         Y.one('#meeting_message').set('value', e.data.status.message);
                         // Show error message.
-                        console.info('Something went wrong, the meeting is not running.');
+                        var alert = new M.core.alert({
+                            message: 'Something went wrong, the meeting is not running.'
+                        });
+                        alert.show();
                         return;
                     }
 
@@ -109,7 +112,6 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action: function(action, recordingid, meetingid) {
-        console.info(action);
         if (action === 'import') {
             this.recording_import(recordingid);
             return;
@@ -231,7 +233,6 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action_performed: function(payload) {
-        console.info("Attempt " + payload.attempt);
         this.datasource.sendRequest({
             request: "action=recording_info&id=" + payload.recordingid + "&idx=" + payload.meetingid,
             callback: {

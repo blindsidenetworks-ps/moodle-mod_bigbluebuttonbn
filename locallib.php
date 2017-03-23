@@ -1081,7 +1081,7 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     }
 
     $recordingpreview = html_writer::start_tag('div',
-        array('id' => 'preview-'.$recording['recordID']));
+        array('id' => 'preview-'.$recording['recordID'], $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
             foreach ($playback['preview'] as $image) {
@@ -1115,7 +1115,8 @@ function bigbluebuttonbn_get_recording_data_row_types($recording) {
     }
 
     $recordingtypes = html_writer::start_tag('div',
-        array('id' => 'playbacks-'.$recording['recordID'], 'data-imported' =>  $dataimported, 'title' => $title));
+        array('id' => 'playbacks-'.$recording['recordID'], 'data-imported' =>  $dataimported,
+              'title' => $title, $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
         $recordingtypes .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'],
             'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'],

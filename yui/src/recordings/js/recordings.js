@@ -74,7 +74,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_inprocess: function(data) {
-        console.info("action " + data.action + " in process");
+        // console.info("action " + data.action + " in process");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var text = M.mod_bigbluebuttonbn.locales.strings.unpublishing;
         if (data.action == 'publish') {
@@ -91,7 +91,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_completed: function(data) {
-        console.info("action " + data.action + " completed");
+        // console.info("action " + data.action + " completed");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var btnosrc = btn.getAttribute('data-osrc');
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
@@ -119,7 +119,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_failed: function(data) {
-        console.info("action " + data.action + " failed");
+        // console.info("action " + data.action + " failed");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
 
