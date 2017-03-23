@@ -102,12 +102,16 @@ try {
     }
 
     if ($a == 'recording_info') {
-        echo bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
+        $recording_info = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
+        error_log(json_encode($recording_info));
+        echo $recording_info;
         return;
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
-        echo bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        $recording_action = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        error_log(json_encode($recording_action));
+        echo $recording_action;
         return;
     }
 

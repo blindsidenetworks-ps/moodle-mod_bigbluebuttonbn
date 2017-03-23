@@ -22,30 +22,27 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.recordings = {
 
-    data_source: null,
-    polling: null,
-    bigbluebuttonbn: {},
+    datasource: null,
+    locale: 'en',
+    profilefeatures: {},
+    datatable: {},
+
     /**
-     * Initialise the broker code.
+     * Initialise recordings code.
      *
      * @method init
      */
-    init: function(bigbluebuttonbn) {
-        this.data_source = new Y.DataSource.Get({
+    init: function(data) {
+        this.datasource = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
-        this.bigbluebuttonbn = bigbluebuttonbn;
+        this.locale = data.locale;
+        this.profilefeatures = data.profile_features;
+        this.datatable.columns = data.columns;
+        this.datatable.data = data.data;
 
-        if (this.bigbluebuttonbn.profile_features.includes('all') ||
-            this.bigbluebuttonbn.profile_features.includes('showrecordings')) {
-            this.init_recordings();
-        }
-    },
-
-    init_recordings: function() {
-        if (this.bigbluebuttonbn.recordings_html === false &&
-            (this.bigbluebuttonbn.profile_features.includes('all') ||
-                this.bigbluebuttonbn.profile_features.includes('showrecordings'))) {
+        if (data.recordings_html === false &&
+            (this.profilefeatures.includes('all') || this.profilefeatures.includes('showrecordings'))) {
             this.datatable_init();
         }
     },
@@ -57,15 +54,15 @@ M.mod_bigbluebuttonbn.recordings = {
             month: 'long',
             day: 'numeric'
         };
-        var columns = this.bigbluebuttonbn.columns;
-        var data = this.bigbluebuttonbn.data;
+        var columns = this.datatable.columns;
+        var data = this.datatable.data;
         for (var i = 0; i < data.length; i++) {
             var date = new Date(data[i].date);
-            data[i].date = date.toLocaleDateString(this.bigbluebuttonbn.locale, options);
+            data[i].date = date.toLocaleDateString(this.locale, options);
         }
 
         YUI({
-            lang: this.bigbluebuttonbn.locale
+            lang: this.locale
         }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
             var table = new Y.DataTable({
                 width: "1075px",
@@ -76,6 +73,67 @@ M.mod_bigbluebuttonbn.recordings = {
             }).render('#bigbluebuttonbn_yui_table');
             return table;
         });
+    },
+
+    recording_action_inprocess: function(data) {
+        console.info("action " + data.action + " in process");
+        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
+        var text = M.mod_bigbluebuttonbn.locales.strings.unpublishing;
+        if (data.action == 'publish') {
+            text = M.mod_bigbluebuttonbn.locales.strings.publishing;
+        }
+        btn.setAttribute('alt', text);
+        btn.setAttribute('title', text);
+        btn.setAttribute('data-osrc', btn.getAttribute('src'));
+        btn.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+
+        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+        link.setAttribute('data-oonlcick', link.getAttribute('onclick'));
+        link.setAttribute('onclick', '');
+    },
+
+    recording_action_completed: function(data) {
+        console.info("action " + data.action + " completed");
+        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
+        var btnosrc = btn.getAttribute('data-osrc');
+        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+        var linkoonclick = link.getAttribute('data-oonlcick');
+
+        var action = 'publish';
+        var linkaction = 'show';
+        var text = M.mod_bigbluebuttonbn.locales.strings.publish;
+        Y.one('#playbacks-' + data.recordingid).hide();
+        if (data.action === 'publish') {
+            action = 'unpublish';
+            linkaction = 'hide';
+            text = M.mod_bigbluebuttonbn.locales.strings.unpublish;
+            Y.one('#playbacks-' + data.recordingid).show();
+        }
+
+        btn.setAttribute('id', 'recording-btn-' + action + '-' + data.recordingid);
+        link.setAttribute('id', 'recording-link-' + action + '-' + data.recordingid);
+        btn.setAttribute('src', btnosrc.substring(0, btnosrc.length - 4) + linkaction);
+        btn.setAttribute('alt', text);
+        btn.setAttribute('title', text);
+        link.setAttribute('onclick', linkoonclick.replace(data.action, action));
+    },
+
+    recording_action_failed: function(data) {
+        console.info("action " + data.action + " failed");
+        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
+        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+
+        var text = M.mod_bigbluebuttonbn.locales.strings.unpublish;
+        if (data.action === 'publish') {
+            text = M.mod_bigbluebuttonbn.locales.strings.publish;
+        }
+
+        btn.setAttribute('id', 'recording-btn-' + data.action + '-' + data.recordingid);
+        link.setAttribute('id', 'recording-link-' + data.action + '-' + data.recordingid);
+        btn.setAttribute('src', btn.getAttribute('data-osrc'));
+        btn.setAttribute('alt', text);
+        btn.setAttribute('title', text);
+        link.setAttribute('onclick', link.getAttribute('data-oonlcick'));
     }
 
 };

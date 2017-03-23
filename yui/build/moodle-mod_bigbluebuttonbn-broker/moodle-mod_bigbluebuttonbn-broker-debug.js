@@ -22,10 +22,9 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.broker = {
 
-    data_source: null,
+    datasource: null,
     polling: null,
     bigbluebuttonbn: {},
-    panel: null,
 
     /**
      * Initialise the broker code.
@@ -33,11 +32,10 @@ M.mod_bigbluebuttonbn.broker = {
      * @method init
      */
     init: function(bigbluebuttonbn) {
-        this.data_source = new Y.DataSource.Get({
+        this.datasource = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
-        //this.panel = M.bigbluebuttonbn.rooms.panel;
     },
 
     waitModerator: function() {
@@ -56,7 +54,7 @@ M.mod_bigbluebuttonbn.broker = {
         var qs = 'action=meeting_info';
         qs += '&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.polling = this.data_source.setInterval(this.bigbluebuttonbn.ping_interval, {
+        this.polling = this.datasource.setInterval(this.bigbluebuttonbn.ping_interval, {
             request: qs,
             callback: {
                 success: function(e) {
@@ -85,29 +83,25 @@ M.mod_bigbluebuttonbn.broker = {
         qs += 'action=meeting_info';
         qs += '&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.data_source.sendRequest({
+        this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
                     if (!e.data.running) {
                         Y.one('#meeting_join_url').set('value', join_url);
                         Y.one('#meeting_message').set('value', e.data.status.message);
-
-                        YUI({
-                            lang: this.bigbluebuttonbn.locale
-                        }).use('panel', function() {
-                            this.panel.show();
-                        });
+                        // Show error message.
+                        console.info('Something went wrong, the meeting is not running.');
                         return;
                     }
 
-                    M.mod_bigbluebuttonbn.broker.joinRedirect(join_url, e.data.status.message);
+                    M.mod_bigbluebuttonbn.broker.join_redirect(join_url, e.data.status.message);
                 }
             }
         });
     },
 
-    joinRedirect: function(join_url) {
+    join_redirect: function(join_url) {
         window.open(join_url);
         // Update view.
         setTimeout(function() {
@@ -116,39 +110,40 @@ M.mod_bigbluebuttonbn.broker = {
         }, 15000);
     },
 
-    recordingAction: function(action, recordingid, meetingid) {
+    recording_action: function(action, recordingid, meetingid) {
+        console.info(action);
         if (action === 'import') {
-            this.recordingImport(recordingid);
+            this.recording_import(recordingid);
             return;
         }
 
         if (action === 'delete') {
-            this.recordingDelete(recordingid);
+            this.recording_delete(recordingid);
             return;
         }
 
         if (action === 'publish') {
-            this.recordingPublish(recordingid, meetingid);
+            this.recording_publish(recordingid, meetingid);
             return;
         }
 
         if (action === 'unpublish') {
-            this.recordingUnpublish(recordingid, meetingid);
+            this.recording_unpublish(recordingid, meetingid);
             return;
         }
     },
 
-    recordingImport: function(recordingid) {
+    recording_import: function(recordingid) {
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recordingConfirmationMessage('import', recordingid)
+            question: this.recording_confirmation_message('import', recordingid)
         });
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.data_source.sendRequest({
+            this.datasource.sendRequest({
                 request: "action=recording_import" + "&id=" + recordingid,
                 callback: {
                     success: function() {
@@ -159,17 +154,17 @@ M.mod_bigbluebuttonbn.broker = {
         }, this);
     },
 
-    recordingDelete: function(recordingid) {
+    recording_delete: function(recordingid) {
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recordingConfirmationMessage('delete', recordingid)
+            question: this.recording_confirmation_message('delete', recordingid)
         });
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.data_source.sendRequest({
+            this.datasource.sendRequest({
                 request: "action=recording_delete" + "&id=" + recordingid,
                 callback: {
                     success: function() {
@@ -180,88 +175,93 @@ M.mod_bigbluebuttonbn.broker = {
         }, this);
     },
 
-    recordingPublish: function(recordingid, meetingid) {
-        // Create the confirmation dialogue.
-        //var confirm = new M.core.confirm({
-        //    modal: true,
-        //    centered: true,
-        //    question: this.recordingConfirmationMessage('publish', recordingid)
-        //});
-        var data_source = this.data_source;
-        var ping_interval = this.ping_interval;
-        var polling = this.polling;
-
-        // If it is confirmed.
-        //confirm.on('complete-yes', function() {
-        this.data_source.sendRequest({
-            request: "action=recording_publish" + "&id=" + recordingid,
-            callback: {
-                success: function(e) {
-                    // Y.one('#recording-td-' + recordingid).remove();
-                    if (e.data.status === 'true') {
-                        var ping_data = {
-                            action: 'publish',
-                            meetingid: meetingid,
-                            recordingid: recordingid
-                        };
-                        // Start pooling until the action has been executed.
-                        polling = data_source.setInterval(
-                            ping_interval,
-                            M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
-                        );
-                    } else {
-                        var alert = new M.core.alert({
-                            message: e.data.message
-                        });
-                        alert.show();
-                    }
-                }
-            }
+    recording_publish: function(recordingid, meetingid) {
+        this.recording_perform({
+            action: 'publish',
+            recordingid: recordingid,
+            meetingid: meetingid,
+            goalstate: true
         });
-        //}, this);
     },
 
-    recordingUnpublish: function(recordingid, meetingid) {
+    recording_unpublish: function(recordingid, meetingid) {
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recordingConfirmationMessage('unpublish', recordingid)
+            question: this.recording_confirmation_message('unpublish', recordingid)
         });
-        var data_source = this.data_source;
-        var ping_interval = this.ping_interval;
-        var polling = this.polling;
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            data_source.sendRequest({
-                request: "action=recording_unpublish" + "&id=" + recordingid,
-                callback: {
-                    success: function(e) {
-                        if (e.data.status === 'true') {
-                            var ping_data = {
-                                action: 'unpublish',
-                                meetingid: meetingid,
-                                recordingid: recordingid
-                            };
-                            // Start pooling until the action has been executed.
-                            polling = data_source.setInterval(
-                                ping_interval,
-                                M.mod_bigbluebuttonbn.broker.pingRecordingObject(ping_data)
-                            );
-                        } else {
-                            var alert = new M.core.alert({
-                                message: e.data.message
-                            });
-                            alert.show();
-                        }
-                    }
-                }
+            this.recording_perform({
+                action: 'unpublish',
+                recordingid: recordingid,
+                meetingid: meetingid,
+                goalstate: false
             });
         }, this);
     },
 
-    recordingConfirmationMessage: function(action, recordingid) {
+    recording_perform: function(payload) {
+        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
+        this.datasource.sendRequest({
+            request: "action=recording_" + payload.action + "&id=" + payload.recordingid,
+            callback: {
+                success: function(e) {
+                    if (e.data.status === 'true') {
+                        return M.mod_bigbluebuttonbn.broker.recording_action_performed({
+                            attempt: 1,
+                            action: payload.action,
+                            meetingid: payload.meetingid,
+                            recordingid: payload.recordingid,
+                            goalstate: payload.goalstate
+                        });
+                    }
+
+                    var alert = new M.core.alert({
+                        message: e.data.message
+                    });
+                    alert.show();
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                },
+                failure: function() {
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                }
+            }
+        });
+    },
+
+    recording_action_performed: function(payload) {
+        console.info("Attempt " + payload.attempt);
+        this.datasource.sendRequest({
+            request: "action=recording_info&id=" + payload.recordingid + "&idx=" + payload.meetingid,
+            callback: {
+                success: function(e) {
+                    var currentstate = e.data.published;
+                    if (currentstate === payload.goalstate) {
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(payload);
+                    }
+
+                    if (payload.attempt < 5) {
+                        payload.attempt += 1;
+                        return setTimeout(((function() {
+                            return function() {
+                                M.mod_bigbluebuttonbn.broker.recording_action_performed(payload);
+                            };
+                        })(this)), (payload.attempt - 1) * 1000);
+                    }
+
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                },
+                failure: function() {
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                }
+            }
+        });
+    },
+
+    recording_confirmation_message: function(action, recordingid) {
 
         if (M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation'] === 'undefined') {
             return '';
@@ -276,7 +276,7 @@ M.mod_bigbluebuttonbn.broker = {
         confirmation = confirmation.replace("{$a}", recording_type);
 
         if (action === 'publish' || action === 'delete') {
-            //if it has associated links imported in a different course/activity, show a confirmation dialog
+            // If it has associated links imported in a different course/activity, show a confirmation dialog.
             var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
             var confirmation_warning = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation_warning_p'];
             if (associated_links == 1) {
@@ -289,66 +289,10 @@ M.mod_bigbluebuttonbn.broker = {
         return confirmation;
     },
 
-    pingRecordingObject: function(data) {
-        var btn_action = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
-        var btn_action_src_current = btn_action.getAttribute('src');
-        var btn_action_src_url = btn_action_src_current.substring(0, btn_action_src_current.length - 4);
-        btn_action.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
-        if (data.action == 'publish') {
-            btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.publishing);
-            btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.publishing);
-        } else {
-            btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.unpublishing);
-            btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.unpublishing);
-        }
-        var link_action = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
-        var link_action_current_onclick = link_action.getAttribute('onclick');
-        link_action.setAttribute('onclick', '');
-
-        return {
-            request: "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid,
-            callback: {
-                success: function(e) {
-                    if (e.data.status !== 'true') {
-                        clearInterval(this.polling);
-                        return;
-                    }
-
-                    if (data.action === 'publish' && e.data.published === 'true') {
-                        clearInterval(this.polling);
-                        btn_action.setAttribute('id', 'recording-btn-unpublish-' + data.recordingid);
-                        link_action.setAttribute('id', 'recording-link-unpublish-' + data.recordingid);
-                        btn_action.setAttribute('src', btn_action_src_url + 'hide');
-                        btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.unpublish);
-                        btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.unpublish);
-                        link_action.setAttribute('onclick', link_action_current_onclick.replace('publish', 'unpublish'));
-                        Y.one('#playbacks-' + data.recordingid).show();
-                        return;
-                    }
-
-                    if (data.action === 'unpublish' && e.data.published === 'false') {
-                        clearInterval(this.polling);
-                        btn_action.setAttribute('id', 'recording-btn-publish-' + data.recordingid);
-                        link_action.setAttribute('id', 'recording-link-publish-' + data.recordingid);
-                        btn_action.setAttribute('src', btn_action_src_url + 'show');
-                        btn_action.setAttribute('alt', M.mod_bigbluebuttonbn.locales.strings.publish);
-                        btn_action.setAttribute('title', M.mod_bigbluebuttonbn.locales.strings.publish);
-                        link_action.setAttribute('onclick', link_action_current_onclick.replace('unpublish', 'publish'));
-                        Y.one('#playbacks-' + data.recordingid).hide();
-                    }
-                },
-                failure: function() {
-                    clearInterval(this.polling);
-                }
-            }
-        };
-    },
-
-    endMeeting: function() {
-
+    end_meeting: function() {
         var qs = 'action=meeting_end&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.data_source.sendRequest({
+        this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {

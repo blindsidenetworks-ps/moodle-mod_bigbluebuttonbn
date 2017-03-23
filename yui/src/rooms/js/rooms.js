@@ -20,7 +20,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.rooms = {
 
-    data_source: null,
+    datasource: null,
     polling: null,
     bigbluebuttonbn: {},
     panel: null,
@@ -31,7 +31,7 @@ M.mod_bigbluebuttonbn.rooms = {
      * @method init
      */
     init: function(bigbluebuttonbn) {
-        this.data_source = new Y.DataSource.Get({
+        this.datasource = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
@@ -113,7 +113,7 @@ M.mod_bigbluebuttonbn.rooms = {
         var qs = 'action=meeting_info';
         qs += '&id=' + this.bigbluebuttonbn.meetingid;
         qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.data_source.sendRequest({
+        this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
@@ -236,7 +236,7 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
         Y.DOM.setAttribute(end_button_input, 'class', 'btn btn-secondary');
         if (status.can_end) {
-            Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.endMeeting();');
+            Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.end_meeting();');
         }
 
         return end_button_input;

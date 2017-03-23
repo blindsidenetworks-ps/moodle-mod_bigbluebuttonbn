@@ -220,7 +220,7 @@ function bigbluebuttonbn_get_meetings_array() {
     }
 
     if ($xml) {
-        // Either failutre or success without meetings.
+        // Either failure or success without meetings.
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
     }
 
@@ -255,7 +255,7 @@ function bigbluebuttonbn_get_meeting_info_array($meetingid) {
     }
 
     if ($xml) {
-        // Either failutre or success without meeting info.
+        // Either failure or success without meeting info.
         return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
     }
 
@@ -1021,9 +1021,12 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
         $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
 
         // Set date.
-        $starttime = isset($recording['startTime']) ? floatval($recording['startTime']) : 0;
+        $starttime = 0;
+        if (isset($recording['startTime'])) {
+            $starttime =  floatval($recording['startTime']);
+        }
+        $row->date = $starttime;
         $starttime = $starttime - ($starttime % 1000);
-        $row->date = floatval($recording['startTime']);
 
         // Set formatted date.
         $dateformat = get_string('strftimerecentfull', 'langconfig').' %Z';
@@ -1139,7 +1142,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording) {
 function bigbluebuttonbn_actionbar_render($manageaction, $managetag, $recording) {
     global $OUTPUT;
 
-    $onclick = 'M.mod_bigbluebuttonbn.broker.recordingAction("'.$manageaction.'", "'.
+    $onclick = 'M.mod_bigbluebuttonbn.broker.recording_action("'.$manageaction.'", "'.
         $recording['recordID'].'", "'.$recording['meetingID'].'");';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $manageaction.
@@ -1233,16 +1236,22 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
             $row->attributes['data-imported'] = 'false';
+            $texthead = '';
+            $texttail = '';
             if (isset($recording['imported'])) {
                 $row->attributes['data-imported'] = 'true';
                 $row->attributes['title'] = get_string('view_recording_link_warning', 'bigbluebuttonbn');
+                $texthead = '<em>';
+                $texttail = '</em>';
             }
 
             $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
             if ($rowdata != null) {
                 $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
-                $row->cells = array($rowdata->recording, $rowdata->activity, $rowdata->description,
-                    $rowdata->preview, $rowdata->date_formatted, $rowdata->duration_formatted);
+                $row->cells = array($texthead.$rowdata->recording.$texttail,
+                    $texthead.$rowdata->activity.$texttail, $texthead.$rowdata->description.$texttail,
+                    $rowdata->preview, $texthead.$rowdata->date_formatted.$texttail,
+                    $rowdata->duration_formatted);
                 if ($bbbsession['managerecordings']) {
                     $row->cells[] = $rowdata->actionbar;
                 }
