@@ -80,6 +80,9 @@ M.mod_bigbluebuttonbn.recordings = {
         if (data.action == 'publish') {
             text = M.mod_bigbluebuttonbn.locales.strings.publishing;
         }
+        if (data.action == 'delete') {
+            text = M.mod_bigbluebuttonbn.locales.strings.deleting;
+        }
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
         btn.setAttribute('data-osrc', btn.getAttribute('src'));
@@ -134,6 +137,10 @@ M.mod_bigbluebuttonbn.recordings = {
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
         link.setAttribute('onclick', link.getAttribute('data-oonlcick'));
+    }
+
+    recording_delete_completed: function(data) {
+        Y.one('#recording-td-' + data.recordingid).remove();
     }
 
 };

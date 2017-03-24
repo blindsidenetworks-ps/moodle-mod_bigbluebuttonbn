@@ -380,7 +380,7 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
         }
     }
     // Second: Execute the real delete.
-    bigbluebuttonbn_delete_recordings($params['id']);
+    //bigbluebuttonbn_delete_recordings($params['id']);
 
     $response = array('status' => 'true');
     return $response;

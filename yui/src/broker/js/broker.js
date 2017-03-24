@@ -118,7 +118,7 @@ M.mod_bigbluebuttonbn.broker = {
         }
 
         if (action === 'delete') {
-            this.recording_delete(recordingid);
+            this.recording_delete(recordingid, meetingid);
             return;
         }
 
@@ -154,7 +154,7 @@ M.mod_bigbluebuttonbn.broker = {
         }, this);
     },
 
-    recording_delete: function(recordingid) {
+    recording_delete: function(recordingid, meetingid) {
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
@@ -164,19 +164,17 @@ M.mod_bigbluebuttonbn.broker = {
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.datasource.sendRequest({
-                request: "action=recording_delete" + "&id=" + recordingid,
-                callback: {
-                    success: function() {
-                        Y.one('#recording-td-' + recordingid).remove();
-                    }
-                }
+            this.recording_action_perform({
+                action: 'delete',
+                recordingid: recordingid,
+                meetingid: meetingid,
+                goalstate: 'false'
             });
         }, this);
     },
 
     recording_publish: function(recordingid, meetingid) {
-        this.recording_perform({
+        this.recording_action_perform({
             action: 'publish',
             recordingid: recordingid,
             meetingid: meetingid,
@@ -194,7 +192,7 @@ M.mod_bigbluebuttonbn.broker = {
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.recording_perform({
+            this.recording_action_perform({
                 action: 'unpublish',
                 recordingid: recordingid,
                 meetingid: meetingid,
@@ -203,7 +201,7 @@ M.mod_bigbluebuttonbn.broker = {
         }, this);
     },
 
-    recording_perform: function(payload) {
+    recording_action_perform: function(payload) {
         M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
         this.datasource.sendRequest({
             request: "action=recording_" + payload.action + "&id=" + payload.recordingid,
@@ -237,7 +235,14 @@ M.mod_bigbluebuttonbn.broker = {
             request: "action=recording_info&id=" + payload.recordingid + "&idx=" + payload.meetingid,
             callback: {
                 success: function(e) {
-                    var currentstate = e.data.published;
+                    var currentstate = M.mod_bigbluebuttonbn.broker.recording_current_state(
+                        payload.action, e.data
+                    );
+
+                    if (currentstate === 'undefined' || currentstate === null) {
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    }
+
                     if (currentstate === payload.goalstate) {
                         return M.mod_bigbluebuttonbn.recordings.recording_action_completed(payload);
                     }
@@ -258,6 +263,20 @@ M.mod_bigbluebuttonbn.broker = {
                 }
             }
         });
+    },
+
+    recording_current_state: function(action, data) {
+        if (action === 'publish' || action === 'upublish') {
+            return data.status;
+        }
+
+        if (action === 'delete') {
+            return data.published;
+        }
+
+        if (action === 'protect' || action === 'uprotect') {
+            return data.secure;
+        }
     },
 
     recording_confirmation_message: function(action, recordingid) {
