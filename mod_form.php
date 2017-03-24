@@ -58,10 +58,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 array('id' => $cm->instance), '*', MUST_EXIST);
         }
 
-
         $context = context_course::instance($course->id);
         $pixicondeleteurl = ''.$OUTPUT->pix_url('t/delete', 'moodle');
-
 
         // UI configuration options.
         $cfg = bigbluebuttonbn_get_cfg_options();

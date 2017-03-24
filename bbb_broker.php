@@ -87,31 +87,33 @@ try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
     if ($a == 'meeting_info') {
-        echo bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
+        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
+        echo meetinginfo;
         return;
     }
 
     if ($a == 'meeting_end') {
-        echo bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        echo $meetingend;
         return;
     }
 
     if ($a == 'recording_links') {
-        echo bigbluebuttonbn_broker_recording_links($bbbsession, $params);
+        $recordinglinks = bigbluebuttonbn_broker_recording_links($bbbsession, $params);
+        echo $recordinglinks;
         return;
     }
 
     if ($a == 'recording_info') {
-        $recording_info = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
-        error_log(json_encode($recording_info));
-        echo $recording_info;
+        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
+        echo $recordinginfo;
         return;
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
-        $recording_action = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
-        error_log(json_encode($recording_action));
-        echo $recording_action;
+        $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom,
+                                                                   $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        echo $recordingaction;
         return;
     }
 
@@ -480,10 +482,10 @@ function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {
 
 function bigbluebuttonbn_broker_validate_parameters($params) {
 
-    $required_params = [
+    $requiredparams = [
         'server_ping' => ['id' => 'The meetingID must be specified.'],
         'meeting_info' => ['id' => 'The meetingID must be specified.'],
-        'meeting_end' => ['id'=> 'The meetingID must be specified.'],
+        'meeting_end' => ['id' => 'The meetingID must be specified.'],
         'recording_info' => ['id' => 'The recordingID must be specified.'],
         'recording_links' => ['id' => 'The recordingID must be specified.'],
         'recording_publish' => ['id' => 'The recordingID must be specified.'],
@@ -507,11 +509,11 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
     }
 
     $action = strtolower($params['action']);
-    if (!array_key_exists($action, $required_params)) {
+    if (!array_key_exists($action, $requiredparams)) {
         return 'Action '.$params['action'].' can not be performed.';
     }
 
-    foreach ($required_params[$action] as $param => $message) {
+    foreach ($requiredparams[$action] as $param => $message) {
         if (!array_key_exists($param, $params) || empty($params[$param])) {
             return $message;
         }

@@ -339,15 +339,15 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     }
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
+    /*
     // Check if array is not sequential.
-    //error_log(json_encode($recordsimported));
-    //if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
-    //    // The response contains a single record and needs to be converted to a sequential array format.
-    //    error_log(json_encode((array)$recordsimported));
-    //    $key = array_keys($recordsimported);
-    //    $recordsimported = array($key => $recordsimported[$key]);
-    //}
-    //error_log(json_encode($recordsimported));
+    if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
+        // The response contains a single record and needs to be converted to a sequential array format.
+        error_log(json_encode((array)$recordsimported));
+        $key = array_keys($recordsimported);
+        $recordsimported = array($key => $recordsimported[$key]);
+    }
+    */
 
     $recordsimportedarray = array();
     foreach ($recordsimported as $recordimported) {
@@ -509,7 +509,6 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     $data = null, $contenttype = 'text/xml') {
 
     //debugging('Request to: '.$url, DEBUG_DEVELOPER);
-    //error_log('Request to: '.$url);
 
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
@@ -520,7 +519,6 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
         }
 
         //debugging('Response: '.$response, DEBUG_DEVELOPER);
-        //error_log('Response: '.$response);
 
         $previous = libxml_use_internal_errors(true);
         try {
