@@ -168,10 +168,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
         $initialmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
         $canjoin = true;
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            $initialmessage = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
-            if ($bbbsession['wait']) {
-                $initialmessage .= ' '.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-            }
+            $initialmessage .= ' '.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
             $canjoin = false;
         }
 

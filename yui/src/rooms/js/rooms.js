@@ -21,9 +21,9 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.rooms = {
 
     datasource: null,
-    polling: null,
     bigbluebuttonbn: {},
     panel: null,
+    pinginterval: 10000,
 
     /**
      * Initialise the broker code.
@@ -35,6 +35,7 @@ M.mod_bigbluebuttonbn.rooms = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
+        this.pinginterval = bigbluebuttonbn.ping_interval;
 
         if (this.bigbluebuttonbn.profile_features.includes('all') || this.bigbluebuttonbn.profile_features.includes('showroom')) {
             this.init_room();
@@ -110,11 +111,10 @@ M.mod_bigbluebuttonbn.rooms = {
         var control_panel = Y.one('#control_panel');
         var join_button = Y.one('#join_button');
         var end_button = Y.one('#end_button');
-        var qs = 'action=meeting_info';
-        qs += '&id=' + this.bigbluebuttonbn.meetingid;
-        qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
+        var id = this.bigbluebuttonbn.meetingid;
+        var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
         this.datasource.sendRequest({
-            request: qs,
+            request: 'action=meeting_info&id=' + id + '&bigbluebuttonbn=' + bnid,
             callback: {
                 success: function(e) {
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
@@ -124,6 +124,12 @@ M.mod_bigbluebuttonbn.rooms = {
                     }
                     if (typeof e.data.status.can_end != 'undefined' && e.data.status.can_end) {
                         Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.rooms.init_end_button(e.data.status));
+                    }
+                    if (!e.data.status.can_join) {
+                        M.mod_bigbluebuttonbn.rooms.wait_moderator({
+                            id: id,
+                            bnid: bnid
+                        });
                     }
                 }
             }
@@ -215,17 +221,25 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
         Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
 
-        if (!status.can_join) {
-            Y.DOM.setAttribute(join_button_input, 'disabled', true);
-            M.mod_bigbluebuttonbn.broker.waitModerator(status.join_url);
-            return join_button_input;
-        }
-
         var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
         input_html += status.join_url + '\', \'' + M.util.get_string('view_message_conference_in_progress',
             'bigbluebuttonbn');
         input_html += '\', ' + status.can_tag + ');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
+
+        if (!status.can_join) {
+            // Disable join button.
+            Y.DOM.setAttribute(join_button_input, 'disabled', true);
+            var status_bar_span = Y.one('#status_bar_span');
+            // Create a img element.
+            var spinning_wheel = Y.DOM.create('<img>');
+            Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
+            Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing16.gif');
+            // Add the spinning wheel.
+            Y.DOM.addHTML(status_bar_span, '&nbsp;');
+            Y.DOM.addHTML(status_bar_span, spinning_wheel);
+        }
+
         return join_button_input;
     },
 
@@ -295,6 +309,30 @@ M.mod_bigbluebuttonbn.rooms = {
             opener.M.mod_bigbluebuttonbn.rooms.remote_update(5000);
         };
         window.close();
+    },
+
+    wait_moderator: function(payload) {
+        console.info("Ping................");
+        this.datasource.sendRequest({
+            request: "action=meeting_info&id=" + payload.id + "&bigbluebuttonbn=" + payload.bnid,
+            callback: {
+                success: function(e) {
+                    if (e.data.running) {
+                        M.mod_bigbluebuttonbn.rooms.clean_room();
+                        M.mod_bigbluebuttonbn.rooms.update_room();
+                    }
+
+                    return setTimeout(((function() {
+                        return function() {
+                            M.mod_bigbluebuttonbn.rooms.wait_moderator(payload);
+                        };
+                    })(this)), M.mod_bigbluebuttonbn.rooms.pinginterval);
+                },
+                failure: function(e) {
+                    payload.message = e.error.message;
+                }
+            }
+        });
     }
 
 };

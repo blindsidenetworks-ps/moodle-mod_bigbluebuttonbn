@@ -23,7 +23,6 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.broker = {
 
     datasource: null,
-    polling: null,
     bigbluebuttonbn: {},
 
     /**
@@ -38,44 +37,11 @@ M.mod_bigbluebuttonbn.broker = {
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
 
-    waitModerator: function() {
-
-        // Show the spinning wheel.
-        var status_bar_span = Y.one('#status_bar_span');
-        // Create a img element.
-        var spinning_wheel = Y.DOM.create('<img>');
-        Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
-        Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing16.gif');
-        // Add the spinning wheel.
-        Y.DOM.addHTML(status_bar_span, '&nbsp;');
-        Y.DOM.addHTML(status_bar_span, spinning_wheel);
-
-        // Start the ping.
-        var qs = 'action=meeting_info';
-        qs += '&id=' + this.bigbluebuttonbn.meetingid;
-        qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.polling = this.datasource.setInterval(this.bigbluebuttonbn.ping_interval, {
-            request: qs,
-            callback: {
-                success: function(e) {
-                    if (e.data.running) {
-                        clearInterval(this.polling);
-                        M.mod_bigbluebuttonbn.rooms.clean_room();
-                        M.mod_bigbluebuttonbn.rooms.update_room();
-                    }
-                },
-                failure: function() {
-                    clearInterval(this.polling);
-                }
-            }
-        });
-    },
-
     join: function(join_url, status_message, can_tag) {
         var qs = '';
 
         if (!can_tag) {
-            M.mod_bigbluebuttonbn.broker.joinRedirect(join_url);
+            M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
             return;
         }
 

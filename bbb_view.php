@@ -60,6 +60,7 @@ require_login($course, true, $cm);
 if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
+
 switch (strtolower($action)) {
     case 'logout':
         if (isset($errors) && $errors != '') {
@@ -128,14 +129,13 @@ switch (strtolower($action)) {
             break;
         }
 
-
         // Moodle event logger: Create an event for meeting created.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $cm);
         // Internal logger: Insert a record with the meeting created.
         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
         // Since the meeting is already running, we just join the session.
-        break;
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
+        break;
     default:
         bigbluebutton_bbb_view_close_window();
 }
