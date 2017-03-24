@@ -244,13 +244,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $showroom = (in_array('all', $features) || in_array('showroom', $features));
     $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
     $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
-
-    // JavaScript for locales.
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-locales', 'M.mod_bigbluebuttonbn.locales.init',
-        array('strings' => bigbluebuttonbn_get_locales_for_view())
-      );
-
-    // JavaScript variables.
     $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() * 1000;
     if ($pinginterval == 0) {
         $pinginterval = 15000;
@@ -258,6 +251,13 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $lang = get_string('locale', 'core_langconfig');
     $locale = substr($lang, 0, strpos($lang, '.'));
     $localecode = substr($locale, 0, strpos($locale, '_'));
+
+    // JavaScript for locales.
+    $stringman = get_string_manager();
+    $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
+    $PAGE->requires->strings_for_js(array_keys($strings), 'bigbluebuttonbn');
+
+    // JavaScript variables.
     $jsvars = array(
         'activity' => $activity,
         'ping_interval' => $pinginterval,

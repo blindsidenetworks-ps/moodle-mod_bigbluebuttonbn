@@ -370,17 +370,17 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
     }
 
     // As the recordingid was not identified as imported recording link, execute delete on a real recording.
-    // First: Delete imported links associated to the recording.
+    // Delete imported links associated to the recording.
     $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
 
     if ($importedall > 0) {
         foreach (array_keys($importedall) as $key) {
-            // Execute delete.
+            // Execute delete on imported links.
             $DB->delete_records('bigbluebuttonbn_logs', array('id' => $key));
         }
     }
-    // Second: Execute the real delete.
-    //bigbluebuttonbn_delete_recordings($params['id']);
+    // Execute the actual delete.
+    bigbluebuttonbn_delete_recordings($params['id']);
 
     $response = array('status' => 'true');
     return $response;
