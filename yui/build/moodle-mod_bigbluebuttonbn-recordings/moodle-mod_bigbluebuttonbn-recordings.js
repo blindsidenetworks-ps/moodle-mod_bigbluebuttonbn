@@ -78,12 +78,12 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_action_inprocess: function(data) {
         // console.info("action " + data.action + " in process");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
-        var text = M.mod_bigbluebuttonbn.locales.strings.unpublishing;
+        var text = M.util.get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn');
         if (data.action == 'publish') {
-            text = M.mod_bigbluebuttonbn.locales.strings.publishing;
+            text = M.util.get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn');
         }
         if (data.action == 'delete') {
-            text = M.mod_bigbluebuttonbn.locales.strings.deleting;
+            text = M.util.get_string('view_recording_list_actionbar_deleting', 'bigbluebuttonbn');
         }
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
@@ -104,13 +104,13 @@ M.mod_bigbluebuttonbn.recordings = {
 
         var action = 'publish';
         var linkaction = 'show';
-        var text = M.mod_bigbluebuttonbn.locales.strings.publish;
+        var text = M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
         Y.one('#playbacks-' + data.recordingid).hide();
         Y.one('#preview-' + data.recordingid).hide();
         if (data.action === 'publish') {
             action = 'unpublish';
             linkaction = 'hide';
-            text = M.mod_bigbluebuttonbn.locales.strings.unpublish;
+            text = M.util.get_string('view_recording_list_actionbar_unpublish', 'bigbluebuttonbn');
             Y.one('#playbacks-' + data.recordingid).show();
             Y.one('#preview-' + data.recordingid).show();
         }
@@ -125,12 +125,18 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_action_failed: function(data) {
         // console.info("action " + data.action + " failed");
+        var alert = new M.core.alert({
+            title: M.util.get_string('error', 'moodle'),
+            message: data.message
+        });
+        alert.show();
+
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
 
-        var text = M.mod_bigbluebuttonbn.locales.strings.unpublish;
+        var text = M.util.get_string('view_recording_list_actionbar_unpublish', 'bigbluebuttonbn');
         if (data.action === 'publish') {
-            text = M.mod_bigbluebuttonbn.locales.strings.publish;
+            text = M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
         }
 
         btn.setAttribute('id', 'recording-btn-' + data.action + '-' + data.recordingid);
@@ -139,7 +145,7 @@ M.mod_bigbluebuttonbn.recordings = {
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
         link.setAttribute('onclick', link.getAttribute('data-oonlcick'));
-    }
+    },
 
     recording_delete_completed: function(data) {
         Y.one('#recording-td-' + data.recordingid).remove();

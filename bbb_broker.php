@@ -88,7 +88,7 @@ try {
     $a = strtolower($params['action']);
     if ($a == 'meeting_info') {
         $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
-        echo meetinginfo;
+        echo $meetinginfo;
         return;
     }
 

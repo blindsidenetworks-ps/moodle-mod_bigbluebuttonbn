@@ -45,7 +45,7 @@ M.mod_bigbluebuttonbn.rooms = {
 
     init_room: function() {
         if (this.bigbluebuttonbn.activity !== 'open') {
-            var status_bar = [M.mod_bigbluebuttonbn.locales.strings.conference_ended];
+            var status_bar = [M.util.get_string('view_message_conference_has_ended', 'bigbluebuttonbn')];
             if (this.bigbluebuttonbn.activity !== 'ended') {
                 status_bar.push(this.bigbluebuttonbn.opening);
                 status_bar.push(this.bigbluebuttonbn.closing);
@@ -60,7 +60,7 @@ M.mod_bigbluebuttonbn.rooms = {
         // Create the main modal form.
         this.panel = new Y.Panel({
             srcNode: '#panelContent',
-            headerContent: M.mod_bigbluebuttonbn.locales.strings.modal_title,
+            headerContent: M.util.get_string('view_recording_modal_title', 'bigbluebuttonbn'),
             width: 250,
             zIndex: 5,
             centered: true,
@@ -72,7 +72,7 @@ M.mod_bigbluebuttonbn.rooms = {
 
         // Define the apply function - this will be called when 'Apply' is pressed in the modal form.
         this.panel.addButton({
-            value: M.mod_bigbluebuttonbn.locales.strings.modal_button,
+            value: M.util.get_string('view_recording_modal_button', 'bigbluebuttonbn'),
             section: Y.WidgetStdMod.FOOTER,
             action: function(e) {
                 e.preventDefault();
@@ -174,19 +174,19 @@ M.mod_bigbluebuttonbn.rooms = {
         var date = new Date(start_timestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var started_at = M.mod_bigbluebuttonbn.locales.strings.started_at;
+        var started_at = M.util.get_string('view_message_session_started_at', 'bigbluebuttonbn');
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
     msg_attendees_in: function(moderators, participants) {
 
         if (typeof participants == 'undefined' || participants === 0) {
-            return M.mod_bigbluebuttonbn.locales.strings.session_no_users + '.';
+            return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
 
-        var msg = M.mod_bigbluebuttonbn.locales.strings.session_has_users;
-        var msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderators;
-        var msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewers;
+        var msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
+        var msg_moderators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
+        var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
 
         if (participants == 1) {
             if (moderators > 0) {
@@ -199,11 +199,11 @@ M.mod_bigbluebuttonbn.rooms = {
         var viewers = participants - moderators;
 
         if (moderators == 1) {
-            msg_moderators = M.mod_bigbluebuttonbn.locales.strings.moderator;
+            msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
         }
 
         if (moderators == 1) {
-            msg_viewers = M.mod_bigbluebuttonbn.locales.strings.viewer;
+            msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
         }
 
         return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
@@ -224,7 +224,8 @@ M.mod_bigbluebuttonbn.rooms = {
         }
 
         var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
-        input_html += status.join_url + '\', \'' + M.mod_bigbluebuttonbn.locales.strings.in_progress;
+        input_html += status.join_url + '\', \'' + M.util.get_string('view_message_conference_in_progress',
+            'bigbluebuttonbn');
         input_html += '\', ' + status.can_tag + ');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
         return join_button_input;

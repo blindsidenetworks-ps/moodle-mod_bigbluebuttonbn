@@ -90,7 +90,8 @@ M.mod_bigbluebuttonbn.broker = {
                         Y.one('#meeting_message').set('value', e.data.status.message);
                         // Show error message.
                         var alert = new M.core.alert({
-                            message: 'Something went wrong, the meeting is not running.'
+                            title: M.util.get_string('error', 'moodle'),
+                            message: M.util.get_string('view_error_meeting_not_running', 'bigbluebuttonbn')
                         });
                         alert.show();
                         return;
@@ -217,13 +218,11 @@ M.mod_bigbluebuttonbn.broker = {
                         });
                     }
 
-                    var alert = new M.core.alert({
-                        message: e.data.message
-                    });
-                    alert.show();
+                    payload.message = e.data.message;
                     return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                 },
-                failure: function() {
+                failure: function(e) {
+                    payload.message = e.error.message;
                     return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                 }
             }
@@ -239,7 +238,8 @@ M.mod_bigbluebuttonbn.broker = {
                         payload.action, e.data
                     );
 
-                    if (currentstate === 'undefined' || currentstate === null) {
+                    if (typeof currentstate == "undefined" || currentstate === null) {
+                        payload.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
                         return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                     }
 
@@ -256,9 +256,11 @@ M.mod_bigbluebuttonbn.broker = {
                         })(this)), (payload.attempt - 1) * 1000);
                     }
 
+                    payload.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
                     return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                 },
-                failure: function() {
+                failure: function(e) {
+                    payload.message = e.error.message;
                     return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                 }
             }
@@ -266,39 +268,42 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_current_state: function(action, data) {
-        if (action === 'publish' || action === 'upublish') {
-            return data.status;
-        }
-
-        if (action === 'delete') {
+        if (action === 'publish' || action === 'unpublish') {
             return data.published;
         }
 
-        if (action === 'protect' || action === 'uprotect') {
+        if (action === 'delete') {
+            return data.status;
+        }
+
+        if (action === 'protect' || action === 'unprotect') {
             return data.secure;
         }
     },
 
     recording_confirmation_message: function(action, recordingid) {
 
-        if (M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation'] === 'undefined') {
+        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
+        if (confirmation === 'undefined') {
             return '';
         }
+
         var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
-        var recording_type = M.mod_bigbluebuttonbn.locales.strings.recording;
+        var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (is_imported_link) {
-            recording_type = M.mod_bigbluebuttonbn.locales.strings.recording_link;
+            recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
 
-        var confirmation = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation'];
         confirmation = confirmation.replace("{$a}", recording_type);
 
         if (action === 'publish' || action === 'delete') {
             // If it has associated links imported in a different course/activity, show a confirmation dialog.
             var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-            var confirmation_warning = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation_warning_p'];
+            var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
+                'bigbluebuttonbn');
             if (associated_links == 1) {
-                confirmation_warning = M.mod_bigbluebuttonbn.locales.strings[action + '_confirmation_warning_s'];
+                confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
+                    'bigbluebuttonbn');
             }
             confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
             confirmation = confirmation_warning + '\n\n' + confirmation;

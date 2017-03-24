@@ -354,3 +354,7 @@ $string['email_body_recording_ready_for'] = 'Recording for';
 $string['email_body_recording_ready_is_ready'] = 'is ready';
 $string['email_footer_sent_by'] = 'This automatic notification message was sent by';
 $string['email_footer_sent_from'] = 'from the course';
+
+$string['view_error_meeting_not_running'] = 'Something went wrong, the meeting is not running.';
+$string['view_error_current_state_not_found'] = 'Current state could not be found';
+$string['view_error_action_not_completed'] = 'Action could not be completed';
