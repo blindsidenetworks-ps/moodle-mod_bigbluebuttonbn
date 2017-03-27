@@ -113,12 +113,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             json_encode(bigbluebuttonbn_get_roles_select($roles)).', "user": '.
             json_encode(bigbluebuttonbn_get_users_select($users)).'}');
         $jsvars['participant_list'] = $participantlist;
-        $PAGE->requires->data_for_js('bigbluebuttonbn', $jsvars);
-        $jsmodule = array(
-            'name' => 'mod_bigbluebuttonbn',
-            'fullpath' => '/mod/bigbluebuttonbn/mod_form.js',
-        );
-        $PAGE->requires->js_init_call('M.mod_bigbluebuttonbn.mod_form_init', array(), false, $jsmodule);
+        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
+            'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
+
     }
 
     public function data_preprocessing(&$defaultvalues) {
@@ -160,7 +157,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ($cfg['instance_type_enabled']) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
                 bigbluebuttonbn_get_instance_profiles_array($data['instance_type_profiles']),
-                array('onchange' => 'M.mod_bigbluebuttonbn.mod_form_update_instance_type_profile(this);'));
+                array('onchange' => 'M.mod_bigbluebuttonbn.modform.update_instance_type_profile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
 
             return;
@@ -320,13 +317,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             html_writer::select($participantselection['type_options'], 'bigbluebuttonbn_participant_selection_type',
                 $participantselection['type_selected'], array(),
                 array('id' => 'bigbluebuttonbn_participant_selection_type',
-                      'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_selection_set(); return 0;')).'&nbsp;&nbsp;'.
+                      'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;')).'&nbsp;&nbsp;'.
             html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
                 $participantselection['selected'], array(),
                 array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')).'&nbsp;&nbsp;'.
             '<input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').
             '" class="btn btn-secondary" type="button" id="id_addselectionid" '.
-            'onclick="M.mod_bigbluebuttonbn.mod_form_participant_add(); return 0;" />'
+            'onclick="M.mod_bigbluebuttonbn.modform.participant_add(); return 0;" />'
         );
 
         $mform->addElement('html', "\n\n");
@@ -376,13 +373,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                     'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
                     $optionselected, array(),
                     array('id' => 'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
-                          'onchange' => 'M.mod_bigbluebuttonbn.mod_form_participant_list_role_update(\''.
+                          'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_list_role_update(\''.
                               $participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;',
                     )
                 )
             );
             $col3 = new html_table_cell();
-            $onclick = 'M.mod_bigbluebuttonbn.mod_form_participant_remove(\''.
+            $onclick = 'M.mod_bigbluebuttonbn.modform.participant_remove(\''.
                 $participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
             // With text for delete.
             $col3->text = html_writer::tag('a', '<b>x</b>', ['class' => 'btn action_icon',
