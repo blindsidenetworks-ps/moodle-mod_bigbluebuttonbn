@@ -121,6 +121,8 @@ M.mod_bigbluebuttonbn.modform = {
                 participant_list_table.deleteRow(i);
             }
         }
+
+        // Update in the form.
         this.participant_list_update();
     },
 
@@ -141,6 +143,9 @@ M.mod_bigbluebuttonbn.modform = {
 
         // Add it to the form.
         this.participant_add_to_form(selection_type, selection);
+
+        // Update in the form.
+        this.participant_list_update();
     },
 
     participant_add_to_memory: function(selection_type, selection) {
