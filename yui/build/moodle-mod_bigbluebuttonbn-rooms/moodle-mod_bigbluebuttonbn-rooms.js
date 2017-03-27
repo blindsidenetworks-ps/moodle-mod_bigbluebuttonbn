@@ -209,7 +209,7 @@ M.mod_bigbluebuttonbn.rooms = {
             msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
         }
 
-        if (moderators == 1) {
+        if (viewers == 1) {
             msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
         }
 

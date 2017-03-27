@@ -139,55 +139,50 @@ try {
 
 function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
-    $meetinginfo = bigbluebuttonbn_get_meeting_info($params['id']);
+    $callbackresponse = array();
 
-    $meetingrunning = false;
-    if ($meetinginfo['returncode'] == 'SUCCESS') {
-        $meetingrunning = bigbluebuttonbn_is_meeting_running($meetinginfo['meetingID']);
+    $info = bigbluebuttonbn_get_meeting_info($params['id']);
+    $callbackresponse['info'] = $info;
+
+    $running = false;
+    if ($info['returncode'] == 'SUCCESS') {
+        $running = bigbluebuttonbn_is_meeting_running($info['meetingID']);
     }
+    $callbackresponse['running'] = $running;
 
-    $statuscanjoin = '"can_join": false';
-    $statuscanend = '"can_end": false';
-    $statuscantag = '"can_tag": false';
-    if ($meetingrunning) {
-        $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $initialmessage = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-        $canjoin = false;
-        if ($bbbsession['userlimit'] == 0 || $meetinginfo->participantCount < $bbbsession['userlimit']) {
-            $initialmessage = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-            $canjoin = true;
+    $status = array();
+    $status["join_url"] = $bbbsession['joinURL'];
+    $status["join_button_text"] = get_string('view_conference_action_join', 'bigbluebuttonbn');
+    $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
+    $status["can_join"] = false;
+    $status["can_end"] = false;
+    $status["can_tag"] = false;
+    if ($running) {
+        $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+        if ($bbbsession['userlimit'] == 0 || $info->participantCount < $bbbsession['userlimit']) {
+            $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+            $status["can_join"] = true;
         }
 
         if ($bbbsession['administrator'] || $bbbsession['moderator']) {
-            $endbuttontext = get_string('view_conference_action_end', 'bigbluebuttonbn');
-            $statuscanend = '"can_end": true, "end_button_text": "'.$endbuttontext.'"';
+            $status["can_end"] = true;
         }
     } else {
         // If user is administrator, moderator or if is viewer and no waiting is required.
-        $joinbuttontext = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $initialmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-        $canjoin = true;
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            $initialmessage .= ' '.get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-            $canjoin = false;
+        $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+        if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
+            $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+            $status["can_join"] = true;
         }
 
-        $cantag = false;
         if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
-            $cantag = true;
+            $status["can_tag"] = true;
         }
-        $statuscantag = '"can_tag": '.($cantag ? 'true' : 'false');
     }
-    $statuscanjoin = '"can_join": '.($canjoin ? 'true' : 'false');
-    return $params['callback'].'({"running": '.($meetingrunning ? 'true' : 'false').
-                              ',"info": '.json_encode($meetinginfo).
-                              ',"status": {'.'"join_url": "'.$bbbsession['joinURL'].'", '.
-                                             '"join_button_text": "'.$joinbuttontext.'", '.
-                                             '"message": "'.$initialmessage.'", '.
-                                             $statuscanjoin.', '.
-                                             $statuscanend.', '.
-                                             $statuscantag.
-                                          '}});';
+    $callbackresponse['status'] = $status;
+
+    $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebuttonbn, $cm) {
@@ -196,6 +191,8 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebutton
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
+
+    $callbackresponse = array('status' => true);
 
     // Execute the end command.
     bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
@@ -206,7 +203,8 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebutton
     // Update the cache.
     bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_FORCED);
 
-    return $params['callback'].'({"status": true});';
+    $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
@@ -216,12 +214,15 @@ function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
         return;
     }
 
-    $out = $params['callback'].'({"status": "false"});';
+    $callbackresponse = array('status' => false);
+
     if (isset($params['id']) && $params['id'] != '') {
         $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-        $out = $params['callback'].'({"status": "true", "links": '.count($importedall).'});';
+        $callbackresponse['status'] = true;
+        $callbackresponse['links'] = count($importedall);
     }
-    return $out;
+    $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) {
@@ -231,32 +232,36 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         return;
     }
 
-    // Retrieve the array of imported recordings.
+    $callbackresponse = array('status' => false);
+
+    $courseid = $bbbsession['course']->id;
     $bigbluebuttonbnid = null;
     if ($showroom) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
-    $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
-        $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
-    if (isset($recordings[$params['id']])) {
+    $include_deleted = $bbbsession['bigbluebuttonbn']->recordings_deleted_activities;
+    // Retrieve the array of imported recordings.
+    $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $showroom, $include_deleted);
+    if (array_key_exists($params['id'], $recordings)) {
         // Look up for an update on the imported recording.
-        $recording = $recordings[$params['id']];
-        $out = $params['callback'].'({ "status": "false" });';
-        if (isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {
+        if (!array_key_exists('messageKey', $recordings[$params['id']])) {
             // The recording was found.
-            $out = $params['callback'].'({"status": "true", "published": "'.$recording['published'].'"});';
+            $callbackresponse['status'] = true;
+            $callbackresponse['published'] = $recordings[$params['id']]['published'];
         }
-        return $out;
+        $callbackresponsedata = json_encode($callbackresponse);
+        return "{$params['callback']}({$callbackresponsedata});";
     }
 
     // As the recordingid was not identified as imported recording link, look up for a real recording.
-    $recording = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
-    $out = $params['callback'].'({"status": "false"});';
-    if (isset($recording) && !empty($recording) && array_key_exists($params['id'], $recording)) {
+    $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+    if (array_key_exists($params['id'], $recordings)) {
         // The recording was found.
-        $out = $params['callback'].'({"status": "true", "published": "'.$recording[$params['id']]['published'].'"});';
+        $callbackresponse['status'] = true;
+        $callbackresponse['published'] = $recordings[$params['id']]['published'];
     }
-    return $out;
+    $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm) {
@@ -267,7 +272,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     }
 
     $callbackresponse = array();
-    $callbackresponse['status'] = 'false';
+    $callbackresponse['status'] = false;
     $eventlog = null;
 
     // Retrieve array of recordings that includes real and imported.
@@ -294,7 +299,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
             break;
     }
 
-    if (isset($bigbluebuttonbn) && $callbackresponse['status'] === 'true') {
+    if (isset($bigbluebuttonbn) && $callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
         bigbluebuttonbn_event_log($eventlog, $bigbluebuttonbn, $cm);
     }
@@ -305,13 +310,13 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
 
-    $status = 'true';
+    $status = true;
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         // Execute publish on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array($recordings[$params['id']]['meetingID'],
                                                              $recordings[$params['id']]['recordID']);
-        $status = $realrecordings[$params['id']]['published'];
-        if ($status === 'true') {
+        $status = ($realrecordings[$params['id']]['published'] === 'true');
+        if ($status) {
             // Only if the physical recording is published, execute publish on imported recording link.
             bigbluebuttonbn_publish_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, true);
         }
@@ -321,7 +326,7 @@ function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $
     }
 
     $response = array('status' => $status);
-    if ($status === 'false') {
+    if (!$status) {
         $response['message'] = get_string('view_recording_publish_link_error', 'bigbluebuttonbn');
     }
     return $response;
@@ -333,7 +338,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         // Execute unpublish on imported recording link.
         bigbluebuttonbn_publish_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, false);
-        return array('status' => 'true');
+        return array('status' => true);
     }
 
     // As the recordingid was not identified as imported recording link, execute unpublish on a real recording.
@@ -353,7 +358,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
     }
     // Second: Execute the real unpublish.
     bigbluebuttonbn_publish_recordings($params['id'], 'false');
-    $response = array('status' => 'true');
+    $response = array('status' => true);
     return $response;
 }
 
@@ -363,7 +368,7 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         // Execute delete on imported recording link.
         bigbluebuttonbn_delete_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id);
-        return array('status' => 'true');
+        return array('status' => true);
     }
 
     // As the recordingid was not identified as imported recording link, execute delete on a real recording.
@@ -379,7 +384,7 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
     // Execute the actual delete.
     bigbluebuttonbn_delete_recordings($params['id']);
 
-    $response = array('status' => 'true');
+    $response = array('status' => true);
     return $response;
 }
 
@@ -439,7 +444,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
     }
 
-    $callbackresponse['status'] = 'true';
+    $callbackresponse['status'] = true;
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
