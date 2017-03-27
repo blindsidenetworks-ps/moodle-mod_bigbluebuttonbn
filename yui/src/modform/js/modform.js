@@ -105,25 +105,35 @@ M.mod_bigbluebuttonbn.modform = {
         participant_list.value = JSON.stringify(this.bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
     },
 
-    participant_remove: function(type, id) {
+    participant_remove: function(selection_type_value, selection_value) {
         // Remove from memory.
-        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == type &&
-                this.bigbluebuttonbn.participant_list[i].selectionid == (id === '' ? null : id)) {
-                this.bigbluebuttonbn.participant_list.splice(i, 1);
-            }
-        }
+        this.participant_remove_from_memory(selection_type_value, selection_value);
 
         // Remove from the form.
-        var participant_list_table = document.getElementById('participant_list_table');
-        for (var ii = 0; ii < participant_list_table.rows.length; ii++) {
-            if (participant_list_table.rows[ii].id == 'participant_list_tr_' + type + '-' + id) {
-                participant_list_table.deleteRow(i);
-            }
-        }
+        this.participant_remove_from_form(selection_type_value, selection_value);
 
         // Update in the form.
         this.participant_list_update();
+    },
+
+    participant_remove_from_memory: function(selection_type_value, selection_value) {
+        var selectionid = (selection_value === '' ? null : selection_value);
+        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
+            if (this.bigbluebuttonbn.participant_list[i].selectiontype == selection_type_value &&
+                this.bigbluebuttonbn.participant_list[i].selectionid == selectionid) {
+                this.bigbluebuttonbn.participant_list.splice(i, 1);
+            }
+        }
+    },
+
+    participant_remove_from_form: function(selection_type_value, selection_value) {
+        var id = 'participant_list_tr_' + selection_type_value + '-' + selection_value;
+        var participant_list_table = document.getElementById('participant_list_table');
+        for (var i = 0; i < participant_list_table.rows.length; i++) {
+            if (participant_list_table.rows[i].id == id) {
+                participant_list_table.deleteRow(i);
+            }
+        }
     },
 
     participant_add: function() {
@@ -170,9 +180,9 @@ M.mod_bigbluebuttonbn.modform = {
             cell1.innerHTML = selection.options[selection.selectedIndex].text;
         }
         var innerHTML;
-        innerHTML = '&nbsp;<i>' + this.bigbluebuttonbn.strings.as + '</i>&nbsp;<select id="participant_list_role_';
-        innerHTML += selection_type.value + '-' + selection.value;
-        innerHTML += '" onchange="this.participant_list_role_update(\'';
+        innerHTML = '&nbsp;<i>' + this.bigbluebuttonbn.strings.as + '</i>&nbsp;';
+        innerHTML += '<select id="participant_list_role_' + selection_type.value + '-' + selection.value + '"';
+        innerHTML += ' onchange="M.mod_bigbluebuttonbn.modform.participant_list_role_update(\'';
         innerHTML += selection_type.value + '\', \'' + selection.value;
         innerHTML += '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">';
         innerHTML += this.bigbluebuttonbn.strings.viewer + '</option><option value="moderator">';
@@ -181,11 +191,11 @@ M.mod_bigbluebuttonbn.modform = {
         cell2.innerHTML = innerHTML;
         var cell3 = row.insertCell(3);
         cell3.width = "20px";
-        innerHTML = '<a onclick="this.participant_remove(\'';
+        innerHTML = '<a onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
         innerHTML += selection_type.value + '\', \'' + selection.value;
         innerHTML += '\'); return 0;" title="' + this.bigbluebuttonbn.strings.remove + '">x</a>';
         if (this.bigbluebuttonbn.icons_enabled) {
-            innerHTML = '<a class="action-icon" onclick="this.participant_remove(\'';
+            innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
             innerHTML += selection_type.value + '\', \'';
             innerHTML += selection.value + '\'); return 0;"><img class="btn icon smallicon" alt="';
             innerHTML += this.bigbluebuttonbn.strings.remove + '" title="' + this.bigbluebuttonbn.strings.remove + '" src="';
@@ -195,7 +205,6 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participant_list_role_update: function(type, id) {
-
         // Update in memory.
         var participant_list_role_selection = document.getElementById('participant_list_role_' + type + '-' + id);
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {

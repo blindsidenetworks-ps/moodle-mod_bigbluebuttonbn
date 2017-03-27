@@ -627,20 +627,12 @@ function bigbluebuttonbn_get_users_select($users) {
     return $usersarray;
 }
 
-function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context = null) {
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
     if ($bigbluebuttonbn == null) {
         return bigbluebuttonbn_get_participant_list_default($context);
     }
 
-    $participantlistarray = array();
-    $participantlist = json_decode($bigbluebuttonbn->participants);
-    foreach ($participantlist as $participant) {
-        $participantlistarray[] = array('selectiontype' => $participant->selectiontype,
-                                          'selectionid' => $participant->selectionid,
-                                          'role' => $participant->role, );
-    }
-
-    return $participantlistarray;
+    return json_decode($bigbluebuttonbn->participants, true);
 }
 
 function bigbluebuttonbn_get_participant_list_default($context) {
@@ -654,14 +646,10 @@ function bigbluebuttonbn_get_participant_list_default($context) {
     $moderatordefaults = explode(',', bigbluebuttonbn_get_cfg_moderator_default());
     foreach ($moderatordefaults as $moderatordefault) {
         if ($moderatordefault == 'owner') {
-            $users = get_enrolled_users($context);
-            foreach ($users as $user) {
-                if ($user->id == $USER->id) {
-                    $participantlistarray[] = array('selectiontype' => 'user',
-                                                       'selectionid' => $USER->id,
-                                                       'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR, );
-                    break;
-                }
+            if (is_enrolled($context, $USER->id)) {
+                $participantlistarray[] = array('selectiontype' => 'user',
+                                                  'selectionid' => $USER->id,
+                                                  'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR, );
             }
             continue;
         }
@@ -672,10 +660,6 @@ function bigbluebuttonbn_get_participant_list_default($context) {
     }
 
     return $participantlistarray;
-}
-
-function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid = null) {
-    return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
 }
 
 function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $userroles = null) {

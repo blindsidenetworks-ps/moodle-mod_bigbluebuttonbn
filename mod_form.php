@@ -327,7 +327,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         );
 
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'my_add_participant',
+        $mform->addElement('static', 'static_add_participant',
             get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmlparticipantselection);
         $mform->addElement('html', "\n\n");
 
