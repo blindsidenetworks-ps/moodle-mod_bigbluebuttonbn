@@ -137,7 +137,9 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     init_status_bar: function(status_message) {
+
         var status_bar_span = Y.DOM.create('<span>');
+        Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
 
         if (status_message.constructor === Array) {
             for (var message in status_message) {
@@ -151,7 +153,6 @@ M.mod_bigbluebuttonbn.rooms = {
                 Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
             }
         } else {
-            Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
             Y.DOM.setText(status_bar_span, status_message);
         }
 
@@ -312,7 +313,6 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     wait_moderator: function(payload) {
-        console.info("Ping................");
         this.datasource.sendRequest({
             request: "action=meeting_info&id=" + payload.id + "&bigbluebuttonbn=" + payload.bnid,
             callback: {

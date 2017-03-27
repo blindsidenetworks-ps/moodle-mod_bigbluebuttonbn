@@ -204,9 +204,9 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebutton
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
     }
     // Update the cache.
-    bigbluebuttonbn_get_meetinginfo($params['id'], BIGBLUEBUTTONBN_FORCED);
+    bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_FORCED);
 
-    return $params['callback'].'({ "status": true });';
+    return $params['callback'].'({"status": true});';
 }
 
 function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
@@ -219,7 +219,7 @@ function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
     $out = $params['callback'].'({"status": "false"});';
     if (isset($params['id']) && $params['id'] != '') {
         $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-        $out = $params['callback'].'({ "status": "true", "links": '.count($importedall).'});';
+        $out = $params['callback'].'({"status": "true", "links": '.count($importedall).'});';
     }
     return $out;
 }
@@ -244,7 +244,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         $out = $params['callback'].'({ "status": "false" });';
         if (isset($recording) && !empty($recording) && !array_key_exists('messageKey', $recording)) {
             // The recording was found.
-            $out = $params['callback'].'({ "status": "true", "published": "'.$recording['published'].'"});';
+            $out = $params['callback'].'({"status": "true", "published": "'.$recording['published'].'"});';
         }
         return $out;
     }
@@ -254,7 +254,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
     $out = $params['callback'].'({"status": "false"});';
     if (isset($recording) && !empty($recording) && array_key_exists($params['id'], $recording)) {
         // The recording was found.
-        $out = $params['callback'].'({ "status": "true", "published": "'.$recording[$params['id']]['published'].'"});';
+        $out = $params['callback'].'({"status": "true", "published": "'.$recording[$params['id']]['published'].'"});';
     }
     return $out;
 }
