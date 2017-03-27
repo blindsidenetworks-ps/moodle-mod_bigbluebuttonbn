@@ -76,7 +76,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_inprocess: function(data) {
-        // console.info("action " + data.action + " in process");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn');
         if (data.action == 'publish') {
@@ -96,7 +95,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_completed: function(data) {
-        // console.info("action " + data.action + " completed");
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
         var btnosrc = btn.getAttribute('data-osrc');
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
@@ -124,7 +122,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_failed: function(data) {
-        // console.info("action " + data.action + " failed");
         var alert = new M.core.alert({
             title: M.util.get_string('error', 'moodle'),
             message: data.message

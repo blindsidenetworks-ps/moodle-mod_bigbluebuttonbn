@@ -14,6 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /** global: M */
+/** global: Y */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 

@@ -239,9 +239,9 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
     if ($showroom) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
-    $include_deleted = $bbbsession['bigbluebuttonbn']->recordings_deleted_activities;
+    $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted_activities;
     // Retrieve the array of imported recordings.
-    $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $showroom, $include_deleted);
+    $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
     if (array_key_exists($params['id'], $recordings)) {
         // Look up for an update on the imported recording.
         if (!array_key_exists('messageKey', $recordings[$params['id']])) {
