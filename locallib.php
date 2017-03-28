@@ -590,20 +590,30 @@ function bigbluebuttonbn_get_guest_role() {
     return array($guestrole->id => $guestrole);
 }
 
-function bigbluebuttonbn_get_roles(context $context = null) {
-    $roles = role_get_names($context);
-    $rolesarray = array();
-    foreach ($roles as $role) {
-        $rolesarray[$role->shortname] = $role->localname;
+function bigbluebuttonbn_get_users(context $context = null) {
+    $users = (array) get_enrolled_users($context);
+    foreach ($users as $key => $value) {
+        $users[$key] = array('id' => $value->id, 'name' => fullname($value));
     }
-
-    return $rolesarray;
+    return $users;
 }
 
-function bigbluebuttonbn_get_role($shortname) {
-    $roles = role_get_names();
+function bigbluebuttonbn_get_roles(context $context = null) {
+    $roles = (array) role_get_names($context);
+    foreach ($roles as $key => $value) {
+        $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+    }
+    return $roles;
+}
+
+function bigbluebuttonbn_get_role($id) {
+    $roles = (array) role_get_names();
+    if (is_numeric($id)) {
+        return $roles[$id];
+    }
+
     foreach ($roles as $role) {
-        if ($role->shortname == $shortname) {
+        if ($role->shortname == $id) {
             return $role;
         }
     }
@@ -620,11 +630,32 @@ function bigbluebuttonbn_get_roles_select($roles = array()) {
 
 function bigbluebuttonbn_get_users_select($users) {
     $usersarray = array();
-    foreach ($users as $user) {
-        $usersarray[] = array('id' => $user->id, 'name' => fullname($user));
+    foreach ($users as $key => $user) {
+        $usersarray[] = array('id' => $key, 'name' => fullname($user));
     }
 
     return $usersarray;
+}
+
+function bigbluebuttonbn_get_participant_data($context) {
+    $data = array(
+        'all' => array(
+            'name' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
+            'children' => []
+          )
+      );
+
+    $data['role'] = array(
+        'name' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
+        'children' => bigbluebuttonbn_get_roles($context)
+      );
+
+    $data['user'] = array(
+        'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
+        'children' => bigbluebuttonbn_get_users($context)
+      );
+
+    return $data;
 }
 
 function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
@@ -632,7 +663,19 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
         return bigbluebuttonbn_get_participant_list_default($context);
     }
 
-    return json_decode($bigbluebuttonbn->participants, true);
+    return bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn);
+}
+
+function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
+    $rules = json_decode($bigbluebuttonbn->participants, true);
+    foreach ($rules as $key => $rule) {
+        if ($rule['selectiontype'] === 'role' && !is_numeric($rule['selectionid'])) {
+            $role = bigbluebuttonbn_get_role($rule['selectionid']);
+            $rule['selectionid'] = $role->id;
+        }
+        $rules[$key] = $rule;
+    }
+    return $rules;
 }
 
 function bigbluebuttonbn_get_participant_list_default($context) {

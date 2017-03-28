@@ -30,17 +30,16 @@ M.mod_bigbluebuttonbn.modform = {
     init: function(bigbluebuttonbn) {
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.update_instance_type_profile();
+        this.participant_list_init();
     },
 
     update_instance_type_profile: function() {
-
         var selected_type = Y.one('#id_type');
         this.apply_instance_type_profile(this.bigbluebuttonbn.instance_type_profiles[
             selected_type.get('value')]);
     },
 
     apply_instance_type_profile: function(instance_type_profile) {
-
         var features = instance_type_profile.features;
         var show_all = features.includes('all');
 
@@ -77,19 +76,20 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participant_selection_set: function() {
-
         this.select_clear('bigbluebuttonbn_participant_selection');
 
         var type = document.getElementById('bigbluebuttonbn_participant_selection_type');
         for (var i = 0; i < type.options.length; i++) {
             if (type.options[i].selected) {
-                var options = this.bigbluebuttonbn.participant_selection[type.options[i].value];
-                for (var j = 0; j < options.length; j++) {
-                    this.select_add_option(
-                        'bigbluebuttonbn_participant_selection', options[j].name, options[j].id
-                    );
+                var options = this.bigbluebuttonbn.participant_data[type.options[i].value].children;
+                for (var option in options) {
+                    if (options.hasOwnProperty(option)) {
+                        this.select_add_option(
+                            'bigbluebuttonbn_participant_selection', options[option].name, options[option].id
+                        );
+                    }
                 }
-                if (j === 0) {
+                if (type.options[i].value === 'all') {
                     this.select_add_option('bigbluebuttonbn_participant_selection',
                         '---------------', 'all');
                     this.select_disable('bigbluebuttonbn_participant_selection');
@@ -98,6 +98,20 @@ M.mod_bigbluebuttonbn.modform = {
                 }
             }
         }
+    },
+
+    participant_list_init: function() {
+        var selection_type_value;
+        var selection_value;
+        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
+            selection_type_value = this.bigbluebuttonbn.participant_list[i].selectiontype;
+            selection_value = this.bigbluebuttonbn.participant_list[i].selectionid;
+
+            // Add it to the form.
+            this.participant_add_to_form(selection_type_value, selection_value);
+        }
+        // Update in the form.
+        this.participant_list_update();
     },
 
     participant_list_update: function() {
@@ -149,41 +163,41 @@ M.mod_bigbluebuttonbn.modform = {
         }
 
         // Add it to memory.
-        this.participant_add_to_memory(selection_type, selection);
+        this.participant_add_to_memory(selection_type.value, selection.value);
 
         // Add it to the form.
-        this.participant_add_to_form(selection_type, selection);
+        this.participant_add_to_form(selection_type.value, selection.value);
 
         // Update in the form.
         this.participant_list_update();
     },
 
-    participant_add_to_memory: function(selection_type, selection) {
+    participant_add_to_memory: function(selection_type_value, selection_value) {
         this.bigbluebuttonbn.participant_list.push({
-            "selectiontype": selection_type.value,
-            "selectionid": selection.value,
+            "selectiontype": selection_type_value,
+            "selectionid": selection_value,
             "role": "viewer"
         });
     },
 
-    participant_add_to_form: function(selection_type, selection) {
+    participant_add_to_form: function(selection_type_value, selection_value) {
         var participant_list_table = document.getElementById('participant_list_table');
         var row = participant_list_table.insertRow(participant_list_table.rows.length);
-        row.id = "participant_list_tr_" + selection_type.value + "-" + selection.value;
+        row.id = "participant_list_tr_" + selection_type_value + "-" + selection_value;
         var cell0 = row.insertCell(0);
         cell0.width = "125px";
-        cell0.innerHTML = '<b><i>' + selection_type.options[selection_type.selectedIndex].text;
-        cell0.innerHTML += (selection_type.value !== 'all' ? ':&nbsp;' : '') + '</i></b>';
+        cell0.innerHTML = '<b><i>' + this.bigbluebuttonbn.participant_data[selection_type_value].name;
+        cell0.innerHTML += (selection_type_value !== 'all' ? ':&nbsp;' : '') + '</i></b>';
         var cell1 = row.insertCell(1);
         cell1.innerHTML = '';
-        if (selection_type.value !== 'all') {
-            cell1.innerHTML = selection.options[selection.selectedIndex].text;
+        if (selection_type_value !== 'all') {
+            cell1.innerHTML = this.bigbluebuttonbn.participant_data[selection_type_value].children[selection_value].name;
         }
         var innerHTML;
         innerHTML = '&nbsp;<i>' + this.bigbluebuttonbn.strings.as + '</i>&nbsp;';
-        innerHTML += '<select id="participant_list_role_' + selection_type.value + '-' + selection.value + '"';
+        innerHTML += '<select id="participant_list_role_' + selection_type_value + '-' + selection_value + '"';
         innerHTML += ' onchange="M.mod_bigbluebuttonbn.modform.participant_list_role_update(\'';
-        innerHTML += selection_type.value + '\', \'' + selection.value;
+        innerHTML += selection_type_value + '\', \'' + selection_value;
         innerHTML += '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">';
         innerHTML += this.bigbluebuttonbn.strings.viewer + '</option><option value="moderator">';
         innerHTML += this.bigbluebuttonbn.strings.moderator + '</option></select>';
@@ -192,12 +206,12 @@ M.mod_bigbluebuttonbn.modform = {
         var cell3 = row.insertCell(3);
         cell3.width = "20px";
         innerHTML = '<a onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
-        innerHTML += selection_type.value + '\', \'' + selection.value;
+        innerHTML += selection_type_value + '\', \'' + selection_value;
         innerHTML += '\'); return 0;" title="' + this.bigbluebuttonbn.strings.remove + '">x</a>';
         if (this.bigbluebuttonbn.icons_enabled) {
             innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
-            innerHTML += selection_type.value + '\', \'';
-            innerHTML += selection.value + '\'); return 0;"><img class="btn icon smallicon" alt="';
+            innerHTML += selection_type_value + '\', \'';
+            innerHTML += selection_value + '\'); return 0;"><img class="btn icon smallicon" alt="';
             innerHTML += this.bigbluebuttonbn.strings.remove + '" title="' + this.bigbluebuttonbn.strings.remove + '" src="';
             innerHTML += this.bigbluebuttonbn.pix_icon_delete + '"></img></a>';
         }
@@ -240,7 +254,7 @@ M.mod_bigbluebuttonbn.modform = {
         var option = document.createElement('option');
         option.text = text;
         option.value = value;
-        select.add(option, 0);
+        select.add(option, option.length);
     }
 
 };

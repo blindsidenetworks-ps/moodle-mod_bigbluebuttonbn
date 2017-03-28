@@ -87,8 +87,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
 
         // Data required for "Add participant" and initial "Participant list" setup.
+        $data = bigbluebuttonbn_get_participant_data($context);
+        $jsvars['participant_data'] = $data;
+
+
         $roles = bigbluebuttonbn_get_roles($context);
-        $users = get_enrolled_users($context);
+        $users = bigbluebuttonbn_get_users($context);
 
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, [
@@ -335,68 +339,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $table = new html_table();
         $table->id = 'participant_list_table';
         $table->data = array();
-        // Build table content.
-        foreach ($participantlist as $participant) {
-            $selectionid = '';
-            $selectiontype = $participant['selectiontype'];
-            if ($selectiontype == 'role') {
-                $selectionid = $data['roles'][$participant['selectionid']];
-            } else {
-                foreach ($data['users'] as $user) {
-                    if ($user->id == $participant['selectionid']) {
-                        $selectionid = fullname($user);
-                        break;
-                    }
-                }
-            }
-            $selectiontype = '<b><i>'.
-                get_string('mod_form_field_participant_list_type_'.$selectiontype, 'bigbluebuttonbn').'</i></b>';
-
-            $row = new html_table_row();
-            $row->id = 'participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'];
-
-            $col0 = new html_table_cell();
-            $col0->text = $selectiontype;
-            $col1 = new html_table_cell();
-            $col1->text = $selectionid;
-            $col2 = new html_table_cell();
-            $options = [
-                BIGBLUEBUTTONBN_ROLE_VIEWER => get_string('mod_form_field_participant_bbb_role_'.
-                                                          BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn'),
-                BIGBLUEBUTTONBN_ROLE_MODERATOR => get_string('mod_form_field_participant_bbb_role_'.
-                                                          BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn'),
-            ];
-            $optionselected = $participant['role'];
-            $col2->text = html_writer::tag('i', '&nbsp;'.
-                get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn').'&nbsp;'.
-                html_writer::select($options,
-                    'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
-                    $optionselected, array(),
-                    array('id' => 'participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'],
-                          'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_list_role_update(\''.
-                              $participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;',
-                    )
-                )
-            );
-            $col3 = new html_table_cell();
-            $onclick = 'M.mod_bigbluebuttonbn.modform.participant_remove(\''.
-                $participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;';
-            // With text for delete.
-            $col3->text = html_writer::tag('a', '<b>x</b>', ['class' => 'btn action_icon',
-                'onclick' => $onclick, 'title' => $data['strings']['remove'], ]);
-            if ($cfg['recording_icons_enabled']) {
-                // With icon for delete.
-                $pixicondelete = html_writer::tag('img', null, ['class' => 'btn icon smallicon',
-                    'title' => $data['strings']['remove'],
-                    'alt' => $data['strings']['remove'],
-                    'src' => $data['pix_icon_delete_url']]);
-                $col3->text = html_writer::tag('a', $pixicondelete, ['class' => 'action_icon',
-                    'onclick' => $onclick, 'title' => $data['strings']['remove']]);
-            }
-
-            $row->cells = array($col0, $col1, $col2, $col3);
-            array_push($table->data, $row);
-        }
 
         // Render elements for participant list.
         $htmlparticipantlist = html_writer::tag('div',
