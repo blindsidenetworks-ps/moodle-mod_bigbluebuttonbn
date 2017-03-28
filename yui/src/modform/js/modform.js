@@ -21,6 +21,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.modform = {
 
     bigbluebuttonbn: {},
+    strings: {},
 
     /**
      * Initialise the broker code.
@@ -29,6 +30,12 @@ M.mod_bigbluebuttonbn.modform = {
      */
     init: function(bigbluebuttonbn) {
         this.bigbluebuttonbn = bigbluebuttonbn;
+        this.strings = {
+            as: M.str.bigbluebuttonbn.mod_form_field_participant_list_text_as,
+            viewer: M.str.bigbluebuttonbn.mod_form_field_participant_bbb_role_viewer,
+            moderator: M.str.bigbluebuttonbn.mod_form_field_participant_bbb_role_moderator,
+            remove: M.str.bigbluebuttonbn.mod_form_field_participant_list_action_removee
+        };
         this.update_instance_type_profile();
         this.participant_list_init();
     },
@@ -194,25 +201,25 @@ M.mod_bigbluebuttonbn.modform = {
             cell1.innerHTML = this.bigbluebuttonbn.participant_data[selection_type_value].children[selection_value].name;
         }
         var innerHTML;
-        innerHTML = '&nbsp;<i>' + this.bigbluebuttonbn.strings.as + '</i>&nbsp;';
+        innerHTML = '&nbsp;<i>' + this.strings.as + '</i>&nbsp;';
         innerHTML += '<select id="participant_list_role_' + selection_type_value + '-' + selection_value + '"';
         innerHTML += ' onchange="M.mod_bigbluebuttonbn.modform.participant_list_role_update(\'';
         innerHTML += selection_type_value + '\', \'' + selection_value;
         innerHTML += '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">';
-        innerHTML += this.bigbluebuttonbn.strings.viewer + '</option><option value="moderator">';
-        innerHTML += this.bigbluebuttonbn.strings.moderator + '</option></select>';
+        innerHTML += this.strings.viewer + '</option><option value="moderator">';
+        innerHTML += this.strings.moderator + '</option></select>';
         var cell2 = row.insertCell(2);
         cell2.innerHTML = innerHTML;
         var cell3 = row.insertCell(3);
         cell3.width = "20px";
         innerHTML = '<a onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
         innerHTML += selection_type_value + '\', \'' + selection_value;
-        innerHTML += '\'); return 0;" title="' + this.bigbluebuttonbn.strings.remove + '">x</a>';
+        innerHTML += '\'); return 0;" title="' + this.strings.remove + '">x</a>';
         if (this.bigbluebuttonbn.icons_enabled) {
             innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
             innerHTML += selection_type_value + '\', \'';
             innerHTML += selection_value + '\'); return 0;"><img class="btn icon smallicon" alt="';
-            innerHTML += this.bigbluebuttonbn.strings.remove + '" title="' + this.bigbluebuttonbn.strings.remove + '" src="';
+            innerHTML += this.strings.remove + '" title="' + this.strings.remove + '" src="';
             innerHTML += this.bigbluebuttonbn.pix_icon_delete + '"></img></a>';
         }
         cell3.innerHTML = innerHTML;

@@ -82,24 +82,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
 
         // Data for participant selection.
-        $strings = $this->bigbluebuttonbn_get_participant_selection_strings();
-        $participantselection = $this->bigbluebuttonbn_get_participant_selection_data();
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
 
         // Data required for "Add participant" and initial "Participant list" setup.
         $data = bigbluebuttonbn_get_participant_data($context);
-        $jsvars['participant_data'] = $data;
-
-
-        $roles = bigbluebuttonbn_get_roles($context);
-        $users = bigbluebuttonbn_get_users($context);
 
         // Add block 'Schedule'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, [
-            'strings' => $strings, 'pix_icon_delete_url' => $pixicondeleteurl, 'roles' => $roles,
-            'users' => $users, 'participant_selection' => $participantselection,
-            'participant_list' => $participantlist,
-          ]);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, ['participant_list' => $participantlist]);
 
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, ['activity' => $currentactivity]);
@@ -110,12 +99,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
 
+        // JavaScript for locales.
+        $lang = get_string('locale', 'core_langconfig');
+        $locale = substr($lang, 0, strpos($lang, '.'));
+        $stringman = get_string_manager();
+        $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
+        $PAGE->requires->strings_for_js(array_keys($strings), 'bigbluebuttonbn');
+
         $jsvars['icons_enabled'] = $cfg['recording_icons_enabled'];
         $jsvars['pix_icon_delete'] = $pixicondeleteurl;
-        $jsvars['strings'] = $strings;
-        $jsvars['participant_selection'] = json_decode('{"all": [], "role": '.
-            json_encode(bigbluebuttonbn_get_roles_select($roles)).', "user": '.
-            json_encode(bigbluebuttonbn_get_users_select($users)).'}');
+        $jsvars['participant_data'] = $data;
         $jsvars['participant_list'] = $participantlist;
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
@@ -307,7 +300,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     private function bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $data) {
-        $participantselection = $data['participant_selection'];
+        $participantselection = $this->bigbluebuttonbn_get_participant_selection_data();
         $participantlist = $data['participant_list'];
 
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
@@ -384,15 +377,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
-    }
-
-    private function bigbluebuttonbn_get_participant_selection_strings() {
-        return [
-          'as' => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
-          'viewer' => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
-          'moderator' => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
-          'remove' => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
-        ];
     }
 
     private function bigbluebuttonbn_get_participant_selection_data() {

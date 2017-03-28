@@ -619,24 +619,6 @@ function bigbluebuttonbn_get_role($id) {
     }
 }
 
-function bigbluebuttonbn_get_roles_select($roles = array()) {
-    $rolesarray = array();
-    foreach ($roles as $key => $value) {
-        $rolesarray[] = array('id' => $key, 'name' => $value);
-    }
-
-    return $rolesarray;
-}
-
-function bigbluebuttonbn_get_users_select($users) {
-    $usersarray = array();
-    foreach ($users as $key => $user) {
-        $usersarray[] = array('id' => $key, 'name' => fullname($user));
-    }
-
-    return $usersarray;
-}
-
 function bigbluebuttonbn_get_participant_data($context) {
     $data = array(
         'all' => array(
