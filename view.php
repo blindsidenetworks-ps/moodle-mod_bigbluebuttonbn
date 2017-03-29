@@ -248,24 +248,17 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     if ($pinginterval == 0) {
         $pinginterval = 15000;
     }
-    $lang = get_string('locale', 'core_langconfig');
-    $locale = substr($lang, 0, strpos($lang, '.'));
-    $localecode = substr($locale, 0, strpos($locale, '_'));
 
     // JavaScript for locales.
-    $stringman = get_string_manager();
-    $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
-    $PAGE->requires->strings_for_js(array_keys($strings), 'bigbluebuttonbn');
+    $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
     // JavaScript variables.
     $jsvars = array(
         'activity' => $activity,
         'ping_interval' => $pinginterval,
-        'locale' => $localecode,
+        'locale' => bigbluebuttonbn_get_localcode(),
         'profile_features' => $features,
     );
-    // JavaScript dependences.
-    $jsdependences = array('datasource-get', 'datasource-jsonschema', 'datasource-polling');
 
     $output = $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
@@ -277,7 +270,7 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     }
 
     if ($showrecordings) {
-        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $jsvars, $jsdependences);
+        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $jsvars);
         if ($importrecordings && $bbbsession['managerecordings'] &&
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $output .= bigbluebuttonbn_view_show_imported($bbbsession);
@@ -339,7 +332,7 @@ function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings,
     return $output;
 }
 
-function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars, &$jsdependences) {
+function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars) {
 
     // Get recordings.
     $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id,
@@ -370,9 +363,6 @@ function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars, 
             'columns' => bigbluebuttonbn_get_recording_columns($bbbsession),
             'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
           );
-
-    // JavaScript dependences for recordings with YUI.
-    $jsdependences += array('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number');
 
     // Render a YUI table.
     return html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));

@@ -59,7 +59,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         $context = context_course::instance($course->id);
-        $pixicondeleteurl = ''.$OUTPUT->pix_url('t/delete', 'moodle');
 
         // UI configuration options.
         $cfg = bigbluebuttonbn_get_cfg_options();
@@ -75,19 +74,19 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $jsvars['instance_type_profiles'] = $typeprofiles;
         }
 
-        $this->bigbluebuttonbn_mform_add_block_general($mform, $cfg);
-
-        $this->bigbluebuttonbn_mform_add_block_room($mform, $cfg);
-
-        $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
-
         // Data for participant selection.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
 
-        // Data required for "Add participant" and initial "Participant list" setup.
-        $data = bigbluebuttonbn_get_participant_data($context);
+        // Add block 'General'.
+        $this->bigbluebuttonbn_mform_add_block_general($mform, $cfg);
 
-        // Add block 'Schedule'.
+        // Add block 'Room'.
+        $this->bigbluebuttonbn_mform_add_block_room($mform, $cfg);
+
+        // Add block 'Preuploads'.
+        $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
+
+        // Add block 'Participant List'.
         $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, ['participant_list' => $participantlist]);
 
         // Add block 'Schedule'.
@@ -100,16 +99,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->add_action_buttons();
 
         // JavaScript for locales.
-        $lang = get_string('locale', 'core_langconfig');
-        $locale = substr($lang, 0, strpos($lang, '.'));
-        $stringman = get_string_manager();
-        $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
-        $PAGE->requires->strings_for_js(array_keys($strings), 'bigbluebuttonbn');
+        $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
         $jsvars['icons_enabled'] = $cfg['recording_icons_enabled'];
-        $jsvars['pix_icon_delete'] = $pixicondeleteurl;
-        $jsvars['participant_data'] = $data;
-        $jsvars['participant_list'] = $participantlist;
+        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_url('t/delete', 'moodle');
+        $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
+        $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
 

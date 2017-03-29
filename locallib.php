@@ -483,7 +483,7 @@ function bigbluebuttonbn_is_meeting_running($meetingid) {
       );
 
     if ($xml && $xml->returncode == 'SUCCESS') {
-        return ($xml->running == 'true') ? true : false;
+        return ($xml->running == 'true');
     }
 
     return false;
@@ -2037,4 +2037,21 @@ function bigbluebuttonbn_recordings_enabled() {
 
     return !(isset($CFG->bigbluebuttonbn['recording_default)']) &&
              isset($CFG->bigbluebuttonbn['recording_editable']));
+}
+
+function bigbluebuttonbn_get_strings_for_js() {
+    $locale = bigbluebuttonbn_get_locale();
+    $stringman = get_string_manager();
+    $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
+    return $strings;
+}
+
+function bigbluebuttonbn_get_locale() {
+    $lang = get_string('locale', 'core_langconfig');
+    return substr($lang, 0, strpos($lang, '.'));
+}
+
+function bigbluebuttonbn_get_localcode() {
+    $locale = bigbluebuttonbn_get_locale();
+    return substr($locale, 0, strpos($locale, '_'));
 }

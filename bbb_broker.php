@@ -146,7 +146,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
     $running = false;
     if ($info['returncode'] == 'SUCCESS') {
-        $running = bigbluebuttonbn_is_meeting_running($info['meetingID']);
+        $running = ($info['running'] === 'true');
     }
     $callbackresponse['running'] = $running;
 
