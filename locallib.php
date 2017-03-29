@@ -593,6 +593,14 @@ function bigbluebuttonbn_get_guest_role() {
 function bigbluebuttonbn_get_users(context $context = null) {
     $users = (array) get_enrolled_users($context);
     foreach ($users as $key => $value) {
+        $users[$key] = fullname($value);
+    }
+    return $users;
+}
+
+function bigbluebuttonbn_get_users_select(context $context = null) {
+    $users = (array) get_enrolled_users($context);
+    foreach ($users as $key => $value) {
         $users[$key] = array('id' => $value->id, 'name' => fullname($value));
     }
     return $users;
@@ -601,10 +609,18 @@ function bigbluebuttonbn_get_users(context $context = null) {
 function bigbluebuttonbn_get_roles(context $context = null) {
     $roles = (array) role_get_names($context);
     foreach ($roles as $key => $value) {
-        $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+        $roles[$key] = $value->localname;
     }
     return $roles;
 }
+
+function bigbluebuttonbn_get_roles_select(context $context = null) {
+    $roles = (array) role_get_names($context);
+    foreach ($roles as $key => $value) {
+        $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+    }
+    return $roles;
+ }
 
 function bigbluebuttonbn_get_role($id) {
     $roles = (array) role_get_names();
@@ -629,12 +645,12 @@ function bigbluebuttonbn_get_participant_data($context) {
 
     $data['role'] = array(
         'name' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
-        'children' => bigbluebuttonbn_get_roles($context)
+        'children' => bigbluebuttonbn_get_roles_select($context)
       );
 
     $data['user'] = array(
         'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
-        'children' => bigbluebuttonbn_get_users($context)
+        'children' => bigbluebuttonbn_get_users_select($context)
       );
 
     return $data;
