@@ -35,38 +35,8 @@ M.mod_bigbluebuttonbn.broker = {
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
 
-    join: function(join_url, status_message, can_tag) {
-        var qs = '';
-
-        if (!can_tag) {
-            M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
-            return;
-        }
-
-        Y.one('#panelContent').removeClass('hidden');
-        qs += 'action=meeting_info';
-        qs += '&id=' + this.bigbluebuttonbn.meetingid;
-        qs += '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid;
-        this.datasource.sendRequest({
-            request: qs,
-            callback: {
-                success: function(e) {
-                    if (!e.data.running) {
-                        Y.one('#meeting_join_url').set('value', join_url);
-                        Y.one('#meeting_message').set('value', e.data.status.message);
-                        // Show error message.
-                        var alert = new M.core.alert({
-                            title: M.util.get_string('error', 'moodle'),
-                            message: M.util.get_string('view_error_meeting_not_running', 'bigbluebuttonbn')
-                        });
-                        alert.show();
-                        return;
-                    }
-
-                    M.mod_bigbluebuttonbn.broker.join_redirect(join_url, e.data.status.message);
-                }
-            }
-        });
+    join: function(join_url) {
+        M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
     },
 
     join_redirect: function(join_url) {

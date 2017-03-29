@@ -234,14 +234,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['recording_default']);
-
-        $field = ['type' => 'hidden', 'name' => 'tagging', 'data_type' => PARAM_INT, 'description_key' => null];
-        if ($cfg['recording_tagging_editable']) {
-            $field['type'] = 'checkbox';
-            $field['description_key'] = 'mod_form_field_recordingtagging';
-        }
-        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], $cfg['recording_tagging_default']);
     }
 
     private function bigbluebuttonbn_mform_add_block_room_recordings($mform, $cfg) {
@@ -265,7 +257,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     private function bigbluebuttonbn_mform_add_block_room($mform, $cfg) {
         if ($cfg['voicebridge_editable'] || $cfg['waitformoderator_editable'] ||
-            $cfg['userlimit_editable'] || $cfg['recording_editable'] || $cfg['recording_tagging_editable']) {
+            $cfg['userlimit_editable'] || $cfg['recording_editable']) {
             $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_block_room_room($mform, $cfg);
         }

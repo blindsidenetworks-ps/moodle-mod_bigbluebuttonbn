@@ -85,32 +85,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
 $CFG->bigbluebuttonbn['recording_icons_enabled'] = 1;
 
 /*
- * 3. CONFIGURATION FOR "RECORDING TAGGING" FEATURE
- **
- * The "Recording tagging" feature should be used for adding extra
- * information to the recording metadata that later on can be used to
- * identify the recording. This allows the user who starts the session
- * who is usually a teacher (or anyone with edition capabilities in the
- * course) to add an specific name, description and tags that later on
- * can be used to identify the recording in the list of recordings.
- **/
-
- /*
- * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
- * activities will have the 'recording tagging' capability enabled by
- * default.
- */
-$CFG->bigbluebuttonbn['recordingtagging_default'] = 0;
-
-/*
- * When the value is set to 1 (checked) the recording tagging capability
- * can be enabled/disabled by the user creating or editing the room or
- * activity.
- */
-$CFG->bigbluebuttonbn['recordingtagging_editable'] = 1;
-
-/*
- * 4. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
+ * 3. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
  *
  * The "Import recordings" feature should only be used by Administrators
  * or Teachers (or anyone with edition capabilities in the
@@ -132,7 +107,7 @@ $CFG->bigbluebuttonbn['importrecordings_enabled'] = 0;
 $CFG->bigbluebuttonbn['importrecordings_from_deleted_activities_enabled'] = 0;
 
 /*
- * 5. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
+ * 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
  *
  * This feature makes the rooms or activity work as a traditional classroom
  * cloed until the moderator (teacher) comes to unlock the room. The students
@@ -171,7 +146,7 @@ $CFG->bigbluebuttonbn['waitformoderator_ping_interval'] = 15;
 $CFG->bigbluebuttonbn['waitformoderator_cache_ttl'] = 60;
 
 /*
- * 6. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
+ * 5. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
  *
  **/
  /*
@@ -181,7 +156,7 @@ $CFG->bigbluebuttonbn['waitformoderator_cache_ttl'] = 60;
 $CFG->bigbluebuttonbn['voicebridge_editable'] = 0;
 
 /*
- * 7. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
+ * 6. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
  *
  **/
  /*
@@ -195,7 +170,7 @@ $CFG->bigbluebuttonbn['voicebridge_editable'] = 0;
 $CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
 
 /*
- * 8. CONFIGURATION FOR "USER LIMIT" FEATURE
+ * 7. CONFIGURATION FOR "USER LIMIT" FEATURE
  *
  * It is possible to establish a limit of users per session. This limit can be
  * applied to each room or activity, or globally.
@@ -215,7 +190,7 @@ $CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
 $CFG->bigbluebuttonbn['userlimit_editable'] = 0;
 
 /*
- * 9. CONFIGURATION FOR "PERMISSIONS" FEATURE
+ * 8. CONFIGURATION FOR "PERMISSIONS" FEATURE
  *
  * Defines a rule applied by default to all the new rooms or activities created
  * for defining the users who will have access to the meeting session as Moderators.
@@ -230,7 +205,7 @@ $CFG->bigbluebuttonbn['userlimit_editable'] = 0;
  */
 
 /*
- * 10. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
+ * 9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
  *
  **/
  /*
@@ -244,7 +219,7 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
 ** ------------------------------------------------------------------ **/
 /*
- * 11. CONFIGURATION FOR "RECORDING READY" FEATURE
+ * 10. CONFIGURATION FOR "RECORDING READY" FEATURE
  *
  **/
  /*
@@ -255,7 +230,7 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  */
 
 /*
- * 12. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
+ * 11. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
 ** ------------------------------------------------------------------ **
 ** ------------------------------------------------------------------ **/
 /*
@@ -267,7 +242,7 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  */
 
 /*
- * 13. GENERAL CONFIGURATION FOR RECORDINGS UI
+ * 12. GENERAL CONFIGURATION FOR RECORDINGS UI
  *
  **/
  /*

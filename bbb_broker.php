@@ -156,7 +156,6 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
     $status["can_join"] = false;
     $status["can_end"] = false;
-    $status["can_tag"] = false;
     if ($running) {
         $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
         if ($bbbsession['userlimit'] == 0 || $info->participantCount < $bbbsession['userlimit']) {
@@ -173,10 +172,6 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
         if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
             $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
             $status["can_join"] = true;
-        }
-
-        if ($bbbsession['tagging'] && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
-            $status["can_tag"] = true;
         }
     }
     $callbackresponse['status'] = $status;

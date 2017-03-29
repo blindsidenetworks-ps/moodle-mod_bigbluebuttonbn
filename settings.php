@@ -81,29 +81,6 @@ if ($ADMIN->fulltree) {
         }
     }
 
-    // Configuration for 'recording tagging' feature.
-    if (!isset($CFG->bigbluebuttonbn['recordingtagging_default']) ||
-        !isset($CFG->bigbluebuttonbn['recordingtagging_editable'])) {
-        $settings->add(new admin_setting_heading('bigbluebuttonbn_recordingtagging',
-                get_string('config_feature_recordingtagging', 'bigbluebuttonbn'),
-                get_string('config_feature_recordingtagging_description', 'bigbluebuttonbn')));
-
-        if (!isset($CFG->bigbluebuttonbn['recordingtagging_default'])) {
-            // Default value for 'recording tagging' feature.
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_default',
-                    get_string('config_feature_recordingtagging_default', 'bigbluebuttonbn'),
-                    get_string('config_feature_recordingtagging_default_description', 'bigbluebuttonbn'),
-                    0));
-        }
-        // UI for 'recording tagging' feature.
-        if (!isset($CFG->bigbluebuttonbn['recordingtagging_editable'])) {
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingtagging_editable',
-                    get_string('config_feature_recordingtagging_editable', 'bigbluebuttonbn'),
-                    get_string('config_feature_recordingtagging_editable_description', 'bigbluebuttonbn'),
-                    1));
-        }
-    }
-
     // Configuration for 'import recordings' feature.
     if (!isset($CFG->bigbluebuttonbn['importrecordings_enabled']) ||
         !isset($CFG->bigbluebuttonbn['importrecordings_from_deleted_activities_enabled'])) {

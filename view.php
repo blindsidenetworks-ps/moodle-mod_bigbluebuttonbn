@@ -92,7 +92,6 @@ $bbbsession['record'] = $bigbluebuttonbn->record;
 if ($bigbluebuttonbn->record) {
     $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
 }
-$bbbsession['tagging'] = $bigbluebuttonbn->tagging;
 
 $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
 $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
@@ -321,8 +320,6 @@ function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings,
 
     if ($activity == 'ended') {
         $output .= bigbluebuttonbn_view_ended($bbbsession);
-    } else {
-        $output .= bigbluebuttonbn_view_joining($bbbsession);
     }
 
     if ($showrecordings && isset($bbbsession['record']) && $bbbsession['record']) {
@@ -384,36 +381,6 @@ function bigbluebuttonbn_view_show_imported($bbbsession) {
     $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
 
     return $output;
-}
-
-function bigbluebuttonbn_view_joining($bbbsession) {
-    if (!$bbbsession['tagging'] || !$bbbsession['administrator'] && !$bbbsession['moderator']) {
-        return '';
-    }
-
-    return ''.
-        '<div id="panelContent" class="hidden">'."\n".
-        '  <div class="yui3-widget-bd">'."\n".
-        '    <form>'."\n".
-        '      <fieldset>'."\n".
-        '        <input type="hidden" name="join" id="meeting_join_url" value="">'."\n".
-        '        <input type="hidden" name="message" id="meeting_message" value="">'."\n".
-        '        <div>'."\n".
-        '          <label for="name">'.get_string('view_recording_name', 'bigbluebuttonbn').'</label><br/>'."\n".
-        '          <input type="text" name="name" id="recording_name" placeholder="">'."\n".
-        '        </div><br>'."\n".
-        '        <div>'."\n".
-        '          <label for="description">'.get_string('view_recording_description', 'bigbluebuttonbn').'</label><br/>'."\n".
-        '          <input type="text" name="description" id="recording_description" value="" placeholder="">'."\n".
-        '        </div><br>'."\n".
-        '        <div>'."\n".
-        '          <label for="tags">'.get_string('view_recording_tags', 'bigbluebuttonbn').'</label><br/>'."\n".
-        '          <input type="text" name="tags" id="recording_tags" value="" placeholder="">'."\n".
-        '        </div>'."\n".
-        '      </fieldset>'."\n".
-        '    </form>'."\n".
-        '  </div>'."\n".
-        '</div>';
 }
 
 function bigbluebuttonbn_view_ended($bbbsession) {

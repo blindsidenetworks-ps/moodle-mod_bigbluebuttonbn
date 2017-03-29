@@ -52,57 +52,6 @@ M.mod_bigbluebuttonbn.rooms = {
             Y.DOM.addHTML(Y.one('#status_bar'), this.init_status_bar(status_bar));
             return;
         }
-        this.init_room_open();
-    },
-
-    init_room_open: function() {
-        // Create the main modal form.
-        this.panel = new Y.Panel({
-            srcNode: '#panelContent',
-            headerContent: M.util.get_string('view_recording_modal_title', 'bigbluebuttonbn'),
-            width: 250,
-            zIndex: 5,
-            centered: true,
-            modal: true,
-            visible: false,
-            render: true,
-            plugins: [Y.Plugin.Drag]
-        });
-
-        // Define the apply function - this will be called when 'Apply' is pressed in the modal form.
-        this.panel.addButton({
-            value: M.util.get_string('view_recording_modal_button', 'bigbluebuttonbn'),
-            section: Y.WidgetStdMod.FOOTER,
-            action: function(e) {
-                e.preventDefault();
-                this.panel.hide();
-
-                var joinField = Y.one('#meeting_join_url');
-                var messageField = Y.one('#meeting_message');
-                var nameField = Y.one('#recording_name');
-                var descriptionField = Y.one('#recording_description');
-                var tagsField = Y.one('#recording_tags');
-
-                // Gatter the fields thay will be passed as metaparameters to the bbb server.
-                var name = nameField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                var description = descriptionField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                var tags = tagsField.get('value').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-                // Prepare the new join_url.
-                var join_url = joinField.get('value') + '&name=' + name + '&description=' + description + '&tags=' + tags;
-
-                // Executes the join.
-                M.mod_bigbluebuttonbn.broker.executeJoin(join_url, messageField.get('value'));
-
-                // Clean values in case the for is used again.
-                nameField.set('value', '');
-                descriptionField.set('value', '');
-                tagsField.set('value', '');
-                joinField.set('value', '');
-                messageField.set('value', '');
-            }
-        });
-
         this.update_room();
     },
 
@@ -222,10 +171,7 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
         Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
 
-        var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'';
-        input_html += status.join_url + '\', \'' + M.util.get_string('view_message_conference_in_progress',
-            'bigbluebuttonbn');
-        input_html += '\', ' + status.can_tag + ');';
+        var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'' + status.join_url + '\');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
 
         if (!status.can_join) {

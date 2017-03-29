@@ -1426,40 +1426,6 @@ function bigbluebuttonbn_get_cfg_recording_editable() {
 /**
  * @return boolean
  */
-function bigbluebuttonbn_get_cfg_recording_tagging_default() {
-    global $CFG;
-
-    if (isset($CFG->bigbluebuttonbn['recordingtagging_default'])) {
-        return $CFG->bigbluebuttonbn['recordingtagging_default'];
-    }
-
-    if (isset($CFG->bigbluebuttonbn_recordingtagging_default)) {
-        return $CFG->bigbluebuttonbn_recordingtagging_default;
-    }
-
-    return  false;
-}
-
-/**
- * @return boolean
- */
-function bigbluebuttonbn_get_cfg_recording_tagging_editable() {
-    global $CFG;
-
-    if (isset($CFG->bigbluebuttonbn['recordingtagging_editable'])) {
-        return $CFG->bigbluebuttonbn['recordingtagging_editable'];
-    }
-
-    if (isset($CFG->bigbluebuttonbn_recordingtagging_editable)) {
-        return $CFG->bigbluebuttonbn_recordingtagging_editable;
-    }
-
-    return  false;
-}
-
-/**
- * @return boolean
- */
 function bigbluebuttonbn_get_cfg_recording_icons_enabled() {
     global $CFG;
 
@@ -1826,8 +1792,6 @@ function bigbluebuttonbn_get_cfg_options() {
           'voicebridge_editable' => bigbluebuttonbn_get_cfg_voicebridge_editable(),
           'recording_default' => bigbluebuttonbn_get_cfg_recording_default(),
           'recording_editable' => bigbluebuttonbn_get_cfg_recording_editable(),
-          'recording_tagging_default' => bigbluebuttonbn_get_cfg_recording_tagging_default(),
-          'recording_tagging_editable' => bigbluebuttonbn_get_cfg_recording_tagging_editable(),
           'waitformoderator_default' => bigbluebuttonbn_get_cfg_waitformoderator_default(),
           'waitformoderator_editable' => bigbluebuttonbn_get_cfg_waitformoderator_editable(),
           'userlimit_default' => bigbluebuttonbn_get_cfg_userlimit_default(),
@@ -1999,7 +1963,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
                 'features' => array('all')),
             array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                    'recordingtagging', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
+                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
             array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
                 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
     );

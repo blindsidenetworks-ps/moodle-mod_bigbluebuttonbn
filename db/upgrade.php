@@ -48,7 +48,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Change userid definition in bigbluebuttonbn_log.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
                                   'precision' => '10',
-                                  'unsigned' => XMLDB_UNSIGNED,
+                                  'unsigned' => null,
                                   'notnull' => XMLDB_NOTNULL,
                                   'sequence' => null,
                                   'default' => null,
@@ -72,14 +72,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2016080106) {
+    if ($oldversion < 2016080112) {
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
 
         // Add field type.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
                                   'precision' => '2',
-                                  'unsigned' => XMLDB_UNSIGNED,
+                                  'unsigned' => null,
                                   'notnull' => XMLDB_NOTNULL,
                                   'sequence' => null,
                                   'default' => 0,
@@ -90,7 +90,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Add field recordings_html.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
                                   'precision' => '1',
-                                  'unsigned' => XMLDB_UNSIGNED,
+                                  'unsigned' => null,
                                   'notnull' => XMLDB_NOTNULL,
                                   'sequence' => null,
                                   'default' => 0,
@@ -101,7 +101,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Add field recordings_deleted_activities.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
                                   'precision' => '1',
-                                  'unsigned' => XMLDB_UNSIGNED,
+                                  'unsigned' => null,
                                   'notnull' => XMLDB_NOTNULL,
                                   'sequence' => null,
                                   'default' => 1,
@@ -109,7 +109,10 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted_activities',
             $fielddefinition);
 
-        upgrade_mod_savepoint(true, 2016080106, 'bigbluebuttonbn');
+        // Drop field newwindow.
+        xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'tagging');
+
+        upgrade_mod_savepoint(true, 2016080112, 'bigbluebuttonbn');
     }
 
     return true;
@@ -126,8 +129,10 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
                            $fielddefinition['default'],
                            $fielddefinition['previous']);
     if ($dbman->field_exists($table, $field)) {
-        $dbman->change_field($table, $field, true, true);
-
+        $dbman->change_field_type($table, $field, true, true);
+        $dbman->change_field_precision($table, $field, true, true);
+        $dbman->change_field_notnull($table, $field, true, true);
+        $dbman->change_field_default($table, $field, true, true);
         return;
     }
 
