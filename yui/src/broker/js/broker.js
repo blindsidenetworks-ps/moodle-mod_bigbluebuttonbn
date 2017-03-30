@@ -50,24 +50,22 @@ M.mod_bigbluebuttonbn.broker = {
 
     recording_action: function(action, recordingid, meetingid) {
         if (action === 'import') {
-            this.recording_import(recordingid);
-            return;
+            return this.recording_import(recordingid);
         }
 
         if (action === 'delete') {
-            this.recording_delete(recordingid, meetingid);
-            return;
+            return this.recording_delete(recordingid, meetingid);
         }
 
         if (action === 'publish') {
-            this.recording_publish(recordingid, meetingid);
-            return;
+            return this.recording_publish(recordingid, meetingid);
         }
 
         if (action === 'unpublish') {
-            this.recording_unpublish(recordingid, meetingid);
-            return;
+            return this.recording_unpublish(recordingid, meetingid);
         }
+
+        return null;
     },
 
     recording_import: function(recordingid) {
@@ -215,6 +213,8 @@ M.mod_bigbluebuttonbn.broker = {
         if (action === 'protect' || action === 'unprotect') {
             return data.secure;
         }
+
+        return null;
     },
 
     recording_confirmation_message: function(action, recordingid) {
