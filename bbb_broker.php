@@ -54,7 +54,7 @@ if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
     $context = context_module::instance($cm->id);
 }
 
-if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_events') {
+if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
     if (!isset($SESSION->bigbluebuttonbn_bbbsession) || is_null($SESSION->bigbluebuttonbn_bbbsession)) {
         header('HTTP/1.0 400 Bad Request. No session variable set');
         return;
@@ -111,14 +111,9 @@ try {
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
-        $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom,
-                                                                   $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        $recordingaction = bigbluebuttonbn_broker_recording_action(
+            $bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
         echo $recordingaction;
-        return;
-    }
-
-    if ($a == 'recording_ready') {
-        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;
     }
 
@@ -127,8 +122,13 @@ try {
         return;
     }
 
-    if ($a == 'meeting_events') {
-        bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm);
+    if ($a == 'recording_ready') {
+        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
+        return;
+    }
+
+    if ($a == 'live_session_events') {
+        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm);
         return;
     }
 
@@ -137,23 +137,23 @@ try {
     return;
 }
 
-function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $users) {
+function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount) {
     $status = array("can_join" => false);
     if ($running) {
         $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-        if ($bbbsession['userlimit'] == 0 || $users < $bbbsession['userlimit']) {
+        if ($bbbsession['userlimit'] == 0 || $participantcount < $bbbsession['userlimit']) {
             $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
             $status["can_join"] = true;
         }
         return $status;
     }
-  
+
     // If user is administrator, moderator or if is viewer and no waiting is required.
     $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
     if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
         $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
         $status["can_join"] = true;
-    }  
+    }
     return $status;
 }
 
@@ -183,7 +183,11 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     $status["join_button_text"] = get_string('view_conference_action_join', 'bigbluebuttonbn');
     $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
 
-    $can_join = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $info->participantCount);
+    $participantcount = 0;
+    if (isset($info['participantCount'])) {
+        $participantcount = $info['participantCount'];
+    }
+    $can_join = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount);
     $status["can_join"] = $can_join["can_join"];
     $status["message"] = $can_join["message"];
 
@@ -310,7 +314,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
             break;
     }
 
-    if (isset($bigbluebuttonbn) && $callbackresponse['status']) {
+    if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
         bigbluebuttonbn_event_log($eventlog, $bigbluebuttonbn, $cm);
     }
@@ -324,8 +328,8 @@ function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $
     $status = true;
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         // Execute publish on imported recording link, if the real recording is published.
-        $realrecordings = bigbluebuttonbn_get_recordings_array($recordings[$params['id']]['meetingID'],
-                                                             $recordings[$params['id']]['recordID']);
+        $realrecordings = bigbluebuttonbn_get_recordings_array(
+            $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
         $status = ($realrecordings[$params['id']]['published'] === 'true');
         if ($status) {
             // Only if the physical recording is published, execute publish on imported recording link.
@@ -460,7 +464,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     return "{$params['callback']}({$callbackresponsedata});";
 }
 
-function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'], bigbluebuttonbn_get_cfg_shared_secret(),
@@ -483,7 +487,7 @@ function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {
     // Store the events.
     try {
         foreach ($decodedparameters->events as $event) {
-            bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm);
+            bigbluebuttonbn_live_session_event_log($event, $bigbluebuttonbn, $cm);
         }
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
@@ -507,7 +511,7 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
         'recording_ready' => [
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ],
-        'meeting_events' => [
+        'live_session_events' => [
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ]
       ];

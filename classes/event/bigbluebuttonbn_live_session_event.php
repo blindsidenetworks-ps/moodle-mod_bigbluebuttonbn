@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn viewed event.
+ * The mod_bigbluebuttonbn live session event.
  *
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
@@ -26,7 +26,7 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class bigbluebuttonbn_meeting_event extends \core\event\base
+class bigbluebuttonbn_live_session_event extends \core\event\base
 {
     /**
      * Init method.
@@ -43,7 +43,7 @@ class bigbluebuttonbn_meeting_event extends \core\event\base
      * @return string
      */
     public static function get_name() {
-        return 'BigBlueButtonBN meeting live session event';
+        return 'BigBlueButtonBN live session event';
     }
 
     /**

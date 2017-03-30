@@ -49,7 +49,8 @@ $context = context_module::instance($cm->id);
 bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $cm);
 
 // Additional info related to the course.
-$bbbsession = bigbluebuttonbn_view_init_session();
+
+bigbluebuttonbn_view_bbbsession_init($context, $bigbluebuttonbn, $bbbsession);
 // Additional info related to the course.
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
@@ -112,13 +113,6 @@ $bbbsession['meetingEventsURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.
     '&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
 
-// Metadata (context).
-$bbbsession['contextActivityName'] = $bbbsession['meetingname'];
-$bbbsession['contextActivityDescription'] = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
-$bbbsession['contextActivityTags'] = bigbluebuttonbn_get_tags($cm->id); // Same as $id.
-
-$bigbluebuttonbnactivity = bigbluebuttonbn_view_get_activity_status($bbbsession, $bigbluebuttonbn);
-
 // Initialize session variable used across views.
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
@@ -126,7 +120,13 @@ $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 echo $OUTPUT->header();
 
 bigbluebuttonbn_view_groups($bbbsession);
-bigbluebuttonbn_view_main($bbbsession, $bigbluebuttonbnactivity);
+
+// Metadata (context).
+$bbbsession['contextActivityName'] = $bbbsession['meetingname'];
+$bbbsession['contextActivityDescription'] = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
+$bbbsession['contextActivityTags'] = bigbluebuttonbn_get_tags($bbbsession['cm']->id); // Same as $id.
+
+bigbluebuttonbn_view_main($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession, $bigbluebuttonbn));
 
 // Output finishes.
 echo $OUTPUT->footer();
@@ -134,10 +134,8 @@ echo $OUTPUT->footer();
 // Shows version as a comment.
 echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
 
-function bigbluebuttonbn_view_bbbsession_init($context, $bigbluebuttonbn) {
+function bigbluebuttonbn_view_bbbsession_init($context, $bigbluebuttonbn, &$bbbsession) {
     global $CFG, $USER;
-
-    $bbbsession = array();
 
     // BigBluebuttonBN activity data.
     $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
@@ -210,7 +208,7 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn
     if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
         // The activity has been closed.
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-            $context, $bigbluebuttonbn->presentation);
+            $bbbsession['context'], $bigbluebuttonbn->presentation);
         return 'ended';
     }
 
@@ -230,34 +228,36 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
             $bbbsession['bigbluebuttonbn']->id;
         $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
-    } else {                                        // Separate or visible groups mode.
-        echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<br><div class="alert alert-warning">'.get_string('view_groups_selection_warning', 'bigbluebuttonbn').
-            '</div>';
-        echo $OUTPUT->box_end();
-
-        groups_print_activity_menu($bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
-        if ($groupmode == SEPARATEGROUPS) {
-            $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
-            $currentgroup = current($groups);
-            $bbbsession['group'] = $currentgroup->id;
-        } else {
-            $groups = groups_get_all_groups($bbbsession['course']->id);
-            $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
-        }
-
-        $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-            $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
-        if ($bbbsession['group'] > 0) {
-            $groupname = groups_get_group_name($bbbsession['group']);
-        } else {
-            $groupname = get_string('allparticipants');
-        }
-        $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
+        return;
     }
+
+    // Separate or visible groups mode.
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    echo '<br><div class="alert alert-warning">'.get_string('view_groups_selection_warning', 'bigbluebuttonbn').
+      '</div>';
+    echo $OUTPUT->box_end();
+
+    groups_print_activity_menu($bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
+    if ($groupmode == SEPARATEGROUPS) {
+        $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+        $currentgroup = current($groups);
+        $bbbsession['group'] = $currentgroup->id;
+    } else {
+        $groups = groups_get_all_groups($bbbsession['course']->id);
+        $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
+    }
+
+    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
+        $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
+    if ($bbbsession['group'] > 0) {
+        $groupname = groups_get_group_name($bbbsession['group']);
+    } else {
+        $groupname = get_string('allparticipants');
+    }
+    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
 }
 
-function bigbluebuttonbn_view_main($bbbsession, $activity) {
+function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     global $OUTPUT, $PAGE;
 
     $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
@@ -307,7 +307,7 @@ function bigbluebuttonbn_view_main($bbbsession, $activity) {
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
-function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings, &$jsvars) {
+function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, $showrecordings, &$jsvars) {
     global $OUTPUT;
 
     // JavaScript variables for room.
@@ -349,7 +349,7 @@ function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings,
     return $output;
 }
 
-function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars) {
+function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars) {
 
     // Get recordings.
     $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id,
@@ -385,7 +385,7 @@ function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars) 
     return html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
 }
 
-function bigbluebuttonbn_view_show_imported($bbbsession) {
+function bigbluebuttonbn_view_show_imported(&$bbbsession) {
     global $CFG;
 
     $button = html_writer::tag('input', '',
@@ -401,7 +401,7 @@ function bigbluebuttonbn_view_show_imported($bbbsession) {
     return $output;
 }
 
-function bigbluebuttonbn_view_ended($bbbsession) {
+function bigbluebuttonbn_view_ended(&$bbbsession) {
     global $OUTPUT;
 
     if (!is_null($bbbsession['presentation']['url'])) {

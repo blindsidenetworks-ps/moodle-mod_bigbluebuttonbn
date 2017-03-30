@@ -41,14 +41,17 @@ const BIGBLUEBUTTONBN_METHOD_GET = 'GET';
 const BIGBLUEBUTTONBN_METHOD_POST = 'POST';
 
 const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
+const BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED = 'activity_management_viewed';
+const BIGBLUEBUTTON_EVENT_LIVE_SESSION = 'live_session';
 const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
 const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
 const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
 const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
-const BIGBLUEBUTTON_EVENT_MEETING_EVENT = 'meeting_event';
 const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
 const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
+const BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED = 'recording_protected';
 const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED = 'recording_unprotected';
 const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 
 function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null) {
@@ -271,45 +274,63 @@ function bigbluebuttonbn_get_meeting_info_array($meetingid) {
  *
  * @return associative array with recordings indexed by recordID, each recording is a non sequential associative array
  */
-function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = null) {
-    $recordings = array();
+function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
 
     $meetingidsarray = $meetingids;
     if (!is_array($meetingids)) {
         $meetingidsarray = explode(',', $meetingids);
     }
 
-    // If $meetingidsarray is not empty a paginated getRecordings request is executed.
-    if (!empty($meetingidsarray)) {
-        $pages = floor(count($meetingidsarray) / 25) + 1;
-        for ($page = 1; $page <= $pages; ++$page) {
-            $mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
-            // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-            $xml = bigbluebuttonbn_wrap_xml_load_file(
-                bigbluebuttonbn_bigbluebutton_action_url('getRecordings', ['meetingID' => implode(',', $mids)])
-              );
-            if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                // If there were meetings already created.
-                foreach ($xml->recordings->recording as $recording) {
-                    $recordingarrayvalue = bigbluebuttonbn_get_recording_array_value($recording);
-                    $recordings[$recordingarrayvalue['recordID']] = $recordingarrayvalue;
-                }
-                uasort($recordings, 'bigbluebuttonbn_recording_build_sorter');
+    // If $meetingidsarray is empty there is no need to go further.
+    if (empty($meetingidsarray)) {
+        return array();
+    }
+
+    $recordings = bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
+
+    // Filter recordings based on recordingIDs.
+    $recordingidsarray = $recordingids;
+    if (!is_array($recordingids)) {
+        $recordingidsarray = explode(',', $recordingids);
+    }
+
+    if (empty($recordingidsarray)) {
+        return $recordings;
+    }
+
+    return bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, $recordings);
+}
+
+function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
+
+    $recordings = array();
+
+    // Execute a paginated getRecordings request.
+    $pages = floor(count($meetingidsarray) / 25) + 1;
+    for ($page = 1; $page <= $pages; ++$page) {
+        $mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
+        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
+        $xml = bigbluebuttonbn_wrap_xml_load_file(
+            bigbluebuttonbn_bigbluebutton_action_url('getRecordings', ['meetingID' => implode(',', $mids)])
+          );
+        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+            // If there were meetings already created.
+            foreach ($xml->recordings->recording as $recording) {
+                $recordingarrayvalue = bigbluebuttonbn_get_recording_array_value($recording);
+                $recordings[$recordingarrayvalue['recordID']] = $recordingarrayvalue;
             }
+            uasort($recordings, 'bigbluebuttonbn_recording_build_sorter');
         }
     }
 
-    // Filter recordings based on recordingIDs.
-    if (!empty($recordings) && !is_null($recordingids)) {
-        $recordingidsarray = $recordingids;
-        if (!is_array($recordingids)) {
-            $recordingidsarray = explode(',', $recordingids);
-        }
+    return $recordings;
+}
 
-        foreach ($recordings as $key => $recording) {
-            if (!in_array($recording['recordID'], $recordingidsarray)) {
-                unset($recordings[$key]);
-            }
+function bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, $recordings) {
+
+    foreach ($recordings as $key => $recording) {
+        if (!in_array($recording['recordID'], $recordingidsarray)) {
+            unset($recordings[$key]);
         }
     }
 
@@ -527,7 +548,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
             return $xml;
         } catch (Exception $e) {
             libxml_use_internal_errors($previous);
-            $error = 'Caught exception: '.$e->getMessage();
+            //$error = 'Caught exception: '.$e->getMessage();
             //debugging($error, DEBUG_DEVELOPER);
             return null;
         }
@@ -540,7 +561,7 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
         //debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
         return $response;
     } catch (Exception $e) {
-        $error = 'Caught exception: '.$e->getMessage();
+        //$error = 'Caught exception: '.$e->getMessage();
         //debugging($error, DEBUG_DEVELOPER);
         libxml_use_internal_errors($previous);
         return null;
@@ -722,21 +743,30 @@ function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $
     $participantlist = json_decode($participants);
     // Iterate participant rules.
     foreach ($participantlist as $participant) {
-        if ($participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR) {
-            // Looks for all configuration.
-            if ($participant->selectiontype == 'all') {
+        if (bigbluebuttonbn_is_moderator_rule_validation($participant, $userroles, $userid)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function bigbluebuttonbn_is_moderator_rule_validation($participant, $userroles, $userid) {
+
+    if ($participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR) {
+        // Looks for all configuration.
+        if ($participant->selectiontype == 'all') {
+            return true;
+        }
+        // Looks for users.
+        if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
+            return true;
+        }
+        // Looks for roles.
+        if ($participant->selectiontype == 'role') {
+            $role = bigbluebuttonbn_get_role($participant->selectionid);
+            if (array_key_exists($role->id, $userroles)) {
                 return true;
-            }
-            // Looks for users.
-            if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
-                return true;
-            }
-            // Looks for roles.
-            if ($participant->selectiontype == 'role') {
-                $role = bigbluebuttonbn_get_role($participant->selectionid);
-                if (array_key_exists($role->id, $userroles)) {
-                    return true;
-                }
             }
         }
     }
@@ -849,59 +879,53 @@ function bigbluebuttonbn_get_moodle_version_major() {
     return $versionarray[0];
 }
 
+function bigbluebuttonbn_events() {
+    return array(
+        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED,
+        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED,
+        (string) BIGBLUEBUTTON_EVENT_LIVE_SESSION,
+        (string) BIGBLUEBUTTON_EVENT_MEETING_CREATED,
+        (string) BIGBLUEBUTTON_EVENT_MEETING_ENDED,
+        (string) BIGBLUEBUTTON_EVENT_MEETING_JOINED,
+        (string) BIGBLUEBUTTON_EVENT_MEETING_LEFT,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_DELETED,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED,
+        //(string) BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
+        //(string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
+    );
+}
+
 function bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm,
         $timecreated = null, $userid = null, $eventsubtype = null) {
+
+    $events = bigbluebuttonbn_events();
+
+    if (!in_array($eventtype, $events)) {
+        // No log will be created.
+        return;
+    }
 
     $context = context_module::instance($cm->id);
     $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
 
-    switch ($eventtype) {
-        case BIGBLUEBUTTON_EVENT_MEETING_JOINED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_MEETING_CREATED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_created::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_MEETING_ENDED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_ended::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_MEETING_LEFT:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_published::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_unpublished::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_RECORDING_DELETED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_recording_deleted::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED:
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_management_viewed::create($eventproperties);
-            break;
-        case BIGBLUEBUTTON_EVENT_MEETING_EVENT:
-            $eventproperties['userid'] = $userid;
-            $eventproperties['timecreated'] = $timecreated;
-            $eventproperties['other'] = $eventsubtype;
-            $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_event::create($eventproperties);
-            break;
+    if ($eventtype == BIGBLUEBUTTON_EVENT_LIVE_SESSION) {
+        $eventproperties['userid'] = $userid;
+        $eventproperties['timecreated'] = $timecreated;
+        $eventproperties['other'] = $eventsubtype;
     }
-
-    if (isset($event)) {
-        $event->trigger();
-    }
+    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_'.$eventtype.'::create',
+      array($eventproperties));
+    $event->trigger();
 }
 
 function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm) {
     bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm);
 }
 
-function bigbluebuttonbn_meeting_event_log($event, $bigbluebuttonbn, $cm) {
-    bigbluebuttonbn_event_log_standard(BIGBLUEBUTTON_EVENT_MEETING_EVENT, $bigbluebuttonbn, $cm,
+function bigbluebuttonbn_live_session_event_log($event, $bigbluebuttonbn, $cm) {
+    bigbluebuttonbn_event_log_standard(BIGBLUEBUTTON_EVENT_LIVE_SESSION, $bigbluebuttonbn, $cm,
         $event->timestamp, $event->user, $event->event);
 }
 

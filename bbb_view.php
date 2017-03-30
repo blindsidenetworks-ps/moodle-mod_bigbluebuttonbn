@@ -101,25 +101,30 @@ switch (strtolower($action)) {
         $response = bigbluebutton_bbb_view_create_meeting($bbbsession, $bigbluebuttonbn, $name, $description, $tags);
 
         if (!$response) {
-            // If the server is unreachable, then prompts the user of the necessary action.
-            $printerrorkey = 'view_error_unable_join_student';
+            // The server is unreachable.
             if ($bbbsession['administrator']) {
-                $printerrorkey = 'view_error_unable_join';
+                print_error('view_error_unable_join', 'bigbluebuttonbn',
+                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                break;
             }
             if ($bbbsession['moderator']) {
-                $printerrorkey = 'view_error_unable_join_teacher';
+                print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                break;
             }
-            print_error($printerrorkey, 'bigbluebuttonbn',
+
+            print_error('view_error_unable_join_student', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             break;
         }
 
         if ($response['returncode'] == 'FAILED') {
             // The meeting was not created.
-            $printerrorkey = bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
             if (!$printerrorkey) {
-                $printerrorkey = $response['message'];
+                print_error($response['message'], 'bigbluebuttonbn');
+                break;
             }
+            $printerrorkey = bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
             print_error($printerrorkey, 'bigbluebuttonbn');
             break;
         }
@@ -152,7 +157,7 @@ function bigbluebutton_bbb_view_close_window_manually() {
     echo get_string('view_message_tab_close', 'bigbluebuttonbn');
 }
 
-function bigbluebutton_bbb_view_create_meeting($bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
+function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
 
     // Prepare the metadata.
     $bbbrecordingname = $bbbsession['contextActivityName'];

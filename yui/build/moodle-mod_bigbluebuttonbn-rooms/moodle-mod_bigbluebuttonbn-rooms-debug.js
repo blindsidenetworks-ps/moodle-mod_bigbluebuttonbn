@@ -128,12 +128,12 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     msg_started_at: function(startTime) {
-
         var start_timestamp = (parseInt(startTime, 10) - parseInt(startTime, 10) % 1000);
         var date = new Date(start_timestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
         var started_at = M.util.get_string('view_message_session_started_at', 'bigbluebuttonbn');
+
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
