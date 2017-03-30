@@ -137,6 +137,34 @@ try {
     return;
 }
 
+function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $users) {
+    $status = array("can_join" => false);
+    if ($running) {
+        $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+        if ($bbbsession['userlimit'] == 0 || $users < $bbbsession['userlimit']) {
+            $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+            $status["can_join"] = true;
+        }
+        return $status;
+    }
+  
+    // If user is administrator, moderator or if is viewer and no waiting is required.
+    $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+    if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
+        $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+        $status["can_join"] = true;
+    }  
+    return $status;
+}
+
+function bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running) {
+    $status = array("can_end" => false);
+    if ($running && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
+        $status["can_end"] = true;
+    }
+    return $status;
+}
+
 function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
     $callbackresponse = array();
@@ -154,26 +182,14 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     $status["join_url"] = $bbbsession['joinURL'];
     $status["join_button_text"] = get_string('view_conference_action_join', 'bigbluebuttonbn');
     $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
-    $status["can_join"] = false;
-    $status["can_end"] = false;
-    if ($running) {
-        $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-        if ($bbbsession['userlimit'] == 0 || $info->participantCount < $bbbsession['userlimit']) {
-            $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-            $status["can_join"] = true;
-        }
 
-        if ($bbbsession['administrator'] || $bbbsession['moderator']) {
-            $status["can_end"] = true;
-        }
-    } else {
-        // If user is administrator, moderator or if is viewer and no waiting is required.
-        $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-        if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
-            $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-            $status["can_join"] = true;
-        }
-    }
+    $can_join = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $info->participantCount);
+    $status["can_join"] = $can_join["can_join"];
+    $status["message"] = $can_join["message"];
+
+    $can_end = bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running);
+    $status["can_end"] = $can_end["can_end"];
+
     $callbackresponse['status'] = $status;
 
     $callbackresponsedata = json_encode($callbackresponse);
@@ -400,8 +416,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     $meetingidelements = explode('-', $meetingidelements[0]);
 
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-        $error = 'Caught exception: '.$e->getMessage();
-        header('HTTP/1.0 410 Gone. '.$error);
+        header('HTTP/1.0 410 Gone. The activity may have been deleted');
         return;
     }
 
@@ -430,8 +445,10 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
         return;
     }
 
+    $callbackresponse = array('status' => true);
+
     $importrecordings[$params['id']]['imported'] = true;
-    $overrides['meetingid'] = $importrecordings[$params['id']]['meetingID'];
+    $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
     $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
     bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
@@ -439,7 +456,6 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
     }
 
-    $callbackresponse['status'] = true;
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
@@ -460,8 +476,7 @@ function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn, $cm) {
     $meetingidelements = explode('-', $meetingidelements[0]);
 
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-        $error = 'Caught exception: '.$e->getMessage();
-        header('HTTP/1.0 410 Gone. '.$error);
+        header('HTTP/1.0 410 Gone. The activity may have been deleted');
         return;
     }
 
