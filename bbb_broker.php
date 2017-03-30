@@ -74,14 +74,13 @@ if (!$hascourseaccess) {
     return;
 }
 
-$instancetypeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-$features = $instancetypeprofiles[0]['features'];
+$type = null;
 if (isset($bbbsession['bigbluebuttonbn']->type)) {
-    $features = $instancetypeprofiles[$bbbsession['bigbluebuttonbn']->type]['features'];
+    $type = $bbbsession['bigbluebuttonbn']->type;
 }
-$showroom = (in_array('all', $features) || in_array('showroom', $features));
-$showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
-$importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
+
+$typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+$enabled_features = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
 
 try {
     header('Content-Type: application/javascript; charset=utf-8');
@@ -105,14 +104,14 @@ try {
     }
 
     if ($a == 'recording_info') {
-        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom);
+        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabled_features['showroom']);
         echo $recordinginfo;
         return;
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
         $recordingaction = bigbluebuttonbn_broker_recording_action(
-            $bbbsession, $params, $showroom, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+            $bbbsession, $params, $enabled_features['showroom'], $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
         echo $recordingaction;
         return;
     }

@@ -260,14 +260,13 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
 function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     global $OUTPUT, $PAGE;
 
-    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-    $features = $typeprofiles[0]['features'];
+    $type = null;
     if (isset($bbbsession['bigbluebuttonbn']->type)) {
-        $features = $typeprofiles[$bbbsession['bigbluebuttonbn']->type]['features'];
+        $type = $bbbsession['bigbluebuttonbn']->type;
     }
-    $showroom = (in_array('all', $features) || in_array('showroom', $features));
-    $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
-    $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
+
+    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+    $enabled_features = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
     $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() * 1000;
 
     // JavaScript for locales.
@@ -278,21 +277,21 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
         'activity' => $activity,
         'ping_interval' => $pinginterval,
         'locale' => bigbluebuttonbn_get_localcode(),
-        'profile_features' => $features,
+        'profile_features' => $typeprofiles[0]['features'],
     );
 
     $output = $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
-    if ($showroom) {
-        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings, $jsvars);
+    if ($enabled_features['showroom']) {
+        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $enabled_features['showrecordings'], $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
-    if ($showrecordings) {
-        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, $jsvars);
-        if ($importrecordings && $bbbsession['managerecordings'] &&
+    if ($enabled_features['showrecordings']) {
+        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $enabled_features['showroom'], $jsvars);
+        if ($enabled_features['importrecordings'] && $bbbsession['managerecordings'] &&
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
             $output .= bigbluebuttonbn_view_show_imported($bbbsession);
         }
@@ -352,10 +351,9 @@ function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, $showrecordings
 function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars) {
 
     // Get recordings.
-    $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id,
-                                                 $showroom ? $bbbsession['bigbluebuttonbn']->id : null,
-                                                 $showroom,
-                                                 $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+    $recordings = bigbluebuttonbn_get_recordings(
+        $bbbsession['course']->id, $showroom ? $bbbsession['bigbluebuttonbn']->id : null, $showroom,
+        $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
 
     if (!isset($recordings) || empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.

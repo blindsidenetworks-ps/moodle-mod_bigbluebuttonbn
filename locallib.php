@@ -295,12 +295,20 @@ function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
     }
 
     if (empty($recordingidsarray)) {
+        // No recording ids, no need to filter.
         return $recordings;
     }
 
     return bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, $recordings);
 }
 
+/**
+ * helper function to fetch recordings from a BigBlueButton server.
+ *
+ * @param array $meetingidsarray   array with meeting ids in the form array("mid1","mid2","mid3")
+ *
+ * @return associative array with recordings indexed by recordID, each recording is a non sequential associative array
+ */
 function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
 
     $recordings = array();
@@ -1993,6 +2001,20 @@ function bigbluebuttonbn_get_instance_type_profiles() {
     );
 
     return $instanceprofiles;
+}
+
+function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
+    $enabled_features = array();
+
+    $features = $typeprofiles[0]['features'];
+    if (!is_null($type)) {
+        $features = $typeprofiles[$type]['features'];
+    }
+    $enabled_features['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
+    $enabled_features['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
+    $enabled_features['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+
+    return $enabled_features;
 }
 
 function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
