@@ -709,24 +709,27 @@ function bigbluebuttonbn_get_participant_list_default($context) {
     global $USER;
 
     $participantlistarray = array();
-    $participantlistarray[] = array('selectiontype' => 'all',
-                                       'selectionid' => 'all',
-                                       'role' => BIGBLUEBUTTONBN_ROLE_VIEWER, );
+    $participantlistarray[] = array(
+        'selectiontype' => 'all',
+        'selectionid' => 'all',
+        'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
 
     $moderatordefaults = explode(',', bigbluebuttonbn_get_cfg_moderator_default());
     foreach ($moderatordefaults as $moderatordefault) {
         if ($moderatordefault == 'owner') {
             if (is_enrolled($context, $USER->id)) {
-                $participantlistarray[] = array('selectiontype' => 'user',
-                                                  'selectionid' => $USER->id,
-                                                  'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR, );
+                $participantlistarray[] = array(
+                    'selectiontype' => 'user',
+                    'selectionid' => $USER->id,
+                    'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
             }
             continue;
         }
 
-        $participantlistarray[] = array('selectiontype' => 'role',
-                                          'selectionid' => $moderatordefault,
-                                          'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR, );
+        $participantlistarray[] = array(
+              'selectiontype' => 'role',
+              'selectionid' => $moderatordefault,
+              'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
     }
 
     return $participantlistarray;
@@ -751,7 +754,7 @@ function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $
     $participantlist = json_decode($participants);
     // Iterate participant rules.
     foreach ($participantlist as $participant) {
-        if (bigbluebuttonbn_is_moderator_rule_validation($participant, $userroles, $userid)) {
+        if (bigbluebuttonbn_is_moderator_rule_validation($participant, $userid, $userroles)) {
             return true;
         }
     }
@@ -759,24 +762,26 @@ function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $
     return false;
 }
 
-function bigbluebuttonbn_is_moderator_rule_validation($participant, $userroles, $userid) {
+function bigbluebuttonbn_is_moderator_rule_validation($participant, $userid, $userroles) {
 
-    if ($participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR) {
-        // Looks for all configuration.
-        if ($participant->selectiontype == 'all') {
-            return true;
-        }
-        // Looks for users.
-        if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
-            return true;
-        }
-        // Looks for roles.
-        if ($participant->selectiontype == 'role') {
-            $role = bigbluebuttonbn_get_role($participant->selectionid);
-            if (array_key_exists($role->id, $userroles)) {
-                return true;
-            }
-        }
+    if ($participant->role == BIGBLUEBUTTONBN_ROLE_VIEWER) {
+        return false;
+    }
+
+    // Looks for all configuration.
+    if ($participant->selectiontype == 'all') {
+        return true;
+    }
+
+    // Looks for users.
+    if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
+        return true;
+    }
+
+    // Looks for roles.
+    $role = bigbluebuttonbn_get_role($participant->selectionid);
+    if (array_key_exists($role->id, $userroles)) {
+        return true;
     }
 
     return false;
