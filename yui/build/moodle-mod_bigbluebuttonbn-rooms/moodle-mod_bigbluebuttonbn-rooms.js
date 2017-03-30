@@ -25,7 +25,7 @@ M.mod_bigbluebuttonbn.rooms = {
     datasource: null,
     bigbluebuttonbn: {},
     panel: null,
-    pinginterval: 10000,
+    pinginterval: null,
 
     /**
      * Initialise the broker code.
@@ -38,6 +38,9 @@ M.mod_bigbluebuttonbn.rooms = {
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.pinginterval = bigbluebuttonbn.ping_interval;
+        if (this.pinginterval === 0) {
+            this.pinginterval = 10000;
+        }
 
         if (this.bigbluebuttonbn.profile_features.includes('all') || this.bigbluebuttonbn.profile_features.includes('showroom')) {
             this.init_room();

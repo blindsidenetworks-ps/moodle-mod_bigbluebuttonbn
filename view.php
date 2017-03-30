@@ -244,9 +244,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
     $showrecordings = (in_array('all', $features) || in_array('showrecordings', $features));
     $importrecordings = (in_array('all', $features) || in_array('importrecordings', $features));
     $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() * 1000;
-    if ($pinginterval == 0) {
-        $pinginterval = 15000;
-    }
 
     // JavaScript for locales.
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
@@ -288,8 +285,6 @@ function bigbluebuttonbn_view($bbbsession, $activity) {
 function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings, &$jsvars) {
     global $OUTPUT;
 
-    $output = '';
-
     // JavaScript variables for room.
     $openingtime = '';
     if ($bbbsession['openingtime']) {
@@ -309,7 +304,7 @@ function bigbluebuttonbn_view_show_room($bbbsession, $activity, $showrecordings,
         'closing' => $closingtime,
     );
 
-    $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+    $output = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
     $output .= '<br><span id="status_bar"></span><br>';
     $output .= '<span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();
@@ -368,15 +363,13 @@ function bigbluebuttonbn_view_show_recordings($bbbsession, $showroom, &$jsvars) 
 function bigbluebuttonbn_view_show_imported($bbbsession) {
     global $CFG;
 
-    $output = '';
-
     $button = html_writer::tag('input', '',
         array('type' => 'button',
               'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
               'class' => 'btn btn-secondary',
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.
                   $bbbsession['bigbluebuttonbn']->id.'\''));
-    $output .= html_writer::start_tag('br');
+    $output = html_writer::start_tag('br');
     $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
     $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
 

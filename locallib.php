@@ -1522,7 +1522,7 @@ function bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() {
         return $CFG->bigbluebuttonbn_waitformoderator_ping_interval;
     }
 
-    return  15;
+    return  10;
 }
 
 /**
