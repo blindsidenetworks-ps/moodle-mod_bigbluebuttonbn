@@ -2009,17 +2009,17 @@ function bigbluebuttonbn_get_instance_type_profiles() {
 }
 
 function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
-    $enabled_features = array();
+    $enabledfeatures = array();
 
     $features = $typeprofiles[0]['features'];
     if (!is_null($type)) {
         $features = $typeprofiles[$type]['features'];
     }
-    $enabled_features['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
-    $enabled_features['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
-    $enabled_features['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+    $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
+    $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
+    $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
 
-    return $enabled_features;
+    return $enabledfeatures;
 }
 
 function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {

@@ -80,7 +80,7 @@ if (isset($bbbsession['bigbluebuttonbn']->type)) {
 }
 
 $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-$enabled_features = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
+$enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
 
 try {
     header('Content-Type: application/javascript; charset=utf-8');
@@ -104,14 +104,14 @@ try {
     }
 
     if ($a == 'recording_info') {
-        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabled_features['showroom']);
+        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordinginfo;
         return;
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
         $recordingaction = bigbluebuttonbn_broker_recording_action(
-            $bbbsession, $params, $enabled_features['showroom'], $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+            $bbbsession, $params, $enabledfeatures['showroom'], $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
         echo $recordingaction;
         return;
     }
@@ -186,12 +186,12 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
     if (isset($info['participantCount'])) {
         $participantcount = $info['participantCount'];
     }
-    $can_join = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount);
-    $status["can_join"] = $can_join["can_join"];
-    $status["message"] = $can_join["message"];
+    $canjoin = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount);
+    $status["can_join"] = $canjoin["can_join"];
+    $status["message"] = $canjoin["message"];
 
-    $can_end = bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running);
-    $status["can_end"] = $can_end["can_end"];
+    $canend = bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running);
+    $status["can_end"] = $canend["can_end"];
 
     $callbackresponse['status'] = $status;
 
