@@ -165,17 +165,17 @@ function bigbluebutton_bbb_view_close_window_manually() {
 function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
 
     // Prepare the metadata.
-    $bbbrecordingname = $bbbsession['meetingname'];
+    $bbbrecname = $bbbsession['meetingname'];
     if (!empty($name)) {
-        $bbbrecordingname = $name;
+        $bbbrecname = $name;
     }
-    $bbbrecordingdescription = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
+    $bbbrecdescription = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
     if (!empty($description)) {
-        $bbbrecordingdescription = $description;
+        $bbbrecdescription = $description;
     }
-    $bbbrecordingtags = bigbluebuttonbn_get_tags($bbbsession['cm']->id); // Same as $id.
+    $bbbrectags = bigbluebuttonbn_get_tags($bbbsession['cm']->id); // Same as $id.
     if (!empty($tags)) {
-        $bbbrecordingtags = $tags;
+        $bbbrectags = $tags;
     }
     $metadata = array('bbb-origin' => $bbbsession['origin'],
                       'bbb-origin-version' => $bbbsession['originVersion'],
@@ -183,9 +183,9 @@ function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $
                       'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
                       'bbb-origin-tag' => $bbbsession['originTag'],
                       'bbb-context' => $bbbsession['course']->fullname,
-                      'bbb-recording-name' => $bbbrecordingname,
-                      'bbb-recording-description' => $bbbrecordingdescription,
-                      'bbb-recording-tags' => $bbbrecordingtags,
+                      'bbb-recording-name' => $bbbrecname,
+                      'bbb-recording-description' => $bbbrecdescription,
+                      'bbb-recording-tags' => $bbbrectags,
                     );
 
     if (bigbluebuttonbn_is_bn_server()) {

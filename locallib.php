@@ -1902,14 +1902,16 @@ function bigbluebuttonbn_html2text($html, $len) {
     return $text;
 }
 
+/**
+ * helper function to obtain the tags linked to a bigbluebuttonbn activity
+ *
+ * @param string $id
+ *
+ * @return string containing the tags separated by commas
+ */
 function bigbluebuttonbn_get_tags($id) {
-    $tags = '';
     $tagsarray = core_tag_tag::get_item_tags_array('core', 'course_modules', $id);
-    foreach ($tagsarray as $tag) {
-        $tags .= ($tags == '') ? $tag : ','.$tag;
-    }
-
-    return $tags;
+    return implode(',', $tagsarray);
 }
 
 /**
