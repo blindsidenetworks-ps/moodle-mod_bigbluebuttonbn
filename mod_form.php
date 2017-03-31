@@ -287,7 +287,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     private function bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $data) {
-        $participantselection = $this->bigbluebuttonbn_get_participant_selection_data();
+        $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $participantlist = $data['participant_list'];
 
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
@@ -364,18 +364,5 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
-    }
-
-    private function bigbluebuttonbn_get_participant_selection_data() {
-        return [
-          'type_options' => [
-              'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
-              'role' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
-              'user' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
-          ],
-          'type_selected' => 'all',
-          'options' => ['all' => '---------------'],
-          'selected' => 'all',
-        ];
     }
 }

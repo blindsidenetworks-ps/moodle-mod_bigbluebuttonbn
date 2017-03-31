@@ -735,6 +735,19 @@ function bigbluebuttonbn_get_participant_list_default($context) {
     return $participantlistarray;
 }
 
+function bigbluebuttonbn_get_participant_selection_data() {
+    return [
+        'type_options' => [
+            'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
+            'role' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
+            'user' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
+          ],
+        'type_selected' => 'all',
+        'options' => ['all' => '---------------'],
+        'selected' => 'all',
+      ];
+}
+
 function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $userroles = null) {
     global $USER;
 
