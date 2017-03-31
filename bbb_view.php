@@ -57,6 +57,7 @@ $PAGE->blocks->show_only_fake_blocks();
 
 require_login($course, true, $cm);
 
+$bbbsession = null;
 if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
@@ -65,21 +66,25 @@ switch (strtolower($action)) {
     case 'logout':
         if (isset($errors) && $errors != '') {
             bigbluebutton_bbb_view_errors($errors, $id);
-        } else if (isset($bbbsession) && !is_null($bbbsession)) {
-            // Moodle event logger: Create an event for meeting left.
-            bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $cm);
-
-            // Update the cache.
-            $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
-
-            // Close the tab or window where BBB was opened.
-            bigbluebutton_bbb_view_close_window();
-        } else {
-            bigbluebutton_bbb_view_close_window_manually();
+            break;
         }
+
+        if (is_null($bbbsession)) {
+            bigbluebutton_bbb_view_close_window_manually();
+            break;
+        }
+
+        // Moodle event logger: Create an event for meeting left.
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $cm);
+
+        // Update the cache.
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
+
+        // Close the tab or window where BBB was opened.
+        bigbluebutton_bbb_view_close_window();
         break;
     case 'join':
-        if (!isset($bbbsession) || is_null($bbbsession)) {
+        if (is_null($bbbsession)) {
             print_error('view_error_unable_join', 'bigbluebuttonbn');
             break;
         }
@@ -160,15 +165,15 @@ function bigbluebutton_bbb_view_close_window_manually() {
 function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
 
     // Prepare the metadata.
-    $bbbrecordingname = $bbbsession['contextActivityName'];
+    $bbbrecordingname = $bbbsession['meetingname'];
     if (!empty($name)) {
         $bbbrecordingname = $name;
     }
-    $bbbrecordingdescription = $bbbsession['contextActivityDescription'];
+    $bbbrecordingdescription = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
     if (!empty($description)) {
         $bbbrecordingdescription = $description;
     }
-    $bbbrecordingtags = $bbbsession['contextActivityTags'];
+    $bbbrecordingtags = bigbluebuttonbn_get_tags($bbbsession['cm']->id); // Same as $id.
     if (!empty($tags)) {
         $bbbrecordingtags = $tags;
     }
