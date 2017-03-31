@@ -58,15 +58,18 @@ M.mod_bigbluebuttonbn.rooms = {
         this.update_room();
     },
 
-    update_room: function() {
+    update_room: function(f) {
+        f = typeof f !== 'undefined' ? f : false;
+
         var status_bar = Y.one('#status_bar');
         var control_panel = Y.one('#control_panel');
         var join_button = Y.one('#join_button');
         var end_button = Y.one('#end_button');
         var id = this.bigbluebuttonbn.meetingid;
         var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
+        var forced = f ? 'true' : 'false';
         this.datasource.sendRequest({
-            request: 'action=meeting_info&id=' + id + '&bigbluebuttonbn=' + bnid,
+            request: 'action=meeting_info&id=' + id + '&bigbluebuttonbn=' + bnid + '&forced=' + forced,
             callback: {
                 success: function(e) {
                     Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
@@ -210,7 +213,7 @@ M.mod_bigbluebuttonbn.rooms = {
     remote_update: function(delay) {
         setTimeout(function() {
             M.mod_bigbluebuttonbn.rooms.clean_room();
-            M.mod_bigbluebuttonbn.rooms.update_room();
+            M.mod_bigbluebuttonbn.rooms.update_room(true);
         }, delay);
     },
 

@@ -46,7 +46,7 @@ M.mod_bigbluebuttonbn.broker = {
         // Update view.
         setTimeout(function() {
             M.mod_bigbluebuttonbn.rooms.clean_room();
-            M.mod_bigbluebuttonbn.rooms.update_room();
+            M.mod_bigbluebuttonbn.rooms.update_room(true);
         }, 15000);
     },
 

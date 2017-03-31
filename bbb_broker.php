@@ -35,6 +35,7 @@ $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
+$params['forced'] = optional_param('forced', 'false', PARAM_TEXT);
 
 if (empty($params['action'])) {
     header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
@@ -86,7 +87,7 @@ try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
     if ($a == 'meeting_info') {
-        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params);
+        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['forced'] == 'true'));
         echo $meetinginfo;
         return;
     }
@@ -136,39 +137,10 @@ try {
     return;
 }
 
-function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount) {
-    $status = array("can_join" => false);
-    if ($running) {
-        $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-        if ($bbbsession['userlimit'] == 0 || $participantcount < $bbbsession['userlimit']) {
-            $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-            $status["can_join"] = true;
-        }
-        return $status;
-    }
-
-    // If user is administrator, moderator or if is viewer and no waiting is required.
-    $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-    if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
-        $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-        $status["can_join"] = true;
-    }
-    return $status;
-}
-
-function bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running) {
-    $status = array("can_end" => false);
-    if ($running && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
-        $status["can_end"] = true;
-    }
-    return $status;
-}
-
-function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
-
+function bigbluebuttonbn_broker_meeting_info($bbbsession, $params, $forced) {
     $callbackresponse = array();
 
-    $info = bigbluebuttonbn_get_meeting_info($params['id']);
+    $info = bigbluebuttonbn_get_meeting_info($params['id'], $forced);
     $callbackresponse['info'] = $info;
 
     $running = false;
@@ -197,6 +169,34 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params) {
 
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
+}
+
+function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount) {
+    $status = array("can_join" => false);
+    if ($running) {
+        $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+        if ($bbbsession['userlimit'] == 0 || $participantcount < $bbbsession['userlimit']) {
+            $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+            $status["can_join"] = true;
+        }
+        return $status;
+    }
+
+    // If user is administrator, moderator or if is viewer and no waiting is required.
+    $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+    if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
+        $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+        $status["can_join"] = true;
+    }
+    return $status;
+}
+
+function bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running) {
+    $status = array("can_end" => false);
+    if ($running && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
+        $status["can_end"] = true;
+    }
+    return $status;
 }
 
 function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebuttonbn, $cm) {
