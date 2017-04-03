@@ -3,11 +3,15 @@ Enhancement: Included the parameter userID as part of the join request.
 Enhancement: Added preview thumbnails to recordings.
 Enhancement: Added type to diferenciate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
 
+2.1.7 (2016051911)
+Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
+Bug: Fixed issue with a string not properly localised.
+
 2.1.6 (2016051910)
 Bug: Fixed issue with groups not shown correctly when set up as separated and no groups where created. (CONTRIB-6652)
 Bug: Fixed issue with references to recordings and imported links duplicated when a backup is restored in a different course.
 Bug: Fixed issue with references to recordings and imported links not being properly restored when using the option import from backups.
-Bug: Fixed issue with guest users not being able to join as moderators even though the role is matched with the role with BBB .
+Bug: Fixed issue with guest users not able to join as moderators even though the role is matched with the role with BBB .
 
 2.1.5 (2016051909)
 Bug: Fixed issue with actions for recording managment not working in instances with schedule. (CONTRIB-6654)

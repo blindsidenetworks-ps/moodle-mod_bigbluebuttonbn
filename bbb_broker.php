@@ -261,7 +261,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         if (!array_key_exists('messageKey', $recordings[$params['id']])) {
             // The recording was found.
             $callbackresponse['status'] = true;
-            $callbackresponse['published'] = $recordings[$params['id']]['published'];
+            $callbackresponse['published'] = ($recordings[$params['id']]['published'] == 'true');
         }
         $callbackresponsedata = json_encode($callbackresponse);
         return "{$params['callback']}({$callbackresponsedata});";

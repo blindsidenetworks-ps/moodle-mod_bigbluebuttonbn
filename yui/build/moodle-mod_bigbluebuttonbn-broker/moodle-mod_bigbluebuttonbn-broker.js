@@ -52,19 +52,37 @@ M.mod_bigbluebuttonbn.broker = {
 
     recording_action: function(action, recordingid, meetingid) {
         if (action === 'import') {
-            return this.recording_import(recordingid);
+            return this.recording_import({
+                recordingid: recordingid
+            });
         }
 
         if (action === 'delete') {
-            return this.recording_delete(recordingid, meetingid);
+            return this.recording_delete({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
         }
 
         if (action === 'publish') {
-            return this.recording_publish(recordingid, meetingid);
+            return this.recording_publish({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
         }
 
         if (action === 'unpublish') {
-            return this.recording_unpublish(recordingid, meetingid);
+            return this.recording_unpublish({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
+        }
+
+        if (action === 'update') {
+            return this.recording_update({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
         }
 
         return null;
@@ -105,7 +123,7 @@ M.mod_bigbluebuttonbn.broker = {
                 action: 'delete',
                 recordingid: recordingid,
                 meetingid: meetingid,
-                goalstate: 'false'
+                goalstate: false
             });
         }, this);
     },
@@ -115,7 +133,7 @@ M.mod_bigbluebuttonbn.broker = {
             action: 'publish',
             recordingid: recordingid,
             meetingid: meetingid,
-            goalstate: 'true'
+            goalstate: true
         });
     },
 
@@ -133,9 +151,22 @@ M.mod_bigbluebuttonbn.broker = {
                 action: 'unpublish',
                 recordingid: recordingid,
                 meetingid: meetingid,
-                goalstate: 'false'
+                goalstate: false
             });
         }, this);
+    },
+
+    recording_update: function(recordingid, meetingid) {
+        console.info("Updating...");
+        /*
+        this.recording_action_perform({
+            action: 'update',
+            recordingid: recordingid,
+            meetingid: meetingid,
+            target: data.target,
+            goalstate: true,
+        });
+        */
     },
 
     recording_action_perform: function(payload) {
@@ -144,7 +175,7 @@ M.mod_bigbluebuttonbn.broker = {
             request: "action=recording_" + payload.action + "&id=" + payload.recordingid,
             callback: {
                 success: function(e) {
-                    if (e.data.status === 'true') {
+                    if (e.data.status) {
                         return M.mod_bigbluebuttonbn.broker.recording_action_performed({
                             attempt: 1,
                             action: payload.action,
@@ -174,7 +205,7 @@ M.mod_bigbluebuttonbn.broker = {
                         payload.action, e.data
                     );
 
-                    if (typeof currentstate == "undefined" || currentstate === null) {
+                    if (currentstate === null) {
                         payload.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
                         return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
                     }
@@ -213,7 +244,11 @@ M.mod_bigbluebuttonbn.broker = {
         }
 
         if (action === 'protect' || action === 'unprotect') {
-            return data.secure;
+            return data.secured;
+        }
+
+        if (action === 'update') {
+            return data.updated;
         }
 
         return null;

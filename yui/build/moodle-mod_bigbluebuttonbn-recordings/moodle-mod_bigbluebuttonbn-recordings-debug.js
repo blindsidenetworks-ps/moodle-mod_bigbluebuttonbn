@@ -86,19 +86,19 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
-        btn.setAttribute('data-osrc', btn.getAttribute('src'));
+        btn.setAttribute('data-src', btn.getAttribute('src'));
         btn.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
-        link.setAttribute('data-oonlcick', link.getAttribute('onclick'));
+        link.setAttribute('data-onlcick', link.getAttribute('onclick'));
         link.setAttribute('onclick', '');
     },
 
     recording_action_completed: function(data) {
         var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
-        var btnosrc = btn.getAttribute('data-osrc');
+        var btnsrc = btn.getAttribute('data-src');
         var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
-        var linkoonclick = link.getAttribute('data-oonlcick');
+        var linkonclick = link.getAttribute('data-onlcick');
 
         var action = 'publish';
         var linkaction = 'show';
@@ -115,10 +115,10 @@ M.mod_bigbluebuttonbn.recordings = {
 
         btn.setAttribute('id', 'recording-btn-' + action + '-' + data.recordingid);
         link.setAttribute('id', 'recording-link-' + action + '-' + data.recordingid);
-        btn.setAttribute('src', btnosrc.substring(0, btnosrc.length - 4) + linkaction);
+        btn.setAttribute('src', btnsrc.substring(0, btnsrc.length - 4) + linkaction);
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
-        link.setAttribute('onclick', linkoonclick.replace(data.action, action));
+        link.setAttribute('onclick', linkonclick.replace(data.action, action));
     },
 
     recording_action_failed: function(data) {
@@ -138,16 +138,54 @@ M.mod_bigbluebuttonbn.recordings = {
 
         btn.setAttribute('id', 'recording-btn-' + data.action + '-' + data.recordingid);
         link.setAttribute('id', 'recording-link-' + data.action + '-' + data.recordingid);
-        btn.setAttribute('src', btn.getAttribute('data-osrc'));
+        btn.setAttribute('src', btn.getAttribute('data-src'));
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
-        link.setAttribute('onclick', link.getAttribute('data-oonlcick'));
+        link.setAttribute('onclick', link.getAttribute('data-onlcick'));
     },
 
     recording_delete_completed: function(data) {
         Y.one('#recording-td-' + data.recordingid).remove();
-    }
+    },
 
+    //recording_edit: function(recordingid, meetingid, target) {
+    recording_edit: function(element) {
+        var nodeeditlink = Y.one(element);
+        var node = nodeeditlink.ancestor('div');
+        console.info('Editing ' + node.getAttribute('data-target') + '...');
+        var nodetext = node.one('> span');
+
+        nodetext.hide();
+        nodeeditlink.hide();
+
+        var nodeinputtext = Y.Node.create('<input type="text" class="form-control"></input>');
+        nodeinputtext.setAttribute('id', node.getAttribute('id'));
+        nodeinputtext.setAttribute('value', nodetext.getHTML());
+        nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
+        node.append(nodeinputtext);
+
+        //console.info(node.get('children'));
+        //console.info(node.one('> span'));
+        //console.info(node.one('> a'));
+    },
+
+    recording_edit_keydown: function(element) {
+        if (event.keyCode == 13) {
+            var text = element.value;
+            var nodeinputtext = Y.one(element);
+            var node = nodeinputtext.ancestor('div');
+            var nodetext = node.one('> span');
+            var nodeeditlink = node.one('> a');
+            return setTimeout((function() {
+                M.mod_bigbluebuttonbn.broker.recording_action(
+                    'update', node.getAttribute('data-recordingid'), node.getAttribute('data-meetingid'));
+                nodetext.setHTML(text);
+                nodeinputtext.hide();
+                nodetext.show();
+                nodeeditlink.show();
+            }), 0);
+        }
+    }
 };
 
 
