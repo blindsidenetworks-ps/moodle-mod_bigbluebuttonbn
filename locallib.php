@@ -431,24 +431,12 @@ function bigbluebuttonbn_get_guest_role(context $context = null) {
 
 function bigbluebuttonbn_get_role_name($role_shortname){
     $role = bigbluebuttonbn_get_db_moodle_roles($role_shortname);
+
     if( $role != null && $role->name != "") {
-        $role_name = $role->name;
-    } else {
-        switch ($role_shortname) {
-            case 'manager':         $role_name = get_string('manager', 'role'); break;
-            case 'coursecreator':   $role_name = get_string('coursecreators'); break;
-            case 'editingteacher':  $role_name = get_string('defaultcourseteacher'); break;
-            case 'teacher':         $role_name = get_string('noneditingteacher'); break;
-            case 'student':         $role_name = get_string('defaultcoursestudent'); break;
-            case 'guest':           $role_name = get_string('guest'); break;
-            case 'user':            $role_name = get_string('authenticateduser'); break;
-            case 'frontpage':       $role_name = get_string('frontpageuser', 'role'); break;
-            // We should not get here, the role UI should require the name for custom roles!
-            default:                $role_name = $role_shortname; break;
-        }
+        return $role->name;
     }
 
-    return $role_name;
+    return role_get_name($role);
 }
 
 function bigbluebuttonbn_get_roles($rolename='all', $format='json'){
