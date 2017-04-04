@@ -35,17 +35,8 @@ M.mod_bigbluebuttonbn.broker = {
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
 
-    join: function(join_url) {
-        M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
-    },
-
     join_redirect: function(join_url) {
         window.open(join_url);
-        // Update view.
-        setTimeout(function() {
-            M.mod_bigbluebuttonbn.rooms.clean_room();
-            M.mod_bigbluebuttonbn.rooms.update_room(true);
-        }, 15000);
     },
 
     recording_import: function(data) {

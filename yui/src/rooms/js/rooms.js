@@ -177,7 +177,7 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
         Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
 
-        var input_html = 'M.mod_bigbluebuttonbn.broker.join(\'' + status.join_url + '\');';
+        var input_html = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
         Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
 
         if (!status.can_join) {
@@ -285,6 +285,14 @@ M.mod_bigbluebuttonbn.rooms = {
                 }
             }
         });
-    }
+    },
 
+    join: function(join_url) {
+        M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
+        // Update view.
+        setTimeout(function() {
+            M.mod_bigbluebuttonbn.rooms.clean_room();
+            M.mod_bigbluebuttonbn.rooms.update_room(true);
+        }, 15000);
+    }
 };
