@@ -39,86 +39,68 @@ M.mod_bigbluebuttonbn.broker = {
         window.open(join_url);
     },
 
-    recording_import: function(data) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('import', data.recordingid)
-        });
-
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            this.datasource.sendRequest({
-                request: "action=recording_import" + "&id=" + data.recordingid,
-                callback: {
-                    success: function() {
-                        Y.one('#recording-td-' + data.recordingid).remove();
-                    }
-                }
-            });
-        }, this);
-    },
-
-    recording_action_perform: function(payload) {
+    recording_action_perform: function(data) {
         this.datasource.sendRequest({
-            request: "action=recording_" + payload.action + "&id=" + payload.recordingid,
+            request: this.recording_action_perform_qs(data),
             callback: {
                 success: function(e) {
-                    if (e.data.status) {
-                        return M.mod_bigbluebuttonbn.broker.recording_action_performed({
-                            attempt: 1,
-                            action: payload.action,
-                            meetingid: payload.meetingid,
-                            recordingid: payload.recordingid,
-                            goalstate: payload.goalstate
-                        });
+                    if (typeof data.goalstate === 'undefined') {
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(data);
                     }
 
-                    payload.message = e.data.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    if (e.data.status) {
+                        data.attempt = 1;
+                        return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
+                    }
+
+                    data.message = e.data.message;
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
                 },
                 failure: function(e) {
-                    payload.message = e.error.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    data.message = e.error.message;
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
                 }
             }
         });
     },
 
-    recording_action_performed: function(payload) {
+    recording_action_perform_qs: function(data) {
+        var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
+        if (typeof data.source !== 'undefined') {
+            qs += "&" + data.source + "=" + data.goalstate;
+        }
+        return qs;
+    },
+
+    recording_action_performed: function(data) {
         this.datasource.sendRequest({
-            request: "action=recording_info&id=" + payload.recordingid + "&idx=" + payload.meetingid,
+            request: "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid,
             callback: {
                 success: function(e) {
-                    var currentstate = M.mod_bigbluebuttonbn.broker.recording_current_state(
-                        payload.action, e.data
-                    );
-
-                    if (currentstate === null) {
-                        payload.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    if (typeof e.data[data.source] === 'undefined') {
+                        data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
                     }
 
-                    if (currentstate === payload.goalstate) {
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(payload);
+                    if (e.data[data.source] === data.goalstate) {
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(data);
                     }
 
-                    if (payload.attempt < 5) {
-                        payload.attempt += 1;
+                    if (data.attempt < 5) {
+                        data.attempt += 1;
                         return setTimeout(((function() {
                             return function() {
-                                M.mod_bigbluebuttonbn.broker.recording_action_performed(payload);
+                                M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
                             };
-                        })(this)), (payload.attempt - 1) * 1000);
+                        })(this)), (data.attempt - 1) * 1000);
                     }
 
-                    payload.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    data.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
                 },
                 failure: function(e) {
-                    payload.message = e.error.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(payload);
+                    data.message = e.error.message;
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
                 }
             }
         });

@@ -132,6 +132,9 @@ try {
         return;
     }
 
+    header('HTTP/1.0 400 Bad request. The action {$a} doesn\'t exist');
+    return;
+
 } catch (Exception $e) {
     header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());
     return;

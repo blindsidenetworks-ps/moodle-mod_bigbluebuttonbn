@@ -1272,11 +1272,11 @@ function bigbluebuttonbn_get_recording_data_row_text($text, $edit) {
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_edit(this);';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $editaction.
-        $iconattributes = array('class' => 'icon smallicon');
+        $iconattributes = array('id' => $id, 'class' => 'icon smallicon');
         $icon = new pix_icon('i/'.$edit['action'],
             get_string($edit['action']) . ' ' . get_string('view_recording_' . $edit['target'] ,'bigbluebuttonbn'),
             'moodle', $iconattributes);
-        $linkattributes = array('onclick' => $onclick);
+        $linkattributes = array('id' => $id, 'onclick' => $onclick);
         $htmllink = $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
         return $head . $htmltext . $htmllink . $tail;
     }
