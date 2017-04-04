@@ -1121,30 +1121,40 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 }
 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
+
+    $id = 'recording-actionbar-' . $recording['recordID'];
+    $attributes = array(
+        'id' => $id, 'data-recordingid' => $recording['recordID'], 'data-meetingid' => $recording['meetingID']);
+
     $actionbar = '';
 
     if (in_array('publishing', $tools)) {
         // Set action [show|hide].
-        $manageaction = 'publish';
-        $managetag = 'show';
+        $payload = array('action' => 'publish', 'tag' => 'show');
         if ($recording['published'] == 'true') {
-            $manageaction = 'unpublish';
-            $managetag = 'hide';
+            $payload = array('action' => 'unpublish', 'tag' => 'hide');
         }
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($manageaction, $managetag, $recording);
+        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
     }
 
     if (in_array('deleting', $tools)) {
-        $manageaction = $managetag = 'delete';
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($manageaction, $managetag, $recording);
+        $payload = array('action' => 'delete', 'tag' => 'delete');
+        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
     }
 
     if (in_array('importing', $tools)) {
-        $manageaction = $managetag = 'import';
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($manageaction, $managetag, $recording);
+        $payload = array('action' => 'import', 'tag' => 'import');
+        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
     }
 
-    return $actionbar;
+    if (in_array('securing', $tools)) {
+        $payload = array('action' => 'secure', 'tag' => 'secure');
+        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
+    }
+
+    $head = html_writer::start_tag('div', $attributes);
+    $tail = html_writer::end_tag('div');
+    return $head . $actionbar . $tail;
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
@@ -1267,7 +1277,6 @@ function bigbluebuttonbn_get_recording_data_row_text($text, $edit) {
             get_string($edit['action']) . ' ' . get_string('view_recording_' . $edit['target'] ,'bigbluebuttonbn'),
             'moodle', $iconattributes);
         $linkattributes = array('onclick' => $onclick);
-
         $htmllink = $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
         return $head . $htmltext . $htmllink . $tail;
     }
@@ -1275,31 +1284,27 @@ function bigbluebuttonbn_get_recording_data_row_text($text, $edit) {
     // With text for $editaction.
     $linkattributes = array('title' => get_string($edit['action']), 'class' => 'btn btn-xs btn-secondary',
         'onclick' => $onclick);
-
     $htmllink = $OUTPUT->action_link('#', get_string($edit['action']), null, $linkattributes);
     return $head . $htmltext . $htmllink . $tail;
 }
 
-function bigbluebuttonbn_actionbar_render_button($manageaction, $managetag, $recording) {
+function bigbluebuttonbn_actionbar_render_button($recording, $payload) {
     global $OUTPUT;
 
-    $onclick = 'M.mod_bigbluebuttonbn.broker.recording_action("'.$manageaction.'", "'.
-        $recording['recordID'].'", "'.$recording['meetingID'].'");';
+    $id = 'recording-' . $payload['action'] . '-' . $recording['recordID'];
+    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_action(this);';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $manageaction.
-        $iconattributes = array('id' => 'recording-btn-'.$manageaction.'-'.$recording['recordID']);
-        $icon = new pix_icon('i/'.$managetag, get_string($managetag), 'moodle', $iconattributes);
-        $linkattributes = array('id' => 'recording-link-'.$manageaction.'-'.$recording['recordID'],
-            'onclick' => $onclick);
-
+        $iconattributes = array('id' => $id);
+        $icon = new pix_icon('i/'.$payload['tag'], get_string($payload['tag']), 'moodle', $iconattributes);
+        $linkattributes = array('id' => $id, 'onclick' => $onclick, 'data-action' => $payload['action']);
         return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
     }
 
     // With text for $manageaction.
-    $linkattributes = array('title' => get_string($managetag), 'class' => 'btn btn-xs btn-danger',
+    $linkattributes = array('title' => get_string($payload['tag']), 'class' => 'btn btn-xs btn-danger',
         'onclick' => $onclick);
-
-    return $OUTPUT->action_link('#', get_string($manageaction), null, $linkattributes);
+    return $OUTPUT->action_link('#', get_string($payload['action']), null, $linkattributes);
 }
 
 function bigbluebuttonbn_get_recording_columns($bbbsession) {

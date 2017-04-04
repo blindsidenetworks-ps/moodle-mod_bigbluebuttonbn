@@ -75,8 +75,149 @@ M.mod_bigbluebuttonbn.recordings = {
         });
     },
 
+    recording_action: function(element) {
+        var nodelink = Y.one(element);
+        var action = nodelink.getAttribute('data-action');
+        var node = nodelink.ancestor('div');
+        var recordingid = node.getAttribute('data-recordingid');
+        var meetingid = node.getAttribute('data-meetingid');
+
+        if (action === 'import') {
+            return this.recording_import({
+                recordingid: recordingid
+            });
+        }
+
+        if (action === 'publish') {
+            return this.recording_publish({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
+        }
+
+        if (action === 'unpublish') {
+            return this.recording_unpublish({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
+        }
+
+        if (action === 'update') {
+            return this.recording_update({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
+        }
+
+        if (action === 'delete') {
+            return this.recording_delete({
+                recordingid: recordingid,
+                meetingid: meetingid
+            });
+        }
+
+        return null;
+    },
+
+    recording_delete: function(data) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recording_confirmation_message('delete', data.recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            var payload = {
+                action: 'delete',
+                recordingid: data.recordingid,
+                meetingid: data.meetingid,
+                goalstate: false
+            };
+            M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
+            M.mod_bigbluebuttonbn.broker.recording_action_perform();
+        }, this);
+    },
+
+    recording_publish: function(data) {
+        var payload = {
+            action: 'publish',
+            recordingid: data.recordingid,
+            meetingid: data.meetingid,
+            goalstate: true
+        };
+        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
+        M.mod_bigbluebuttonbn.broker.recording_action_perform(payload);
+    },
+
+    recording_unpublish: function(data) {
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recording_confirmation_message('unpublish', data.recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            var payload = {
+                action: 'unpublish',
+                recordingid: data.recordingid,
+                meetingid: data.meetingid,
+                goalstate: false
+            };
+            M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
+            M.mod_bigbluebuttonbn.broker.recording_action_perform(payload);
+        }, this);
+    },
+
+    recording_update: function(data) {
+        console.info("Updating" + data.recordingid + "...");
+        /*
+        M.mod_bigbluebuttonbn.broker.recording_action_perform({
+            action: 'update',
+            recordingid: recordingid,
+            meetingid: meetingid,
+            target: data.target,
+            goalstate: true,
+        });
+        */
+    },
+
+    recording_confirmation_message: function(action, recordingid) {
+        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
+        if (confirmation === 'undefined') {
+            return '';
+        }
+
+        var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
+        var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
+        if (is_imported_link) {
+            recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
+        }
+
+        confirmation = confirmation.replace("{$a}", recording_type);
+
+        if (action === 'publish' || action === 'delete') {
+            // If it has associated links imported in a different course/activity, show a confirmation dialog.
+            var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
+            var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
+                'bigbluebuttonbn');
+            if (associated_links == 1) {
+                confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
+                    'bigbluebuttonbn');
+            }
+            confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
+            confirmation = confirmation_warning + '\n\n' + confirmation;
+        }
+
+        return confirmation;
+    },
+
     recording_action_inprocess: function(data) {
-        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
+        var btn = Y.one('img#recording-' + data.action + '-' + data.recordingid);
+        console.info(btn);
         var text = M.util.get_string('view_recording_list_actionbar_unpublishing', 'bigbluebuttonbn');
         if (data.action == 'publish') {
             text = M.util.get_string('view_recording_list_actionbar_publishing', 'bigbluebuttonbn');
@@ -89,15 +230,15 @@ M.mod_bigbluebuttonbn.recordings = {
         btn.setAttribute('data-src', btn.getAttribute('src'));
         btn.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
-        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+        var link = Y.one('a#recording-' + data.action + '-' + data.recordingid);
         link.setAttribute('data-onlcick', link.getAttribute('onclick'));
         link.setAttribute('onclick', '');
     },
 
     recording_action_completed: function(data) {
-        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
+        var btn = Y.one('img#recording-' + data.action + '-' + data.recordingid);
         var btnsrc = btn.getAttribute('data-src');
-        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+        var link = Y.one('a#recording-' + data.action + '-' + data.recordingid);
         var linkonclick = link.getAttribute('data-onlcick');
 
         var action = 'publish';
@@ -113,8 +254,9 @@ M.mod_bigbluebuttonbn.recordings = {
             Y.one('#preview-' + data.recordingid).show();
         }
 
-        btn.setAttribute('id', 'recording-btn-' + action + '-' + data.recordingid);
-        link.setAttribute('id', 'recording-link-' + action + '-' + data.recordingid);
+        btn.setAttribute('id', 'recording-' + action + '-' + data.recordingid);
+        link.setAttribute('id', 'recording-' + action + '-' + data.recordingid);
+        link.setAttribute('data-action', action);
         btn.setAttribute('src', btnsrc.substring(0, btnsrc.length - 4) + linkaction);
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
@@ -128,16 +270,17 @@ M.mod_bigbluebuttonbn.recordings = {
         });
         alert.show();
 
-        var btn = Y.one('#recording-btn-' + data.action + '-' + data.recordingid);
-        var link = Y.one('#recording-link-' + data.action + '-' + data.recordingid);
+        var btn = Y.one('img#recording-' + data.action + '-' + data.recordingid);
+        var link = Y.one('a#recording-' + data.action + '-' + data.recordingid);
 
         var text = M.util.get_string('view_recording_list_actionbar_unpublish', 'bigbluebuttonbn');
         if (data.action === 'publish') {
             text = M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
         }
 
-        btn.setAttribute('id', 'recording-btn-' + data.action + '-' + data.recordingid);
-        link.setAttribute('id', 'recording-link-' + data.action + '-' + data.recordingid);
+        btn.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        link.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        link.setAttribute('data-action', data.action);
         btn.setAttribute('src', btn.getAttribute('data-src'));
         btn.setAttribute('alt', text);
         btn.setAttribute('title', text);
@@ -148,7 +291,6 @@ M.mod_bigbluebuttonbn.recordings = {
         Y.one('#recording-td-' + data.recordingid).remove();
     },
 
-    //recording_edit: function(recordingid, meetingid, target) {
     recording_edit: function(element) {
         var nodeeditlink = Y.one(element);
         var node = nodeeditlink.ancestor('div');
@@ -163,13 +305,11 @@ M.mod_bigbluebuttonbn.recordings = {
         nodeinputtext.setAttribute('value', nodetext.getHTML());
         nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
         node.append(nodeinputtext);
-
-        //console.info(node.get('children'));
-        //console.info(node.one('> span'));
-        //console.info(node.one('> a'));
     },
 
     recording_edit_keydown: function(element) {
+        /** global: event */
+
         if (event.keyCode == 13) {
             var text = element.value;
             var nodeinputtext = Y.one(element);

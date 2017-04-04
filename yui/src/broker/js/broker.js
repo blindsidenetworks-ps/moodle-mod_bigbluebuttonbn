@@ -48,127 +48,28 @@ M.mod_bigbluebuttonbn.broker = {
         }, 15000);
     },
 
-    recording_action: function(action, recordingid, meetingid) {
-        if (action === 'import') {
-            return this.recording_import({
-                recordingid: recordingid
-            });
-        }
-
-        if (action === 'delete') {
-            return this.recording_delete({
-                recordingid: recordingid,
-                meetingid: meetingid
-            });
-        }
-
-        if (action === 'publish') {
-            return this.recording_publish({
-                recordingid: recordingid,
-                meetingid: meetingid
-            });
-        }
-
-        if (action === 'unpublish') {
-            return this.recording_unpublish({
-                recordingid: recordingid,
-                meetingid: meetingid
-            });
-        }
-
-        if (action === 'update') {
-            return this.recording_update({
-                recordingid: recordingid,
-                meetingid: meetingid
-            });
-        }
-
-        return null;
-    },
-
-    recording_import: function(recordingid) {
+    recording_import: function(data) {
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recording_confirmation_message('import', recordingid)
+            question: this.recording_confirmation_message('import', data.recordingid)
         });
 
         // If it is confirmed.
         confirm.on('complete-yes', function() {
             this.datasource.sendRequest({
-                request: "action=recording_import" + "&id=" + recordingid,
+                request: "action=recording_import" + "&id=" + data.recordingid,
                 callback: {
                     success: function() {
-                        Y.one('#recording-td-' + recordingid).remove();
+                        Y.one('#recording-td-' + data.recordingid).remove();
                     }
                 }
             });
         }, this);
     },
 
-    recording_delete: function(recordingid, meetingid) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('delete', recordingid)
-        });
-
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            this.recording_action_perform({
-                action: 'delete',
-                recordingid: recordingid,
-                meetingid: meetingid,
-                goalstate: false
-            });
-        }, this);
-    },
-
-    recording_publish: function(recordingid, meetingid) {
-        this.recording_action_perform({
-            action: 'publish',
-            recordingid: recordingid,
-            meetingid: meetingid,
-            goalstate: true
-        });
-    },
-
-    recording_unpublish: function(recordingid, meetingid) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('unpublish', recordingid)
-        });
-
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            this.recording_action_perform({
-                action: 'unpublish',
-                recordingid: recordingid,
-                meetingid: meetingid,
-                goalstate: false
-            });
-        }, this);
-    },
-
-    recording_update: function(recordingid, meetingid) {
-        console.info("Updating...");
-        /*
-        this.recording_action_perform({
-            action: 'update',
-            recordingid: recordingid,
-            meetingid: meetingid,
-            target: data.target,
-            goalstate: true,
-        });
-        */
-    },
-
     recording_action_perform: function(payload) {
-        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(payload);
         this.datasource.sendRequest({
             request: "action=recording_" + payload.action + "&id=" + payload.recordingid,
             callback: {
@@ -241,7 +142,7 @@ M.mod_bigbluebuttonbn.broker = {
             return data.status;
         }
 
-        if (action === 'protect' || action === 'unprotect') {
+        if (action === 'secure' || action === 'unsecure') {
             return data.secured;
         }
 
@@ -250,37 +151,6 @@ M.mod_bigbluebuttonbn.broker = {
         }
 
         return null;
-    },
-
-    recording_confirmation_message: function(action, recordingid) {
-
-        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
-        if (confirmation === 'undefined') {
-            return '';
-        }
-
-        var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
-        var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
-        if (is_imported_link) {
-            recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
-        }
-
-        confirmation = confirmation.replace("{$a}", recording_type);
-
-        if (action === 'publish' || action === 'delete') {
-            // If it has associated links imported in a different course/activity, show a confirmation dialog.
-            var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-            var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
-                'bigbluebuttonbn');
-            if (associated_links == 1) {
-                confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
-                    'bigbluebuttonbn');
-            }
-            confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
-            confirmation = confirmation_warning + '\n\n' + confirmation;
-        }
-
-        return confirmation;
     },
 
     end_meeting: function() {
