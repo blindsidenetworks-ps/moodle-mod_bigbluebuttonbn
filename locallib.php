@@ -1141,10 +1141,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
 
-    $id = 'recording-actionbar-' . $recording['recordID'];
-    $attributes = array(
-        'id' => $id, 'data-recordingid' => $recording['recordID'], 'data-meetingid' => $recording['meetingID']);
-
     $actionbar = '';
 
     if (in_array('securing', $tools) && isset($recording['protected'])) {
@@ -1174,7 +1170,10 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
         $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
     }
 
-    $head = html_writer::start_tag('div', $attributes);
+    $head = html_writer::start_tag('div', array(
+        'id' => 'recording-actionbar-' . $recording['recordID'],
+        'data-recordingid' => $recording['recordID'],
+        'data-meetingid' => $recording['meetingID']));
     $tail = html_writer::end_tag('div');
     return $head . $actionbar . $tail;
 }
@@ -1314,14 +1313,19 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
         // With icon for $manageaction.
         $iconattributes = array('id' => $id, 'class' => 'icon iconsmall');
         $icon = new pix_icon('i/'.$data['tag'], get_string($data['tag']), 'moodle', $iconattributes);
-        $linkattributes = array('id' => $id, 'onclick' => $onclick, 'data-action' => $data['action']);
+        $linkattributes = array(
+            'id' => $id,
+            'onclick' => $onclick,
+            'data-action' => $data['action'],
+            'data-links' => bigbluebuttonbn_get_count_recording_imported_instances($recording['recordID'])
+          );
         return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
     }
 
     // With text for $manageaction.
-    $linkattributes = array('title' => get_string($payload['tag']), 'class' => 'btn btn-xs btn-danger',
+    $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger',
         'onclick' => $onclick);
-    return $OUTPUT->action_link('#', get_string($payload['action']), null, $linkattributes);
+    return $OUTPUT->action_link('#', get_string($data['action']), null, $linkattributes);
 }
 
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
@@ -2070,7 +2074,7 @@ function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
 function bigbluebuttonbn_get_count_recording_imported_instances($recordid) {
     global $DB;
 
-    $sql = 'SELECT * FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
+    $sql = 'SELECT COUNT(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
 
     return $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordid}%"));
 }

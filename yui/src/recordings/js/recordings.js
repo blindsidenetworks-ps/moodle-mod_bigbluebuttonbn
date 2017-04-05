@@ -162,7 +162,6 @@ M.mod_bigbluebuttonbn.recordings = {
         var nodelink = Y.one(element);
         var node = nodelink.ancestor('div');
         var nodetext = node.one('> span');
-        var nodelink = node.one('> a');
 
         nodetext.hide();
         nodelink.hide();
@@ -170,6 +169,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var nodeinputtext = Y.Node.create('<input type="text" class="form-control"></input>');
         nodeinputtext.setAttribute('id', nodelink.getAttribute('id'));
         nodeinputtext.setAttribute('value', nodetext.getHTML());
+        nodeinputtext.setAttribute('data-value', nodetext.getHTML());
         nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
         node.append(nodeinputtext);
     },
@@ -188,7 +188,7 @@ M.mod_bigbluebuttonbn.recordings = {
                 nodeinputtext.setAttribute('data-action', 'edit');
                 nodeinputtext.setAttribute('data-goalstate', text);
                 M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
-                nodeinputtext.remove();
+                nodeinputtext.hide();
                 nodetext.setHTML(text);
                 nodetext.show();
                 nodelink.show();
@@ -196,12 +196,24 @@ M.mod_bigbluebuttonbn.recordings = {
         }
     },
 
-    recording_confirmation_message: function(action, recordingid) {
-        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
-        if (confirmation === 'undefined') {
-            return '';
+    recording_edit_failover: function(element) {
+        var nodelink = Y.one(element);
+        var node = nodelink.ancestor('div');
+        var nodetext = node.one('> span');
+        if (typeof nodetext === 'undefined') {
+            return;
         }
 
+        var nodeinputtext = node.one('> input');
+        nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
+        nodeinputtext.remove();
+    },
+
+    recording_confirmation_message: function(action, recordingid) {
+        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
+        if (typeof confirmation === 'undefined') {
+            return '';
+        }
         var is_imported_link = Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true';
         var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (is_imported_link) {
@@ -210,45 +222,48 @@ M.mod_bigbluebuttonbn.recordings = {
 
         confirmation = confirmation.replace("{$a}", recording_type);
 
-        if (action === 'publish' || action === 'delete') {
-            // If it has associated links imported in a different course/activity, show a confirmation dialog.
-            var associated_links = Y.one('#recording-link-' + action + '-' + recordingid).get('dataset').links;
-            var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
-                'bigbluebuttonbn');
-            if (associated_links == 1) {
-                confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
-                    'bigbluebuttonbn');
-            }
-            confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
-            confirmation = confirmation_warning + '\n\n' + confirmation;
+        if (action !== 'publish' && action !== 'delete') {
+            return confirmation;
         }
 
-        return confirmation;
+        // If it has associated links imported in a different course/activity, show that in confirmation dialog.
+        var associated_links = Y.one('a#recording-' + action + '-' + recordingid).get('dataset').links;
+        if (associated_links == 0) {
+            return confirmation;
+        }
+
+        var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
+            'bigbluebuttonbn');
+        if (associated_links == 1) {
+            confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
+                'bigbluebuttonbn');
+        }
+        confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
+        return confirmation_warning + '\n\n' + confirmation;
     },
 
     recording_action_inprocess: function(data) {
-        var target = data.action;
-        if (typeof data.target !== 'undefined') {
-            target += '-' + data.target;
-        }
-        var nodebutton = Y.one('img#recording-' + target + '-' + data.recordingid);
+        var elementid = this.recording_action_elementid(data);
+
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         nodebutton.setAttribute('alt', text);
         nodebutton.setAttribute('title', text);
         nodebutton.setAttribute('data-src', nodebutton.getAttribute('src'));
         nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
-        var nodelink = Y.one('a#recording-' + target + '-' + data.recordingid);
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
         nodelink.setAttribute('data-onlcick', nodelink.getAttribute('onclick'));
         nodelink.setAttribute('onclick', '');
     },
 
-    recording_action_completed: function(data) {
-        var target = this.recording_processing_target(data);
+    recording_action_completion: function(data) {
+        var elementid = this.recording_action_elementid(data);
 
-        // If action == delete or action == import, delete the row on completion.
+        // If action = delete or action = import, delete the row on completion.
         if (data.action == 'delete' || data.action == 'import') {
-            return this.recording_importdelete_completed(data);
+            this.recording_deleteimport_completed(data);
+            return;
         }
 
         var action;
@@ -256,9 +271,9 @@ M.mod_bigbluebuttonbn.recordings = {
             action = this.recording_publishunpublish_completed(data);
         }
 
-        var btn = Y.one('img#recording-' + target + '-' + data.recordingid);
-        var btnsrc = btn.getAttribute('data-src');
-        var link = Y.one('a#recording-' + target + '-' + data.recordingid);
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var btnsrc = nodebutton.getAttribute('data-src');
+        var link = Y.one('a#recording-' + elementid + '-' + data.recordingid);
         var linkonclick = link.getAttribute('data-onlcick');
 
         action = this.recording_processing_action(data);
@@ -274,29 +289,21 @@ M.mod_bigbluebuttonbn.recordings = {
             Y.one('#preview-' + data.recordingid).show();
         }
 
-        btn.setAttribute('id', 'recording-' + action.action + '-' + data.recordingid);
+        nodebutton.setAttribute('id', 'recording-' + action.action + '-' + data.recordingid);
         link.setAttribute('id', 'recording-' + action.action + '-' + data.recordingid);
         link.setAttribute('data-action', action.action);
-        btn.setAttribute('src', btnsrc.substring(0, btnsrc.length - 4) + linkaction);
-        btn.setAttribute('alt', action.text);
-        btn.setAttribute('title', action.text);
+        nodebutton.setAttribute('src', btnsrc.substring(0, btnsrc.length - 4) + linkaction);
+        nodebutton.setAttribute('alt', action.text);
+        nodebutton.setAttribute('title', action.text);
         link.setAttribute('onclick', linkonclick.replace(data.action, action.action));
     },
 
-    recording_importdelete_completed: function(data) {
-        Y.one('#recording-td-' + data.recordingid).remove();
-    },
-
-    recording_publishunpublish_completed: function(data) {
-        Y.one('#recording-td-' + data.recordingid).remove();
-    },
-
-    recording_processing_target: function(data) {
-        var target = data.action;
+    recording_action_elementid: function(data) {
+        var elementid = data.action;
         if (typeof data.target !== 'undefined') {
-            target = data.target;
+            elementid += '-' + data.target;
         }
-        return target;
+        return elementid;
     },
 
     recording_processing_action: function(data) {
@@ -312,31 +319,35 @@ M.mod_bigbluebuttonbn.recordings = {
         */
     },
 
-    recording_action_failed: function(data) {
+    recording_action_failover: function(data) {
         var alert = new M.core.alert({
             title: M.util.get_string('error', 'moodle'),
             message: data.message
         });
         alert.show();
 
-        var btn = Y.one('img#recording-' + data.action + '-' + data.recordingid);
-        var link = Y.one('a#recording-' + data.action + '-' + data.recordingid);
+        var elementid = this.recording_action_elementid(data);
 
-        var text = M.util.get_string('view_recording_list_actionbar_unpublish', 'bigbluebuttonbn');
-        if (data.action === 'publish') {
-            text = M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
+        nodebutton.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
+        nodebutton.setAttribute('alt', text);
+        nodebutton.setAttribute('title', text);
+
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
+        nodelink.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        nodelink.setAttribute('data-action', data.action);
+        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onlcick'));
+
+        if (data.action === 'edit') {
+            this.recording_edit_failover(nodelink.getDOMNode());
         }
-
-        btn.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
-        link.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
-        link.setAttribute('data-action', data.action);
-        btn.setAttribute('src', btn.getAttribute('data-src'));
-        btn.setAttribute('alt', text);
-        btn.setAttribute('title', text);
-        link.setAttribute('onclick', link.getAttribute('data-onlcick'));
     },
 
-    recording_delete_completed: function(data) {
+    recording_publishunpublish_completed: function(data) {},
+
+    recording_deleteimport_completed: function(data) {
         Y.one('#recording-td-' + data.recordingid).remove();
     }
 };

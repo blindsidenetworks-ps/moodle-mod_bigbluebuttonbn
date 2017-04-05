@@ -46,7 +46,7 @@ M.mod_bigbluebuttonbn.broker = {
             callback: {
                 success: function(e) {
                     if (typeof data.goalstate === 'undefined') {
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(data);
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
                     }
 
                     if (e.data.status) {
@@ -55,11 +55,11 @@ M.mod_bigbluebuttonbn.broker = {
                     }
 
                     data.message = e.data.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 },
                 failure: function(e) {
                     data.message = e.error.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 }
             }
         });
@@ -82,11 +82,11 @@ M.mod_bigbluebuttonbn.broker = {
                 success: function(e) {
                     if (typeof e.data[data.source] === 'undefined') {
                         data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                     }
 
                     if (e.data[data.source] === data.goalstate) {
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_completed(data);
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
                     }
 
                     if (data.attempt < 5) {
@@ -99,11 +99,11 @@ M.mod_bigbluebuttonbn.broker = {
                     }
 
                     data.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 },
                 failure: function(e) {
                     data.message = e.error.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failed(data);
+                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 }
             }
         });
