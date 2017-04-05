@@ -42,6 +42,7 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action_perform: function(data) {
+        console.info(data);
         this.datasource.sendRequest({
             request: this.recording_action_perform_qs(data),
             callback: {
@@ -69,7 +70,9 @@ M.mod_bigbluebuttonbn.broker = {
     recording_action_perform_qs: function(data) {
         var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
         if (typeof data.source !== 'undefined') {
-            qs += "&" + data.source + "=" + data.goalstate;
+            var meta = {};
+            meta[data.source] = encodeURIComponent(data.goalstate);
+            qs += "&meta=" + JSON.stringify(meta);
         }
         return qs;
     },
@@ -117,8 +120,8 @@ M.mod_bigbluebuttonbn.broker = {
             return data.status;
         }
 
-        if (action === 'secure' || action === 'unsecure') {
-            return data.secured;
+        if (action === 'protect' || action === 'unprotect') {
+            return data.secured; // The broker responds with secured as protected is a reserverd word
         }
 
         if (action === 'update') {

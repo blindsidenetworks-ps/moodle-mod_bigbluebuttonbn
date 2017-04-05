@@ -36,6 +36,7 @@ $params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 $params['forced'] = optional_param('forced', 'false', PARAM_TEXT);
+$params['meta'] = optional_param('meta', '', PARAM_TEXT);
 
 if (empty($params['action'])) {
     header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
@@ -110,7 +111,7 @@ try {
         return;
     }
 
-    if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete') {
+    if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete' || $a == 'recording_edit') {
         $recordingaction = bigbluebuttonbn_broker_recording_action(
             $bbbsession, $params, $enabledfeatures['showroom'], $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
         echo $recordingaction;
@@ -132,7 +133,7 @@ try {
         return;
     }
 
-    header('HTTP/1.0 400 Bad request. The action {$a} doesn\'t exist');
+    header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
     return;
 
 } catch (Exception $e) {
@@ -310,6 +311,10 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
             $callbackresponse = bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);
             $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED;
             break;
+        case 'recording_edit':
+            $callbackresponse = bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings);
+            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_EDITED;
+            break;
         case 'recording_delete':
             $callbackresponse = bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
             $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_DELETED;
@@ -375,6 +380,25 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
     }
     // Second: Execute the real unpublish.
     bigbluebuttonbn_publish_recordings($params['id'], 'false');
+    $response = array('status' => true);
+    return $response;
+}
+
+function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings) {
+    global $DB;
+
+    if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+        error_log("Updating imported");
+        // Execute update on imported recording link.
+        //bigbluebuttonbn_update_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta']));
+        return array('status' => true);
+    }
+
+    // As the recordingid was not identified as imported recording link, execute update on a real recording.
+    // (No need to update imported links as the update only affects the actual recording).
+    // Execute update on actual recording.
+    error_log("Updating real");
+    bigbluebuttonbn_update_recordings($params['id'], json_decode($params['meta']));
     $response = array('status' => true);
     return $response;
 }
@@ -509,6 +533,10 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
         'recording_publish' => ['id' => 'The recordingID must be specified.'],
         'recording_unpublish' => ['id' => 'The recordingID must be specified.'],
         'recording_delete' => ['id' => 'The recordingID must be specified.'],
+        'recording_protect' => ['id' => 'The recordingID must be specified.'],
+        'recording_unprotect' => ['id' => 'The recordingID must be specified.'],
+        'recording_edit' => ['id' => 'The recordingID must be specified.',
+            'meta' => 'A meta parameter should be included'],
         'recording_import' => ['id' => 'The recordingID must be specified.'],
         'recording_ready' => [
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'

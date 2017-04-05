@@ -75,101 +75,127 @@ M.mod_bigbluebuttonbn.recordings = {
         });
     },
 
-    recording_action: function(element) {
+    recording_action: function(element, confirmation, extras) {
+        var payload = this.recording_element_payload(element);
+
+        // Add extras to payload.
+        for (var extra in extras) {
+            if (extras.hasOwnProperty(extra)) {
+                payload[extra] = extras[extra];
+            }
+        }
+
+        // The action doesn;t require confirmation.
+        if (!confirmation) {
+            this.recording_action_perform(payload);
+            return;
+        }
+
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            modal: true,
+            centered: true,
+            question: this.recording_confirmation_message(payload.action, payload.recordingid)
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+            this.recording_action_perform(payload);
+        }, this);
+    },
+
+    recording_element_payload: function(element) {
+        var nodeelement = Y.one(element);
+        var node = nodeelement.ancestor('div');
+        return {
+            action: nodeelement.getAttribute('data-action'),
+            recordingid: node.getAttribute('data-recordingid'),
+            meetingid: node.getAttribute('data-meetingid')
+        };
+    },
+
+    recording_action_perform: function(data) {
+        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
+        M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
+    },
+
+    recording_publish: function(element) {
+        var extras = {
+            source: 'published',
+            goalstate: true
+        };
+        this.recording_action(element, false, extras);
+    },
+
+    recording_unpublish: function(element) {
+        var extras = {
+            source: 'published',
+            goalstate: false
+        };
+        this.recording_action(element, true, extras);
+    },
+
+    recording_delete: function(element) {
+        var extras = {
+            source: 'status',
+            goalstate: false
+        };
+        this.recording_action(element, true, extras);
+    },
+
+    recording_import: function(element) {
+        var extras = {};
+        this.recording_action(element, true, extras);
+    },
+
+    recording_update: function(element) {
+        console.info('Updating...');
+        var nodeelement = Y.one(element);
+        var node = nodeelement.ancestor('div');
+        var extras = {
+            target: node.getAttribute('data-target'),
+            source: node.getAttribute('data-source'),
+            goalstate: nodeelement.getAttribute('data-goalstate')
+        };
+        this.recording_action(element, false, extras);
+    },
+
+    recording_edit: function(element) {
         var nodelink = Y.one(element);
-        var action = nodelink.getAttribute('data-action');
         var node = nodelink.ancestor('div');
+        var nodetext = node.one('> span');
+        var nodelink = node.one('> a');
 
-        var payload = {
-            action: action,
-            recordingid: node.getAttribute('data-recordingid')
-        }
-        if (action === 'import') {
-            return this.recording_import(payload);
-        }
+        nodetext.hide();
+        nodelink.hide();
 
-        payload['meetingid'] = node.getAttribute('data-meetingid');
-        if (action === 'publish') {
-            return this.recording_publish(payload);
-        }
-
-        if (action === 'unpublish') {
-            return this.recording_unpublish(payload);
-        }
-
-        if (action === 'delete') {
-            return this.recording_delete(payload);
-        }
-
-        if (action === 'update') {
-            payload['target'] = action + '-' + node.getAttribute('data-target');
-            payload['source'] = node.getAttribute('data-source');
-            payload['goalstate'] = node.getAttribute('data-goalstate');
-            return this.recording_update(payload);
-        }
-
-        return null;
+        var nodeinputtext = Y.Node.create('<input type="text" class="form-control"></input>');
+        nodeinputtext.setAttribute('id', nodelink.getAttribute('id'));
+        nodeinputtext.setAttribute('value', nodetext.getHTML());
+        nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
+        node.append(nodeinputtext);
     },
 
-    recording_import: function(data) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('import', data.recordingid)
-        });
+    recording_edit_keydown: function(element) {
+        /** global: event */
 
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
-            M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
-        }, this);
-    },
-
-    recording_delete: function(data) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('delete', data.recordingid)
-        });
-
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            data['source'] = 'status';
-            data['goalstate'] = false;
-            M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
-            M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
-        }, this);
-    },
-
-    recording_publish: function(data) {
-        data['source'] = 'published';
-        data['goalstate'] = true;
-        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
-        M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
-    },
-
-    recording_unpublish: function(data) {
-        // Create the confirmation dialogue.
-        var confirm = new M.core.confirm({
-            modal: true,
-            centered: true,
-            question: this.recording_confirmation_message('unpublish', data.recordingid)
-        });
-
-        // If it is confirmed.
-        confirm.on('complete-yes', function() {
-            data['source'] = 'published';
-            data['goalstate'] = false;
-            M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
-            M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
-        }, this);
-    },
-
-    recording_update: function(data) {
-        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
-        M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
+        if (event.keyCode == 13) {
+            var text = element.value;
+            var nodeinputtext = Y.one(element);
+            var node = nodeinputtext.ancestor('div');
+            var nodetext = node.one('> span');
+            var nodelink = node.one('> a');
+            setTimeout((function() {
+                // Perform the update.
+                nodeinputtext.setAttribute('data-action', 'edit');
+                nodeinputtext.setAttribute('data-goalstate', text);
+                M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
+                nodeinputtext.remove();
+                nodetext.setHTML(text);
+                nodetext.show();
+                nodelink.show();
+            })(this), 0);
+        }
     },
 
     recording_confirmation_message: function(action, recordingid) {
@@ -205,31 +231,31 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_action_inprocess: function(data) {
         var target = data.action;
         if (typeof data.target !== 'undefined') {
-            target = data.target;
+            target += '-' + data.target;
         }
-        var btn = Y.one('img#recording-' + target + '-' + data.recordingid);
+        var nodebutton = Y.one('img#recording-' + target + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
-        btn.setAttribute('alt', text);
-        btn.setAttribute('title', text);
-        btn.setAttribute('data-src', btn.getAttribute('src'));
-        btn.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+        nodebutton.setAttribute('alt', text);
+        nodebutton.setAttribute('title', text);
+        nodebutton.setAttribute('data-src', nodebutton.getAttribute('src'));
+        nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
-        var link = Y.one('a#recording-' + target + '-' + data.recordingid);
-        link.setAttribute('data-onlcick', link.getAttribute('onclick'));
-        link.setAttribute('onclick', '');
+        var nodelink = Y.one('a#recording-' + target + '-' + data.recordingid);
+        nodelink.setAttribute('data-onlcick', nodelink.getAttribute('onclick'));
+        nodelink.setAttribute('onclick', '');
     },
 
     recording_action_completed: function(data) {
-        var target = recording_processing_target(data);
+        var target = this.recording_processing_target(data);
 
         // If action == delete or action == import, delete the row on completion.
         if (data.action == 'delete' || data.action == 'import') {
-            return recording_importdelete_completed(data);
+            return this.recording_importdelete_completed(data);
         }
 
         var action;
         if (data.action == 'publish' || data.action == 'unpublish') {
-            action = recording_publishunpublish_completed(data);
+            action = this.recording_publishunpublish_completed(data);
         }
 
         var btn = Y.one('img#recording-' + target + '-' + data.recordingid);
@@ -237,7 +263,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var link = Y.one('a#recording-' + target + '-' + data.recordingid);
         var linkonclick = link.getAttribute('data-onlcick');
 
-        var action = recording_processing_action(data);
+        action = this.recording_processing_action(data);
         var linkaction = 'show';
         var text = M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
         Y.one('#playbacks-' + data.recordingid).hide();
@@ -276,15 +302,16 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_processing_action: function(data) {
+        /*
         var action = {
             action: 'publish',
             linkaction: 'show',
-            text: M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn');
+            text: M.util.get_string('view_recording_list_actionbar_publish', 'bigbluebuttonbn')
         };
         if (data.action === 'publish') {
 
         }
-
+        */
     },
 
     recording_action_failed: function(data) {
@@ -313,47 +340,6 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_delete_completed: function(data) {
         Y.one('#recording-td-' + data.recordingid).remove();
-    },
-
-    recording_edit: function(element) {
-        var nodeeditlink = Y.one(element);
-        var node = nodeeditlink.ancestor('div');
-        console.info('Editing ' + node.getAttribute('data-target') + '...');
-        var nodetext = node.one('> span');
-
-        nodetext.hide();
-        nodeeditlink.hide();
-
-        var nodeinputtext = Y.Node.create('<input type="text" class="form-control"></input>');
-        nodeinputtext.setAttribute('id', node.getAttribute('id'));
-        nodeinputtext.setAttribute('value', nodetext.getHTML());
-        nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
-        node.append(nodeinputtext);
-    },
-
-    recording_edit_keydown: function(element) {
-        /** global: event */
-
-        if (event.keyCode == 13) {
-            var text = element.value;
-            var nodeinputtext = Y.one(element);
-            var node = nodeinputtext.ancestor('div');
-            var nodetext = node.one('> span');
-            var nodeeditlink = node.one('> a');
-            return setTimeout((function() {
-                M.mod_bigbluebuttonbn.recordings.recording_update({
-                    recordingid: node.getAttribute('data-recordingid'),
-                    meetingid: node.getAttribute('data-meetingid'),
-                    target: 'edit-' + node.getAttribute('data-target'),
-                    source: node.getAttribute('data-source'),
-                    goalstate: text
-                });
-                nodetext.setHTML(text);
-                nodeinputtext.hide();
-                nodetext.show();
-                nodeeditlink.show();
-            }), 0);
-        }
     }
 };
 
