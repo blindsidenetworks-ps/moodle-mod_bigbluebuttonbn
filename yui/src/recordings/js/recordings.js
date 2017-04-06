@@ -118,6 +118,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_publish: function(element) {
+        console.info(element);
         var extras = {
             source: 'published',
             goalstate: true
@@ -126,6 +127,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_unpublish: function(element) {
+        console.info(element);
         var extras = {
             source: 'published',
             goalstate: false
@@ -147,7 +149,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_update: function(element) {
-        console.info('Updating...');
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('div');
         var extras = {
@@ -250,9 +251,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_inprocess: function(data) {
-        console.info(data);
         var elementid = this.recording_action_elementid(data.action, data.target);
-        console.info(elementid);
 
         var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
@@ -262,7 +261,7 @@ M.mod_bigbluebuttonbn.recordings = {
         nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
         var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-onlcick', nodelink.getAttribute('onclick'));
+        nodelink.setAttribute('data-onclick', nodelink.getAttribute('onclick'));
         nodelink.setAttribute('onclick', '');
     },
 
@@ -275,26 +274,33 @@ M.mod_bigbluebuttonbn.recordings = {
 
         var elementid = this.recording_action_elementid(data.action, data.target);
         var action = this.recording_action_aftercompletion(data.action);
-      
+
         var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        nodebutton.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
         var buttontext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
-        nodebutton.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
-        nodebutton.setAttribute('alt', buttontext);
-        nodebutton.setAttribute('title', buttontext);
-        var buttonsrc = nodebutton.getAttribute('data-src');
         var buttontag = this.recording_action_elementtag(action);
-        console.info(buttonsrc);
-        console.info(action);
-        console.info(buttontag);
-        console.info(buttonsrc.substring(0, buttonsrc.lastIndexOf("/") + 1) + buttontag);
-        nodebutton.setAttribute('src',
-            buttonsrc.substring(0, buttonsrc.lastIndexOf("/") + 1) + buttontag);
+        var buttonsrc = nodebutton.getAttribute('data-src');
 
         var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-action', data.action);
-        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onlcick'));
+        var linkonclick = nodelink.getAttribute('data-onclick');
+
+        var id = 'recording-' + elementid + '-' + data.recordingid;
+        if (action !== data.action) {
+            var replace = data.action;
+            var re = new RegExp(replace, "g");
+            id = id.replace(re, action);
+            linkonclick = linkonclick.replace(data.action, action);
+            buttonsrc = buttonsrc.replace(this.recording_action_elementtag(data.action), buttontag);
+        }
+        nodebutton.setAttribute('id', id);
+        nodebutton.setAttribute('alt', buttontext);
+        nodebutton.setAttribute('title', buttontext);
+        nodebutton.setAttribute('src', buttonsrc);
+        nodebutton.removeAttribute('data-src');
+
+        nodelink.setAttribute('id', id);
+        nodelink.setAttribute('data-action', action);
+        nodelink.setAttribute('onclick', linkonclick);
+        nodelink.removeAttribute('data-onclick');
         console.info(nodelink.getDOMNode());
     },
 
@@ -357,7 +363,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
         nodelink.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
         nodelink.setAttribute('data-action', data.action);
-        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onlcick'));
+        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
 
         if (data.action === 'edit') {
             this.recording_edit_failover(nodelink.getDOMNode());

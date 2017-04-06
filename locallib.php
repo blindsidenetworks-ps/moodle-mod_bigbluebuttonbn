@@ -1322,8 +1322,10 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_'.$data['action'].'(this);';
     if (bigbluebuttonbn_get_cfg_recording_icons_enabled()) {
         // With icon for $manageaction.
-        $iconattributes = array('id' => $id, 'class' => 'icon iconsmall');
-        $icon = new pix_icon('i/'.$data['tag'], get_string($data['tag']), 'moodle', $iconattributes);
+        $iconattributes = array('id' => $id, 'class' => 'iconsmall');
+        $icon = new pix_icon('i/'.$data['tag'],
+            get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
+            'moodle', $iconattributes);
         $linkattributes = array(
             'id' => $id,
             'onclick' => $onclick,
