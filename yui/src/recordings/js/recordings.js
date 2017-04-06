@@ -36,31 +36,16 @@ M.mod_bigbluebuttonbn.recordings = {
         });
         this.locale = data.locale;
         this.profilefeatures = data.profile_features;
-        this.datatable.columns = data.columns;
-        this.datatable.data = this.datatable_init_data(data.data);
 
         if (data.recordings_html === false &&
             (this.profilefeatures.includes('all') || this.profilefeatures.includes('showrecordings'))) {
+            this.datatable.columns = data.columns;
+            this.datatable.data = this.datatable_init_format_dates(data.data);
             this.datatable_init();
         }
     },
 
-    datatable_init: function() {
-        YUI({
-            lang: this.locale
-        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
-            var table = new Y.DataTable({
-                width: "1075px",
-                columns: this.datatable.columns,
-                data: this.datatable.data,
-                rowsPerPage: 10,
-                paginatorLocation: ['header', 'footer']
-            }).render('#bigbluebuttonbn_yui_table');
-            return table;
-        });
-    },
-
-    datatable_init_data: function(data) {
+    datatable_init_format_dates: function(data) {
         for (var i = 0; i < data.length; i++) {
             var date = new Date(data[i].date);
             data[i].date = date.toLocaleDateString(this.locale, {
@@ -71,6 +56,23 @@ M.mod_bigbluebuttonbn.recordings = {
             });
         }
         return data;
+    },
+
+    datatable_init: function() {
+        var columns = this.datatable.columns;
+        var data = this.datatable.data;
+        YUI({
+            lang: this.locale
+        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+            var table = new Y.DataTable({
+                width: "1075px",
+                columns: columns,
+                data: data,
+                rowsPerPage: 10,
+                paginatorLocation: ['header', 'footer']
+            }).render('#bigbluebuttonbn_yui_table');
+            return table;
+        });
     },
 
     recording_action: function(element, confirmation, extras) {

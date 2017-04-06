@@ -59,26 +59,28 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     update_room: function(f) {
-        f = typeof f !== 'undefined' ? f : false;
-
-        var status_bar = Y.one('#status_bar');
-        var control_panel = Y.one('#control_panel');
-        var join_button = Y.one('#join_button');
-        var end_button = Y.one('#end_button');
+        var forced = 'false';
+        if (typeof f !== 'undefined' && f) {
+            forced = 'true';
+        }
         var id = this.bigbluebuttonbn.meetingid;
         var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
-        var forced = f ? 'true' : 'false';
+
         this.datasource.sendRequest({
             request: 'action=meeting_info&id=' + id + '&bigbluebuttonbn=' + bnid + '&forced=' + forced,
             callback: {
                 success: function(e) {
-                    Y.DOM.addHTML(status_bar, M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
-                    Y.DOM.addHTML(control_panel, M.mod_bigbluebuttonbn.rooms.init_control_panel(e.data));
+                    Y.DOM.addHTML(Y.one('#status_bar'),
+                        M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
+                    Y.DOM.addHTML(Y.one('#control_panel'),
+                        M.mod_bigbluebuttonbn.rooms.init_control_panel(e.data));
                     if (typeof e.data.status.can_join != 'undefined') {
-                        Y.DOM.addHTML(join_button, M.mod_bigbluebuttonbn.rooms.init_join_button(e.data.status));
+                        Y.DOM.addHTML(Y.one('#join_button'),
+                            M.mod_bigbluebuttonbn.rooms.init_join_button(e.data.status));
                     }
                     if (typeof e.data.status.can_end != 'undefined' && e.data.status.can_end) {
-                        Y.DOM.addHTML(end_button, M.mod_bigbluebuttonbn.rooms.init_end_button(e.data.status));
+                        Y.DOM.addHTML(Y.one('#end_button'),
+                            M.mod_bigbluebuttonbn.rooms.init_end_button(e.data.status));
                     }
                     if (!e.data.status.can_join) {
                         M.mod_bigbluebuttonbn.rooms.wait_moderator({
