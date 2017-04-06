@@ -207,6 +207,12 @@ M.mod_bigbluebuttonbn.rooms = {
         return end_button_input;
     },
 
+    end_meeting: function() {
+        Y.one('#control_panel_div').remove();
+        Y.one('#join_button').hide();
+        Y.one('#end_button').hide();
+    },
+
     remote_update: function(delay) {
         setTimeout(function() {
             M.mod_bigbluebuttonbn.rooms.clean_room();
@@ -215,42 +221,10 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     clean_room: function() {
-        this.clean_status_bar();
-        this.clean_control_panel();
-        this.clean_join_button();
-        this.clean_end_button();
-    },
-
-    clean_status_bar: function() {
         Y.one('#status_bar_span').remove();
-    },
-
-    clean_control_panel: function() {
         Y.one('#control_panel_div').remove();
-    },
-
-    clean_join_button: function() {
         Y.one('#join_button').setContent('');
-    },
-
-    hide_join_button: function() {
-        Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'hidden');
-    },
-
-    show_join_button: function() {
-        Y.DOM.setStyle(Y.one('#join_button'), 'visibility', 'shown');
-    },
-
-    clean_end_button: function() {
         Y.one('#end_button').setContent('');
-    },
-
-    hide_end_button: function() {
-        Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'hidden');
-    },
-
-    show_end_button: function() {
-        Y.DOM.setStyle(Y.one('#end_button'), 'visibility', 'shown');
     },
 
     window_close: function() {

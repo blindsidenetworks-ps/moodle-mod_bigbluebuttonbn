@@ -143,9 +143,7 @@ M.mod_bigbluebuttonbn.broker = {
             callback: {
                 success: function(e) {
                     if (e.data.status) {
-                        M.mod_bigbluebuttonbn.rooms.clean_control_panel();
-                        M.mod_bigbluebuttonbn.rooms.hide_join_button();
-                        M.mod_bigbluebuttonbn.rooms.hide_end_button();
+                        M.mod_bigbluebuttonbn.rooms.end_meeting();
                         location.reload();
                     }
                 }
