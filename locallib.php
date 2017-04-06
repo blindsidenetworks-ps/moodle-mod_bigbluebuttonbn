@@ -1142,32 +1142,11 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
 
     $actionbar = '';
-
-    if (in_array('securing', $tools) && isset($recording['protected'])) {
-        $payload = array('action' => 'protect', 'tag' => 'protect');
-        if ( $recording['protected'] == 'true') {
-            $payload = array('action' => 'unprotect', 'tag' => 'unprotect');
-        }
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
-    }
-
-    if (in_array('publishing', $tools)) {
-        // Set action [show|hide].
-        $payload = array('action' => 'publish', 'tag' => 'show');
-        if ($recording['published'] == 'true') {
-            $payload = array('action' => 'unpublish', 'tag' => 'hide');
-        }
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
-    }
-
-    if (in_array('deleting', $tools)) {
-        $payload = array('action' => 'delete', 'tag' => 'delete');
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
-    }
-
-    if (in_array('importing', $tools)) {
-        $payload = array('action' => 'import', 'tag' => 'import');
-        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $payload);
+    foreach ($tools as $tool) {
+        $actionbar .= bigbluebuttonbn_actionbar_render_button(
+            $recording,
+            bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool)
+          );
     }
 
     $head = html_writer::start_tag('div', array(
@@ -1176,6 +1155,38 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
         'data-meetingid' => $recording['meetingID']));
     $tail = html_writer::end_tag('div');
     return $head . $actionbar . $tail;
+}
+
+function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
+    if ($protected == 'true') {
+        return array('action' => 'unprotect', 'tag' => 'unprotect');
+    }
+
+    return array('action' => 'protect', 'tag' => 'protect');
+}
+
+function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
+    if ($published == 'true') {
+        return array('action' => 'unpublish', 'tag' => 'hide');
+    }
+
+    return array('action' => 'publish', 'tag' => 'show');
+}
+
+function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
+    if ($tool == 'protecting' && isset($recording['protected'])) {
+        return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
+    }
+
+    if ($tool == 'publishing') {
+        return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
+    }
+
+    if ($tool == 'deleting') {
+        return array('action' => 'delete', 'tag' => 'delete');
+    }
+
+    return array('action' => 'import', 'tag' => 'import');
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {

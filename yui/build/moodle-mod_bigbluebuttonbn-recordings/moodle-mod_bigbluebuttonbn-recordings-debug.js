@@ -231,7 +231,7 @@ M.mod_bigbluebuttonbn.recordings = {
         }
 
         confirmation = confirmation.replace("{$a}", recording_type);
-        if (action !== 'publish' && action !== 'delete') {
+        if (action === 'import') {
             return confirmation;
         }
 
