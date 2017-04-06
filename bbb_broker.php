@@ -282,7 +282,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
 
 function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     $callbackresponse['status'] = true;
-    $callbackresponse['published'] = ($recording['published'] == true || $recording['published'] == 'true');
+    $callbackresponse['published'] = (string) $recording['published'];
     if (!isset($params['meta'])) {
         return $callbackresponse;
     }

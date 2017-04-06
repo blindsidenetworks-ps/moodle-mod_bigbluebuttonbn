@@ -77,13 +77,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_action: function(element, confirmation, extras) {
         var payload = this.recording_element_payload(element);
-
-        // Add extras to payload.
-        for (var extra in extras) {
-            if (extras.hasOwnProperty(extra)) {
-                payload[extra] = extras[extra];
-            }
-        }
+        payload = Object.assign(payload, extras);
 
         // The action doesn;t require confirmation.
         if (!confirmation) {
@@ -122,7 +116,7 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_publish: function(element) {
         var extras = {
             source: 'published',
-            goalstate: true
+            goalstate: 'true'
         };
         this.recording_action(element, false, extras);
     },
@@ -130,7 +124,7 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_unpublish: function(element) {
         var extras = {
             source: 'published',
-            goalstate: false
+            goalstate: 'false'
         };
         this.recording_action(element, false, extras);
     },
