@@ -172,7 +172,7 @@ M.mod_bigbluebuttonbn.recordings = {
         nodeinputtext.setAttribute('value', nodetext.getHTML());
         nodeinputtext.setAttribute('data-value', nodetext.getHTML());
         nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
-        //nodeinputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
+        nodeinputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
         node.append(nodeinputtext);
     },
 
@@ -183,39 +183,35 @@ M.mod_bigbluebuttonbn.recordings = {
             return;
         }
         if (event.keyCode == 27) {
-            this.recording_edit_cancel(element);
-            return;
+            this.recording_edit_onfocusout(element);
         }
     },
 
-    //recording_edit_onfocusout: function(element) {
-    //    this.recording_edit_perform(element);
-    //},
+    recording_edit_onfocusout: function(element) {
+        var nodeinputtext = Y.one(element);
+        var node = nodeinputtext.ancestor('div');
+        nodeinputtext.hide();
+        node.one('> span').show();
+        node.one('> a').show();
+    },
 
     recording_edit_perform: function(element) {
         var nodeinputtext = Y.one(element);
-
-        var text = element.value;
         var node = nodeinputtext.ancestor('div');
-        var nodetext = node.one('> span');
-        var nodelink = node.one('> a');
+        var text = element.value;
 
         // Perform the update.
         nodeinputtext.setAttribute('data-action', 'edit');
         nodeinputtext.setAttribute('data-goalstate', text);
         M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
-        nodetext.setHTML(text);
+        node.one('> span').setHTML(text);
 
-        this.recording_edit_close(nodeinputtext);
+        var nodelink = node.one('> a');
+        nodelink.show();
+        nodelink.focus();
     },
 
-    recording_edit_cancel: function(element) {
-        var nodeinputtext = Y.one(element);
-        this.recording_edit_close(nodeinputtext);
-        nodeinputtext.remove();
-    },
-
-    recording_edit_complete: function(element) {
+    recording_edit_completion: function(element) {
         var nodelink = Y.one(element);
         var node = nodelink.ancestor('div');
         var nodetext = node.one('> span');
@@ -223,6 +219,7 @@ M.mod_bigbluebuttonbn.recordings = {
             return;
         }
 
+        var nodeinputtext = node.one('> input');
         nodeinputtext.remove();
     },
 
@@ -237,13 +234,6 @@ M.mod_bigbluebuttonbn.recordings = {
         var nodeinputtext = node.one('> input');
         nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
         nodeinputtext.remove();
-    },
-
-    recording_edit_close: function(nodeinputtext) {
-        var node = nodeinputtext.ancestor('div');
-        nodeinputtext.hide();
-        node.one('> span').show();
-        node.one('> a').show();
     },
 
     recording_confirmation_message: function(action, recordingid) {
@@ -331,7 +321,7 @@ M.mod_bigbluebuttonbn.recordings = {
         nodelink.removeAttribute('data-onclick');
 
         if (data.action === 'edit') {
-            //this.recording_edit_complete(nodelink.getDOMNode());
+            //this.recording_edit_completion(nodelink.getDOMNode());
         }
     },
 
