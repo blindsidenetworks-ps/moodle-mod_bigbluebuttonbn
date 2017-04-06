@@ -40,7 +40,6 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action_perform: function(data) {
-        console.info(data);
         var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
         qs += this.recording_action_meta_qs(data);
         this.datasource.sendRequest({
@@ -84,31 +83,33 @@ M.mod_bigbluebuttonbn.broker = {
             request: qs,
             callback: {
                 success: function(e) {
-                    console.info(e.data);
                     if (typeof e.data[data.source] === 'undefined') {
                         data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                        M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                        return;
                     }
 
                     if (e.data[data.source] === data.goalstate) {
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
+                        M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
+                        return;
                     }
 
                     if (data.attempt < 5) {
                         data.attempt += 1;
-                        return setTimeout(((function() {
+                        setTimeout(((function() {
                             return function() {
                                 M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
                             };
                         })(this)), (data.attempt - 1) * 1000);
+                        return;
                     }
 
                     data.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                    M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 },
                 failure: function(e) {
                     data.message = e.error.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                    M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 }
             }
         });

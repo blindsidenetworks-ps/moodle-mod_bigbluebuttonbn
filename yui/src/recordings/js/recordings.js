@@ -147,7 +147,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_update: function(element) {
-        console.info('recording_update');
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('div');
         var extras = {
@@ -179,6 +178,11 @@ M.mod_bigbluebuttonbn.recordings = {
         /** global: event */
         if (event.keyCode == 13) {
             this.recording_edit_perform(element);
+            return;
+        }
+        if (event.keyCode == 27) {
+            this.recording_edit_cancel(element);
+            return;
         }
     },
 
@@ -187,23 +191,37 @@ M.mod_bigbluebuttonbn.recordings = {
     //},
 
     recording_edit_perform: function(element) {
-        console.info('recording_edit_perform');
-        console.info(element);
-        var text = element.value;
         var nodeinputtext = Y.one(element);
+
+        var text = element.value;
         var node = nodeinputtext.ancestor('div');
         var nodetext = node.one('> span');
         var nodelink = node.one('> a');
-        setTimeout((function() {
-            // Perform the update.
-            nodeinputtext.setAttribute('data-action', 'edit');
-            nodeinputtext.setAttribute('data-goalstate', text);
-            M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
-            nodeinputtext.hide();
-            nodetext.setHTML(text);
-            nodetext.show();
-            nodelink.show();
-        })(this), 0);
+
+        // Perform the update.
+        nodeinputtext.setAttribute('data-action', 'edit');
+        nodeinputtext.setAttribute('data-goalstate', text);
+        M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
+        nodetext.setHTML(text);
+
+        this.recording_edit_close(nodeinputtext);
+    },
+
+    recording_edit_cancel: function(element) {
+        var nodeinputtext = Y.one(element);
+        this.recording_edit_close(nodeinputtext);
+        nodeinputtext.remove();
+    },
+
+    recording_edit_complete: function(element) {
+        var nodelink = Y.one(element);
+        var node = nodelink.ancestor('div');
+        var nodetext = node.one('> span');
+        if (typeof nodetext === 'undefined') {
+            return;
+        }
+
+        nodeinputtext.remove();
     },
 
     recording_edit_failover: function(element) {
@@ -217,6 +235,13 @@ M.mod_bigbluebuttonbn.recordings = {
         var nodeinputtext = node.one('> input');
         nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
         nodeinputtext.remove();
+    },
+
+    recording_edit_close: function(nodeinputtext) {
+        var node = nodeinputtext.ancestor('div');
+        nodeinputtext.hide();
+        node.one('> span').show();
+        node.one('> a').show();
     },
 
     recording_confirmation_message: function(action, recordingid) {
@@ -302,7 +327,10 @@ M.mod_bigbluebuttonbn.recordings = {
         nodelink.setAttribute('data-action', action);
         nodelink.setAttribute('onclick', linkonclick);
         nodelink.removeAttribute('data-onclick');
-        console.info(nodelink.getDOMNode());
+
+        if (data.action === 'edit') {
+            //this.recording_edit_complete(nodelink.getDOMNode());
+        }
     },
 
     recording_action_elementid: function(action, target) {
@@ -346,26 +374,24 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_failover: function(data) {
-        console.info('recording_action_failover');
-        //var alert = new M.core.alert({
-        //    title: M.util.get_string('error', 'moodle'),
-        //    message: data.message
-        //});
-        //alert.show();
+        var alert = new M.core.alert({
+            title: M.util.get_string('error', 'moodle'),
+            message: data.message
+        });
+        alert.show();
 
         var elementid = this.recording_action_elementid(data.action, data.target);
-        console.info(elementid);
 
         var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
-        nodebutton.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        nodebutton.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
         nodebutton.setAttribute('alt', text);
         nodebutton.setAttribute('title', text);
         nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
         nodebutton.removeAttribute('data-src');
 
         var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
+        nodelink.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
         nodelink.setAttribute('data-action', data.action);
         nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
         nodelink.removeAttribute('data-onclick');
