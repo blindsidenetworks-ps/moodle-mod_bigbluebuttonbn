@@ -334,43 +334,31 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_elementtag: function(action) {
-        if (action === 'publish') {
-            return 'show';
-        }
+        var tags = {
+            publish: 'show',
+            unpublish: 'hide',
+            protect: 'lock',
+            unprotect: 'unlock',
+            edit: 'edit',
+            import: 'import',
+            delete: 'delete'
+        };
 
-        if (action === 'unpublish') {
-            return 'hide';
-        }
-
-        if (action === 'protect') {
-            return 'lock';
-        }
-
-        if (action === 'unprotect') {
-            return 'unlock';
-        }
-
-        return action;
+        return tags[action];
     },
 
     recording_action_aftercompletion: function(action) {
-        if (action === 'publish') {
-            return 'unpublish';
-        }
+        var reverseactions = {
+            publish: 'unpublish',
+            unpublish: 'publish',
+            protect: 'unprotect',
+            unprotect: 'protect',
+            edit: 'edit',
+            import: 'import',
+            delete: 'delete'
+        };
 
-        if (action === 'unpublish') {
-            return 'publish';
-        }
-
-        if (action === 'protect') {
-            return 'unlock';
-        }
-
-        if (action === 'unprotect') {
-            return 'lock';
-        }
-
-        return action;
+        return reverseactions[action];
     },
 
     recording_action_failover: function(data) {
