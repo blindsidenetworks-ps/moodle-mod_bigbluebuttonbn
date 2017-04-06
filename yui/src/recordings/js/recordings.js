@@ -340,6 +340,14 @@ M.mod_bigbluebuttonbn.recordings = {
             return 'hide';
         }
 
+        if (action === 'protect') {
+            return 'lock';
+        }
+
+        if (action === 'unprotect') {
+            return 'unlock';
+        }
+
         return action;
     },
 

@@ -94,25 +94,22 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     init_status_bar: function(status_message) {
+        var status_bar_span = Y.DOM.create('<span id="status_bar_span">');
 
-        var status_bar_span = Y.DOM.create('<span>');
-        Y.DOM.setAttribute(status_bar_span, 'id', 'status_bar_span');
-
-        if (status_message.constructor === Array) {
-            for (var message in status_message) {
-                if (!status_message.hasOwnProperty(message)) {
-                    continue; // Skip keys from the prototype.
-                }
-                var status_bar_span_span = Y.DOM.create('<span>');
-                Y.DOM.setAttribute(status_bar_span_span, 'id', 'status_bar_span_span');
-                Y.DOM.setText(status_bar_span_span, status_message[message]);
-                Y.DOM.addHTML(status_bar_span, status_bar_span_span);
-                Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
-            }
-        } else {
+        if (status_message.constructor !== Array) {
             Y.DOM.setText(status_bar_span, status_message);
+            return status_bar_span;
         }
 
+        for (var message in status_message) {
+            if (!status_message.hasOwnProperty(message)) {
+                continue; // Skip keys from the prototype.
+            }
+            var status_bar_span_span = Y.DOM.create('<span id="status_bar_span_span">');
+            Y.DOM.setText(status_bar_span_span, status_message[message]);
+            Y.DOM.addHTML(status_bar_span, status_bar_span_span);
+            Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
+        }
         return status_bar_span;
     },
 
