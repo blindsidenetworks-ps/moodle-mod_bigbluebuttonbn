@@ -264,8 +264,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         // Look up for an update on the imported recording.
         if (!array_key_exists('messageKey', $recordings[$params['id']])) {
             // The recording was found.
-            $callbackresponse['status'] = true;
-            $callbackresponse['published'] = ($recordings[$params['id']]['published'] == 'true');
+            $callbackresponse = bigbluebuttonbn_broker_recording_info_current($recordings[$params['id']], $params);
         }
         $callbackresponsedata = json_encode($callbackresponse);
         return "{$params['callback']}({$callbackresponsedata});";
@@ -275,11 +274,26 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
     $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
     if (array_key_exists($params['id'], $recordings)) {
         // The recording was found.
-        $callbackresponse['status'] = true;
-        $callbackresponse['published'] = $recordings[$params['id']]['published'];
+        $callbackresponse = bigbluebuttonbn_broker_recording_info_current($recordings[$params['id']], $params);
     }
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
+}
+
+function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
+    $callbackresponse['status'] = true;
+    $callbackresponse['published'] = ($recording['published'] == true || $recording['published'] == 'true');
+    if (!isset($params['meta'])) {
+        return $callbackresponse;
+    }
+
+    $meta = json_decode($params['meta']);
+    foreach ($meta as $key => $value) {
+        if (isset($recording[$key])) {
+            $callbackresponse[$key] = $recording[$key];
+        }
+    }
+    return $callbackresponse;
 }
 
 function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm) {

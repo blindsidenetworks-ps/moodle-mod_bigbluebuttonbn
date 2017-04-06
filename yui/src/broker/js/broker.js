@@ -41,8 +41,10 @@ M.mod_bigbluebuttonbn.broker = {
 
     recording_action_perform: function(data) {
         console.info(data);
+        var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
+        qs += this.recording_action_meta_qs(data);
         this.datasource.sendRequest({
-            request: this.recording_action_perform_qs(data),
+            request: qs,
             callback: {
                 success: function(e) {
                     if (typeof data.goalstate === 'undefined') {
@@ -65,8 +67,8 @@ M.mod_bigbluebuttonbn.broker = {
         });
     },
 
-    recording_action_perform_qs: function(data) {
-        var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
+    recording_action_meta_qs: function(data) {
+        var qs = '';
         if (typeof data.source !== 'undefined') {
             var meta = {};
             meta[data.source] = encodeURIComponent(data.goalstate);
@@ -76,10 +78,13 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action_performed: function(data) {
+        var qs = "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid;
+        qs += this.recording_action_meta_qs(data);
         this.datasource.sendRequest({
-            request: "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid,
+            request: qs,
             callback: {
                 success: function(e) {
+                    console.info(e.data);
                     if (typeof e.data[data.source] === 'undefined') {
                         data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
                         return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);

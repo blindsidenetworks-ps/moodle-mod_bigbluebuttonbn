@@ -120,7 +120,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_publish: function(element) {
-        console.info(element);
         var extras = {
             source: 'published',
             goalstate: true
@@ -129,7 +128,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_unpublish: function(element) {
-        console.info(element);
         var extras = {
             source: 'published',
             goalstate: false
@@ -151,6 +149,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_update: function(element) {
+        console.info('recording_update');
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('div');
         var extras = {
@@ -174,7 +173,7 @@ M.mod_bigbluebuttonbn.recordings = {
         nodeinputtext.setAttribute('value', nodetext.getHTML());
         nodeinputtext.setAttribute('data-value', nodetext.getHTML());
         nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
-        nodeinputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
+        //nodeinputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
         node.append(nodeinputtext);
     },
 
@@ -185,11 +184,13 @@ M.mod_bigbluebuttonbn.recordings = {
         }
     },
 
-    recording_edit_onfocusout: function(element) {
-        this.recording_edit_perform(element);
-    },
+    //recording_edit_onfocusout: function(element) {
+    //    this.recording_edit_perform(element);
+    //},
 
     recording_edit_perform: function(element) {
+        console.info('recording_edit_perform');
+        console.info(element);
         var text = element.value;
         var nodeinputtext = Y.one(element);
         var node = nodeinputtext.ancestor('div');
@@ -347,25 +348,29 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_failover: function(data) {
-        var alert = new M.core.alert({
-            title: M.util.get_string('error', 'moodle'),
-            message: data.message
-        });
-        alert.show();
+        console.info('recording_action_failover');
+        //var alert = new M.core.alert({
+        //    title: M.util.get_string('error', 'moodle'),
+        //    message: data.message
+        //});
+        //alert.show();
 
         var elementid = this.recording_action_elementid(data.action, data.target);
+        console.info(elementid);
 
         var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         nodebutton.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
-        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
         nodebutton.setAttribute('alt', text);
         nodebutton.setAttribute('title', text);
+        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
+        nodebutton.removeAttribute('data-src');
 
         var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
         nodelink.setAttribute('id', 'recording-' + data.action + '-' + data.recordingid);
         nodelink.setAttribute('data-action', data.action);
         nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
+        nodelink.removeAttribute('data-onclick');
 
         if (data.action === 'edit') {
             this.recording_edit_failover(nodelink.getDOMNode());
