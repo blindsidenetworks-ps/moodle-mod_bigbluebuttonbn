@@ -297,5 +297,6 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         playbacks.show();
         preview.show();
+        M.mod_bigbluebuttonbn.helpers.reload_preview(data);
     }
 };

@@ -126,6 +126,16 @@ M.mod_bigbluebuttonbn.helpers = {
         reverseactions['delete'] = 'delete';
 
         return reverseactions[action];
+    },
+
+    reload_preview: function(data) {
+        var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
+        thumbnails.each(function (thumbnail) {
+            var thumbnailsrc = thumbnail.getAttribute('src');
+            thumbnailsrc = thumbnailsrc.substring(0, thumbnailsrc.indexOf('?'));
+            thumbnailsrc += '?' + new Date().getTime();
+            thumbnail.setAttribute('src', thumbnailsrc);
+        });
     }
   
 };

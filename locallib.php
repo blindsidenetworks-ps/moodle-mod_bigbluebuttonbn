@@ -1202,7 +1202,7 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
         if (isset($playback['preview'])) {
             foreach ($playback['preview'] as $image) {
                 $recordingpreview .= html_writer::empty_tag('img',
-                    array('src' => $image['url'], 'class' => 'thumbnail'));
+                    array('src' => $image['url'] . '?' . time(), 'class' => 'thumbnail'));
             }
             $recordingpreview .= html_writer::empty_tag('br');
             $recordingpreview .= html_writer::tag('div',
