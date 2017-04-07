@@ -207,8 +207,9 @@ M.mod_bigbluebuttonbn.recordings = {
         nodelink.focus();
     },
 
-    recording_edit_completion: function(element) {
-        var nodelink = Y.one(element);
+    recording_edit_completion: function(data, failed) {
+        var elementid = this.element_id(data.action, data.target);
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
         var node = nodelink.ancestor('div');
         var nodetext = node.one('> span');
         if (typeof nodetext === 'undefined') {
@@ -216,19 +217,9 @@ M.mod_bigbluebuttonbn.recordings = {
         }
 
         var nodeinputtext = node.one('> input');
-        nodeinputtext.remove();
-    },
-
-    recording_edit_failover: function(element) {
-        var nodelink = Y.one(element);
-        var node = nodelink.ancestor('div');
-        var nodetext = node.one('> span');
-        if (typeof nodetext === 'undefined') {
-            return;
+        if (failed) {
+            nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
         }
-
-        var nodeinputtext = node.one('> input');
-        nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
         nodeinputtext.remove();
     },
 
@@ -263,101 +254,25 @@ M.mod_bigbluebuttonbn.recordings = {
         confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
         return confirmation_warning + '\n\n' + confirmation;
     },
-
+  
     recording_action_inprocess: function(data) {
-        var elementid = this.recording_action_elementid(data.action, data.target);
-
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
-        nodebutton.setAttribute('alt', text);
-        nodebutton.setAttribute('title', text);
-        nodebutton.setAttribute('data-src', nodebutton.getAttribute('src'));
-        nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
-
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-onclick', nodelink.getAttribute('onclick'));
-        nodelink.setAttribute('onclick', '');
+        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_on(data);
     },
 
     recording_action_completion: function(data) {
-        // If action = delete or action = import, delete the row on completion.
+
         if (data.action == 'delete' || data.action == 'import') {
             Y.one('#recording-td-' + data.recordingid).remove();
             return;
         }
 
-        var elementid = this.recording_action_elementid(data.action, data.target);
-        var action = this.recording_action_aftercompletion(data.action);
-
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        var buttontext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
-        var buttontag = this.recording_action_elementtag(action);
-        var buttonsrc = nodebutton.getAttribute('data-src');
-
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        var linkonclick = nodelink.getAttribute('data-onclick');
-
-        var id = 'recording-' + elementid + '-' + data.recordingid;
-        if (action !== data.action) {
-            var replace = data.action;
-            var re = new RegExp(replace, "g");
-            id = id.replace(re, action);
-            linkonclick = linkonclick.replace(data.action, action);
-            buttonsrc = buttonsrc.replace(this.recording_action_elementtag(data.action), buttontag);
-        }
-        nodebutton.setAttribute('id', id);
-        nodebutton.setAttribute('alt', buttontext);
-        nodebutton.setAttribute('title', buttontext);
-        nodebutton.setAttribute('src', buttonsrc);
-        nodebutton.removeAttribute('data-src');
-
-        nodelink.setAttribute('id', id);
-        nodelink.setAttribute('data-action', action);
-        nodelink.setAttribute('onclick', linkonclick);
-        nodelink.removeAttribute('data-onclick');
-
-        if (data.action === 'edit') {
-            //this.recording_edit_completion(nodelink.getDOMNode());
-        }
+        M.mod_bigbluebuttonbn.helpers.update_data(data);
+        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
+        M.mod_bigbluebuttonbn.helpers.update_id(data);
+      
         if (data.action === 'publish' || data.action === 'unpublish') {
-            this.recording_publishunpublish_completion(data.recordingid, data.action);
+            this.recording_publishunpublish_completion(data);
         }
-    },
-
-    recording_action_elementid: function(action, target) {
-        var elementid = action;
-        if (typeof target !== 'undefined') {
-            elementid += '-' + target;
-        }
-        return elementid;
-    },
-
-    recording_action_elementtag: function(action) {
-        var tags = {
-            publish: 'show',
-            unpublish: 'hide',
-            protect: 'lock',
-            unprotect: 'unlock',
-            edit: 'edit',
-            import: 'import',
-            delete: 'delete'
-        };
-
-        return tags[action];
-    },
-
-    recording_action_aftercompletion: function(action) {
-        var reverseactions = {
-            publish: 'unpublish',
-            unpublish: 'publish',
-            protect: 'unprotect',
-            unprotect: 'protect',
-            edit: 'edit',
-            import: 'import',
-            delete: 'delete'
-        };
-
-        return reverseactions[action];
     },
 
     recording_action_failover: function(data) {
@@ -367,31 +282,17 @@ M.mod_bigbluebuttonbn.recordings = {
         });
         alert.show();
 
-        var elementid = this.recording_action_elementid(data.action, data.target);
-
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
-        nodebutton.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
-        nodebutton.setAttribute('alt', text);
-        nodebutton.setAttribute('title', text);
-        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
-        nodebutton.removeAttribute('data-src');
-
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('id', 'recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-action', data.action);
-        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
-        nodelink.removeAttribute('data-onclick');
+        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
 
         if (data.action === 'edit') {
-            this.recording_edit_failover(nodelink.getDOMNode());
+            this.recording_edit_completion(data, true);
         }
     },
 
-    recording_publishunpublish_completion: function(recordingid, action) {
-        var playbacks = Y.one('#playbacks-' + recordingid); 
-        var preview = Y.one('#preview-' + recordingid); 
-        if (action == 'unpublish') {
+    recording_publishunpublish_completion: function(data) {
+        var playbacks = Y.one('#playbacks-' + data.recordingid);
+        var preview = Y.one('#preview-' + data.recordingid);
+        if (data.action == 'unpublish') {
             playbacks.hide();
             preview.hide();
             return;
@@ -399,6 +300,137 @@ M.mod_bigbluebuttonbn.recordings = {
         playbacks.show();
         preview.show();
     }
+};
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/** global: M */
+/** global: Y */
+
+M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
+
+M.mod_bigbluebuttonbn.helpers = {
+
+    toggle_spinning_wheel_on: function(data) {
+        var elementid = this.element_id(data.action, data.target);
+
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
+        nodebutton.setAttribute('data-alt', nodebutton.getAttribute('alt'));
+        nodebutton.setAttribute('alt', text);
+        nodebutton.setAttribute('data-title', nodebutton.getAttribute('title'));
+        nodebutton.setAttribute('title', text);
+        nodebutton.setAttribute('data-src', nodebutton.getAttribute('src'));
+        nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
+        nodelink.setAttribute('data-onclick', nodelink.getAttribute('onclick'));
+        nodelink.setAttribute('onclick', '');
+    },
+
+    toggle_spinning_wheel_off: function(data) {
+        var elementid = this.element_id(data.action, data.target);
+
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        nodebutton.setAttribute('alt', nodebutton.getAttribute('data-alt'));
+        nodebutton.removeAttribute('data-alt');
+        nodebutton.setAttribute('title', nodebutton.getAttribute('data-title'));
+        nodebutton.removeAttribute('data-title');
+        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
+        nodebutton.removeAttribute('data-src');
+
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
+        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
+        nodelink.removeAttribute('data-onclick');
+    },
+
+    update_data: function(data) {
+        var action = this.element_action_reversed(data.action);
+      
+        if (action === data.action) {
+            return;
+        }
+
+        var elementid = this.element_id(data.action, data.target);
+        
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
+        var buttondatatag = this.element_tag(action);
+        var buttondatasrc = nodebutton.getAttribute('data-src').replace(
+            this.element_tag(data.action), buttondatatag);
+        nodebutton.setAttribute('data-alt', buttondatatext);
+        nodebutton.setAttribute('data-title', buttondatatext);
+        nodebutton.setAttribute('data-src', buttondatasrc);
+      
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
+        nodelink.setAttribute('data-action', action);
+        var linkdataonclick = nodelink.getAttribute('data-onclick').replace(data.action, action);
+        nodelink.setAttribute('data-onclick', linkdataonclick);
+    },
+
+    update_id: function(data) {
+        var action = this.element_action_reversed(data.action);
+      
+        if (action === data.action) {
+            return;
+        }
+
+        var elementid = this.element_id(data.action, data.target);
+        var id = 'recording-' + elementid.replace(data.action, action) + '-' + data.recordingid;
+
+        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        nodebutton.setAttribute('id', id);
+
+        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
+        nodelink.setAttribute('id', id);
+    },
+  
+    element_id: function(action, target) {
+        var elementid = action;
+        if (typeof target !== 'undefined') {
+            elementid += '-' + target;
+        }
+        return elementid;
+    },
+
+    element_tag: function(action) {
+        var tags = {};
+        tags.publish = 'show';
+        tags.unpublish = 'hide';
+        tags.protect = 'lock';
+        tags.unprotect = 'unlock';
+        tags.edit = 'edit';
+        tags['import'] = 'import';
+        tags['delete'] = 'delete';
+
+        return tags[action];
+    },
+
+    element_action_reversed: function(action) {
+        var reverseactions = {};
+        reverseactions.publish = 'unpublish';
+        reverseactions.unpublish = 'publish';
+        reverseactions.protect = 'unprotect';
+        reverseactions.unprotect = 'protect';
+        reverseactions.edit = 'edit';
+        reverseactions['import'] = 'import';
+        reverseactions['delete'] = 'delete';
+
+        return reverseactions[action];
+    }
+  
 };
 
 

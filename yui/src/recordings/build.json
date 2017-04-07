@@ -3,7 +3,8 @@
     "builds": {
         "moodle-mod_bigbluebuttonbn-recordings": {
             "jsfiles": [
-                "recordings.js"
+                "recordings.js",
+                "helpers.js"
             ]
         }
     }
