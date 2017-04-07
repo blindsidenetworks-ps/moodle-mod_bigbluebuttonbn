@@ -319,6 +319,9 @@ M.mod_bigbluebuttonbn.recordings = {
         if (data.action === 'edit') {
             //this.recording_edit_completion(nodelink.getDOMNode());
         }
+        if (data.action === 'publish' || data.action === 'unpublish') {
+            this.recording_publishunpublish_completion(data.recordingid, data.action);
+        }
     },
 
     recording_action_elementid: function(action, target) {
@@ -383,6 +386,18 @@ M.mod_bigbluebuttonbn.recordings = {
         if (data.action === 'edit') {
             this.recording_edit_failover(nodelink.getDOMNode());
         }
+    },
+
+    recording_publishunpublish_completion: function(recordingid, action) {
+        var playbacks = Y.one('#playbacks-' + recordingid); 
+        var preview = Y.one('#preview-' + recordingid); 
+        if (action == 'unpublish') {
+            playbacks.hide();
+            preview.hide();
+            return;
+        }
+        playbacks.show();
+        preview.show();
     }
 };
 
