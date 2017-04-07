@@ -154,20 +154,20 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_edit: function(element) {
-        var nodelink = Y.one(element);
-        var node = nodelink.ancestor('div');
-        var nodetext = node.one('> span');
+        var link = Y.one(element);
+        var node = link.ancestor('div');
+        var text = node.one('> span');
 
-        nodetext.hide();
-        nodelink.hide();
+        text.hide();
+        link.hide();
 
-        var nodeinputtext = Y.Node.create('<input type="text" class="form-control"></input>');
-        nodeinputtext.setAttribute('id', nodelink.getAttribute('id'));
-        nodeinputtext.setAttribute('value', nodetext.getHTML());
-        nodeinputtext.setAttribute('data-value', nodetext.getHTML());
-        nodeinputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
-        nodeinputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
-        node.append(nodeinputtext);
+        var inputtext = Y.Node.create('<input type="text" class="form-control"></input>');
+        inputtext.setAttribute('id', link.getAttribute('id'));
+        inputtext.setAttribute('value', text.getHTML());
+        inputtext.setAttribute('data-value', text.getHTML());
+        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
+        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
+        node.append(inputtext);
     },
 
     recording_edit_keydown: function(element) {
@@ -182,71 +182,72 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_edit_onfocusout: function(element) {
-        var nodeinputtext = Y.one(element);
-        var node = nodeinputtext.ancestor('div');
-        nodeinputtext.hide();
+        var inputtext = Y.one(element);
+        var node = inputtext.ancestor('div');
+        inputtext.hide();
         node.one('> span').show();
         node.one('> a').show();
     },
 
     recording_edit_perform: function(element) {
-        var nodeinputtext = Y.one(element);
-        var node = nodeinputtext.ancestor('div');
+        var inputtext = Y.one(element);
+        var node = inputtext.ancestor('div');
         var text = element.value;
 
         // Perform the update.
-        nodeinputtext.setAttribute('data-action', 'edit');
-        nodeinputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recording_update(nodeinputtext.getDOMNode());
+        inputtext.setAttribute('data-action', 'edit');
+        inputtext.setAttribute('data-goalstate', text);
+        M.mod_bigbluebuttonbn.recordings.recording_update(inputtext.getDOMNode());
         node.one('> span').setHTML(text);
 
-        var nodelink = node.one('> a');
-        nodelink.show();
-        nodelink.focus();
+        var link = node.one('> a');
+        link.show();
+        link.focus();
     },
 
     recording_edit_completion: function(data, failed) {
-        var elementid = this.element_id(data.action, data.target);
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        var node = nodelink.ancestor('div');
-        var nodetext = node.one('> span');
-        if (typeof nodetext === 'undefined') {
+        var elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
+        var link = Y.one('a#' + elementid + '-' + data.recordingid);
+        var node = link.ancestor('div');
+        var text = node.one('> span');
+        if (typeof text === 'undefined') {
             return;
         }
 
-        var nodeinputtext = node.one('> input');
+        var inputtext = node.one('> input');
         if (failed) {
-            nodetext.setHTML(nodeinputtext.getAttribute('data-value'));
+            text.setHTML(inputtext.getAttribute('data-value'));
         }
-        nodeinputtext.remove();
+        inputtext.remove();
     },
 
-    recording_confirmation_message: function(action, recordingid) {
-        var confirmation = M.util.get_string('view_recording_' + action + '_confirmation', 'bigbluebuttonbn');
+    recording_confirmation_message: function(data) {
+        var confirmation = M.util.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
         if (typeof confirmation === 'undefined') {
             return '';
         }
 
         var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
-        if (Y.one('#playbacks-' + recordingid).get('dataset').imported === 'true') {
+        if (Y.one('#playbacks-' + data.recordingid).get('dataset').imported === 'true') {
             recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
 
         confirmation = confirmation.replace("{$a}", recording_type);
-        if (action === 'import') {
+        if (data.action === 'import') {
             return confirmation;
         }
 
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
-        var associated_links = Y.one('a#recording-' + action + '-' + recordingid).get('dataset').links;
+        var elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
+        var associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
         if (associated_links === 0) {
             return confirmation;
         }
 
-        var confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_p',
+        var confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
             'bigbluebuttonbn');
         if (associated_links == 1) {
-            confirmation_warning = M.util.get_string('view_recording_' + action + '_confirmation_warning_s',
+            confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_s',
                 'bigbluebuttonbn');
         }
         confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';

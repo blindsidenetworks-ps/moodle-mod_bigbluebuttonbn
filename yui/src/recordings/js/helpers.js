@@ -23,34 +23,34 @@ M.mod_bigbluebuttonbn.helpers = {
     toggle_spinning_wheel_on: function(data) {
         var elementid = this.element_id(data.action, data.target);
 
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var button = Y.one('img#' + elementid + '-' + data.recordingid);
         var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
-        nodebutton.setAttribute('data-alt', nodebutton.getAttribute('alt'));
-        nodebutton.setAttribute('alt', text);
-        nodebutton.setAttribute('data-title', nodebutton.getAttribute('title'));
-        nodebutton.setAttribute('title', text);
-        nodebutton.setAttribute('data-src', nodebutton.getAttribute('src'));
-        nodebutton.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+        button.setAttribute('data-alt', button.getAttribute('alt'));
+        button.setAttribute('alt', text);
+        button.setAttribute('data-title', button.getAttribute('title'));
+        button.setAttribute('title', text);
+        button.setAttribute('data-src', button.getAttribute('src'));
+        button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
 
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-onclick', nodelink.getAttribute('onclick'));
-        nodelink.setAttribute('onclick', '');
+        var link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('data-onclick', link.getAttribute('onclick'));
+        link.setAttribute('onclick', '');
     },
 
     toggle_spinning_wheel_off: function(data) {
         var elementid = this.element_id(data.action, data.target);
 
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        nodebutton.setAttribute('alt', nodebutton.getAttribute('data-alt'));
-        nodebutton.removeAttribute('data-alt');
-        nodebutton.setAttribute('title', nodebutton.getAttribute('data-title'));
-        nodebutton.removeAttribute('data-title');
-        nodebutton.setAttribute('src', nodebutton.getAttribute('data-src'));
-        nodebutton.removeAttribute('data-src');
+        var button = Y.one('img#' + elementid + '-' + data.recordingid);
+        button.setAttribute('alt', button.getAttribute('data-alt'));
+        button.removeAttribute('data-alt');
+        button.setAttribute('title', button.getAttribute('data-title'));
+        button.removeAttribute('data-title');
+        button.setAttribute('src', button.getAttribute('data-src'));
+        button.removeAttribute('data-src');
 
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('onclick', nodelink.getAttribute('data-onclick'));
-        nodelink.removeAttribute('data-onclick');
+        var link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('onclick', link.getAttribute('data-onclick'));
+        link.removeAttribute('data-onclick');
     },
 
     update_data: function(data) {
@@ -62,19 +62,19 @@ M.mod_bigbluebuttonbn.helpers = {
 
         var elementid = this.element_id(data.action, data.target);
         
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
+        var button = Y.one('img#' + elementid + '-' + data.recordingid);
         var buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
         var buttondatatag = this.element_tag(action);
-        var buttondatasrc = nodebutton.getAttribute('data-src').replace(
+        var buttondatasrc = button.getAttribute('data-src').replace(
             this.element_tag(data.action), buttondatatag);
-        nodebutton.setAttribute('data-alt', buttondatatext);
-        nodebutton.setAttribute('data-title', buttondatatext);
-        nodebutton.setAttribute('data-src', buttondatasrc);
+        button.setAttribute('data-alt', buttondatatext);
+        button.setAttribute('data-title', buttondatatext);
+        button.setAttribute('data-src', buttondatasrc);
       
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('data-action', action);
-        var linkdataonclick = nodelink.getAttribute('data-onclick').replace(data.action, action);
-        nodelink.setAttribute('data-onclick', linkdataonclick);
+        var link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('data-action', action);
+        var linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
+        link.setAttribute('data-onclick', linkdataonclick);
     },
 
     update_id: function(data) {
@@ -85,17 +85,17 @@ M.mod_bigbluebuttonbn.helpers = {
         }
 
         var elementid = this.element_id(data.action, data.target);
-        var id = 'recording-' + elementid.replace(data.action, action) + '-' + data.recordingid;
+        var id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
 
-        var nodebutton = Y.one('img#recording-' + elementid + '-' + data.recordingid);
-        nodebutton.setAttribute('id', id);
+        var button = Y.one('img#' + elementid + '-' + data.recordingid);
+        button.setAttribute('id', id);
 
-        var nodelink = Y.one('a#recording-' + elementid + '-' + data.recordingid);
-        nodelink.setAttribute('id', id);
+        var link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('id', id);
     },
   
     element_id: function(action, target) {
-        var elementid = action;
+        var elementid = 'recording-' + action;
         if (typeof target !== 'undefined') {
             elementid += '-' + target;
         }
