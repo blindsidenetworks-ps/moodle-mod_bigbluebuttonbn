@@ -97,9 +97,7 @@ if (empty($options)) {
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
 
     // JavaScript for locales.
-    $stringman = get_string_manager();
-    $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
-    $PAGE->requires->strings_for_js(array_keys($strings), 'bigbluebuttonbn');
+    $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
     // Require JavaScript modules.
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-import', 'M.mod_bigbluebuttonbn.import.init',
