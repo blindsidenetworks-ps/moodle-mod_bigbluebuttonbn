@@ -41,9 +41,12 @@ $context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
-if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    print_error(get_string('view_error_invalid_session', 'bigbluebuttonbn'));
+    return;
 }
+
+$bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 
 $output = '';
 
@@ -100,8 +103,8 @@ if (empty($options)) {
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
     // Require JavaScript modules.
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-import', 'M.mod_bigbluebuttonbn.import.init',
-        array('bn' => $bn, 'tc' => $selected));
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-imports', 'M.mod_bigbluebuttonbn.imports.init',
+        array(array('bn' => $bn, 'tc' => $selected)));
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init',
         array());
 }

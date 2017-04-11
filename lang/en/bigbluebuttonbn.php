@@ -222,6 +222,7 @@ $string['view_error_userlimit_reached'] = 'The number of users allowed in a meet
 $string['view_error_url_missing_parameters'] = 'There are parameters missing in this URL';
 $string['view_error_import_no_courses'] = 'No courses to look up for recordings';
 $string['view_error_import_no_recordings'] = 'No recordings in this course for importing';
+$string['view_error_invalid_session'] = 'The session is expired. Go back to the activity main page.';
 $string['view_groups_selection_join'] = 'Join';
 $string['view_groups_selection'] = 'Select the group you want to join and confirm the action';
 $string['view_login_moderator'] = 'Logging in as moderator ...';
