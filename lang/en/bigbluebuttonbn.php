@@ -162,6 +162,7 @@ $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
+$string['mod_form_field_participant_role_unknown'] = 'Unknown';
 $string['mod_form_field_predefinedprofile'] = 'Predefined profile';
 $string['mod_form_field_predefinedprofile_help'] = 'Predefined profile';
 $string['mod_form_field_notification'] = 'Send notification';

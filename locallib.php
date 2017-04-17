@@ -432,7 +432,11 @@ function bigbluebuttonbn_get_guest_role(context $context = null) {
 function bigbluebuttonbn_get_role_name($role_shortname){
     $role = bigbluebuttonbn_get_db_moodle_roles($role_shortname);
 
-    if( $role != null && $role->name != "") {
+    if (!$role) {
+        return get_string('mod_form_field_participant_role_unknown', 'bigbluebuttonbn');
+    }
+
+    if ($role->name != "") {
         return $role->name;
     }
 
