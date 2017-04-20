@@ -185,6 +185,7 @@ if ($groupmode == NOGROUPS) {  //No groups mode
     echo $OUTPUT->box_end();
 
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id);
+    $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
     if ($groupmode == SEPARATEGROUPS && sizeof($groups) > 0) {
         $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
         $current_group = current($groups);
