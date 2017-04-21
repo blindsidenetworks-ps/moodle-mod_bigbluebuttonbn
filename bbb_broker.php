@@ -538,7 +538,30 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
 
 function bigbluebuttonbn_broker_validate_parameters($params) {
 
-    $requiredparams = [
+    $requiredparams = bigbluebuttonbn_broker_required_parameters();
+
+    if (!isset($params['callback'])) {
+        return 'This call must include a javascript callback.';
+    }
+
+    if (!isset($params['action'])) {
+        return 'Action parameter must be included.';
+    }
+
+    $action = strtolower($params['action']);
+    if (!array_key_exists($action, $requiredparams)) {
+        return 'Action '.$params['action'].' can not be performed.';
+    }
+
+    foreach ($requiredparams[$action] as $param => $message) {
+        if (!array_key_exists($param, $params) || empty($params[$param])) {
+            return $message;
+        }
+    }
+}
+
+function bigbluebuttonbn_broker_required_parameters() {
+    return [
         'server_ping' => ['id' => 'The meetingID must be specified.'],
         'meeting_info' => ['id' => 'The meetingID must be specified.'],
         'meeting_end' => ['id' => 'The meetingID must be specified.'],
@@ -559,23 +582,4 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ]
       ];
-
-    if (!isset($params['callback'])) {
-        return 'This call must include a javascript callback.';
-    }
-
-    if (!isset($params['action'])) {
-        return 'Action parameter must be included.';
-    }
-
-    $action = strtolower($params['action']);
-    if (!array_key_exists($action, $requiredparams)) {
-        return 'Action '.$params['action'].' can not be performed.';
-    }
-
-    foreach ($requiredparams[$action] as $param => $message) {
-        if (!array_key_exists($param, $params) || empty($params[$param])) {
-            return $message;
-        }
-    }
 }

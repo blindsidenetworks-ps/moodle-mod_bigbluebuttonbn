@@ -21,48 +21,58 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.helpers = {
 
     toggle_spinning_wheel_on: function(data) {
-        var elementid = this.element_id(data.action, data.target);
+        var elementid, link, button, text;
 
-        var button = Y.one('img#' + elementid + '-' + data.recordingid);
-        var text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
+        elementid = this.element_id(data.action, data.target);
+        link = Y.one('a#' + elementid + '-' + data.recordingid);
+        button = link.one('> i');
+        // For backward compatibility
+        if (button === null) {
+            button = link.one('> img');
+        }
+        text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         button.setAttribute('data-alt', button.getAttribute('alt'));
         button.setAttribute('alt', text);
         button.setAttribute('data-title', button.getAttribute('title'));
         button.setAttribute('title', text);
         button.setAttribute('data-src', button.getAttribute('src'));
         button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
-
-        var link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-onclick', link.getAttribute('onclick'));
         link.setAttribute('onclick', '');
     },
 
     toggle_spinning_wheel_off: function(data) {
-        var elementid = this.element_id(data.action, data.target);
-
-        var button = Y.one('img#' + elementid + '-' + data.recordingid);
+        var elementid, link, button;
+        elementid = this.element_id(data.action, data.target);
+        link = Y.one('a#' + elementid + '-' + data.recordingid);
+        button = link.one('> i');
+        // For backward compatibility
+        if (button === null) {
+            button = link.one('> img');
+        }
         button.setAttribute('alt', button.getAttribute('data-alt'));
         button.removeAttribute('data-alt');
         button.setAttribute('title', button.getAttribute('data-title'));
         button.removeAttribute('data-title');
         button.setAttribute('src', button.getAttribute('data-src'));
         button.removeAttribute('data-src');
-
-        var link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('onclick', link.getAttribute('data-onclick'));
         link.removeAttribute('data-onclick');
     },
 
     update_data: function(data) {
-        var action = this.element_action_reversed(data.action);
-      
+        var action, elementid, link, button;
+        action = this.element_action_reversed(data.action);
         if (action === data.action) {
             return;
         }
-
-        var elementid = this.element_id(data.action, data.target);
-        
-        var button = Y.one('img#' + elementid + '-' + data.recordingid);
+        elementid = this.element_id(data.action, data.target);
+        link = Y.one('a#' + elementid + '-' + data.recordingid);
+        button = link.one('> i');
+        // For backward compatibility
+        if (button === null) {
+            button = link.one('> img');
+        }
         var buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
         var buttondatatag = this.element_tag(action);
         var buttondatasrc = button.getAttribute('data-src').replace(
@@ -70,30 +80,29 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
         button.setAttribute('data-src', buttondatasrc);
-      
-        var link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-action', action);
         var linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
         link.setAttribute('data-onclick', linkdataonclick);
     },
 
     update_id: function(data) {
-        var action = this.element_action_reversed(data.action);
-      
+        var action, elementid, link, button, id;
+        action = this.element_action_reversed(data.action);
         if (action === data.action) {
             return;
         }
-
-        var elementid = this.element_id(data.action, data.target);
-        var id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
-
-        var button = Y.one('img#' + elementid + '-' + data.recordingid);
+        elementid = this.element_id(data.action, data.target);
+        link = Y.one('a#' + elementid + '-' + data.recordingid);
+        button = link.one('> i');
+        // For backward compatibility
+        if (button === null) {
+            button = link.one('> img');
+        }
+        id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
         button.setAttribute('id', id);
-
-        var link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('id', id);
     },
-  
+
     element_id: function(action, target) {
         var elementid = 'recording-' + action;
         if (typeof target !== 'undefined') {
@@ -137,5 +146,5 @@ M.mod_bigbluebuttonbn.helpers = {
             thumbnail.setAttribute('src', thumbnailsrc);
         });
     }
-  
+
 };
