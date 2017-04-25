@@ -28,9 +28,6 @@ require_once(dirname(__FILE__).'/locallib.php');
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $action = required_param('action', PARAM_TEXT);
-$name = optional_param('name', '', PARAM_TEXT);
-$description = optional_param('description', '', PARAM_TEXT);
-$tags = optional_param('tags', '', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 
 if ($id) {
@@ -103,7 +100,12 @@ switch (strtolower($action)) {
         }
 
         // As the meeting doesn't exist, try to create it.
-        $response = bigbluebutton_bbb_view_create_meeting($bbbsession, $bigbluebuttonbn, $name, $description, $tags);
+        $response = bigbluebuttonbn_get_create_meeting_array(
+            bigbluebutton_bbb_view_create_meeting_data($bbbsession, $bigbluebuttonbn),
+            bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
+            $bbbsession['presentation']['name'],
+            $bbbsession['presentation']['url']
+        );
 
         if (!$response) {
             // The server is unreachable.
@@ -162,31 +164,58 @@ function bigbluebutton_bbb_view_close_window_manually() {
     echo get_string('view_message_tab_close', 'bigbluebuttonbn');
 }
 
-function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $name, $description, $tags) {
+function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebuttonbn) {
+    $data = ['meetingID' => $bbbsession['meetingid'],
+              'name' => $bbbsession['meetingname'],
+              'attendeePW' => $bbbsession['viewerPW'],
+              'moderatorPW' => $bbbsession['modPW'],
+              'logoutURL' => $bbbsession['logoutURL'],
+            ];
 
-    // Prepare the metadata.
-    $bbbrecname = $bbbsession['meetingname'];
-    if (!empty($name)) {
-        $bbbrecname = $name;
+    $data['record'] = 'false';
+    if ($bbbsession['record']) {
+        $data['record'] = 'true';
     }
-    $bbbrecdescription = bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64);
-    if (!empty($description)) {
-        $bbbrecdescription = $description;
+
+    $welcome = trim($bbbsession['welcome']);
+    if ($welcome != '') {
+        $data['welcome'] = $welcome;
     }
-    $bbbrectags = bigbluebuttonbn_get_tags($bbbsession['cm']->id); // Same as $id.
-    if (!empty($tags)) {
-        $bbbrectags = $tags;
+
+    // Set the duration for the meeting.
+    $durationtime = 0;
+    if (bigbluebuttonbn_get_cfg_scheduled_duration_enabled()) {
+        $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
     }
-    $metadata = array('bbb-origin' => $bbbsession['origin'],
-                      'bbb-origin-version' => $bbbsession['originVersion'],
-                      'bbb-origin-server-name' => $bbbsession['originServerName'],
-                      'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
-                      'bbb-origin-tag' => $bbbsession['originTag'],
-                      'bbb-context' => $bbbsession['course']->fullname,
-                      'bbb-recording-name' => $bbbrecname,
-                      'bbb-recording-description' => $bbbrecdescription,
-                      'bbb-recording-tags' => $bbbrectags,
-                    );
+    if ($durationtime > 0) {
+        $data['duration'] = $durationtime;
+        $data['welcome'] .= '<br><br>'.str_replace('%duration%', ''.$durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));
+    }
+
+    $voicebridge = intval($bbbsession['voicebridge']);
+    if ($voicebridge > 0 && $voicebridge < 79999) {
+        $data['voiceBridge'] = $voicebridge;
+    }
+
+    $maxparticipants = intval($bbbsession['userlimit']);
+    if ($maxparticipants > 0) {
+        $data['maxParticipants'] = $maxparticipants;
+    }
+
+    return $data;
+}
+
+function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
+      $metadata = ['bbb-origin' => $bbbsession['origin'],
+                   'bbb-origin-version' => $bbbsession['originVersion'],
+                   'bbb-origin-server-name' => $bbbsession['originServerName'],
+                   'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
+                   'bbb-origin-tag' => $bbbsession['originTag'],
+                   'bbb-context' => $bbbsession['course']->fullname,
+                   'bbb-recording-name' => $bbbsession['meetingname'],
+                   'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
+                   'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+                  ];
 
     if (bigbluebuttonbn_is_bn_server()) {
         if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
@@ -197,31 +226,7 @@ function bigbluebutton_bbb_view_create_meeting(&$bbbsession, $bigbluebuttonbn, $
         }
     }
 
-    // Set the duration for the meeting.
-    $durationtime = 0;
-    if (bigbluebuttonbn_get_cfg_scheduled_duration_enabled()) {
-        $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
-        if ($durationtime > 0) {
-            $bbbsession['welcome'] .= '<br><br>'.str_replace('%duration%', ''.$durationtime,
-                get_string('bbbdurationwarning', 'bigbluebuttonbn'));
-        }
-    }
-    // Execute the create command.
-    return bigbluebuttonbn_get_create_meeting_array(
-            $bbbsession['meetingname'],
-            $bbbsession['meetingid'],
-            $bbbsession['welcome'],
-            $bbbsession['modPW'],
-            $bbbsession['viewerPW'],
-            $bbbsession['logoutURL'],
-            $bbbsession['record'] ? 'true' : 'false',
-            $durationtime,
-            $bbbsession['voicebridge'],
-            $bbbsession['userlimit'],
-            $metadata,
-            $bbbsession['presentation']['name'],
-            $bbbsession['presentation']['url']
-        );
+    return $metadata;
 }
 
 function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn) {

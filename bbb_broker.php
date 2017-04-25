@@ -404,7 +404,7 @@ function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $rec
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         error_log("Updating imported");
         // Execute update on imported recording link.
-        //bigbluebuttonbn_update_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta']));
+        bigbluebuttonbn_update_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta']));
         return array('status' => true);
     }
 
@@ -554,7 +554,7 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
     }
 
     foreach ($requiredparams[$action] as $param => $message) {
-        if (!array_key_exists($param, $params) || empty($params[$param])) {
+        if (!array_key_exists($param, $params) || $params[$param] == '') {
             return $message;
         }
     }

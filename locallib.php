@@ -99,38 +99,6 @@ function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $c
     return bigbluebuttonbn_bigbluebutton_action_url('join', $data);
 }
 
-function bigbluebuttonbn_get_create_meeting_url($name, $meetingid, $attendeepw, $moderatorpw, $welcome,
-    $logouturl, $record = 'false', $duration = 0, $voicebridge = 0, $maxparticipants = 0, $metadata = array()) {
-    $data = ['meetingID' => $meetingid,
-              'name' => $name,
-              'attendeePW' => $attendeepw,
-              'moderatorPW' => $moderatorpw,
-              'logoutURL' => $logouturl,
-              'record' => $record,
-            ];
-
-    $voicebridge = intval($voicebridge);
-    if ($voicebridge > 0 && $voicebridge < 79999) {
-        $data['voiceBridge'] = $voicebridge;
-    }
-
-    $duration = intval($duration);
-    if ($duration > 0) {
-        $data['duration'] = $duration;
-    }
-
-    $maxparticipants = intval($maxparticipants);
-    if ($maxparticipants > 0) {
-        $data['maxParticipants'] = $maxparticipants;
-    }
-
-    if (trim($welcome)) {
-        $data['welcome'] = $welcome;
-    }
-
-    return bigbluebuttonbn_bigbluebutton_action_url('create', $data, $metadata);
-}
-
 /**
  * @param string $recordid
  * @param array  $metadata
@@ -146,7 +114,6 @@ function bigbluebuttonbn_get_update_recordings_url($recordid, $metadata = array(
  */
 function bigbluebuttonbn_bigbluebutton_action_url($action = '', $data = array(), $metadata = array()) {
     $baseurl = bigbluebuttonbn_get_cfg_server_url().'api/'.$action.'?';
-
     $params = '';
 
     foreach ($data as $key => $value) {
@@ -160,12 +127,8 @@ function bigbluebuttonbn_bigbluebutton_action_url($action = '', $data = array(),
     return $baseurl.$params.'&checksum='.sha1($action.$params.bigbluebuttonbn_get_cfg_shared_secret());
 }
 
-function bigbluebuttonbn_get_create_meeting_array($meetingname, $meetingid, $welcomestring, $mpw, $apw,
-        $logouturl, $record = 'false', $duration = 0, $voicebridge = 0, $maxparticipants = 0,
-        $metadata = array(), $pname = null, $purl = null) {
-
-    $createmeetingurl = bigbluebuttonbn_get_create_meeting_url($meetingname, $meetingid, $apw, $mpw, $welcomestring,
-        $logouturl, $record, $duration, $voicebridge, $maxparticipants, $metadata);
+function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $pname = null, $purl = null) {
+    $createmeetingurl = bigbluebuttonbn_bigbluebutton_action_url('create', $data, $metadata);
     $method = BIGBLUEBUTTONBN_METHOD_GET;
     $data = null;
 
@@ -499,6 +462,18 @@ function bigbluebuttonbn_update_recordings($recordids, $params) {
         if ($xml && $xml->returncode != 'SUCCESS') {
             return false;
         }
+    }
+
+    return true;
+}
+
+/**
+ * @param string $recordids
+ * @param array $params ['key'=>param_key, 'value']
+ */
+function bigbluebuttonbn_update_recording_imported($recordids, $bigbluebuttonid, $params) {
+    $ids = explode(',', $recordids);
+    foreach ($ids as $id) {
     }
 
     return true;
