@@ -912,7 +912,27 @@ function bigbluebuttonbn_events() {
         (string) BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED,
         (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
         (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED
+    );
+}
+
+function bigbluebuttonbn_events_action() {
+    return array(
+        'view' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED,
+        'view_management' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED,
+        'live_action' => (string) BIGBLUEBUTTON_EVENT_LIVE_SESSION,
+        'meeting_create' => (string) BIGBLUEBUTTON_EVENT_MEETING_CREATED,
+        'meeting_end' => (string) BIGBLUEBUTTON_EVENT_MEETING_ENDED,
+        'meeting_join' => (string) BIGBLUEBUTTON_EVENT_MEETING_JOINED,
+        'meeting_left' => (string) BIGBLUEBUTTON_EVENT_MEETING_LEFT,
+        'recording_delete' => (string) BIGBLUEBUTTON_EVENT_RECORDING_DELETED,
+        'recording_import' => (string) BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED,
+        'recording_protect' => (string) BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED,
+        'recording_publish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
+        'recording_unprotect' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
+        'recording_unpublish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
+        'recording_edit' => (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED
     );
 }
 

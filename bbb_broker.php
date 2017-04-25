@@ -297,15 +297,10 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
 }
 
 function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm) {
-
     if (!$bbbsession['managerecordings']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
-
-    $callbackresponse = array();
-    $callbackresponse['status'] = false;
-    $eventlog = null;
 
     // Retrieve array of recordings that includes real and imported.
     $bigbluebuttonbnid = null;
@@ -315,26 +310,12 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
         $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
 
-    // Excecute action.
-    switch (strtolower($params['action'])) {
-        case 'recording_publish':
-            $callbackresponse = bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings);
-            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED;
-            break;
-        case 'recording_unpublish':
-            $callbackresponse = bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);
-            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED;
-            break;
-        case 'recording_edit':
-            $callbackresponse = bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings);
-            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_EDITED;
-            break;
-        case 'recording_delete':
-            $callbackresponse = bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
-            $eventlog = BIGBLUEBUTTON_EVENT_RECORDING_DELETED;
-            break;
-    }
+    $action = strtolower($params['action']);
+    $events = bigbluebuttonbn_events_action();
 
+    // Excecute action.
+    $eventlog = $events[$action];
+    $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $params, $recordings);
     if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
         bigbluebuttonbn_event_log($eventlog, $bigbluebuttonbn, $cm);
@@ -342,6 +323,21 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
+}
+
+function bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $params, $recordings) {
+    if ($action == 'recording_publish') {
+        return bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings);
+    }
+    if ($action == 'recording_unpublish') {
+        return bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);
+    }
+    if ($action == 'recording_edit') {
+        return bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings);
+    }
+    if ($action == 'recording_delete') {
+        return bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
+    }
 }
 
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
