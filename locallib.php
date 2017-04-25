@@ -387,21 +387,22 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
     }
 
     // Add the metadata to the recordings array.
+    $metadataarray = bigbluebuttonbn_get_recording_array_meta(get_object_vars($recording->metadata));
+    return array('recordID' => (string) $recording->recordID,
+        'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
+        'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
+        'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray) + $metadataarray;
+}
+
+function bigbluebuttonbn_get_recording_array_meta($metadata) {
     $metadataarray = array();
-    $metadata = get_object_vars($recording->metadata);
     foreach ($metadata as $key => $value) {
         if (is_object($value)) {
             $value = '';
         }
         $metadataarray['meta_'.$key] = $value;
     }
-
-    $recordingarrayvalue = array('recordID' => (string) $recording->recordID,
-        'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
-        'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-        'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray) + $metadataarray;
-
-    return $recordingarrayvalue;
+    return $metadataarray;
 }
 
 function bigbluebuttonbn_recording_build_sorter($a, $b) {
