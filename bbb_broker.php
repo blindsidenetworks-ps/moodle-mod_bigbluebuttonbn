@@ -531,7 +531,6 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
 }
 
 function bigbluebuttonbn_broker_validate_parameters($params) {
-
     $requiredparams = bigbluebuttonbn_broker_required_parameters();
 
     if (!isset($params['callback'])) {
@@ -547,7 +546,11 @@ function bigbluebuttonbn_broker_validate_parameters($params) {
         return 'Action '.$params['action'].' can not be performed.';
     }
 
-    foreach ($requiredparams[$action] as $param => $message) {
+    return bigbluebuttonbn_broker_validate_parameters_message($params, $requiredparams[$action]);
+}
+
+function bigbluebuttonbn_broker_validate_parameters_message($params, $requiredparams) {
+    foreach ($requiredparams as $param => $message) {
         if (!array_key_exists($param, $params) || $params[$param] == '') {
             return $message;
         }
