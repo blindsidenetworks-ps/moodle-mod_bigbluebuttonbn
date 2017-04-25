@@ -145,29 +145,26 @@ M.mod_bigbluebuttonbn.rooms = {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
 
+        var viewers = participants - moderators;
         var msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         var msg_moderators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
-        var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
-
-        if (participants == 1) {
-            if (moderators > 0) {
-                return msg + ' <b>1</b> ' + msg_moderators + '.';
-            }
-
-            return msg + ' <b>1</b> ' + msg_viewers + '.';
-        }
-
-        var viewers = participants - moderators;
-
         if (moderators == 1) {
             msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
         }
-
+        var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
         if (viewers == 1) {
             msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
         }
 
-        return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
+        if (participants > 1) {
+            return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
+        }
+
+        if (moderators > 0) {
+            return msg + ' <b>1</b> ' + msg_moderators + '.';
+        }
+
+        return msg + ' <b>1</b> ' + msg_viewers + '.';
     },
 
     init_join_button: function(status) {

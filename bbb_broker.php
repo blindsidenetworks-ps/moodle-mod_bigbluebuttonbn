@@ -288,7 +288,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     }
 
     $meta = json_decode($params['meta']);
-    foreach ($meta as $key => $value) {
+    foreach (array_keys($meta) as $key) {
         if (isset($recording[$key])) {
             $callbackresponse[$key] = $recording[$key];
         }
@@ -399,8 +399,6 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
 }
 
 function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings) {
-    global $DB;
-
     if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
         error_log("Updating imported");
         // Execute update on imported recording link.

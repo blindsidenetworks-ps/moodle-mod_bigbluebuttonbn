@@ -407,10 +407,10 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
 function bigbluebuttonbn_recording_build_sorter($a, $b) {
     if ($a['startTime'] < $b['startTime']) {
         return -1;
-    } else if ($a['startTime'] == $b['startTime']) {
+    }
+    if ($a['startTime'] == $b['startTime']) {
         return 0;
     }
-
     return 1;
 }
 
@@ -469,13 +469,13 @@ function bigbluebuttonbn_update_recordings($recordids, $params) {
 
 /**
  * @param string $recordids
+ * @param string $bigbluebuttonid
  * @param array $params ['key'=>param_key, 'value']
  */
 function bigbluebuttonbn_update_recording_imported($recordids, $bigbluebuttonid, $params) {
     $ids = explode(',', $recordids);
     foreach ($ids as $id) {
     }
-
     return true;
 }
 
@@ -795,14 +795,13 @@ function bigbluebuttonbn_is_moderator_rule_validation($participant, $userid, $us
 }
 
 function bigbluebuttonbn_get_error_key($messagekey, $defaultkey = null) {
-    $key = $defaultkey;
     if ($messagekey == 'checksumError') {
-        $key = 'index_error_checksum';
-    } else if ($messagekey == 'maxConcurrent') {
-        $key = 'view_error_max_concurrent';
+        return 'index_error_checksum';
     }
-
-    return $key;
+    if ($messagekey == 'maxConcurrent') {
+        return 'view_error_max_concurrent';
+    }
+    return $defaultkey;
 }
 
 function bigbluebuttonbn_voicebridge_unique($voicebridge, $id = null) {
@@ -1264,8 +1263,6 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $ed
 }
 
 function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $data) {
-    global $OUTPUT;
-
     $htmltext = '<span>' . htmlentities($text) . '</span>';
 
     if (empty($data)) {

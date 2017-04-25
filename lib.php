@@ -168,7 +168,7 @@ function bigbluebuttonbn_update_instance($data, $mform) {
  * @return bool Success/Failure
  */
 function bigbluebuttonbn_delete_instance($id) {
-    global $DB, $USER;
+    global $DB;
 
     if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
@@ -191,8 +191,14 @@ function bigbluebuttonbn_delete_instance($id) {
         return false;
     }
 
-    $log = new stdClass();
+    // Log action performed.
+    return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+}
 
+function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
+    global $DB, $USER;
+
+    $log = new stdClass();
     $log->meetingid = $bigbluebuttonbn->meetingid;
     $log->courseid = $bigbluebuttonbn->course;
     $log->bigbluebuttonbnid = $bigbluebuttonbn->id;
@@ -201,17 +207,12 @@ function bigbluebuttonbn_delete_instance($id) {
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
 
     $logs = $DB->get_records('bigbluebuttonbn_logs',
-        array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
-    $hasrecordings = 'false';
+        array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE, 'meta' => "{\"record\":true}")
+      );
+    $log->meta = "{\"has_recordings\":false}";
     if (!empty($logs)) {
-        foreach ($logs as $l) {
-            $meta = json_decode($l->meta);
-            if ($meta->record) {
-                $hasrecordings = 'true';
-            }
-        }
+        $log->meta = "{\"has_recordings\":true}";
     }
-    $log->meta = "{\"has_recordings\":{$hasrecordings}}";
 
     if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
         return false;
@@ -219,7 +220,6 @@ function bigbluebuttonbn_delete_instance($id) {
 
     return true;
 }
-
 /**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
@@ -254,6 +254,7 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  */
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
+
     $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
                                                               'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                                                               'userid' => $user->id,
@@ -494,15 +495,14 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $drafti
     $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
         'itemid, filepath, filename', false);
     // Check that there is a file to process.
+    $filesrc = '';
     if (count($files) == 1) {
         // Get the first (and only) file.
         $file = reset($files);
-        // Set the presentation column in the bigbluebuttonbn table.
-        $DB->set_field('bigbluebuttonbn', 'presentation', '/'.$file->get_filename(), array('id' => $bigbluebuttonbnid));
-    } else {
-        // Set the presentation column in the bigbluebuttonbn table.
-        $DB->set_field('bigbluebuttonbn', 'presentation', '', array('id' => $bigbluebuttonbnid));
+        $filesrc = '/'.$file->get_filename();
     }
+    // Set the presentation column in the bigbluebuttonbn table.
+    $DB->set_field('bigbluebuttonbn', 'presentation', $filesrc, array('id' => $bigbluebuttonbnid));
 }
 
 /**
@@ -568,9 +568,8 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
 
         // The nonce value is actually used twice because BigBlueButton reads the file two times.
         $noncecounter += 1;
-        if ($noncecounter < 2) {
-            $cache->set($noncekey, array('value' => $noncevalue, 'counter' => $noncecounter));
-        } else {
+        $cache->set($noncekey, array('value' => $noncevalue, 'counter' => $noncecounter));
+        if ($noncecounter == 2) {
             $cache->delete($noncekey);
         }
 
@@ -608,13 +607,11 @@ function bigbluebuttonbn_get_file_areas() {
 function bigbluebuttonbn_get_db_moodle_roles($rolename = 'all') {
     global $DB;
 
+    $roletarget = array();
     if ($rolename != 'all') {
-        $roles = $DB->get_record('role', array('shortname' => $rolename));
-    } else {
-        $roles = $DB->get_records('role', array());
+        $roletarget['shortname'] = $rolename;
     }
-
-    return $roles;
+    return $DB->get_records('role', $roletarget);
 }
 
 function bigbluebuttonbn_notification_process($bigbluebuttonbn, $action) {
@@ -684,11 +681,11 @@ function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message =
     foreach ($users as $user) {
         if ($user->id != $sender->id) {
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
-            if (!empty($messageid)) {
-                debugging('Msg to '.$msg->user_name.' was sent.', DEBUG_DEVELOPER);
-            } else {
-                debugging('Msg to '.$msg->user_name.' was NOT sent.', DEBUG_DEVELOPER);
+            $msgsend = ' was sent.';
+            if (empty($messageid)) {
+                $msgsend = ' was NOT sent.';
             }
+            debugging('Msg to '.$msg->user_name.$msgsend, DEBUG_DEVELOPER);
         }
     }
 }
