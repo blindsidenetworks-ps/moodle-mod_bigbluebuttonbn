@@ -343,7 +343,7 @@ function bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
 
     $status = true;
-    if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute publish on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
             $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
@@ -367,7 +367,7 @@ function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $
 function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings) {
     global $DB;
 
-    if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unpublish on imported recording link.
         bigbluebuttonbn_publish_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, false);
         return array('status' => true);
@@ -395,7 +395,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
 }
 
 function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings) {
-    if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         error_log("Updating imported");
         // Execute update on imported recording link.
         bigbluebuttonbn_update_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta']));
@@ -414,7 +414,7 @@ function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $rec
 function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings) {
     global $DB;
 
-    if (isset($recordings[$params['id']]) && isset($recordings[$params['id']]['imported'])) {
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute delete on imported recording link.
         bigbluebuttonbn_delete_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id);
         return array('status' => true);
@@ -579,4 +579,8 @@ function bigbluebuttonbn_broker_required_parameters() {
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ]
       ];
+}
+
+function bigbluebuttonbn_broker_recording_is_imported($recordings, $recordingid) {
+    return (isset($recordings[$recordingid]) && isset($recordings[$recordingid]['imported']));
 }
