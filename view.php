@@ -217,7 +217,7 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn
 }
 
 /*
-There are no groups, 
+There are no groups,
 */
 function bigbluebuttonbn_view_groups(&$bbbsession) {
     global $OUTPUT, $CFG;
@@ -264,7 +264,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
     $groupname = groups_get_group_name($bbbsession['group']);
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
-  
+
     if (sizeof($groups) == 1) {
         // There only one group and the user has access to.
         return;
@@ -307,12 +307,15 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
     if ($enabledfeatures['showroom']) {
-        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $enabledfeatures['showrecordings'], $jsvars);
+        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
     if ($enabledfeatures['showrecordings']) {
+        if (isset($bbbsession['record']) && $bbbsession['record']) {
+            $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        }
         $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
         if ($enabledfeatures['importrecordings'] && $bbbsession['managerecordings'] &&
             bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
@@ -329,7 +332,7 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
-function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, $showrecordings, &$jsvars) {
+function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, &$jsvars) {
     global $OUTPUT;
 
     // JavaScript variables for room.
@@ -362,10 +365,6 @@ function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, $showrecordings
 
     if ($activity == 'ended') {
         $output .= bigbluebuttonbn_view_ended($bbbsession);
-    }
-
-    if ($showrecordings && isset($bbbsession['record']) && $bbbsession['record']) {
-        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
     }
 
     return $output;

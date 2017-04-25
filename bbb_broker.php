@@ -370,7 +370,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
         // Execute unpublish on imported recording link.
         return array(
           'status' => bigbluebuttonbn_publish_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id, false)
+              $params['id'], $bbbsession['bigbluebuttonbn']->id, false
             )
           );
     }
@@ -423,7 +423,7 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
         // Execute delete on imported recording link.
         return array(
           'status' => bigbluebuttonbn_delete_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id)
+              $params['id'], $bbbsession['bigbluebuttonbn']->id
             )
           );
     }
