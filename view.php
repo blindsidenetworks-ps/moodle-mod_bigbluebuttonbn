@@ -138,11 +138,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
     // User data.
     $bbbsession['username'] = fullname($USER);
     $bbbsession['userID'] = $USER->id;
-    if (isguestuser()) {
-        $bbbsession['roles'] = bigbluebuttonbn_get_guest_role();
-    } else {
-        $bbbsession['roles'] = bigbluebuttonbn_get_user_roles($context, $USER->id);
-    }
+    $bbbsession['roles'] = bigbluebuttonbn_view_bbbsession_set_roles($context, $USER->id);
 
     // User roles.
     $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
@@ -196,6 +192,13 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
     $bbbsession['originServerUrl'] = $CFG->wwwroot;
     $bbbsession['originServerCommonName'] = '';
     $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
+}
+
+function bigbluebuttonbn_view_bbbsession_set_roles($context, $userid) {
+    if (isguestuser()) {
+      return bigbluebuttonbn_get_guest_role();
+    }
+    return bigbluebuttonbn_get_user_roles($context, $userid);
 }
 
 function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn) {
