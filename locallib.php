@@ -298,7 +298,7 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
     return $recordings;
 }
 
-function bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, $recordings) {
+function bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, &$recordings) {
 
     foreach ($recordings as $key => $recording) {
         if (!in_array($recording['recordID'], $recordingidsarray)) {
