@@ -332,16 +332,6 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     }
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
-    /*
-    // Check if array is not sequential.
-    if (!empty($recordsimported) && array_keys($recordsimported) !== range(0, count($recordsimported) - 1)) {
-        // The response contains a single record and needs to be converted to a sequential array format.
-        error_log(json_encode((array)$recordsimported));
-        $key = array_keys($recordsimported);
-        $recordsimported = array($key => $recordsimported[$key]);
-    }
-    */
-
     $recordsimportedarray = array();
     foreach ($recordsimported as $recordimported) {
         $meta = json_decode($recordimported->meta, true);
@@ -499,7 +489,7 @@ function bigbluebuttonbn_update_recording_imported_perform($recordid, $bigbluebu
         $meta = json_decode($record->meta, true);
         if ($recordid == $meta['recording']['recordID']) {
             // Found, prepare data for the update.
-            $meta['recording'] = $meta['recording'] + $params;
+            $meta['recording'] = $params + $meta['recording'];
             $records[$key]->meta = json_encode($meta);
 
             // Proceed with the update.

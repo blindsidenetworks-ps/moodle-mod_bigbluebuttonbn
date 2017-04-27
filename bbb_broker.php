@@ -287,7 +287,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
         return $callbackresponse;
     }
 
-    $meta = json_decode($params['meta']);
+    $meta = json_decode($params['meta'], true);
     foreach (array_keys($meta) as $key) {
         if (isset($recording[$key])) {
             $callbackresponse[$key] = $recording[$key];
@@ -398,11 +398,10 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
 
 function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        error_log("Updating imported");
         // Execute update on imported recording link.
         return array(
           'status' => bigbluebuttonbn_update_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta'])
+              $params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta'], true)
             )
           );
     }
@@ -410,7 +409,6 @@ function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $rec
     // As the recordingid was not identified as imported recording link, execute update on a real recording.
     // (No need to update imported links as the update only affects the actual recording).
     // Execute update on actual recording.
-    error_log("Updating real");
     return array(
       'status' => bigbluebuttonbn_update_recordings($params['id'], json_decode($params['meta']))
       );
