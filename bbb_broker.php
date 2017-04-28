@@ -584,28 +584,27 @@ function bigbluebuttonbn_broker_validate_parameters_message($params, $requiredpa
 }
 
 function bigbluebuttonbn_broker_required_parameters() {
-    return [
-        'server_ping' => ['id' => 'The meetingID must be specified.'],
-        'meeting_info' => ['id' => 'The meetingID must be specified.'],
-        'meeting_end' => ['id' => 'The meetingID must be specified.'],
-        'recording_play' => ['id' => 'The recordingID must be specified.'],
-        'recording_info' => ['id' => 'The recordingID must be specified.'],
-        'recording_links' => ['id' => 'The recordingID must be specified.'],
-        'recording_publish' => ['id' => 'The recordingID must be specified.'],
-        'recording_unpublish' => ['id' => 'The recordingID must be specified.'],
-        'recording_delete' => ['id' => 'The recordingID must be specified.'],
-        'recording_protect' => ['id' => 'The recordingID must be specified.'],
-        'recording_unprotect' => ['id' => 'The recordingID must be specified.'],
-        'recording_edit' => ['id' => 'The recordingID must be specified.',
-            'meta' => 'A meta parameter should be included'],
-        'recording_import' => ['id' => 'The recordingID must be specified.'],
-        'recording_ready' => [
+    $params['server_ping'] = ['id' => 'The meetingID must be specified.'];
+    $params['meeting_info'] = ['id' => 'The meetingID must be specified.'];
+    $params['meeting_end'] = ['id' => 'The meetingID must be specified.'];
+    $params['recording_play'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_info'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_links'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_publish'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_unpublish'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_delete'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_protect'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_unprotect'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_edit'] = ['id' => 'The recordingID must be specified.',
+            'meta' => 'A meta parameter should be included'];
+    $params['recording_import'] = ['id' => 'The recordingID must be specified.'];
+    $params['recording_ready'] = [
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
-          ],
-        'live_session_events' => [
+          ];
+    $params['live_session_events'] = [
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
-          ]
-      ];
+          ];
+    return $params;
 }
 
 function bigbluebuttonbn_broker_recording_is_imported($recordings, $recordingid) {
