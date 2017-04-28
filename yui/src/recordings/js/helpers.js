@@ -24,83 +24,112 @@ M.mod_bigbluebuttonbn.helpers = {
         var elementid, link, button, text;
 
         elementid = this.element_id(data.action, data.target);
-        link = Y.one('a#' + elementid + '-' + data.recordingid);
-        button = link.one('> i');
-        // For backward compatibility
-        if (button === null) {
-            button = link.one('> img');
-        }
         text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
+        link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('data-onclick', link.getAttribute('onclick'));
+        link.setAttribute('onclick', '');
+        button = link.one('> i');
+        if (button !== null) {
+            button.setAttribute('data-aria-label', button.getAttribute('aria-label'));
+            button.setAttribute('aria-label', text);
+            button.setAttribute('data-title', button.getAttribute('title'));
+            button.setAttribute('title', text);
+            button.setAttribute('data-class', button.getAttribute('class'));
+            button.setAttribute('class', this.element_fa_class('process'));
+            return;
+        }
+
+        // For backward compatibility
+        button = link.one('> img');
         button.setAttribute('data-alt', button.getAttribute('alt'));
         button.setAttribute('alt', text);
         button.setAttribute('data-title', button.getAttribute('title'));
         button.setAttribute('title', text);
         button.setAttribute('data-src', button.getAttribute('src'));
         button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
-        link.setAttribute('data-onclick', link.getAttribute('onclick'));
-        link.setAttribute('onclick', '');
     },
 
     toggle_spinning_wheel_off: function(data) {
         var elementid, link, button;
+
         elementid = this.element_id(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('onclick', link.getAttribute('data-onclick'));
+        link.removeAttribute('data-onclick');
         button = link.one('> i');
-        // For backward compatibility
-        if (button === null) {
-            button = link.one('> img');
+        if (button !== null) {
+            button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
+            button.removeAttribute('data-aria-label');
+            button.setAttribute('title', button.getAttribute('data-title'));
+            button.removeAttribute('data-title');
+            button.setAttribute('class', button.getAttribute('data-class'));
+            button.removeAttribute('data-class');
+            return;
         }
+
+        // For backward compatibility
+        button = link.one('> img');
         button.setAttribute('alt', button.getAttribute('data-alt'));
         button.removeAttribute('data-alt');
         button.setAttribute('title', button.getAttribute('data-title'));
         button.removeAttribute('data-title');
         button.setAttribute('src', button.getAttribute('data-src'));
         button.removeAttribute('data-src');
-        link.setAttribute('onclick', link.getAttribute('data-onclick'));
-        link.removeAttribute('data-onclick');
     },
 
     update_data: function(data) {
-        var action, elementid, link, button;
+        var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag, buttondatasrc, buttondataclass;
+
         action = this.element_action_reversed(data.action);
         if (action === data.action) {
             return;
         }
         elementid = this.element_id(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
+        link.setAttribute('data-action', action);
+        linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
+        link.setAttribute('data-onclick', linkdataonclick);
+
+        buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
+        buttondatatag = this.element_tag(action);
         button = link.one('> i');
-        // For backward compatibility
-        if (button === null) {
-            button = link.one('> img');
+        if (button !== null) {
+            buttondataclass = this.element_fa_class(action);
+            button.setAttribute('data-aria-label', buttondatatext);
+            button.setAttribute('data-title', buttondatatext);
+            button.setAttribute('data-class', buttondataclass);
+            return;
         }
-        var buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
-        var buttondatatag = this.element_tag(action);
-        var buttondatasrc = button.getAttribute('data-src').replace(
-            this.element_tag(data.action), buttondatatag);
+
+        // For backward compatibility
+        button = link.one('> img');
+        buttondatasrc = button.getAttribute('data-src').replace(this.element_tag(data.action), buttondatatag);
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
         button.setAttribute('data-src', buttondatasrc);
-        link.setAttribute('data-action', action);
-        var linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
-        link.setAttribute('data-onclick', linkdataonclick);
     },
 
     update_id: function(data) {
         var action, elementid, link, button, id;
+
         action = this.element_action_reversed(data.action);
         if (action === data.action) {
             return;
         }
         elementid = this.element_id(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
-        button = link.one('> i');
-        // For backward compatibility
-        if (button === null) {
-            button = link.one('> img');
-        }
         id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
-        button.setAttribute('id', id);
         link.setAttribute('id', id);
+
+        button = link.one('> i');
+        if (button !== null) {
+            button.setAttribute('id', id);
+            return;
+        }
+
+        // For backward compatibility
+        button = link.one('> img');
+        button.setAttribute('id', id);
     },
 
     element_id: function(action, target) {
@@ -118,10 +147,23 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.protect = 'lock';
         tags.unprotect = 'unlock';
         tags.edit = 'edit';
+        tags.process = 'process';
         tags['import'] = 'import';
         tags['delete'] = 'delete';
-
         return tags[action];
+    },
+
+    element_fa_class: function(action) {
+        var tags = {};
+        tags.publish = 'fa-eye fa-fw';
+        tags.unpublish = 'fa-eye-slash fa-fw';
+        tags.protect = 'fa-lock fa-fw';
+        tags.unprotect = 'fa-unlock fa-fw';
+        tags.edit = 'fa-pencil fa-fw';
+        tags.process = 'fa-spinner fa-spin';
+        tags['import'] = 'fa-download fa-fw';
+        tags['delete'] = 'fa-trash fa-fw';
+        return 'icon fa ' + tags[action] + ' iconsmall';
     },
 
     element_action_reversed: function(action) {
@@ -133,7 +175,6 @@ M.mod_bigbluebuttonbn.helpers = {
         reverseactions.edit = 'edit';
         reverseactions['import'] = 'import';
         reverseactions['delete'] = 'delete';
-
         return reverseactions[action];
     },
 

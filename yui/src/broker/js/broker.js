@@ -50,13 +50,13 @@ M.mod_bigbluebuttonbn.broker = {
                         return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
                     }
 
-                    if (e.data.status) {
-                        data.attempt = 1;
-                        return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
+                    if (!e.data.status) {
+                        data.message = e.data.message;
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                     }
 
-                    data.message = e.data.message;
-                    return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                    data.attempt = 1;
+                    return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
                 },
                 failure: function(e) {
                     data.message = e.error.message;

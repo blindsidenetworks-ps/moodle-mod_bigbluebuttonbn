@@ -83,7 +83,6 @@ if (isset($bbbsession['bigbluebuttonbn']->type)) {
 
 $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
 $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
-
 try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
@@ -94,8 +93,14 @@ try {
     }
 
     if ($a == 'meeting_end') {
-        $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params);
         echo $meetingend;
+        return;
+    }
+
+    if ($a == 'recording_play') {
+        $recordingplay = bigbluebuttonbn_broker_recording_play($bbbsession, $params, $enabledfeatures['showroom']);
+        echo $recordingplay;
         return;
     }
 
@@ -112,8 +117,7 @@ try {
     }
 
     if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete' || $a == 'recording_edit') {
-        $recordingaction = bigbluebuttonbn_broker_recording_action(
-            $bbbsession, $params, $enabledfeatures['showroom'], $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingaction;
         return;
     }
@@ -203,7 +207,7 @@ function bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running) {
     return $status;
 }
 
-function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
 
     if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
@@ -216,7 +220,8 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params, $bigbluebutton
     bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
     // Moodle event logger: Create an event for meeting ended.
     if (isset($bigbluebuttonbn)) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bbbsession['bigbluebuttonbn'],
+            $bbbsession['cm']);
     }
     // Update the cache.
     bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_FORCED);
@@ -296,7 +301,21 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     return $callbackresponse;
 }
 
-function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_recording_play($bbbsession, $params, $showroom) {
+    $action = strtolower($params['action']);
+    $events = bigbluebuttonbn_events_action();
+
+    // Excecute action.
+    $eventlog = $events[$action];
+    // Moodle event logger: Create an event for action performed on recording.
+    bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], $bbbsession['cm'],
+        ['other' => $params['id']]);
+
+    $callbackresponsedata = json_encode(array('status' => true));
+    return "{$params['callback']}({$callbackresponsedata});";
+}
+
+function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom) {
     if (!$bbbsession['managerecordings']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
@@ -318,7 +337,8 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $params, $recordings);
     if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
-        bigbluebuttonbn_event_log($eventlog, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], $bbbsession['cm'],
+            ['other' => $params['id']]);
     }
 
     $callbackresponsedata = json_encode($callbackresponse);
@@ -496,7 +516,8 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
     if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'], $bbbsession['cm']);
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'],
+            $bbbsession['cm'], ['other' => $params['id']]);
     }
 
     $callbackresponsedata = json_encode($callbackresponse);
@@ -567,6 +588,7 @@ function bigbluebuttonbn_broker_required_parameters() {
         'server_ping' => ['id' => 'The meetingID must be specified.'],
         'meeting_info' => ['id' => 'The meetingID must be specified.'],
         'meeting_end' => ['id' => 'The meetingID must be specified.'],
+        'recording_play' => ['id' => 'The recordingID must be specified.'],
         'recording_info' => ['id' => 'The recordingID must be specified.'],
         'recording_links' => ['id' => 'The recordingID must be specified.'],
         'recording_publish' => ['id' => 'The recordingID must be specified.'],

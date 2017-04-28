@@ -75,6 +75,16 @@ M.mod_bigbluebuttonbn.recordings = {
         });
     },
 
+    recording_element_payload: function(element) {
+        var nodeelement = Y.one(element);
+        var node = nodeelement.ancestor('div');
+        return {
+            action: nodeelement.getAttribute('data-action'),
+            recordingid: node.getAttribute('data-recordingid'),
+            meetingid: node.getAttribute('data-meetingid')
+        };
+    },
+
     recording_action: function(element, confirmation, extras) {
         var payload = this.recording_element_payload(element);
         payload = Object.assign(payload, extras);
@@ -98,18 +108,8 @@ M.mod_bigbluebuttonbn.recordings = {
         }, this);
     },
 
-    recording_element_payload: function(element) {
-        var nodeelement = Y.one(element);
-        var node = nodeelement.ancestor('div');
-        return {
-            action: nodeelement.getAttribute('data-action'),
-            recordingid: node.getAttribute('data-recordingid'),
-            meetingid: node.getAttribute('data-meetingid')
-        };
-    },
-
     recording_action_perform: function(data) {
-        M.mod_bigbluebuttonbn.recordings.recording_action_inprocess(data);
+        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_on(data);
         M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
     },
 
@@ -221,13 +221,24 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.remove();
     },
 
+    recording_play: function(element) {
+        var nodeelement = Y.one(element);
+        //var payload = this.recording_element_payload(element);
+        //payload = Object.assign(payload, {href: nodeelement.getAttribute('data-href')});
+        //console.info(payload);
+        //M.mod_bigbluebuttonbn.broker.recording_action_perform(payload);
+        window.open(nodeelement.getAttribute('data-href'));
+        return;
+    },
+
     recording_confirmation_message: function(data) {
-        var confirmation = M.util.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
+        var confirmation, recording_type, elementid, associated_links, confirmation_warning;
+        confirmation = M.util.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
         if (typeof confirmation === 'undefined') {
             return '';
         }
 
-        var recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
+        recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (Y.one('#playbacks-' + data.recordingid).get('dataset').imported === 'true') {
             recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
@@ -238,13 +249,13 @@ M.mod_bigbluebuttonbn.recordings = {
         }
 
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
-        var elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
-        var associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
+        elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
+        associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
         if (associated_links === 0) {
             return confirmation;
         }
 
-        var confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
+        confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
             'bigbluebuttonbn');
         if (associated_links == 1) {
             confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_s',
@@ -253,12 +264,12 @@ M.mod_bigbluebuttonbn.recordings = {
         confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
         return confirmation_warning + '\n\n' + confirmation;
     },
-  
-    recording_action_inprocess: function(data) {
-        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_on(data);
-    },
 
     recording_action_completion: function(data) {
+        if (data.action == 'play') {
+            window.open(data.href);
+            return;
+        }
 
         if (data.action == 'delete' || data.action == 'import') {
             Y.one('#recording-td-' + data.recordingid).remove();
@@ -268,7 +279,7 @@ M.mod_bigbluebuttonbn.recordings = {
         M.mod_bigbluebuttonbn.helpers.update_data(data);
         M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
         M.mod_bigbluebuttonbn.helpers.update_id(data);
-      
+
         if (data.action === 'publish' || data.action === 'unpublish') {
             this.recording_publishunpublish_completion(data);
         }
@@ -289,8 +300,9 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_publishunpublish_completion: function(data) {
-        var playbacks = Y.one('#playbacks-' + data.recordingid);
-        var preview = Y.one('#preview-' + data.recordingid);
+        var playbacks, preview;
+        playbacks = Y.one('#playbacks-' + data.recordingid);
+        preview = Y.one('#preview-' + data.recordingid);
         if (data.action == 'unpublish') {
             playbacks.hide();
             preview.hide();

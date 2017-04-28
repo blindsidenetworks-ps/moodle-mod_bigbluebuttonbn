@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording unpublished event.
+ * The mod_bigbluebuttonbn recording viewed event.
  *
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
@@ -26,7 +26,7 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class bigbluebuttonbn_recording_unpublished extends \core\event\base
+class bigbluebuttonbn_recording_viewed extends \core\event\base
 {
     /**
      * Init method.
@@ -43,7 +43,7 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base
      * @return string
      */
     public static function get_name() {
-        return 'Recording unpublished';
+        return 'Recording viewed';
     }
 
     /**
@@ -57,8 +57,8 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base
                             'recordingid' => $rid,
                             'courseid' => $this->contextinstanceid);
 
-        return "The user with id '$a->userid' has unpublished a recording with id ".
-        "'$a->recordingid' in the course id '$a->courseid'.";
+        return "The user with id '$a->userid' has viewed a recording with id ".
+        "'$a->recordingid' from the course id '$a->courseid'.";
     }
 
     /**
@@ -67,8 +67,8 @@ class bigbluebuttonbn_recording_unpublished extends \core\event\base
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'bigbluebuttonbn', 'recording unpublished',
-                'view.php?pageid='.$this->objectid, 'Recording unpublished',
+        return array($this->courseid, 'bigbluebuttonbn', 'recording viewed',
+                'view.php?pageid='.$this->objectid, 'Recording viewed',
                 $this->contextinstanceid);
     }
 

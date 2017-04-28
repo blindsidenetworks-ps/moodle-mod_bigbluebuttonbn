@@ -25,9 +25,11 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
+$action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
-$action = required_param('action', PARAM_TEXT);
+$href = optional_param('href', '', PARAM_TEXT);
+$rid = optional_param('rid', '', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 
 if ($id) {
@@ -148,6 +150,16 @@ switch (strtolower($action)) {
         // Since the meeting is already running, we just join the session.
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
         break;
+    case 'playback':
+        if ($href == '') {
+            bigbluebutton_bbb_view_close_window();
+            return;
+        }
+        // Moodle event logger: Create an event for meeting left.
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_VIEWED, $bigbluebuttonbn, $cm, ['other' => $rid]);
+        // Execute the redirect.
+        header('Location: '.urldecode($href));
+        break;
     default:
         bigbluebutton_bbb_view_close_window();
 }
@@ -236,7 +248,6 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
         // No more users allowed to join.
         header('Location: '.$bbbsession['logoutURL']);
-
         return;
     }
 

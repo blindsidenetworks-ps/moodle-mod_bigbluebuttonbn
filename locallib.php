@@ -54,6 +54,7 @@ const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
 const BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED = 'recording_unprotected';
 const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
+const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
 
 function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null) {
     global $DB;
@@ -935,7 +936,8 @@ function bigbluebuttonbn_events() {
         (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
         (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
         (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED,
+        (string) BIGBLUEBUTTON_EVENT_RECORDING_VIEWED
     );
 }
 
@@ -954,15 +956,14 @@ function bigbluebuttonbn_events_action() {
         'recording_publish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
         'recording_unprotect' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
         'recording_unpublish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
-        'recording_edit' => (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED
+        'recording_edit' => (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED,
+        'recording_play' => (string) BIGBLUEBUTTON_EVENT_RECORDING_VIEWED
     );
 }
 
-function bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm,
-        $timecreated = null, $userid = null, $eventsubtype = null) {
+function bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm, $options = []) {
 
     $events = bigbluebuttonbn_events();
-
     if (!in_array($eventtype, $events)) {
         // No log will be created.
         return;
@@ -970,24 +971,29 @@ function bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm,
 
     $context = context_module::instance($cm->id);
     $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
-
-    if ($eventtype == BIGBLUEBUTTON_EVENT_LIVE_SESSION) {
-        $eventproperties['userid'] = $userid;
-        $eventproperties['timecreated'] = $timecreated;
-        $eventproperties['other'] = $eventsubtype;
+    if (array_key_exists('timecreated', $options)) {
+        $eventproperties['timecreated'] = $options['timecreated'];
     }
+    if (array_key_exists('userid', $options)) {
+        $eventproperties['userid'] = $options['userid'];
+    }
+    if (array_key_exists('other', $options)) {
+        $eventproperties['other'] = $options['other'];
+    }
+
     $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_'.$eventtype.'::create',
       array($eventproperties));
     $event->trigger();
 }
 
-function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm) {
-    bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm);
+function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm, $options = []) {
+    bigbluebuttonbn_event_log_standard($eventtype, $bigbluebuttonbn, $cm, $options);
 }
 
 function bigbluebuttonbn_live_session_event_log($event, $bigbluebuttonbn, $cm) {
     bigbluebuttonbn_event_log_standard(BIGBLUEBUTTON_EVENT_LIVE_SESSION, $bigbluebuttonbn, $cm,
-        $event->timestamp, $event->user, $event->event);
+        ['timecreated' => $event->timestamp, 'userid' => $event->user, 'other' => $event->event]);
+
 }
 
 /**
@@ -1120,7 +1126,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
         $row = new stdClass();
 
         // Set recording_types.
-        $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording);
+        $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
 
         // Set activity name and description.
         $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $managerecordings);
@@ -1231,8 +1237,8 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     return $recordingpreview;
 }
 
-function bigbluebuttonbn_get_recording_data_row_types($recording) {
-    global $OUTPUT;
+function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebuttonbnid) {
+    global $CFG, $OUTPUT;
 
     $dataimported = 'false';
     $title = '';
@@ -1246,13 +1252,20 @@ function bigbluebuttonbn_get_recording_data_row_types($recording) {
         $visibility = 'hidden ';
     }
 
-    $recordingtypes = html_writer::start_tag('div',
-        array('id' => 'playbacks-'.$recording['recordID'], 'data-imported' => $dataimported,
-              'title' => $title, $visibility => $visibility));
+    $id = 'playbacks-'.$recording['recordID'];
+    $recordingtypes = html_writer::start_tag('div', array('id' => $id, 'data-imported' => $dataimported,
+          'data-recordingid' => $recording['recordID'], 'data-meetingid' => $recording['meetingID'],
+          'title' => $title, $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
-        $recordingtypes .= $OUTPUT->action_link($playback['url'], get_string('view_recording_format_'.$playback['type'],
-            'bigbluebuttonbn'), null, array('title' => get_string('view_recording_format_'.$playback['type'],
-            'bigbluebuttonbn'), 'target' => '_new')).'&#32;';
+        $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
+        $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
+            '&href='.urlencode($playback['url']).'&rid='.$recording['recordID'];
+        //$href = $playback['url'];
+        $linkattributes = array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'),
+            'class' => 'btn btn-sm btn-default', 'onclick' => $onclick,
+            'data-action' => 'play', 'data-href' => $href);
+        $recordingtypes .= $OUTPUT->action_link('#', get_string('view_recording_format_'.$playback['type'],
+            'bigbluebuttonbn'), null, $linkattributes).'&#32;';
     }
     $recordingtypes .= html_writer::end_tag('div');
 

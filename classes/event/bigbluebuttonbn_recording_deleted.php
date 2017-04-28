@@ -52,7 +52,7 @@ class bigbluebuttonbn_recording_deleted extends \core\event\base
      * @return string
      */
     public function get_description() {
-        $rid = isset($this->other['rid']) ? $this->other['rid'] : '';
+        $rid = isset($this->other) ? $this->other : 'unknown';
         $a = (object) array('userid' => $this->userid,
                             'recordingid' => $rid,
                             'courseid' => $this->contextinstanceid);

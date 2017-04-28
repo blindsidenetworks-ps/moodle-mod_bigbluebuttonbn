@@ -109,7 +109,7 @@ $bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broke
 $bbbsession['meetingEventsURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=meeting'.
     '_events&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
 $bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.
-    '&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
+    '&bn='.$bbbsession['bigbluebuttonbn']->id;
 
 // Output starts.
 echo $OUTPUT->header();
