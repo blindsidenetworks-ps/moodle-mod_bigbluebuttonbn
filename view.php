@@ -185,10 +185,13 @@ if ($groupmode == NOGROUPS) {  //No groups mode
     echo $OUTPUT->box_end();
 
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id);
-    if ($groupmode == SEPARATEGROUPS && sizeof($groups) > 0) {
+    $bbbsession['group'] = 0;
+    if ($groupmode == SEPARATEGROUPS) {
         $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
         $current_group = current($groups);
-        $bbbsession['group'] = $current_group->id;
+        if ($current_group) {
+            $bbbsession['group'] = $current_group->id;
+        }
     } else {
         $groups = groups_get_all_groups($bbbsession['course']->id);
         $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
