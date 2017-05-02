@@ -1,5 +1,6 @@
-2.1.8 (2016051912)
+2.1.8 (2016051913)
 Bug: Fixed issue with custom role names failing when they were edited after being used.
+Bug: Fixed issue with separated groups.
 
 2.1.7 (2016051911)
 Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
