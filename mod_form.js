@@ -52,7 +52,7 @@ bigbluebuttonbn_participant_add = function() {
     var participant_selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
     var participant_selection = document.getElementById('bigbluebuttonbn_participant_selection');
 
-    //Lookup to see if it has been added already 
+    //Lookup to see if it has been added already
     var found = false;
     for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
         if( bigbluebuttonbn_participant_list[i].selectiontype == participant_selection_type.value && bigbluebuttonbn_participant_list[i].selectionid == participant_selection.value ){
@@ -75,17 +75,19 @@ bigbluebuttonbn_participant_add = function() {
         cell0.innerHTML = '<a onclick="bigbluebuttonbn_participant_remove(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" title="' + bigbluebuttonbn_strings.remove + '">x</a>';
         var cell1 = row.insertCell(1);
         cell1.width = "125px";
-        if( participant_selection_type.value == 'all' )
+        if (participant_selection_type.value == 'all') {
             cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + '</i></b>';
-        else    
+        } else {
             cell1.innerHTML = '<b><i>' + participant_selection_type.options[participant_selection_type.selectedIndex].text + ':&nbsp;</i></b>';
+        }
         var cell2 = row.insertCell(2);
-        if( participant_selection_type.value == 'all' )
+        if (participant_selection_type.value == 'all') {
             cell2.innerHTML = '';
-        else
+        } else {
             cell2.innerHTML = participant_selection.options[participant_selection.selectedIndex].text;
+        }
         var cell3 = row.insertCell(3);
-        cell3.innerHTML = '<i>&nbsp;' + bigbluebuttonbn_strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="bigbluebuttonbn_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;"><option value="viewer" selected="selected">' + bigbluebuttonbn_strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn_strings.moderator + '</option></select>';
+        cell3.innerHTML = '<i>&nbsp;' + bigbluebuttonbn_strings.as + '&nbsp;</i><select id="participant_list_role_' + participant_selection_type.value + '-' + participant_selection.value + '" onchange="bigbluebuttonbn_participant_list_role_update(\'' + participant_selection_type.value + '\', \'' + participant_selection.value + '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">' + bigbluebuttonbn_strings.viewer + '</option><option value="moderator">' + bigbluebuttonbn_strings.moderator + '</option></select>';
     }
 
     bigbluebuttonbn_participant_list_update();
@@ -125,7 +127,7 @@ bigbluebuttonbn_select_disable = function(id) {
 bigbluebuttonbn_select_add_option = function(id, text, value) {
     var select = document.getElementById(id);
     var option = document.createElement('option');
-    option.text = text; 
+    option.text = text;
     option.value = value;
     select.add(option , 0);
 }

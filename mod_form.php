@@ -1,7 +1,7 @@
 <?php
 /**
  * Config all BigBlueButtonBN instances in this course.
- * 
+ *
  * @package   mod_bigbluebuttonbn
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -46,9 +46,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $userlimit_default = bigbluebuttonbn_get_cfg_userlimit_default();
         $userlimit_editable = bigbluebuttonbn_get_cfg_userlimit_editable();
         $preuploadpresentation_enabled = bigbluebuttonbn_get_cfg_preuploadpresentation_enabled();
-        $sendnotifications_enabled = bigbluebuttonbn_get_cfg_sendnotifications_enabled(); 
+        $sendnotifications_enabled = bigbluebuttonbn_get_cfg_sendnotifications_enabled();
 
-        //Validates if the BigBlueButton server is running 
+        //Validates if the BigBlueButton server is running
         $serverVersion = bigbluebuttonbn_getServerVersion($endpoint);
         if ( !isset($serverVersion) ) {
             print_error( 'general_error_unable_connect', 'bigbluebuttonbn', $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn' );
@@ -179,31 +179,32 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'participants', json_encode($participant_list));
         $mform->setType('participants', PARAM_TEXT);
 
-        $html_participant_selection = ''.
-             '<div id="fitem_bigbluebuttonbn_participant_selection" class="fitem fitem_fselect">'."\n".
+        $html_participant_selection = ''.html_writer::tag('div',
+             '<div class="fitem fitem_fselect">'."\n".
              '  <div class="fitemtitle">'."\n".
              '    <label for="bigbluebuttonbn_participant_selectiontype">'.get_string('mod_form_field_participant_add', 'bigbluebuttonbn').' </label>'."\n".
              '  </div>'."\n".
              '  <div class="felement fselect">'."\n".
-             '    <select id="bigbluebuttonbn_participant_selection_type" onchange="bigbluebuttonbn_participant_selection_set(); return 0;">'."\n".
+             '    <select id="bigbluebuttonbn_participant_selection_type" onchange="bigbluebuttonbn_participant_selection_set(); return 0;" class="select custom-select">'."\n".
              '      <option value="all" selected="selected">'.get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn').'</option>'."\n".
              '      <option value="role">'.get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn').'</option>'."\n".
              '      <option value="user">'.get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn').'</option>'."\n".
              '    </select>'."\n".
              '    &nbsp;&nbsp;'."\n".
-             '    <select id="bigbluebuttonbn_participant_selection" disabled="disabled">'."\n".
+             '    <select id="bigbluebuttonbn_participant_selection" disabled="disabled" class="select custom-select">'."\n".
              '      <option value="all" selected="selected">---------------</option>'."\n".
              '    </select>'."\n".
              '    &nbsp;&nbsp;'."\n".
-             '    <input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').'" type="button" id="id_addselectionid" onclick="bigbluebuttonbn_participant_add(); return 0;" />'."\n".
+             '    <input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').'" class="btn btn-secondary" type="button" id="id_addselectionid" onclick="bigbluebuttonbn_participant_add(); return 0;" />'."\n".
              '  </div>'."\n".
              '</div>'."\n".
-             '<div id="fitem_bigbluebuttonbn_participant_list" class="fitem">'."\n".
+             '<div class="fitem">'."\n".
              '  <div class="fitemtitle">'."\n".
              '    <label for="bigbluebuttonbn_participant_list">'.get_string('mod_form_field_participant_list', 'bigbluebuttonbn').' </label>'."\n".
              '  </div>'."\n".
              '  <div class="felement fselect">'."\n".
-             '    <table id="participant_list_table">'."\n";
+             '    <table id="participant_list_table">'."\n"
+        );
 
         // Add participant list
         foreach($participant_list as $participant){
@@ -227,11 +228,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
             $html_participant_selection .= ''.
                 '      <tr id="participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'].'">'."\n".
-                '        <td width="20px"><a onclick="bigbluebuttonbn_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" title="'.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn').'">x</a></td>'."\n".
+                '        <td width="20px"><a onclick="bigbluebuttonbn_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" title="'.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn').'" class="btn btn-link">x</a></td>'."\n".
                 '        <td width="125px">'.$participant_selectiontype.'</td>'."\n".
                 '        <td>'.$participant_selectionid.'</td>'."\n".
                 '        <td><i>&nbsp;'.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn').'&nbsp;</i>'."\n".
-                '          <select id="participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'].'" onchange="bigbluebuttonbn_participant_list_role_update(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;">'."\n".
+                '          <select id="participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'].'" onchange="bigbluebuttonbn_participant_list_role_update(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" class="select custom-select">'."\n".
                 '            <option value="'.BIGBLUEBUTTONBN_ROLE_VIEWER.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn').'</option>'."\n".
                 '            <option value="'.BIGBLUEBUTTONBN_ROLE_MODERATOR.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_MODERATOR? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn').'</option><select>'."\n".
                 '        </td>'."\n".
@@ -308,7 +309,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $errors['closingtime'] = get_string('bbbduetimeoverstartingtime', 'bigbluebuttonbn');
             }
         }
-        
+
         if ( isset($data['voicebridge']) ) {
             if ( !bigbluebuttonbn_voicebridge_unique($data['voicebridge'], $data['instance'])) {
                 $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');

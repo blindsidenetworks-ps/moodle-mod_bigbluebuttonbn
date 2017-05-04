@@ -232,6 +232,7 @@ M.mod_bigbluebuttonbn.view_init_join_button = function (status) {
     Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
     Y.DOM.setAttribute(join_button_input, 'type', 'button');
     Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
+    Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-default');
 
     if (status.can_join) {
         Y.DOM.setAttribute(join_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_joinNow(\'' + status.join_url + '\', \'' + bigbluebuttonbn.locales.in_progress + '\', ' + status.can_tag + ');');
@@ -249,6 +250,7 @@ M.mod_bigbluebuttonbn.view_init_end_button = function (status) {
     Y.DOM.setAttribute(end_button_input, 'id', 'end_button_input');
     Y.DOM.setAttribute(end_button_input, 'type', 'button');
     Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
+    Y.DOM.setAttribute(end_button_input, 'class', 'btn');
     if (status.can_end) {
         Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker_endMeeting();');
     }
