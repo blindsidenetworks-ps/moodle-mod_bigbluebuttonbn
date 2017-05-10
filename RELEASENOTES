@@ -1,3 +1,7 @@
+2.1.9 (2016051914)
+Bug: Fixed Participants for style in mod_form and buttons in view.
+Bug: Fixed Participants for style in mod_form not working in all versions.
+
 2.1.8 (2016051913)
 Bug: Fixed issue with custom role names failing when they were edited after being used.
 Bug: Fixed issue with separated groups.
