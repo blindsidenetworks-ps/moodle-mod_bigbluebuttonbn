@@ -673,32 +673,6 @@ function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
     return $roles;
 }
 
-/**
- * Returns an array with all the users enrolled in a given course
- *
- * @package  mod_bigbluebuttonbn
- * @return array a list of enrolled users in the course
- */
-function bigbluebuttonbn_get_users($context) {
-    global $DB;
-
-    $roles = bigbluebuttonbn_get_db_moodle_roles();
-    $sqluserids = array();
-    foreach($roles as $role){
-        $users = get_role_users($role->id, $context);
-        foreach($users as $user) {
-            array_push($sqluserids, $user->id);
-        }
-    }
-
-    $users_array = array();
-    if( !empty($sqluserids) ) {
-        $users_array = $DB->get_records_select("user", "id IN (" . implode(', ', $sqluserids) . ") AND deleted = 0");
-    }
-
-    return $users_array;
-}
-
 function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="") {
     global $CFG, $DB;
 

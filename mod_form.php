@@ -17,7 +17,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
     function definition() {
-        global $CFG, $DB, $USER, $BIGBLUEBUTTONBN_CFG;
+        global $CFG, $DB, $USER, $BIGBLUEBUTTONBN_CFG, $PAGE, $OUTPUT;
 
         $course_id = optional_param('course', 0, PARAM_INT); // course ID, or
         $course_module_id = optional_param('update', 0, PARAM_INT); // course_module ID, or
@@ -175,82 +175,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $roles = bigbluebuttonbn_get_roles();
         $users = bigbluebuttonbn_get_users($context);
 
-        $participant_list = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-        $mform->addElement('hidden', 'participants', json_encode($participant_list));
+        $participantselection = bigbluebuttonbn_get_participant_selection_data();
+        $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+
+        $mform->addElement('hidden', 'participants', json_encode($participantlist));
         $mform->setType('participants', PARAM_TEXT);
 
-        $html_participant_selection = ''.html_writer::tag('div',
-             '<div class="fitem fitem_fselect">'."\n".
-             '  <div class="fitemtitle">'."\n".
-             '    <label for="bigbluebuttonbn_participant_selectiontype">'.get_string('mod_form_field_participant_add', 'bigbluebuttonbn').' </label>'."\n".
-             '  </div>'."\n".
-             '  <div class="felement fselect">'."\n".
-             '    <select id="bigbluebuttonbn_participant_selection_type" onchange="bigbluebuttonbn_participant_selection_set(); return 0;" class="select custom-select">'."\n".
-             '      <option value="all" selected="selected">'.get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn').'</option>'."\n".
-             '      <option value="role">'.get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn').'</option>'."\n".
-             '      <option value="user">'.get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn').'</option>'."\n".
-             '    </select>'."\n".
-             '    &nbsp;&nbsp;'."\n".
-             '    <select id="bigbluebuttonbn_participant_selection" disabled="disabled" class="select custom-select">'."\n".
-             '      <option value="all" selected="selected">---------------</option>'."\n".
-             '    </select>'."\n".
-             '    &nbsp;&nbsp;'."\n".
-             '    <input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').'" class="btn btn-secondary" type="button" id="id_addselectionid" onclick="bigbluebuttonbn_participant_add(); return 0;" />'."\n".
-             '  </div>'."\n".
-             '</div>'."\n".
-             '<div class="fitem">'."\n".
-             '  <div class="fitemtitle">'."\n".
-             '    <label for="bigbluebuttonbn_participant_list">'.get_string('mod_form_field_participant_list', 'bigbluebuttonbn').' </label>'."\n".
-             '  </div>'."\n".
-             '  <div class="felement fselect">'."\n".
-             '    <table id="participant_list_table">'."\n"
-        );
-
-        // Add participant list
-        foreach($participant_list as $participant){
-            $participant_selectionid = '';
-            $participant_selectiontype = $participant['selectiontype'];
-            if( $participant_selectiontype == 'all') {
-                $participant_selectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participant_selectiontype, 'bigbluebuttonbn').'</i></b>';
-            } else {
-                if ( $participant_selectiontype == 'role') {
-                    $participant_selectionid = bigbluebuttonbn_get_role_name($participant['selectionid']);
-                } else {
-                    foreach($users as $user){
-                        if( $user->id == $participant['selectionid']) {
-                            $participant_selectionid = $user->firstname.' '.$user->lastname;
-                            break;
-                        }
-                    }
-                }
-                $participant_selectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participant_selectiontype, 'bigbluebuttonbn').':</i></b>&nbsp;';
-            }
-
-            $html_participant_selection .= ''.
-                '      <tr id="participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'].'">'."\n".
-                '        <td width="20px"><a onclick="bigbluebuttonbn_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" title="'.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn').'" class="btn btn-link">x</a></td>'."\n".
-                '        <td width="125px">'.$participant_selectiontype.'</td>'."\n".
-                '        <td>'.$participant_selectionid.'</td>'."\n".
-                '        <td><i>&nbsp;'.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn').'&nbsp;</i>'."\n".
-                '          <select id="participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'].'" onchange="bigbluebuttonbn_participant_list_role_update(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" class="select custom-select">'."\n".
-                '            <option value="'.BIGBLUEBUTTONBN_ROLE_VIEWER.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn').'</option>'."\n".
-                '            <option value="'.BIGBLUEBUTTONBN_ROLE_MODERATOR.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_MODERATOR? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn').'</option><select>'."\n".
-                '        </td>'."\n".
-                '      </tr>'."\n";
-        }
-
-        $html_participant_selection .= ''.
-             '    </table>'."\n".
-             '  </div>'."\n".
-             '</div>'."\n".
-             '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/mod_form.js">'."\n".
-             '</script>'."\n";
-
-        $mform->addElement('html', $html_participant_selection);
+        $this->mform_participant_renderer($mform, $context, $participantselection, $participantlist);
 
         // Add data
         $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}; </script>');
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participant_list).'; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participantlist).'; </script>');
         $bigbluebuttonbn_strings = Array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
                                           "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
                                           "moderator" => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
@@ -285,6 +220,23 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
+
+        // JavaScript for locales.
+        $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+
+        $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
+        $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+        $jsvars['icons_enabled'] = true;
+        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+
+        if ($version_major < '2016052300') {
+            // Valid before v3.1
+            $jsvars['pix_icon_delete'] = '<img class="btn btn-link icon smallicon" alt="'.
+                get_string('delete') . '" title="' . get_string('delete') . '" src="' . $jsvars['pix_icon_delete'] . '"></img>';
+        } else {
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform', 'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
+        }
+
     }
 
     function data_preprocessing(&$default_values) {
@@ -317,5 +269,131 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         return $errors;
+    }
+
+    private function mform_participant_renderer($mform, $context, $participantselection, $participantlist) {
+        $version_major = bigbluebuttonbn_get_moodle_version_major();
+        if ($version_major < '2016052300') {
+            //This is valid before v3.1
+            error_log('rendering old format');
+            $this->mform_participant_renderer_old_format($mform, $context, $participantselection, $participantlist);
+            return;
+        }
+        //This is valid after v3.1
+        error_log('rendering new format');
+        $this->mform_participant_renderer_updated_format($mform, $context, $participantselection, $participantlist);
+    }
+
+    private function mform_participant_renderer_old_format($mform, $context, $participantselection, $participantlist) {
+        global $CFG;
+        $htmlparticipantselection = ''.
+             '<div class="fitem fitem_fselect">'."\n".
+             '  <div class="fitemtitle">'."\n".
+             '    <label for="bigbluebuttonbn_participant_selectiontype">'.get_string('mod_form_field_participant_add', 'bigbluebuttonbn').' </label>'."\n".
+             '  </div>'."\n".
+             '  <div class="felement fselect">'."\n".
+             '    <select id="bigbluebuttonbn_participant_selection_type" onchange="bigbluebuttonbn_participant_selection_set(); return 0;" class="select custom-select">'."\n".
+             '      <option value="all" selected="selected">'.get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn').'</option>'."\n".
+             '      <option value="role">'.get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn').'</option>'."\n".
+             '      <option value="user">'.get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn').'</option>'."\n".
+             '    </select>'."\n".
+             '    &nbsp;&nbsp;'."\n".
+             '    <select id="bigbluebuttonbn_participant_selection" disabled="disabled" class="select custom-select">'."\n".
+             '      <option value="all" selected="selected">---------------</option>'."\n".
+             '    </select>'."\n".
+             '    &nbsp;&nbsp;'."\n".
+             '    <input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').'" class="btn btn-secondary" type="button" id="id_addselectionid" onclick="bigbluebuttonbn_participant_add(); return 0;" />'."\n".
+             '  </div>'."\n".
+             '</div>'."\n";
+
+
+        $htmlparticipantselection .= ''.
+             '<div class="fitem">'."\n".
+             '  <div class="fitemtitle">'."\n".
+             '    <label for="bigbluebuttonbn_participant_list">'.get_string('mod_form_field_participant_list', 'bigbluebuttonbn').' </label>'."\n".
+             '  </div>'."\n".
+             '  <div class="felement fselect">'."\n".
+             '    <table id="participant_list_table">'."\n";
+
+
+        // Add participant list
+        foreach($participantlist as $participant){
+            $participantselectionid = '';
+            $participantselectiontype = $participant['selectiontype'];
+            if( $participantselectiontype == 'all') {
+                $participantselectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participantselectiontype, 'bigbluebuttonbn').'</i></b>';
+            } else {
+                if ( $participantselectiontype == 'role') {
+                    $participantselectionid = bigbluebuttonbn_get_role_name($participant['selectionid']);
+                } else {
+                    foreach($users as $user){
+                        if( $user->id == $participant['selectionid']) {
+                            $participantselectionid = $user->firstname.' '.$user->lastname;
+                            break;
+                        }
+                    }
+                }
+                $participantselectiontype = '<b><i>'.get_string('mod_form_field_participant_list_type_'.$participantselectiontype, 'bigbluebuttonbn').':</i></b>&nbsp;';
+            }
+
+            $htmlparticipantselection .= ''.
+                '      <tr id="participant_list_tr_'.$participant['selectiontype'].'-'.$participant['selectionid'].'">'."\n".
+                '        <td width="20px"><a onclick="bigbluebuttonbn_participant_remove(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" title="'.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn').'" class="btn btn-link">x</a></td>'."\n".
+                '        <td width="125px">'.$participantselectiontype.'</td>'."\n".
+                '        <td>'.$participantselectionid.'</td>'."\n".
+                '        <td><i>&nbsp;'.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn').'&nbsp;</i>'."\n".
+                '          <select id="participant_list_role_'.$participant['selectiontype'].'-'.$participant['selectionid'].'" onchange="bigbluebuttonbn_participant_list_role_update(\''.$participant['selectiontype'].'\', \''.$participant['selectionid'].'\'); return 0;" class="select custom-select">'."\n".
+                '            <option value="'.BIGBLUEBUTTONBN_ROLE_VIEWER.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_VIEWER, 'bigbluebuttonbn').'</option>'."\n".
+                '            <option value="'.BIGBLUEBUTTONBN_ROLE_MODERATOR.'" '.($participant['role'] == BIGBLUEBUTTONBN_ROLE_MODERATOR? 'selected="selected" ': '').'>'.get_string('mod_form_field_participant_bbb_role_'.BIGBLUEBUTTONBN_ROLE_MODERATOR, 'bigbluebuttonbn').'</option><select>'."\n".
+                '        </td>'."\n".
+                '      </tr>'."\n";
+        }
+
+        $htmlparticipantselection .= ''.
+             '    </table>'."\n".
+             '  </div>'."\n".
+             '</div>'."\n".
+             '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/mod_form.js">'."\n".
+             '</script>'."\n";
+
+        $mform->addElement('html', $htmlparticipantselection);
+    }
+
+    private function mform_participant_renderer_updated_format($mform, $context, $participantselection, $participantlist) {
+        // Render elements for participant selection.
+        $htmlselection = html_writer::tag('div',
+            html_writer::select($participantselection['type_options'], 'bigbluebuttonbn_participant_selection_type',
+                $participantselection['type_selected'], array(),
+                array('id' => 'bigbluebuttonbn_participant_selection_type',
+                      'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;')).'&nbsp;&nbsp;'.
+            html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
+                $participantselection['selected'], array(),
+                array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')).'&nbsp;&nbsp;'.
+            html_writer::tag('input', '', array('id' => 'id_addselectionid', 'type' => 'button', 'class' => 'btn btn-secondary',
+                'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
+                'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
+                ))
+        );
+
+        $mform->addElement('html', "\n\n");
+        $mform->addElement('static', 'static_add_participant',
+            get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmlselection);
+        $mform->addElement('html', "\n\n");
+
+        // Declare the table.
+        $table = new html_table();
+        $table->id = 'participant_list_table';
+        $table->data = array();
+
+        // Render elements for participant list.
+        $htmllist = html_writer::tag('div',
+            html_writer::label(get_string('mod_form_field_participant_list', 'bigbluebuttonbn'),
+                'bigbluebuttonbn_participant_list').
+            html_writer::table($table)
+        );
+
+        $mform->addElement('html', "\n\n");
+        $mform->addElement('static', 'participant_list', '', $htmllist);
+        $mform->addElement('html', "\n\n");
     }
 }

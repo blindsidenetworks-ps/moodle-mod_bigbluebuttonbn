@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_bigbluebuttonbn-modform",
+    "builds": {
+        "moodle-mod_bigbluebuttonbn-modform": {
+            "jsfiles": [
+                "modform.js"
+            ]
+        }
+    }
+}
