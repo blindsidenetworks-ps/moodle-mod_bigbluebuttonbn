@@ -223,12 +223,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_play: function(element) {
         var nodeelement = Y.one(element);
-        //var payload = this.recording_element_payload(element);
-        //payload = Object.assign(payload, {href: nodeelement.getAttribute('data-href')});
-        //console.info(payload);
-        //M.mod_bigbluebuttonbn.broker.recording_action_perform(payload);
         window.open(nodeelement.getAttribute('data-href'));
-        return;
     },
 
     recording_confirmation_message: function(data) {

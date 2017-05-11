@@ -1260,7 +1260,6 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
         $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
         $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
             '&href='.urlencode($playback['url']).'&rid='.$recording['recordID'];
-        //$href = $playback['url'];
         $linkattributes = array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'),
             'class' => 'btn btn-sm btn-default', 'onclick' => $onclick,
             'data-action' => 'play', 'data-href' => $href);
