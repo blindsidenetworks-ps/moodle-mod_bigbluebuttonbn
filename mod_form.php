@@ -226,7 +226,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
         $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-        $jsvars['icons_enabled'] = true;
+        $jsvars['icons_enabled'] = bigbluebuttonbn_get_cfg_recording_icons_enabled();
         $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
 
         if ($version_major < '2016052300') {

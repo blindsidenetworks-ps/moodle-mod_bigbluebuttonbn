@@ -174,8 +174,6 @@ M.mod_bigbluebuttonbn.modform = {
                 innerHTML += '<option value="' + selection_role + '">' + this.strings.viewer + '</option>';
             }
         }
-        innerHTML += '<option value="viewer"' + (selection_role === 'viewer' ? selected_html : '') + '>' + this.strings.viewer + '</option>';
-        innerHTML += '<option value="moderator"' + (selection_role === 'moderator' ? selected_html : '') + '>' + this.strings.moderator + '</option>';
         innerHTML += '</select>';
         var cell2 = row.insertCell(2);
         cell2.innerHTML = innerHTML;
