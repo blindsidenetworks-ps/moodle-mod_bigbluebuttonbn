@@ -1959,6 +1959,7 @@ function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable() {
  */
 function bigbluebuttonbn_get_cfg_options() {
     return [
+          'version_major' => bigbluebuttonbn_get_moodle_version_major(),
           'voicebridge_editable' => bigbluebuttonbn_get_cfg_voicebridge_editable(),
           'recording_default' => bigbluebuttonbn_get_cfg_recording_default(),
           'recording_editable' => bigbluebuttonbn_get_cfg_recording_editable(),

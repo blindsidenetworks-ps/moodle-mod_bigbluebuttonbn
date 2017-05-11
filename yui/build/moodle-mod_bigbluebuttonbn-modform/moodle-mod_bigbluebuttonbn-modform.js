@@ -110,14 +110,13 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participant_list_init: function() {
-        var selection_type_value;
-        var selection_value;
+        var selection_type_value, selection_value, selection_role;
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
             selection_type_value = this.bigbluebuttonbn.participant_list[i].selectiontype;
             selection_value = this.bigbluebuttonbn.participant_list[i].selectionid;
-
+            selection_role = this.bigbluebuttonbn.participant_list[i].role;
             // Add it to the form.
-            this.participant_add_to_form(selection_type_value, selection_value);
+            this.participant_add_to_form(selection_type_value, selection_value, selection_role);
         }
         // Update in the form.
         this.participant_list_update();
@@ -175,7 +174,7 @@ M.mod_bigbluebuttonbn.modform = {
         this.participant_add_to_memory(selection_type.value, selection.value);
 
         // Add it to the form.
-        this.participant_add_to_form(selection_type.value, selection.value);
+        this.participant_add_to_form(selection_type.value, selection.value, 'viewer');
 
         // Update in the form.
         this.participant_list_update();
@@ -189,7 +188,7 @@ M.mod_bigbluebuttonbn.modform = {
         });
     },
 
-    participant_add_to_form: function(selection_type_value, selection_value) {
+    participant_add_to_form: function(selection_type_value, selection_value, selection_role) {
         var participant_list_table = document.getElementById('participant_list_table');
         var row = participant_list_table.insertRow(participant_list_table.rows.length);
         row.id = "participant_list_tr_" + selection_type_value + "-" + selection_value;
@@ -207,23 +206,28 @@ M.mod_bigbluebuttonbn.modform = {
         innerHTML += '<select id="participant_list_role_' + selection_type_value + '-' + selection_value + '"';
         innerHTML += ' onchange="M.mod_bigbluebuttonbn.modform.participant_list_role_update(\'';
         innerHTML += selection_type_value + '\', \'' + selection_value;
-        innerHTML += '\'); return 0;" class="select custom-select"><option value="viewer" selected="selected">';
-        innerHTML += this.strings.viewer + '</option><option value="moderator">';
-        innerHTML += this.strings.moderator + '</option></select>';
+        innerHTML += '\'); return 0;" class="select custom-select">';
+        var selected_html = ' selected="selected"';
+        var bbb_roles = ['viewer', 'moderator'];
+        for (var i = 0; i < bbb_roles.length; i++) {
+            if (bbb_roles[i] === selection_role) {
+                innerHTML += '<option value="' + selection_role + '"' + selected_html + '>' + this.strings.viewer + '</option>';
+            } else {
+                innerHTML += '<option value="' + selection_role + '">' + this.strings.viewer + '</option>';
+            }
+        }
+        innerHTML += '</select>';
         var cell2 = row.insertCell(2);
         cell2.innerHTML = innerHTML;
         var cell3 = row.insertCell(3);
         cell3.width = "20px";
-        innerHTML = '<a onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
-        innerHTML += selection_type_value + '\', \'' + selection_value;
-        innerHTML += '\'); return 0;" title="' + this.strings.remove + '">x</a>';
+        var remove_html = 'x';
         if (this.bigbluebuttonbn.icons_enabled) {
-            innerHTML = '<a class="action-icon" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
-            innerHTML += selection_type_value + '\', \'';
-            innerHTML += selection_value + '\'); return 0;"><img class="btn icon smallicon" alt="';
-            innerHTML += this.strings.remove + '" title="' + this.strings.remove + '" src="';
-            innerHTML += this.bigbluebuttonbn.pix_icon_delete + '"></img></a>';
+            remove_html = this.bigbluebuttonbn.pix_icon_delete;
         }
+        innerHTML = '<a class="btn btn-link" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
+        innerHTML += selection_type_value + '\', \'' + selection_value;
+        innerHTML += '\'); return 0;" title="' + this.strings.remove + '">' + remove_html + '</a>';
         cell3.innerHTML = innerHTML;
     },
 
