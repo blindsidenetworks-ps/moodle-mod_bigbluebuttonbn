@@ -1260,7 +1260,6 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
         $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
         $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
             '&href='.urlencode($playback['url']).'&rid='.$recording['recordID'];
-        //$href = $playback['url'];
         $linkattributes = array('title' => get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn'),
             'class' => 'btn btn-sm btn-default', 'onclick' => $onclick,
             'data-action' => 'play', 'data-href' => $href);
@@ -1959,6 +1958,7 @@ function bigbluebuttonbn_get_cfg_recordings_deleted_activities_editable() {
  */
 function bigbluebuttonbn_get_cfg_options() {
     return [
+          'version_major' => bigbluebuttonbn_get_moodle_version_major(),
           'voicebridge_editable' => bigbluebuttonbn_get_cfg_voicebridge_editable(),
           'recording_default' => bigbluebuttonbn_get_cfg_recording_default(),
           'recording_editable' => bigbluebuttonbn_get_cfg_recording_editable(),

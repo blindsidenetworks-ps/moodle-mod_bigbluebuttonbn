@@ -99,7 +99,7 @@ try {
     }
 
     if ($a == 'recording_play') {
-        $recordingplay = bigbluebuttonbn_broker_recording_play($bbbsession, $params, $enabledfeatures['showroom']);
+        $recordingplay = bigbluebuttonbn_broker_recording_play($bbbsession, $params);
         echo $recordingplay;
         return;
     }
@@ -301,7 +301,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     return $callbackresponse;
 }
 
-function bigbluebuttonbn_broker_recording_play($bbbsession, $params, $showroom) {
+function bigbluebuttonbn_broker_recording_play($bbbsession, $params) {
     $action = strtolower($params['action']);
     $events = bigbluebuttonbn_events_action();
 

@@ -101,13 +101,22 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
-        $jsvars['icons_enabled'] = $cfg['recording_icons_enabled'];
-        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_url('t/delete', 'moodle');
         $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
         $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+        $jsvars['icons_enabled'] = $cfg['recording_icons_enabled'];
+        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+        if ($cfg['version_major'] < '2016052300') {
+            // Valid before v3.1
+            $options = array('class' => 'btn btn-link icon smallicon',
+                'alt' => get_string('delete'),
+                'title' => get_string('delete'),
+                'src' => $jsvars['pix_icon_delete']
+              );
+
+            $jsvars['pix_icon_delete'] = html_writer::tag('img', $options);
+        }
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
-
     }
 
     public function data_preprocessing(&$defaultvalues) {
@@ -168,8 +177,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $versionmajor = bigbluebuttonbn_get_moodle_version_major();
-        if ($versionmajor < '2015051100') {
+        if ($cfg['version_major'] < '2015051100') {
             // This is valid before v2.9.
             $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         } else {
@@ -305,9 +313,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
                 $participantselection['selected'], array(),
                 array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')).'&nbsp;&nbsp;'.
-            '<input value="'.get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn').
-            '" class="btn btn-secondary" type="button" id="id_addselectionid" '.
-            'onclick="M.mod_bigbluebuttonbn.modform.participant_add(); return 0;" />'
+            html_writer::tag('input', '', array('id' => 'id_addselectionid', 'type' => 'button', 'class' => 'btn btn-secondary',
+                'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
+                'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
+                ))
         );
 
         $mform->addElement('html', "\n\n");
