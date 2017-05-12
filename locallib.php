@@ -240,7 +240,6 @@ function bigbluebuttonbn_get_meeting_info_array($meetingid) {
  * @return associative array with recordings indexed by recordID, each recording is a non sequential associative array
  */
 function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
-
     $meetingidsarray = $meetingids;
     if (!is_array($meetingids)) {
         $meetingidsarray = explode(',', $meetingids);
@@ -250,7 +249,6 @@ function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
     if (empty($meetingidsarray)) {
         return array();
     }
-
     $recordings = bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
 
     // Filter recordings based on recordingIDs.
@@ -337,6 +335,8 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     foreach ($recordsimported as $recordimported) {
         $meta = json_decode($recordimported->meta, true);
         $recording = $meta['recording'];
+        //FORCE protected
+        $recording['protected'] = 'true';
         $recordsimportedarray[$recording['recordID']] = $recording;
     }
 
@@ -379,10 +379,16 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
 
     // Add the metadata to the recordings array.
     $metadataarray = bigbluebuttonbn_get_recording_array_meta(get_object_vars($recording->metadata));
-    return array('recordID' => (string) $recording->recordID,
+    $recordingarray = array('recordID' => (string) $recording->recordID,
         'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
         'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-        'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray) + $metadataarray;
+        'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
+    if (isset($recording->protected)) {
+        $recordingarray['protected'] = (string) $recording->protected;
+    }
+    //FORCE protected
+    $recordingarray['protected'] = 'false';
+    return $recordingarray + $metadataarray;
 }
 
 function bigbluebuttonbn_get_recording_array_meta($metadata) {
@@ -1116,7 +1122,7 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
     return $configxmlarray['configToken'];
 }
 
-function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['publishing', 'deleting']) {
+function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['protect', 'publish', 'delete']) {
     global $USER;
 
     $row = null;
@@ -1162,7 +1168,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 }
 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
-
     $actionbar = '';
     foreach ($tools as $tool) {
         $actionbar .= bigbluebuttonbn_actionbar_render_button(
@@ -1170,7 +1175,6 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
             bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool)
           );
     }
-
     $head = html_writer::start_tag('div', array(
         'id' => 'recording-actionbar-' . $recording['recordID'],
         'data-recordingid' => $recording['recordID'],
@@ -1181,10 +1185,10 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
 
 function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
     if ($protected == 'true') {
-        return array('action' => 'unprotect', 'tag' => 'unprotect');
+        return array('action' => 'unprotect', 'tag' => 'unlock');
     }
 
-    return array('action' => 'protect', 'tag' => 'protect');
+    return array('action' => 'protect', 'tag' => 'lock');
 }
 
 function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
@@ -1196,19 +1200,17 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
 }
 
 function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
-    if ($tool == 'protecting' && isset($recording['protected'])) {
+    if ($tool == 'protect' && isset($recording['protected'])) {
         return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
     }
 
-    if ($tool == 'publishing') {
+    if ($tool == 'publish') {
         return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
     }
 
-    if ($tool == 'deleting') {
-        return array('action' => 'delete', 'tag' => 'delete');
+    if ($tool == 'delete' || $tool == 'import') {
+        return array('action' => $tool, 'tag' => $tool);
     }
-
-    return array('action' => 'import', 'tag' => 'import');
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
@@ -1340,6 +1342,10 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $data) {
 function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     global $OUTPUT;
 
+    if (!$data) {
+        return '';
+    }
+
     $target = $data['action'];
     if (isset($data['target'])) {
         $target .= '-' . $data['target'];
@@ -1396,7 +1402,7 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     return $recordingsbncolumns;
 }
 
-function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
+function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     $tabledata = array();
 
     // Build table content.
@@ -1413,7 +1419,7 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
     return $tabledata;
 }
 
-function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
+function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     // Set strings to show.
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
     $description = get_string('view_recording_description', 'bigbluebuttonbn');
@@ -1995,7 +2001,7 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     return $coursesforselect;
 }
 
-function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools = ['publishing', 'deleting']) {
+function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     if (isset($recordings) && !empty($recordings)) {
         // There are recordings for this meeting.
         $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools);

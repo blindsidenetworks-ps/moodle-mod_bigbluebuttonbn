@@ -116,7 +116,9 @@ try {
         return;
     }
 
-    if ($a == 'recording_publish' || $a == 'recording_unpublish' || $a == 'recording_delete' || $a == 'recording_edit') {
+    if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
+        $a == 'recording_delete' || $a == 'recording_edit' ||
+        $a == 'recording_protect' || $a == 'recording_unprotect') {
         $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingaction;
         return;
@@ -358,15 +360,29 @@ function bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $
     if ($action == 'recording_delete') {
         return bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
     }
+    if ($action == 'recording_protect') {
+        return bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $recordings);
+    }
+    if ($action == 'recording_unprotect') {
+        return bigbluebuttonbn_broker_recording_action_unprotect($bbbsession, $params, $recordings);
+    }
 }
 
 function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, 'publish');
+}
+
+function bigbluebuttonbn_broker_recording_action_unprotect($bbbsession, $params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, 'unprotect');
+}
+
+function bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, $action) {
     $status = true;
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        // Execute publish on imported recording link, if the real recording is published.
+        // Execute publish or unprotect on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
             $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
-        $status = ($realrecordings[$params['id']]['published'] === 'true');
+        $status = ($realrecordings[$params['id']][$action.'ed'] === 'true');
         if ($status) {
             // Only if the physical recording is published, execute publish on imported recording link.
             bigbluebuttonbn_publish_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, true);
@@ -378,16 +394,24 @@ function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $
 
     $response = array('status' => $status);
     if (!$status) {
-        $response['message'] = get_string('view_recording_publish_link_error', 'bigbluebuttonbn');
+        $response['message'] = get_string('view_recording_'.$action.'_link_error', 'bigbluebuttonbn');
     }
     return $response;
 }
 
 function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'unpublish');
+}
+
+function bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'protect');
+}
+
+function bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, $action) {
     global $DB;
 
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        // Execute unpublish on imported recording link.
+        // Execute unpublish or protect on imported recording link.
         return array(
           'status' => bigbluebuttonbn_publish_recording_imported(
               $params['id'], $bbbsession['bigbluebuttonbn']->id, false
@@ -403,7 +427,7 @@ function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params,
         foreach ($importedall as $key => $record) {
             $meta = json_decode($record->meta, true);
             // Prepare data for the update.
-            $meta['recording']['published'] = 'false';
+            $meta['recording'][$action.'ed'] = 'false';
             $importedall[$key]->meta = json_encode($meta);
 
             // Proceed with the update.

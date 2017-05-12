@@ -129,6 +129,22 @@ M.mod_bigbluebuttonbn.recordings = {
         this.recording_action(element, false, extras);
     },
 
+    recording_protect: function(element) {
+        var extras = {
+            source: 'protected',
+            goalstate: 'true'
+        };
+        this.recording_action(element, false, extras);
+    },
+
+    recording_unprotect: function(element) {
+        var extras = {
+            source: 'protected',
+            goalstate: 'false'
+        };
+        this.recording_action(element, false, extras);
+    },
+
     recording_delete: function(element) {
         var extras = {
             source: 'status',
