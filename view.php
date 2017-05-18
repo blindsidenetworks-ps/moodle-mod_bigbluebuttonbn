@@ -358,9 +358,15 @@ function bigbluebuttonbn_view_recordings($bbbsession) {
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings) . "\n";
 
         if ($bbbsession['managerecordings'] && bigbluebuttonbn_get_cfg_importrecordings_enabled()) {
-            $button_import_recordings = html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''));
+            $importrecordingsoptions = array(
+                'type' => 'button',
+                'class' => 'btn btn-default',
+                'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
+                'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' . $bbbsession['bigbluebuttonbn']->id . '\''
+            );
+            $importrecordings = html_writer::tag('input', '', $importrecordingsoptions);
             $output .= html_writer::start_tag('br');
-            $output .= html_writer::tag('span', $button_import_recordings, ['id'=>"import_recording_links_button"]);
+            $output .= html_writer::tag('span', $importrecordings, ['id'=>"import_recording_links_button"]);
             $output .= html_writer::tag('span', '', ['id'=>"import_recording_links_table"]);
         }
 
