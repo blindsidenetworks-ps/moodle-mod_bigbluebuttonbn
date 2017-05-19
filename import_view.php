@@ -1,6 +1,6 @@
 <?php
 /**
- * View for BigBlueButton interaction  
+ * View for BigBlueButton interaction
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -65,7 +65,13 @@ if (empty($options)) {
         $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['importing']);
     }
     $output .= html_writer::start_tag('br');
-    $output .= html_writer::tag('input', '', array('type' => 'button', 'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'), 'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id . '\''));
+    $buttonoptions = array(
+        'type' => 'button',
+        'class' => 'btn btn-default',
+        'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
+        'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id . '\''
+      );
+    $output .= html_writer::tag('input', '', $buttonoptions);
 
     $jsvars = array(
         'bn' => $bn,
