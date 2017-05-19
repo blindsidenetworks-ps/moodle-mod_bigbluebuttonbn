@@ -15,7 +15,7 @@ bigbluebuttonbn_participant_selection_set = function() {
             for( var j = 0; j < options.length; j++ ) {
                 bigbluebuttonbn_select_add_option('bigbluebuttonbn_participant_selection', options[j].name, options[j].id);
             }
-            if( j == 0){
+            if( j === 0){
                 bigbluebuttonbn_select_add_option('bigbluebuttonbn_participant_selection', '---------------', 'all');
                 bigbluebuttonbn_select_disable('bigbluebuttonbn_participant_selection')
             } else {
@@ -33,7 +33,7 @@ bigbluebuttonbn_participant_list_update = function() {
 bigbluebuttonbn_participant_remove = function(type, id) {
     //Remove from memory
     for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
-        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id == ''? null: id) ){
+        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id === ''? null: id) ){
             bigbluebuttonbn_participant_list.splice(i, 1);
         }
     }
@@ -97,7 +97,7 @@ bigbluebuttonbn_participant_list_role_update = function(type, id) {
     // Update in memory
     var participant_list_role_selection = document.getElementById('participant_list_role_' + type + '-' + id);
     for( var i = 0; i < bigbluebuttonbn_participant_list.length; i++ ){
-        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id == ''? null: id) ){
+        if( bigbluebuttonbn_participant_list[i].selectiontype == type && bigbluebuttonbn_participant_list[i].selectionid == (id === ''? null: id) ){
             bigbluebuttonbn_participant_list[i].role = participant_list_role_selection.value;
             //participant_list_role_selection.options[participant_list_role_selection.selectedIndex].text
         }

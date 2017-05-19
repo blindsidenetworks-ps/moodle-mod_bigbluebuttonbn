@@ -275,12 +275,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $version_major = bigbluebuttonbn_get_moodle_version_major();
         if ($version_major < '2016052300') {
             //This is valid before v3.1
-            error_log('rendering old format');
             $this->mform_participant_renderer_old_format($mform, $context, $participantselection, $participantlist);
             return;
         }
         //This is valid after v3.1
-        error_log('rendering new format');
         $this->mform_participant_renderer_updated_format($mform, $context, $participantselection, $participantlist);
     }
 
