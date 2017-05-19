@@ -461,18 +461,19 @@ M.mod_bigbluebuttonbn.broker_manageRecording = function(action, recordingid, mee
 }
 
 M.mod_bigbluebuttonbn.broker_buttonAction = function(link_action, action, recordingid) {
-    if (bigbluebuttonbn.version_major < '2016052300') {
-        // Valid before v3.1
-        return M.mod_bigbluebuttonbn.broker_buttonAction_old(link_action, action, recordingid);
+    var btn_action = link_action.one('> i');
+    if (btn_action === null) {
+        // For backward compatibility
+        btn_action = link_action.one('> img');
+        return M.mod_bigbluebuttonbn.broker_buttonAction_old(btn_action, action, recordingid);
     }
-    return M.mod_bigbluebuttonbn.broker_buttonAction_new(link_action, action, recordingid);
+    return M.mod_bigbluebuttonbn.broker_buttonAction_new(btn_action, action, recordingid);
 }
 
-M.mod_bigbluebuttonbn.broker_buttonAction_old = function(link_action, action, recordingid) {
-    M.mod_bigbluebuttonbn.broker_buttonSetNew(action, recordingid);
-    var btn_action = link_action.one('> img');
+M.mod_bigbluebuttonbn.broker_buttonAction_old = function(btn_action, action, recordingid) {
     var btn_action_src_current = btn_action.getAttribute('src');
     var btn_action_src_url = btn_action_src_current.substring(0, btn_action_src_current.length - 4)
+    btn_action.setAttribute('data-src', btn_action.getAttribute('src'));
     btn_action.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
     var tag = bigbluebuttonbn.locales.unpublishing;
     if (action == 'publish') {
@@ -483,8 +484,7 @@ M.mod_bigbluebuttonbn.broker_buttonAction_old = function(link_action, action, re
     return btn_action;
 }
 
-M.mod_bigbluebuttonbn.broker_buttonAction_new = function(link_action, action, recordingid) {
-    var btn_action = link_action.one('> i');
+M.mod_bigbluebuttonbn.broker_buttonAction_new = function(btn_action, action, recordingid) {
     btn_action.setAttribute('class', M.mod_bigbluebuttonbn.element_fa_class('process'));
     var tag = bigbluebuttonbn.locales.unpublishing;
     if (action == 'publish') {
@@ -496,8 +496,8 @@ M.mod_bigbluebuttonbn.broker_buttonAction_new = function(link_action, action, re
 }
 
 M.mod_bigbluebuttonbn.broker_buttonActionEnds = function(btn_action, action, recordingid) {
-    if (bigbluebuttonbn.version_major < '2016052300') {
-        // Valid before v3.1
+    if (btn_action.test('img')) {
+        // For backward compatibility
         M.mod_bigbluebuttonbn.broker_buttonActionEnds_old(btn_action, action, recordingid);
         return;
     }
@@ -505,7 +505,7 @@ M.mod_bigbluebuttonbn.broker_buttonActionEnds = function(btn_action, action, rec
 }
 
 M.mod_bigbluebuttonbn.broker_buttonActionEnds_old = function (btn_action, action, recordingid) {
-    var btn_action_src_current = btn_action.getAttribute('src');
+    var btn_action_src_current = btn_action.getAttribute('data-src');
     var btn_action_src_url = btn_action_src_current.substring(0, btn_action_src_current.length - 4)
     btn_action.setAttribute('id', 'recording-btn-' + action + '-' + recordingid);
     var src_tag = 'show';
