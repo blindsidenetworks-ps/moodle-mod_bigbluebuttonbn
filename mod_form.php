@@ -171,10 +171,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'permission', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
 
-        // Data required for "Add participant" and initial "Participant list" setup
-        $roles = bigbluebuttonbn_get_roles();
-        $users = bigbluebuttonbn_get_users($context);
-
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
 
@@ -182,16 +178,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setType('participants', PARAM_TEXT);
 
         $this->mform_participant_renderer($mform, $context, $participantselection, $participantlist);
-
-        // Add data
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}; </script>');
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participantlist).'; </script>');
-        $bigbluebuttonbn_strings = Array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
-                                          "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
-                                          "moderator" => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
-                                          "remove" => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
-                                    );
-        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_strings = '.json_encode($bigbluebuttonbn_strings).'; </script>');
         //-------------------------------------------------------------------------------
         // Third block ends here
         //-------------------------------------------------------------------------------
@@ -224,19 +210,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
-        $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
-        $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-        $jsvars['icons_enabled'] = bigbluebuttonbn_get_cfg_recording_icons_enabled();
-        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
-
-        if ($version_major < '2016052300') {
-            // Valid before v3.1
-            $jsvars['pix_icon_delete'] = '<img class="btn btn-link icon smallicon" alt="'.
-                get_string('delete') . '" title="' . get_string('delete') . '" src="' . $jsvars['pix_icon_delete'] . '"></img>';
-        } else {
+        if ($version_major > '2016052300') {
+            // Valid after v3.1
+            $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
+            error_log(json_encode($jsvars['participant_data']));
+            $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+            error_log(json_encode($jsvars['participant_list']));
+            $jsvars['icons_enabled'] = bigbluebuttonbn_get_cfg_recording_icons_enabled();
+            $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform', 'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
         }
-
     }
 
     function data_preprocessing(&$default_values) {
@@ -355,6 +338,21 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
              '</script>'."\n";
 
         $mform->addElement('html', $htmlparticipantselection);
+
+        // Data required for "Add participant" and initial "Participant list" setup
+        $roles = bigbluebuttonbn_get_roles();
+        $users = bigbluebuttonbn_get_users($context);
+
+        // Add data
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_selection = {"all": [], "role": '.json_encode($roles).', "user": '.bigbluebuttonbn_get_users_json($users).'}; </script>');
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_participant_list = '.json_encode($participantlist).'; </script>');
+        $bigbluebuttonbn_strings = Array( "as" => get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
+                                          "viewer" => get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
+                                          "moderator" => get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
+                                          "remove" => get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn'),
+                                    );
+        $mform->addElement('html', '<script type="text/javascript">var bigbluebuttonbn_strings = '.json_encode($bigbluebuttonbn_strings).'; </script>');
+
     }
 
     private function mform_participant_renderer_updated_format($mform, $context, $participantselection, $participantlist) {

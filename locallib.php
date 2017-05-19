@@ -533,71 +533,54 @@ function bigbluebuttonbn_get_participant_data($context) {
     return $data;
 }
 
-function bigbluebuttonbn_get_participant_list($bigbluebuttonbn=null, $context=null){
-    global $CFG, $USER;
-
-    $participant_list_array = array();
-
-    if( $bigbluebuttonbn != null ) {
-        $participant_list = json_decode($bigbluebuttonbn->participants);
-        if (is_array($participant_list)) {
-            foreach($participant_list as $participant){
-                array_push($participant_list_array,
-                        array(
-                            "selectiontype" => $participant->selectiontype,
-                            "selectionid" => $participant->selectionid,
-                            "role" => $participant->role
-                        )
-                );
-            }
-        }
-    } else {
-        array_push($participant_list_array,
-                array(
-                    "selectiontype" => "all",
-                    "selectionid" => "all",
-                    "role" => BIGBLUEBUTTONBN_ROLE_VIEWER
-                )
-        );
-
-        $moderator_defaults = bigbluebuttonbn_get_cfg_moderator_default();
-        if ( !isset($moderator_defaults) ) {
-            $moderator_defaults = array('owner');
-        } else {
-            $moderator_defaults = explode(',', $moderator_defaults);
-        }
-        foreach( $moderator_defaults as $moderator_default ) {
-            if( $moderator_default == 'owner' ) {
-                $users = bigbluebuttonbn_get_users($context);
-                foreach ($users as $key => $value){
-                    if ($key == $USER->id ){
-                        array_push($participant_list_array,
-                                array(
-                                        "selectiontype" => "user",
-                                        "selectionid" => $USER->id,
-                                        "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
-                                )
-                        );
-                        break;
-                    }
-                }
-            } else {
-                array_push($participant_list_array,
-                        array(
-                                "selectiontype" => "role",
-                                "selectionid" => $moderator_default,
-                                "role" => BIGBLUEBUTTONBN_ROLE_MODERATOR
-                        )
-                );
-            }
-        }
+function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
+    if ($bigbluebuttonbn == null) {
+        return bigbluebuttonbn_get_participant_list_default($context);
     }
 
-    return $participant_list_array;
+    return bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn);
 }
 
-function bigbluebuttonbn_get_participant_list_json($bigbluebuttonbnid=null){
-    return json_encode(bigbluebuttonbn_get_participant_list($bigbluebuttonbnid));
+function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
+    $rules = json_decode($bigbluebuttonbn->participants, true);
+    foreach ($rules as $key => $rule) {
+        if ($rule['selectiontype'] === 'role' && !is_numeric($rule['selectionid'])) {
+            $role = bigbluebuttonbn_get_role($rule['selectionid']);
+            $rule['selectionid'] = $role->id;
+        }
+        $rules[$key] = $rule;
+    }
+    return $rules;
+}
+
+function bigbluebuttonbn_get_participant_list_default($context) {
+    global $USER;
+
+    $participantlistarray = array();
+    $participantlistarray[] = array(
+        'selectiontype' => 'all',
+        'selectionid' => 'all',
+        'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
+
+    $moderatordefaults = explode(',', bigbluebuttonbn_get_cfg_moderator_default());
+    foreach ($moderatordefaults as $moderatordefault) {
+        if ($moderatordefault == 'owner') {
+            if (is_enrolled($context, $USER->id)) {
+                $participantlistarray[] = array(
+                    'selectiontype' => 'user',
+                    'selectionid' => $USER->id,
+                    'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
+            }
+            continue;
+        }
+
+        $participantlistarray[] = array(
+              'selectiontype' => 'role',
+              'selectionid' => $moderatordefault,
+              'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
+    }
+
+    return $participantlistarray;
 }
 
 function bigbluebuttonbn_get_participant_selection_data() {

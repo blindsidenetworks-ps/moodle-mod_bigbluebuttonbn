@@ -169,9 +169,9 @@ M.mod_bigbluebuttonbn.modform = {
         var bbb_roles = ['viewer', 'moderator'];
         for (var i = 0; i < bbb_roles.length; i++) {
             if (bbb_roles[i] === selection_role) {
-                innerHTML += '<option value="' + selection_role + '"' + selected_html + '>' + this.strings.viewer + '</option>';
+                innerHTML += '<option value="' + selection_role + '"' + selected_html + '>' + this.strings[bbb_roles[i]] + '</option>';
             } else {
-                innerHTML += '<option value="' + selection_role + '">' + this.strings.viewer + '</option>';
+                innerHTML += '<option value="' + selection_role + '">' + this.strings[bbb_roles[i]] + '</option>';
             }
         }
         innerHTML += '</select>';
