@@ -1,3 +1,10 @@
+2.1.10 (2016051915)
+Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. This affected the way the new UI renders the settings form. (CONTRIB-6900)
+Bug: Fixed Participants for style in mod_form not working in all versions.
+Bug: Fixed issue with action butttons not being updated on publish/unpublish and delete recordings
+Bug: Fixed style in 'Import recordings' and 'Go back' buttons.
+
+
 2.1.9 (2016051914)
 Bug: Fixed Participants for style in mod_form and buttons in view.
 Bug: Fixed Participants for style in mod_form not working in all versions.
