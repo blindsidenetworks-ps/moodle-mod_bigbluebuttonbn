@@ -20,6 +20,21 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.helpers = {
 
+    element_tag: {},
+    element_fa_class: {},
+    element_action_reversed: {},
+  
+    /**
+     * Initialise helpers code.
+     *
+     * @method init
+     */
+    init: function() {
+        this.element_tag = this.init_element_tag();
+        this.element_fa_class = this.init_element_fa_class();
+        this.element_action_reversed = this.init_element_action_reversed();
+    },
+
     toggle_spinning_wheel_on: function(data) {
         var elementid, link, button, text;
 
@@ -39,7 +54,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-title', button.getAttribute('title'));
         button.setAttribute('title', text);
         button.setAttribute('data-class', button.getAttribute('class'));
-        button.setAttribute('class', this.element_fa_class('process'));
+        button.setAttribute('class', this.element_fa_class.process);
     },
 
     toggle_spinning_wheel_on_compatible: function(button, text) {
@@ -84,7 +99,7 @@ M.mod_bigbluebuttonbn.helpers = {
     update_data: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
 
-        action = this.element_action_reversed(data.action);
+        action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
@@ -95,17 +110,17 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('data-onclick', linkdataonclick);
 
         buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
-        buttondatatag = this.element_tag(action);
+        buttondatatag = this.element_tag[action];
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility
-            this.update_data_compatible(link.one('> img'), this.element_tag(data.action), buttondatatag, buttondatatext);
+            this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
 
         button.setAttribute('data-aria-label', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
-        button.setAttribute('data-class', this.element_fa_class(action));
+        button.setAttribute('data-class', this.element_fa_class[action]);
     },
 
     update_data_compatible: function(button, action, buttondatatag, buttondatatext) {
@@ -120,7 +135,7 @@ M.mod_bigbluebuttonbn.helpers = {
     update_id: function(data) {
         var action, elementid, link, button, id;
 
-        action = this.element_action_reversed(data.action);
+        action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
@@ -146,7 +161,7 @@ M.mod_bigbluebuttonbn.helpers = {
         return elementid;
     },
 
-    element_tag: function(action) {
+    init_element_tag: function() {
         var tags = {};
         tags.publish = 'show';
         tags.unpublish = 'hide';
@@ -156,32 +171,32 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.process = 'process';
         tags['import'] = 'import';
         tags['delete'] = 'delete';
-        return tags[action];
+        return tags;
     },
 
-    element_fa_class: function(action) {
+    init_element_fa_class: function() {
         var tags = {};
-        tags.publish = 'fa-eye fa-fw';
-        tags.unpublish = 'fa-eye-slash fa-fw';
-        tags.protect = 'fa-lock fa-fw';
-        tags.unprotect = 'fa-unlock fa-fw';
-        tags.edit = 'fa-pencil fa-fw';
-        tags.process = 'fa-spinner fa-spin';
-        tags['import'] = 'fa-download fa-fw';
-        tags['delete'] = 'fa-trash fa-fw';
-        return 'icon fa ' + tags[action] + ' iconsmall';
+        tags.publish = 'icon fa fa-eye fa-fw iconsmall';
+        tags.unpublish = 'icon fa fa-eye-slash fa-fw iconsmall';
+        tags.protect = 'icon fa fa-lock fa-fw iconsmall';
+        tags.unprotect = 'icon fa fa-unlock fa-fw iconsmall';
+        tags.edit = 'icon fa fa-pencil fa-fw iconsmall';
+        tags.process = 'icon fa fa-spinner fa-spin iconsmall';
+        tags['import'] = 'icon fa fa-download fa-fw iconsmall';
+        tags['delete'] = 'icon fa fa-trash fa-fw iconsmall';
+        return tags;
     },
 
-    element_action_reversed: function(action) {
-        var reverseactions = {};
-        reverseactions.publish = 'unpublish';
-        reverseactions.unpublish = 'publish';
-        reverseactions.protect = 'unprotect';
-        reverseactions.unprotect = 'protect';
-        reverseactions.edit = 'edit';
-        reverseactions['import'] = 'import';
-        reverseactions['delete'] = 'delete';
-        return reverseactions[action];
+    init_element_action_reversed: function() {
+        var actions = {};
+        actions.publish = 'unpublish';
+        actions.unpublish = 'publish';
+        actions.protect = 'unprotect';
+        actions.unprotect = 'protect';
+        actions.edit = 'edit';
+        actions['import'] = 'import';
+        actions['delete'] = 'delete';
+        return actions;
     },
 
     reload_preview: function(data) {
