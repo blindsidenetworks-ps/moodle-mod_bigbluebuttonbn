@@ -662,14 +662,12 @@ function bigbluebuttonbn_get_file_areas() {
  * @package  mod_bigbluebuttonbn
  * @return array a list of available roles
  */
-function bigbluebuttonbn_get_db_moodle_roles($rolename='all') {
-    global $DB;
-
-    if( $rolename != 'all')
-        $roles = $DB->get_record('role', array('shortname' => $rolename));
-    else
-        $roles = $DB->get_records('role', array());
-
+function bigbluebuttonbn_get_moodle_roles($rolename='all') {
+    if( $rolename != 'all') {
+        $roles = array(bigbluebuttonbn_get_role($rolename));
+    } else {
+        $roles = (array) role_get_names();
+    }
     return $roles;
 }
 
