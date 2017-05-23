@@ -43,6 +43,7 @@ M.mod_bigbluebuttonbn.recordings = {
             this.datatable.data = this.datatable_init_format_dates(data.data);
             this.datatable_init();
         }
+        M.mod_bigbluebuttonbn.helpers.init();
     },
 
     datatable_init_format_dates: function(data) {

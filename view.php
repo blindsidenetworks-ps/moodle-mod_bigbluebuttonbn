@@ -396,7 +396,6 @@ function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars)
     }
 
     // JavaScript variables for recordings with YUI.
-    $tools = ['protect', 'publish', 'delete'];
     $jsvars += array(
             'columns' => bigbluebuttonbn_get_recording_columns($bbbsession),
             'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
