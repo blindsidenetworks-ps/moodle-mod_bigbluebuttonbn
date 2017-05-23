@@ -1809,6 +1809,24 @@ function bigbluebuttonbn_get_cfg_recordingready_enabled() {
 /**
  * @return boolean
  */
+function bigbluebuttonbn_get_cfg_recordingstatus_enabled() {
+    global $CFG;
+
+    if (isset($CFG->bigbluebuttonbn['recordingstatus_enabled'])) {
+        return $CFG->bigbluebuttonbn['recordingstatus_enabled'];
+    }
+
+    if (isset($CFG->bigbluebuttonbn_recordingstatus_enabled)) {
+        return $CFG->bigbluebuttonbn_recordingstatus_enabled;
+    }
+
+    return  false;
+}
+
+
+/**
+ * @return boolean
+ */
 function bigbluebuttonbn_get_cfg_meetingevents_enabled() {
     global $CFG;
 
@@ -2210,4 +2228,20 @@ function bigbluebuttonbn_get_locale() {
 function bigbluebuttonbn_get_localcode() {
     $locale = bigbluebuttonbn_get_locale();
     return substr($locale, 0, strpos($locale, '_'));
+}
+
+function bigbluebuttonbn_get_moderator_email($context) {
+    $moderatoremails = array();
+    $users = (array) get_enrolled_users($context);
+    $counter = 0;
+    foreach ($users as $key => $user) {
+        if ($counter == 5) {
+            break;
+        }
+        if(has_capability('mod/bigbluebuttonbn:moderate', $context, $user)) {
+            array_push($moderatoremails, '"' . fullname($user) . '" <' . $user->email . '>');
+            $counter += 1;
+        }
+    }
+    return $moderatoremails;
 }

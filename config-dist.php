@@ -227,6 +227,7 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  * capability is enabled, meaning that a message will be sent to all enrolled
  * users in a course when a recording is ready
  * $CFG->bigbluebuttonbn['recordingready_enabled'] = 0;
+ * $CFG->bigbluebuttonbn['recordingstatus_enabled'] = 0;
  */
 
 /*

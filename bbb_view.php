@@ -229,13 +229,14 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
                    'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
                   ];
 
-    if (bigbluebuttonbn_is_bn_server()) {
-        if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
-            $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
-        }
-        if (bigbluebuttonbn_get_cfg_meetingevents_enabled()) {
-            $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
-        }
+    if (bigbluebuttonbn_get_cfg_recordingstatus_enabled()) {
+        $metadata["meta_bn-recording-status-email"] = json_encode(bigbluebuttonbn_get_moderator_email($bbbsession['context']));
+    }
+    if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
+        $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+    }
+    if (bigbluebuttonbn_get_cfg_meetingevents_enabled()) {
+        $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
     }
 
     return $metadata;
