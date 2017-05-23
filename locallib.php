@@ -476,12 +476,12 @@ function bigbluebuttonbn_get_roles($rolename='all', $format='json'){
     foreach($roles as $role) {
         if( $format=='json' ) {
             array_push($roles_array,
-                    array( "id" => $role->shortname,
-                        "name" => bigbluebuttonbn_get_role_name($role->shortname)
+                    array( "id" => $role->id,
+                        "name" => bigbluebuttonbn_get_role_name($role->id)
                     )
             );
         } else {
-            $roles_array[$role->shortname] = bigbluebuttonbn_get_role_name($role->shortname);
+            $roles_array[$role->id] = bigbluebuttonbn_get_role_name($role->id);
         }
     }
     return $roles_array;
