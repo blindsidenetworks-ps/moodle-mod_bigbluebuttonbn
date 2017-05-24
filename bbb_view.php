@@ -196,7 +196,7 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
 
     // Set the duration for the meeting.
     $durationtime = 0;
-    if (bigbluebuttonbn_get_cfg_scheduled_duration_enabled()) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
         $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
     }
     if ($durationtime > 0) {
@@ -229,13 +229,13 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
                    'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
                   ];
 
-    if (bigbluebuttonbn_get_cfg_recordingstatus_enabled()) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
         $metadata["meta_bn-recording-status-email"] = json_encode(bigbluebuttonbn_get_moderator_email($bbbsession['context']));
     }
-    if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
         $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
     }
-    if (bigbluebuttonbn_get_cfg_meetingevents_enabled()) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
         $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
     }
 

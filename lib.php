@@ -425,7 +425,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     /* Now that an id was assigned, generate and set the meetingid property based on
      * [Moodle Instance + Activity ID + BBB Secret] (but only for new activities) */
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-        $meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.bigbluebuttonbn_get_cfg_shared_secret());
+        $meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
         $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
 
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');

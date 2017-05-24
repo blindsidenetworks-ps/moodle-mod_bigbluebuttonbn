@@ -147,7 +147,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
         || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
     $bbbsession['importrecordings'] = ($bbbsession['managerecordings']
-        && bigbluebuttonbn_get_cfg_importrecordings_enabled());
+        && (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled'));
 
     // Server data.
     $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
@@ -159,8 +159,8 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
     $bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
 
-    $bbbsession['userlimit'] = intval(bigbluebuttonbn_get_cfg_userlimit_default());
-    if (bigbluebuttonbn_get_cfg_userlimit_editable()) {
+    $bbbsession['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
         $bbbsession['userlimit'] = intval($bigbluebuttonbn->userlimit);
     }
     $bbbsession['voicebridge'] = $bigbluebuttonbn->voicebridge;
@@ -295,7 +295,7 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
 
     $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
     $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
-    $pinginterval = bigbluebuttonbn_get_cfg_waitformoderator_ping_interval() * 1000;
+    $pinginterval = (int)\mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
 
     // JavaScript for locales.
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');

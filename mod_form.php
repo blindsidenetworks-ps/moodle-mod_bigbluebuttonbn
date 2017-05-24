@@ -61,7 +61,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = context_course::instance($course->id);
 
         // UI configuration options.
-        $cfg = bigbluebuttonbn_get_cfg_options();
+        $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
 
         $mform = &$this->_form;
         $currentactivity = &$this->current;
