@@ -218,16 +218,16 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
 }
 
 function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
-      $metadata = ['bbb-origin' => $bbbsession['origin'],
-                   'bbb-origin-version' => $bbbsession['originVersion'],
-                   'bbb-origin-server-name' => $bbbsession['originServerName'],
-                   'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
-                   'bbb-origin-tag' => $bbbsession['originTag'],
-                   'bbb-context' => $bbbsession['course']->fullname,
-                   'bbb-recording-name' => $bbbsession['meetingname'],
-                   'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
-                   'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
-                  ];
+    $metadata = ['bbb-origin' => $bbbsession['origin'],
+                 'bbb-origin-version' => $bbbsession['originVersion'],
+                 'bbb-origin-server-name' => $bbbsession['originServerName'],
+                 'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
+                 'bbb-origin-tag' => $bbbsession['originTag'],
+                 'bbb-context' => $bbbsession['course']->fullname,
+                 'bbb-recording-name' => $bbbsession['meetingname'],
+                 'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
+                 'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+                ];
 
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
         $metadata["meta_bn-recording-status-email"] = json_encode(bigbluebuttonbn_get_moderator_email($bbbsession['context']));

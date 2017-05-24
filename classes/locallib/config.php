@@ -83,8 +83,8 @@ class config {
      * @return string
      */
     public static function defaultvalue($setting) {
-        $defaultvalues = defaultvalues();
-        if (!array_key_exists($defaultvalues, $setting)) {
+        $defaultvalues = self::defaultvalues();
+        if (!array_key_exists($setting, $defaultvalues)) {
             return;
         }
 
@@ -121,8 +121,8 @@ class config {
      /**
       * @return array
       */
-     public static function get_options() {
-         return [
+    public static function get_options() {
+        return [
                'version_major' => self::get_moodle_version_major(),
                'voicebridge_editable' => self::get('voicebridge_editable'),
                'recording_default' => self::get('recording_default'),
@@ -140,6 +140,6 @@ class config {
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
                'instance_type_enabled' => self::recordings_enabled(),
                'instance_type_default' => BIGBLUEBUTTONBN_TYPE_ALL,
-             ];
-     }
+          ];
+    }
 }

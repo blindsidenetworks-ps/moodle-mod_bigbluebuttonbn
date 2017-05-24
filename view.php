@@ -196,7 +196,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
 
 function bigbluebuttonbn_view_bbbsession_roles($context, $userid) {
     if (isguestuser()) {
-      return bigbluebuttonbn_get_guest_role();
+        return bigbluebuttonbn_get_guest_role();
     }
     return bigbluebuttonbn_get_user_roles($context, $userid);
 }
@@ -255,9 +255,8 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     $groupname = get_string('allparticipants');
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
 
-
-    if (sizeof($groups) == 0) {
-        // Only the All participants group exists
+    if (count($groups) == 0) {
+        // Only the All participants group exists.
         return;
     }
 
@@ -270,7 +269,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     $groupname = groups_get_group_name($bbbsession['group']);
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
 
-    if (sizeof($groups) == 1) {
+    if (count($groups) == 1) {
         // There only one group and the user has access to.
         return;
     }

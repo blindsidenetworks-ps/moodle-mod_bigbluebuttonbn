@@ -335,7 +335,7 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     foreach ($recordsimported as $recordimported) {
         $meta = json_decode($recordimported->meta, true);
         $recording = $meta['recording'];
-        //FORCE protected
+        // Force protected.
         $recording['protected'] = 'true';
         $recordsimportedarray[$recording['recordID']] = $recording;
     }
@@ -386,7 +386,7 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
     if (isset($recording->protected)) {
         $recordingarray['protected'] = (string) $recording->protected;
     }
-    //FORCE protected
+    // Force protected.
     $recordingarray['protected'] = 'false';
     return $recordingarray + $metadataarray;
 }
@@ -560,17 +560,17 @@ function bigbluebuttonbn_get_server_version() {
 function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METHOD_GET,
     $data = null, $contenttype = 'text/xml') {
 
-    //debugging('Request to: '.$url, DEBUG_DEVELOPER);
+    debugging('Request to: ' . $url, DEBUG_DEVELOPER);
 
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
 
         if (!$response) {
-            //debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
+            debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
             return null;
         }
 
-        //debugging('Response: '.$response, DEBUG_DEVELOPER);
+        debugging('Response: ' . $response, DEBUG_DEVELOPER);
 
         $previous = libxml_use_internal_errors(true);
         try {
@@ -579,8 +579,8 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
             return $xml;
         } catch (Exception $e) {
             libxml_use_internal_errors($previous);
-            //$error = 'Caught exception: '.$e->getMessage();
-            //debugging($error, DEBUG_DEVELOPER);
+            $error = 'Caught exception: '.$e->getMessage();
+            debugging($error, DEBUG_DEVELOPER);
             return null;
         }
     }
@@ -589,11 +589,11 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     $previous = libxml_use_internal_errors(true);
     try {
         $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-        //debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
+        debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
         return $response;
     } catch (Exception $e) {
-        //$error = 'Caught exception: '.$e->getMessage();
-        //debugging($error, DEBUG_DEVELOPER);
+        $error = 'Caught exception: '.$e->getMessage();
+        debugging($error, DEBUG_DEVELOPER);
         libxml_use_internal_errors($previous);
         return null;
     }
@@ -672,7 +672,7 @@ function bigbluebuttonbn_get_roles_select(context $context = null) {
         $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
     }
     return $roles;
- }
+}
 
 function bigbluebuttonbn_get_role($id) {
     $roles = (array) role_get_names();
@@ -1107,7 +1107,7 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
     $configxml = bigbluebuttonbn_setConfigXML($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
-        //debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
+        debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
         return '';
     }
 
@@ -1296,7 +1296,7 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $ed
         $payload['source'] = 'meta_contextactivitydescription';
         $metadescription = trim($recording[$payload['source']]);
         if (!empty($metadescription)) {
-          return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $payload);
+            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $payload);
         }
     }
 
@@ -1726,7 +1726,7 @@ function bigbluebuttonbn_get_moderator_email($context) {
         if ($counter == 5) {
             break;
         }
-        if(has_capability('mod/bigbluebuttonbn:moderate', $context, $user)) {
+        if (has_capability('mod/bigbluebuttonbn:moderate', $context, $user)) {
             array_push($moderatoremails, '"' . fullname($user) . '" <' . $user->email . '>');
             $counter += 1;
         }

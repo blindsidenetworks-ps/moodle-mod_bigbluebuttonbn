@@ -106,7 +106,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['icons_enabled'] = $cfg['recording_icons_enabled'];
         $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
         if ($cfg['version_major'] < '2016052300') {
-            // Valid before v3.1
+            // Valid before v3.1.
             $options = array('class' => 'btn btn-link icon smallicon',
                 'alt' => get_string('delete'),
                 'title' => get_string('delete'),
@@ -129,7 +129,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 );
                 $defaultvalues['presentation'] = $draftitemid;
             } catch (Exception $e) {
-                //debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
+                debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
                 return null;
             }
         }

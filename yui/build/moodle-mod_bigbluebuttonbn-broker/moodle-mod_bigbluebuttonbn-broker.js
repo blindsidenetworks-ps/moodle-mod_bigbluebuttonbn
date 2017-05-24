@@ -127,7 +127,7 @@ M.mod_bigbluebuttonbn.broker = {
         }
 
         if (action === 'protect' || action === 'unprotect') {
-            return data.secured; // The broker responds with secured as protected is a reserverd word
+            return data.secured; // The broker responds with secured as protected is a reserverd word.
         }
 
         if (action === 'update') {

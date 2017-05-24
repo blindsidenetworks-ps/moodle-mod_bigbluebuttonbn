@@ -352,7 +352,7 @@ M.mod_bigbluebuttonbn.helpers = {
     element_tag: {},
     element_fa_class: {},
     element_action_reversed: {},
-  
+
     /**
      * Initialise helpers code.
      *
@@ -374,7 +374,7 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('onclick', '');
         button = link.one('> i');
         if (button === null) {
-            // For backward compatibility
+            // For backward compatibility.
             this.toggle_spinning_wheel_on_compatible(link.one('> img'), text);
             return;
         }
@@ -404,7 +404,7 @@ M.mod_bigbluebuttonbn.helpers = {
         link.removeAttribute('data-onclick');
         button = link.one('> i');
         if (button === null) {
-            // For backward compatibility
+            // For backward compatibility.
             this.toggle_spinning_wheel_off_compatible(link.one('> img'));
             return;
         }
@@ -442,7 +442,7 @@ M.mod_bigbluebuttonbn.helpers = {
         buttondatatag = this.element_tag[action];
         button = link.one('> i');
         if (button === null) {
-            // For backward compatibility
+            // For backward compatibility.
             this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
@@ -475,7 +475,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
         button = link.one('> i');
         if (button === null) {
-            // For backward compatibility
+            // For backward compatibility.
             button = link.one('> img');
         }
 
