@@ -89,7 +89,12 @@ switch (strtolower($action)) {
                     );
 
                     if (bigbluebuttonbn_get_cfg_recordingstatus_enabled()) {
-                        $metadata["meta_bn-recording-status-email"] = json_encode(bigbluebuttonbn_get_moderator_email($bbbsession['context']));
+                        $metadata["meta_bn-recording-status"] = json_encode(
+                            array(
+                                'email' => bigbluebuttonbn_get_moderator_email($bbbsession['context']),
+                                'context' => $bbbsession['bigbluebuttonbnURL']
+                              )
+                          );
                     }
 
                     if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
