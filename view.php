@@ -102,14 +102,14 @@ if (!has_capability('moodle/category:manage', $context) && !has_capability('mod/
 
 // Operation URLs.
 $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
-$bbbsession['logoutURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id.
-    '&bn='.$bbbsession['bigbluebuttonbn']->id;
-$bbbsession['recordingReadyURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=recording_'.
-    'ready&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
-$bbbsession['meetingEventsURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_broker.php?action=meeting'.
-    '_events&bigbluebuttonbn='.$bbbsession['bigbluebuttonbn']->id;
-$bbbsession['joinURL'] = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=join&id='.$id.
-    '&bn='.$bbbsession['bigbluebuttonbn']->id;
+$bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
+    '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+$bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+    'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+$bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+    '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+$bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $id .
+    '&bn=' . $bbbsession['bigbluebuttonbn']->id;
 
 // Output starts.
 echo $OUTPUT->header();
@@ -126,8 +126,6 @@ echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
 
 // Initialize session variable used across views.
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-
-
 
 function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbsession) {
     global $CFG, $USER;
