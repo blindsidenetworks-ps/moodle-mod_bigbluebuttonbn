@@ -560,8 +560,6 @@ function bigbluebuttonbn_get_server_version() {
 function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METHOD_GET,
     $data = null, $contenttype = 'text/xml') {
 
-    debugging('Request to: ' . $url, DEBUG_DEVELOPER);
-
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
 
@@ -569,8 +567,6 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
             debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
             return null;
         }
-
-        debugging('Response: ' . $response, DEBUG_DEVELOPER);
 
         $previous = libxml_use_internal_errors(true);
         try {
@@ -589,7 +585,6 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = BIGBLUEBUTTONBN_METH
     $previous = libxml_use_internal_errors(true);
     try {
         $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-        debugging('Response processed: '.$response->asXML(), DEBUG_DEVELOPER);
         return $response;
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();

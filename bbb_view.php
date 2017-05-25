@@ -230,7 +230,12 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
                 ];
 
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
-        $metadata["meta_bn-recording-status-email"] = json_encode(bigbluebuttonbn_get_moderator_email($bbbsession['context']));
+        $metadata["meta_bn-recording-status"] = json_encode(
+            array(
+                'email' => bigbluebuttonbn_get_moderator_email($bbbsession['context']),
+                'context' => $bbbsession['bigbluebuttonbnURL']
+              )
+          );
     }
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
         $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
