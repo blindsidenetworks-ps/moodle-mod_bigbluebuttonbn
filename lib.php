@@ -617,21 +617,6 @@ function bigbluebuttonbn_get_file_areas() {
     return $areas;
 }
 
-/**
- * Returns an array with all the roles contained in the database.
- *
- * @return array a list of available roles
- */
-function bigbluebuttonbn_get_db_moodle_roles($rolename = 'all') {
-    global $DB;
-
-    $roletarget = array();
-    if ($rolename != 'all') {
-        $roletarget['shortname'] = $rolename;
-    }
-    return $DB->get_records('role', $roletarget);
-}
-
 function bigbluebuttonbn_notification_process($bigbluebuttonbn, $action) {
     global $USER;
 
