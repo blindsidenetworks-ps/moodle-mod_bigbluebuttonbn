@@ -615,7 +615,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             if( $participant->selectiontype == 'role' ) {
                 foreach( $roles as $role ) {
                     $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
-                    if( $participant->selectionid == $moodlerole->shortname ) {
+                    if( $participant->selectionid == $moodlerole->id ) {
                         if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                             return true;
                         }
