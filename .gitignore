@@ -2,3 +2,4 @@
 .project
 .settings*
 deploy*
+config.php
