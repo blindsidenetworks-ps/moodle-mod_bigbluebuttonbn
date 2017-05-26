@@ -430,7 +430,7 @@ function bigbluebuttonbn_get_guest_role(context $context = null) {
 }
 
 function bigbluebuttonbn_get_users(context $context = null) {
-    $users = (array) get_enrolled_users($context);
+    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     foreach ($users as $key => $value) {
         $users[$key] = fullname($value);
     }
@@ -449,7 +449,7 @@ function bigbluebuttonbn_get_users_json($users) {
 }
 
 function bigbluebuttonbn_get_users_select(context $context = null) {
-    $users = (array) get_enrolled_users($context);
+    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     foreach ($users as $key => $value) {
         $users[$key] = array('id' => $value->id, 'name' => fullname($value));
     }
@@ -615,7 +615,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             if( $participant->selectiontype == 'role' ) {
                 foreach( $roles as $role ) {
                     $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
-                    if( $participant->selectionid == $moodlerole->shortname ) {
+                    if( $participant->selectionid == $moodlerole->id ) {
                         if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                             return true;
                         }
