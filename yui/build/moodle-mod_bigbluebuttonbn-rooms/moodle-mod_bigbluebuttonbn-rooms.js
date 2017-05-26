@@ -139,23 +139,32 @@ M.mod_bigbluebuttonbn.rooms = {
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
-    msg_attendees_in: function(moderators, participants) {
-
-        if (typeof participants == 'undefined' || participants === 0) {
-            return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
-        }
-
-        var viewers = participants - moderators;
-        var msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
+    msg_moderators_in: function(moderators) {
         var msg_moderators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
         if (moderators == 1) {
             msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
         }
+        return msg_moderators;
+    },
+
+    msg_viewers_in: function(viewers) {
         var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
         if (viewers == 1) {
             msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
         }
+        return msg_viewers;
+    },
 
+    msg_attendees_in: function(moderators, participants) {
+
+        if (!this.has_participants()) {
+            return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
+        }
+
+        var msg_moderators = this.msg_moderators_in(moderators);
+        var viewers = participants - moderators;
+        var msg_viewers = this.msg_viewers_in(viewers);
+        var msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
             return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
         }
@@ -165,6 +174,10 @@ M.mod_bigbluebuttonbn.rooms = {
         }
 
         return msg + ' <b>1</b> ' + msg_viewers + '.';
+    },
+
+    has_participants: function(participants) {
+        return (typeof participants != 'undefined' && participants > 0);
     },
 
     init_join_button: function(status) {
