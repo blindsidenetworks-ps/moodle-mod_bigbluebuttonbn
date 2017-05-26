@@ -17,6 +17,7 @@
 /**
  * The mod_bigbluebuttonbn viewed event.
  *
+ * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
@@ -26,14 +27,15 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class bigbluebuttonbn_activity_management_viewed extends \core\event\base
+class bigbluebuttonbn_activity_management_viewed extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        parent::init();
+        $this->description = "The user with id '$this->userid' viewed the bigbluebuttonbn activity management page for ".
+        "the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -46,34 +48,10 @@ class bigbluebuttonbn_activity_management_viewed extends \core\event\base
     }
 
     /**
-     * Returns description of what happened.
+     * Return objectid mapping.
      *
      * @return string
      */
-    public function get_description() {
-        return "The user with id '$this->userid' viewed the bigbluebuttonbn activity management page for ".
-        "the course module id '$this->contextinstanceid'.";
-    }
-
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return array($this->courseid, 'bigbluebuttonbn', 'activity management viewed',
-                'view.php?pageid='.$this->objectid, 'BigBlueButtonBN activity management viewed', $this->contextinstanceid, );
-    }
-
-    /**
-     * Get URL related to the action.
-     *
-     * @return \moodle_url
-     */
-    public function get_url() {
-        return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
-    }
-
     public static function get_objectid_mapping() {
         return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }

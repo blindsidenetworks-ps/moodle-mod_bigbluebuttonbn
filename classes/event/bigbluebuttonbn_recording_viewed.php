@@ -34,10 +34,8 @@ class bigbluebuttonbn_recording_viewed extends base
      */
     protected function init() {
         parent::init();
-        $rid = isset($this->other) ? $this->other : 'unknown';
         $this->description = "The user with id '$this->userid' has viewed a recording with id ".
-        "'$rid' from the course id '$this->courseid'.";
-
+            "'$this->other' from the course id '$this->contextinstanceid'.";
     }
 
     /**

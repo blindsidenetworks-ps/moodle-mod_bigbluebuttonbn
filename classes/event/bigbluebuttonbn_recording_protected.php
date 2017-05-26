@@ -17,6 +17,7 @@
 /**
  * The mod_bigbluebuttonbn recording protected event.
  *
+ * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
@@ -26,15 +27,15 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class bigbluebuttonbn_recording_protected extends \core\event\base
+class bigbluebuttonbn_recording_protected extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'bigbluebuttonbn';
+        parent::init();
+        $this->description = "The user with id '$this->userid' has protected a recording with id ".
+            "'$this->other' in the course id '$this->contextinstanceid'.";
     }
 
     /**
@@ -47,40 +48,10 @@ class bigbluebuttonbn_recording_protected extends \core\event\base
     }
 
     /**
-     * Returns description of what happened.
+     * Return objectid mapping.
      *
      * @return string
      */
-    public function get_description() {
-        $rid = isset($this->other) ? $this->other : 'unknown';
-        $a = (object) array('userid' => $this->userid,
-                            'recordingid' => $rid,
-                            'courseid' => $this->contextinstanceid);
-
-        return "The user with id '$a->userid' has protected a recording with id ".
-        "'$a->recordingid' in the course id '$a->courseid'.";
-    }
-
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return array($this->courseid, 'bigbluebuttonbn', 'recording protected',
-                'view.php?pageid='.$this->objectid, 'Recording protected',
-                $this->contextinstanceid);
-    }
-
-    /**
-     * Get URL related to the action.
-     *
-     * @return \moodle_url
-     */
-    public function get_url() {
-        return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->objectid));
-    }
-
     public static function get_objectid_mapping() {
         return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }

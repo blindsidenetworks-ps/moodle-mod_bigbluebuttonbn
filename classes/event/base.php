@@ -50,12 +50,19 @@ abstract class base extends \core\event\base {
     protected $description;
 
     /**
+     * Object Id Mapping.
+     *
+     * @var array
+     */
+    protected static $objectidmapping = array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+
+    /**
      * Legacy log data.
      *
      * @var array
      */
     protected $legacylogdata;
-
+  
     /**
      * Init method.
      */
