@@ -521,6 +521,20 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $drafti
  * @return false|null false if file not found, does not return if found - justsend the file
  */
 function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    if (!bigbluebuttonbn_pluginfile_valid($context, $filearea)) {
+        return false;
+    }
+
+    $file = bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args);
+    if (!$file) {
+        return false;
+    }
+  
+    // Finally send the file.
+    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+}
+
+function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
@@ -533,6 +547,10 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
+    return true;
+}
+
+function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args) {
     $filename = bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args);
     if (!$filename) {
         return false;
@@ -540,12 +558,12 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
     $fs = get_file_storage();
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+    $file = $fs->get_file_by_hash(sha1($fullpath));
+    if (!$file || $file->is_directory()) {
         return false;
     }
 
-    // Finally send the file.
-    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+    return $file;
 }
 
 function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
