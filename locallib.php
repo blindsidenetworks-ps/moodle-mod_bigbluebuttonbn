@@ -1715,7 +1715,7 @@ function bigbluebuttonbn_get_locale() {
 
 function bigbluebuttonbn_get_moderator_email($context) {
     $moderatoremails = array();
-    $users = (array) get_enrolled_users($context);
+    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     $counter = 0;
     foreach ($users as $key => $user) {
         if ($counter == 5) {
