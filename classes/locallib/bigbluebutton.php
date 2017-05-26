@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn locallib/config.
+ * The mod_bigbluebuttonbn locallib/bigbluebutton.
  *
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2017 - present Blindside Networks Inc
@@ -29,5 +29,25 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 class bigbluebutton {
-    
+
+    /**
+     * @param string $action
+     * @param array  $data
+     * @param array  $metadata
+     * @return string
+     */
+    public static function action_url($action = '', $data = array(), $metadata = array()) {
+        $baseurl = \mod_bigbluebuttonbn\locallib\config::get('server_url').'api/'.$action.'?';
+        $params = '';
+
+        foreach ($data as $key => $value) {
+            $params .= '&'.$key.'='.urlencode($value);
+        }
+
+        foreach ($metadata as $key => $value) {
+            $params .= '&'.'meta_'.$key.'='.urlencode($value);
+        }
+
+        return $baseurl.$params.'&checksum='.sha1($action.$params.\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+    }
 }

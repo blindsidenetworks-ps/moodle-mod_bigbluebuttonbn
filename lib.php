@@ -434,11 +434,19 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
 
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
-        bigbluebuttonbn_notification_process($bigbluebuttonbn, $action);
+        $context = context_course::instance($bigbluebuttonbn->course);
+        \mod_bigbluebuttonbn\locallib\notifier::notification_process($context, $bigbluebuttonbn, $action);
     }
 }
 
-function bigbluebuttonbn_process_post_save_event($bigbluebuttonbn) {
+/**
+ * Generates an event after a bigbluebuttonbn insert/update.
+ *
+ * @global object
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ **/
+function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
 
     // Delete evento to the calendar when/if openingtime is NOT set.
@@ -529,7 +537,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
     if (!$file) {
         return false;
     }
-  
+
     // Finally send the file.
     send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
 }
@@ -615,80 +623,4 @@ function bigbluebuttonbn_get_file_areas() {
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
 
     return $areas;
-}
-
-function bigbluebuttonbn_notification_process($bigbluebuttonbn, $action) {
-    global $USER;
-
-    // Prepare message.
-    $msg = new stdClass();
-
-    // Build the message_body.
-    $msg->action = $action;
-    $msg->activity_type = '';
-    $msg->activity_title = $bigbluebuttonbn->name;
-
-    // Add the meeting details to the message_body.
-    $msg->action = ucfirst($action);
-    $msg->activity_description = '';
-    if (!empty($bigbluebuttonbn->intro)) {
-        $msg->activity_description = trim($bigbluebuttonbn->intro);
-    }
-    $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
-    $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
-    $msg->activity_owner = fullname($USER);
-
-    // Send notification to all users enrolled.
-    bigbluebuttonbn_notification_send($USER, $bigbluebuttonbn, bigbluebuttonbn_notification_msg_html($msg));
-}
-
-function bigbluebuttonbn_notification_msg_html($msg) {
-    $messagetext = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
-        get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
-    $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
-        get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
-    $messagetext .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>'."\n";
-    $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-        get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>'."\n";
-    $messagetext .= $msg->activity_title.'</td></tr>'."\n";
-    $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-        get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>'."\n";
-    $messagetext .= $msg->activity_description.'</td></tr>'."\n";
-    $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-        get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>'."\n";
-    $messagetext .= $msg->activity_openingtime.'</td></tr>'."\n";
-    $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-        get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>'."\n";
-    $messagetext .= $msg->activity_closingtime.'</td></tr>'."\n";
-    $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.
-        get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>'."\n";
-    $messagetext .= $msg->activity_owner.'</td></tr></tbody></table></p>'."\n";
-}
-
-function bigbluebuttonbn_notification_send($sender, $bigbluebuttonbn, $message = '') {
-    global $DB;
-
-    $context = context_course::instance($bigbluebuttonbn->course);
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-
-    // Complete message.
-    $msg = new stdClass();
-    $msg->user_name = fullname($sender);
-    $msg->user_email = $sender->email;
-    $msg->course_name = "$course->fullname";
-    $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
-        $msg->user_name.'('.$msg->user_email.') ';
-    $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-
-    $users = get_enrolled_users($context);
-    foreach ($users as $user) {
-        if ($user->id != $sender->id) {
-            $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
-            $msgsend = ' was sent.';
-            if (empty($messageid)) {
-                $msgsend = ' was NOT sent.';
-            }
-            debugging('Msg to '.$msg->user_name.$msgsend, DEBUG_DEVELOPER);
-        }
-    }
 }
