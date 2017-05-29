@@ -51,8 +51,11 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.bigbluebuttonbn.activity !== 'open') {
             var status_bar = [M.util.get_string('view_message_conference_has_ended', 'bigbluebuttonbn')];
             if (this.bigbluebuttonbn.activity !== 'ended') {
-                status_bar.push(this.bigbluebuttonbn.opening);
-                status_bar.push(this.bigbluebuttonbn.closing);
+                status_bar = [
+                    M.util.get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
+                    this.bigbluebuttonbn.opening,
+                    this.bigbluebuttonbn.closing
+                  ];
             }
             Y.DOM.addHTML(Y.one('#status_bar'), this.init_status_bar(status_bar));
             return;

@@ -213,7 +213,7 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn
         return 'ended';
     }
 
-    // The activity is opene.
+    // The activity is open.
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
         $bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
     return 'open';
