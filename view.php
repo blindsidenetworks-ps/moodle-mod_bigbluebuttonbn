@@ -210,15 +210,13 @@ $now = time();
 if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime) {
     //ACTIVITY HAS NOT BEEN OPENED
     $bigbluebuttonbn_activity = 'not_started';
-
 } else if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
     //ACTIVITY HAS BEEN CLOSED
     $bigbluebuttonbn_activity = 'ended';
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation);
-
 } else {
     //ACTIVITY OPEN
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array($context, $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
 }
 
 // Initialize session variable used across views
