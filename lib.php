@@ -685,7 +685,7 @@ function bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $message="
     $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.$msg->user_name.'('.$msg->user_email.') ';
     $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
 
-    $users = bigbluebuttonbn_get_users($context);
+    $users = get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     foreach( $users as $user ) {
         if( $user->id != $sender->id ){
             $messageid = message_post_message($sender, $user, $message, FORMAT_HTML);
