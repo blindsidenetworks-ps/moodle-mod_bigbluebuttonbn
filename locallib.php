@@ -430,7 +430,7 @@ function bigbluebuttonbn_get_guest_role(context $context = null) {
 }
 
 function bigbluebuttonbn_get_users(context $context = null) {
-    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+    $users = get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     foreach ($users as $key => $value) {
         $users[$key] = fullname($value);
     }
@@ -449,7 +449,7 @@ function bigbluebuttonbn_get_users_json($users) {
 }
 
 function bigbluebuttonbn_get_users_select(context $context = null) {
-    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+    $users = get_enrolled_users($context,'',0,'u.*',null,0,0,true);
     foreach ($users as $key => $value) {
         $users[$key] = array('id' => $value->id, 'name' => fullname($value));
     }
