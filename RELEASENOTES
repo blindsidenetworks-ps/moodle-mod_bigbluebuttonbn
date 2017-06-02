@@ -4,6 +4,7 @@ Bug: Fixed issue with roles in participant list not showing corrctly.
 Bug: Fixed issue with users enrolled and no active being included in participant list.
 Bug: Fixed issue with moderators being considered viewers.
 Bug: Fixed issue with message shown to non-moderators when the room is not open yet.
+Bug: Fixed issue with messages not properly sent when the room/activity was added/updated.
 
 2.1.10 (2016051915)
 Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. This affected the way the new UI renders the settings form. (CONTRIB-6900)
