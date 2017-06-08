@@ -1422,6 +1422,9 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
         // There are recordings for this meeting.
         foreach ($recordings as $recording) {
+            if ( !bigbluebuttonbn_include_recording_table_row($bbbsession) ) {
+                continue;
+            }
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
             $row->attributes['data-imported'] = 'false';
@@ -1450,6 +1453,10 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     }
 
     return $table;
+}
+
+function bigbluebuttonbn_include_recording_table_row($bbbsession) {
+    return !( !isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid'] );
 }
 
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
