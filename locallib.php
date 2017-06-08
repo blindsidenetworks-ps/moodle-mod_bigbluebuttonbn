@@ -1422,41 +1422,42 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
         // There are recordings for this meeting.
         foreach ($recordings as $recording) {
-            if ( !bigbluebuttonbn_include_recording_table_row($bbbsession) ) {
-                continue;
-            }
-            $row = new html_table_row();
-            $row->id = 'recording-td-'.$recording['recordID'];
-            $row->attributes['data-imported'] = 'false';
-            $texthead = '';
-            $texttail = '';
-            if (isset($recording['imported'])) {
-                $row->attributes['data-imported'] = 'true';
-                $row->attributes['title'] = get_string('view_recording_link_warning', 'bigbluebuttonbn');
-                $texthead = '<em>';
-                $texttail = '</em>';
-            }
-
-            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-            if ($rowdata != null) {
-                $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
-                $row->cells = array($texthead.$rowdata->recording.$texttail,
-                    $texthead.$rowdata->activity.$texttail, $texthead.$rowdata->description.$texttail,
-                    $rowdata->preview, $texthead.$rowdata->date_formatted.$texttail,
-                    $rowdata->duration_formatted);
-                if ($bbbsession['managerecordings']) {
-                    $row->cells[] = $rowdata->actionbar;
-                }
-                array_push($table->data, $row);
-            }
+            bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, $table);
         }
     }
 
     return $table;
 }
 
-function bigbluebuttonbn_include_recording_table_row($bbbsession) {
-    return !( !isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid'] );
+function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, &$table) {
+    if ( !isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid'] ) {
+        return;
+    }
+
+    $row = new html_table_row();
+    $row->id = 'recording-td-'.$recording['recordID'];
+    $row->attributes['data-imported'] = 'false';
+    $texthead = '';
+    $texttail = '';
+    if (isset($recording['imported'])) {
+        $row->attributes['data-imported'] = 'true';
+        $row->attributes['title'] = get_string('view_recording_link_warning', 'bigbluebuttonbn');
+        $texthead = '<em>';
+        $texttail = '</em>';
+    }
+
+    $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+    if ($rowdata != null) {
+        $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
+        $row->cells = array($texthead.$rowdata->recording.$texttail,
+            $texthead.$rowdata->activity.$texttail, $texthead.$rowdata->description.$texttail,
+            $rowdata->preview, $texthead.$rowdata->date_formatted.$texttail,
+            $rowdata->duration_formatted);
+        if ($bbbsession['managerecordings']) {
+            $row->cells[] = $rowdata->actionbar;
+        }
+        array_push($table->data, $row);
+    }
 }
 
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
