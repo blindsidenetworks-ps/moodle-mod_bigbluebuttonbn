@@ -1,6 +1,6 @@
 <?php
 /**
- * View for BigBlueButton interaction  
+ * View for BigBlueButton interaction
  *
  * @package   mod_bigbluebuttonbn
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -76,7 +76,8 @@ switch (strtolower($action)) {
                 // If user is administrator, moderator or if is viewer and no waiting is required
                 if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
                     /// Prepare the metadata
-                    $metadata = array("meta_bn-origin" => $bbbsession['origin'],
+                    $metadata = array(
+                            "meta_bbb-origin" => $bbbsession['origin'],
                             "meta_bbb-origin-version" => $bbbsession['originVersion'],
                             "meta_bbb-origin-server-name" => $bbbsession['originServerName'],
                             "meta_bbb-origin-server-common-name" => $bbbsession['originServerCommonName'],
@@ -87,7 +88,16 @@ switch (strtolower($action)) {
                             "meta_bbb-recording-tags" => (isset($tags) && $tags != '') ? $tags : $bbbsession['contextActivityTags'],
                     );
 
-                    if (bigbluebuttonbn_server_offers_bn_capabilities() && bigbluebuttonbn_get_cfg_recordingready_enabled()) {
+                    if (bigbluebuttonbn_get_cfg_recordingstatus_enabled()) {
+                        $metadata["meta_bn-recording-status"] = json_encode(
+                            array(
+                                'email' => bigbluebuttonbn_get_moderator_email($bbbsession['context']),
+                                'context' => $bbbsession['bigbluebuttonbnURL']
+                              )
+                          );
+                    }
+
+                    if (bigbluebuttonbn_get_cfg_recordingready_enabled()) {
                         $metadata["meta_bn-recording-ready-url"] = $bbbsession['recordingReadyURL'];
                     }
 

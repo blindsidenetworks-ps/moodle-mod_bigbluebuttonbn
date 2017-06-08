@@ -1445,6 +1445,11 @@ function bigbluebuttonbn_get_cfg_recordingready_enabled() {
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled: (isset($CFG->bigbluebuttonbn_recordingready_enabled)? $CFG->bigbluebuttonbn_recordingready_enabled: false));
 }
 
+function bigbluebuttonbn_get_cfg_recordingstatus_enabled() {
+    global $BIGBLUEBUTTONBN_CFG, $CFG;
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingstatus_enabled)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingstatus_enabled: (isset($CFG->bigbluebuttonbn_recordingstatus_enabled)? $CFG->bigbluebuttonbn_recordingstatus_enabled: false));
+}
+
 function bigbluebuttonbn_get_cfg_moderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
     return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: 'owner'));
@@ -1708,4 +1713,20 @@ function bigbluebuttonbn_get_strings_for_js() {
 function bigbluebuttonbn_get_locale() {
     $lang = get_string('locale', 'core_langconfig');
     return substr($lang, 0, strpos($lang, '.'));
+}
+
+function bigbluebuttonbn_get_moderator_email($context) {
+    $moderatoremails = array();
+    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+    $counter = 0;
+    foreach ($users as $key => $user) {
+        if ($counter == 5) {
+            break;
+        }
+        if(has_capability('mod/bigbluebuttonbn:moderate', $context, $user)) {
+            array_push($moderatoremails, '"' . fullname($user) . '" <' . $user->email . '>');
+            $counter += 1;
+        }
+    }
+    return $moderatoremails;
 }
