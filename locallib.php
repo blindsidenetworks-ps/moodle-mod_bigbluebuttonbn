@@ -1221,8 +1221,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools=['
     }
 
     ///Build table content
-    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
+    if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting.
         foreach ( $recordings as $recording ) {
+            if ( !isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid'] ) {
+                continue;
+            }
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
             if ( isset($recording['imported']) ) {
