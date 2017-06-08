@@ -125,7 +125,7 @@ if (empty($error)) {
 
                         echo $params['callback'].'({ "status": true });';
                     } else {
-                        error_log("ERROR: User not authorized to execute end command");
+                        // ERROR: User not authorized to execute end command.
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
@@ -156,7 +156,7 @@ if (empty($error)) {
                         }
 
                     } else {
-                        error_log("ERROR: User not authorized to execute end command");
+                        // ERROR: User not authorized to execute end command.
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute end command");
                     }
                     break;
@@ -199,7 +199,7 @@ if (empty($error)) {
                         echo "{$params['callback']}({$callback_response_data});";
 
                     } else {
-                        error_log("ERROR: User not authorized to execute publish command");
+                        // ERROR: User not authorized to execute publish command.
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute publish command");
                     }
                     break;
@@ -241,7 +241,7 @@ if (empty($error)) {
                         echo "{$params['callback']}({$callback_response_data});";
 
                     } else {
-                        error_log("ERROR: User not authorized to execute unpublish command");
+                        // ERROR: User not authorized to execute unpublish command.
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute unpublish command");
                     }
                     break;
@@ -278,7 +278,7 @@ if (empty($error)) {
                         echo "{$params['callback']}({$callback_response_data});";
 
                     } else {
-                        error_log("ERROR: User not authorized to execute delete command");
+                        // ERROR: User not authorized to execute delete command.
                         header("HTTP/1.0 401 Unauthorized. User not authorized to execute delete command");
                     }
                     break;
@@ -289,7 +289,6 @@ if (empty($error)) {
 
                     } catch (Exception $e) {
                         $error = 'Caught exception: ' . $e->getMessage();
-                        error_log($error);
                         header("HTTP/1.0 400 Bad Request. " . $error);
                         return;
                     }
@@ -302,7 +301,6 @@ if (empty($error)) {
 
                     } catch (Exception $e) {
                         $error = 'Caught exception: ' . $e->getMessage();
-                        error_log($error);
                         header("HTTP/1.0 410 Gone. " . $error);
                         return;
                     }
@@ -314,7 +312,6 @@ if (empty($error)) {
                         return;
                     } catch (Exception $e) {
                         $error = 'Caught exception: ' . $e->getMessage();
-                        error_log($error);
                         header("HTTP/1.0 503 Service Unavailable. " . $error);
                         return;
                     }
@@ -338,7 +335,6 @@ if (empty($error)) {
 
                         } else {
                             $error = "Recording {$params['id']} could not be found. It can not be imported";
-                            error_log($error);
                             header("HTTP/1.0 404 Not found. " . $error);
                             return;
                         }
@@ -351,7 +347,7 @@ if (empty($error)) {
             }
 
         } catch (Exception $e) {
-            error_log("BBB_BROKER ERROR: " . $e->getCode() . ", " . $e->getMessage());
+            // BBB_BROKER ERROR.
             header("HTTP/1.0 500 Internal Server Error. " . $e->getMessage());
             return;
         }

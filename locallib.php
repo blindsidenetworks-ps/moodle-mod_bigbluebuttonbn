@@ -388,12 +388,11 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method=BIGBLUEBUTTONBN_METHOD
                 return $xml;
             } catch (Exception $e){
                 libxml_use_internal_errors($previous);
-                $error = 'Caught exception: '.$e->getMessage();
-                error_log($error);
+                // Caught exception $e->getMessage().
                 return NULL;
             }
         } else {
-            error_log("No response on wrap_simplexml_load_file");
+            // No response on wrap_simplexml_load_file.
             return NULL;
         }
 
@@ -1223,7 +1222,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools=['
 
     ///Build table content
     if ( isset($recordings) && !array_key_exists('messageKey', $recordings)) {  // There are recordings for this meeting
-        foreach ( $recordings as $recording ){
+        foreach ( $recordings as $recording ) {
             $row = new html_table_row();
             $row->id = 'recording-td-'.$recording['recordID'];
             if ( isset($recording['imported']) ) {

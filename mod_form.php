@@ -228,7 +228,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0, array('subdirs'=>0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true));
                 $default_values['presentation'] = $draftitemid;
             } catch (Exception $e){
-                error_log("Presentation could not be loaded: ".$e->getMessage());
+                // Presentation could not be loaded.
                 return NULL;
             }
         }

@@ -172,12 +172,9 @@ function bigbluebuttonbn_delete_instance($id) {
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
 
     $logs = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE));
-    error_log(json_encode($logs));
     $has_recordings = 'false';
     if (! empty($logs) ) {
-        error_log("IS not empty");
         foreach ( $logs as $l ) {
-            error_log(json_encode($l));
             $meta = json_decode($l->meta);
             if ( $meta->record ) {
                 $has_recordings = 'true';
