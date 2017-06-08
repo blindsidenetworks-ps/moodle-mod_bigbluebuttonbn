@@ -239,10 +239,8 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         return;
     }
 
-    $onlyexistentgroups = false;
     if ($groupmode == SEPARATEGROUPS) {
         $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
-        $onlyexistentgroups = true;
     }
 
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
@@ -278,7 +276,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     echo $OUTPUT->box_end();
 
     groups_print_activity_menu(
-      $bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id, false, $onlyexistentgroups);
+      $bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
     echo '<br><br>';
 }
 

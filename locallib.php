@@ -109,7 +109,7 @@ function bigbluebuttonbn_get_update_recordings_url($recordid, $metadata = array(
 }
 
 /**
- * @param string $data
+ * @param array  $data
  * @param array  $metadata
  * @param string $pname
  * @param string $purl
