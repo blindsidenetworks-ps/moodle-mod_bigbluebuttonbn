@@ -41,7 +41,6 @@ class config {
         return $versionarray[0];
     }
 
-
     /**
      * @return array
      */
@@ -118,9 +117,9 @@ class config {
                  isset($CFG->bigbluebuttonbn['recording_editable']));
     }
 
-     /**
-      * @return array
-      */
+    /**
+     * @return array
+     */
     public static function get_options() {
         return [
                'version_major' => self::get_moodle_version_major(),
