@@ -11,8 +11,8 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$bn = optional_param('bn', 0, PARAM_INT); // bigbluebuttonbn instance ID
+$id = optional_param('id', 0, PARAM_INT);
+$bn = optional_param('bn', 0, PARAM_INT);
 $action = required_param('action', PARAM_TEXT);
 $name = optional_param('name', '', PARAM_TEXT);
 $description = optional_param('description', '', PARAM_TEXT);
@@ -33,7 +33,7 @@ if ($id) {
 
 $context = bigbluebuttonbn_get_context_module($cm->id);
 
-/// Print the page header
+// Print the page header.
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
@@ -52,13 +52,13 @@ switch (strtolower($action)) {
           bigbluebutton_bbb_view_errors($errors, $id);
 
         } else if (isset($bbbsession) && !is_null($bbbsession)) {
-            /// Moodle event logger: Create an event for meeting left
+            // Moodle event logger: Create an event for meeting left.
             bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $context, $cm);
 
-            /// Update the cache
+            // Update the cache.
             $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], BIGBLUEBUTTONBN_FORCED);
 
-            /// Close the tab or window where BBB was opened
+            // Close the tab or window where BBB was opened.
             bigbluebutton_bbb_view_close_window();
 
         } else {
@@ -67,15 +67,15 @@ switch (strtolower($action)) {
         break;
     case 'join':
         if (isset($bbbsession) && !is_null($bbbsession)) {
-            //See if the session is in progress
+            // See if the session is in progress.
             if (bigbluebuttonbn_isMeetingRunning($bbbsession['meetingid'], $bbbsession['endpoint'], $bbbsession['shared_secret'])) {
-                /// Since the meeting is already running, we just join the session
+                // Since the meeting is already running, we just join the session.
                 bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn);
 
             } else {
-                // If user is administrator, moderator or if is viewer and no waiting is required
+                // If user is administrator, moderator or if is viewer and no waiting is required.
                 if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
-                    /// Prepare the metadata
+                    // Prepare the metadata.
                     $metadata = array(
                             "meta_bbb-origin" => $bbbsession['origin'],
                             "meta_bbb-origin-version" => $bbbsession['originVersion'],
@@ -91,7 +91,7 @@ switch (strtolower($action)) {
                     if (bigbluebuttonbn_get_cfg_recordingstatus_enabled()) {
                         $metadata["meta_bn-recording-status"] = json_encode(
                             array(
-                                'email' => bigbluebuttonbn_get_moderator_email($bbbsession['context']),
+                                'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
                                 'context' => $bbbsession['bigbluebuttonbnURL']
                               )
                           );
@@ -101,7 +101,7 @@ switch (strtolower($action)) {
                         $metadata["meta_bn-recording-ready-url"] = $bbbsession['recordingReadyURL'];
                     }
 
-                    /// Set the duration for the meeting
+                    // Set the duration for the meeting.
                     if (bigbluebuttonbn_get_cfg_scheduled_duration_enabled()) {
                         $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->openingtime, $bigbluebuttonbn->closingtime);
                         if ($durationtime > 0)
@@ -109,7 +109,7 @@ switch (strtolower($action)) {
                     } else {
                         $durationtime = 0;
                     }
-                    /// Execute the create command
+                    // Execute the create command.
                     $response = bigbluebuttonbn_getCreateMeetingArray(
                             $bbbsession['meetingname'],
                             $bbbsession['meetingid'],
@@ -129,7 +129,7 @@ switch (strtolower($action)) {
                     );
 
                     if (!$response) {
-                        // If the server is unreachable, then prompts the user of the necessary action
+                        // If the server is unreachable, then prompts the user of the necessary action.
                         if ($bbbsession['administrator']) {
                             print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
                         } else if ($bbbsession['moderator']) {
@@ -139,7 +139,7 @@ switch (strtolower($action)) {
                         }
 
                     } else if ($response['returncode'] == "FAILED") {
-                        // The meeting was not created
+                        // The meeting was not created.
                         $error_key = bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
                         if (!$error_key) {
                             print_error($response['message'], 'bigbluebuttonbn');
@@ -150,12 +150,12 @@ switch (strtolower($action)) {
                     } else if ($response['hasBeenForciblyEnded'] == "true") {
                         print_error(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
 
-                    } else { ///////////////Everything is ok /////////////////////
-                        /// Moodle event logger: Create an event for meeting created
+                    } else {
+                        // Moodle event logger: Create an event for meeting created.
                         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $context, $cm);
-                        /// Internal logger: Instert a record with the meeting created
+                        // Internal logger: Instert a record with the meeting created.
                         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
-                        /// Since the meeting is already running, we just join the session
+                        // Since the meeting is already running, we just join the session.
                         bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn);
                     }
 
@@ -172,8 +172,6 @@ switch (strtolower($action)) {
         bigbluebutton_bbb_view_close_window();
 }
 
-
-////////////////// Local functions /////////////////////
 function bigbluebutton_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
 
@@ -187,23 +185,23 @@ function bigbluebutton_bbb_view_close_window_manually() {
 }
 
 function bigbluebutton_bbb_view_execute_join($bbbsession, $cm, $context, $bigbluebuttonbn) {
-    //// Update the cache
+    // Update the cache.
     $meeting_info = bigbluebuttonbn_bbb_broker_get_meeting_info($bbbsession['meetingid'], $bbbsession['modPW'], true);
     if ($bbbsession['userlimit'] == 0 || intval($meeting_info['participantCount']) < $bbbsession['userlimit']) {
-        //// Build the URL
+        // Build the URL.
         if ($bbbsession['administrator'] || $bbbsession['moderator']) {
             $password = $bbbsession['modPW'];
         } else {
             $password = $bbbsession['viewerPW'];
         }
         $join_url = bigbluebuttonbn_getJoinURL($bbbsession['meetingid'], $bbbsession['username'], $password, $bbbsession['shared_secret'], $bbbsession['endpoint'], $bbbsession['logoutURL']);
-        //// Moodle event logger: Create an event for meeting joined
+        // Moodle event logger: Create an event for meeting joined.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $context, $cm);
-        /// Internal logger: Instert a record with the meeting created
+        // Internal logger: Instert a record with the meeting created.
         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_JOIN);
-        //// Before executing the redirect, increment the number of participants
+        // Before executing the redirect, increment the number of participants.
         bigbluebuttonbn_bbb_broker_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']));
-        //// Execute the redirect
+        // Execute the redirect.
         header('Location: ' . $join_url);
 
     } else {

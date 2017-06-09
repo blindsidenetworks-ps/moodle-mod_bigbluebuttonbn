@@ -1718,19 +1718,3 @@ function bigbluebuttonbn_get_locale() {
     $lang = get_string('locale', 'core_langconfig');
     return substr($lang, 0, strpos($lang, '.'));
 }
-
-function bigbluebuttonbn_get_moderator_email($context) {
-    $moderatoremails = array();
-    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
-    $counter = 0;
-    foreach ($users as $key => $user) {
-        if ($counter == 5) {
-            break;
-        }
-        if(has_capability('mod/bigbluebuttonbn:moderate', $context, $user)) {
-            array_push($moderatoremails, '"' . fullname($user) . '" <' . $user->email . '>');
-            $counter += 1;
-        }
-    }
-    return $moderatoremails;
-}
