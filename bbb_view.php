@@ -232,7 +232,7 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
         $metadata["bn-recording-status"] = json_encode(
             array(
-                'email' => bigbluebuttonbn_get_moderator_email($bbbsession['context']),
+                'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
                 'context' => $bbbsession['bigbluebuttonbnURL']
               )
           );
