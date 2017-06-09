@@ -41,7 +41,7 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error('You must specify a course_module ID or a BigBlueButtonBN instance ID');
+    print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
 
 $context = context_module::instance($cm->id);
@@ -218,6 +218,8 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
 }
 
 function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
+    global $USER;
+
     $metadata = ['bbb-origin' => $bbbsession['origin'],
                  'bbb-origin-version' => $bbbsession['originVersion'],
                  'bbb-origin-server-name' => $bbbsession['originServerName'],
