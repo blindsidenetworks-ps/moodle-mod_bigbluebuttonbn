@@ -658,7 +658,7 @@ function bigbluebuttonbn_get_roles_select(context $context = null) {
 function bigbluebuttonbn_get_role($id) {
     $roles = (array) role_get_names();
     if (is_numeric($id)) {
-        return $roles[$id];
+        return (object)$roles[$id];
     }
 
     foreach ($roles as $role) {
@@ -666,6 +666,10 @@ function bigbluebuttonbn_get_role($id) {
             return $role;
         }
     }
+}
+
+function bigbluebuttonbn_role_unknown() {
+    return array("id" => "0", "name" => "", "shortname" => "unknown", "description" => "", "sortorder" => "0", "archetype" => "guest", "localname" => "Unknown");
 }
 
 function bigbluebuttonbn_get_participant_data($context) {
@@ -700,10 +704,17 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
 function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
     $rules = json_decode($bigbluebuttonbn->participants, true);
     foreach ($rules as $key => $rule) {
-        if ($rule['selectiontype'] === 'role' && !is_numeric($rule['selectionid'])) {
-            $role = bigbluebuttonbn_get_role($rule['selectionid']);
-            $rule['selectionid'] = $role->id;
+        if ( $rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid']) ) {
+            continue;
         }
+
+        $role = bigbluebuttonbn_get_role($rule['selectionid']);
+        if ( $role == null ) {
+            unset($rules[$key]);
+            continue;
+        }
+
+        $rule['selectionid'] = $role->id;
         $rules[$key] = $rule;
     }
     return $rules;

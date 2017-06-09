@@ -140,8 +140,9 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
 
     // User roles.
     $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
+    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
     $bbbsession['moderator'] = bigbluebuttonbn_is_moderator(
-        $context, $bigbluebuttonbn->participants, $bbbsession['userID'], $bbbsession['roles']);
+        $context, json_encode($participantlist), $bbbsession['userID'], $bbbsession['roles']);
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
         || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
     $bbbsession['importrecordings'] = ($bbbsession['managerecordings']
