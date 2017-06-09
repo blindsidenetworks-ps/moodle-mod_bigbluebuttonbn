@@ -614,7 +614,11 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             if( $participant->selectiontype == 'role' ) {
                 foreach( $roles as $role ) {
                     $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
-                    if( $participant->selectionid == $moodlerole->id ) {
+                    $moodleroleid = $moodlerole->id;
+                    if ( !is_int($participant->selectionid) ) {
+                        $moodleroleid = $moodlerole->shortname;
+                    }
+                    if( $participant->selectionid == $moodleroleid ) {
                         if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                             return true;
                         }
@@ -639,8 +643,8 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
 }
 
 function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
-    foreach( $db_moodle_roles as $db_moodle_role ){
-        if( $role_id ==  $db_moodle_role->id ) {
+    foreach( $db_moodle_roles as $db_moodle_role ) {
+        if ( $role_id == $db_moodle_role->id ) {
             return $db_moodle_role;
         }
     }
