@@ -65,17 +65,19 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participant_list_init: function() {
-        var selection_type_value, selection_value, selection_role, participant_selection;
+        var selection_type_value, selection_value, selection_role, participant_selection_types;
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
             selection_type_value = this.bigbluebuttonbn.participant_list[i].selectiontype;
             selection_value = this.bigbluebuttonbn.participant_list[i].selectionid;
             selection_role = this.bigbluebuttonbn.participant_list[i].role;
-
-            participant_selection = this.bigbluebuttonbn.participant_data[selection_type_value].children[selection_value];
-            if (typeof participant_selection != 'undefined') {
-                // Add it to the form.
-                this.participant_add_to_form(selection_type_value, selection_value, selection_role);
+            participant_selection_types = this.bigbluebuttonbn.participant_data[selection_type_value];
+            if (selection_type_value != 'all' && typeof participant_selection_types.children[selection_value] == 'undefined') {
+                // Remove from memory.
+                this.participant_remove_from_memory(selection_type_value, selection_value);
+                continue;
             }
+            // Add it to the form.
+            this.participant_add_to_form(selection_type_value, selection_value, selection_role);
         }
         // Update in the form.
         this.participant_list_update();
