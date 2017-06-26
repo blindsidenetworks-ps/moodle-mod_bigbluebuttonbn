@@ -210,7 +210,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
 
-        if ($version_major > '2016052300') {
+        if ($version_major >= '2016052300') {
             // Valid after v3.1
             $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
             $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);

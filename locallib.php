@@ -540,7 +540,9 @@ function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
     foreach ($rules as $key => $rule) {
         if ($rule['selectiontype'] === 'role' && !is_numeric($rule['selectionid'])) {
             $role = bigbluebuttonbn_get_role($rule['selectionid']);
-            $rule['selectionid'] = $role->id;
+            if ($role) {
+                $rule['selectionid'] = $role->id;
+            }
         }
         $rules[$key] = $rule;
     }
