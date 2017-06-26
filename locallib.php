@@ -542,6 +542,9 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
 
 function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
     $rules = json_decode($bigbluebuttonbn->participants, true);
+    if (!is_array($rules)) {
+        return array();
+    }
     foreach ($rules as $key => $rule) {
         if ($rule['selectiontype'] === 'role' && !is_numeric($rule['selectionid'])) {
             $role = bigbluebuttonbn_get_role($rule['selectionid']);
