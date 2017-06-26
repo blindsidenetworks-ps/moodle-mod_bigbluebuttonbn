@@ -457,15 +457,12 @@ function bigbluebuttonbn_get_users_select(context $context = null) {
 
 function bigbluebuttonbn_get_role_name($role_shortname) {
     $role = bigbluebuttonbn_get_role($role_shortname);
-
     if (!$role) {
         return get_string('mod_form_field_participant_role_unknown', 'bigbluebuttonbn');
     }
-
     if ($role->name != "") {
         return $role->name;
     }
-
     return role_get_name($role);
 }
 
@@ -503,7 +500,6 @@ function bigbluebuttonbn_get_role($id) {
     if (is_numeric($id)) {
         return $roles[$id];
     }
-
     foreach ($roles as $role) {
         if ($role->shortname == $id) {
             return $role;
@@ -518,17 +514,14 @@ function bigbluebuttonbn_get_participant_data($context) {
             'children' => []
           )
       );
-
     $data['role'] = array(
         'name' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
         'children' => bigbluebuttonbn_get_roles_select($context)
       );
-
     $data['user'] = array(
         'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
         'children' => bigbluebuttonbn_get_users_select($context)
       );
-
     return $data;
 }
 
@@ -536,7 +529,6 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
     if ($bigbluebuttonbn == null) {
         return bigbluebuttonbn_get_participant_list_default($context);
     }
-
     return bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn);
 }
 
@@ -557,13 +549,11 @@ function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
 
 function bigbluebuttonbn_get_participant_list_default($context) {
     global $USER;
-
     $participantlistarray = array();
     $participantlistarray[] = array(
         'selectiontype' => 'all',
         'selectionid' => 'all',
         'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
-
     $moderatordefaults = explode(',', bigbluebuttonbn_get_cfg_moderator_default());
     foreach ($moderatordefaults as $moderatordefault) {
         if ($moderatordefault == 'owner') {
@@ -575,13 +565,11 @@ function bigbluebuttonbn_get_participant_list_default($context) {
             }
             continue;
         }
-
         $participantlistarray[] = array(
               'selectiontype' => 'role',
               'selectionid' => $moderatordefault,
               'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
     }
-
     return $participantlistarray;
 }
 
@@ -600,40 +588,28 @@ function bigbluebuttonbn_get_participant_selection_data() {
 
 function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     $participantlist = json_decode($participants);
-
-    if (is_array($participantlist)) {
-        // Iterate looking for all configuration
-        foreach($participantlist as $participant) {
-            if( $participant->selectiontype == 'all' ) {
-                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
-                    return true;
-                }
+    if (!is_array($participantlist)) {
+        return false;
+    }
+    // Iterate looking for all configuration.
+    foreach($participantlist as $participant) {
+        if( $participant->selectiontype == 'all' ) {
+            if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
+                return true;
             }
         }
-
-        //Iterate looking for roles
-        $moodleroles = bigbluebuttonbn_get_moodle_roles();
-        foreach($participantlist as $participant) {
-            if( $participant->selectiontype == 'role' ) {
-                foreach( $roles as $role ) {
-                    $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
-                    $moodleroleid = $moodlerole->id;
-                    if ( !is_int($participant->selectionid) ) {
-                        $moodleroleid = $moodlerole->shortname;
-                    }
-                    if( $participant->selectionid == $moodleroleid ) {
-                        if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
-                            return true;
-                        }
-                    }
+    }
+    // Iterate looking for roles.
+    $moodleroles = bigbluebuttonbn_get_moodle_roles();
+    foreach($participantlist as $participant) {
+        if( $participant->selectiontype == 'role' ) {
+            foreach( $roles as $role ) {
+                $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
+                $moodleroleid = $moodlerole->id;
+                if ( !is_int($participant->selectionid) ) {
+                    $moodleroleid = $moodlerole->shortname;
                 }
-            }
-        }
-
-        //Iterate looking for users
-        foreach($participantlist as $participant) {
-            if( $participant->selectiontype == 'user' ) {
-                if( $participant->selectionid == $user ) {
+                if( $participant->selectionid == $moodleroleid ) {
                     if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                         return true;
                     }
@@ -641,7 +617,16 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
             }
         }
     }
-
+    // Iterate looking for users.
+    foreach($participantlist as $participant) {
+        if( $participant->selectiontype == 'user' ) {
+            if( $participant->selectionid == $user ) {
+                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
+                    return true;
+                }
+            }
+        }
+    }
     return false;
 }
 
