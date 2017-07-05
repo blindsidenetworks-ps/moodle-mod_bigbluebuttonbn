@@ -56,6 +56,12 @@ const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
 const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
 
+/**
+ * @param array  $bbbsession
+ * @param string $event
+ * @param array  $overrides
+ * @param string $meta
+ */
 function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null) {
     global $DB;
 
@@ -82,7 +88,14 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
     $DB->insert_record('bigbluebuttonbn_logs', $log);
 }
 
-// BigBlueButton API Calls.
+/**
+ * @param string $meetingid
+ * @param string $username
+ * @param string $pw
+ * @param string $logouturl
+ * @param string $configtoken
+ * @param string $userid
+ */
 function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
@@ -1023,8 +1036,7 @@ function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebutton
 }
 
 /**
- * @param string $recordingid
- * @param string $bigbluebuttonbnid
+ * @param string $id
  */
 function bigbluebuttonbn_delete_recording_imported($id) {
     global $DB;
@@ -1122,9 +1134,9 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
 
 function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
     if ($protected == 'true') {
-        return array('action' => 'unprotect', 'tag' => 'unlock');
+        return array('action' => 'unprotect', 'tag' => 'lock');
     }
-    return array('action' => 'protect', 'tag' => 'lock');
+    return array('action' => 'protect', 'tag' => 'unlock');
 }
 
 function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
@@ -1382,30 +1394,34 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
 }
 
 function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, &$table) {
+    $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+
+    if ($rowdata == null) {
+        return;
+    }
+
     $row = new html_table_row();
     $row->id = 'recording-td-'.$recording['recordID'];
     $row->attributes['data-imported'] = 'false';
     $texthead = '';
     $texttail = '';
     if (isset($recording['imported'])) {
-        $row->attributes['data-imported'] = 'true';
         $row->attributes['title'] = get_string('view_recording_link_warning', 'bigbluebuttonbn');
+        $row->attributes['data-imported'] = 'true';
         $texthead = '<em>';
         $texttail = '</em>';
     }
-
-    $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-    if ($rowdata != null) {
-        $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
-        $row->cells = array($texthead.$rowdata->recording.$texttail,
-            $texthead.$rowdata->activity.$texttail, $texthead.$rowdata->description.$texttail,
-            $rowdata->preview, $texthead.$rowdata->date_formatted.$texttail,
-            $rowdata->duration_formatted);
-        if ($bbbsession['managerecordings']) {
-            $row->cells[] = $rowdata->actionbar;
-        }
-        array_push($table->data, $row);
+    $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
+    $row->cells = array(
+        $texthead . $rowdata->recording . $texttail,
+        $texthead . $rowdata->activity . $texttail, $texthead . $rowdata->description . $texttail,
+        $rowdata->preview, $texthead . $rowdata->date_formatted . $texttail,
+        $rowdata->duration_formatted
+      );
+    if ($bbbsession['managerecordings']) {
+        $row->cells[] = $rowdata->actionbar;
     }
+    array_push($table->data, $row);
 }
 
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {

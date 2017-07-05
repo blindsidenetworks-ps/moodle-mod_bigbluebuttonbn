@@ -359,7 +359,7 @@ function bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $
         return bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings);
     }
     if ($action == 'recording_delete') {
-        return bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_delete($params, $recordings);
     }
     if ($action == 'recording_protect') {
         return bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $recordings);
@@ -459,7 +459,7 @@ function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $rec
       );
 }
 
-function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $recordings) {
+function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
     global $DB;
 
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
