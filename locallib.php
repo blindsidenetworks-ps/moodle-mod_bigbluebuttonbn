@@ -308,12 +308,12 @@ function bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, &$recor
 function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid = null, $subset = true) {
     global $DB;
 
-    $select = "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '".
-        BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+    $select = "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '" .
+        BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
     if ($bigbluebuttonbnid === null) {
-        $select = "courseid = '{$courseid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+        $select = "courseid = '{$courseid}' AND log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
     } else if ($subset) {
-        $select = "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_IMPORT."'";
+        $select = "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
     }
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
 
@@ -321,8 +321,13 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
     foreach ($recordsimported as $recordimported) {
         $meta = json_decode($recordimported->meta, true);
         $recording = $meta['recording'];
+        // Override imported flag with actual ID.
+        $recording['imported'] = $recordimported->id;
+        /////////////////////////////////////////
+        // MOCKUP TO BE DELETED BEFORE RELEASE
         // Force protected.
-        $recording['protected'] = 'true';
+        $recording['protected'] = 'false';
+        ////////////////////////////////////////
         $recordsimportedarray[$recording['recordID']] = $recording;
     }
 
@@ -1021,18 +1026,11 @@ function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebutton
  * @param string $recordingid
  * @param string $bigbluebuttonbnid
  */
-function bigbluebuttonbn_delete_recording_imported($recordingid, $bigbluebuttonbnid) {
+function bigbluebuttonbn_delete_recording_imported($id) {
     global $DB;
-    // Locate the record to be updated.
-    $records = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbnid,
-        'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
-    foreach ($records as $key => $record) {
-        $meta = json_decode($record->meta, true);
-        if ($recordingid == $meta['recording']['recordID']) {
-            // Execute delete.
-            $DB->delete_records('bigbluebuttonbn_logs', array('id' => $key));
-        }
-    }
+    // Execute delete.
+    $DB->delete_records('bigbluebuttonbn_logs', array('id' => $id));
+    return true;
 }
 
 /**
@@ -1512,8 +1510,8 @@ function bigbluebuttonbn_get_tags($id) {
  * @return associative array containing the recordings indexed by recordID, each recording is also a
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null,
-        $subset = true, $includedeleted = false) {
+function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
+        $includedeleted = false) {
     global $DB;
 
     // Gather the bigbluebuttonbnids whose meetingids should be included in the getRecordings request'.

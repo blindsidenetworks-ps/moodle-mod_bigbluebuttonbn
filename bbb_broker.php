@@ -257,7 +257,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         return;
     }
 
-    $callbackresponse = array('status' => false);
+    $callbackresponse = array('status' => true, 'found' => false);
 
     $courseid = $bbbsession['course']->id;
     $bigbluebuttonbnid = null;
@@ -289,6 +289,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
 
 function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     $callbackresponse['status'] = true;
+    $callbackresponse['found'] = true;
     $callbackresponse['published'] = (string) $recording['published'];
     if (!isset($params['meta'])) {
         return $callbackresponse;
@@ -465,7 +466,7 @@ function bigbluebuttonbn_broker_recording_action_delete($bbbsession, $params, $r
         // Execute delete on imported recording link.
         return array(
           'status' => bigbluebuttonbn_delete_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id
+              $recordings[$params['id']]['imported']
             )
           );
     }

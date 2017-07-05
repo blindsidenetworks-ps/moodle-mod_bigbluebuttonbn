@@ -371,7 +371,8 @@ function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars)
     }
     $recordings = bigbluebuttonbn_get_recordings(
         $bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
-        $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+        $bbbsession['bigbluebuttonbn']->recordings_deleted_activities
+      );
 
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.

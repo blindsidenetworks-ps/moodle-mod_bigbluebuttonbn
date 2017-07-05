@@ -148,7 +148,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_delete: function(element) {
         var extras = {
-            source: 'status',
+            source: 'found',
             goalstate: false
         };
         this.recording_action(element, true, extras);
