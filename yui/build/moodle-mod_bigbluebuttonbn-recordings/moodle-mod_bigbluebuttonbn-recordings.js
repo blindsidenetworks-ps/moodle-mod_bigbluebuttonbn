@@ -102,7 +102,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recording_confirmation_message(payload.action, payload.recordingid)
+            question: this.recording_confirmation_message(payload)
         });
 
         // If it is confirmed.
