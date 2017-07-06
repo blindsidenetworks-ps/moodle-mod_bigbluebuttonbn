@@ -1001,8 +1001,7 @@ function bigbluebuttonbn_delete_recording_imported($id) {
 }
 
 /**
- * @param string $recordids
- * @param string $bigbluebuttonbnid
+ * @param string $id
  * @param array $params ['key'=>param_key, 'value']
  */
 function bigbluebuttonbn_update_recording_imported($id, $params) {

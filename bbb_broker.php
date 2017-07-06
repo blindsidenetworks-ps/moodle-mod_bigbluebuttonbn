@@ -213,9 +213,6 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
-
-    $callbackresponse = array('status' => true);
-
     // Execute the end command.
     bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
     // Moodle event logger: Create an event for meeting ended.
@@ -225,20 +222,17 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
     }
     // Update the cache.
     bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_FORCED);
-
+    $callbackresponse = array('status' => true);
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
 
 function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
-
     if (!$bbbsession['managerecordings']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
-
     $callbackresponse = array('status' => false);
-
     if (isset($params['id']) && $params['id'] != '') {
         $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
         $callbackresponse['status'] = true;
@@ -249,7 +243,6 @@ function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
 }
 
 function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) {
-
     if (!$bbbsession['managerecordings']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
@@ -292,7 +285,6 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     if (!isset($params['meta'])) {
         return $callbackresponse;
     }
-
     $meta = json_decode($params['meta'], true);
     foreach (array_keys($meta) as $key) {
         if (isset($recording[$key])) {
@@ -348,10 +340,10 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
 function bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings) {
     if ($action == 'recording_publish') {
-        return bigbluebuttonbn_broker_recording_action_publish($params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'publish');
     }
     if ($action == 'recording_unpublish') {
-        return bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'unpublish');
     }
     if ($action == 'recording_edit') {
         return bigbluebuttonbn_broker_recording_action_edit($params, $recordings);
@@ -360,27 +352,11 @@ function bigbluebuttonbn_broker_recording_action_perform($action, $params, $reco
         return bigbluebuttonbn_broker_recording_action_delete($params, $recordings);
     }
     if ($action == 'recording_protect') {
-        return bigbluebuttonbn_broker_recording_action_protect($params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'protect');
     }
     if ($action == 'recording_unprotect') {
-        return bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'unprotect');
     }
-}
-
-function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'publish');
-}
-
-function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'unprotect');
-}
-
-function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'unpublish');
-}
-
-function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'protect');
 }
 
 function bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, $action) {
