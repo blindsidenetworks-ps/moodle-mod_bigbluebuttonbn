@@ -377,29 +377,6 @@ function bigbluebuttonbn_broker_recording_action_unprotect($bbbsession, $params,
     return bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, 'unprotect');
 }
 
-function bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, $action) {
-    $status = true;
-    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        // Execute publish or unprotect on imported recording link, if the real recording is published.
-        $realrecordings = bigbluebuttonbn_get_recordings_array(
-            $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
-        $status = ($realrecordings[$params['id']][$action.'ed'] === 'true');
-        if ($status) {
-            // Only if the physical recording is published, execute publish on imported recording link.
-            bigbluebuttonbn_publish_recording_imported($params['id'], $bbbsession['bigbluebuttonbn']->id, true);
-        }
-    } else {
-        // As the recordingid was not identified as imported recording link, execute publish on a real recording.
-        bigbluebuttonbn_publish_recordings($params['id'], 'true');
-    }
-
-    $response = array('status' => $status);
-    if (!$status) {
-        $response['message'] = get_string('view_recording_'.$action.'_link_error', 'bigbluebuttonbn');
-    }
-    return $response;
-}
-
 function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings) {
     return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'unpublish');
 }
@@ -408,15 +385,43 @@ function bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $
     return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'protect');
 }
 
+function bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, $action) {
+    $status = true;
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
+        // Execute publish or unprotect on imported recording link, if the real recording is published.
+        $realrecordings = bigbluebuttonbn_get_recordings_array(
+            $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
+        // Only if the physical recording exist and it is published, execute publish on imported recording link.
+        if (!isset($realrecordings[$params['id']])) {
+            return array(
+                'status' => false,
+                'message' => get_string('view_recording_'.$action.'_link_deleted', 'bigbluebuttonbn')
+              );
+        }
+        if ($realrecordings[$params['id']][$action.'ed'] !== 'true') {
+            return array(
+                'status' => false,
+                'message' => get_string('view_recording_'.$action.'_link_not_'.$action.'ed', 'bigbluebuttonbn')
+              );
+        }
+        return array(
+            'status' => bigbluebuttonbn_publish_recording_imported($recordings[$params['id']]['imported'], true)
+          );
+    }
+
+    // As the recordingid was not identified as imported recording link, execute publish on a real recording.
+    return array(
+        'status' => bigbluebuttonbn_publish_recordings($params['id'], 'true')
+      );
+}
+
 function bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, $action) {
     global $DB;
 
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unpublish or protect on imported recording link.
         return array(
-          'status' => bigbluebuttonbn_publish_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id, false
-            )
+            'status' => bigbluebuttonbn_publish_recording_imported($recordings[$params['id']]['imported'], false)
           );
     }
 
@@ -430,14 +435,41 @@ function bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $
             // Prepare data for the update.
             $meta['recording'][$action.'ed'] = 'false';
             $importedall[$key]->meta = json_encode($meta);
-
             // Proceed with the update.
             $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
         }
     }
-    // Second: Execute the real unpublish.
+    // Second: Execute the actual unpublish.
     return array(
       'status' => bigbluebuttonbn_publish_recordings($params['id'], 'false')
+      );
+}
+
+function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
+    global $DB;
+
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
+        // Execute delete on imported recording link.
+        return array(
+          'status' => bigbluebuttonbn_delete_recording_imported(
+              $recordings[$params['id']]['imported']
+            )
+          );
+    }
+
+    // As the recordingid was not identified as imported recording link, execute delete on a real recording.
+    // First: Delete imported links associated to the recording.
+    $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
+
+    if ($importedall > 0) {
+        foreach (array_keys($importedall) as $key) {
+            // Execute delete on imported links.
+            $DB->delete_records('bigbluebuttonbn_logs', array('id' => $key));
+        }
+    }
+    // Second: Execute the actual delete.
+    return array(
+      'status' => bigbluebuttonbn_delete_recordings($params['id'])
       );
 }
 
@@ -456,34 +488,6 @@ function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $rec
     // Execute update on actual recording.
     return array(
       'status' => bigbluebuttonbn_update_recordings($params['id'], json_decode($params['meta']))
-      );
-}
-
-function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
-    global $DB;
-
-    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        // Execute delete on imported recording link.
-        return array(
-          'status' => bigbluebuttonbn_delete_recording_imported(
-              $recordings[$params['id']]['imported']
-            )
-          );
-    }
-
-    // As the recordingid was not identified as imported recording link, execute delete on a real recording.
-    // Delete imported links associated to the recording.
-    $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-
-    if ($importedall > 0) {
-        foreach (array_keys($importedall) as $key) {
-            // Execute delete on imported links.
-            $DB->delete_records('bigbluebuttonbn_logs', array('id' => $key));
-        }
-    }
-    // Execute the actual delete.
-    return array(
-      'status' => bigbluebuttonbn_delete_recordings($params['id'])
       );
 }
 

@@ -1014,25 +1014,20 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $forced = false) {
 }
 
 /**
- * @param string $recordingid
- * @param string $bigbluebuttonbnid
+ * @param string $id
  * @param boolean $publish
  */
-function bigbluebuttonbn_publish_recording_imported($recordingid, $bigbluebuttonbnid, $publish = true) {
+function bigbluebuttonbn_publish_recording_imported($id, $publish = true) {
     global $DB;
     // Locate the record to be updated.
-    $records = $DB->get_records('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bigbluebuttonbnid,
-        'log' => BIGBLUEBUTTONBN_LOG_EVENT_IMPORT));
-    foreach ($records as $key => $record) {
-        $meta = json_decode($record->meta, true);
-        if ($recordingid == $meta['recording']['recordID']) {
-            // Found, prepare data for the update.
-            $meta['recording']['published'] = ($publish) ? 'true' : 'false';
-            $records[$key]->meta = json_encode($meta);
-            // Proceed with the update.
-            $DB->update_record('bigbluebuttonbn_logs', $records[$key]);
-        }
-    }
+    $record = $DB->get_record('bigbluebuttonbn_logs', array('id' => $id));
+    $meta = json_decode($record->meta, true);
+    // Prepare data for the update.
+    $meta['recording']['published'] = ($publish) ? 'true' : 'false';
+    $record->meta = json_encode($meta);
+    // Proceed with the update.
+    $DB->update_record('bigbluebuttonbn_logs', $record);
+    return true;
 }
 
 /**
