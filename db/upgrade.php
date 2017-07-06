@@ -72,7 +72,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2016080112) {
+    if ($oldversion < 2016080114) {
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
 
@@ -98,7 +98,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_html',
             $fielddefinition);
 
-        // Add field recordings_deleted_activities.
+        // Add field recordings_deleted.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
                                   'precision' => '1',
                                   'unsigned' => null,
@@ -106,13 +106,24 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
                                   'sequence' => null,
                                   'default' => 1,
                                   'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted_activities',
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted',
+            $fielddefinition);
+
+        // Add field recordings_imported.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
+                                  'precision' => '1',
+                                  'unsigned' => null,
+                                  'notnull' => XMLDB_NOTNULL,
+                                  'sequence' => null,
+                                  'default' => 0,
+                                  'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
 
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'tagging');
 
-        upgrade_mod_savepoint(true, 2016080112, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2016080114, 'bigbluebuttonbn');
     }
 
     return true;
