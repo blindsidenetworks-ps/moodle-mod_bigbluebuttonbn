@@ -399,8 +399,8 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->record)) {
         $bigbluebuttonbn->record = 0;
     }
-    if (!isset($bigbluebuttonbn->recordings_deleted_activities)) {
-        $bigbluebuttonbn->recordings_deleted_activities = 0;
+    if (!isset($bigbluebuttonbn->recordings_deleted)) {
+        $bigbluebuttonbn->recordings_deleted = 0;
     }
     if (!isset($bigbluebuttonbn->recordings_html)) {
         $bigbluebuttonbn->recordings_html = 0;

@@ -255,7 +255,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
     if ($showroom) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
-    $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted_activities;
+    $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
     // Retrieve the array of imported recordings.
     $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
     if (array_key_exists($params['id'], $recordings)) {
@@ -320,7 +320,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
     $recordings = bigbluebuttonbn_get_recordings($bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
-        $bbbsession['bigbluebuttonbn']->recordings_deleted_activities);
+        $bbbsession['bigbluebuttonbn']->recordings_deleted);
 
     $action = strtolower($params['action']);
     $events = bigbluebuttonbn_events_action();

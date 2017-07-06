@@ -57,10 +57,10 @@ $string['config_feature_recordings_html_default'] = 'UI as html is enabled by de
 $string['config_feature_recordings_html_default_description'] = 'If enabled the recording table is shown in plain HTML by default.';
 $string['config_feature_recordings_html_editable'] = 'UI as html feature can be edited';
 $string['config_feature_recordings_html_editable_description'] = 'UI as html value by default can be edited when the recordingbn is added or updated.';
-$string['config_feature_recordings_deleted_activities_default'] = 'Include recordings from deleted activities enabled by default';
-$string['config_feature_recordings_deleted_activities_default_description'] = 'If enabled the recording table will include the recordings belonging to deleted activities if there is any.';
-$string['config_feature_recordings_deleted_activities_editable'] = 'Include recordings from deleted activities feature can be edited';
-$string['config_feature_recordings_deleted_activities_editable_description'] = 'Include recordings from deleted activities by default can be edited when the recordingbn is added or updated.';
+$string['config_feature_recordings_deleted_default'] = 'Include recordings from deleted activities enabled by default';
+$string['config_feature_recordings_deleted_default_description'] = 'If enabled the recording table will include the recordings belonging to deleted activities if there is any.';
+$string['config_feature_recordings_deleted_editable'] = 'Include recordings from deleted activities feature can be edited';
+$string['config_feature_recordings_deleted_editable_description'] = 'Include recordings from deleted activities by default can be edited when the recordingbn is added or updated.';
 
 $string['config_feature_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_feature_importrecordings_description'] = 'These settings are feature specific';
@@ -193,7 +193,7 @@ $string['mod_form_field_notification_msg_created'] = 'created';
 $string['mod_form_field_notification_msg_modified'] = 'modified';
 $string['mod_form_field_notification_msg_at'] = 'at';
 $string['mod_form_field_recordings_html'] = 'Show the table in plain html';
-$string['mod_form_field_recordings_deleted_activities'] = 'Include recordings from deleted activities';
+$string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted activities';
 
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';

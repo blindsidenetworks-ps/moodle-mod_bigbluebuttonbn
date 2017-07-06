@@ -129,8 +129,8 @@ if ($ADMIN->fulltree) {
 
     if (!isset($CFG->bigbluebuttonbn['recordings_html_default']) ||
         !isset($CFG->bigbluebuttonbn['recordings_html_editable']) ||
-        !isset($CFG->bigbluebuttonbn['recordings_deleted_activities_default']) ||
-        !isset($CFG->bigbluebuttonbn['recordings_deleted_activities_editable'])) {
+        !isset($CFG->bigbluebuttonbn['recordings_deleted_default']) ||
+        !isset($CFG->bigbluebuttonbn['recordings_deleted_editable'])) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recordings',
                     get_string('config_feature_recordings', 'bigbluebuttonbn'),
                     get_string('config_feature_recordings_description', 'bigbluebuttonbn')));
@@ -149,17 +149,17 @@ if ($ADMIN->fulltree) {
                     0));
         }
 
-        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_activities_default'])) {
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_default',
-                    get_string('config_feature_recordings_deleted_activities_default', 'bigbluebuttonbn'),
-                    get_string('config_feature_recordings_deleted_activities_default_description', 'bigbluebuttonbn'),
+        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_default'])) {
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_default',
+                    get_string('config_feature_recordings_deleted_default', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_deleted_default_description', 'bigbluebuttonbn'),
                     1));
         }
-        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_activities_editable'])) {
+        if (!isset($CFG->bigbluebuttonbn['recordings_deleted_editable'])) {
             // UI for 'recording' feature.
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_activities_editable',
-                    get_string('config_feature_recordings_deleted_activities_editable', 'bigbluebuttonbn'),
-                    get_string('config_feature_recordings_deleted_activities_editable_description', 'bigbluebuttonbn'),
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordings_deleted_editable',
+                    get_string('config_feature_recordings_deleted_editable', 'bigbluebuttonbn'),
+                    get_string('config_feature_recordings_deleted_editable_description', 'bigbluebuttonbn'),
                     0));
         }
     }

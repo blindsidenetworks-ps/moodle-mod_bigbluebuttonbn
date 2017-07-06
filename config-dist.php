@@ -261,11 +261,11 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
 /*
  * When the value is set to 1 (checked) the bigbluebuttonbn resources
  * will show the recodings belonging to deleted activities as part of the list.
- * $CFG->bigbluebuttonbn['recordings_deleted_activities_default'] = 1;
+ * $CFG->bigbluebuttonbn['recordings_deleted_default'] = 1;
  */
 
 /*
  * When the value is set to 1 (checked) the 'include recordings from deleted activities'
  * capability can be enabled/disabled by the user creating or editing the resource.
- * $CFG->bigbluebuttonbn['recordings_deleted_activities_editable'] = 0;
+ * $CFG->bigbluebuttonbn['recordings_deleted_editable'] = 0;
  */

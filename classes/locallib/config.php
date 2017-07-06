@@ -72,8 +72,8 @@ class config {
             'scheduled_pre_opening' => '10',
             'recordings_html_default' => 'false',
             'recordings_html_editable' => 'false',
-            'recordings_deleted_activities_default' => 'false',
-            'recordings_deleted_activities_editable' => 'false'
+            'recordings_deleted_default' => 'false',
+            'recordings_deleted_editable' => 'false'
 
         );
     }
@@ -134,8 +134,8 @@ class config {
                'sendnotifications_enabled' => self::get('sendnotifications_enabled'),
                'recordings_html_default' => self::get('recordings_html_default'),
                'recordings_html_editable' => self::get('recordings_html_editable'),
-               'recordings_deleted_activities_default' => self::get('recordings_deleted_activities_default'),
-               'recordings_deleted_activities_editable' => self::get('recordings_deleted_activities_editable'),
+               'recordings_deleted_default' => self::get('recordings_deleted_default'),
+               'recordings_deleted_editable' => self::get('recordings_deleted_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
                'instance_type_enabled' => self::recordings_enabled(),
                'instance_type_default' => BIGBLUEBUTTONBN_TYPE_ALL,
