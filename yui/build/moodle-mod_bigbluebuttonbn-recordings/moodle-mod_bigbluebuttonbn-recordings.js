@@ -474,12 +474,13 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('id', id);
 
         button = link.one('> i');
+        console.info(button);
         if (button === null) {
             // For backward compatibility.
             button = link.one('> img');
         }
 
-        button.setAttribute('id', id);
+        button.removeAttribute('id');
     },
 
     element_id: function(action, target) {
@@ -492,8 +493,8 @@ M.mod_bigbluebuttonbn.helpers = {
 
     init_element_tag: function() {
         var tags = {};
-        tags.publish = 'show';
-        tags.unpublish = 'hide';
+        tags.publish = 'hide';
+        tags.unpublish = 'show';
         tags.protect = 'lock';
         tags.unprotect = 'unlock';
         tags.edit = 'edit';
@@ -505,8 +506,8 @@ M.mod_bigbluebuttonbn.helpers = {
 
     init_element_fa_class: function() {
         var tags = {};
-        tags.publish = 'icon fa fa-eye fa-fw iconsmall';
-        tags.unpublish = 'icon fa fa-eye-slash fa-fw iconsmall';
+        tags.publish = 'icon fa fa-eye-slash fa-fw iconsmall';
+        tags.unpublish = 'icon fa fa-eye fa-fw iconsmall';
         tags.protect = 'icon fa fa-lock fa-fw iconsmall';
         tags.unprotect = 'icon fa fa-unlock fa-fw iconsmall';
         tags.edit = 'icon fa fa-pencil fa-fw iconsmall';
