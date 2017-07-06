@@ -22,7 +22,6 @@ M.mod_bigbluebuttonbn.recordings = {
 
     datasource: null,
     locale: 'en',
-    profilefeatures: {},
     datatable: {},
 
     /**
@@ -34,11 +33,9 @@ M.mod_bigbluebuttonbn.recordings = {
         this.datasource = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
-        this.locale = data.locale;
-        this.profilefeatures = data.profile_features;
-
         if (data.recordings_html === false &&
-            (this.profilefeatures.includes('all') || this.profilefeatures.includes('showrecordings'))) {
+            (data.profile_features.includes('all') || data.profile_features.includes('showrecordings'))) {
+            this.locale = data.locale;
             this.datatable.columns = data.columns;
             this.datatable.data = this.datatable_init_format_dates(data.data);
             this.datatable_init();

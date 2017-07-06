@@ -89,7 +89,7 @@ if (empty($options)) {
     if (!empty($recordings)) {
         $output .= html_writer::tag('span', '',
             ['id' => 'import_recording_links_table', 'name' => 'import_recording_links_table']);
-        $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['importing']);
+        $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['import']);
     } else {
         $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     }
@@ -107,6 +107,9 @@ if (empty($options)) {
         array(array('bn' => $bn, 'tc' => $selected)));
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init',
         array());
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings', 'M.mod_bigbluebuttonbn.recordings.init',
+        array('recordings_html' => true));
+
 }
 
 $output .= $OUTPUT->footer();

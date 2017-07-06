@@ -1148,9 +1148,7 @@ function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $t
     if ($tool == 'publish') {
         return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
     }
-    if ($tool == 'delete' || $tool == 'import') {
-        return array('action' => $tool, 'tag' => $tool);
-    }
+    return array('action' => $tool, 'tag' => $tool);
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
