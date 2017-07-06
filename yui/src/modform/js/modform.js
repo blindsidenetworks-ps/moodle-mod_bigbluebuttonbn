@@ -55,6 +55,7 @@ M.mod_bigbluebuttonbn.modform = {
 
         // Show recordings settings validation.
         this.show_fieldset('id_recordings', show_all || features.includes('showrecordings'));
+        this.show_input('id_recordings_imported', features.includes('showrecordings'));
 
         // Preuploadpresentation feature validation.
         this.show_fieldset('id_preuploadpresentation', show_all ||
@@ -80,6 +81,23 @@ M.mod_bigbluebuttonbn.modform = {
         }
 
         Y.DOM.setStyle(fieldset, 'display', 'none');
+    },
+
+    show_input: function(id, show) {
+        // Show room settings validation.
+        var inputset = Y.DOM.byId(id);
+        if (!inputset) {
+            return;
+        }
+
+        var node = Y.one(inputset).ancestor('div').ancestor('div');
+
+        if (show) {
+            node.setStyle('display', 'block');
+            return;
+        }
+
+        node.setStyle('display', 'none');
     },
 
     participant_selection_set: function() {

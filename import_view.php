@@ -72,10 +72,10 @@ if (empty($options)) {
     // Get course recordings.
     if ($course->id == $selected) {
         $recordings = bigbluebuttonbn_get_recordings($selected, $bigbluebuttonbn->id, false,
-            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_activities_enabled'));
+            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
     } else {
         $recordings = bigbluebuttonbn_get_recordings($selected, null, false,
-            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_activities_enabled'));
+            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
     }
     if (!empty($recordings)) {
         // Exclude the ones that are already imported.

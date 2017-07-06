@@ -61,13 +61,17 @@ $string['config_feature_recordings_deleted_default'] = 'Include recordings from 
 $string['config_feature_recordings_deleted_default_description'] = 'If enabled the recording table will include the recordings belonging to deleted activities if there is any.';
 $string['config_feature_recordings_deleted_editable'] = 'Include recordings from deleted activities feature can be edited';
 $string['config_feature_recordings_deleted_editable_description'] = 'Include recordings from deleted activities by default can be edited when the recordingbn is added or updated.';
+$string['config_feature_recordings_imported_default'] = 'Show only imported links enabled by default';
+$string['config_feature_recordings_imported_default_description'] = 'If enabled the recording table will include only the imported links to recordings.';
+$string['config_feature_recordings_imported_editable'] = 'Show only imported links feature can be edited';
+$string['config_feature_recordings_imported_editable_description'] = 'Show only imported links by default can be edited when the recordingbn is added or updated.';
 
 $string['config_feature_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_feature_importrecordings_description'] = 'These settings are feature specific';
 $string['config_feature_importrecordings_enabled'] = 'Import recordings enabled';
 $string['config_feature_importrecordings_enabled_description'] = 'When this and the recording feature are enabled, it is possible to import recordings from different courses into an activity.';
-$string['config_feature_importrecordings_from_deleted_activities_enabled'] = 'Import recordings from deleted activities enabled';
-$string['config_feature_importrecordings_from_deleted_activities_enabled_description'] = 'When this and the import recording feature are enabled, it is possible to import recordings from activities that are no longer in the course.';
+$string['config_feature_importrecordings_from_deleted_enabled'] = 'Import recordings from deleted activities enabled';
+$string['config_feature_importrecordings_from_deleted_enabled_description'] = 'When this and the import recording feature are enabled, it is possible to import recordings from activities that are no longer in the course.';
 
 $string['config_feature_waitformoderator'] = 'Configuration for "Wait for moderator" feature';
 $string['config_feature_waitformoderator_description'] = 'These settings are feature specific';
@@ -194,6 +198,7 @@ $string['mod_form_field_notification_msg_modified'] = 'modified';
 $string['mod_form_field_notification_msg_at'] = 'at';
 $string['mod_form_field_recordings_html'] = 'Show the table in plain html';
 $string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted activities';
+$string['mod_form_field_recordings_imported'] = 'Show only imported links';
 
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';

@@ -104,7 +104,7 @@ $CFG->bigbluebuttonbn['importrecordings_enabled'] = 0;
  * When the value is set to 1 (checked) the import recordings capability
  * can import recordings from deleted activities.
  */
-$CFG->bigbluebuttonbn['importrecordings_from_deleted_activities_enabled'] = 0;
+$CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled'] = 0;
 
 /*
  * 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
@@ -269,3 +269,15 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  * capability can be enabled/disabled by the user creating or editing the resource.
  * $CFG->bigbluebuttonbn['recordings_deleted_editable'] = 0;
  */
+
+ /*
+  * When the value is set to 1 (checked) the bigbluebuttonbn resources for recordings
+  * will show only the imported links as part of the list.
+  * $CFG->bigbluebuttonbn['recordings_imported_default'] = 0;
+  */
+
+ /*
+  * When the value is set to 1 (checked) the 'show only imported links'
+  * capability can be enabled/disabled by the user creating or editing the resource for recordings.
+  * $CFG->bigbluebuttonbn['recordings_imported_editable'] = 1;
+  */

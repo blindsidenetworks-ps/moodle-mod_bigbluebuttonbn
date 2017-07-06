@@ -54,7 +54,7 @@ class config {
             'recording_editable' => 'true',
             'recording_icons_enabled' => 'true',
             'importrecordings_enabled' => 'false',
-            'importrecordings_from_deleted_activities_enabled' => 'false',
+            'importrecordings_from_deleted_enabled' => 'false',
             'waitformoderator_default' => 'false',
             'waitformoderator_editable' => 'true',
             'waitformoderator_ping_interval' => '10',
@@ -73,8 +73,9 @@ class config {
             'recordings_html_default' => 'false',
             'recordings_html_editable' => 'false',
             'recordings_deleted_default' => 'false',
-            'recordings_deleted_editable' => 'false'
-
+            'recordings_deleted_editable' => 'false',
+            'recordings_imported_default' => 'false',
+            'recordings_imported_editable' => 'false'
         );
     }
 
@@ -136,6 +137,8 @@ class config {
                'recordings_html_editable' => self::get('recordings_html_editable'),
                'recordings_deleted_default' => self::get('recordings_deleted_default'),
                'recordings_deleted_editable' => self::get('recordings_deleted_editable'),
+               'recordings_imported_default' => self::get('recordings_imported_default'),
+               'recordings_imported_editable' => self::get('recordings_imported_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
                'instance_type_enabled' => self::recordings_enabled(),
                'instance_type_default' => BIGBLUEBUTTONBN_TYPE_ALL,
