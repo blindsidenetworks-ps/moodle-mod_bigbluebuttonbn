@@ -151,7 +151,7 @@ M.mod_bigbluebuttonbn.recordings = {
             source: 'found',
             goalstate: false
         };
-        this.recording_action(element, true, extras);
+        this.recording_action(element, (this.recording_is_imported(element) == 'false'), extras);
     },
 
     recording_import: function(element) {
@@ -323,5 +323,11 @@ M.mod_bigbluebuttonbn.recordings = {
         playbacks.show();
         preview.show();
         M.mod_bigbluebuttonbn.helpers.reload_preview(data);
+    },
+
+    recording_is_imported: function(element) {
+        var nodeelement = Y.one(element);
+        var node = nodeelement.ancestor('tr');
+        return node.getAttribute('data-imported');
     }
 };

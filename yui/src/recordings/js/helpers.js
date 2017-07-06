@@ -145,7 +145,6 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('id', id);
 
         button = link.one('> i');
-        console.info(button);
         if (button === null) {
             // For backward compatibility.
             button = link.one('> img');
