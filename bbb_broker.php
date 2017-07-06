@@ -202,15 +202,13 @@ function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $pa
 }
 
 function bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running) {
-    $status = array("can_end" => false);
     if ($running && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
-        $status["can_end"] = true;
+        return array("can_end" => true);
     }
-    return $status;
+    return array("can_end" => false);
 }
 
 function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
-
     if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
@@ -337,7 +335,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     // Excecute action.
     $eventlog = $events[$action];
-    $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $params, $recordings);
+    $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings);
     if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
         bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], $bbbsession['cm'],
@@ -348,45 +346,44 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     return "{$params['callback']}({$callbackresponsedata});";
 }
 
-function bigbluebuttonbn_broker_recording_action_perform($action, $bbbsession, $params, $recordings) {
+function bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings) {
     if ($action == 'recording_publish') {
-        return bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_publish($params, $recordings);
     }
     if ($action == 'recording_unpublish') {
-        return bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings);
     }
     if ($action == 'recording_edit') {
-        return bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_edit($params, $recordings);
     }
     if ($action == 'recording_delete') {
         return bigbluebuttonbn_broker_recording_action_delete($params, $recordings);
     }
     if ($action == 'recording_protect') {
-        return bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_protect($params, $recordings);
     }
     if ($action == 'recording_unprotect') {
-        return bigbluebuttonbn_broker_recording_action_unprotect($bbbsession, $params, $recordings);
+        return bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings);
     }
 }
 
-function bigbluebuttonbn_broker_recording_action_publish($bbbsession, $params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, 'publish');
+function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'publish');
 }
 
-function bigbluebuttonbn_broker_recording_action_unprotect($bbbsession, $params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, 'unprotect');
+function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, 'unprotect');
 }
 
-function bigbluebuttonbn_broker_recording_action_unpublish($bbbsession, $params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'unpublish');
+function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'unpublish');
 }
 
-function bigbluebuttonbn_broker_recording_action_protect($bbbsession, $params, $recordings) {
-    return bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, 'protect');
+function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
+    return bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, 'protect');
 }
 
-function bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $params, $recordings, $action) {
-    $status = true;
+function bigbluebuttonbn_broker_recording_action_publishunprotect($params, $recordings, $action) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute publish or unprotect on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
@@ -415,7 +412,7 @@ function bigbluebuttonbn_broker_recording_action_publishunprotect($bbbsession, $
       );
 }
 
-function bigbluebuttonbn_broker_recording_action_unpublishprotect($bbbsession, $params, $recordings, $action) {
+function bigbluebuttonbn_broker_recording_action_unpublishprotect($params, $recordings, $action) {
     global $DB;
 
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
@@ -473,12 +470,12 @@ function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
       );
 }
 
-function bigbluebuttonbn_broker_recording_action_edit($bbbsession, $params, $recordings) {
+function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute update on imported recording link.
         return array(
           'status' => bigbluebuttonbn_update_recording_imported(
-              $params['id'], $bbbsession['bigbluebuttonbn']->id, json_decode($params['meta'], true)
+              $recordings[$params['id']]['imported'], json_decode($params['meta'], true)
             )
           );
     }
