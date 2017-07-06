@@ -1297,15 +1297,14 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     $recordingsbncolumns = array(
         array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true),
         array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true),
-        array('key' => 'description', 'label' => $description, 'width' => '250px', 'sortable' => true,
-            'width' => '250px', 'allowHTML' => true),
+        array('key' => 'description', 'label' => $description, 'sortable' => true, 'width' => '250px', 'allowHTML' => true),
         array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true),
         array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true),
         array('key' => 'duration', 'label' => $duration, 'width' => '50px'),
         );
 
     if ($bbbsession['managerecordings']) {
-        array_push($recordingsbncolumns, array('key' => 'actionbar', 'label' => $actionbar, 'width' => '100px',
+        array_push($recordingsbncolumns, array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px',
             'allowHTML' => true));
     }
 

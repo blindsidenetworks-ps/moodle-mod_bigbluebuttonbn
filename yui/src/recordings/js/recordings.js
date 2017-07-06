@@ -63,7 +63,7 @@ M.mod_bigbluebuttonbn.recordings = {
             lang: this.locale
         }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
             var table = new Y.DataTable({
-                width: "1075px",
+                width: "1195px",
                 columns: columns,
                 data: data,
                 rowsPerPage: 10,
