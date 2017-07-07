@@ -1519,6 +1519,13 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid, $bigbluebut
         BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
 }
 
+function bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid = null, $subset = true,
+        $includedeleted = false) {
+        $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
+        $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $showroom);
+        return ($recordings + $recordingsimported);
+}
+
 /**
  * helper function to retrieve recordings from the BigBlueButton. The references are stored as events
  * in bigbluebuttonbn_logs.

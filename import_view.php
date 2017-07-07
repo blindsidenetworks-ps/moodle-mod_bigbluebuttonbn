@@ -70,18 +70,19 @@ if (empty($options)) {
     $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected));
 
     // Get course recordings.
+    $bigbluebuttonbnid = null;
     if ($course->id == $selected) {
-        $recordings = bigbluebuttonbn_get_recordings($selected, $bigbluebuttonbn->id, false,
-            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
-    } else {
-        $recordings = bigbluebuttonbn_get_recordings($selected, null, false,
-            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
+        $bigbluebuttonbnid = $bigbluebuttonbn->id;
     }
+    $recordings = bigbluebuttonbn_get_allrecordings($selected, $bigbluebuttonbnid, false,
+            (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
+
+    // Exclude the ones that are already imported.
     if (!empty($recordings)) {
-        // Exclude the ones that are already imported.
         $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
             $course->id, $bigbluebuttonbn->id);
     }
+
     // Store recordings (indexed) in a session variable.
     $SESSION->bigbluebuttonbn_importrecordings = $recordings;
 
@@ -118,13 +119,8 @@ $output .= $OUTPUT->footer();
 echo $output;
 
 function bigbluebuttonbn_selected_course($options, $tc = '') {
-    if (empty($options)) {
-        $selected = '';
-    } else if (array_key_exists($tc, $options)) {
-        $selected = $tc;
-    } else {
-        $selected = '';
+    if (array_key_exists($tc, $options)) {
+        return $tc;
     }
-
-    return $selected;
+    return '';
 }
