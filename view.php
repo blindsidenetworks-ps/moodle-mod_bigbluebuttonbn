@@ -73,6 +73,7 @@ if (is_null($serverversion)) {
         $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
     exit;
 }
+$bbbsession['serverversion'] = (string) $serverversion;
 
 // Mark viewed by user (if required).
 $completion = new completion_info($course);

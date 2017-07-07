@@ -1066,13 +1066,14 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     global $USER;
     $row = null;
     $managerecordings = $bbbsession['managerecordings'];
+    $editable = ($bbbsession['managerecordings'] && (double)$bbbsession['serverversion'] >= 1.0);
     if ($managerecordings || $recording['published'] == 'true') {
         $row = new stdClass();
         // Set recording_types.
         $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
         // Set activity name and description.
-        $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $managerecordings);
-        $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $managerecordings);
+        $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
+        $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
         // Set recording_preview.
         $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
         // Set date.
@@ -1196,15 +1197,16 @@ function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $edita
     if ($editable) {
         $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
             'action' => 'edit', 'tag' => 'edit',
-            'target' => 'name', 'source' => 'meta_bbb-recording-name');
+            'target' => 'name');
     }
     if (isset($recording['meta_contextactivity'])) {
-        $payload['source'] = 'meta_contextactivity';
-        return bigbluebuttonbn_get_recording_data_row_text($recording, $recording[$payload['source']], $payload);
+        $metaname = trim($recording['meta_contextactivity']);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, 'meta_contextactivity', $payload);
     }
 
     if (isset($recording['meta_bbb-recording-name'])) {
-        return bigbluebuttonbn_get_recording_data_row_text($recording, $recording[$payload['source']], $payload);
+        $metaname = trim($recording['meta_bbb-recording-name']);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, 'meta_bbb-recording-name', $payload);
     }
 
     return bigbluebuttonbn_get_recording_data_row_text($recording, $recording['meetingName'], $payload);
@@ -1215,28 +1217,27 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $ed
     if ($editable) {
         $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
             'action' => 'edit', 'tag' => 'edit',
-            'target' => 'description', 'source' => 'meta_bbb-recording-description');
+            'target' => 'description');
     }
 
     if (isset($recording['meta_contextactivitydescription'])) {
-        $payload['source'] = 'meta_contextactivitydescription';
-        $metadescription = trim($recording[$payload['source']]);
+        $metadescription = trim($recording['meta_contextactivitydescription']);
         if (!empty($metadescription)) {
-            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $payload);
+            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $source, $payload);
         }
     }
 
     if (isset($recording['meta_bbb-recording-description'])) {
-        $metadescription = trim($recording[$payload['source']]);
+        $metadescription = trim($recording['meta_bbb-recording-description']);
         if (!empty($metadescription)) {
-            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $payload);
+            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, 'meta_bbb-recording-description', $payload);
         }
     }
 
     return bigbluebuttonbn_get_recording_data_row_text($recording, '', $payload);
 }
 
-function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $data) {
+function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source, $data) {
     $htmltext = '<span>' . htmlentities($text) . '</span>';
 
     if (empty($data)) {
@@ -1247,12 +1248,15 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $data) {
     $id = 'recording-' . $target . '-' . $data['recordingid'];
     $attributes = array('id' => $id, 'class' => 'quickeditlink col-md-20',
         'data-recordingid' => $data['recordingid'], 'data-meetingid' => $data['meetingid'],
-        'data-target' => $data['target'], 'data-source' => $data['source']);
+        'data-target' => $data['target'], 'data-source' => $source);
     $head = html_writer::start_tag('div', $attributes);
     $tail = html_writer::end_tag('div');
 
     $payload = array('action' => $data['action'], 'tag' => $data['tag'], 'target' => $data['target']);
-    $htmllink = bigbluebuttonbn_actionbar_render_button($recording, $payload);
+    //$htmllink = '';
+    //if ($addbutton) {
+        $htmllink = bigbluebuttonbn_actionbar_render_button($recording, $payload);
+    //}
 
     return $head . $htmltext . $htmllink . $tail;
 }
