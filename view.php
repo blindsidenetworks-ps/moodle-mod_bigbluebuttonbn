@@ -116,7 +116,7 @@ echo $OUTPUT->header();
 
 bigbluebuttonbn_view_groups($bbbsession);
 
-bigbluebuttonbn_view_main($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession, $bigbluebuttonbn));
+bigbluebuttonbn_view_render($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession, $bigbluebuttonbn));
 
 // Output finishes.
 echo $OUTPUT->footer();
@@ -281,7 +281,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     echo '<br><br>';
 }
 
-function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
+function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     global $OUTPUT, $PAGE;
 
     $type = null;
@@ -304,16 +304,16 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
     if ($enabledfeatures['showroom']) {
-        $output .= bigbluebuttonbn_view_show_room($bbbsession, $activity, $jsvars);
+        $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
     if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
         $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-        $output .= bigbluebuttonbn_view_show_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
+        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
         if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
-            $output .= bigbluebuttonbn_view_show_imported($bbbsession);
+            $output .= bigbluebuttonbn_view_render_imported($bbbsession);
         }
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
             'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
@@ -324,7 +324,7 @@ function bigbluebuttonbn_view_main(&$bbbsession, $activity) {
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
-function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, &$jsvars) {
+function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
     global $OUTPUT;
 
     // JavaScript variables for room.
@@ -362,17 +362,37 @@ function bigbluebuttonbn_view_show_room(&$bbbsession, $activity, &$jsvars) {
     return $output;
 }
 
-function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars) {
+function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
+   if ( $bbbsession['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY &&
+       $bbbsession['bigbluebuttonbn']->recordings_imported ) {
+       return false;
+   }
+   return true;
+}
 
-    // Get recordings.
+function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvars) {
     $bigbluebuttonbnid = null;
     if ($showroom) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
-    $recordings = bigbluebuttonbn_get_recordings(
-        $bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
-        $bbbsession['bigbluebuttonbn']->recordings_deleted
+
+    // Get recordings.
+    $recordings = array();
+    if ( bigbluebuttonbn_view_include_recordings($bbbsession) ) {
+        $recordings = bigbluebuttonbn_get_recordings(
+            $bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
+            $bbbsession['bigbluebuttonbn']->recordings_deleted
+          );
+    }
+
+    // Get recording links.
+    $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
+        $bbbsession['course']->id, $bigbluebuttonbnid, $showroom
       );
+
+    /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
+     * recordings are not included. */
+    $recordings += $recordingsimported;
 
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
@@ -402,7 +422,7 @@ function bigbluebuttonbn_view_show_recordings(&$bbbsession, $showroom, &$jsvars)
     return html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
 }
 
-function bigbluebuttonbn_view_show_imported(&$bbbsession) {
+function bigbluebuttonbn_view_render_imported(&$bbbsession) {
     global $CFG;
 
     $button = html_writer::tag('input', '',

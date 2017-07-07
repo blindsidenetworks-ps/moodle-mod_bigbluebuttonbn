@@ -1485,6 +1485,40 @@ function bigbluebuttonbn_get_tags($id) {
     return implode(',', $tagsarray);
 }
 
+
+/**
+ * helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
+ * in the getRecordings request
+ *
+ * @param string $courseid
+ * @param string $bigbluebuttonbnid
+ * @param bool   $subset
+ *
+ * @return string containing the sql used for getting the target bigbluebuttonbn instances
+ */
+function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid = null, $subset = true) {
+    if ($bigbluebuttonbnid === null) {
+        return "course = '{$courseid}'";
+    }
+    if ($subset) {
+        return "id = '{$bigbluebuttonbnid}'";
+    }
+    return "id <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
+}
+
+function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid, $bigbluebuttonbnid = null, $subset = true) {
+    if ($bigbluebuttonbnid === null) {
+        return "courseid = '{$courseid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
+            "' AND meta like '%has_recordings%' AND meta like '%true%'";
+    }
+    if ($subset) {
+        return "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
+            "' AND meta like '%has_recordings%' AND meta like '%true%'";
+    }
+    return "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '".
+        BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
+}
+
 /**
  * helper function to retrieve recordings from the BigBlueButton. The references are stored as events
  * in bigbluebuttonbn_logs.
@@ -1501,24 +1535,13 @@ function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $s
         $includedeleted = false) {
     global $DB;
 
-    // Gather the bigbluebuttonbnids whose meetingids should be included in the getRecordings request'.
-    $select = "id <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
-    $selectdeleted = "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '".
-        BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
-    if ($bigbluebuttonbnid === null) {
-        $select = "course = '{$courseid}'";
-        $selectdeleted = "courseid = '{$courseid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
-            "' AND meta like '%has_recordings%' AND meta like '%true%'";
-    } else if ($subset) {
-        $select = "id = '{$bigbluebuttonbnid}'";
-        $selectdeleted = "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
-            "' AND meta like '%has_recordings%' AND meta like '%true%'";
-    }
+    $select = bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
     $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
 
     /* Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in
      * the getRecordings request. */
     if ($includedeleted) {
+        $selectdeleted = bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid, $bigbluebuttonbnid, $subset);
         $bigbluebuttonbnsdel = $DB->get_records_select_menu('bigbluebuttonbn_logs', $selectdeleted, null,
             'bigbluebuttonbnid', 'bigbluebuttonbnid, meetingid');
         if (!empty($bigbluebuttonbnsdel)) {
@@ -1530,24 +1553,19 @@ function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $s
 
     // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true.
     $recordings = array();
-    if (!empty($bigbluebuttonbns)) {
-        // Prepare select for loading records based on existent bigbluebuttonbns.
-        $sql = 'SELECT DISTINCT meetingid, bigbluebuttonbnid FROM {bigbluebuttonbn_logs} WHERE ';
-        $sql .= '(bigbluebuttonbnid='.implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)).')';
-        // Include only Create events and exclude those with record not true.
-        $sql .= ' AND log = ? AND meta LIKE ? AND meta LIKE ?';
-        // Execute select for loading records based on existent bigbluebuttonbns.
-        $records = $DB->get_records_sql_menu($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
-        // Get actual recordings.
-        $recordings = bigbluebuttonbn_get_recordings_array(array_keys($records));
+    if (empty($bigbluebuttonbns)) {
+        return array();
     }
 
-    // Get recording links.
-    $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
-
-    /* Perform aritmetic add instead of merge so the imported recordings corresponding to existent recordings
-     * are not included. */
-    return $recordings + $recordingsimported;
+    // Prepare select for loading records based on existent bigbluebuttonbns.
+    $sql = 'SELECT DISTINCT meetingid, bigbluebuttonbnid FROM {bigbluebuttonbn_logs} WHERE ';
+    $sql .= '(bigbluebuttonbnid='.implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)).')';
+    // Include only Create events and exclude those with record not true.
+    $sql .= ' AND log = ? AND meta LIKE ? AND meta LIKE ?';
+    // Execute select for loading records based on existent bigbluebuttonbns.
+    $records = $DB->get_records_sql_menu($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
+    // Get actual recordings.
+    return bigbluebuttonbn_get_recordings_array(array_keys($records));
 }
 
 function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $courseid, $bigbluebuttonbnid) {
