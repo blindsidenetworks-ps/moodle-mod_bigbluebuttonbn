@@ -1199,17 +1199,21 @@ function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $edita
             'action' => 'edit', 'tag' => 'edit',
             'target' => 'name');
     }
-    if (isset($recording['meta_contextactivity'])) {
-        $metaname = trim($recording['meta_contextactivity']);
-        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, 'meta_contextactivity', $payload);
+
+    $oldsource = 'meta_contextactivity';
+    if (isset($recording[$oldsource])) {
+        $metaname = trim($recording[$oldsource]);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $oldsource, $payload);
     }
 
-    if (isset($recording['meta_bbb-recording-name'])) {
-        $metaname = trim($recording['meta_bbb-recording-name']);
-        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, 'meta_bbb-recording-name', $payload);
+    $newsource = 'meta_bbb-recording-name';
+    if (isset($recording[$newsource])) {
+        $metaname = trim($recording[$newsource]);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $newsource, $payload);
     }
 
-    return bigbluebuttonbn_get_recording_data_row_text($recording, $recording['meetingName'], $payload);
+    $metaname = trim($recording['meetingName']);
+    return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $newsource, $payload);
 }
 
 function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable) {
@@ -1220,21 +1224,19 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $ed
             'target' => 'description');
     }
 
-    if (isset($recording['meta_contextactivitydescription'])) {
-        $metadescription = trim($recording['meta_contextactivitydescription']);
-        if (!empty($metadescription)) {
-            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $source, $payload);
-        }
+    $oldsource = 'meta_contextactivitydescription';
+    if (isset($recording[$oldsource])) {
+        $metadescription = trim($recording[$oldsource]);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $oldsource, $payload);
     }
 
-    if (isset($recording['meta_bbb-recording-description'])) {
-        $metadescription = trim($recording['meta_bbb-recording-description']);
-        if (!empty($metadescription)) {
-            return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, 'meta_bbb-recording-description', $payload);
-        }
+    $newsource = 'meta_bbb-recording-description';
+    if (isset($recording[$newsource])) {
+        $metadescription = trim($recording[$newsource]);
+        return bigbluebuttonbn_get_recording_data_row_text($recording, $metadescription, $newsource, $payload);
     }
 
-    return bigbluebuttonbn_get_recording_data_row_text($recording, '', $payload);
+    return bigbluebuttonbn_get_recording_data_row_text($recording, '', $newsource, $payload);
 }
 
 function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source, $data) {
