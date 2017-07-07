@@ -336,10 +336,13 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
         $recording = $meta['recording'];
         // Override imported flag with actual ID.
         $recording['imported'] = $recordimported->id;
+        if (isset($recordimported->protected)) {
+            $recording['protected'] = (string) $recordimported->protected;
+        }
         /////////////////////////////////////////
         // MOCKUP TO BE DELETED BEFORE RELEASE
         // Force protected.
-        $recording['protected'] = 'false';
+        //$recording['protected'] = 'false';
         ////////////////////////////////////////
         $recordsimportedarray[$recording['recordID']] = $recording;
     }
@@ -393,7 +396,7 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
     /////////////////////////////////////////
     // MOCKUP TO BE DELETED BEFORE RELEASE
     // Force protected.
-    $recordingarray['protected'] = 'false';
+    //$recordingarray['protected'] = 'false';
     ////////////////////////////////////////
     return $recordingarray + $metadataarray;
 }
@@ -1097,10 +1100,11 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
     foreach ($tools as $tool) {
-        $actionbar .= bigbluebuttonbn_actionbar_render_button(
-            $recording,
-            bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool)
-          );
+        if ( $tool == 'protect' && !isset($recording['protected']) ) {
+            continue;
+        }
+        $buttonpayload = bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool);
+        $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $buttonpayload);
     }
     $head = html_writer::start_tag('div', array(
         'id' => 'recording-actionbar-' . $recording['recordID'],
@@ -1108,6 +1112,16 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
         'data-meetingid' => $recording['meetingID']));
     $tail = html_writer::end_tag('div');
     return $head . $actionbar . $tail;
+}
+
+function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
+    if ($tool == 'protect') {
+        return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
+    }
+    if ($tool == 'publish') {
+        return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
+    }
+    return array('action' => $tool, 'tag' => $tool);
 }
 
 function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
@@ -1122,16 +1136,6 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
         return array('action' => 'unpublish', 'tag' => 'hide');
     }
     return array('action' => 'publish', 'tag' => 'show');
-}
-
-function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
-    if ($tool == 'protect' && isset($recording['protected'])) {
-        return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
-    }
-    if ($tool == 'publish') {
-        return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
-    }
-    return array('action' => $tool, 'tag' => $tool);
 }
 
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
@@ -1353,7 +1357,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     if ($bbbsession['managerecordings']) {
         $table->head[] = $actionbar;
         $table->align[] = 'left';
-        $table->size[] = ''.sizeof($tools)*40.'px';
+        $table->size[] = (sizeof($tools)*40) . 'px';
     }
 
     // Build table content.
