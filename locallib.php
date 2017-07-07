@@ -735,12 +735,6 @@ function bigbluebuttonbn_get_participant_selection_data() {
 
 function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $userroles = null) {
     global $USER;
-    if (empty($userid)) {
-        $userid = $USER->id;
-    }
-    if (empty($userroles)) {
-        $userroles = get_user_roles($context, $userid, true);
-    }
     if (empty($participants)) {
         // The room that is being used comes from a previous version.
         return has_capability('mod/bigbluebuttonbn:moderate', $context);
@@ -749,16 +743,26 @@ function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $
     if (!is_array($participantlist)) {
         return false;
     }
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+    if (empty($userroles)) {
+        $userroles = get_user_roles($context, $userid, true);
+    }
+    return bigbluebuttonbn_is_moderator_validator($participantlist, $userid , $userroles);
+}
+
+function bigbluebuttonbn_is_moderator_validator($participantlist, $userid , $userroles) {
     // Iterate participant rules.
     foreach ($participantlist as $participant) {
-        if (bigbluebuttonbn_is_moderator_rule_validation($participant, $userid, $userroles)) {
+        if (bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $userroles)) {
             return true;
         }
     }
     return false;
 }
 
-function bigbluebuttonbn_is_moderator_rule_validation($participant, $userid, $userroles) {
+function bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $userroles) {
     if ($participant->role == BIGBLUEBUTTONBN_ROLE_VIEWER) {
         return false;
     }
@@ -1559,7 +1563,6 @@ function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $s
     }
 
     // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true.
-    $recordings = array();
     if (empty($bigbluebuttonbns)) {
         return array();
     }
