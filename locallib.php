@@ -1349,9 +1349,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     // Initialize table headers.
     $table->head = array($playback, $recording, $description, $preview, $date, $duration);
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
+    $table->size = array('', '', '', '', '', '');
     if ($bbbsession['managerecordings']) {
         $table->head[] = $actionbar;
         $table->align[] = 'left';
+        $table->size[] = ''.sizeof($tools)*40.'px';
     }
 
     // Build table content.
