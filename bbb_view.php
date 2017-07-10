@@ -34,17 +34,14 @@ $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 
-if ($id) {
-    $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
-} else if ($bn) {
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-} else {
+$bbbviewinstance = bigbluebuttonbn_views_validator($id, $bn);
+if (!$bbbviewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
+
+$cm = $bbbviewinstance['cm'];
+$course = $bbbviewinstance['course'];
+$bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
 
 $context = context_module::instance($cm->id);
 

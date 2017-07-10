@@ -1096,7 +1096,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     // Set formatted date.
     $row->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($row->date);
     // Set formatted duration.
-    $row->duration_formatted = $row->duration = bigbluebuttonbn_get_recording_data_row_duration_formatted($recording);
+    $row->duration_formatted = $row->duration = bigbluebuttonbn_get_recording_data_row_duration($recording);
     // Set actionbar, if user is allowed to manage recordings.
     if ($bbbsession['managerecordings']) {
         $row->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
@@ -1730,4 +1730,21 @@ function bigbluebuttonbn_get_locale() {
 function bigbluebuttonbn_get_localcode() {
     $locale = bigbluebuttonbn_get_locale();
     return substr($locale, 0, strpos($locale, '_'));
+}
+
+function bigbluebuttonbn_views_validator($id, $bn) {
+    global $DB;
+    if ($id) {
+        $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
+        $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+        return array('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn);
+    }
+    if ($bn) {
+        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
+        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+        return array('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn);
+    }
+    return;
 }
