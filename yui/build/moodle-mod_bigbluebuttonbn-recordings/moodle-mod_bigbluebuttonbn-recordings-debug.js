@@ -17,6 +17,7 @@ YUI.add('moodle-mod_bigbluebuttonbn-recordings', function (Y, NAME) {
 
 /** global: M */
 /** global: Y */
+/** global: event */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
@@ -187,7 +188,6 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_edit_keydown: function(element) {
-        /** global: event */
         if (event.keyCode == 13) {
             this.recording_edit_perform(element);
             return;

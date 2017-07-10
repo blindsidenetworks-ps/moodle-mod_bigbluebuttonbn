@@ -222,7 +222,12 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
     }
     if ($durationtime > 0) {
         $data['duration'] = $durationtime;
-        $data['welcome'] .= '<br><br>'.str_replace('%duration%', ''.$durationtime, get_string('bbbdurationwarning', 'bigbluebuttonbn'));
+        $data['welcome'] .= '<br><br>';
+        $data['welcome'] .= str_replace(
+            '%duration%',
+            (string) $durationtime,
+            get_string('bbbdurationwarning', 'bigbluebuttonbn')
+          );
     }
 
     $voicebridge = intval($bbbsession['voicebridge']);

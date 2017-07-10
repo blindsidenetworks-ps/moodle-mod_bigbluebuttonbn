@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-  * The mod_bigbluebuttonbn abstract base event.
-  *
-  * @package   mod_bigbluebuttonbn
-  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
-  * @copyright 2017 - present, Blindside Networks Inc
-  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-  */
+ * The mod_bigbluebuttonbn abstract base event.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @copyright 2017 - present, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace mod_bigbluebuttonbn\event;
 
@@ -62,7 +62,7 @@ abstract class base extends \core\event\base {
      * @var array
      */
     protected $legacylogdata;
-  
+
     /**
      * Init method.
      */

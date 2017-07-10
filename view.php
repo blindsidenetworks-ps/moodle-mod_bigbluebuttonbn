@@ -364,11 +364,11 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
 }
 
 function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
-   if ( $bbbsession['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY &&
-       $bbbsession['bigbluebuttonbn']->recordings_imported ) {
-       return false;
-   }
-   return true;
+    if ($bbbsession['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY &&
+        $bbbsession['bigbluebuttonbn']->recordings_imported) {
+        return false;
+    }
+    return true;
 }
 
 function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvars) {

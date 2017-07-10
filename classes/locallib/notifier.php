@@ -91,7 +91,7 @@ class notifier {
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
 
-        $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+        $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
         foreach ($users as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);

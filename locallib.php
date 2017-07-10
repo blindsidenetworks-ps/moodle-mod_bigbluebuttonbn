@@ -339,11 +339,6 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebutton
         if (isset($recordimported->protected)) {
             $recording['protected'] = (string) $recordimported->protected;
         }
-        /////////////////////////////////////////
-        // MOCKUP TO BE DELETED BEFORE RELEASE
-        // Force protected.
-        //$recording['protected'] = 'false';
-        ////////////////////////////////////////
         $recordsimportedarray[$recording['recordID']] = $recording;
     }
 
@@ -393,11 +388,6 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
     if (isset($recording->protected)) {
         $recordingarray['protected'] = (string) $recording->protected;
     }
-    /////////////////////////////////////////
-    // MOCKUP TO BE DELETED BEFORE RELEASE
-    // Force protected.
-    //$recordingarray['protected'] = 'false';
-    ////////////////////////////////////////
     return $recordingarray + $metadataarray;
 }
 
@@ -605,7 +595,7 @@ function bigbluebuttonbn_get_guest_role() {
 }
 
 function bigbluebuttonbn_get_users(context $context = null) {
-    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+    $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
     foreach ($users as $key => $value) {
         $users[$key] = fullname($value);
     }
@@ -613,7 +603,7 @@ function bigbluebuttonbn_get_users(context $context = null) {
 }
 
 function bigbluebuttonbn_get_users_select(context $context = null) {
-    $users = (array) get_enrolled_users($context,'',0,'u.*',null,0,0,true);
+    $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
     foreach ($users as $key => $value) {
         $users[$key] = array('id' => $value->id, 'name' => fullname($value));
     }
@@ -649,7 +639,15 @@ function bigbluebuttonbn_get_role($id) {
 }
 
 function bigbluebuttonbn_role_unknown() {
-    return array("id" => "0", "name" => "", "shortname" => "unknown", "description" => "", "sortorder" => "0", "archetype" => "guest", "localname" => "Unknown");
+    return array(
+              "id" => "0",
+              "name" => "",
+              "shortname" => "unknown",
+              "description" => "",
+              "sortorder" => "0",
+              "archetype" => "guest",
+              "localname" => "Unknown"
+            );
 }
 
 function bigbluebuttonbn_get_participant_data($context) {
@@ -1107,7 +1105,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 }
 
 function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
-    return ($managerecordings && (double)$bbbsession['serverversion'] >= 1.0);
+    return ($bbbsession['managerecordings'] && (double)$bbbsession['serverversion'] >= 1.0);
 }
 
 function bigbluebuttonbn_get_recording_data_row_date($recording) {
@@ -1299,10 +1297,7 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source,
     $tail = html_writer::end_tag('div');
 
     $payload = array('action' => $data['action'], 'tag' => $data['tag'], 'target' => $data['target']);
-    //$htmllink = '';
-    //if ($addbutton) {
-        $htmllink = bigbluebuttonbn_actionbar_render_button($recording, $payload);
-    //}
+    $htmllink = bigbluebuttonbn_actionbar_render_button($recording, $payload);
 
     return $head . $htmltext . $htmllink . $tail;
 }
@@ -1407,7 +1402,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     if ($bbbsession['managerecordings']) {
         $table->head[] = $actionbar;
         $table->align[] = 'left';
-        $table->size[] = (sizeof($tools)*40) . 'px';
+        $table->size[] = (count($tools) * 40) . 'px';
     }
 
     // Build table content.
@@ -1456,7 +1451,10 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
 }
 
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    return !( !isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid'] );
+    if ( isset($recording['imported']) || !isset($bbbsession['group']) || $recording['meetingID'] == $bbbsession['meetingid'] ) {
+        return true;
+    }
+    return false;
 }
 
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
