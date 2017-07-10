@@ -1027,6 +1027,23 @@ function bigbluebuttonbn_update_recording_imported($id, $params) {
 }
 
 /**
+ * @param string $id
+ * @param boolean $protect
+ */
+function bigbluebuttonbn_protect_recording_imported($id, $protect = true) {
+    global $DB;
+    // Locate the record to be updated.
+    $record = $DB->get_record('bigbluebuttonbn_logs', array('id' => $id));
+    $meta = json_decode($record->meta, true);
+    // Prepare data for the update.
+    $meta['recording']['protected'] = ($protect) ? 'true' : 'false';
+    $record->meta = json_encode($meta);
+    // Proceed with the update.
+    $DB->update_record('bigbluebuttonbn_logs', $record);
+    return true;
+}
+
+/**
  * @param string $meetingid
  * @param string $configxml
  */
@@ -1088,7 +1105,10 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
         $row->date_formatted = userdate($starttime / 1000, $dateformat, usertimezone($USER->timezone));
         // Set formatted duration.
         $firstplayback = array_values($recording['playbacks'])[0];
-        $length = isset($firstplayback['length']) ? $firstplayback['length'] : 0;
+        $length = 0;
+        if (isset($firstplayback['length'])) {
+            $length = $firstplayback['length'];
+        }
         $row->duration_formatted = $row->duration = intval($length);
         // Set actionbar, if user is allowed to manage recordings.
         if ($managerecordings) {
@@ -1190,8 +1210,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonb
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
     $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
-      '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'];
-    if (!isset($recording['imported']) || $recording['protected'] === 'false') {
+      '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'].'&rtype='.$playback['type'];
+    if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode($playback['url']);
     }
     $linkattributes = array('title' => $title,

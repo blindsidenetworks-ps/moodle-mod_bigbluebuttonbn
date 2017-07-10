@@ -29,7 +29,9 @@ $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $href = optional_param('href', '', PARAM_TEXT);
+$mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
+$rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 
 if ($id) {
@@ -151,10 +153,12 @@ switch (strtolower($action)) {
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
         break;
     case 'playback':
+        $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
         if ($href == '') {
             bigbluebutton_bbb_view_close_window();
             return;
         }
+
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_VIEWED, $bigbluebuttonbn, $cm, ['other' => $rid]);
         // Execute the redirect.
@@ -162,6 +166,23 @@ switch (strtolower($action)) {
         break;
     default:
         bigbluebutton_bbb_view_close_window();
+}
+
+function bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype) {
+    if ($href != '' || $mid == '' || $rid == '') {
+        return $href;
+    }
+    $recordings = bigbluebuttonbn_get_recordings_array($mid, $rid);
+    return bigbluebutton_bbb_view_playback_href_lookup($recordings[$rid]['playbacks'], $rtype);
+}
+
+function bigbluebutton_bbb_view_playback_href_lookup($playbacks, $type) {
+    foreach ($playbacks as $playback) {
+        if ($playback['type'] == $type) {
+            return $playback['url'];
+        }
+    }
+    return '';
 }
 
 function bigbluebutton_bbb_view_close_window() {

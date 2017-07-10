@@ -363,7 +363,7 @@ function bigbluebuttonbn_broker_recording_action_perform($action, $params, $reco
 
 function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
-        // Execute publish or unprotect on imported recording link, if the real recording is published.
+        // Execute publish on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
             $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
         // Only if the physical recording exist and it is published, execute publish on imported recording link.
@@ -380,21 +380,50 @@ function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
               );
         }
         return array(
-            'status' => bigbluebuttonbn_publish_recording_imported($recordings[$params['id']]['imported'], true)
+            'status' => bigbluebuttonbn_publish_recording_imported(
+                $recordings[$params['id']]['imported'], true
+            )
           );
     }
 
     // As the recordingid was not identified as imported recording link, execute actual publish.
     return array(
-        'status' => bigbluebuttonbn_publish_recordings($params['id'], 'true')
+        'status' => bigbluebuttonbn_publish_recordings(
+            $params['id'], 'true'
+        )
       );
 }
 
 function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings) {
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
+        // Execute unprotect on imported recording link, if the real recording is unprotected.
+        $realrecordings = bigbluebuttonbn_get_recordings_array(
+            $recordings[$params['id']]['meetingID'], $recordings[$params['id']]['recordID']);
+        // Only if the physical recording exist and it is published, execute unprotect on imported recording link.
+        if (!isset($realrecordings[$params['id']])) {
+            return array(
+                'status' => false,
+                'message' => get_string('view_recording_unprotect_link_deleted', 'bigbluebuttonbn')
+              );
+        }
+        if ($realrecordings[$params['id']]['protected'] === 'true') {
+            return array(
+                'status' => false,
+                'message' => get_string('view_recording_unprotect_link_not_unprotected', 'bigbluebuttonbn')
+              );
+        }
+        return array(
+            'status' => bigbluebuttonbn_protect_recording_imported(
+                $recordings[$params['id']]['imported'], false
+            )
+          );
+    }
 
     // As the recordingid was not identified as imported recording link, execute actual uprotect.
     return array(
-        'status' => bigbluebuttonbn_update_recordings($params['id'], array('protect' => 'false'))
+        'status' => bigbluebuttonbn_update_recordings(
+            $params['id'], array('protect' => 'false')
+        )
       );
 }
 
@@ -404,7 +433,9 @@ function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings)
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unpublish or protect on imported recording link.
         return array(
-            'status' => bigbluebuttonbn_publish_recording_imported($recordings[$params['id']]['imported'], false)
+            'status' => bigbluebuttonbn_publish_recording_imported(
+                $recordings[$params['id']]['imported'], false
+            )
           );
     }
 
@@ -412,26 +443,51 @@ function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings)
     // First: Unpublish imported links associated to the recording.
     $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
 
-    if ($importedall > 0) {
-        foreach ($importedall as $key => $record) {
-            $meta = json_decode($record->meta, true);
-            // Prepare data for the update.
-            $meta['recording'][$action.'ed'] = 'false';
-            $importedall[$key]->meta = json_encode($meta);
-            // Proceed with the update.
-            $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
-        }
+    foreach ($importedall as $key => $record) {
+        $meta = json_decode($record->meta, true);
+        // Prepare data for the update.
+        $meta['recording']['published'] = 'false';
+        $importedall[$key]->meta = json_encode($meta);
+        // Proceed with the update.
+        $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
     }
     // Second: Execute the actual unpublish.
     return array(
-      'status' => bigbluebuttonbn_publish_recorbigbluebuttonbn_update_recordingsdings($params['id'], 'false')
+        'status' => bigbluebuttonbn_publish_recordings(
+            $params['id'], 'false'
+        )
       );
 }
 
 function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
+    global $DB;
+
+    if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
+        // Execute unpublish or protect on imported recording link.
+        return array(
+            'status' => bigbluebuttonbn_protect_recording_imported(
+                $recordings[$params['id']]['imported'], true
+            )
+          );
+    }
+
+    // As the recordingid was not identified as imported recording link, execute protect on a real recording.
+    // First: Protect imported links associated to the recording.
+    $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
+
+    foreach ($importedall as $key => $record) {
+        $meta = json_decode($record->meta, true);
+        // Prepare data for the update.
+        $meta['recording']['protected'] = 'true';
+        $importedall[$key]->meta = json_encode($meta);
+        // Proceed with the update.
+        $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
+    }
     // Second: Execute the actual protect.
     return array(
-      'status' => bigbluebuttonbn_update_recordings($params['id'], array('protect' => 'true'))
+        'status' => bigbluebuttonbn_update_recordings(
+            $params['id'], array('protect' => 'true')
+        )
       );
 }
 
@@ -441,8 +497,8 @@ function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute delete on imported recording link.
         return array(
-          'status' => bigbluebuttonbn_delete_recording_imported(
-              $recordings[$params['id']]['imported']
+            'status' => bigbluebuttonbn_delete_recording_imported(
+                $recordings[$params['id']]['imported']
             )
           );
     }
@@ -459,7 +515,9 @@ function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
     }
     // Second: Execute the actual delete.
     return array(
-      'status' => bigbluebuttonbn_delete_recordings($params['id'])
+        'status' => bigbluebuttonbn_delete_recordings(
+            $params['id']
+        )
       );
 }
 
@@ -467,8 +525,8 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute update on imported recording link.
         return array(
-          'status' => bigbluebuttonbn_update_recording_imported(
-              $recordings[$params['id']]['imported'], json_decode($params['meta'], true)
+            'status' => bigbluebuttonbn_update_recording_imported(
+                $recordings[$params['id']]['imported'], json_decode($params['meta'], true)
             )
           );
     }
@@ -477,7 +535,9 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
     // (No need to update imported links as the update only affects the actual recording).
     // Execute update on actual recording.
     return array(
-      'status' => bigbluebuttonbn_update_recordings($params['id'], json_decode($params['meta']))
+        'status' => bigbluebuttonbn_update_recordings(
+            $params['id'], json_decode($params['meta'])
+        )
       );
 }
 
