@@ -1732,23 +1732,28 @@ function bigbluebuttonbn_get_localcode() {
     return substr($locale, 0, strpos($locale, '_'));
 }
 
-function bigbluebuttonbn_views_validator($id, $bn) {
-    global $DB;
+function bigbluebuttonbn_views_validator($id, $bigbluebuttonbnid) {
     if ($id) {
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
-        $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
-        return bigbluebuttonbn_views_instance($cm, $course, $bigbluebuttonbn);
+        return bigbluebuttonbn_views_instance_id($id);
     }
-    if ($bn) {
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
-        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-        $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-        return bigbluebuttonbn_views_instance($cm, $course, $bigbluebuttonbn);
+    if ($bigbluebuttonbnid) {
+        return bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid);
     }
     return;
 }
 
-function bigbluebuttonbn_views_instance($cm, $course, $bigbluebuttonbn) {
+function bigbluebuttonbn_views_instance_id($id) {
+    global $DB;
+    $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+    return array('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn);
+}
+
+function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
+    global $DB;
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     return array('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn);
 }

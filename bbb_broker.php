@@ -49,10 +49,10 @@ if (!empty($error)) {
     return;
 }
 
-if (isset($params['bigbluebuttonbn']) && $params['bigbluebuttonbn'] != 0) {
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbn']), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+if ($params['bigbluebuttonbn']) {
+    $bbbbrokerinstance = bigbluebuttonbn_views_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+    $cm = $bbbbrokerinstance['cm'];
+    $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
     $context = context_module::instance($cm->id);
 }
 
