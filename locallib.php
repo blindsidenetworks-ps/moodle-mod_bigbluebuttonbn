@@ -114,14 +114,6 @@ function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $c
 }
 
 /**
- * @param string $recordid
- * @param array  $metadata
- */
-function bigbluebuttonbn_get_update_recordings_url($recordid, $metadata = array()) {
-    return \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('updateRecordings', ['recordID' => $recordid], $metadata);
-}
-
-/**
  * @param array  $data
  * @param array  $metadata
  * @param string $pname
@@ -821,42 +813,38 @@ function bigbluebuttonbn_get_duration($closingtime) {
 }
 
 function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
-    $pname = null;
-    $purl = null;
-    $picon = null;
-    $pmimetypedescrip = null;
-    if (!empty($presentation)) {
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
-            'itemid, filepath, filename', false);
-        if (count($files) >= 1) {
-            $file = reset($files);
-            unset($files);
-            $pname = $file->get_filename();
-            $picon = file_file_icon($file, 24);
-            $pmimetypedescrip = get_mimetype_description($file);
-            $pnoncevalue = null;
-            if (!is_null($id)) {
-                // Create the nonce component for granting a temporary public access.
-                $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn',
-                    'presentation_cache');
-                $pnoncekey = sha1($id);
-                /* The item id was adapted for granting public access to the presentation once in order
-                 * to allow BigBlueButton to gather the file. */
-                $pnoncevalue = bigbluebuttonbn_generate_nonce();
-                $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
-            }
-            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
-                $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
-
-            $purl = $url->out(false);
-        }
+    if (empty($presentation)) {
+        return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
     }
-    $parray = array('url' => $purl, 'name' => $pname,
-                               'icon' => $picon,
-                               'mimetype_description' => $pmimetypedescrip);
-    return $parray;
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
+        'itemid, filepath, filename', false);
+
+    if (count($files) == 0) {
+        return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
+    }
+
+    $file = reset($files);
+    unset($files);
+    $pnoncevalue = null;
+    if (!is_null($id)) {
+        // Create the nonce component for granting a temporary public access.
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn',
+            'presentation_cache');
+        $pnoncekey = sha1($id);
+        /* The item id was adapted for granting public access to the presentation once in order
+         * to allow BigBlueButton to gather the file. */
+        $pnoncevalue = bigbluebuttonbn_generate_nonce();
+        $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
+    }
+    $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
+        $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
+
+    return array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+            'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
 }
+
 
 function bigbluebuttonbn_generate_nonce() {
     $mt = microtime();
