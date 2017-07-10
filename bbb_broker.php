@@ -216,7 +216,7 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
     // Execute the end command.
     bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
     // Moodle event logger: Create an event for meeting ended.
-    if (isset($bigbluebuttonbn)) {
+    if (isset($bbbsession['bigbluebuttonbn'])) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bbbsession['bigbluebuttonbn'],
             $bbbsession['cm']);
     }

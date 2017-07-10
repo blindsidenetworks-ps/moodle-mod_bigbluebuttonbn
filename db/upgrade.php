@@ -35,24 +35,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'description');
 
         // Change welcome, allow null.
-        $fielddefinition = array('type' => XMLDB_TYPE_TEXT,
-                                  'precision' => null,
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => null,
-                                  'previous' => 'type');
+        $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'welcome',
             $fielddefinition);
 
         // Change userid definition in bigbluebuttonbn_log.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
-                                  'precision' => '10',
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => null,
-                                  'previous' => 'bigbluebuttonbnid');
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null,
+            'previous' => 'bigbluebuttonbnid');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_log', 'userid',
             $fielddefinition);
 
@@ -77,46 +68,26 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
 
         // Add field type.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
-                                  'precision' => '2',
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => 0,
-                                  'previous' => 'id');
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
             $fielddefinition);
 
         // Add field recordings_html.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
-                                  'precision' => '1',
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => 0,
-                                  'previous' => null);
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_html',
             $fielddefinition);
 
         // Add field recordings_deleted.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
-                                  'precision' => '1',
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => 1,
-                                  'previous' => null);
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted',
             $fielddefinition);
 
         // Add field recordings_imported.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER,
-                                  'precision' => '1',
-                                  'unsigned' => null,
-                                  'notnull' => XMLDB_NOTNULL,
-                                  'sequence' => null,
-                                  'default' => 0,
-                                  'previous' => null);
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
 
@@ -132,13 +103,9 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
     $table = new xmldb_table($tablename);
     $field = new xmldb_field($fieldname);
-    $field->set_attributes($fielddefinition['type'],
-                           $fielddefinition['precision'],
-                           $fielddefinition['unsigned'],
-                           $fielddefinition['notnull'],
-                           $fielddefinition['sequence'],
-                           $fielddefinition['default'],
-                           $fielddefinition['previous']);
+    $field->set_attributes($fielddefinition['type'], $fielddefinition['precision'], $fielddefinition['unsigned'],
+        $fielddefinition['notnull'], $fielddefinition['sequence'], $fielddefinition['default'],
+        $fielddefinition['previous']);
     if ($dbman->field_exists($table, $field)) {
         $dbman->change_field_type($table, $field, true, true);
         $dbman->change_field_precision($table, $field, true, true);
