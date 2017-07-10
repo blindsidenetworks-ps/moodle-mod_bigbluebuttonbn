@@ -1080,42 +1080,58 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
 }
 
 function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['protect', 'publish', 'delete']) {
-    global $USER;
-    $row = null;
-    $managerecordings = $bbbsession['managerecordings'];
-    $editable = ($bbbsession['managerecordings'] && (double)$bbbsession['serverversion'] >= 1.0);
-    if ($managerecordings || $recording['published'] == 'true') {
-        $row = new stdClass();
-        // Set recording_types.
-        $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
-        // Set activity name and description.
-        $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
-        $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
-        // Set recording_preview.
-        $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
-        // Set date.
-        $starttime = 0;
-        if (isset($recording['startTime'])) {
-            $starttime = floatval($recording['startTime']);
-        }
-        $row->date = $starttime;
-        $starttime = $starttime - ($starttime % 1000);
-        // Set formatted date.
-        $dateformat = get_string('strftimerecentfull', 'langconfig').' %Z';
-        $row->date_formatted = userdate($starttime / 1000, $dateformat, usertimezone($USER->timezone));
-        // Set formatted duration.
-        $firstplayback = array_values($recording['playbacks'])[0];
-        $length = 0;
-        if (isset($firstplayback['length'])) {
-            $length = $firstplayback['length'];
-        }
-        $row->duration_formatted = $row->duration = intval($length);
-        // Set actionbar, if user is allowed to manage recordings.
-        if ($managerecordings) {
-            $row->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
-        }
+    if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
+        return;
+    }
+    $editable = bigbluebuttonbn_get_recording_data_row_editable($bbbsession);
+    $row = new stdClass();
+    // Set recording_types.
+    $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
+    // Set activity name.
+    $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
+    // Set activity description.
+    $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
+    // Set recording_preview.
+    $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
+    // Set date.
+    $row->date = bigbluebuttonbn_get_recording_data_row_date($recording);
+    // Set formatted date.
+    $row->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($row->date);
+    // Set formatted duration.
+    $row->duration_formatted = $row->duration = bigbluebuttonbn_get_recording_data_row_duration_formatted($recording);
+    // Set actionbar, if user is allowed to manage recordings.
+    if ($bbbsession['managerecordings']) {
+        $row->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
     }
     return $row;
+}
+
+function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
+    return ($managerecordings && (double)$bbbsession['serverversion'] >= 1.0);
+}
+
+function bigbluebuttonbn_get_recording_data_row_date($recording) {
+    if (!isset($recording['startTime'])) {
+        return 0;
+    }
+    return floatval($recording['startTime']);
+}
+
+function bigbluebuttonbn_get_recording_data_row_date_formatted($starttime) {
+    global $USER;
+    $starttime = $starttime - ($starttime % 1000);
+    // Set formatted date.
+    $dateformat = get_string('strftimerecentfull', 'langconfig').' %Z';
+    return userdate($starttime / 1000, $dateformat, usertimezone($USER->timezone));
+}
+
+function bigbluebuttonbn_get_recording_data_row_duration($recording) {
+    $firstplayback = array_values($recording['playbacks'])[0];
+    $length = 0;
+    if (isset($firstplayback['length'])) {
+        $length = $firstplayback['length'];
+    }
+    return intval($length);
 }
 
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
