@@ -151,14 +151,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ( $preuploadpresentation_enabled ) {
             $mform->addElement('header', 'preupload', get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
             $mform->setExpanded('preupload');
-
             $filemanager_options = array();
             $filemanager_options['accepted_types'] = '*';
             $filemanager_options['maxbytes'] = 0;
             $filemanager_options['subdirs'] = 0;
             $filemanager_options['maxfiles'] = 1;
             $filemanager_options['mainfile'] = true;
-
             $mform->addElement('filemanager', 'presentation', get_string('selectfiles'), null, $filemanager_options);
         }
         //-------------------------------------------------------------------------------
@@ -214,7 +212,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             // Valid after v3.1
             $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
             $jsvars['participant_list'] = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-            $jsvars['icons_enabled'] = bigbluebuttonbn_get_cfg_recording_icons_enabled();
+            $jsvars['icons_enabled'] = bigbluebuttonbn_get_cfg_recording_icons_enabled() ? true : false;
             $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform', 'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
         }

@@ -34,7 +34,7 @@ M.mod_bigbluebuttonbn.modform = {
             as: M.str.bigbluebuttonbn.mod_form_field_participant_list_text_as,
             viewer: M.str.bigbluebuttonbn.mod_form_field_participant_bbb_role_viewer,
             moderator: M.str.bigbluebuttonbn.mod_form_field_participant_bbb_role_moderator,
-            remove: M.str.bigbluebuttonbn.mod_form_field_participant_list_action_removee
+            remove: M.str.bigbluebuttonbn.mod_form_field_participant_list_action_remove
         };
         this.participant_list_init();
     },
@@ -181,7 +181,7 @@ M.mod_bigbluebuttonbn.modform = {
         cell2.innerHTML = innerHTML;
         cell3 = row.insertCell(3);
         cell3.width = "20px";
-        remove_html = 'x';
+        remove_html = this.strings.remove;
         if (this.bigbluebuttonbn.icons_enabled) {
             remove_html = this.bigbluebuttonbn.pix_icon_delete;
         }
