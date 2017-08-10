@@ -211,7 +211,7 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participant_add_to_form: function(selection_type_value, selection_value, selection_role) {
-        var list_table, innerHTML, selected_html, remove_html, bbb_roles, i, row, cell0, cell1, cell2, cell3;
+        var list_table, innerHTML, selected_html, remove_html, remove_class, bbb_roles, i, row, cell0, cell1, cell2, cell3;
         list_table = document.getElementById('participant_list_table');
         row = list_table.insertRow(list_table.rows.length);
         row.id = "participant_list_tr_" + selection_type_value + "-" + selection_value;
@@ -243,10 +243,12 @@ M.mod_bigbluebuttonbn.modform = {
         cell3 = row.insertCell(3);
         cell3.width = "20px";
         remove_html = this.strings.remove;
+        remove_class = "btn btn-secondary btn-sm";
         if (this.bigbluebuttonbn.icons_enabled) {
             remove_html = this.bigbluebuttonbn.pix_icon_delete;
+            remove_class = "btn btn-link";
         }
-        innerHTML = '<a class="btn btn-link" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
+        innerHTML = '<a class="' + remove_class + '" onclick="M.mod_bigbluebuttonbn.modform.participant_remove(\'';
         innerHTML += selection_type_value + '\', \'' + selection_value;
         innerHTML += '\'); return 0;" title="' + this.strings.remove + '">' + remove_html + '</a>';
         cell3.innerHTML = innerHTML;
