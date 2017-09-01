@@ -1,5 +1,6 @@
 2.1.13 (2016051918)
 Bug: Fixed issue with hint on hovering pareticipant list button
+Bug: Fixed issue participant list not considering rules based on Moodle roles.
 
 2.1.12 (2016051917)
 Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. As the permissions are now based in role and user id, previous settings were ignored. (CONTRIB-6925)
