@@ -594,7 +594,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
         return false;
     }
     // Iterate looking for all configuration.
-    foreach($participantlist as $participant) {
+    foreach ($participantlist as $participant) {
         if( $participant->selectiontype == 'all' ) {
             if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
                 return true;
@@ -603,18 +603,17 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     }
     // Iterate looking for roles.
     $moodleroles = bigbluebuttonbn_get_moodle_roles();
-    foreach($participantlist as $participant) {
-        if( $participant->selectiontype == 'role' ) {
-            foreach( $roles as $role ) {
-                $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $role->id);
-                $moodleroleid = $moodlerole->id;
-                if ( !is_int($participant->selectionid) ) {
-                    $moodleroleid = $moodlerole->shortname;
-                }
-                if( $participant->selectionid == $moodleroleid ) {
-                    if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
-                        return true;
-                    }
+    foreach ($participantlist as $participant) {
+        if ($participant->selectiontype == 'role') {
+            $selectionid = $participant->selectionid;
+            // For backward compatibility when selectiontype contains the role  shortname.
+            if ( !is_int($selectionid) ) {
+                $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $selectionid);
+                $selectionid = $moodlerole->id;
+            }
+            if (array_key_exists($selectionid, $roles)) {
+                if ( $participant->role == BIGBLUEBUTTONBN_ROLE_MODERATOR ) {
+                    return true;
                 }
             }
         }
@@ -633,8 +632,11 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
 }
 
 function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
+    if ( is_int($role_id) && array_key_exists($role_id, $db_moodle_roles) ) {
+        return $db_moodle_roles[$role_id];
+    }
     foreach( $db_moodle_roles as $db_moodle_role ) {
-        if ( $role_id == $db_moodle_role->id ) {
+        if ( $role_id == $db_moodle_role->shortname ) {
             return $db_moodle_role;
         }
     }
