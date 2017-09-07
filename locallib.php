@@ -606,8 +606,8 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
     foreach ($participantlist as $participant) {
         if ($participant->selectiontype == 'role') {
             $selectionid = $participant->selectionid;
-            // For backward compatibility when selectiontype contains the role  shortname.
-            if ( !is_int($selectionid) ) {
+            // For backward compatibility when selectiontype contains the role shortname.
+            if ( !is_numeric($selectionid) ) {
                 $moodlerole = bigbluebuttonbn_moodle_db_role_lookup($moodleroles, $selectionid);
                 $selectionid = $moodlerole->id;
             }
