@@ -126,7 +126,7 @@ function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $p
 
     if (!is_null($pname) && !is_null($purl)) {
         $method = BIGBLUEBUTTONBN_METHOD_POST;
-        $data = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='" . $pname . "'><document url='".
+        $data = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".
             $purl."' /></module></modules>";
     }
 
