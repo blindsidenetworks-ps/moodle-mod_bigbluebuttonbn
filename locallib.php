@@ -416,7 +416,7 @@ function bigbluebuttonbn_get_user_roles($context, $userid) {
     if ($user_roles) {
         $where = '';
         foreach ($user_roles as $key => $value){
-            $where .= (empty($where) ? ' WHERE' : ' AND').' id='.$value->roleid;
+            $where .= (empty($where) ? ' WHERE' : ' OR').' id='.$value->roleid;
         }
         $user_roles = $DB->get_records_sql('SELECT * FROM {role}'.$where);
     }

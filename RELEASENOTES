@@ -1,3 +1,6 @@
+2.1.14 (2016051919)
+Bug: Fixed issue participant list not considering rules based on Moodle roles when user had multiple.
+
 2.1.13 (2016051918)
 Bug: Fixed issue with hint on hovering pareticipant list button
 Bug: Fixed issue participant list not considering rules based on Moodle roles.
