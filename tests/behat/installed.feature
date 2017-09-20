@@ -1,4 +1,4 @@
-@mod @mod_newmodule
+@mod @mod_bigbluebuttonbn
 Feature: Installation succeeds
   In order to use this plugin
   As a user

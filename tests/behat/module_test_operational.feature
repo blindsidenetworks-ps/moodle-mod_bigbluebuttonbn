@@ -1,4 +1,4 @@
-@mod @bigbluebuttonbn @rl
+@mod @mod_bigbluebuttonbn @rl
 Feature: Test the complete sequence of operational steps for an activity module
   In order to guarantee activity module functionality
   As an administrator
