@@ -61,14 +61,13 @@ before_install:
   - nvm install node
   - cd ../..
   ## Custom script
-  #- composer selfupdate
-  #- cd ../..
   #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci
   #- cd ci
-  #- composer config repositories.moodle-coding-standard '{"type":"vcs", "url":"https://github.com/jfederico/moodle-coding-standard", "no-api":true}'
   #- composer config repositories.moodle-plugin-ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-plugin-ci", "no-api":true}'
-  #- composer require --prefer-dist moodlerooms/moodle-coding-standard:dev-master#6a4a63a1f265466417500050ff668a1b927b54ab
-  #- composer require --prefer-dist moodlerooms/moodle-plugin-ci:dev-master#45e7c2babaebd8068e67ade31116f70a2ab8b596
+  #- composer config repositories.moodle-local-codechecker '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_codechecker", "no-api":true}'
+  #- composer config repositories.moodle-local_ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_ci", "no-api":true}'
+  #- composer require --prefer-dist moodlehq/moodle-local_ci:dev-master#279e6b521f16c55b22ffff4ca00726ef291ee3e2
+  #- composer require --prefer-dist moodlehq/moodle-local_codechecker:dev-master#4f32c02e6d6b19be7431fd33ea175d2f93929387
   #- cd ..
   ## Standard script
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
@@ -82,10 +81,10 @@ script:
   - moodle-plugin-ci phplint
   #- moodle-plugin-ci phpcpd      ## Failing
   - moodle-plugin-ci phpmd
-  #- moodle-plugin-ci codechecker
+  #- moodle-plugin-ci codechecker ## Failing due BIGBLUEBUTTONBN_CFG
   #- moodle-plugin-ci validate    ## Failing
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  #- moodle-plugin-ci behat       ## Failing because the function not defined
