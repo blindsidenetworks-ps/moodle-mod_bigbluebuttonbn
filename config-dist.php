@@ -63,11 +63,11 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_shared_secret = '8cd8ef52e8e101574e400365b
 
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
 // activities will have the recording capability enabled by default.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default = 1;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_default = 1;
 
 // When the value is set to 1 (checked) the recording capability can be
 // enabled/disabled by the user creating or editing the room or activity.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recording_editable = 0;
 
 // When the value is set to 1 (checked) the list of recordings in both
 // bigbluebuttonbn and recordingbn are generated using icons.
@@ -125,12 +125,12 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_importrecordings_from_deleted_activities_e
 // When the value is set to 1 (checked) the bigbluebuttonbn rooms or
 // activities will have the 'wait for moderator' capability enabled by
 // default.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_default = 0;
 
 // When the value is set to 1 (checked) the 'wait for moderator'
 // capability can be enabled/disabled by the user creating or editing
 // the room or activity.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable = 1;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_waitformoderator_editable = 1;
 
 
 // When the 'wait for moderator' capability is enabled, the ping interval
@@ -175,7 +175,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_preuploadpresentation_enabled = 1;
 
 // The number of users allowed in a session by default when a new room or
 // conference is added. If the number is set to 0, no limit is established.
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_default = 0;
 
 // When the value is set to 1 (checked) the 'wait for moderator'
 // capability can be enabled/disabled by the user creating or editing
@@ -192,7 +192,7 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable = 0;
 // Moodle (including the custom parameters). The value used will be the key for the role.
 // [owner|manager|coursecreator|editingteacher|teacher|student|guest|user|frontpage|ANY_CUSTOM_ROLE]
 
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = 'owner';
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = 'owner';
 
 //=========================================================================
 // 9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
@@ -212,8 +212,8 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_sendnotifications_enabled = 0;
 // When the value is set to 1 (checked) the 'notify users when recording ready'
 // capability is enabled, meaning that a message will be sent to all enrolled
 // users in a course when a recording is ready
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
-#$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingstatus_enabled = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingready_enabled = 0;
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_recordingstatus_enabled = 0;
 
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!
