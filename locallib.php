@@ -497,7 +497,7 @@ function bigbluebuttonbn_get_roles_select(context $context = null) {
 
 function bigbluebuttonbn_get_role($id) {
     $roles = (array) role_get_names();
-    if (is_numeric($id)) {
+    if (is_numeric($id) && array_key_exists($id, $roles)) {
         return $roles[$id];
     }
     foreach ($roles as $role) {
