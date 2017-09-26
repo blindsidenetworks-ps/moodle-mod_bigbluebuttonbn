@@ -356,12 +356,12 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
     $playbackarray = array();
     foreach ($recording->playback->format as $format) {
         $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
-            'url' => (string) $format->url, 'length' => (string) $format->length);
+            'url' => trim((string) $format->url), 'length' => (string) $format->length);
         // Add preview per format when existing.
         if ($format->preview) {
             $imagesarray = array();
             foreach ($format->preview->images->image as $image) {
-                $imagearray = array('url' => (string) $image);
+                $imagearray = array('url' => trim((string) $image));
                 foreach ($image->attributes() as $attkey => $attvalue) {
                     $imagearray[$attkey] = (string) $attvalue;
                 }
@@ -1172,7 +1172,7 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
         if (isset($playback['preview'])) {
             foreach ($playback['preview'] as $image) {
                 $recordingpreview .= html_writer::empty_tag('img',
-                    array('src' => $image['url'] . '?' . time(), 'class' => 'thumbnail'));
+                    array('src' => trim($image['url']) . '?' . time(), 'class' => 'thumbnail'));
             }
             $recordingpreview .= html_writer::empty_tag('br');
             $recordingpreview .= html_writer::tag('div',
@@ -1214,7 +1214,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonb
     $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
       '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'].'&rtype='.$playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
-        $href .= '&href='.urlencode($playback['url']);
+        $href .= '&href='.urlencode(trim($playback['url']));
     }
     $linkattributes = array('title' => $title,
         'class' => 'btn btn-sm btn-default', 'onclick' => $onclick,
