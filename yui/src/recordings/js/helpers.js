@@ -37,7 +37,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     toggle_spinning_wheel_on: function(data) {
         var elementid, link, button, text;
-
         elementid = this.element_id(data.action, data.target);
         text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         link = Y.one('a#' + elementid + '-' + data.recordingid);
@@ -46,7 +45,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_on_compatible(link.one('> img'), text);
+            this.toggle_spinning_wheel_on_compatible(link, text);
             return;
         }
         button.setAttribute('data-aria-label', button.getAttribute('aria-label'));
@@ -57,7 +56,12 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('class', this.element_fa_class.process);
     },
 
-    toggle_spinning_wheel_on_compatible: function(button, text) {
+    toggle_spinning_wheel_on_compatible: function(link, text) {
+        var button = link.one('> img');
+        if (button === null) {
+            // Button doesn't even have an icon.
+            return;
+        }
         button.setAttribute('data-alt', button.getAttribute('alt'));
         button.setAttribute('alt', text);
         button.setAttribute('data-title', button.getAttribute('title'));
@@ -68,7 +72,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     toggle_spinning_wheel_off: function(data) {
         var elementid, link, button;
-
         elementid = this.element_id(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('onclick', link.getAttribute('data-onclick'));
@@ -76,7 +79,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_off_compatible(link.one('> img'));
+            this.toggle_spinning_wheel_off_compatible(link);
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -87,7 +90,12 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggle_spinning_wheel_off_compatible: function(button) {
+    toggle_spinning_wheel_off_compatible: function(link) {
+        var button = link.one('> img');
+        if (button === null) {
+            // Button doesn't have an icon.
+            return;
+        }
         button.setAttribute('alt', button.getAttribute('data-alt'));
         button.removeAttribute('data-alt');
         button.setAttribute('title', button.getAttribute('data-title'));
@@ -98,7 +106,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_data: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
-
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
@@ -108,7 +115,6 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('data-action', action);
         linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
         link.setAttribute('data-onclick', linkdataonclick);
-
         buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
         buttondatatag = this.element_tag[action];
         button = link.one('> i');
@@ -117,7 +123,6 @@ M.mod_bigbluebuttonbn.helpers = {
             this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
-
         button.setAttribute('data-aria-label', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
         button.setAttribute('data-class', this.element_fa_class[action]);
@@ -125,7 +130,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_data_compatible: function(button, action, buttondatatag, buttondatatext) {
         var buttondatasrc;
-
         buttondatasrc = button.getAttribute('data-src').replace(action, buttondatatag);
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
@@ -134,7 +138,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_id: function(data) {
         var action, elementid, link, button, id;
-
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
@@ -143,13 +146,11 @@ M.mod_bigbluebuttonbn.helpers = {
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
         link.setAttribute('id', id);
-
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
             button = link.one('> img');
         }
-
         button.removeAttribute('id');
     },
 

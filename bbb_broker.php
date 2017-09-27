@@ -99,7 +99,7 @@ try {
     }
 
     if ($a == 'recording_play') {
-        $recordingplay = bigbluebuttonbn_broker_recording_play($bbbsession, $params);
+        $recordingplay = bigbluebuttonbn_broker_recording_play($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingplay;
         return;
     }
@@ -229,7 +229,7 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
 
 function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
     if (!$bbbsession['managerecordings']) {
-        header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
+        header('HTTP/1.0 401 Unauthorized. User not authorized to execute update command');
         return;
     }
     $callbackresponse = array('status' => false);
@@ -244,7 +244,7 @@ function bigbluebuttonbn_broker_recording_links($bbbsession, $params) {
 
 function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) {
     if (!$bbbsession['managerecordings']) {
-        header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
+        header('HTTP/1.0 401 Unauthorized. User not authorized to execute command');
         return;
     }
 
@@ -284,7 +284,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     $callbackresponse['status'] = true;
     $callbackresponse['found'] = true;
     $callbackresponse['published'] = (string) $recording['published'];
-    if (!isset($params['meta'])) {
+    if (!isset($params['meta']) || empty($params['meta'])) {
         return $callbackresponse;
     }
     $meta = json_decode($params['meta'], true);
@@ -296,17 +296,14 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     return $callbackresponse;
 }
 
-function bigbluebuttonbn_broker_recording_play($bbbsession, $params) {
-    $action = strtolower($params['action']);
-    $events = bigbluebuttonbn_events_action();
-
-    // Excecute action.
-    $eventlog = $events[$action];
-    // Moodle event logger: Create an event for action performed on recording.
-    bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], $bbbsession['cm'],
-        ['other' => $params['id']]);
-
-    $callbackresponsedata = json_encode(array('status' => true));
+function bigbluebuttonbn_broker_recording_play($bbbsession, $params, $showroom) {
+    $callbackresponse = array('status' => true, 'found' => false);
+    $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+    if (array_key_exists($params['id'], $recordings)) {
+        // The recording was found.
+        $callbackresponse = bigbluebuttonbn_broker_recording_info_current($recordings[$params['id']], $params);
+    }
+    $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
 

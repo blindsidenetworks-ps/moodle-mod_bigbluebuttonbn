@@ -90,7 +90,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var payload = this.recording_element_payload(element);
         payload = Object.assign(payload, extras);
 
-        // The action doesn;t require confirmation.
+        // The action doesn't require confirmation.
         if (!confirmation) {
             this.recording_action_perform(payload);
             return;
@@ -174,10 +174,8 @@ M.mod_bigbluebuttonbn.recordings = {
         var link = Y.one(element);
         var node = link.ancestor('div');
         var text = node.one('> span');
-
         text.hide();
         link.hide();
-
         var inputtext = Y.Node.create('<input type="text" class="form-control"></input>');
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
@@ -209,13 +207,11 @@ M.mod_bigbluebuttonbn.recordings = {
         var inputtext = Y.one(element);
         var node = inputtext.ancestor('div');
         var text = element.value;
-
         // Perform the update.
         inputtext.setAttribute('data-action', 'edit');
         inputtext.setAttribute('data-goalstate', text);
         M.mod_bigbluebuttonbn.recordings.recording_update(inputtext.getDOMNode());
         node.one('> span').setHTML(text);
-
         var link = node.one('> a');
         link.show();
         link.focus();
@@ -229,7 +225,6 @@ M.mod_bigbluebuttonbn.recordings = {
         if (typeof text === 'undefined') {
             return;
         }
-
         var inputtext = node.one('> input');
         if (failed) {
             text.setHTML(inputtext.getAttribute('data-value'));
@@ -239,7 +234,15 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_play: function(element) {
         var nodeelement = Y.one(element);
-        window.open(nodeelement.getAttribute('data-href'));
+        var extras = {
+            target: nodeelement.getAttribute('data-target'),
+            source: 'published',
+            goalstate: 'true',
+            attempts: 1,
+            async: false,
+            dataset: nodeelement.getData()
+        };
+        this.recording_action(element, false, extras);
     },
 
     recording_confirmation_message: function(data) {
@@ -248,24 +251,20 @@ M.mod_bigbluebuttonbn.recordings = {
         if (typeof confirmation === 'undefined') {
             return '';
         }
-
         recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (Y.one('#playbacks-' + data.recordingid).get('dataset').imported === 'true') {
             recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
-
         confirmation = confirmation.replace("{$a}", recording_type);
         if (data.action === 'import') {
             return confirmation;
         }
-
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
         elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
         associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
         if (associated_links === 0) {
             return confirmation;
         }
-
         confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
             'bigbluebuttonbn');
         if (associated_links == 1) {
@@ -277,20 +276,18 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_completion: function(data) {
-        if (data.action == 'play') {
-            window.open(data.href);
-            return;
-        }
-
         if (data.action == 'delete' || data.action == 'import') {
             Y.one('#recording-td-' + data.recordingid).remove();
             return;
         }
-
+        if (data.action == 'play') {
+            M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
+            window.open(data.dataset.href, "_self");
+            return;
+        }
         M.mod_bigbluebuttonbn.helpers.update_data(data);
         M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
         M.mod_bigbluebuttonbn.helpers.update_id(data);
-
         if (data.action === 'publish' || data.action === 'unpublish') {
             this.recording_publishunpublish_completion(data);
         }
@@ -302,9 +299,7 @@ M.mod_bigbluebuttonbn.recordings = {
             message: data.message
         });
         alert.show();
-
         M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
-
         if (data.action === 'edit') {
             this.recording_edit_completion(data, true);
         }
@@ -369,7 +364,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     toggle_spinning_wheel_on: function(data) {
         var elementid, link, button, text;
-
         elementid = this.element_id(data.action, data.target);
         text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         link = Y.one('a#' + elementid + '-' + data.recordingid);
@@ -378,7 +372,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_on_compatible(link.one('> img'), text);
+            this.toggle_spinning_wheel_on_compatible(link, text);
             return;
         }
         button.setAttribute('data-aria-label', button.getAttribute('aria-label'));
@@ -389,7 +383,12 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('class', this.element_fa_class.process);
     },
 
-    toggle_spinning_wheel_on_compatible: function(button, text) {
+    toggle_spinning_wheel_on_compatible: function(link, text) {
+        var button = link.one('> img');
+        if (button === null) {
+            // Button doesn't even have an icon.
+            return;
+        }
         button.setAttribute('data-alt', button.getAttribute('alt'));
         button.setAttribute('alt', text);
         button.setAttribute('data-title', button.getAttribute('title'));
@@ -400,7 +399,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     toggle_spinning_wheel_off: function(data) {
         var elementid, link, button;
-
         elementid = this.element_id(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('onclick', link.getAttribute('data-onclick'));
@@ -408,7 +406,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_off_compatible(link.one('> img'));
+            this.toggle_spinning_wheel_off_compatible(link);
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -419,7 +417,12 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggle_spinning_wheel_off_compatible: function(button) {
+    toggle_spinning_wheel_off_compatible: function(link) {
+        var button = link.one('> img');
+        if (button === null) {
+            // Button doesn't have an icon.
+            return;
+        }
         button.setAttribute('alt', button.getAttribute('data-alt'));
         button.removeAttribute('data-alt');
         button.setAttribute('title', button.getAttribute('data-title'));
@@ -430,7 +433,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_data: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
-
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
@@ -440,7 +442,6 @@ M.mod_bigbluebuttonbn.helpers = {
         link.setAttribute('data-action', action);
         linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
         link.setAttribute('data-onclick', linkdataonclick);
-
         buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
         buttondatatag = this.element_tag[action];
         button = link.one('> i');
@@ -449,7 +450,6 @@ M.mod_bigbluebuttonbn.helpers = {
             this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
-
         button.setAttribute('data-aria-label', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
         button.setAttribute('data-class', this.element_fa_class[action]);
@@ -457,7 +457,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_data_compatible: function(button, action, buttondatatag, buttondatatext) {
         var buttondatasrc;
-
         buttondatasrc = button.getAttribute('data-src').replace(action, buttondatatag);
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
@@ -466,7 +465,6 @@ M.mod_bigbluebuttonbn.helpers = {
 
     update_id: function(data) {
         var action, elementid, link, button, id;
-
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
@@ -475,13 +473,11 @@ M.mod_bigbluebuttonbn.helpers = {
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
         link.setAttribute('id', id);
-
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
             button = link.one('> img');
         }
-
         button.removeAttribute('id');
     },
 

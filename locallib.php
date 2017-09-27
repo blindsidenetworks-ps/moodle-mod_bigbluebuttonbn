@@ -1211,14 +1211,24 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonb
     global $CFG, $OUTPUT;
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
-    $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=playback&bn='.$bigbluebuttonbnid.
+    $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=play&bn='.$bigbluebuttonbnid.
       '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'].'&rtype='.$playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode(trim($playback['url']));
     }
-    $linkattributes = array('title' => $title,
-        'class' => 'btn btn-sm btn-default', 'onclick' => $onclick,
-        'data-action' => 'play', 'data-href' => $href);
+    $id = 'recording-play-' . $playback['type'] . '-' . $recording['recordID'];
+    $linkattributes = array(
+        'id' => $id,
+        'onclick' => $onclick,
+        'data-action' => 'play',
+        'data-target' => $playback['type'],
+        'data-bn' => $bigbluebuttonbnid,
+        'data-mid' => $recording['meetingID'],
+        'data-rid' => $recording['recordID'],
+        'data-rtype' => $playback['type'],
+        'data-href' => $href,
+        'class' => 'btn btn-sm btn-default'
+      );
     return $OUTPUT->action_link('#', $title, null, $linkattributes);
 }
 

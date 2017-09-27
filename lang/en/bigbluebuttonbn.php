@@ -251,6 +251,7 @@ $string['view_recording_list_action_protect'] = 'Protecting';
 $string['view_recording_list_action_unprotect'] = 'Unprotecting';
 $string['view_recording_list_action_update'] = 'Updating';
 $string['view_recording_list_action_edit'] = 'Updating';
+$string['view_recording_list_action_play'] = 'Play';
 $string['view_recording_list_actionbar'] = 'Toolbar';
 $string['view_recording_list_activity'] = 'Activity';
 $string['view_recording_list_course'] = 'Course';

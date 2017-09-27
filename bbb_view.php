@@ -149,12 +149,8 @@ switch (strtolower($action)) {
         // Since the meeting is already running, we just join the session.
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
         break;
-    case 'playback':
+    case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
-        if ($href == '') {
-            bigbluebutton_bbb_view_close_window();
-            return;
-        }
 
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_VIEWED, $bigbluebuttonbn, $cm, ['other' => $rid]);

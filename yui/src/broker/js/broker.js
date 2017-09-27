@@ -40,22 +40,30 @@ M.mod_bigbluebuttonbn.broker = {
     },
 
     recording_action_perform: function(data) {
-        var qs = "action=recording_" + data.action + "&id=" + data.recordingid;
+        var qs = "action=recording_" + data.action + "&id=" + data.recordingid + "&idx=" + data.meetingid;
         qs += this.recording_action_meta_qs(data);
+        data.attempt = 1;
+        if (typeof data.attempts === 'undefined') {
+            data.attempts = 5;
+        }
         this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
-                    if (typeof data.goalstate === 'undefined') {
-                        return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
-                    }
-
+                    // Something went wrong.
                     if (!e.data.status) {
                         data.message = e.data.message;
                         return M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                     }
-
-                    data.attempt = 1;
+                    // There is no need for verification
+                    if (typeof data.goalstate === 'undefined') {
+                        return M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
+                    }
+                    // Use the current response for verification
+                    if (data.attempts <= 1) {
+                        return M.mod_bigbluebuttonbn.broker.recording_action_performed_validation(e, data);
+                    }
+                    // Iterate the verification.
                     return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
                 },
                 failure: function(e) {
@@ -78,11 +86,11 @@ M.mod_bigbluebuttonbn.broker = {
 
     recording_action_performed: function(data) {
         var qs = "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid;
-        qs += this.recording_action_meta_qs(data);
         this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
+                    // Something went wrong.
                     if (typeof e.data[data.source] === 'undefined') {
                         data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
                         M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
@@ -94,7 +102,7 @@ M.mod_bigbluebuttonbn.broker = {
                         return;
                     }
 
-                    if (data.attempt < 5) {
+                    if (data.attempt < data.attempts) {
                         data.attempt += 1;
                         setTimeout(((function() {
                             return function() {
@@ -113,6 +121,20 @@ M.mod_bigbluebuttonbn.broker = {
                 }
             }
         });
+    },
+
+    recording_action_performed_validation: function(e, data) {
+        // Something went wrong.
+        if (typeof e.data[data.source] === 'undefined') {
+            data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
+            M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+            return;
+        }
+
+        if (e.data[data.source] === data.goalstate) {
+            M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
+            return;
+        }
     },
 
     recording_current_state: function(action, data) {
