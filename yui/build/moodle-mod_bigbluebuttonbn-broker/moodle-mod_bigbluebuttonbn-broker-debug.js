@@ -129,7 +129,6 @@ M.mod_bigbluebuttonbn.broker = {
         // Evaluates if the state is as expected.
         if (e.data[data.source] === data.goalstate) {
             M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
-            return true;
         }
     },
 

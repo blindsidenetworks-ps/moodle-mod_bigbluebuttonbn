@@ -239,7 +239,6 @@ M.mod_bigbluebuttonbn.recordings = {
             source: 'published',
             goalstate: 'true',
             attempts: 1,
-            async: false,
             dataset: nodeelement.getData()
         };
         this.recording_action(element, false, extras);
