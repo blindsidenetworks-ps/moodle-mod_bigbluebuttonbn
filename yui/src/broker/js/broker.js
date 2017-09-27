@@ -61,7 +61,7 @@ M.mod_bigbluebuttonbn.broker = {
                     }
                     // Use the current response for verification
                     if (data.attempts <= 1) {
-                        return M.mod_bigbluebuttonbn.broker.recording_action_performed_validation(e, data);
+                        return M.mod_bigbluebuttonbn.broker.recording_action_performed_completed(e, data);
                     }
                     // Iterate the verification.
                     return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
@@ -90,18 +90,12 @@ M.mod_bigbluebuttonbn.broker = {
             request: qs,
             callback: {
                 success: function(e) {
-                    // Something went wrong.
-                    if (typeof e.data[data.source] === 'undefined') {
-                        data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
-                        M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
+                    // Evaluates if the current attempt has been completed.
+                    if (M.mod_bigbluebuttonbn.recording_action_performed_completed(e, data)) {
+                        // It has been completed, so stop the action.
                         return;
                     }
-
-                    if (e.data[data.source] === data.goalstate) {
-                        M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
-                        return;
-                    }
-
+                    // Evaluates if more attempts have to be performed.
                     if (data.attempt < data.attempts) {
                         data.attempt += 1;
                         setTimeout(((function() {
@@ -111,7 +105,7 @@ M.mod_bigbluebuttonbn.broker = {
                         })(this)), (data.attempt - 1) * 1000);
                         return;
                     }
-
+                    // No more attempts to perform, it stops with failing over.
                     data.message = M.util.get_string('view_error_action_not_completed', 'bigbluebuttonbn');
                     M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
                 },
@@ -123,17 +117,17 @@ M.mod_bigbluebuttonbn.broker = {
         });
     },
 
-    recording_action_performed_validation: function(e, data) {
+    recording_action_performed_completed: function(e, data) {
         // Something went wrong.
         if (typeof e.data[data.source] === 'undefined') {
             data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
             M.mod_bigbluebuttonbn.recordings.recording_action_failover(data);
-            return;
+            return true;
         }
-
+        // Evaluates if the state is as expected.
         if (e.data[data.source] === data.goalstate) {
             M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
-            return;
+            return true;
         }
     },
 
