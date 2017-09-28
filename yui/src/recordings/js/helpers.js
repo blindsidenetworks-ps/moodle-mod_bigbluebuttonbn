@@ -164,6 +164,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     init_element_tag: function() {
         var tags = {};
+        tags.play = 'play';
         tags.publish = 'hide';
         tags.unpublish = 'show';
         tags.protect = 'lock';
@@ -190,6 +191,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     init_element_action_reversed: function() {
         var actions = {};
+        actions.play = 'play';
         actions.publish = 'unpublish';
         actions.unpublish = 'publish';
         actions.protect = 'unprotect';

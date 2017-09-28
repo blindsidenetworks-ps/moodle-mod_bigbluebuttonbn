@@ -61,10 +61,10 @@ M.mod_bigbluebuttonbn.broker = {
                     }
                     // Use the current response for verification
                     if (data.attempts <= 1) {
-                        return M.mod_bigbluebuttonbn.broker.recording_action_performed_completed(e, data);
+                        return M.mod_bigbluebuttonbn.broker.recording_action_performed_complete(e, data);
                     }
                     // Iterate the verification.
-                    return M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
+                    return M.mod_bigbluebuttonbn.broker.recording_action_performed_validate(data);
                 },
                 failure: function(e) {
                     data.message = e.error.message;
@@ -84,14 +84,14 @@ M.mod_bigbluebuttonbn.broker = {
         return qs;
     },
 
-    recording_action_performed: function(data) {
+    recording_action_performed_validate: function(data) {
         var qs = "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid;
         this.datasource.sendRequest({
             request: qs,
             callback: {
                 success: function(e) {
                     // Evaluates if the current attempt has been completed.
-                    if (M.mod_bigbluebuttonbn.recording_action_performed_completed(e, data)) {
+                    if (M.mod_bigbluebuttonbn.broker.recording_action_performed_complete(e, data)) {
                         // It has been completed, so stop the action.
                         return;
                     }
@@ -100,7 +100,7 @@ M.mod_bigbluebuttonbn.broker = {
                         data.attempt += 1;
                         setTimeout(((function() {
                             return function() {
-                                M.mod_bigbluebuttonbn.broker.recording_action_performed(data);
+                                M.mod_bigbluebuttonbn.broker.recording_action_performed_validate(data);
                             };
                         })(this)), (data.attempt - 1) * 1000);
                         return;
@@ -117,7 +117,7 @@ M.mod_bigbluebuttonbn.broker = {
         });
     },
 
-    recording_action_performed_completed: function(e, data) {
+    recording_action_performed_complete: function(e, data) {
         // Something went wrong.
         if (typeof e.data[data.source] === 'undefined') {
             data.message = M.util.get_string('view_error_current_state_not_found', 'bigbluebuttonbn');
@@ -127,6 +127,7 @@ M.mod_bigbluebuttonbn.broker = {
         // Evaluates if the state is as expected.
         if (e.data[data.source] === data.goalstate) {
             M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
+            return true;
         }
     },
 
