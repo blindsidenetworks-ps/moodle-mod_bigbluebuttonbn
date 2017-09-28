@@ -281,3 +281,20 @@ $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
   * capability can be enabled/disabled by the user creating or editing the resource for recordings.
   * $CFG->bigbluebuttonbn['recordings_imported_editable'] = 1;
   */
+
+  /*
+   *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
+  ** ------------------------------------------------------------------ **/
+  /*
+   * When general_warning_message value is different than "", the string is shown
+   * as a warning message to privileged users (administrators and Teachers or users allowed to edit).
+   * $CFG->bigbluebuttonbn['general_warning_message'] = "This will may have recordings enabled when upgraded to premium.";
+   *
+   * Additionally, when general_warning_button_href value is different than "", a button
+   * can also be shown right after the message.
+   * $CFG->bigbluebuttonbn['general_warning_button_href'] = "http://google.ca/";
+   *
+   * Finally, the text and class for the button can be modified
+   * $CFG->bigbluebuttonbn['general_warning_button_text'] = "Upgrade your site";
+   * $CFG->bigbluebuttonbn['general_warning_button_class'] = "btn btn-primary";
+   */

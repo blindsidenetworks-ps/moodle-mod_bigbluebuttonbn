@@ -301,6 +301,8 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $output = $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
+    $output .= bigbluebuttonbn_view_render_general_warning();
+
     if ($enabledfeatures['showroom']) {
         $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
@@ -320,6 +322,42 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
 
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
+}
+
+function bigbluebuttonbn_view_render_general_warning() {
+    global $OUTPUT;
+    $output = "\n";
+    // UI configuration options.
+    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
+    // Evaluates if config_warning is enabled.
+    if ($cfg['general_warning_message'] == "") {
+        return $output;
+    }
+    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-info alert-block fade in', 'bigbluebuttonbn_view_general_warning')."\n";
+    $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$cfg['general_warning_message']."\n";
+    $output .= '  <div class="singlebutton">'."\n";
+    if ($cfg['general_warning_button_href'] != "") {
+        $output .= bigbluebutton_view_render_general_warning_button($cfg['general_warning_button_href'],
+            $cfg['general_warning_button_text'], $cfg['general_warning_button_class']);
+    }
+    $output .= '  </div>'."\n";
+    $output .= $OUTPUT->box_end()."\n";
+    return $output;
+}
+
+function bigbluebutton_view_render_general_warning_button($href, $text = '', $class = '') {
+    if ($text == '') {
+        $text = get_string('ok', 'moodle');
+    }
+    if ($class == '') {
+        $class = 'btn btn-secondary';
+    }
+    $output  = '  <form method="post" action="' . $href . '" class="form-inline">'."\n";
+    $output .= '      <button type="submit" class="' . $class . '"'."\n";
+    $output .= '          title=""'."\n";
+    $output .= '          >' . $text . '</button>'."\n";
+    $output .= '  </form>'."\n";
+    return $output;
 }
 
 function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {

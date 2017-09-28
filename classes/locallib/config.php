@@ -75,7 +75,11 @@ class config {
             'recordings_deleted_default' => 'false',
             'recordings_deleted_editable' => 'false',
             'recordings_imported_default' => 'false',
-            'recordings_imported_editable' => 'false'
+            'recordings_imported_editable' => 'false',
+            'general_warning_message' => '',
+            'general_warning_button_text' => '',
+            'general_warning_button_href' => '',
+            'general_warning_button_class' => '',
         );
     }
 
@@ -142,6 +146,10 @@ class config {
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
                'instance_type_enabled' => self::recordings_enabled(),
                'instance_type_default' => BIGBLUEBUTTONBN_TYPE_ALL,
+               'general_warning_message' => self::get('general_warning_message'),
+               'general_warning_button_text' => self::get('general_warning_button_text'),
+               'general_warning_button_href' => self::get('general_warning_button_href'),
+               'general_warning_button_class' => self::get('general_warning_button_class'),
           ];
     }
 }
