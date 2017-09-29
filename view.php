@@ -143,8 +143,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
         $context, json_encode($participantlist), $bbbsession['userID'], $bbbsession['roles']);
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
         || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-    $bbbsession['importrecordings'] = ($bbbsession['managerecordings']
-        && (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled'));
+    $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
 
     // Server data.
     $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
@@ -298,10 +297,13 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
         'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
 
-    $output = $OUTPUT->heading($bbbsession['meetingname'], 3);
-    $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
+    // Renders general warning when configured.
+    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
+    $output  = bigbluebuttonbn_view_render_warning($cfg['general_warning_message'], 'info',
+        $cfg['general_warning_button_href'], $cfg['general_warning_button_text'], $cfg['general_warning_button_class']);
 
-    $output .= bigbluebuttonbn_view_render_general_warning();
+    $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
+    $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
 
     if ($enabledfeatures['showroom']) {
         $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
@@ -309,14 +311,18 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
-    if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
-        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
-        if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
-            $output .= bigbluebuttonbn_view_render_imported($bbbsession);
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
+            $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+            $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
+            if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
+                $output .= bigbluebuttonbn_view_render_imported($bbbsession);
+            }
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
+                'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
         }
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
-            'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
+    } elseif ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        $output  = bigbluebuttonbn_view_render_warning(get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
     }
 
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
@@ -324,28 +330,27 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
 }
 
-function bigbluebuttonbn_view_render_general_warning() {
+function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $text='', $class='') {
     global $OUTPUT;
     $output = "\n";
     // UI configuration options.
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     // Evaluates if config_warning is enabled.
-    if ($cfg['general_warning_message'] == "") {
+    if (empty($message)) {
         return $output;
     }
-    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-info alert-block fade in', 'bigbluebuttonbn_view_general_warning')."\n";
-    $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$cfg['general_warning_message']."\n";
+    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in', 'bigbluebuttonbn_view_general_warning')."\n";
+    $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$message."\n";
     $output .= '  <div class="singlebutton">'."\n";
-    if ($cfg['general_warning_button_href'] != "") {
-        $output .= bigbluebutton_view_render_general_warning_button($cfg['general_warning_button_href'],
-            $cfg['general_warning_button_text'], $cfg['general_warning_button_class']);
+    if (!empty($href)) {
+        $output .= bigbluebutton_view_render_general_warning_button($href, $text, $class);
     }
     $output .= '  </div>'."\n";
     $output .= $OUTPUT->box_end()."\n";
     return $output;
 }
 
-function bigbluebutton_view_render_general_warning_button($href, $text = '', $class = '') {
+function bigbluebutton_view_render_warning_button($href, $text = '', $class = '') {
     if ($text == '') {
         $text = get_string('ok', 'moodle');
     }

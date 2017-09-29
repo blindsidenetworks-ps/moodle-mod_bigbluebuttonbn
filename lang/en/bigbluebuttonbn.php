@@ -298,6 +298,7 @@ $string['view_message_conference_wait_for_moderator'] = 'Waiting for a moderator
 $string['view_message_conference_in_progress'] = 'This conference is in progress.';
 $string['view_message_conference_has_ended'] = 'This conference has ended.';
 $string['view_message_tab_close'] = 'This tab/window must be closed manually';
+$string['view_message_recordings_disabled'] = 'Recordings were disabled on this server. BigBlueButtonBN instances for recordings only can not be used.';
 
 $string['view_groups_selection_warning'] = 'There is a conference room for each group. If you have access to more than one be sure to select the correct one.';
 $string['view_conference_action_join'] = 'Join session';

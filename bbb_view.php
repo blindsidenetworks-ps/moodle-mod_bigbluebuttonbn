@@ -202,7 +202,7 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
             ];
 
     $data['record'] = 'false';
-    if ($bbbsession['record']) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $bbbsession['record']) {
         $data['record'] = 'true';
     }
 
