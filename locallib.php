@@ -59,6 +59,16 @@ function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], 
 function bigbluebuttonbn_getJoinURL( $meetingID, $userName, $PW, $SALT, $URL, $logoutURL ) {
     $url_join = $URL."api/join?";
     $params = 'meetingID='.urlencode($meetingID).'&fullName='.urlencode($userName).'&password='.urlencode($PW).'&logoutURL='.urlencode($logoutURL);
+
+    $parsed_url = parse_url($URL);
+    $statusHTML5 = file_get_contents($parsed_url["scheme"]."://".$parsed_url["host"]."/html5client/check");
+    if($statusHTML5 == '{"html5clientStatus":"running"}') {
+        // HTML5 client is running => joining HTML5 client
+
+        $clientURL = $parsed_url["scheme"]."://".$parsed_url["host"]."/html5client/join";
+        $params = $params.'&clientURL='.urlencode($clientURL);
+    }
+
     $url = $url_join.$params.'&checksum='.sha1("join".$params.$SALT);
     return $url;
 }
