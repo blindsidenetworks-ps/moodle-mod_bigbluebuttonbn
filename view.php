@@ -311,23 +311,34 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
 
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
-        if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
-            $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-            $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
-            if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
-                $output .= bigbluebuttonbn_view_render_imported($bbbsession);
-            }
-            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
+    if ($enabledfeatures['showrecordings']) {
+        $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
+        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
-        }
-    } elseif ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
-        $output  = bigbluebuttonbn_view_render_warning(get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
     }
 
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
-
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
+}
+
+function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $enabledfeatures, &$jsvars) {
+    $output = '';
+    // Evaluates if the recordings are enterely disabled
+    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+            $output .= bigbluebuttonbn_view_render_warning(get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
+        }
+        return $output;
+    }
+    // Recordings are rendered either if it is a 'recordings only' instance or it is set to be recorded
+    if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
+        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
+        if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
+            $output .= bigbluebuttonbn_view_render_imported($bbbsession);
+        }
+    }
+    return $output;
 }
 
 function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $text='', $class='') {
