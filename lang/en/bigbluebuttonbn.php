@@ -40,7 +40,7 @@ $string['config_server_url_description'] = 'The URL of your BigBlueButton server
 $string['config_shared_secret'] = 'BigBlueButton Shared Secret';
 $string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 
-$string['config_feature_recording'] = 'Configuration for "Recording" feature';
+$string['config_feature_recording'] = 'Configuration for "Record meeting" feature';
 $string['config_feature_recording_description'] = 'These settings are feature specific';
 $string['config_feature_recording_default'] = 'Recording feature enabled by default';
 $string['config_feature_recording_default_description'] = 'If enabled the sessions created in BigBlueButton will have recording capabilities.';

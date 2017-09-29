@@ -300,7 +300,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     // Renders general warning when configured.
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $output  = bigbluebuttonbn_view_render_warning($cfg['general_warning_message'], 'info',
-        $cfg['general_warning_button_href'], $cfg['general_warning_button_text'], $cfg['general_warning_button_class']);
+        (string)$cfg['general_warning_button_href'], (string)$cfg['general_warning_button_text'], (string)$cfg['general_warning_button_class']);
 
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
@@ -344,8 +344,6 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
 function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $text='', $class='') {
     global $OUTPUT;
     $output = "\n";
-    // UI configuration options.
-    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     // Evaluates if config_warning is enabled.
     if (empty($message)) {
         return $output;

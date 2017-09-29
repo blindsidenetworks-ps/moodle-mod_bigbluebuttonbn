@@ -1559,7 +1559,6 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
 }
 
 function bigbluebuttonbn_get_instance_type_profiles() {
-    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $instanceprofiles = array(
             array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
                 'features' => array('all')),
@@ -1654,8 +1653,7 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
 function bigbluebutonbn_settings_general(&$settings) {
     global $CFG;
     // Configuration for BigBlueButton.
-    if (!isset($CFG->bigbluebuttonbn['server_url']) ||
-        !isset($CFG->bigbluebuttonbn['shared_secret'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_general_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_config_general',
                 get_string('config_general', 'bigbluebuttonbn'),
                 get_string('config_general_description', 'bigbluebuttonbn')));
@@ -1677,9 +1675,7 @@ function bigbluebutonbn_settings_general(&$settings) {
 function bigbluebutonbn_settings_recordings(&$settings) {
     global $CFG;
     // Configuration for 'recording' feature.
-    if (!isset($CFG->bigbluebuttonbn['recording_default']) ||
-        !isset($CFG->bigbluebuttonbn['recording_editable']) ||
-        !isset($CFG->bigbluebuttonbn['recording_icons_enabled'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_record_meeting_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recording',
                 get_string('config_feature_recording', 'bigbluebuttonbn'),
                 get_string('config_feature_recording_description', 'bigbluebuttonbn')));
@@ -1707,8 +1703,7 @@ function bigbluebutonbn_settings_recordings(&$settings) {
         }
     }
     // Configuration for 'import recordings' feature.
-    if (!isset($CFG->bigbluebuttonbn['importrecordings_enabled']) ||
-        !isset($CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_import_recordings_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_importrecordings',
                 get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
                 get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
@@ -1729,34 +1724,7 @@ function bigbluebutonbn_settings_recordings(&$settings) {
         }
     }
     // Configuration for 'show recordings' feature.
-    if (!isset($CFG->bigbluebuttonbn['recordings_enabled']) ||
-        !isset($CFG->bigbluebuttonbn['showrecordings_from_deleted_enabled'])) {
-        $settings->add(new admin_setting_heading('bigbluebuttonbn_importrecordings',
-                get_string('config_feature_importrecordings', 'bigbluebuttonbn'),
-                get_string('config_feature_importrecordings_description', 'bigbluebuttonbn')));
-
-        if (!isset($CFG->bigbluebuttonbn['showrecordings_enabled'])) {
-            // Default value for 'import recordings' feature.
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
-                    get_string('config_feature_importrecordings_enabled', 'bigbluebuttonbn'),
-                    get_string('config_feature_importrecordings_enabled_description', 'bigbluebuttonbn'),
-                    0));
-        }
-        if (!isset($CFG->bigbluebuttonbn['showrecordings_from_deleted_enabled'])) {
-            // Consider deleted activities for 'import recordings' feature.
-            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_from_deleted_enabled',
-                    get_string('config_feature_importrecordings_from_deleted_enabled', 'bigbluebuttonbn'),
-                    get_string('config_feature_importrecordings_from_deleted_enabled_description', 'bigbluebuttonbn'),
-                    0));
-        }
-    }
-    // Configuration for 'show recordings' feature.
-    if (!isset($CFG->bigbluebuttonbn['recordings_html_default']) ||
-        !isset($CFG->bigbluebuttonbn['recordings_html_editable']) ||
-        !isset($CFG->bigbluebuttonbn['recordings_deleted_default']) ||
-        !isset($CFG->bigbluebuttonbn['recordings_deleted_editable']) ||
-          !isset($CFG->bigbluebuttonbn['recordings_imported_default']) ||
-          !isset($CFG->bigbluebuttonbn['recordings_imported_editable'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_show_recordings_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_recordings',
                     get_string('config_feature_recordings', 'bigbluebuttonbn'),
                     get_string('config_feature_recordings_description', 'bigbluebuttonbn')));
@@ -1806,10 +1774,7 @@ function bigbluebutonbn_settings_recordings(&$settings) {
 function bigbluebutonbn_settings_meetings(&$settings) {
     global $CFG;
     // Configuration for wait for moderator feature.
-    if (!isset($CFG->bigbluebuttonbn['waitformoderator_default']) ||
-        !isset($CFG->bigbluebuttonbn['waitformoderator_editable']) ||
-        !isset($CFG->bigbluebuttonbn['waitformoderator_ping_interval']) ||
-        !isset($CFG->bigbluebuttonbn['waitformoderator_cache_ttl'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_waitformoderator',
                 get_string('config_feature_waitformoderator', 'bigbluebuttonbn'),
                 get_string('config_feature_waitformoderator_description', 'bigbluebuttonbn')));
@@ -1844,7 +1809,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
         }
     }
     // Configuration for "static voice bridge" feature.
-    if (!isset($CFG->bigbluebuttonbn['voicebridge_editable'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_static_voice_bridge_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_voicebridge',
                 get_string('config_feature_voicebridge', 'bigbluebuttonbn'),
                 get_string('config_feature_voicebridge_description', 'bigbluebuttonbn')));
@@ -1856,7 +1821,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
                 0));
     }
     // Configuration for "preupload presentation" feature.
-    if (!isset($CFG->bigbluebuttonbn['preuploadpresentation_enabled'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_preupload_presentation_shown()) {
         // This feature only works if curl is installed.
         if (extension_loaded('curl')) {
             $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_preuploadpresentation',
@@ -1880,8 +1845,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
         }
     }
     // Configuration for "user limit" feature.
-    if (!isset($CFG->bigbluebuttonbn['userlimit_default']) ||
-        !isset($CFG->bigbluebuttonbn['userlimit_editable'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_user_limit_shown()) {
         $settings->add(new admin_setting_heading('config_userlimit',
                 get_string('config_feature_userlimit', 'bigbluebuttonbn'),
                 get_string('config_feature_userlimit_description', 'bigbluebuttonbn')));
@@ -1902,7 +1866,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
         }
     }
     // Configuration for "scheduled duration" feature.
-    if (!isset($CFG->bigbluebuttonbn['scheduled_duration_enabled'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_scheduled_duration_shown()) {
         $settings->add(new admin_setting_heading('config_scheduled',
                 get_string('config_scheduled', 'bigbluebuttonbn'),
                 get_string('config_scheduled_description', 'bigbluebuttonbn')));
@@ -1926,7 +1890,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
                 10, PARAM_INT));
     }
     // Configuration for defining the default role/user that will be moderator on new activities.
-    if (!isset($CFG->bigbluebuttonbn['moderator_default'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_moderator_default_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_permission',
                 get_string('config_permission', 'bigbluebuttonbn'),
                 get_string('config_permission_description', 'bigbluebuttonbn')));
@@ -1940,7 +1904,7 @@ function bigbluebutonbn_settings_meetings(&$settings) {
                 array_keys($owner), array_merge($owner, $roles)));
     }
     // Configuration for "send notifications" feature.
-    if (!isset($CFG->bigbluebuttonbn['sendnotifications_enabled'])) {
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_send_notifications_shown()) {
         $settings->add(new admin_setting_heading('bigbluebuttonbn_feature_sendnotifications',
                 get_string('config_feature_sendnotifications', 'bigbluebuttonbn'),
                 get_string('config_feature_sendnotifications_description', 'bigbluebuttonbn')));
@@ -1956,29 +1920,29 @@ function bigbluebutonbn_settings_meetings(&$settings) {
 function bigbluebutonbn_settings_extended(&$settings) {
     global $CFG;
     // Configuration for extended BN capabilities.
-    if (bigbluebuttonbn_is_bn_server()) {
-        // Configuration for 'notify users when recording ready' feature.
-        if (!isset($CFG->bigbluebuttonbn['recordingready_enabled']) ||
-            !isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
-            $settings->add(new admin_setting_heading('bigbluebuttonbn_extended_capabilities',
-                    get_string('config_extended_capabilities', 'bigbluebuttonbn'),
-                    get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
+    if (!bigbluebuttonbn_is_bn_server()) {
+        return;
+    }
+    // Configuration for 'notify users when recording ready' feature.
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_settings_extended_shown()) {
+        $settings->add(new admin_setting_heading('bigbluebuttonbn_extended_capabilities',
+                get_string('config_extended_capabilities', 'bigbluebuttonbn'),
+                get_string('config_extended_capabilities_description', 'bigbluebuttonbn')));
 
-            // UI for 'notify users when recording ready' feature.
-            if (!isset($CFG->bigbluebuttonbn['recordingready_enabled'])) {
-                $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
-                    get_string('config_extended_feature_recordingready_enabled', 'bigbluebuttonbn'),
-                    get_string('config_extended_feature_recordingready_enabled_description', 'bigbluebuttonbn'),
-                    0));
-            }
+        // UI for 'notify users when recording ready' feature.
+        if (!isset($CFG->bigbluebuttonbn['recordingready_enabled'])) {
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
+                get_string('config_extended_feature_recordingready_enabled', 'bigbluebuttonbn'),
+                get_string('config_extended_feature_recordingready_enabled_description', 'bigbluebuttonbn'),
+                0));
+        }
 
-            // UI for 'register meeting events' feature.
-            if (!isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
-                $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_meetingevents_enabled',
-                        get_string('config_extended_feature_meetingevents_enabled', 'bigbluebuttonbn'),
-                        get_string('config_extended_feature_meetingevents_enabled_description', 'bigbluebuttonbn'),
-                        0));
-            }
+        // UI for 'register meeting events' feature.
+        if (!isset($CFG->bigbluebuttonbn['meetingevents_enabled'])) {
+            $settings->add(new admin_setting_configcheckbox('bigbluebuttonbn_meetingevents_enabled',
+                get_string('config_extended_feature_meetingevents_enabled', 'bigbluebuttonbn'),
+                get_string('config_extended_feature_meetingevents_enabled_description', 'bigbluebuttonbn'),
+                0));
         }
     }
 }

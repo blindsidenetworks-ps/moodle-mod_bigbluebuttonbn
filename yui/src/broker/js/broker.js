@@ -129,7 +129,6 @@ M.mod_bigbluebuttonbn.broker = {
             M.mod_bigbluebuttonbn.recordings.recording_action_completion(data);
             return true;
         }
-        return;
     },
 
     recording_current_state: function(action, data) {
