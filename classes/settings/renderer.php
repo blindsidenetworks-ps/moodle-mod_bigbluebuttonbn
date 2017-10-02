@@ -27,8 +27,72 @@ namespace mod_bigbluebuttonbn\settings;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+require_once($CFG->libdir.'/adminlib.php');
 
 class renderer {
+
+    private $settings;
+
+    public function __construct($settings) {
+        $this->settings = $settings;
+    }
+
+    /**
+     * @return
+     */
+    public function render_group_header($name, $itemname = null, $itemdescription = null) {
+        if ($itemname == null) {
+            $itemname = get_string('config_' . $name, 'bigbluebuttonbn');
+        }
+        if ($itemdescription == null) {
+            $itemdescription = get_string('config_' .$name . '_description', 'bigbluebuttonbn');
+        }
+        $item = new \admin_setting_heading('bigbluebuttonbn_config_' . $name, $itemname, $itemdescription);
+        $this->settings->add($item);
+    }
+
+    /**
+     * @return
+     */
+    public function render_group_element($name, $item) {
+        global $CFG;
+        if (!isset($CFG->bigbluebuttonbn[$name])) {
+            $this->settings->add($item);
+        }
+    }
+
+    /**
+     * @return Object
+     */
+    public function render_group_element_text($name, $default = null, $type = null) {
+        $item = new \admin_setting_configtext('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $default, $type);
+        return $item;
+    }
+
+    /**
+     * @return Object
+     */
+    public function render_group_element_checkbox($name, $default = null) {
+        $item = new \admin_setting_configcheckbox('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $default);
+        return $item;
+    }
+
+    /**
+     * @return Object
+     */
+    public function render_group_element_configmultiselect($name, $defaultsetting, $choices) {
+        $item = new \admin_setting_configmultiselect('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $defaultsetting, $choices);
+        return $item;
+    }
 
     /**
      * @return boolean

@@ -31,14 +31,14 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 if ($ADMIN->fulltree) {
     // Configuration for BigBlueButton.
+    $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
+
     // Renders general settings.
-    bigbluebutonbn_settings_general($settings);
-    // Evaluates if recordings are enabled for the Moodle site.
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
-        bigbluebutonbn_settings_recordings($settings);
-    }
+    bigbluebutonbn_settings_general($renderer);
+    // Renders settings for recordings.
+    bigbluebutonbn_settings_recordings($renderer);
     // Renders settings for meetings.
-    bigbluebutonbn_settings_meetings($settings);
+    bigbluebutonbn_settings_meetings($settings, $renderer);
     // Renders settings for extended capabilities.
-    bigbluebutonbn_settings_extended($settings);
+    bigbluebutonbn_settings_extended($settings, $renderer);
 }
