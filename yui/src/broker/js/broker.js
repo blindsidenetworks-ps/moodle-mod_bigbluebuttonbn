@@ -86,6 +86,7 @@ M.mod_bigbluebuttonbn.broker = {
 
     recording_action_performed_validate: function(data) {
         var qs = "action=recording_info&id=" + data.recordingid + "&idx=" + data.meetingid;
+        qs += this.recording_action_meta_qs(data);
         this.datasource.sendRequest({
             request: qs,
             callback: {

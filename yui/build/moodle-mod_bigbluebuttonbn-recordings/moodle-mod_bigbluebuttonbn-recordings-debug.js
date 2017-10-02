@@ -89,20 +89,17 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_action: function(element, confirmation, extras) {
         var payload = this.recording_element_payload(element);
         payload = Object.assign(payload, extras);
-
         // The action doesn't require confirmation.
         if (!confirmation) {
             this.recording_action_perform(payload);
             return;
         }
-
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
             question: this.recording_confirmation_message(payload)
         });
-
         // If it is confirmed.
         confirm.on('complete-yes', function() {
             this.recording_action_perform(payload);
