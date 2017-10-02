@@ -32,13 +32,12 @@ require_once(dirname(__FILE__).'/locallib.php');
 if ($ADMIN->fulltree) {
     // Configuration for BigBlueButton.
     $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
-
     // Renders general settings.
     bigbluebutonbn_settings_general($renderer);
     // Renders settings for recordings.
     bigbluebutonbn_settings_recordings($renderer);
     // Renders settings for meetings.
-    bigbluebutonbn_settings_meetings($settings, $renderer);
+    bigbluebutonbn_settings_meetings($renderer);
     // Renders settings for extended capabilities.
-    bigbluebutonbn_settings_extended($settings, $renderer);
+    bigbluebutonbn_settings_extended($renderer);
 }

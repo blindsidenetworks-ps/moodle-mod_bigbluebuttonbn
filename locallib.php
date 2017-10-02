@@ -1691,7 +1691,7 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
     }
 }
 
-function bigbluebutonbn_settings_meetings(&$settings, &$renderer) {
+function bigbluebutonbn_settings_meetings(&$renderer) {
     global $CFG;
     // Configuration for wait for moderator feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
@@ -1748,7 +1748,7 @@ function bigbluebutonbn_settings_meetings(&$settings, &$renderer) {
     }
 }
 
-function bigbluebutonbn_settings_extended(&$settings, &$renderer) {
+function bigbluebutonbn_settings_extended(&$renderer) {
     global $CFG;
     // Configuration for extended BN capabilities.
     if (!bigbluebuttonbn_is_bn_server()) {

@@ -33,7 +33,7 @@ class renderer {
 
     private $settings;
 
-    public function __construct($settings) {
+    public function __construct(&$settings) {
         $this->settings = $settings;
     }
 
@@ -64,7 +64,7 @@ class renderer {
     /**
      * @return Object
      */
-    public function render_group_element_text($name, $default = null, $type = null) {
+    public function& render_group_element_text($name, $default = null, $type = PARAM_RAW) {
         $item = new \admin_setting_configtext('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
@@ -75,7 +75,7 @@ class renderer {
     /**
      * @return Object
      */
-    public function render_group_element_checkbox($name, $default = null) {
+    public function& render_group_element_checkbox($name, $default = null) {
         $item = new \admin_setting_configcheckbox('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
@@ -86,7 +86,7 @@ class renderer {
     /**
      * @return Object
      */
-    public function render_group_element_configmultiselect($name, $defaultsetting, $choices) {
+    public function& render_group_element_configmultiselect($name, $defaultsetting, $choices) {
         $item = new \admin_setting_configmultiselect('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
