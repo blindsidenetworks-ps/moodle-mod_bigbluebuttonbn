@@ -623,7 +623,7 @@ function bigbluebuttonbn_get_participant_list_default($context) {
         'selectiontype' => 'all',
         'selectionid' => 'all',
         'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
-    $moderatordefaults = explode(',', \mod_bigbluebuttonbn\locallib\config::get('moderator_default'));
+    $moderatordefaults = explode(',', \mod_bigbluebuttonbn\locallib\config::get('participant_moderator_default'));
     foreach ($moderatordefaults as $moderatordefault) {
         if ($moderatordefault == 'owner') {
             if (is_enrolled($context, $USER->id)) {

@@ -45,7 +45,7 @@ class config {
     public static function defaultvalues() {
         return array(
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
-            'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+            'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
             'importrecordings_enabled' => 'false',
             'voicebridge_editable' => 'false',
             'importrecordings_enabled' => 'false',
@@ -61,7 +61,7 @@ class config {
             'recordingready_enabled' => 'false',
             'recordingstatus_enabled' => 'false',
             'meetingevents_enabled' => 'false',
-            'moderator_default' => 'owner',
+            'participant_moderator_default' => 'owner',
             'scheduled_duration_enabled' => 'false',
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',

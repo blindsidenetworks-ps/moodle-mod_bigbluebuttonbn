@@ -201,7 +201,7 @@ $CFG->bigbluebuttonbn['userlimit_editable'] = 0;
  * The values for this parameter can be 'owner' and/or any of the roles defined in
  * Moodle (including the custom parameters). The value used will be the key for the role.
  * [owner|manager|coursecreator|editingteacher|teacher|student|guest|user|frontpage|ANY_CUSTOM_ROLE]
- * $CFG->bigbluebuttonbn['moderator_default'] = 'owner';
+ * $CFG->bigbluebuttonbn['participant_moderator_default'] = 'owner';
  */
 
 /*

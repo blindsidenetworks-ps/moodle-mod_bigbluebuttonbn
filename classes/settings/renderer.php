@@ -185,7 +185,7 @@ class renderer {
      */
     public static function section_moderator_default_shown() {
         global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['moderator_default']));
+        return (!isset($CFG->bigbluebuttonbn['participant_moderator_default']));
     }
 
     /**
