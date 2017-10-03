@@ -27,76 +27,73 @@ defined('MOODLE_INTERNAL') || die();
 
 function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     global $DB;
-
     $dbman = $DB->get_manager();
-
     if ($oldversion < 2015080605) {
         // Drop field description.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'description');
-
         // Change welcome, allow null.
         $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'welcome',
             $fielddefinition);
-
         // Change userid definition in bigbluebuttonbn_log.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null,
             'previous' => 'bigbluebuttonbnid');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_log', 'userid',
             $fielddefinition);
-
+        // No settings to migrate.
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2015080605, 'bigbluebuttonbn');
     }
-
     if ($oldversion < 2016011305) {
         // Define field type to be droped from bigbluebuttonbn.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'type');
-
         // Rename table bigbluebuttonbn_log to bigbluebuttonbn_logs.
         xmldb_bigbluebuttonbn_rename_table($dbman, 'bigbluebuttonbn_log', 'bigbluebuttonbn_logs');
-
         // Rename field event to log in table bigbluebuttonbn_logs.
         xmldb_bigbluebuttonbn_rename_field($dbman, 'bigbluebuttonbn_logs', 'event', 'log');
-
+        // No settings to migrate.
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
-
     if ($oldversion < 2016080114) {
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
-
         // Add field type.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
             $fielddefinition);
-
         // Add field recordings_html.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_html',
             $fielddefinition);
-
         // Add field recordings_deleted.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted',
             $fielddefinition);
-
         // Add field recordings_imported.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
-
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'tagging');
-
+        // Migrate settings.
+        unset_config('recordingtagging_default', 'mod_bigbluebuttonbn');
+        unset_config('recordingtagging_editable', 'mod_bigbluebuttonbn');
+        $cfgvalue =  get_config('mod_bigbluebuttonbn', 'importrecordings_from_deleted_activities_enabled');
+        set_config('importrecordings_from_deleted_enabled', $cfgvalue, 'mod_bigbluebuttonbn');
+        unset_config('importrecordings_from_deleted_activities_enabled', 'mod_bigbluebuttonbn');
+        $cfgvalue =  get_config('mod_bigbluebuttonbn', 'moderator_default');
+        set_config('participant_moderator_default', $cfgvalue, 'mod_bigbluebuttonbn');
+        unset_config('moderator_default', 'mod_bigbluebuttonbn');
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2016080114, 'bigbluebuttonbn');
     }
-
     return true;
 }
 
@@ -113,7 +110,6 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
         $dbman->change_field_default($table, $field, true, true);
         return;
     }
-
     $dbman->add_field($table, $field, true, true);
 }
 
