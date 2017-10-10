@@ -78,9 +78,9 @@ script:
   - moodle-plugin-ci phpcpd
   - moodle-plugin-ci phpmd
   #- moodle-plugin-ci codechecker ## Failing due BIGBLUEBUTTONBN_CFG
-  - moodle-plugin-ci validate    ## Failing
+  - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  #- moodle-plugin-ci behat       ## Failing because the function not defined
+  - moodle-plugin-ci behat       ## Failing because the function not defined
