@@ -113,7 +113,7 @@ function bigbluebuttonbn_supports($feature) {
  *
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
-function bigbluebuttonbn_add_instance($data, $mform) {
+function bigbluebuttonbn_add_instance($data) {
     global $DB;
 
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
@@ -139,7 +139,7 @@ function bigbluebuttonbn_add_instance($data, $mform) {
  *
  * @return bool Success/Fail
  */
-function bigbluebuttonbn_update_instance($data, $mform) {
+function bigbluebuttonbn_update_instance($data) {
     global $DB;
 
     $data->id = $data->instance;

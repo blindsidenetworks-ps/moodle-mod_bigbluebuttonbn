@@ -1651,7 +1651,6 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
 }
 
 function bigbluebutonbn_settings_general(&$renderer) {
-    global $CFG;
     // Configuration for BigBlueButton.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_general_shown()) {
         $renderer->render_group_header('general');
@@ -1661,7 +1660,6 @@ function bigbluebutonbn_settings_general(&$renderer) {
 }
 
 function bigbluebutonbn_settings_recordings(&$renderer) {
-    global $CFG;
     // Evaluates if recordings are enabled for the Moodle site.
     if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
         return;
@@ -1692,7 +1690,6 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
 }
 
 function bigbluebutonbn_settings_meetings(&$renderer) {
-    global $CFG;
     // Configuration for wait for moderator feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
         $renderer->render_group_header('waitformoderator');
@@ -1709,11 +1706,11 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
     // Configuration for "preupload presentation" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_preupload_presentation_shown()) {
         // This feature only works if curl is installed.
-        $preuploadpresentationdescrip = get_string('config_preuploadpresentation_description', 'bigbluebuttonbn');
+        $preuploaddescripion = get_string('config_preuploadpresentation_description', 'bigbluebuttonbn');
         if (!extension_loaded('curl')) {
-            $preuploadpresentationdescrip .= '<div class="form-defaultinfo">'.get_string('config_warning_curl_not_installed', 'bigbluebuttonbn').'</div><br>';
+            $preuploaddescripion .= '<div class="form-defaultinfo">'.get_string('config_warning_curl_not_installed', 'bigbluebuttonbn').'</div><br>';
         }
-        $renderer->render_group_header('preuploadpresentation', null, $preuploadpresentationdescrip);
+        $renderer->render_group_header('preuploadpresentation', null, $preuploaddescripion);
         if (extension_loaded('curl')) {
             $renderer->render_group_element('preuploadpresentation_enabled', $renderer->render_group_element_checkbox('preuploadpresentation_enabled', 0));
         }
@@ -1749,7 +1746,6 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
 }
 
 function bigbluebutonbn_settings_extended(&$renderer) {
-    global $CFG;
     // Configuration for extended BN capabilities.
     if (!bigbluebuttonbn_is_bn_server()) {
         return;
