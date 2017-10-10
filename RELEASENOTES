@@ -1,7 +1,46 @@
 2.2 (2016080100)
 Enhancement: Included the parameter userID as part of the join request.
 Enhancement: Added preview thumbnails to recordings.
-Enhancement: Added type to diferenciate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
+Enhancement: Added type to differentiate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
+
+2.1.14 (2016051919)
+Bug: Fixed issue participant list not considering rules based on Moodle roles when user had multiple.
+Bug: Fixed issue participant list not applying the default rule correctly.
+
+2.1.13 (2016051918)
+Bug: Fixed issue with hint on hovering participant list button
+Bug: Fixed issue participant list not considering rules based on Moodle roles.
+
+2.1.12 (2016051917)
+Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. As the permissions are now based in role and user id, previous settings were ignored. (CONTRIB-6925)
+Bug: Fixed issue with mod_form not being rendered when participants were not set (happened with activities imported from old versions).
+Bug: Fixed issue with all recordings shown to all users when separated groups were set.
+
+2.1.11 (2016051916)
+Bug: Fixed issue with role names not properly shown in Totara.
+Bug: Fixed issue with roles in participant list not showing correctly.
+Bug: Fixed issue with users enrolled and no active being included in participant list.
+Bug: Fixed issue with moderators being considered viewers.
+Bug: Fixed issue with message shown to non-moderators when the room is not open yet.
+Bug: Fixed issue with messages not properly sent when the room/activity was added/updated.
+
+2.1.10 (2016051915)
+Hot fix: After some changes introduced in v2.1.7 the way participants are handled changed. This affected the way the new UI renders the settings form. (CONTRIB-6900)
+Bug: Fixed Participants for style in mod_form not working in all versions.
+Bug: Fixed issue with action buttons not being updated on publish/unpublish and delete recordings
+Bug: Fixed style in 'Import recordings' and 'Go back' buttons.
+
+2.1.9 (2016051914)
+Bug: Fixed Participants for style in mod_form and buttons in view.
+Bug: Fixed Participants for style in mod_form not working in all versions.
+
+2.1.8 (2016051913)
+Bug: Fixed issue with custom role names failing when they were edited after being used.
+Bug: Fixed issue with separated groups.
+
+2.1.7 (2016051911)
+Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
+Bug: Fixed issue with a string not properly localized.
 
 2.1.7 (2016051911)
 Bug: Fixed issue with roles not shown correctly in Totara and any custom implementation.
@@ -14,11 +53,11 @@ Bug: Fixed issue with references to recordings and imported links not being prop
 Bug: Fixed issue with guest users not able to join as moderators even though the role is matched with the role with BBB .
 
 2.1.5 (2016051909)
-Bug: Fixed issue with actions for recording managment not working in instances with schedule. (CONTRIB-6654)
-Bug: Standarized output in intermediate page for activities not started/ended.
+Bug: Fixed issue with actions for recording management not working in instances with schedule. (CONTRIB-6654)
+Bug: Standardized output in intermediate page for activities not started/ended.
 Bug: Fixed issue with past BBB sessions listed as upcoming in the course overview block. (CONTRIB-6650)
 Bug: Fixed issue with default bigbluebutton server settings. (CONTRIB-6630)
-Bug: Rework to prevent potental issue with recordings not fetched when the course has too many groups.
+Bug: Rework to prevent potential issue with recordings not fetched when the course has too many groups.
 
 2.1.4 (2016051908)
 Bug: Reverted changes made to the language strings in previous release.

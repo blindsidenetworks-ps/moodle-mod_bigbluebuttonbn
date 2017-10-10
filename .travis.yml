@@ -33,28 +33,24 @@ env:
 
 matrix:
   include:
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
     - php: 7.0
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=mysqli
-    #  addons:
-    #    postgresql: 9.3
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=mysqli
+      addons:
+        postgresql: 9.3
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=pgsql
 
 before_install:
   - phpenv config-rm xdebug.ini

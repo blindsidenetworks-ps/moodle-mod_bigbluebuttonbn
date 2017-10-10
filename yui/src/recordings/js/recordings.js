@@ -87,20 +87,17 @@ M.mod_bigbluebuttonbn.recordings = {
     recording_action: function(element, confirmation, extras) {
         var payload = this.recording_element_payload(element);
         payload = Object.assign(payload, extras);
-
-        // The action doesn;t require confirmation.
+        // The action doesn't require confirmation.
         if (!confirmation) {
             this.recording_action_perform(payload);
             return;
         }
-
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
             question: this.recording_confirmation_message(payload)
         });
-
         // If it is confirmed.
         confirm.on('complete-yes', function() {
             this.recording_action_perform(payload);
@@ -172,10 +169,8 @@ M.mod_bigbluebuttonbn.recordings = {
         var link = Y.one(element);
         var node = link.ancestor('div');
         var text = node.one('> span');
-
         text.hide();
         link.hide();
-
         var inputtext = Y.Node.create('<input type="text" class="form-control"></input>');
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
@@ -207,13 +202,11 @@ M.mod_bigbluebuttonbn.recordings = {
         var inputtext = Y.one(element);
         var node = inputtext.ancestor('div');
         var text = element.value;
-
         // Perform the update.
         inputtext.setAttribute('data-action', 'edit');
         inputtext.setAttribute('data-goalstate', text);
         M.mod_bigbluebuttonbn.recordings.recording_update(inputtext.getDOMNode());
         node.one('> span').setHTML(text);
-
         var link = node.one('> a');
         link.show();
         link.focus();
@@ -227,7 +220,6 @@ M.mod_bigbluebuttonbn.recordings = {
         if (typeof text === 'undefined') {
             return;
         }
-
         var inputtext = node.one('> input');
         if (failed) {
             text.setHTML(inputtext.getAttribute('data-value'));
@@ -237,7 +229,14 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recording_play: function(element) {
         var nodeelement = Y.one(element);
-        window.open(nodeelement.getAttribute('data-href'));
+        var extras = {
+            target: nodeelement.getAttribute('data-target'),
+            source: 'published',
+            goalstate: 'true',
+            attempts: 1,
+            dataset: nodeelement.getData()
+        };
+        this.recording_action(element, false, extras);
     },
 
     recording_confirmation_message: function(data) {
@@ -246,24 +245,20 @@ M.mod_bigbluebuttonbn.recordings = {
         if (typeof confirmation === 'undefined') {
             return '';
         }
-
         recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (Y.one('#playbacks-' + data.recordingid).get('dataset').imported === 'true') {
             recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
-
         confirmation = confirmation.replace("{$a}", recording_type);
         if (data.action === 'import') {
             return confirmation;
         }
-
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
         elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
         associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
         if (associated_links === 0) {
             return confirmation;
         }
-
         confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
             'bigbluebuttonbn');
         if (associated_links == 1) {
@@ -275,20 +270,18 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recording_action_completion: function(data) {
-        if (data.action == 'play') {
-            window.open(data.href);
-            return;
-        }
-
         if (data.action == 'delete' || data.action == 'import') {
             Y.one('#recording-td-' + data.recordingid).remove();
             return;
         }
-
+        if (data.action == 'play') {
+            M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
+            window.open(data.dataset.href, "_self");
+            return;
+        }
         M.mod_bigbluebuttonbn.helpers.update_data(data);
         M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
         M.mod_bigbluebuttonbn.helpers.update_id(data);
-
         if (data.action === 'publish' || data.action === 'unpublish') {
             this.recording_publishunpublish_completion(data);
         }
@@ -300,9 +293,7 @@ M.mod_bigbluebuttonbn.recordings = {
             message: data.message
         });
         alert.show();
-
         M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
-
         if (data.action === 'edit') {
             this.recording_edit_completion(data, true);
         }
