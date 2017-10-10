@@ -265,9 +265,8 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     }
 
     bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'), 'warning');
-
-    groups_print_activity_menu(
-      $bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
+    $urltoroot = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id;
+    groups_print_activity_menu($bbbsession['cm'], $urltoroot);
     echo '<br><br>';
 }
 

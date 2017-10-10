@@ -1,4 +1,0 @@
-checks:
-    php:
-        duplication: false
-        

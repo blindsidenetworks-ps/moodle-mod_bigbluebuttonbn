@@ -200,22 +200,11 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
               'moderatorPW' => $bbbsession['modPW'],
               'logoutURL' => $bbbsession['logoutURL'],
             ];
-
-    $data['record'] = 'false';
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $bbbsession['record']) {
-        $data['record'] = 'true';
-    }
-
-    $welcome = trim($bbbsession['welcome']);
-    if ($welcome != '') {
-        $data['welcome'] = $welcome;
-    }
+    $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+    $data['welcome'] = trim($bbbsession['welcome']);
 
     // Set the duration for the meeting.
-    $durationtime = 0;
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
-        $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
-    }
+    $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bigbluebuttonbn->closingtime);
     if ($durationtime > 0) {
         $data['duration'] = $durationtime;
         $data['welcome'] .= '<br><br>';
@@ -237,6 +226,20 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
     }
 
     return $data;
+}
+
+function bigbluebutton_bbb_view_create_meeting_data_record($record) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
+        return 'true';
+    }
+    return 'false';
+}
+
+function bigbluebutton_bbb_view_create_meeting_data_duration($closingtime) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
+        return bigbluebuttonbn_get_duration($closingtime);
+    }
+    return 0;
 }
 
 function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
