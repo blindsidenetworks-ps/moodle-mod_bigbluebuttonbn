@@ -109,26 +109,18 @@ function bigbluebuttonbn_supports($feature) {
  * of the new instance.
  *
  * @param object $data  An object from the form in mod_form.php
- * @param object $mform An object from the form in mod_form.php
- *
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data) {
     global $DB;
-
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
     $context = context_module::instance($data->coursemodule);
-
     bigbluebuttonbn_process_pre_save($data);
-
     unset($data->presentation);
     $bigbluebuttonbnid = $DB->insert_record('bigbluebuttonbn', $data);
     $data->id = $bigbluebuttonbnid;
-
     bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $draftitemid);
-
     bigbluebuttonbn_process_post_save($data);
-
     return $bigbluebuttonbnid;
 }
 
@@ -137,24 +129,19 @@ function bigbluebuttonbn_add_instance($data) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
+ * @param object $data  An object from the form in mod_form.php
  * @return bool Success/Fail
  */
 function bigbluebuttonbn_update_instance($data) {
     global $DB;
-
     $data->id = $data->instance;
     $draftitemid = isset($data->presentation) ? $data->presentation : null;
     $context = context_module::instance($data->coursemodule);
-
     bigbluebuttonbn_process_pre_save($data);
-
     unset($data->presentation);
     $DB->update_record('bigbluebuttonbn', $data);
-
     bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
-
     bigbluebuttonbn_process_post_save($data);
-
     return true;
 }
 
@@ -169,35 +156,27 @@ function bigbluebuttonbn_update_instance($data) {
  */
 function bigbluebuttonbn_delete_instance($id) {
     global $DB;
-
     if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
     }
-
     // End the session associated with this instance (if it's running).
     $meetingid = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
     $modpw = $bigbluebuttonbn->moderatorpass;
-
-    if (bigbluebuttonbn_is_meeting_running($meetingid)) {
-        bigbluebuttonbn_end_meeting($meetingid, $modpw);
-    }
+    // TODO: Validate if the meeting is running, end it if true.
 
     // Perform delete.
     if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
         return false;
     }
-
     if (!$DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
         return false;
     }
-
     // Log action performed.
     return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
 }
 
 function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     global $DB, $USER;
-
     $log = new stdClass();
     $log->meetingid = $bigbluebuttonbn->meetingid;
     $log->courseid = $bigbluebuttonbn->course;
@@ -205,7 +184,6 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     $log->userid = $USER->id;
     $log->timecreated = time();
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
-
     $logs = $DB->get_records('bigbluebuttonbn_logs',
         array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE, 'meta' => "{\"record\":true}")
       );
@@ -213,11 +191,9 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     if (!empty($logs)) {
         $log->meta = "{\"has_recordings\":true}";
     }
-
     if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
         return false;
     }
-
     return true;
 }
 /**
@@ -231,18 +207,15 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
-
     $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
                                                               'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                                                               'userid' => $user->id,
                                                               'log' => 'Join', ), '*');
-
     if ($completed > 0) {
         return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.
             get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.
             get_string('view_message_times', 'bigbluebuttonbn');
     }
-
     return '';
 }
 
@@ -254,12 +227,10 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  */
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
-
     $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
                                                               'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                                                               'userid' => $user->id,
                                                               'log' => 'Join', ), '*', IGNORE_MULTIPLE);
-
     return $completed > 0;
 }
 
