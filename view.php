@@ -221,7 +221,7 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn
 There are no groups,
 */
 function bigbluebuttonbn_view_groups(&$bbbsession) {
-    global $OUTPUT, $CFG;
+    global $CFG;
 
     // Find out current group mode.
     $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
@@ -234,6 +234,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     $groups = groups_get_all_groups($bbbsession['course']->id);
     if (empty($groups)) {
         // No groups in this course.
+        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'), 'info', true);
         return;
     }
 
@@ -242,40 +243,42 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
     }
 
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
+    $groupname = get_string('allparticipants');
+    if ($bbbsession['group'] != 0) {
+        $groupname = groups_get_group_name($bbbsession['group']);
+    }
 
     // Assign group default values.
     $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
         $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
-    $groupname = get_string('allparticipants');
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
 
     if (count($groups) == 0) {
         // Only the All participants group exists.
+        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info', false);
         return;
     }
-
-    if ($bbbsession['group'] == 0) {
-        $bbbsession['group'] = array_values($groups)[0]->id;
-    }
-
-    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-        $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
-    $groupname = groups_get_group_name($bbbsession['group']);
-    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
 
     if (count($groups) == 1) {
-        // There only one group and the user has access to.
+        // There is only one group and the user has access to it.
         return;
     }
 
-    echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo '<br><div class="alert alert-warning">'.get_string('view_groups_selection_warning', 'bigbluebuttonbn').
-      '</div>';
-    echo $OUTPUT->box_end();
+    bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'), 'warning');
 
     groups_print_activity_menu(
       $bbbsession['cm'], $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id);
     echo '<br><br>';
+}
+
+function bigbluebuttonbn_view_message_box(&$bbbsession, $message, $type='warning', $onlymoderator=false) {
+    global $OUTPUT;
+    if ($onlymoderator && !$bbbsession['moderator'] && !$bbbsession['administrator']) {
+        return;
+    }
+    echo $OUTPUT->box_start('generalbox boxaligncenter');
+    echo '<br><div class="alert alert-' . $type . '">' . $message . '</div>';
+    echo $OUTPUT->box_end();
 }
 
 function bigbluebuttonbn_view_render(&$bbbsession, $activity) {

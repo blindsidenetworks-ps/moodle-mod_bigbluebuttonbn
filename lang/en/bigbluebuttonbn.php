@@ -122,12 +122,12 @@ $string['config_sendnotifications_enabled_description'] = 'Send notifications fe
 
 $string['config_extended_capabilities'] = 'Configuration for extended capabilities';
 $string['config_extended_capabilities_description'] = 'Configuration for extended capabilities when the BigBlueButton server offers them.';
-$string['config_extended_feature_uidelegation_enabled'] = 'UI delegation is enabled';
-$string['config_extended_feature_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
-$string['config_extended_feature_recordingready_enabled'] = 'Notifications when recording ready enabled';
-$string['config_extended_feature_recordingready_enabled_description'] = 'Notifications when recording ready feature is enabled.';
-$string['config_extended_feature_meetingevents_enabled'] = 'Register meeting events';
-$string['config_extended_feature_meetingevents_enabled_description'] = 'Register meeting events feature is enabled.';
+$string['config_uidelegation_enabled'] = 'UI delegation is enabled';
+$string['config_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
+$string['config_recordingready_enabled'] = 'Notifications when recording ready enabled';
+$string['config_recordingready_enabled_description'] = 'Notifications when recording ready feature is enabled.';
+$string['config_meetingevents_enabled'] = 'Register meeting events';
+$string['config_meetingevents_enabled_description'] = 'Register meeting events feature is enabled.';
 
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
 
@@ -301,6 +301,8 @@ $string['view_message_tab_close'] = 'This tab/window must be closed manually';
 $string['view_message_recordings_disabled'] = 'Recordings were disabled on this server. BigBlueButtonBN instances for recordings only can not be used.';
 
 $string['view_groups_selection_warning'] = 'There is a conference room for each group. If you have access to more than one be sure to select the correct one.';
+$string['view_groups_nogroups_warning'] = 'The room was configured for using groups but the course does not have goups defined.';
+$string['view_groups_notenrolled_warning'] = 'The room was configured for using groups but you are not enrolled in any of them.';
 $string['view_conference_action_join'] = 'Join session';
 $string['view_conference_action_end'] = 'End session';
 
