@@ -157,23 +157,21 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     msg_attendees_in: function(moderators, participants) {
-
-        if (!this.has_participants()) {
+        var msg_moderators, viewers, msg_viewers, msg;
+        if (!this.has_participants(participants)) {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
-
-        var msg_moderators = this.msg_moderators_in(moderators);
-        var viewers = participants - moderators;
-        var msg_viewers = this.msg_viewers_in(viewers);
-        var msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
+        msg_moderators = this.msg_moderators_in(moderators);
+        viewers = participants - moderators;
+        msg_viewers = this.msg_viewers_in(viewers);
+        msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
             return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
         }
-
+        msg = M.util.get_string('view_message_session_has_user', 'bigbluebuttonbn');
         if (moderators > 0) {
             return msg + ' <b>1</b> ' + msg_moderators + '.';
         }
-
         return msg + ' <b>1</b> ' + msg_viewers + '.';
     },
 

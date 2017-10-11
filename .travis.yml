@@ -16,9 +16,9 @@ cache:
     - $HOME/.npm
 
 php:
-  #- 5.4
-  #- 5.5
-  #- 5.6
+  - 5.4
+  - 5.5
+  - 5.6
 
 env:
   global:
@@ -30,61 +30,68 @@ env:
     #- MOODLE_BRANCH=MOODLE_28_STABLE DB=pgsql
     #- MOODLE_BRANCH=MOODLE_29_STABLE DB=mysqli
     #- MOODLE_BRANCH=MOODLE_29_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
 
 matrix:
   include:
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
     - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
     #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=mysqli
     #  addons:
     #    postgresql: 9.3
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=pgsql
+    #  env: MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
 
 before_install:
   - phpenv config-rm xdebug.ini
   - nvm install node
   - cd ../..
-  ## Custom script
-  #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci
-  #- cd ci
-  #- composer config repositories.moodle-plugin-ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-plugin-ci", "no-api":true}'
-  #- composer config repositories.moodle-local-codechecker '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_codechecker", "no-api":true}'
-  #- composer config repositories.moodle-local_ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_ci", "no-api":true}'
-  #- composer require --prefer-dist moodlehq/moodle-local_ci:dev-master#279e6b521f16c55b22ffff4ca00726ef291ee3e2
-  #- composer require --prefer-dist moodlehq/moodle-local_codechecker:dev-master#4f32c02e6d6b19be7431fd33ea175d2f93929387
-  #- cd ..
   ## Standard script
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
-  ## Complete settings
+  - composer selfupdate
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^${MOODLE_PLUGIN_CI}
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  ### Custom script for bypassing codechecker failing due BIGBLUEBUTTONBN_CFG
+  ##- git clone https://github.com/jfederico/moodle-plugin-ci.git ci
+  ##- cd ci
+  ##- composer config repositories.moodle-plugin-ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-plugin-ci", "no-api":true}'
+  ##- composer config repositories.moodle-local-codechecker '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_codechecker", "no-api":true}'
+  ##- composer config repositories.moodle-local_ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_ci", "no-api":true}'
+  ##- composer require --prefer-dist moodlehq/moodle-local_ci:dev-master#279e6b521f16c55b22ffff4ca00726ef291ee3e2
+  ##- composer require --prefer-dist moodlehq/moodle-local_codechecker:dev-master#4f32c02e6d6b19be7431fd33ea175d2f93929387
+  ##- cd ..
 
 install:
   - moodle-plugin-ci install
 
 script:
   - moodle-plugin-ci phplint
-  #- moodle-plugin-ci phpcpd      ## Failing
+  - moodle-plugin-ci phpcpd
   - moodle-plugin-ci phpmd
   #- moodle-plugin-ci codechecker ## Failing due BIGBLUEBUTTONBN_CFG
-  #- moodle-plugin-ci validate    ## Failing
-  - moodle-plugin-ci savepoints
-  - moodle-plugin-ci mustache
-  - moodle-plugin-ci grunt
+  - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
-  #- moodle-plugin-ci behat       ## Failing because the function not defined
+  # Specific for version 1
+  - 'if [ ${MOODLE_PLUGIN_CI} = "1" ]; then
+        moodle-plugin-ci csslint;
+        moodle-plugin-ci shifter;
+        moodle-plugin-ci jshint;
+     fi'
+  # Specific for version 2
+  - 'if [ ${MOODLE_PLUGIN_CI} = "2" ]; then
+        moodle-plugin-ci savepoints;
+        moodle-plugin-ci mustache;
+        moodle-plugin-ci grunt;
+        moodle-plugin-ci behat;
+     fi'

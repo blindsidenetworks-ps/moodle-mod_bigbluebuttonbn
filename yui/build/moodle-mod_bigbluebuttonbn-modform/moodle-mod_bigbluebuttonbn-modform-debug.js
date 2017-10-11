@@ -43,29 +43,28 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     update_instance_type_profile: function() {
-        var selected_type = Y.one('#id_type');
-        this.apply_instance_type_profile(this.bigbluebuttonbn.instance_type_profiles[
-            selected_type.get('value')]);
+        var selected_type, profile_type;
+        selected_type = Y.one('#id_type');
+        profile_type = this.bigbluebuttonbn.instance_type_room_only;
+        if (selected_type !== null) {
+            profile_type = selected_type.get('value');
+        }
+        this.apply_instance_type_profile(this.bigbluebuttonbn.instance_type_profiles[profile_type]);
     },
 
     apply_instance_type_profile: function(instance_type_profile) {
         var features = instance_type_profile.features;
         var show_all = features.includes('all');
-
         // Show room settings validation.
         this.show_fieldset('id_room', show_all || features.includes('showroom'));
-
         // Show recordings settings validation.
         this.show_fieldset('id_recordings', show_all || features.includes('showrecordings'));
         this.show_input('id_recordings_imported', features.includes('showrecordings'));
-
         // Preuploadpresentation feature validation.
         this.show_fieldset('id_preuploadpresentation', show_all ||
             features.includes('preuploadpresentation'));
-
         // Participants feature validation.
         this.show_fieldset('id_permissions', show_all || features.includes('permissions'));
-
         // Schedule feature validation.
         this.show_fieldset('id_schedule', show_all || features.includes('schedule'));
     },
@@ -76,12 +75,10 @@ M.mod_bigbluebuttonbn.modform = {
         if (!fieldset) {
             return;
         }
-
         if (show) {
             Y.DOM.setStyle(fieldset, 'display', 'block');
             return;
         }
-
         Y.DOM.setStyle(fieldset, 'display', 'none');
     },
 
@@ -91,20 +88,16 @@ M.mod_bigbluebuttonbn.modform = {
         if (!inputset) {
             return;
         }
-
         var node = Y.one(inputset).ancestor('div').ancestor('div');
-
         if (show) {
             node.setStyle('display', 'block');
             return;
         }
-
         node.setStyle('display', 'none');
     },
 
     participant_selection_set: function() {
         this.select_clear('bigbluebuttonbn_participant_selection');
-
         var type = document.getElementById('bigbluebuttonbn_participant_selection_type');
         for (var i = 0; i < type.options.length; i++) {
             if (type.options[i].selected) {

@@ -149,12 +149,8 @@ switch (strtolower($action)) {
         // Since the meeting is already running, we just join the session.
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
         break;
-    case 'playback':
+    case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
-        if ($href == '') {
-            bigbluebutton_bbb_view_close_window();
-            return;
-        }
 
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_VIEWED, $bigbluebuttonbn, $cm, ['other' => $rid]);
@@ -170,6 +166,9 @@ function bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype) {
         return $href;
     }
     $recordings = bigbluebuttonbn_get_recordings_array($mid, $rid);
+    if (empty($recordings)) {
+        return '';
+    }
     return bigbluebutton_bbb_view_playback_href_lookup($recordings[$rid]['playbacks'], $rtype);
 }
 
@@ -201,22 +200,11 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
               'moderatorPW' => $bbbsession['modPW'],
               'logoutURL' => $bbbsession['logoutURL'],
             ];
-
-    $data['record'] = 'false';
-    if ($bbbsession['record']) {
-        $data['record'] = 'true';
-    }
-
-    $welcome = trim($bbbsession['welcome']);
-    if ($welcome != '') {
-        $data['welcome'] = $welcome;
-    }
+    $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+    $data['welcome'] = trim($bbbsession['welcome']);
 
     // Set the duration for the meeting.
-    $durationtime = 0;
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
-        $durationtime = bigbluebuttonbn_get_duration($bigbluebuttonbn->closingtime);
-    }
+    $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bigbluebuttonbn->closingtime);
     if ($durationtime > 0) {
         $data['duration'] = $durationtime;
         $data['welcome'] .= '<br><br>';
@@ -238,6 +226,20 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
     }
 
     return $data;
+}
+
+function bigbluebutton_bbb_view_create_meeting_data_record($record) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
+        return 'true';
+    }
+    return 'false';
+}
+
+function bigbluebutton_bbb_view_create_meeting_data_duration($closingtime) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
+        return bigbluebuttonbn_get_duration($closingtime);
+    }
+    return 0;
 }
 
 function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
