@@ -33,24 +33,24 @@ env:
 
 matrix:
   include:
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
     - php: 7.0
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=mysqli
-    #  addons:
-    #    postgresql: 9.3
-    #- php: 7.0
-    #  env: MOODLE_BRANCH=master DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=mysqli
+      addons:
+        postgresql: 9.3
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=pgsql
 
 before_install:
   - phpenv config-rm xdebug.ini
@@ -83,4 +83,4 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat       ## Failing because the function not defined
+  - moodle-plugin-ci behat
