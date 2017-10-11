@@ -1,7 +1,15 @@
-2.2 (2016080100)
+2.2 (2017101000)
 Enhancement: Included the parameter userID as part of the join request.
 Enhancement: Added preview thumbnails to recordings.
-Enhancement: Added type to differentiate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
+Enhancement: Merged RecordingsBN by adding a type to differentiate if the instance implements "Room & Recordings"/"Only room"/"Only recordings".
+Enhancement: Recording name and description can be edited.
+Enhancement: Make use of Moodle tags for tagging recordings.
+Enhancement: Imported links to real recordings can also be imported.
+Enhancement: Links can be imported from activities in the same course.
+Enhancement: When users playback a recording an event for reports is logged.
+Enhancement: Guest users may are able to join a meeting based on Moodle permissions.
+Enhancement: Added automated tests.
+Refactoring: Major refactoring was applied in order to improve the quality of the code.
 
 2.1.14 (2016051919)
 Bug: Fixed issue participant list not considering rules based on Moodle roles when user had multiple.
