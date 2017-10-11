@@ -156,13 +156,11 @@ function bigbluebuttonbn_update_instance($data) {
  */
 function bigbluebuttonbn_delete_instance($id) {
     global $DB;
-    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id));
+    if (!$bigbluebuttonbn) {
         return false;
     }
-    // End the session associated with this instance (if it's running).
-    $meetingid = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
-    $modpw = $bigbluebuttonbn->moderatorpass;
-    // TODO: Validate if the meeting is running, end it if true.
+    // TODO: End the meeting if it is running.
 
     // Perform delete.
     if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
@@ -184,9 +182,8 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     $log->userid = $USER->id;
     $log->timecreated = time();
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
-    $logs = $DB->get_records('bigbluebuttonbn_logs',
-        array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE, 'meta' => "{\"record\":true}")
-      );
+    $sql = "SELECT * FROM {bigbluebuttonbn_logs} WHERE bigbluebuttonbnid = ? AND log = ? AND " . $DB->sql_compare_text('meta') . " = ?";
+    $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, BIGBLUEBUTTONBN_LOG_EVENT_CREATE, "{\"record\":true}"));
     $log->meta = "{\"has_recordings\":false}";
     if (!empty($logs)) {
         $log->meta = "{\"has_recordings\":true}";

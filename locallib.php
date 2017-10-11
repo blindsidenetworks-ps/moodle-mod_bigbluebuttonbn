@@ -517,6 +517,14 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = BIGBLUE
     return $c->get($url);
 }
 
+function bigbluebuttonbn_end_meeting_if_running($bigbluebuttonbn) {
+    // End the session associated with this instance (if it's running).
+    $meetingid = $bigbluebuttonbn->meetingid.'-'.$bigbluebuttonbn->course.'-'.$bigbluebuttonbn->id;
+    if (bigbluebuttonbn_is_meeting_running($meetingid)) {
+        bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
+    }
+}
+
 function bigbluebuttonbn_get_user_roles($context, $userid) {
     global $DB;
     $userroles = get_user_roles($context, $userid);
