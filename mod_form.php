@@ -73,7 +73,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, ['participant_list' => $participantlist]);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, ['participant_list' => $participantlist]);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, ['activity' => $currentactivity]);
         // Add standard elements, common to all modules.
@@ -267,7 +267,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
-    private function bigbluebuttonbn_mform_add_block_participants($mform, $data) {
+    private function bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $data) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $participantlist = $data['participant_list'];
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
@@ -292,8 +292,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
         // Declare the table.
         $htmltable = new html_table();
-        $htmltable->head  = array('', '', '', '');
-        $htmltable->align = array('left', 'left', 'left', 'left');
+        if ($cfg['version_major'] < '2016052300') {
+            // This is required before v3.1
+            $htmltable->head  = array('', '', '', '');
+            $htmltable->align = array('left', 'left', 'left', 'left');
+        }
         $htmltable->id = 'participant_list_table';
         $htmltable->data = array();
         // Render elements for participant list.
