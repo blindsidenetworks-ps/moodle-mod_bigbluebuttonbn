@@ -61,7 +61,7 @@ class config {
             'recordingready_enabled' => 'false',
             'recordingstatus_enabled' => 'false',
             'meetingevents_enabled' => 'false',
-            'participant_moderator_default' => 'owner',
+            'participant_moderator_default' => '0',
             'scheduled_duration_enabled' => 'false',
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',

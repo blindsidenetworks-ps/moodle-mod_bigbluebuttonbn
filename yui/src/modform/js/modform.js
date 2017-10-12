@@ -176,7 +176,6 @@ M.mod_bigbluebuttonbn.modform = {
     participant_add: function() {
         var selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
         var selection = document.getElementById('bigbluebuttonbn_participant_selection');
-
         // Lookup to see if it has been added already.
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
             if (this.bigbluebuttonbn.participant_list[i].selectiontype == selection_type.value &&
@@ -184,13 +183,10 @@ M.mod_bigbluebuttonbn.modform = {
                 return;
             }
         }
-
         // Add it to memory.
         this.participant_add_to_memory(selection_type.value, selection.value);
-
         // Add it to the form.
         this.participant_add_to_form(selection_type.value, selection.value, 'viewer');
-
         // Update in the form.
         this.participant_list_update();
     },
