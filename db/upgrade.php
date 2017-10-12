@@ -57,7 +57,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2016080114) {
+    if ($oldversion < 2017101000) {
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
         // Add field type.
@@ -92,7 +92,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         set_config('participant_moderator_default', $cfgvalue, 'mod_bigbluebuttonbn');
         unset_config('moderator_default', 'mod_bigbluebuttonbn');
         // Update db version tag.
-        upgrade_mod_savepoint(true, 2016080114, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2017101000, 'bigbluebuttonbn');
     }
     return true;
 }
