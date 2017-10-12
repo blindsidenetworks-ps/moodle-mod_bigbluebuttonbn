@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->version = 2017101000;
-$plugin->requires = 2016052300;
+$plugin->requires = 2015111610;
 $plugin->cron = 0;
 $plugin->component = 'mod_bigbluebuttonbn';
 $plugin->maturity = MATURITY_ALPHA;
