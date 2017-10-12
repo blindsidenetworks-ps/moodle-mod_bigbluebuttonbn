@@ -88,13 +88,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
         if ($cfg['version_major'] < '2016052300') {
             // Valid before v3.1.
+            $contents = get_string('delete');
             $options = array('class' => 'btn btn-link icon smallicon',
-                'alt' => get_string('delete'),
-                'title' => get_string('delete'),
+                'alt' => $contents,
+                'title' => $contents,
                 'src' => $jsvars['pix_icon_delete']
               );
-
-            $jsvars['pix_icon_delete'] = html_writer::tag('img', $options);
+            $jsvars['pix_icon_delete'] = html_writer::tag('img', $contents, $options);
         }
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
@@ -159,11 +159,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
         if ($cfg['sendnotifications_enabled']) {
-            $mform->addElement('checkbox', 'notification', get_string('mod_form_field_notification',
-                'bigbluebuttonbn'));
-            $mform->addHelpButton('notification', 'mod_form_field_notification', 'bigbluebuttonbn');
-            $mform->setDefault('notification', 0);
-            $mform->setType('notification', PARAM_INT);
+            $field = ['type' => 'checkbox', 'name' => 'notification', 'data_type' => PARAM_INT,
+                'description_key' => 'mod_form_field_notification'];
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], 0);
         }
     }
 
@@ -194,7 +193,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['waitformoderator_default']);
-
         $field = ['type' => 'hidden', 'name' => 'userlimit', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['userlimit_editable']) {
             $field['type'] = 'text';
@@ -241,13 +239,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['recordings_imported_default']);
     }
 
-    private function bigbluebuttonbn_mform_add_block_room($mform, $cfg) {
+    private function bigbluebuttonbn_mform_add_block_room(&$mform, $cfg) {
         if ($cfg['voicebridge_editable'] || $cfg['waitformoderator_editable'] ||
             $cfg['userlimit_editable'] || $cfg['recording_editable']) {
             $mform->addElement('header', 'room', get_string('mod_form_block_room', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_block_room_room($mform, $cfg);
         }
-
         if ($cfg['recordings_html_editable'] || $cfg['recordings_deleted_editable'] || $cfg['recordings_imported_editable']) {
             $mform->addElement('header', 'recordings', get_string('mod_form_block_recordings', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_block_room_recordings($mform, $cfg);
@@ -278,35 +275,29 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'participants', json_encode($participantlist));
         $mform->setType('participants', PARAM_TEXT);
         // Render elements for participant selection.
-        $htmlselection = html_writer::tag('div',
-            html_writer::select($participantselection['type_options'], 'bigbluebuttonbn_participant_selection_type',
-                $participantselection['type_selected'], array(),
-                array('id' => 'bigbluebuttonbn_participant_selection_type',
-                      'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;')).'&nbsp;&nbsp;'.
-            html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
-                $participantselection['selected'], array(),
-                array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled')).'&nbsp;&nbsp;'.
-            html_writer::tag('input', '', array('id' => 'id_addselectionid', 'type' => 'button', 'class' => 'btn btn-secondary',
-                'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
-                'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
-                ))
-        );
+        $htmlselectiontype = html_writer::select($participantselection['type_options'], 'bigbluebuttonbn_participant_selection_type',
+            $participantselection['type_selected'], array(),
+            array('id' => 'bigbluebuttonbn_participant_selection_type',
+                  'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;'));
+        $htmlselectionoptions = html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
+            $participantselection['selected'], array(),
+            array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled'));
+        $htmlselectioninput = html_writer::tag('input', '', array('id' => 'id_addselectionid', 'type' => 'button', 'class' => 'btn btn-secondary',
+            'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
+            'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
+          ));
+        $htmlselection = html_writer::tag('div', $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_add_participant',
-            get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmlselection);
+        $mform->addElement('static', 'static_add_participant', get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmlselection);
         $mform->addElement('html', "\n\n");
         // Declare the table.
         $table = new html_table();
         $table->id = 'participant_list_table';
         $table->data = array();
         // Render elements for participant list.
-        $htmllist = html_writer::tag('div',
-            html_writer::label(get_string('mod_form_field_participant_list', 'bigbluebuttonbn'),
-                'bigbluebuttonbn_participant_list').
-            html_writer::table($table)
-        );
+        $htmllist = html_writer::table($table);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'participant_list', '', $htmllist);
+        $mform->addElement('static', 'static_participant_list', get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmllist);
         $mform->addElement('html', "\n\n");
     }
 
@@ -325,7 +316,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     private function bigbluebuttonbn_mform_add_element($mform, $type, $name, $datatype,
-            $descriptionkey, $defaultvalue = null, $options = [], $rule = []) {
+            $descriptionkey, $defaultvalue = null, $options = null, $rule = null) {
         if ($type === 'hidden') {
             $mform->addElement($type, $name, $defaultvalue);
             $mform->setType($name, $datatype);
