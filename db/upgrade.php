@@ -83,14 +83,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Drop field newwindow.
         xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'tagging');
         // Migrate settings.
-        unset_config('recordingtagging_default', 'mod_bigbluebuttonbn');
-        unset_config('recordingtagging_editable', 'mod_bigbluebuttonbn');
-        $cfgvalue =  get_config('mod_bigbluebuttonbn', 'importrecordings_from_deleted_activities_enabled');
-        set_config('importrecordings_from_deleted_enabled', $cfgvalue, 'mod_bigbluebuttonbn');
-        unset_config('importrecordings_from_deleted_activities_enabled', 'mod_bigbluebuttonbn');
-        $cfgvalue =  get_config('mod_bigbluebuttonbn', 'moderator_default');
-        set_config('participant_moderator_default', $cfgvalue, 'mod_bigbluebuttonbn');
-        unset_config('moderator_default', 'mod_bigbluebuttonbn');
+        unset_config('bigbluebuttonbn_recordingtagging_default', '');
+        unset_config('bigbluebuttonbn_recordingtagging_editable', '');
+        $cfgvalue =  get_config('', 'bigbluebuttonbn_importrecordings_from_deleted_activities_enabled');
+        set_config('bigbluebuttonbn_importrecordings_from_deleted_enabled', $cfgvalue, '');
+        unset_config('bigbluebuttonbn_importrecordings_from_deleted_activities_enabled', '');
+        $cfgvalue =  get_config('', 'bigbluebuttonbn_moderator_default');
+        set_config('bigbluebuttonbn_participant_moderator_default', $cfgvalue, '');
+        unset_config('bigbluebuttonbn_moderator_default', '');
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101000, 'bigbluebuttonbn');
     }
