@@ -94,7 +94,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 'title' => $contents,
                 'src' => $jsvars['pix_icon_delete']
               );
-            $jsvars['pix_icon_delete'] = html_writer::tag('img', $contents, $options);
+            $jsvars['pix_icon_delete'] = html_writer::tag('img', '', $options);
         }
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
@@ -286,18 +286,20 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
             'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
           ));
-        $htmlselection = html_writer::tag('div', $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
+        $htmladdparticipant = html_writer::tag('div', $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_add_participant', get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmlselection);
+        $mform->addElement('static', 'static_add_participant', get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmladdparticipant);
         $mform->addElement('html', "\n\n");
         // Declare the table.
-        $table = new html_table();
-        $table->id = 'participant_list_table';
-        $table->data = array();
+        $htmltable = new html_table();
+        $htmltable->head  = array('', '', '', '');
+        $htmltable->align = array('left', 'left', 'left', 'left');
+        $htmltable->id = 'participant_list_table';
+        $htmltable->data = array();
         // Render elements for participant list.
-        $htmllist = html_writer::table($table);
+        $htmlparticipantlist = html_writer::table($htmltable);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_participant_list', get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmllist);
+        $mform->addElement('static', 'static_participant_list', get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
         $mform->addElement('html', "\n\n");
     }
 
