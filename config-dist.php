@@ -190,9 +190,9 @@ $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_userlimit_editable = 0;
 // By default only the owner is assigned.
 // The values for this parameter can be 'owner' and/or any of the roles defined in
 // Moodle (including the custom parameters). The value used will be the key for the role.
-// [owner|manager|coursecreator|editingteacher|teacher|student|guest|user|frontpage|ANY_CUSTOM_ROLE]
+// [owner=0|manager=1|coursecreator=2|editingteacher=3|teacher=4|student=5|guest=6|user=7|frontpage=8|ANY_CUSTOM_ROLE=x]
 
-//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = 'owner';
+//$BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default = '0';
 
 //=========================================================================
 // 9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE

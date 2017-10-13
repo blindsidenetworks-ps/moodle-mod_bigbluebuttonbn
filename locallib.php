@@ -558,7 +558,7 @@ function bigbluebuttonbn_get_participant_list_default($context) {
         'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
     $moderatordefaults = explode(',', bigbluebuttonbn_get_cfg_moderator_default());
     foreach ($moderatordefaults as $moderatordefault) {
-        if ($moderatordefault == 'owner') {
+        if ($moderatordefault == '0') {
             if (is_enrolled($context, $USER->id)) {
                 $participantlistarray[] = array(
                     'selectiontype' => 'user',
@@ -632,7 +632,7 @@ function bigbluebuttonbn_is_moderator($user, $roles, $participants) {
 }
 
 function bigbluebuttonbn_moodle_db_role_lookup($db_moodle_roles, $role_id) {
-    if ( is_int($role_id) && array_key_exists($role_id, $db_moodle_roles) ) {
+    if ( is_numeric($role_id) && array_key_exists($role_id, $db_moodle_roles) ) {
         return $db_moodle_roles[$role_id];
     }
     foreach( $db_moodle_roles as $db_moodle_role ) {
@@ -1448,7 +1448,7 @@ function bigbluebuttonbn_get_cfg_recordingstatus_enabled() {
 
 function bigbluebuttonbn_get_cfg_moderator_default() {
     global $BIGBLUEBUTTONBN_CFG, $CFG;
-    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: 'owner'));
+    return (isset($BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default)? $BIGBLUEBUTTONBN_CFG->bigbluebuttonbn_moderator_default: (isset($CFG->bigbluebuttonbn_moderator_default)? $CFG->bigbluebuttonbn_moderator_default: '0'));
 }
 
 function bigbluebuttonbn_get_cfg_scheduled_duration_enabled() {
