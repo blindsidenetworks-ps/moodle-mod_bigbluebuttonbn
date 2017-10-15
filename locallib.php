@@ -221,6 +221,8 @@ function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
         return array();
     }
     $recordings = bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
+    // Sort recordings.
+    uasort($recordings, 'bigbluebuttonbn_recording_build_sorter');
     // Filter recordings based on recordingIDs.
     $recordingidsarray = $recordingids;
     if (!is_array($recordingids)) {
@@ -246,17 +248,21 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
     $pages = floor(count($meetingidsarray) / 25) + 1;
     for ($page = 1; $page <= $pages; ++$page) {
         $mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $xml = bigbluebuttonbn_wrap_xml_load_file(
-            \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)])
-          );
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recording) {
-                $recordingarrayvalue = bigbluebuttonbn_get_recording_array_value($recording);
-                $recordings[$recordingarrayvalue['recordID']] = $recordingarrayvalue;
-            }
-            uasort($recordings, 'bigbluebuttonbn_recording_build_sorter');
+        $recordings += bigbluebuttonbn_get_recordings_array_fetch_page($mids);
+    }
+    return $recordings;
+}
+
+function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
+    $recordings = array();
+    // Do getRecordings is executed using a method GET (supported by all versions of BBB).
+    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]); 
+    $xml = bigbluebuttonbn_wrap_xml_load_file($url);
+    if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+        // If there were meetings already created.
+        foreach ($xml->recordings->recording as $recordingxml) {
+            $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
+            $recordings[$recording['recordID']] = $recording;
         }
     }
     return $recordings;
