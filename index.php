@@ -144,7 +144,6 @@ function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonb
         $paramgroup = '&group='.$groupobj->id;
         $groupname = $groupobj->name;
     }
-
     $meetinginfo = bigbluebuttonbn_get_meeting_info_array($meetingid);
 
     if (!$meetinginfo) {
@@ -167,9 +166,8 @@ function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonb
     $moderatorlist = '';
     $recording = '';
     $actions = '';
-
     // The meeting info was returned.
-    if ($meetinginfo['running'] == 'true') {
+    if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
         $users = bigbluebuttonbn_index_display_room_users($meetinginfo);
         $viewerlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'VIEWER');
         $moderatorlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'MODERATOR');

@@ -131,44 +131,7 @@ function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $p
         }
         return $response;
     }
-    return null;
-}
-
-/**
- * @param string $meetingid
- */
-function bigbluebuttonbn_get_meeting_array($meetingid) {
-    $meetings = bigbluebuttonbn_get_meetings_array();
-    if ($meetings) {
-        foreach ($meetings as $meeting) {
-            if ($meeting['meetingID'] == $meetingid) {
-                return $meeting;
-            }
-        }
-    }
-    return null;
-}
-
-function bigbluebuttonbn_get_meetings_array() {
-    $xml = bigbluebuttonbn_wrap_xml_load_file(\mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetings'));
-    if ($xml && $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
-        // Meetings were returned.
-        $meetings = array();
-        foreach ($xml->meetings->meeting as $meeting) {
-            $meetings[] = array('meetingID' => $meeting->meetingID,
-                                'moderatorPW' => $meeting->moderatorPW,
-                                'attendeePW' => $meeting->attendeePW,
-                                'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded,
-                                'running' => $meeting->running, );
-        }
-        return $meetings;
-    }
-    if ($xml) {
-        // Either failure or success without meetings.
-        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
-    }
-    // If the server is unreachable, then prompts the user of the necessary action.
-    return null;
+    return array('returncode' => 'FAILED', 'message' => 'unreachable', 'messageKey' => 'Server is unreachable');
 }
 
 /**
@@ -197,10 +160,10 @@ function bigbluebuttonbn_get_meeting_info_array($meetingid) {
     }
     if ($xml) {
         // Either failure or success without meeting info.
-        return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+        return (array)$xml;
     }
     // If the server is unreachable, then prompts the user of the necessary action.
-    return null;
+    return array('returncode' => 'FAILED', 'message' => 'unreachable', 'messageKey' => 'Server is unreachable');
 }
 
 /**
@@ -256,7 +219,7 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
 function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
     $recordings = array();
     // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]); 
+    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
     $xml = bigbluebuttonbn_wrap_xml_load_file($url);
     if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
         // If there were meetings already created.
