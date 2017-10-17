@@ -1738,5 +1738,6 @@ function bigbluebutonbn_settings_extended(&$renderer) {
 }
 
 function bigbluebuttonbn_encode_meetingid($seed) {
+    global $CFG;
     return sha1($CFG->wwwroot . $seed . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
 }

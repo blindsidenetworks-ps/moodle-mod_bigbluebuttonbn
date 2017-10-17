@@ -112,8 +112,7 @@ function bigbluebuttonbn_supports($feature) {
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data) {
-    global $CFG, $DB;
-    $data->id = null;
+    global $DB;
     bigbluebuttonbn_process_pre_save($data);
     unset($data->presentation);
     try {
@@ -127,13 +126,13 @@ function bigbluebuttonbn_add_instance($data) {
         bigbluebuttonbn_update_media_file($bigbluebuttonbn);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
+        // Complete the process.
+        bigbluebuttonbn_process_post_save($data);
+        return $data->id;
     } catch(Exception $e) {
         $transaction->rollback($e);
     }
-    if ($data->id) {
-        bigbluebuttonbn_process_post_save($data);
-    }
-    return $data->id;
+    return null;
 }
 
 /**
@@ -155,15 +154,13 @@ function bigbluebuttonbn_update_instance($data) {
         $DB->update_record('bigbluebuttonbn', $data);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
-        $updated = true;
+        // Complete the process.
+        bigbluebuttonbn_process_post_save($data);
     } catch(Exception $e) {
         $transaction->rollback($e);
-        $updated = false;
+        return false;
     }
-    if ($updated) {
-        bigbluebuttonbn_process_post_save($data);
-    }
-    return $updated;
+    return true;
 }
 
 /**
