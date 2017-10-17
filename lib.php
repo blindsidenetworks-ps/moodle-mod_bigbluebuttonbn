@@ -121,7 +121,7 @@ function bigbluebuttonbn_add_instance($data) {
         // Insert a record.
         $data->id = $DB->insert_record('bigbluebuttonbn', $data);
         // Generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret].
-        $meetingid = sha1($CFG->wwwroot . $data->id . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+        $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
         $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
         // Add or Update attachment.
         bigbluebuttonbn_update_media_file($bigbluebuttonbn);

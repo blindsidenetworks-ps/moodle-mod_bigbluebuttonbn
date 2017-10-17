@@ -1736,3 +1736,7 @@ function bigbluebutonbn_settings_extended(&$renderer) {
         $renderer->render_group_element('meetingevents_enabled', $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
     }
 }
+
+function bigbluebuttonbn_encode_meetingid($seed) {
+    return sha1($CFG->wwwroot . $seed . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+}
