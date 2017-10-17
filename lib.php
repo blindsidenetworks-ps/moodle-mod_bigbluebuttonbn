@@ -123,7 +123,7 @@ function bigbluebuttonbn_add_instance($data) {
         $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
         $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
         // Add or Update attachment.
-        bigbluebuttonbn_update_media_file($bigbluebuttonbn);
+        bigbluebuttonbn_update_media_file($data);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
         // Complete the process.
@@ -152,6 +152,8 @@ function bigbluebuttonbn_update_instance($data) {
         $transaction = $DB->start_delegated_transaction();
         // Update a record.
         $DB->update_record('bigbluebuttonbn', $data);
+        // Add or Update attachment.
+        bigbluebuttonbn_update_media_file($data);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
         // Complete the process.
