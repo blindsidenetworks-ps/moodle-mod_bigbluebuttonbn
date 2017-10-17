@@ -129,9 +129,6 @@ function bigbluebuttonbn_add_instance($data) {
         $transaction->rollback($e);
     }
     if ($data->id) {
-        $draftitemid = isset($data->presentation) ? $data->presentation : null;
-        $context = context_module::instance($data->coursemodule);
-        bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
         bigbluebuttonbn_process_post_save($data);
     }
     return $data->id;
@@ -162,9 +159,6 @@ function bigbluebuttonbn_update_instance($data) {
         $updated = false;
     }
     if ($updated) {
-        $draftitemid = isset($data->presentation) ? $data->presentation : null;
-        $context = context_module::instance($data->coursemodule);
-        bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
         bigbluebuttonbn_process_post_save($data);
     }
     return $updated;
@@ -307,7 +301,7 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
 /**
  * @global object
  *
- * @param array $courses
+ * @param array $bigbluebuttonbn
  * @param int $now
  */
 function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
@@ -403,6 +397,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
+    bigbluebuttonbn_update_media_file($bigbluebuttonbn);
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
@@ -471,9 +466,10 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
  * @param stdClass $context            the context
  * @param int      $draftitemid        the draft item
  */
-function bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $draftitemid) {
+function bigbluebuttonbn_update_media_file(&$bigbluebuttonbn) {
     global $DB;
-
+    $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
+    $context = context_module::instance($bigbluebuttonbn->coursemodule);
     // Set the filestorage object.
     $fs = get_file_storage();
     // Save the file if it exists that is currently in the draft area.
@@ -489,7 +485,7 @@ function bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $drafti
         $filesrc = '/'.$file->get_filename();
     }
     // Set the presentation column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'presentation', $filesrc, array('id' => $bigbluebuttonbnid));
+    $DB->set_field('bigbluebuttonbn', 'presentation', $filesrc, array('id' => $bigbluebuttonbn->id));
 }
 
 /**
