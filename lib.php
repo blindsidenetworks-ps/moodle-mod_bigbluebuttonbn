@@ -123,6 +123,8 @@ function bigbluebuttonbn_add_instance($data) {
         // Generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret].
         $meetingid = sha1($CFG->wwwroot . $data->id . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
         $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
+        // Add or Update attachment.
+        bigbluebuttonbn_update_media_file($bigbluebuttonbn);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
     } catch(Exception $e) {
@@ -397,7 +399,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
-    bigbluebuttonbn_update_media_file($bigbluebuttonbn);
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
@@ -462,9 +463,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
  * that was uploaded, or if there is none, set the
  * presentation field to blank.
  *
- * @param int      $bigbluebuttonbnid the bigbluebuttonbn id
- * @param stdClass $context            the context
- * @param int      $draftitemid        the draft item
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
  */
 function bigbluebuttonbn_update_media_file(&$bigbluebuttonbn) {
     global $DB;
