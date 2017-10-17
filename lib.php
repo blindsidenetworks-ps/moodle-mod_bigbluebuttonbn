@@ -113,14 +113,17 @@ function bigbluebuttonbn_supports($feature) {
  */
 function bigbluebuttonbn_add_instance($data) {
     global $DB;
+    // Excecute preprocess.
     bigbluebuttonbn_process_pre_save($data);
-    unset($data->presentation);
     try {
         $transaction = $DB->start_delegated_transaction();
+        // Pre-set initial values.
+        $data->presentation = bigbluebuttonbn_get_media_file($data);
         // Insert a record.
         $data->id = $DB->insert_record('bigbluebuttonbn', $data);
-        // Generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret].
+        // Encode meetingid.
         $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+        // Set the meetingid column in the bigbluebuttonbn table.
         $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
         // Add or Update attachment.
         bigbluebuttonbn_update_media_file($data);
@@ -145,15 +148,14 @@ function bigbluebuttonbn_add_instance($data) {
  */
 function bigbluebuttonbn_update_instance($data) {
     global $DB;
-    $data->id = $data->instance;
     bigbluebuttonbn_process_pre_save($data);
-    unset($data->presentation);
     try {
         $transaction = $DB->start_delegated_transaction();
+        // Pre-set initial values.
+        $data->id = $data->instance;
+        $data->presentation = bigbluebuttonbn_get_media_file($data);
         // Update a record.
         $DB->update_record('bigbluebuttonbn', $data);
-        // Add or Update attachment.
-        bigbluebuttonbn_update_media_file($data);
         // Assuming the inserts work, we get to the following line.
         $transaction->allow_commit();
         // Complete the process.
@@ -458,13 +460,12 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
 }
 
 /**
- * Update the bigbluebuttonbn activity to include any file
- * that was uploaded, or if there is none, set the
- * presentation field to blank.
+ * Get a full path to the file attached as a preuploaded presentation
+ * or if there is none, set the presentation field will be set to blank.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  */
-function bigbluebuttonbn_update_media_file(&$bigbluebuttonbn) {
+function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
     global $DB;
     $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
     $context = context_module::instance($bigbluebuttonbn->coursemodule);
@@ -482,8 +483,7 @@ function bigbluebuttonbn_update_media_file(&$bigbluebuttonbn) {
         $file = reset($files);
         $filesrc = '/'.$file->get_filename();
     }
-    // Set the presentation column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'presentation', $filesrc, array('id' => $bigbluebuttonbn->id));
+    return $filesrc;
 }
 
 /**
@@ -505,12 +505,10 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
     if (!bigbluebuttonbn_pluginfile_valid($context, $filearea)) {
         return false;
     }
-
     $file = bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args);
     if (!$file) {
         return false;
     }
-
     // Finally send the file.
     send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
 }
@@ -519,15 +517,12 @@ function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
-
     if ($filearea !== 'presentation') {
         return false;
     }
-
     if (!array_key_exists($filearea, bigbluebuttonbn_get_file_areas())) {
         return false;
     }
-
     return true;
 }
 
@@ -536,51 +531,41 @@ function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $arg
     if (!$filename) {
         return false;
     }
-
     $fullpath = "/$context->id/mod_bigbluebuttonbn/$filearea/0/".$filename;
     $fs = get_file_storage();
     $file = $fs->get_file_by_hash(sha1($fullpath));
     if (!$file || $file->is_directory()) {
         return false;
     }
-
     return $file;
 }
 
 function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
     global $DB;
-
     if (count($args) > 1) {
         if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
             return;
         }
-
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bigbluebuttonbn->id);
         $presentationnonce = $cache->get($noncekey);
         $noncevalue = $presentationnonce['value'];
         $noncecounter = $presentationnonce['counter'];
-
         if ($args['0'] != $noncevalue) {
             return;
         }
-
         // The nonce value is actually used twice because BigBlueButton reads the file two times.
         $noncecounter += 1;
         $cache->set($noncekey, array('value' => $noncevalue, 'counter' => $noncecounter));
         if ($noncecounter == 2) {
             $cache->delete($noncekey);
         }
-
         return $args['1'];
     }
-
     require_course_login($course, true, $cm);
-
     if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
         return;
     }
-
     return implode('/', $args);
 }
 
@@ -594,6 +579,5 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
 function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
-
     return $areas;
 }
