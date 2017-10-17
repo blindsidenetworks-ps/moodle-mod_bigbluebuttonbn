@@ -112,16 +112,29 @@ function bigbluebuttonbn_supports($feature) {
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($data) {
-    global $DB;
-    $draftitemid = isset($data->presentation) ? $data->presentation : null;
-    $context = context_module::instance($data->coursemodule);
+    global $CFG, $DB;
+    $data->id = null;
     bigbluebuttonbn_process_pre_save($data);
     unset($data->presentation);
-    $bigbluebuttonbnid = $DB->insert_record('bigbluebuttonbn', $data);
-    $data->id = $bigbluebuttonbnid;
-    bigbluebuttonbn_update_media_file($bigbluebuttonbnid, $context, $draftitemid);
-    bigbluebuttonbn_process_post_save($data);
-    return $bigbluebuttonbnid;
+    try {
+        $transaction = $DB->start_delegated_transaction();
+        // Insert a record.
+        $data->id = $DB->insert_record('bigbluebuttonbn', $data);
+        // Generate and set the meetingid property based on [Moodle Instance + Activity ID + BBB Secret].
+        $meetingid = sha1($CFG->wwwroot . $data->id . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+        $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
+        // Assuming the inserts work, we get to the following line.
+        $transaction->allow_commit();
+    } catch(Exception $e) {
+        $transaction->rollback($e);
+    }
+    if ($data->id) {
+        $draftitemid = isset($data->presentation) ? $data->presentation : null;
+        $context = context_module::instance($data->coursemodule);
+        bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
+        bigbluebuttonbn_process_post_save($data);
+    }
+    return $data->id;
 }
 
 /**
@@ -135,14 +148,26 @@ function bigbluebuttonbn_add_instance($data) {
 function bigbluebuttonbn_update_instance($data) {
     global $DB;
     $data->id = $data->instance;
-    $draftitemid = isset($data->presentation) ? $data->presentation : null;
-    $context = context_module::instance($data->coursemodule);
     bigbluebuttonbn_process_pre_save($data);
     unset($data->presentation);
-    $DB->update_record('bigbluebuttonbn', $data);
-    bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
-    bigbluebuttonbn_process_post_save($data);
-    return true;
+    try {
+        $transaction = $DB->start_delegated_transaction();
+        // Update a record.
+        $DB->update_record('bigbluebuttonbn', $data);
+        // Assuming the inserts work, we get to the following line.
+        $transaction->allow_commit();
+        $updated = true;
+    } catch(Exception $e) {
+        $transaction->rollback($e);
+        $updated = false;
+    }
+    if ($updated) {
+        $draftitemid = isset($data->presentation) ? $data->presentation : null;
+        $context = context_module::instance($data->coursemodule);
+        bigbluebuttonbn_update_media_file($data->id, $context, $draftitemid);
+        bigbluebuttonbn_process_post_save($data);
+    }
+    return $updated;
 }
 
 /**
@@ -259,20 +284,14 @@ function bigbluebuttonbn_get_post_actions() {
 }
 
 /**
- * @global object
- * @global object
- *
  * @param array $courses
  * @param array $htmlarray Passed by reference
  */
 function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
-
-    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
+    if (empty($courses) || !is_array($courses)) {
         return array();
     }
-
     $bns = get_all_instances_in_courses('bigbluebuttonbn', $courses);
-
     foreach ($bns as $bn) {
         $now = time();
         if ($bn->openingtime and (!$bn->closingtime or $bn->closingtime > $now)) {
@@ -285,9 +304,14 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
     }
 }
 
+/**
+ * @global object
+ *
+ * @param array $courses
+ * @param int $now
+ */
 function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     global $CFG;
-
     $start = 'started_at';
     if ($bigbluebuttonbn->openingtime > $now) {
         $start = 'starts_at';
@@ -296,7 +320,7 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     if ($bigbluebuttonbn->visible) {
         $classes = 'class="dimmed" ';
     }
-    $str = '<div class="bigbluebuttonbn overview">'."\n";
+    $str  = '<div class="bigbluebuttonbn overview">'."\n";
     $str .= '  <div class="name">'.get_string('modulename', 'bigbluebuttonbn').':&nbsp;'."\n";
     $str .= '    <a '.$classes.'href="'.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bigbluebuttonbn->coursemodule.
       '">'.$bigbluebuttonbn->name.'</a>'."\n";
@@ -306,7 +330,6 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
       .'</div>'."\n";
     $str .= '</div>'."\n";
-
     return $str;
 }
 
@@ -324,27 +347,22 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
  */
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $DB;
-
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $coursemodule->instance),
         'id, name, intro, introformat');
     if (!$bigbluebuttonbn) {
         return null;
     }
-
     $info = new cached_cm_info();
     $info->name = $bigbluebuttonbn->name;
-
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
         $info->content = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
     }
-
     return $info;
 }
 
 /**
- * Runs any processes that must run before
- * a bigbluebuttonbn insert/update.
+ * Runs any processes that must run before a bigbluebuttonbn insert/update.
  *
  * @global object
  *
@@ -352,7 +370,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
-
     if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
         $bigbluebuttonbn->timecreated = time();
         // Assign password only if it is a new activity.
@@ -360,7 +377,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->timemodified = 0;
     }
-
     if (!isset($bigbluebuttonbn->wait)) {
         $bigbluebuttonbn->wait = 0;
     }
@@ -376,38 +392,37 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->recordings_imported)) {
         $bigbluebuttonbn->recordings_imported = 0;
     }
-
     $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
 }
 
 /**
- * Runs any processes that must be run
- * after a bigbluebuttonbn insert/update.
+ * Runs any processes that must be run after a bigbluebuttonbn insert/update.
  *
  * @global object
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
-    global $DB, $CFG;
+    if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
+        bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
+    }
+    bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
+}
 
+/**
+ * Generates a message on insert/update which is sent to all users enrolled.
+ *
+ * @global object
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ **/
+function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
     $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
-
-    /* Now that an id was assigned, generate and set the meetingid property based on
-     * [Moodle Instance + Activity ID + BBB Secret] (but only for new activities) */
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-        $meetingid = sha1($CFG->wwwroot.$bigbluebuttonbn->id.\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
-        $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
-
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     }
-
-    bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
-
-    if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
-        $context = context_course::instance($bigbluebuttonbn->course);
-        \mod_bigbluebuttonbn\locallib\notifier::notification_process($context, $bigbluebuttonbn, $action);
-    }
+    $context = context_course::instance($bigbluebuttonbn->course);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_process($context, $bigbluebuttonbn, $action);
 }
 
 /**
@@ -419,14 +434,11 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
-
     // Delete evento to the calendar when/if openingtime is NOT set.
     if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
         $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
-
         return;
     }
-
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
     $event->name = $bigbluebuttonbn->name;
@@ -437,20 +449,16 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->instance = $bigbluebuttonbn->id;
     $event->timestart = $bigbluebuttonbn->openingtime;
     $event->durationtime = 0;
-
     if ($bigbluebuttonbn->closingtime) {
         $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
-
     $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     if ($event->id) {
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->update($event);
-
         return;
     }
-
     calendar_event::create($event);
 }
 
