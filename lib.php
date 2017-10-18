@@ -115,27 +115,17 @@ function bigbluebuttonbn_add_instance($data) {
     global $DB;
     // Excecute preprocess.
     bigbluebuttonbn_process_pre_save($data);
-    try {
-        $transaction = $DB->start_delegated_transaction();
-        // Pre-set initial values.
-        $data->presentation = bigbluebuttonbn_get_media_file($data);
-        // Insert a record.
-        $data->id = $DB->insert_record('bigbluebuttonbn', $data);
-        // Encode meetingid.
-        $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
-        // Set the meetingid column in the bigbluebuttonbn table.
-        $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
-        // Add or Update attachment.
-        bigbluebuttonbn_update_media_file($data);
-        // Assuming the inserts work, we get to the following line.
-        $transaction->allow_commit();
-        // Complete the process.
-        bigbluebuttonbn_process_post_save($data);
-        return $data->id;
-    } catch(Exception $e) {
-        $transaction->rollback($e);
-    }
-    return null;
+    // Pre-set initial values.
+    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    // Insert a record.
+    $data->id = $DB->insert_record('bigbluebuttonbn', $data);
+    // Encode meetingid.
+    $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+    // Set the meetingid column in the bigbluebuttonbn table.
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
+    // Complete the process.
+    bigbluebuttonbn_process_post_save($data);
+    return $data->id;
 }
 
 /**
@@ -148,22 +138,15 @@ function bigbluebuttonbn_add_instance($data) {
  */
 function bigbluebuttonbn_update_instance($data) {
     global $DB;
+    // Excecute preprocess.
     bigbluebuttonbn_process_pre_save($data);
-    try {
-        $transaction = $DB->start_delegated_transaction();
-        // Pre-set initial values.
-        $data->id = $data->instance;
-        $data->presentation = bigbluebuttonbn_get_media_file($data);
-        // Update a record.
-        $DB->update_record('bigbluebuttonbn', $data);
-        // Assuming the inserts work, we get to the following line.
-        $transaction->allow_commit();
-        // Complete the process.
-        bigbluebuttonbn_process_post_save($data);
-    } catch(Exception $e) {
-        $transaction->rollback($e);
-        return false;
-    }
+    // Pre-set initial values.
+    $data->id = $data->instance;
+    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    // Update a record.
+    $DB->update_record('bigbluebuttonbn', $data);
+    // Complete the process.
+    bigbluebuttonbn_process_post_save($data);
     return true;
 }
 
@@ -369,10 +352,10 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
     if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
         $bigbluebuttonbn->timecreated = time();
-        // Assign password only if it is a new activity.
+        $bigbluebuttonbn->timemodified = 0;
+        // As it is a new activity, assign passwords.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
-        $bigbluebuttonbn->timemodified = 0;
     }
     if (!isset($bigbluebuttonbn->wait)) {
         $bigbluebuttonbn->wait = 0;
