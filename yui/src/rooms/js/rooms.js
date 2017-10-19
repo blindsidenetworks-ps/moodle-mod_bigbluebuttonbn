@@ -41,11 +41,11 @@ M.mod_bigbluebuttonbn.rooms = {
         }
 
         if (this.bigbluebuttonbn.profile_features.includes('all') || this.bigbluebuttonbn.profile_features.includes('showroom')) {
-            this.init_room();
+            this.initRoom();
         }
     },
 
-    init_room: function() {
+    initRoom: function() {
         if (this.bigbluebuttonbn.activity !== 'open') {
             var status_bar = [M.util.get_string('view_message_conference_has_ended', 'bigbluebuttonbn')];
             if (this.bigbluebuttonbn.activity !== 'ended') {
@@ -55,13 +55,13 @@ M.mod_bigbluebuttonbn.rooms = {
                     this.bigbluebuttonbn.closing
                   ];
             }
-            Y.DOM.addHTML(Y.one('#status_bar'), this.init_status_bar(status_bar));
+            Y.DOM.addHTML(Y.one('#status_bar'), this.initStatusBar(status_bar));
             return;
         }
-        this.update_room();
+        this.updateRoom();
     },
 
-    update_room: function(f) {
+    updateRoom: function(f) {
         var forced = 'false';
         if (typeof f !== 'undefined' && f) {
             forced = 'true';
@@ -74,19 +74,19 @@ M.mod_bigbluebuttonbn.rooms = {
             callback: {
                 success: function(e) {
                     Y.DOM.addHTML(Y.one('#status_bar'),
-                        M.mod_bigbluebuttonbn.rooms.init_status_bar(e.data.status.message));
+                        M.mod_bigbluebuttonbn.rooms.initStatusBar(e.data.status.message));
                     Y.DOM.addHTML(Y.one('#control_panel'),
-                        M.mod_bigbluebuttonbn.rooms.init_control_panel(e.data));
+                        M.mod_bigbluebuttonbn.rooms.initControlPanel(e.data));
                     if (typeof e.data.status.can_join != 'undefined') {
                         Y.DOM.addHTML(Y.one('#join_button'),
-                            M.mod_bigbluebuttonbn.rooms.init_join_button(e.data.status));
+                            M.mod_bigbluebuttonbn.rooms.initJoinButton(e.data.status));
                     }
                     if (typeof e.data.status.can_end != 'undefined' && e.data.status.can_end) {
                         Y.DOM.addHTML(Y.one('#end_button'),
-                            M.mod_bigbluebuttonbn.rooms.init_end_button(e.data.status));
+                            M.mod_bigbluebuttonbn.rooms.initEndButton(e.data.status));
                     }
                     if (!e.data.status.can_join) {
-                        M.mod_bigbluebuttonbn.rooms.wait_moderator({
+                        M.mod_bigbluebuttonbn.rooms.waitModerator({
                             id: id,
                             bnid: bnid
                         });
@@ -96,7 +96,7 @@ M.mod_bigbluebuttonbn.rooms = {
         });
     },
 
-    init_status_bar: function(status_message) {
+    initStatusBar: function(status_message) {
         var status_bar_span = Y.DOM.create('<span id="status_bar_span">');
 
         if (status_message.constructor !== Array) {
@@ -116,21 +116,21 @@ M.mod_bigbluebuttonbn.rooms = {
         return status_bar_span;
     },
 
-    init_control_panel: function(data) {
+    initControlPanel: function(data) {
         var control_panel_div = Y.DOM.create('<div>');
 
         Y.DOM.setAttribute(control_panel_div, 'id', 'control_panel_div');
         var control_panel_div_html = '';
         if (data.running) {
-            control_panel_div_html += this.msg_started_at(data.info.startTime) + ' ';
-            control_panel_div_html += this.msg_attendees_in(data.info.moderatorCount, data.info.participantCount);
+            control_panel_div_html += this.msgStartedAt(data.info.startTime) + ' ';
+            control_panel_div_html += this.msgAttendeesIn(data.info.moderatorCount, data.info.participantCount);
         }
         Y.DOM.addHTML(control_panel_div, control_panel_div_html);
 
         return (control_panel_div);
     },
 
-    msg_started_at: function(startTime) {
+    msgStartedAt: function(startTime) {
         var start_timestamp = (parseInt(startTime, 10) - parseInt(startTime, 10) % 1000);
         var date = new Date(start_timestamp);
         var hours = date.getHours();
@@ -140,7 +140,7 @@ M.mod_bigbluebuttonbn.rooms = {
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
-    msg_moderators_in: function(moderators) {
+    msgModeratorsIn: function(moderators) {
         var msg_moderators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
         if (moderators == 1) {
             msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
@@ -148,7 +148,7 @@ M.mod_bigbluebuttonbn.rooms = {
         return msg_moderators;
     },
 
-    msg_viewers_in: function(viewers) {
+    msgViewersIn: function(viewers) {
         var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
         if (viewers == 1) {
             msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
@@ -156,14 +156,14 @@ M.mod_bigbluebuttonbn.rooms = {
         return msg_viewers;
     },
 
-    msg_attendees_in: function(moderators, participants) {
+    msgAttendeesIn: function(moderators, participants) {
         var msg_moderators, viewers, msg_viewers, msg;
-        if (!this.has_participants(participants)) {
+        if (!this.hasParticipants(participants)) {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
-        msg_moderators = this.msg_moderators_in(moderators);
+        msg_moderators = this.msgModeratorsIn(moderators);
         viewers = participants - moderators;
-        msg_viewers = this.msg_viewers_in(viewers);
+        msg_viewers = this.msgViewersIn(viewers);
         msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
             return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
@@ -175,11 +175,11 @@ M.mod_bigbluebuttonbn.rooms = {
         return msg + ' <b>1</b> ' + msg_viewers + '.';
     },
 
-    has_participants: function(participants) {
+    hasParticipants: function(participants) {
         return (typeof participants != 'undefined' && participants > 0);
     },
 
-    init_join_button: function(status) {
+    initJoinButton: function(status) {
         var join_button_input = Y.DOM.create('<input>');
 
         Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
@@ -206,7 +206,7 @@ M.mod_bigbluebuttonbn.rooms = {
         return join_button_input;
     },
 
-    init_end_button: function(status) {
+    initEndButton: function(status) {
         var end_button_input = Y.DOM.create('<input>');
 
         Y.DOM.setAttribute(end_button_input, 'id', 'end_button_input');
@@ -214,53 +214,53 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
         Y.DOM.setAttribute(end_button_input, 'class', 'btn btn-secondary');
         if (status.can_end) {
-            Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.end_meeting();');
+            Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.endMeeting();');
         }
 
         return end_button_input;
     },
 
-    end_meeting: function() {
+    endMeeting: function() {
         Y.one('#control_panel_div').remove();
         Y.one('#join_button').hide();
         Y.one('#end_button').hide();
     },
 
-    remote_update: function(delay) {
+    remoteUpdate: function(delay) {
         setTimeout(function() {
-            M.mod_bigbluebuttonbn.rooms.clean_room();
-            M.mod_bigbluebuttonbn.rooms.update_room(true);
+            M.mod_bigbluebuttonbn.rooms.cleanRoom();
+            M.mod_bigbluebuttonbn.rooms.updateRoom(true);
         }, delay);
     },
 
-    clean_room: function() {
+    cleanRoom: function() {
         Y.one('#status_bar_span').remove();
         Y.one('#control_panel_div').remove();
         Y.one('#join_button').setContent('');
         Y.one('#end_button').setContent('');
     },
 
-    window_close: function() {
+    windowClose: function() {
         window.onunload = function() {
             /* global: opener */
-            opener.M.mod_bigbluebuttonbn.rooms.remote_update(5000);
+            opener.M.mod_bigbluebuttonbn.rooms.remoteUpdate(5000);
         };
         window.close();
     },
 
-    wait_moderator: function(payload) {
+    waitModerator: function(payload) {
         this.datasource.sendRequest({
             request: "action=meeting_info&id=" + payload.id + "&bigbluebuttonbn=" + payload.bnid,
             callback: {
                 success: function(e) {
                     if (e.data.running) {
-                        M.mod_bigbluebuttonbn.rooms.clean_room();
-                        M.mod_bigbluebuttonbn.rooms.update_room();
+                        M.mod_bigbluebuttonbn.rooms.cleanRoom();
+                        M.mod_bigbluebuttonbn.rooms.updateRoom();
                     }
 
                     return setTimeout(((function() {
                         return function() {
-                            M.mod_bigbluebuttonbn.rooms.wait_moderator(payload);
+                            M.mod_bigbluebuttonbn.rooms.waitModerator(payload);
                         };
                     })(this)), M.mod_bigbluebuttonbn.rooms.pinginterval);
                 },
@@ -272,11 +272,11 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     join: function(join_url) {
-        M.mod_bigbluebuttonbn.broker.join_redirect(join_url);
+        M.mod_bigbluebuttonbn.broker.joinRedirect(join_url);
         // Update view.
         setTimeout(function() {
-            M.mod_bigbluebuttonbn.rooms.clean_room();
-            M.mod_bigbluebuttonbn.rooms.update_room(true);
+            M.mod_bigbluebuttonbn.rooms.cleanRoom();
+            M.mod_bigbluebuttonbn.rooms.updateRoom(true);
         }, 15000);
     }
 };

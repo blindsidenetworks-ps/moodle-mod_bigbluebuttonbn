@@ -26,6 +26,7 @@ M.mod_bigbluebuttonbn.imports = {
      * Initialise the broker code.
      *
      * @method init
+     * @param {object} data
      */
     init: function(data) {
         // Init event listener for course selector.

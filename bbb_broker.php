@@ -64,10 +64,9 @@ if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
+$userid = $USER->id;
 if (!isloggedin() && $PAGE->course->id == SITEID) {
     $userid = guest_user()->id;
-} else {
-    $userid = $USER->id;
 }
 $hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
 
@@ -91,31 +90,26 @@ try {
         echo $meetinginfo;
         return;
     }
-
     if ($a == 'meeting_end') {
         $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params);
         echo $meetingend;
         return;
     }
-
     if ($a == 'recording_play') {
         $recordingplay = bigbluebuttonbn_broker_recording_play($params);
         echo $recordingplay;
         return;
     }
-
     if ($a == 'recording_links') {
         $recordinglinks = bigbluebuttonbn_broker_recording_links($bbbsession, $params);
         echo $recordinglinks;
         return;
     }
-
     if ($a == 'recording_info') {
         $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordinginfo;
         return;
     }
-
     if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
         $a == 'recording_delete' || $a == 'recording_edit' ||
         $a == 'recording_protect' || $a == 'recording_unprotect') {
@@ -123,22 +117,18 @@ try {
         echo $recordingaction;
         return;
     }
-
     if ($a == 'recording_import') {
         echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
         return;
     }
-
     if ($a == 'recording_ready') {
         bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;
     }
-
     if ($a == 'live_session_events') {
         bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm);
         return;
     }
-
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
     return;
 
@@ -149,21 +139,17 @@ try {
 
 function bigbluebuttonbn_broker_meeting_info($bbbsession, $params, $forced) {
     $callbackresponse = array();
-
     $info = bigbluebuttonbn_get_meeting_info($params['id'], $forced);
     $callbackresponse['info'] = $info;
-
     $running = false;
     if ($info['returncode'] == 'SUCCESS') {
         $running = ($info['running'] === 'true');
     }
     $callbackresponse['running'] = $running;
-
     $status = array();
     $status["join_url"] = $bbbsession['joinURL'];
     $status["join_button_text"] = get_string('view_conference_action_join', 'bigbluebuttonbn');
     $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
-
     $participantcount = 0;
     if (isset($info['participantCount'])) {
         $participantcount = $info['participantCount'];
@@ -171,12 +157,9 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params, $forced) {
     $canjoin = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount);
     $status["can_join"] = $canjoin["can_join"];
     $status["message"] = $canjoin["message"];
-
     $canend = bigbluebuttonbn_broker_meeting_info_can_end($bbbsession, $running);
     $status["can_end"] = $canend["can_end"];
-
     $callbackresponse['status'] = $status;
-
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
@@ -191,7 +174,6 @@ function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $pa
         }
         return $status;
     }
-
     // If user is administrator, moderator or if is viewer and no waiting is required.
     $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
     if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
@@ -247,19 +229,15 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute command');
         return;
     }
-
     $callbackresponse = array('status' => true, 'found' => false);
-
     $courseid = $bbbsession['course']->id;
     $bigbluebuttonbnid = null;
     if ($showroom) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
     $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
-
     // Retrieve the array of imported recordings.
     $recordings = bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
-
     if (array_key_exists($params['id'], $recordings)) {
         // Look up for an update on the imported recording.
         if (!array_key_exists('messageKey', $recordings[$params['id']])) {
@@ -269,7 +247,6 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         $callbackresponsedata = json_encode($callbackresponse);
         return "{$params['callback']}({$callbackresponsedata});";
     }
-
     // As the recordingid was not identified as imported recording link, look up for a real recording.
     $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
     if (array_key_exists($params['id'], $recordings)) {
@@ -312,7 +289,6 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
-
     // Retrieve array of recordings that includes real and imported.
     $bigbluebuttonbnid = null;
     if ($showroom) {
@@ -323,7 +299,6 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     $action = strtolower($params['action']);
     $events = bigbluebuttonbn_events_action();
-
     // Excecute action.
     $eventlog = $events[$action];
     $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings);
@@ -332,7 +307,6 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
         bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], $bbbsession['cm'],
             ['other' => $params['id']]);
     }
-
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
@@ -382,7 +356,6 @@ function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
             )
           );
     }
-
     // As the recordingid was not identified as imported recording link, execute actual publish.
     return array(
         'status' => bigbluebuttonbn_publish_recordings(
@@ -415,7 +388,6 @@ function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings)
             )
           );
     }
-
     // As the recordingid was not identified as imported recording link, execute actual uprotect.
     return array(
         'status' => bigbluebuttonbn_update_recordings(
@@ -426,7 +398,6 @@ function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings)
 
 function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings) {
     global $DB;
-
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unpublish or protect on imported recording link.
         return array(
@@ -435,11 +406,9 @@ function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings)
             )
           );
     }
-
     // As the recordingid was not identified as imported recording link, execute unpublish on a real recording.
     // First: Unpublish imported links associated to the recording.
     $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-
     foreach ($importedall as $key => $record) {
         $meta = json_decode($record->meta, true);
         // Prepare data for the update.
@@ -458,7 +427,6 @@ function bigbluebuttonbn_broker_recording_action_unpublish($params, $recordings)
 
 function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
     global $DB;
-
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unpublish or protect on imported recording link.
         return array(
@@ -467,11 +435,9 @@ function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
             )
           );
     }
-
     // As the recordingid was not identified as imported recording link, execute protect on a real recording.
     // First: Protect imported links associated to the recording.
     $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-
     foreach ($importedall as $key => $record) {
         $meta = json_decode($record->meta, true);
         // Prepare data for the update.
@@ -490,7 +456,6 @@ function bigbluebuttonbn_broker_recording_action_protect($params, $recordings) {
 
 function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
     global $DB;
-
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute delete on imported recording link.
         return array(
@@ -499,11 +464,9 @@ function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
             )
           );
     }
-
     // As the recordingid was not identified as imported recording link, execute delete on a real recording.
     // First: Delete imported links associated to the recording.
     $importedall = bigbluebuttonbn_get_recording_imported_instances($params['id']);
-
     if ($importedall > 0) {
         foreach (array_keys($importedall) as $key) {
             // Execute delete on imported links.
@@ -539,17 +502,15 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
 }
 
 function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
-
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'], (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
-            array('HS256'));
+        $decodedparameters = JWT::decode($params['signed_parameters'],
+            (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 400 Bad Request. '.$error);
         return;
     }
-
     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
     $meetingidelements = explode('[', $decodedparameters->meeting_id);
     $meetingidelements = explode('-', $meetingidelements[0]);
@@ -558,7 +519,6 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
         header('HTTP/1.0 410 Gone. The activity may have been deleted');
         return;
     }
-
     // Sends the messages.
     try {
         bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
@@ -571,21 +531,17 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
 
 function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     global $SESSION;
-
     if (!$bbbsession['managerecordings']) {
         header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
         return;
     }
-
     $importrecordings = $SESSION->bigbluebuttonbn_importrecordings;
     if (!isset($importrecordings[$params['id']])) {
         $error = "Recording {$params['id']} could not be found. It can not be imported";
         header('HTTP/1.0 404 Not found. '.$error);
         return;
     }
-
     $callbackresponse = array('status' => true);
-
     $importrecordings[$params['id']]['imported'] = true;
     $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
     $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
@@ -595,7 +551,6 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED, $bbbsession['bigbluebuttonbn'],
             $bbbsession['cm'], ['other' => $params['id']]);
     }
-
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
 }
@@ -603,14 +558,13 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'], (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
-            array('HS256'));
+        $decodedparameters = JWT::decode($params['signed_parameters'],
+            (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 400 Bad Request. '.$error);
         return;
     }
-
     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
     $meetingidelements = explode('[', $decodedparameters->meeting_id);
     $meetingidelements = explode('-', $meetingidelements[0]);
@@ -619,7 +573,6 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
         header('HTTP/1.0 410 Gone. The activity may have been deleted');
         return;
     }
-
     // Store the events.
     try {
         foreach ($decodedparameters->events as $event) {
@@ -634,20 +587,16 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
 
 function bigbluebuttonbn_broker_validate_parameters($params) {
     $requiredparams = bigbluebuttonbn_broker_required_parameters();
-
     if (!isset($params['callback'])) {
         return 'This call must include a javascript callback.';
     }
-
     if (!isset($params['action'])) {
         return 'Action parameter must be included.';
     }
-
     $action = strtolower($params['action']);
     if (!array_key_exists($action, $requiredparams)) {
         return 'Action '.$params['action'].' can not be performed.';
     }
-
     return bigbluebuttonbn_broker_validate_parameters_message($params, $requiredparams[$action]);
 }
 

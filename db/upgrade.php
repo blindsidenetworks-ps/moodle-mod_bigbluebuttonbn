@@ -85,10 +85,10 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Migrate settings.
         unset_config('bigbluebuttonbn_recordingtagging_default', '');
         unset_config('bigbluebuttonbn_recordingtagging_editable', '');
-        $cfgvalue =  get_config('', 'bigbluebuttonbn_importrecordings_from_deleted_activities_enabled');
+        $cfgvalue = get_config('', 'bigbluebuttonbn_importrecordings_from_deleted_activities_enabled');
         set_config('bigbluebuttonbn_importrecordings_from_deleted_enabled', $cfgvalue, '');
         unset_config('bigbluebuttonbn_importrecordings_from_deleted_activities_enabled', '');
-        $cfgvalue =  get_config('', 'bigbluebuttonbn_moderator_default');
+        $cfgvalue = get_config('', 'bigbluebuttonbn_moderator_default');
         set_config('bigbluebuttonbn_participant_moderator_default', $cfgvalue, '');
         unset_config('bigbluebuttonbn_moderator_default', '');
         // Update db version tag.

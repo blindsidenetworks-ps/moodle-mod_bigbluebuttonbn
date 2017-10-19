@@ -1133,7 +1133,7 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
 function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid, $playback) {
     global $CFG, $OUTPUT;
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
-    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_play(this);';
+    $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
     $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=play&bn='.$bigbluebuttonbnid.
       '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'].'&rtype='.$playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
@@ -1219,7 +1219,7 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
         $target .= '-' . $data['target'];
     }
     $id = 'recording-' . $target . '-' . $recording['recordID'];
-    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording_'.$data['action'].'(this);';
+    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this);';
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recording_icons_enabled')) {
         // With icon for $manageaction.
         $iconattributes = array('id' => $id, 'class' => 'iconsmall');
@@ -1631,8 +1631,10 @@ function bigbluebutonbn_settings_general(&$renderer) {
     // Configuration for BigBlueButton.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_general_shown()) {
         $renderer->render_group_header('general');
-        $renderer->render_group_element('server_url', $renderer->render_group_element_text('server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL));
-        $renderer->render_group_element('shared_secret', $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET));
+        $renderer->render_group_element('server_url',
+            $renderer->render_group_element_text('server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL));
+        $renderer->render_group_element('shared_secret',
+            $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET));
     }
 }
 
@@ -1644,25 +1646,36 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
     // Configuration for 'recording' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_record_meeting_shown()) {
         $renderer->render_group_header('recording');
-        $renderer->render_group_element('recording_default', $renderer->render_group_element_checkbox('recording_default', 1));
-        $renderer->render_group_element('recording_editable', $renderer->render_group_element_checkbox('recording_editable', 1));
-        $renderer->render_group_element('recording_icons_enabled', $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
+        $renderer->render_group_element('recording_default',
+            $renderer->render_group_element_checkbox('recording_default', 1));
+        $renderer->render_group_element('recording_editable',
+            $renderer->render_group_element_checkbox('recording_editable', 1));
+        $renderer->render_group_element('recording_icons_enabled',
+            $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
     }
     // Configuration for 'import recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_import_recordings_shown()) {
         $renderer->render_group_header('importrecordings');
-        $renderer->render_group_element('importrecordings_enabled', $renderer->render_group_element_checkbox('importrecordings_enabled', 0));
-        $renderer->render_group_element('importrecordings_from_deleted_enabled', $renderer->render_group_element_checkbox('importrecordings_from_deleted_enabled', 0));
+        $renderer->render_group_element('importrecordings_enabled',
+            $renderer->render_group_element_checkbox('importrecordings_enabled', 0));
+        $renderer->render_group_element('importrecordings_from_deleted_enabled',
+            $renderer->render_group_element_checkbox('importrecordings_from_deleted_enabled', 0));
     }
     // Configuration for 'show recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_show_recordings_shown()) {
         $renderer->render_group_header('recordings');
-        $renderer->render_group_element('recordings_html_default', $renderer->render_group_element_checkbox('recordings_html_default', 1));
-        $renderer->render_group_element('recordings_html_editable', $renderer->render_group_element_checkbox('recordings_html_editable', 0));
-        $renderer->render_group_element('recordings_deleted_default', $renderer->render_group_element_checkbox('recordings_deleted_default', 1));
-        $renderer->render_group_element('recordings_deleted_editable', $renderer->render_group_element_checkbox('recordings_deleted_editable', 0));
-        $renderer->render_group_element('recordings_imported_default', $renderer->render_group_element_checkbox('recordings_imported_default', 0));
-        $renderer->render_group_element('recordings_imported_editable', $renderer->render_group_element_checkbox('recordings_imported_editable', 1));
+        $renderer->render_group_element('recordings_html_default',
+            $renderer->render_group_element_checkbox('recordings_html_default', 1));
+        $renderer->render_group_element('recordings_html_editable',
+            $renderer->render_group_element_checkbox('recordings_html_editable', 0));
+        $renderer->render_group_element('recordings_deleted_default',
+            $renderer->render_group_element_checkbox('recordings_deleted_default', 1));
+        $renderer->render_group_element('recordings_deleted_editable',
+            $renderer->render_group_element_checkbox('recordings_deleted_editable', 0));
+        $renderer->render_group_element('recordings_imported_default',
+            $renderer->render_group_element_checkbox('recordings_imported_default', 0));
+        $renderer->render_group_element('recordings_imported_editable',
+            $renderer->render_group_element_checkbox('recordings_imported_editable', 1));
     }
 }
 
@@ -1670,40 +1683,53 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
     // Configuration for wait for moderator feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
         $renderer->render_group_header('waitformoderator');
-        $renderer->render_group_element('waitformoderator_default', $renderer->render_group_element_checkbox('waitformoderator_default', 0));
-        $renderer->render_group_element('waitformoderator_editable', $renderer->render_group_element_checkbox('waitformoderator_editable', 1));
-        $renderer->render_group_element('waitformoderator_ping_interval', $renderer->render_group_element_text('waitformoderator_ping_interval', 10, PARAM_INT));
-        $renderer->render_group_element('waitformoderator_cache_ttl', $renderer->render_group_element_text('waitformoderator_cache_ttl', 60, PARAM_INT));
+        $renderer->render_group_element('waitformoderator_default',
+            $renderer->render_group_element_checkbox('waitformoderator_default', 0));
+        $renderer->render_group_element('waitformoderator_editable',
+            $renderer->render_group_element_checkbox('waitformoderator_editable', 1));
+        $renderer->render_group_element('waitformoderator_ping_interval',
+            $renderer->render_group_element_text('waitformoderator_ping_interval', 10, PARAM_INT));
+        $renderer->render_group_element('waitformoderator_cache_ttl',
+            $renderer->render_group_element_text('waitformoderator_cache_ttl', 60, PARAM_INT));
     }
     // Configuration for "static voice bridge" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_static_voice_bridge_shown()) {
         $renderer->render_group_header('voicebridge');
-        $renderer->render_group_element('voicebridge_editable', $renderer->render_group_element_checkbox('voicebridge_editable', 0));
+        $renderer->render_group_element('voicebridge_editable',
+            $renderer->render_group_element_checkbox('voicebridge_editable', 0));
     }
     // Configuration for "preupload presentation" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_preupload_presentation_shown()) {
         // This feature only works if curl is installed.
         $preuploaddescripion = get_string('config_preuploadpresentation_description', 'bigbluebuttonbn');
         if (!extension_loaded('curl')) {
-            $preuploaddescripion .= '<div class="form-defaultinfo">'.get_string('config_warning_curl_not_installed', 'bigbluebuttonbn').'</div><br>';
+            $preuploaddescripion .= '<div class="form-defaultinfo">';
+            $preuploaddescripion .= get_string('config_warning_curl_not_installed', 'bigbluebuttonbn');
+            $preuploaddescripion .= '</div><br>';
         }
         $renderer->render_group_header('preuploadpresentation', null, $preuploaddescripion);
         if (extension_loaded('curl')) {
-            $renderer->render_group_element('preuploadpresentation_enabled', $renderer->render_group_element_checkbox('preuploadpresentation_enabled', 0));
+            $renderer->render_group_element('preuploadpresentation_enabled',
+                $renderer->render_group_element_checkbox('preuploadpresentation_enabled', 0));
         }
     }
     // Configuration for "user limit" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_user_limit_shown()) {
         $renderer->render_group_header('userlimit');
-        $renderer->render_group_element('userlimit_default', $renderer->render_group_element_text('userlimit_default', 0, PARAM_INT));
-        $renderer->render_group_element('userlimit_editable', $renderer->render_group_element_checkbox('userlimit_editable', 0));
+        $renderer->render_group_element('userlimit_default',
+            $renderer->render_group_element_text('userlimit_default', 0, PARAM_INT));
+        $renderer->render_group_element('userlimit_editable',
+            $renderer->render_group_element_checkbox('userlimit_editable', 0));
     }
     // Configuration for "scheduled duration" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_scheduled_duration_shown()) {
         $renderer->render_group_header('scheduled');
-        $renderer->render_group_element('scheduled_duration_enabled', $renderer->render_group_element_checkbox('scheduled_duration_enabled', 1));
-        $renderer->render_group_element('scheduled_duration_compensation', $renderer->render_group_element_text('scheduled_duration_compensation', 10, PARAM_INT));
-        $renderer->render_group_element('scheduled_pre_opening', $renderer->render_group_element_text('scheduled_pre_opening', 10, PARAM_INT));
+        $renderer->render_group_element('scheduled_duration_enabled',
+            $renderer->render_group_element_checkbox('scheduled_duration_enabled', 1));
+        $renderer->render_group_element('scheduled_duration_compensation',
+            $renderer->render_group_element_text('scheduled_duration_compensation', 10, PARAM_INT));
+        $renderer->render_group_element('scheduled_pre_opening',
+            $renderer->render_group_element_text('scheduled_pre_opening', 10, PARAM_INT));
     }
     // Configuration for defining the default role/user that will be moderator on new activities.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_moderator_default_shown()) {
@@ -1712,13 +1738,15 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
         $roles = bigbluebuttonbn_get_roles();
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $renderer->render_group_element('participant_moderator_default',
-            $renderer->render_group_element_configmultiselect('participant_moderator_default', array_keys($owner), array_merge($owner, $roles))
+            $renderer->render_group_element_configmultiselect('participant_moderator_default',
+                array_keys($owner), array_merge($owner, $roles))
           );
     }
     // Configuration for "send notifications" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_send_notifications_shown()) {
         $renderer->render_group_header('sendnotifications');
-        $renderer->render_group_element('sendnotifications_enabled', $renderer->render_group_element_checkbox('sendnotifications_enabled', 1));
+        $renderer->render_group_element('sendnotifications_enabled',
+            $renderer->render_group_element_checkbox('sendnotifications_enabled', 1));
     }
 }
 
@@ -1731,9 +1759,11 @@ function bigbluebutonbn_settings_extended(&$renderer) {
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_settings_extended_shown()) {
         $renderer->render_group_header('extended_capabilities');
         // UI for 'notify users when recording ready' feature.
-        $renderer->render_group_element('recordingready_enabled', $renderer->render_group_element_checkbox('recordingready_enabled', 0));
+        $renderer->render_group_element('recordingready_enabled',
+            $renderer->render_group_element_checkbox('recordingready_enabled', 0));
         // UI for 'register meeting events' feature.
-        $renderer->render_group_element('meetingevents_enabled', $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
+        $renderer->render_group_element('meetingevents_enabled',
+            $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
     }
 }
 

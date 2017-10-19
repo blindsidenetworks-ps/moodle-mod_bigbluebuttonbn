@@ -172,7 +172,7 @@ function bigbluebutton_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
 
     echo $OUTPUT->header();
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms', 'M.mod_bigbluebuttonbn.rooms.window_close');
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms', 'M.mod_bigbluebuttonbn.rooms.windowClose');
     echo $OUTPUT->footer();
 }
 

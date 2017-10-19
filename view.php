@@ -255,7 +255,8 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
 
     if (count($groups) == 0) {
         // Only the All participants group exists.
-        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info', false);
+        bigbluebuttonbn_view_message_box($bbbsession,
+            get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info', false);
         return;
     }
 
@@ -302,7 +303,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     // Renders general warning when configured.
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $output  = bigbluebuttonbn_view_render_warning($cfg['general_warning_message'], 'info',
-        (string)$cfg['general_warning_button_href'], (string)$cfg['general_warning_button_text'], (string)$cfg['general_warning_button_class']);
+        (string)$cfg['general_warning_button_href'],
+        (string)$cfg['general_warning_button_text'],
+        (string)$cfg['general_warning_button_class']);
 
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
@@ -325,14 +328,15 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
 
 function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $enabledfeatures, &$jsvars) {
     $output = '';
-    // Evaluates if the recordings are enterely disabled
+    // Evaluates if the recordings are enterely disabled.
     if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
         if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
-            $output .= bigbluebuttonbn_view_render_warning(get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
+            $output .= bigbluebuttonbn_view_render_warning(
+                get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
         }
         return $output;
     }
-    // Recordings are rendered either if it is a 'recordings only' instance or it is set to be recorded
+    // Recordings are rendered either if it is a 'recordings only' instance or it is set to be recorded.
     if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
         $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
         $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
@@ -350,7 +354,8 @@ function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $
     if (empty($message)) {
         return $output;
     }
-    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in', 'bigbluebuttonbn_view_general_warning')."\n";
+    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
+      'bigbluebuttonbn_view_general_warning')."\n";
     $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$message."\n";
     $output .= '  <div class="singlebutton">'."\n";
     if (!empty($href)) {

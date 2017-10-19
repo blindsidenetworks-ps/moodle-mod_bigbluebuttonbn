@@ -275,25 +275,28 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'participants', json_encode($participantlist));
         $mform->setType('participants', PARAM_TEXT);
         // Render elements for participant selection.
-        $htmlselectiontype = html_writer::select($participantselection['type_options'], 'bigbluebuttonbn_participant_selection_type',
-            $participantselection['type_selected'], array(),
+        $htmlselectiontype = html_writer::select($participantselection['type_options'],
+            'bigbluebuttonbn_participant_selection_type', $participantselection['type_selected'], array(),
             array('id' => 'bigbluebuttonbn_participant_selection_type',
                   'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;'));
         $htmlselectionoptions = html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
             $participantselection['selected'], array(),
             array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled'));
-        $htmlselectioninput = html_writer::tag('input', '', array('id' => 'id_addselectionid', 'type' => 'button', 'class' => 'btn btn-secondary',
+        $htmlselectioninput = html_writer::tag('input', '', array('id' => 'id_addselectionid',
+            'type' => 'button', 'class' => 'btn btn-secondary',
             'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
             'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
           ));
-        $htmladdparticipant = html_writer::tag('div', $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
+        $htmladdparticipant = html_writer::tag('div',
+            $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_add_participant', get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmladdparticipant);
+        $mform->addElement('static', 'static_add_participant',
+            get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmladdparticipant);
         $mform->addElement('html', "\n\n");
         // Declare the table.
         $htmltable = new html_table();
         if ($cfg['version_major'] < '2016052300') {
-            // This is required before v3.1
+            // This is required before v3.1.
             $htmltable->head  = array('', '', '', '');
             $htmltable->align = array('left', 'left', 'left', 'left');
         }
@@ -302,7 +305,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Render elements for participant list.
         $htmlparticipantlist = html_writer::table($htmltable);
         $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_participant_list', get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
+        $mform->addElement('static', 'static_participant_list',
+            get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
         $mform->addElement('html', "\n\n");
     }
 

@@ -187,7 +187,8 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     $log->userid = $USER->id;
     $log->timecreated = time();
     $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
-    $sql = "SELECT * FROM {bigbluebuttonbn_logs} WHERE bigbluebuttonbnid = ? AND log = ? AND " . $DB->sql_compare_text('meta') . " = ?";
+    $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
+    $sql .= "WHERE bigbluebuttonbnid = ? AND log = ? AND ". $DB->sql_compare_text('meta') . " = ?";
     $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, BIGBLUEBUTTONBN_LOG_EVENT_CREATE, "{\"record\":true}"));
     $log->meta = "{\"has_recordings\":false}";
     if (!empty($logs)) {

@@ -30,14 +30,14 @@ M.mod_bigbluebuttonbn.helpers = {
      * @method init
      */
     init: function() {
-        this.element_tag = this.init_element_tag();
-        this.element_fa_class = this.init_element_fa_class();
-        this.element_action_reversed = this.init_element_action_reversed();
+        this.element_tag = this.initElementTag();
+        this.element_fa_class = this.initElementFAClass();
+        this.element_action_reversed = this.initElementActionReversed();
     },
 
-    toggle_spinning_wheel_on: function(data) {
+    toggleSpinningWheelOn: function(data) {
         var elementid, link, button, text;
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-onclick', link.getAttribute('onclick'));
@@ -45,7 +45,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_on_compatible(link, text);
+            this.toggleSpinningWheelOnCompatible(link, text);
             return;
         }
         button.setAttribute('data-aria-label', button.getAttribute('aria-label'));
@@ -56,7 +56,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('class', this.element_fa_class.process);
     },
 
-    toggle_spinning_wheel_on_compatible: function(link, text) {
+    toggleSpinningWheelOnCompatible: function(link, text) {
         var button = link.one('> img');
         if (button === null) {
             // Button doesn't even have an icon.
@@ -70,16 +70,16 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
     },
 
-    toggle_spinning_wheel_off: function(data) {
+    toggleSpinningWheelOff: function(data) {
         var elementid, link, button;
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('onclick', link.getAttribute('data-onclick'));
         link.removeAttribute('data-onclick');
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_off_compatible(link);
+            this.toggleSpinningWheelOffCompatible(link);
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -90,7 +90,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggle_spinning_wheel_off_compatible: function(link) {
+    toggleSpinningWheelOffCompatible: function(link) {
         var button = link.one('> img');
         if (button === null) {
             // Button doesn't have an icon.
@@ -104,13 +104,13 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-src');
     },
 
-    update_data: function(data) {
+    updateData: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-action', action);
         linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
@@ -120,7 +120,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
+            this.updateDataCompatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
         button.setAttribute('data-aria-label', buttondatatext);
@@ -128,7 +128,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-class', this.element_fa_class[action]);
     },
 
-    update_data_compatible: function(button, action, buttondatatag, buttondatatext) {
+    updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
         var buttondatasrc;
         buttondatasrc = button.getAttribute('data-src').replace(action, buttondatatag);
         button.setAttribute('data-alt', buttondatatext);
@@ -136,13 +136,13 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-src', buttondatasrc);
     },
 
-    update_id: function(data) {
+    updateId: function(data) {
         var action, elementid, link, button, id;
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
         link.setAttribute('id', id);
@@ -154,7 +154,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('id');
     },
 
-    element_id: function(action, target) {
+    elementId: function(action, target) {
         var elementid = 'recording-' + action;
         if (typeof target !== 'undefined') {
             elementid += '-' + target;
@@ -162,7 +162,7 @@ M.mod_bigbluebuttonbn.helpers = {
         return elementid;
     },
 
-    init_element_tag: function() {
+    initElementTag: function() {
         var tags = {};
         tags.play = 'play';
         tags.publish = 'hide';
@@ -171,12 +171,12 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'unlock';
         tags.edit = 'edit';
         tags.process = 'process';
-        tags['import'] = 'import';
-        tags['delete'] = 'delete';
+        tags.import = 'import';
+        tags.delete = 'delete';
         return tags;
     },
 
-    init_element_fa_class: function() {
+    initElementFAClass: function() {
         var tags = {};
         tags.publish = 'icon fa fa-eye-slash fa-fw iconsmall';
         tags.unpublish = 'icon fa fa-eye fa-fw iconsmall';
@@ -184,12 +184,12 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'icon fa fa-lock fa-fw iconsmall';
         tags.edit = 'icon fa fa-pencil fa-fw iconsmall';
         tags.process = 'icon fa fa-spinner fa-spin iconsmall';
-        tags['import'] = 'icon fa fa-download fa-fw iconsmall';
-        tags['delete'] = 'icon fa fa-trash fa-fw iconsmall';
+        tags.import = 'icon fa fa-download fa-fw iconsmall';
+        tags.delete = 'icon fa fa-trash fa-fw iconsmall';
         return tags;
     },
 
-    init_element_action_reversed: function() {
+    initElementActionReversed: function() {
         var actions = {};
         actions.play = 'play';
         actions.publish = 'unpublish';
@@ -197,12 +197,12 @@ M.mod_bigbluebuttonbn.helpers = {
         actions.protect = 'unprotect';
         actions.unprotect = 'protect';
         actions.edit = 'edit';
-        actions['import'] = 'import';
-        actions['delete'] = 'delete';
+        actions.import = 'import';
+        actions.delete = 'delete';
         return actions;
     },
 
-    reload_preview: function(data) {
+    reloadPreview: function(data) {
         var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
         thumbnails.each(function (thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');

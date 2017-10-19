@@ -17,6 +17,7 @@ YUI.add('moodle-mod_bigbluebuttonbn-recordings', function (Y, NAME) {
 
 /** global: M */
 /** global: Y */
+/** global: YUI */
 /** global: event */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
@@ -40,13 +41,13 @@ M.mod_bigbluebuttonbn.recordings = {
             (data.profile_features.includes('all') || data.profile_features.includes('showrecordings'))) {
             this.locale = data.locale;
             this.datatable.columns = data.columns;
-            this.datatable.data = this.datatable_init_format_dates(data.data);
-            this.datatable_init();
+            this.datatable.data = this.datatableInitFormatDates(data.data);
+            this.datatableInit();
         }
         M.mod_bigbluebuttonbn.helpers.init();
     },
 
-    datatable_init_format_dates: function(data) {
+    datatableInitFormatDates: function(data) {
         for (var i = 0; i < data.length; i++) {
             var date = new Date(data[i].date);
             data[i].date = date.toLocaleDateString(this.locale, {
@@ -59,7 +60,7 @@ M.mod_bigbluebuttonbn.recordings = {
         return data;
     },
 
-    datatable_init: function() {
+    datatableInit: function() {
         var columns = this.datatable.columns;
         var data = this.datatable.data;
         YUI({
@@ -76,7 +77,7 @@ M.mod_bigbluebuttonbn.recordings = {
         });
     },
 
-    recording_element_payload: function(element) {
+    recordingElementPayload: function(element) {
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('div');
         return {
@@ -86,77 +87,77 @@ M.mod_bigbluebuttonbn.recordings = {
         };
     },
 
-    recording_action: function(element, confirmation, extras) {
-        var payload = this.recording_element_payload(element);
+    recordingAction: function(element, confirmation, extras) {
+        var payload = this.recordingElementPayload(element);
         payload = Object.assign(payload, extras);
         // The action doesn't require confirmation.
         if (!confirmation) {
-            this.recording_action_perform(payload);
+            this.recordingActionPerform(payload);
             return;
         }
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             modal: true,
             centered: true,
-            question: this.recording_confirmation_message(payload)
+            question: this.recordingConfirmationMessage(payload)
         });
         // If it is confirmed.
         confirm.on('complete-yes', function() {
-            this.recording_action_perform(payload);
+            this.recordingActionPerform(payload);
         }, this);
     },
 
-    recording_action_perform: function(data) {
-        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_on(data);
-        M.mod_bigbluebuttonbn.broker.recording_action_perform(data);
+    recordingActionPerform: function(data) {
+        M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOn(data);
+        M.mod_bigbluebuttonbn.broker.recordingActionPerform(data);
     },
 
-    recording_publish: function(element) {
+    recordingPublish: function(element) {
         var extras = {
             source: 'published',
             goalstate: 'true'
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_unpublish: function(element) {
+    recordingUnpublish: function(element) {
         var extras = {
             source: 'published',
             goalstate: 'false'
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_protect: function(element) {
+    recordingProtect: function(element) {
         var extras = {
             source: 'protected',
             goalstate: 'true'
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_unprotect: function(element) {
+    recordingUnprotect: function(element) {
         var extras = {
             source: 'protected',
             goalstate: 'false'
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_delete: function(element) {
+    recordingDelete: function(element) {
         var extras = {
             source: 'found',
             goalstate: false
         };
-        this.recording_action(element, (this.recording_is_imported(element) == 'false'), extras);
+        this.recordingAction(element, (this.recordingIsImported(element) == 'false'), extras);
     },
 
-    recording_import: function(element) {
+    recordingImport: function(element) {
         var extras = {};
-        this.recording_action(element, true, extras);
+        this.recordingAction(element, true, extras);
     },
 
-    recording_update: function(element) {
+    recordingUpdate: function(element) {
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('div');
         var extras = {
@@ -164,10 +165,10 @@ M.mod_bigbluebuttonbn.recordings = {
             source: node.getAttribute('data-source'),
             goalstate: nodeelement.getAttribute('data-goalstate')
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_edit: function(element) {
+    recordingEdit: function(element) {
         var link = Y.one(element);
         var node = link.ancestor('div');
         var text = node.one('> span');
@@ -177,22 +178,22 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
         inputtext.setAttribute('data-value', text.getHTML());
-        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recording_edit_keydown(this);');
-        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recording_edit_onfocusout(this);');
+        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recordingEditKeydown(this);');
+        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(this);');
         node.append(inputtext);
     },
 
-    recording_edit_keydown: function(element) {
+    recordingEditKeydown: function(element) {
         if (event.keyCode == 13) {
-            this.recording_edit_perform(element);
+            this.recordingEditPerform(element);
             return;
         }
         if (event.keyCode == 27) {
-            this.recording_edit_onfocusout(element);
+            this.recordingEditOnfocusout(element);
         }
     },
 
-    recording_edit_onfocusout: function(element) {
+    recordingEditOnfocusout: function(element) {
         var inputtext = Y.one(element);
         var node = inputtext.ancestor('div');
         inputtext.hide();
@@ -200,7 +201,7 @@ M.mod_bigbluebuttonbn.recordings = {
         node.one('> a').show();
     },
 
-    recording_edit_perform: function(element) {
+    recordingEditPerform: function(element) {
         var inputtext = Y.one(element);
         var node = inputtext.ancestor('div');
         var text = element.value;
@@ -214,8 +215,8 @@ M.mod_bigbluebuttonbn.recordings = {
         link.focus();
     },
 
-    recording_edit_completion: function(data, failed) {
-        var elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
+    recordingEditCompletion: function(data, failed) {
+        var elementid = M.mod_bigbluebuttonbn.helpers.elementId(data.action, data.target);
         var link = Y.one('a#' + elementid + '-' + data.recordingid);
         var node = link.ancestor('div');
         var text = node.one('> span');
@@ -229,7 +230,7 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.remove();
     },
 
-    recording_play: function(element) {
+    recordingPlay: function(element) {
         var nodeelement = Y.one(element);
         var extras = {
             target: nodeelement.getAttribute('data-target'),
@@ -238,70 +239,70 @@ M.mod_bigbluebuttonbn.recordings = {
             attempts: 1,
             dataset: nodeelement.getData()
         };
-        this.recording_action(element, false, extras);
+        this.recordingAction(element, false, extras);
     },
 
-    recording_confirmation_message: function(data) {
-        var confirmation, recording_type, elementid, associated_links, confirmation_warning;
+    recordingConfirmationMessage: function(data) {
+        var confirmation, recordingType, elementid, associatedLinks, confirmationWarning;
         confirmation = M.util.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
         if (typeof confirmation === 'undefined') {
             return '';
         }
-        recording_type = M.util.get_string('view_recording', 'bigbluebuttonbn');
+        recordingType = M.util.get_string('view_recording', 'bigbluebuttonbn');
         if (Y.one('#playbacks-' + data.recordingid).get('dataset').imported === 'true') {
-            recording_type = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
+            recordingType = M.util.get_string('view_recording_link', 'bigbluebuttonbn');
         }
-        confirmation = confirmation.replace("{$a}", recording_type);
+        confirmation = confirmation.replace("{$a}", recordingType);
         if (data.action === 'import') {
             return confirmation;
         }
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
-        elementid = M.mod_bigbluebuttonbn.helpers.element_id(data.action, data.target);
-        associated_links = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
-        if (associated_links === 0) {
+        elementid = M.mod_bigbluebuttonbn.helpers.elementId(data.action, data.target);
+        associatedLinks = Y.one('a#' + elementid + '-' + data.recordingid).get('dataset').links;
+        if (associatedLinks === 0) {
             return confirmation;
         }
-        confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
+        confirmationWarning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_p',
             'bigbluebuttonbn');
-        if (associated_links == 1) {
-            confirmation_warning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_s',
+        if (associatedLinks == 1) {
+            confirmationWarning = M.util.get_string('view_recording_' + data.action + '_confirmation_warning_s',
                 'bigbluebuttonbn');
         }
-        confirmation_warning = confirmation_warning.replace("{$a}", associated_links) + '. ';
-        return confirmation_warning + '\n\n' + confirmation;
+        confirmationWarning = confirmationWarning.replace("{$a}", associatedLinks) + '. ';
+        return confirmationWarning + '\n\n' + confirmation;
     },
 
-    recording_action_completion: function(data) {
+    recordingActionCompletion: function(data) {
         if (data.action == 'delete' || data.action == 'import') {
             Y.one('#recording-td-' + data.recordingid).remove();
             return;
         }
         if (data.action == 'play') {
-            M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
+            M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
             window.open(data.dataset.href, "_self");
             return;
         }
-        M.mod_bigbluebuttonbn.helpers.update_data(data);
-        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
-        M.mod_bigbluebuttonbn.helpers.update_id(data);
+        M.mod_bigbluebuttonbn.helpers.updateData(data);
+        M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
+        M.mod_bigbluebuttonbn.helpers.updateId(data);
         if (data.action === 'publish' || data.action === 'unpublish') {
-            this.recording_publishunpublish_completion(data);
+            this.recordingPublishUnpublishCompletion(data);
         }
     },
 
-    recording_action_failover: function(data) {
+    recordingActionFailover: function(data) {
         var alert = new M.core.alert({
             title: M.util.get_string('error', 'moodle'),
             message: data.message
         });
         alert.show();
-        M.mod_bigbluebuttonbn.helpers.toggle_spinning_wheel_off(data);
+        M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
-            this.recording_edit_completion(data, true);
+            this.recordingEditCompletion(data, true);
         }
     },
 
-    recording_publishunpublish_completion: function(data) {
+    recordingPublishUnpublishCompletion: function(data) {
         var playbacks, preview;
         playbacks = Y.one('#playbacks-' + data.recordingid);
         preview = Y.one('#preview-' + data.recordingid);
@@ -312,10 +313,10 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         playbacks.show();
         preview.show();
-        M.mod_bigbluebuttonbn.helpers.reload_preview(data);
+        M.mod_bigbluebuttonbn.helpers.reloadPreview(data);
     },
 
-    recording_is_imported: function(element) {
+    recordingIsImported: function(element) {
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('tr');
         return node.getAttribute('data-imported');
@@ -353,14 +354,14 @@ M.mod_bigbluebuttonbn.helpers = {
      * @method init
      */
     init: function() {
-        this.element_tag = this.init_element_tag();
-        this.element_fa_class = this.init_element_fa_class();
-        this.element_action_reversed = this.init_element_action_reversed();
+        this.element_tag = this.initElementTag();
+        this.element_fa_class = this.initElementFAClass();
+        this.element_action_reversed = this.initElementActionReversed();
     },
 
-    toggle_spinning_wheel_on: function(data) {
+    toggleSpinningWheelOn: function(data) {
         var elementid, link, button, text;
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         text = M.util.get_string('view_recording_list_action_' + data.action, 'bigbluebuttonbn');
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-onclick', link.getAttribute('onclick'));
@@ -368,7 +369,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_on_compatible(link, text);
+            this.toggleSpinningWheelOnCompatible(link, text);
             return;
         }
         button.setAttribute('data-aria-label', button.getAttribute('aria-label'));
@@ -379,7 +380,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('class', this.element_fa_class.process);
     },
 
-    toggle_spinning_wheel_on_compatible: function(link, text) {
+    toggleSpinningWheelOnCompatible: function(link, text) {
         var button = link.one('> img');
         if (button === null) {
             // Button doesn't even have an icon.
@@ -393,16 +394,16 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
     },
 
-    toggle_spinning_wheel_off: function(data) {
+    toggleSpinningWheelOff: function(data) {
         var elementid, link, button;
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('onclick', link.getAttribute('data-onclick'));
         link.removeAttribute('data-onclick');
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggle_spinning_wheel_off_compatible(link);
+            this.toggleSpinningWheelOffCompatible(link);
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -413,7 +414,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggle_spinning_wheel_off_compatible: function(link) {
+    toggleSpinningWheelOffCompatible: function(link) {
         var button = link.one('> img');
         if (button === null) {
             // Button doesn't have an icon.
@@ -427,13 +428,13 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-src');
     },
 
-    update_data: function(data) {
+    updateData: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-action', action);
         linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
@@ -443,7 +444,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.update_data_compatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
+            this.updateDataCompatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
             return;
         }
         button.setAttribute('data-aria-label', buttondatatext);
@@ -451,7 +452,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-class', this.element_fa_class[action]);
     },
 
-    update_data_compatible: function(button, action, buttondatatag, buttondatatext) {
+    updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
         var buttondatasrc;
         buttondatasrc = button.getAttribute('data-src').replace(action, buttondatatag);
         button.setAttribute('data-alt', buttondatatext);
@@ -459,13 +460,13 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-src', buttondatasrc);
     },
 
-    update_id: function(data) {
+    updateId: function(data) {
         var action, elementid, link, button, id;
         action = this.element_action_reversed[data.action];
         if (action === data.action) {
             return;
         }
-        elementid = this.element_id(data.action, data.target);
+        elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         id = '' + elementid.replace(data.action, action) + '-' + data.recordingid;
         link.setAttribute('id', id);
@@ -477,7 +478,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('id');
     },
 
-    element_id: function(action, target) {
+    elementId: function(action, target) {
         var elementid = 'recording-' + action;
         if (typeof target !== 'undefined') {
             elementid += '-' + target;
@@ -485,7 +486,7 @@ M.mod_bigbluebuttonbn.helpers = {
         return elementid;
     },
 
-    init_element_tag: function() {
+    initElementTag: function() {
         var tags = {};
         tags.play = 'play';
         tags.publish = 'hide';
@@ -494,12 +495,12 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'unlock';
         tags.edit = 'edit';
         tags.process = 'process';
-        tags['import'] = 'import';
-        tags['delete'] = 'delete';
+        tags.import = 'import';
+        tags.delete = 'delete';
         return tags;
     },
 
-    init_element_fa_class: function() {
+    initElementFAClass: function() {
         var tags = {};
         tags.publish = 'icon fa fa-eye-slash fa-fw iconsmall';
         tags.unpublish = 'icon fa fa-eye fa-fw iconsmall';
@@ -507,12 +508,12 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'icon fa fa-lock fa-fw iconsmall';
         tags.edit = 'icon fa fa-pencil fa-fw iconsmall';
         tags.process = 'icon fa fa-spinner fa-spin iconsmall';
-        tags['import'] = 'icon fa fa-download fa-fw iconsmall';
-        tags['delete'] = 'icon fa fa-trash fa-fw iconsmall';
+        tags.import = 'icon fa fa-download fa-fw iconsmall';
+        tags.delete = 'icon fa fa-trash fa-fw iconsmall';
         return tags;
     },
 
-    init_element_action_reversed: function() {
+    initElementActionReversed: function() {
         var actions = {};
         actions.play = 'play';
         actions.publish = 'unpublish';
@@ -520,12 +521,12 @@ M.mod_bigbluebuttonbn.helpers = {
         actions.protect = 'unprotect';
         actions.unprotect = 'protect';
         actions.edit = 'edit';
-        actions['import'] = 'import';
-        actions['delete'] = 'delete';
+        actions.import = 'import';
+        actions.delete = 'delete';
         return actions;
     },
 
-    reload_preview: function(data) {
+    reloadPreview: function(data) {
         var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
         thumbnails.each(function (thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');
