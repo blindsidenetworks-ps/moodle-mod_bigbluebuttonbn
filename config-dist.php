@@ -69,6 +69,11 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * are 1=checked, 0=unchecked.
  **/
 
+ /* When the value is set to 0 (unchecked) the all the features for recordings
+  *  are ignored. Recording features are enabled by default.
+  *  $CFG->bigbluebuttonbn['recordings_enabled'] = 1;
+  */
+
 /* When the value is set to 1 (checked) the bigbluebuttonbn rooms or
  *  activities will have the recording capability enabled by default.
  *  $CFG->bigbluebuttonbn['recording_default'] = 1;
@@ -81,8 +86,8 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
 
 /* When the value is set to 1 (checked) the list of recordings in both
  * bigbluebuttonbn and recordingbn are generated using icons.
+ * $CFG->bigbluebuttonbn['recording_icons_enabled'] = 1;
  */
-$CFG->bigbluebuttonbn['recording_icons_enabled'] = 1;
 
 /*
  * 3. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
@@ -97,14 +102,14 @@ $CFG->bigbluebuttonbn['recording_icons_enabled'] = 1;
  /*
  * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
  * activities will have the 'import recordings' capability enabled.
+ * $CFG->bigbluebuttonbn['importrecordings_enabled'] = 0;
  */
-$CFG->bigbluebuttonbn['importrecordings_enabled'] = 0;
 
 /*
  * When the value is set to 1 (checked) the import recordings capability
  * can import recordings from deleted activities.
+ * $CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled'] = 0;
  */
-$CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled'] = 0;
 
 /*
  * 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
@@ -133,8 +138,8 @@ $CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled'] = 0;
  * When the 'wait for moderator' capability is enabled, the ping interval
  * is used for pooling the status of the server. Its value is expresed
  * in seconds. The default values is 15 secs.
+ * $CFG->bigbluebuttonbn['waitformoderator_ping_interval'] = 15;
  */
-$CFG->bigbluebuttonbn['waitformoderator_ping_interval'] = 15;
 
 /*
  * When the 'wait for moderator' capability is enabled, the ping interval
@@ -142,8 +147,8 @@ $CFG->bigbluebuttonbn['waitformoderator_ping_interval'] = 15;
  * load to the BigBluebutton server, the information retrieved from it is
  * cached. The value is expresed in seconds and is also used for other
  * information gathering. The default value is 60 secs.
+ * $CFG->bigbluebuttonbn['waitformoderator_cache_ttl'] = 60;
  */
-$CFG->bigbluebuttonbn['waitformoderator_cache_ttl'] = 60;
 
 /*
  * 5. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
@@ -152,8 +157,8 @@ $CFG->bigbluebuttonbn['waitformoderator_cache_ttl'] = 60;
  /*
  * A conference voice bridge number can be permanently assigned to a room
  * or activity.
+ * $CFG->bigbluebuttonbn['voicebridge_editable'] = 0;
  */
-$CFG->bigbluebuttonbn['voicebridge_editable'] = 0;
 
 /*
  * 6. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
@@ -166,8 +171,8 @@ $CFG->bigbluebuttonbn['voicebridge_editable'] = 0;
  * Moodle file repository and vinculate it to the BigBlueButtonBN room or
  * activity in one step. This file will be pulled by the BigBluebutton server
  * when the meeting session is accessed for the first time.
+ * $CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
  */
-$CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
 
 /*
  * 7. CONFIGURATION FOR "USER LIMIT" FEATURE
@@ -186,8 +191,8 @@ $CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
  * When the value is set to 1 (checked) the 'wait for moderator'
  * capability can be enabled/disabled by the user creating or editing
  * the room or activity.
+ * $CFG->bigbluebuttonbn['userlimit_editable'] = 0;
  */
-$CFG->bigbluebuttonbn['userlimit_editable'] = 0;
 
 /*
  * 8. CONFIGURATION FOR "PERMISSIONS" FEATURE
@@ -212,8 +217,8 @@ $CFG->bigbluebuttonbn['userlimit_editable'] = 0;
  * When the value is set to 1 (checked) the 'notification sending'
  * capability can be used by the user creating or editing the room or
  * activity.
+ * $CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
  */
-$CFG->bigbluebuttonbn['sendnotifications_enabled'] = 0;
 
 /*
  *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
