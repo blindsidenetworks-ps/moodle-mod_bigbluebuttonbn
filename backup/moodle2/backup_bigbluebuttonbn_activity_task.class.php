@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class for backup BigBlueButtonBN.
+ *
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
@@ -26,13 +28,14 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot.'/mod/bigbluebuttonbn/backup/moodle2/backup_bigbluebuttonbn_stepslib.php');
 
 /**
- * bigbluebuttonbn backup task that provides all the settings and steps to perform one
- * complete backup of the activity.
+ * Backup task that provides all the settings and steps to perform one complete backup of the activity.
  */
 class backup_bigbluebuttonbn_activity_task extends backup_activity_task
 {
     /**
      * Define (add) particular settings this activity can have.
+     *
+     * @return void
      */
     protected function define_my_settings() {
         // No particular settings for this activity.
@@ -40,6 +43,8 @@ class backup_bigbluebuttonbn_activity_task extends backup_activity_task
 
     /**
      * Define (add) particular steps this activity can have.
+     *
+     * @return void
      */
     protected function define_my_steps() {
         // Choice only has one structure step.
@@ -49,6 +54,10 @@ class backup_bigbluebuttonbn_activity_task extends backup_activity_task
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links.
+     *
+     * @param string $content
+     *
+     * @return string
      */
     public static function encode_content_links($content) {
         global $CFG;

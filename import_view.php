@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * View for BigBlueButton interaction.
+ * View for importing BigBlueButtonBN recordings.
  *
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2015-2017 Blindside Networks Inc

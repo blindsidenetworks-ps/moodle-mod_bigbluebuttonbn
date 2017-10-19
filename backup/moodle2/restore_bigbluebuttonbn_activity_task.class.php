@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class for restore BigBlueButtonBN.
+ *
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
@@ -26,13 +28,14 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/mod/bigbluebuttonbn/backup/moodle2/restore_bigbluebuttonbn_stepslib.php');
 
 /**
- * bigbluebuttonbn restore task that provides all the settings and steps to perform one
- * complete restore of the activity.
+ * Restore task that provides all the settings and steps to perform one complete restore of the activity.
  */
 class restore_bigbluebuttonbn_activity_task extends restore_activity_task
 {
     /**
      * Define (add) particular settings this activity can have.
+     *
+     * @return void
      */
     protected function define_my_settings() {
         // No particular settings for this activity.
@@ -40,6 +43,8 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task
 
     /**
      * Define (add) particular steps this activity can have.
+     *
+     * @return void
      */
     protected function define_my_steps() {
         // BigBlueButtonBN only has one structure step.
@@ -47,47 +52,51 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task
     }
 
     /**
-     * Define the contents in the activity that must be
-     * processed by the link decoder.
+     * Define the contents in the activity that must be processed by the link decoder.
+     *
+     * @return array
      */
     public static function define_decode_contents() {
         $contents = array();
-
         $contents[] = new restore_decode_content('bigbluebuttonbn', array('intro'), 'bigbluebuttonbn');
         $contents[] = new restore_decode_content('bigbluebuttonbn_logs', array('log'), 'bigbluebuttonbn_logs');
-
         return $contents;
     }
 
     /**
-     * Define the decoding rules for links belonging
-     * to the activity to be executed by the link decoder.
+     * Define the decoding rules for links belonging to the activity to be executed by the link decoder.
+     *
+     * @return array
      */
     public static function define_decode_rules() {
         $rules = array();
-
         $rules[] = new restore_decode_rule('BIGBLUEBUTTONBNVIEWBYID', '/mod/bigbluebuttonbn/view.php?id=$1', 'course_module');
         $rules[] = new restore_decode_rule('BIGBLUEBUTTONBNINDEX', '/mod/bigbluebuttonbn/index.php?id=$1', 'course');
-
         return $rules;
     }
 
+    /**
+    * Define the restoring rules for logs belonging to the activity to be executed by the link decoder.
+    *
+    * @return array
+    */
     public static function define_restore_log_rules() {
         $rules = array();
-
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'add', 'view.php?id={course_module}', '{bigbluebuttonbn}');
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'update', 'view.php?id={course_module}', '{bigbluebuttonbn}');
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'view', 'view.php?id={course_module}', '{bigbluebuttonbn}');
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'report', 'report.php?id={course_module}', '{bigbluebuttonbn}');
-
         return $rules;
     }
 
+    /**
+    * Define the restoring rules for course associated to the activity to be executed by the link decoder.
+    *
+    * @return array
+    */
     public static function define_restore_log_rules_for_course() {
         $rules = array();
-
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'view all', 'index.php?id={course}', null);
-
         return $rules;
     }
 }

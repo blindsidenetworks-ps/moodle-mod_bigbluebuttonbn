@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class for the structure used for backup BigBlueButtonBN.
+ *
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
@@ -26,21 +28,22 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Define all the backup steps that will be used by the backup_bigbluebuttonbn_activity_task.
  */
-
-/**
- * Define the complete bigbluebuttonbn structure for backup, with file and id annotations.
- */
 class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step
 {
+    /**
+     * Define the complete bigbluebuttonbn structure for backup, with file and id annotations.
+     *
+     * @return object
+     */
     protected function define_structure() {
 
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
-                            'course', 'name', 'intro', 'introformat', 'meetingid',
-                            'moderatorpass', 'viewerpass', 'wait', 'record', 'tagging',
-                            'welcome', 'voicebridge', 'openingtime', 'closingtime',
-                            'timecreated', 'timemodified', 'presentation', 'participants',
-                            'userlimit', ));
+                            'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
+                            'moderatorpass', 'viewerpass', 'wait', 'record', 'welcome',
+                            'voicebridge', 'openingtime', 'closingtime', 'timecreated',
+                            'timemodified', 'presentation', 'participants', 'userlimit',
+                            'recordings_html', 'recordings_deleted', 'recordings_imported'));
 
         $logs = new backup_nested_element('logs');
 

@@ -15,20 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * BigBlueButtonBN configuration file for moodle
- *
- * This file should be renamed "config.php" in the plugin directory
- *
- * It is intended to be used for setting configuration by default and
- * also for enable/diable configuration options in the admin setting UI
- * for those multitenancy deployments where the admin account is given
- * to the tenant owner and some shared information like the
- * bigbluebutton_server_url and bigbluebutton_shared_secret must been
- * kept private. And also when some of the features are going to be
- * disabled for all the tenants in that server
- **/
-
-/*
  * Configuration file for bigbluebuttonbn.
  *
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
@@ -39,6 +25,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+
+/*
+ * This file should be renamed to "config.php" in the plugin directory
+ *
+ * It is intended to be used for setting configuration by default and
+ * also for enable/diable configuration options in the admin setting UI
+ * for those multitenancy deployments where the admin account is given
+ * to the tenant owner and some shared information like the
+ * bigbluebutton_server_url and bigbluebutton_shared_secret must been
+ * kept private. And also when some of the features are going to be
+ * disabled for all the tenants in that server
+ **/
 
 /*
  * Any parameter included in this fill will not be shown in the admin UI
