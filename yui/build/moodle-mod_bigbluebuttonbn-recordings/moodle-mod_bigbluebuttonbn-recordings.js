@@ -208,7 +208,7 @@ M.mod_bigbluebuttonbn.recordings = {
         // Perform the update.
         inputtext.setAttribute('data-action', 'edit');
         inputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recording_update(inputtext.getDOMNode());
+        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
         node.one('> span').setHTML(text);
         var link = node.one('> a');
         link.show();
@@ -437,7 +437,7 @@ M.mod_bigbluebuttonbn.helpers = {
         elementid = this.elementId(data.action, data.target);
         link = Y.one('a#' + elementid + '-' + data.recordingid);
         link.setAttribute('data-action', action);
-        linkdataonclick = link.getAttribute('data-onclick').replace(data.action, action);
+        linkdataonclick = link.getAttribute('data-onclick').replace(this.capitalize(data.action), this.capitalize(action));
         link.setAttribute('data-onclick', linkdataonclick);
         buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
         buttondatatag = this.element_tag[action];
@@ -454,7 +454,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
         var buttondatasrc;
-        buttondatasrc = button.getAttribute('data-src').replace(action, buttondatatag);
+        buttondatasrc = button.getAttribute('data-src').replace(this.capitalize(action), this.capitalize(buttondatatag));
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
         button.setAttribute('data-src', buttondatasrc);
@@ -534,8 +534,11 @@ M.mod_bigbluebuttonbn.helpers = {
             thumbnailsrc += '?' + new Date().getTime();
             thumbnail.setAttribute('src', thumbnailsrc);
         });
-    }
+    },
 
+    capitalize: function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 };
 
 

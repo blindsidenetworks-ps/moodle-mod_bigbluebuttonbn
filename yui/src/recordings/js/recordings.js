@@ -206,7 +206,7 @@ M.mod_bigbluebuttonbn.recordings = {
         // Perform the update.
         inputtext.setAttribute('data-action', 'edit');
         inputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recording_update(inputtext.getDOMNode());
+        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
         node.one('> span').setHTML(text);
         var link = node.one('> a');
         link.show();
