@@ -65,7 +65,7 @@ class config {
             'scheduled_duration_enabled' => 'false',
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',
-            'recordings_enabled' => true,
+            'recordings_enabled' => 'true',
             'recordings_html_default' => 'false',
             'recordings_html_editable' => 'false',
             'recordings_deleted_default' => 'false',
@@ -111,7 +111,7 @@ class config {
      * @return boolean
      */
     public static function recordings_enabled() {
-        return self::get('recordings_enabled');
+        return (self::get('recordings_enabled') === 'true');
     }
 
     /**

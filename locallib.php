@@ -1638,11 +1638,7 @@ function bigbluebutonbn_settings_general(&$renderer) {
     }
 }
 
-function bigbluebutonbn_settings_recordings(&$renderer) {
-    // Evaluates if recordings are enabled for the Moodle site.
-    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
-        return;
-    }
+function bigbluebutonbn_settings_record(&$renderer) {
     // Configuration for 'recording' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_record_meeting_shown()) {
         $renderer->render_group_header('recording');
@@ -1653,6 +1649,9 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
         $renderer->render_group_element('recording_icons_enabled',
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
     }
+}
+
+function bigbluebutonbn_settings_importrecordings(&$renderer) {
     // Configuration for 'import recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_import_recordings_shown()) {
         $renderer->render_group_header('importrecordings');
@@ -1661,6 +1660,9 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
         $renderer->render_group_element('importrecordings_from_deleted_enabled',
             $renderer->render_group_element_checkbox('importrecordings_from_deleted_enabled', 0));
     }
+}
+
+function bigbluebutonbn_settings_showrecordings(&$renderer) {
     // Configuration for 'show recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_show_recordings_shown()) {
         $renderer->render_group_header('recordings');
@@ -1679,7 +1681,7 @@ function bigbluebutonbn_settings_recordings(&$renderer) {
     }
 }
 
-function bigbluebutonbn_settings_meetings(&$renderer) {
+function bigbluebutonbn_settings_waitmoderator(&$renderer) {
     // Configuration for wait for moderator feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
         $renderer->render_group_header('waitformoderator');
@@ -1692,12 +1694,18 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
         $renderer->render_group_element('waitformoderator_cache_ttl',
             $renderer->render_group_element_text('waitformoderator_cache_ttl', 60, PARAM_INT));
     }
+}
+
+function bigbluebutonbn_settings_voicebridge(&$renderer) {
     // Configuration for "static voice bridge" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_static_voice_bridge_shown()) {
         $renderer->render_group_header('voicebridge');
         $renderer->render_group_element('voicebridge_editable',
             $renderer->render_group_element_checkbox('voicebridge_editable', 0));
     }
+}
+
+function bigbluebutonbn_settings_preupload(&$renderer) {
     // Configuration for "preupload presentation" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_preupload_presentation_shown()) {
         // This feature only works if curl is installed.
@@ -1713,6 +1721,9 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
                 $renderer->render_group_element_checkbox('preuploadpresentation_enabled', 0));
         }
     }
+}
+
+function bigbluebutonbn_settings_userlimit(&$renderer) {
     // Configuration for "user limit" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_user_limit_shown()) {
         $renderer->render_group_header('userlimit');
@@ -1721,6 +1732,9 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
         $renderer->render_group_element('userlimit_editable',
             $renderer->render_group_element_checkbox('userlimit_editable', 0));
     }
+}
+
+function bigbluebutonbn_settings_duration(&$renderer) {
     // Configuration for "scheduled duration" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_scheduled_duration_shown()) {
         $renderer->render_group_header('scheduled');
@@ -1731,6 +1745,9 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
         $renderer->render_group_element('scheduled_pre_opening',
             $renderer->render_group_element_text('scheduled_pre_opening', 10, PARAM_INT));
     }
+}
+
+function bigbluebutonbn_settings_participants(&$renderer) {
     // Configuration for defining the default role/user that will be moderator on new activities.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_moderator_default_shown()) {
         $renderer->render_group_header('participant');
@@ -1742,6 +1759,9 @@ function bigbluebutonbn_settings_meetings(&$renderer) {
                 array_keys($owner), array_merge($owner, $roles))
           );
     }
+}
+
+function bigbluebutonbn_settings_notifications(&$renderer) {
     // Configuration for "send notifications" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_send_notifications_shown()) {
         $renderer->render_group_header('sendnotifications');
