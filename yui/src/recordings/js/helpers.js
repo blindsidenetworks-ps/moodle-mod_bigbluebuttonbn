@@ -67,7 +67,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-title', button.getAttribute('title'));
         button.setAttribute('title', text);
         button.setAttribute('data-src', button.getAttribute('src'));
-        button.setAttribute('src', M.cfg.wwwroot + "/mod/bigbluebuttonbn/pix/processing16.gif");
+        button.setAttribute('src', 'pix/i/processing16.gif');
     },
 
     toggleSpinningWheelOff: function(data) {
