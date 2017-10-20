@@ -211,9 +211,7 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
     $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
-                                                              'bigbluebuttonbnid' => $bigbluebuttonbn->id,
-                                                              'userid' => $user->id,
-                                                              'log' => 'Join', ), '*');
+        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ), '*');
     if ($completed > 0) {
         return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.
             get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.
@@ -231,9 +229,8 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
     $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
-                                                              'bigbluebuttonbnid' => $bigbluebuttonbn->id,
-                                                              'userid' => $user->id,
-                                                              'log' => 'Join', ), '*', IGNORE_MULTIPLE);
+        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ),
+        '*', IGNORE_MULTIPLE);
     return $completed > 0;
 }
 
@@ -564,4 +561,13 @@ function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
     return $areas;
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
+    return [
+        'mod_bigbluebuttonbn:i/bigbluebutton' => 'fa-bigbluebutton',
+    ];
 }
