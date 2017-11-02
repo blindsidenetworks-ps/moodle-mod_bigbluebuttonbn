@@ -359,14 +359,14 @@ function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $
     $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$message."\n";
     $output .= '  <div class="singlebutton">'."\n";
     if (!empty($href)) {
-        $output .= bigbluebutton_view_render_general_warning_button($href, $text, $class);
+        $output .= bigbluebuttonbn_view_render_warning_button($href, $text, $class);
     }
     $output .= '  </div>'."\n";
     $output .= $OUTPUT->box_end()."\n";
     return $output;
 }
 
-function bigbluebutton_view_render_warning_button($href, $text = '', $class = '') {
+function bigbluebuttonbn_view_render_warning_button($href, $text = '', $class = '') {
     if ($text == '') {
         $text = get_string('ok', 'moodle');
     }

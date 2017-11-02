@@ -46,7 +46,15 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install node
+  #- nvm install node 8.9.0
+  ## Install node manually as is broken since Nov 1, 2017
+  - sudo apt-get install -y build-essential libssl-dev curl
+  - curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
+  - bash install_nvm.sh
+  - source ~/.profile
+  - nvm install 8.9.0
+  - nvm alias default 8.9.0
+  - nvm use default
   - cd ../..
   ## Standard script
   - composer selfupdate

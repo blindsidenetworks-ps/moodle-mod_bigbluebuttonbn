@@ -197,7 +197,7 @@ M.mod_bigbluebuttonbn.rooms = {
             // Create a img element.
             var spinning_wheel = Y.DOM.create('<img>');
             Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
-            Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/processing16.gif');
+            Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/i/processing16.gif');
             // Add the spinning wheel.
             Y.DOM.addHTML(status_bar_span, '&nbsp;');
             Y.DOM.addHTML(status_bar_span, spinning_wheel);
