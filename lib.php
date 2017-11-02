@@ -447,7 +447,6 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  */
 function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
-    global $DB;
     $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
     $context = context_module::instance($bigbluebuttonbn->coursemodule);
     // Set the filestorage object.
