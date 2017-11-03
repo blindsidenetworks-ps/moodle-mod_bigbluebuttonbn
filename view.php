@@ -302,7 +302,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
 
     // Renders general warning when configured.
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
-    $output  = bigbluebuttonbn_view_render_warning($cfg['general_warning_message'], 'info',
+    $output  = bigbluebuttonbn_view_render_warning(
+        (string)$cfg['general_warning_message'],
+        (string)$cfg['general_warning_box_type'],
         (string)$cfg['general_warning_button_href'],
         (string)$cfg['general_warning_button_text'],
         (string)$cfg['general_warning_button_class']);

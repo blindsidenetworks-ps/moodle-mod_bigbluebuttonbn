@@ -293,6 +293,10 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
    * as a warning message to privileged users (administrators and Teachers or users allowed to edit).
    * $CFG->bigbluebuttonbn['general_warning_message'] = "This will may have recordings enabled when upgraded to premium.";
    *
+   * As the general_warning_message is shown in a box, its type can be defined with general_warning_type
+   * The default type is 'info' which is normaly rendered in blue when using a bootstrap theme.
+   * $CFG->bigbluebuttonbn['general_warning_box_type'] = 'info';
+   *
    * Additionally, when general_warning_button_href value is different than "", a button
    * can also be shown right after the message.
    * $CFG->bigbluebuttonbn['general_warning_button_href'] = "http://google.ca/";

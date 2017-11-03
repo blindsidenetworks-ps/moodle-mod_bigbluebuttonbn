@@ -1,3 +1,6 @@
+2.2 (2017101001)
+Enhancement: A general warning message can be set up by configuration.
+
 2.2 (2017101000)
 Enhancement: Included the parameter userID as part of the join request.
 Enhancement: Added preview thumbnails to recordings.

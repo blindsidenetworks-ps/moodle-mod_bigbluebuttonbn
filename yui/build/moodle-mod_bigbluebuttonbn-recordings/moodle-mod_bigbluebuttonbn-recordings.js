@@ -495,8 +495,8 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'unlock';
         tags.edit = 'edit';
         tags.process = 'process';
-        tags.import = 'import';
-        tags.delete = 'delete';
+        tags['import'] = 'import';
+        tags['delete'] = 'delete';
         return tags;
     },
 
@@ -508,8 +508,8 @@ M.mod_bigbluebuttonbn.helpers = {
         tags.unprotect = 'icon fa fa-lock fa-fw iconsmall';
         tags.edit = 'icon fa fa-pencil fa-fw iconsmall';
         tags.process = 'icon fa fa-spinner fa-spin iconsmall';
-        tags.import = 'icon fa fa-download fa-fw iconsmall';
-        tags.delete = 'icon fa fa-trash fa-fw iconsmall';
+        tags['import'] = 'icon fa fa-download fa-fw iconsmall';
+        tags['delete'] = 'icon fa fa-trash fa-fw iconsmall';
         return tags;
     },
 
@@ -521,8 +521,8 @@ M.mod_bigbluebuttonbn.helpers = {
         actions.protect = 'unprotect';
         actions.unprotect = 'protect';
         actions.edit = 'edit';
-        actions.import = 'import';
-        actions.delete = 'delete';
+        actions['import'] = 'import';
+        actions['delete'] = 'delete';
         return actions;
     },
 
