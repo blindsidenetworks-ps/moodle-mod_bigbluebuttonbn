@@ -136,7 +136,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
                 bigbluebuttonbn_get_instance_profiles_array($profiles),
-                array('onchange' => 'M.mod_bigbluebuttonbn.modform.update_instance_type_profile(this);'));
+                array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
             return;
         }
@@ -278,14 +278,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $htmlselectiontype = html_writer::select($participantselection['type_options'],
             'bigbluebuttonbn_participant_selection_type', $participantselection['type_selected'], array(),
             array('id' => 'bigbluebuttonbn_participant_selection_type',
-                  'onchange' => 'M.mod_bigbluebuttonbn.modform.participant_selection_set(); return 0;'));
+                  'onchange' => 'M.mod_bigbluebuttonbn.modform.participantSelectionSet(); return 0;'));
         $htmlselectionoptions = html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
             $participantselection['selected'], array(),
             array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled'));
         $htmlselectioninput = html_writer::tag('input', '', array('id' => 'id_addselectionid',
             'type' => 'button', 'class' => 'btn btn-secondary',
             'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
-            'onclick' => 'M.mod_bigbluebuttonbn.modform.participant_add(); return 0;'
+            'onclick' => 'M.mod_bigbluebuttonbn.modform.participantAdd(); return 0;'
           ));
         $htmladdparticipant = html_writer::tag('div',
             $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
