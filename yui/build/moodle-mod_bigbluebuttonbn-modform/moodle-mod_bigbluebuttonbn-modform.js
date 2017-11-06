@@ -45,11 +45,11 @@ M.mod_bigbluebuttonbn.modform = {
     updateInstanceTypeProfile: function() {
         var selected_type, profile_type;
         selected_type = Y.one('#id_type');
-        profile_type = this.bigbluebuttonbn.instance_type_room_only;
+        profile_type = this.bigbluebuttonbn.instanceTypeRoomOnly;
         if (selected_type !== null) {
             profile_type = selected_type.get('value');
         }
-        this.applyInstanceTypeProfile(this.bigbluebuttonbn.instance_type_profiles[profile_type]);
+        this.applyInstanceTypeProfile(this.bigbluebuttonbn.instanceTypeProfiles[profile_type]);
     },
 
     applyInstanceTypeProfile: function(instance_type_profile) {
@@ -101,7 +101,7 @@ M.mod_bigbluebuttonbn.modform = {
         var type = document.getElementById('bigbluebuttonbn_participant_selection_type');
         for (var i = 0; i < type.options.length; i++) {
             if (type.options[i].selected) {
-                var options = this.bigbluebuttonbn.participant_data[type.options[i].value].children;
+                var options = this.bigbluebuttonbn.participantData[type.options[i].value].children;
                 for (var option in options) {
                     if (options.hasOwnProperty(option)) {
                         this.selectAddOption(
@@ -122,11 +122,11 @@ M.mod_bigbluebuttonbn.modform = {
 
     participantListInit: function() {
         var selection_type_value, selection_value, selection_role, participant_selection_types;
-        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            selection_type_value = this.bigbluebuttonbn.participant_list[i].selectiontype;
-            selection_value = this.bigbluebuttonbn.participant_list[i].selectionid;
-            selection_role = this.bigbluebuttonbn.participant_list[i].role;
-            participant_selection_types = this.bigbluebuttonbn.participant_data[selection_type_value];
+        for (var i = 0; i < this.bigbluebuttonbn.participantList.length; i++) {
+            selection_type_value = this.bigbluebuttonbn.participantList[i].selectiontype;
+            selection_value = this.bigbluebuttonbn.participantList[i].selectionid;
+            selection_role = this.bigbluebuttonbn.participantList[i].role;
+            participant_selection_types = this.bigbluebuttonbn.participantData[selection_type_value];
             if (selection_type_value != 'all' && typeof participant_selection_types.children[selection_value] == 'undefined') {
                 // Remove from memory.
                 this.participantRemoveFromMemory(selection_type_value, selection_value);
@@ -141,7 +141,7 @@ M.mod_bigbluebuttonbn.modform = {
 
     participantListUpdate: function() {
         var participant_list = document.getElementsByName('participants')[0];
-        participant_list.value = JSON.stringify(this.bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
+        participant_list.value = JSON.stringify(this.bigbluebuttonbn.participantList).replace(/"/g, '&quot;');
     },
 
     participantRemove: function(selection_type_value, selection_value) {
@@ -157,10 +157,10 @@ M.mod_bigbluebuttonbn.modform = {
 
     participantRemoveFromMemory: function(selection_type_value, selection_value) {
         var selectionid = (selection_value === '' ? null : selection_value);
-        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == selection_type_value &&
-                this.bigbluebuttonbn.participant_list[i].selectionid == selectionid) {
-                this.bigbluebuttonbn.participant_list.splice(i, 1);
+        for (var i = 0; i < this.bigbluebuttonbn.participantList.length; i++) {
+            if (this.bigbluebuttonbn.participantList[i].selectiontype == selection_type_value &&
+                this.bigbluebuttonbn.participantList[i].selectionid == selectionid) {
+                this.bigbluebuttonbn.participantList.splice(i, 1);
             }
         }
     },
@@ -179,9 +179,9 @@ M.mod_bigbluebuttonbn.modform = {
         var selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
         var selection = document.getElementById('bigbluebuttonbn_participant_selection');
         // Lookup to see if it has been added already.
-        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == selection_type.value &&
-                this.bigbluebuttonbn.participant_list[i].selectionid == selection.value) {
+        for (var i = 0; i < this.bigbluebuttonbn.participantList.length; i++) {
+            if (this.bigbluebuttonbn.participantList[i].selectiontype == selection_type.value &&
+                this.bigbluebuttonbn.participantList[i].selectionid == selection.value) {
                 return;
             }
         }
@@ -194,7 +194,7 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participantAddToMemory: function(selection_type_value, selection_value) {
-        this.bigbluebuttonbn.participant_list.push({
+        this.bigbluebuttonbn.participantList.push({
             "selectiontype": selection_type_value,
             "selectionid": selection_value,
             "role": "viewer"
@@ -208,12 +208,12 @@ M.mod_bigbluebuttonbn.modform = {
         row.id = "participant_list_tr_" + selection_type_value + "-" + selection_value;
         cell0 = row.insertCell(0);
         cell0.width = "125px";
-        cell0.innerHTML = '<b><i>' + this.bigbluebuttonbn.participant_data[selection_type_value].name;
+        cell0.innerHTML = '<b><i>' + this.bigbluebuttonbn.participantData[selection_type_value].name;
         cell0.innerHTML += (selection_type_value !== 'all' ? ':&nbsp;' : '') + '</i></b>';
         cell1 = row.insertCell(1);
         cell1.innerHTML = '';
         if (selection_type_value !== 'all') {
-            cell1.innerHTML = this.bigbluebuttonbn.participant_data[selection_type_value].children[selection_value].name;
+            cell1.innerHTML = this.bigbluebuttonbn.participantData[selection_type_value].children[selection_value].name;
         }
         innerHTML = '&nbsp;<i>' + this.strings.as + '</i>&nbsp;';
         innerHTML += '<select id="participant_list_role_' + selection_type_value + '-' + selection_value + '"';
@@ -235,8 +235,8 @@ M.mod_bigbluebuttonbn.modform = {
         cell3.width = "20px";
         remove_html = this.strings.remove;
         remove_class = "btn btn-secondary btn-sm";
-        if (this.bigbluebuttonbn.icons_enabled) {
-            remove_html = this.bigbluebuttonbn.pix_icon_delete;
+        if (this.bigbluebuttonbn.iconsEnabled) {
+            remove_html = this.bigbluebuttonbn.pixIconDelete;
             remove_class = "btn btn-link";
         }
         innerHTML = '<a class="' + remove_class + '" onclick="M.mod_bigbluebuttonbn.modform.participantRemove(\'';
@@ -248,10 +248,10 @@ M.mod_bigbluebuttonbn.modform = {
     participantListRoleUpdate: function(type, id) {
         // Update in memory.
         var participant_list_role_selection = document.getElementById('participant_list_role_' + type + '-' + id);
-        for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == type &&
-                this.bigbluebuttonbn.participant_list[i].selectionid == (id === '' ? null : id)) {
-                this.bigbluebuttonbn.participant_list[i].role = participant_list_role_selection.value;
+        for (var i = 0; i < this.bigbluebuttonbn.participantList.length; i++) {
+            if (this.bigbluebuttonbn.participantList[i].selectiontype == type &&
+                this.bigbluebuttonbn.participantList[i].selectionid == (id === '' ? null : id)) {
+                this.bigbluebuttonbn.participantList[i].role = participant_list_role_selection.value;
             }
         }
 
