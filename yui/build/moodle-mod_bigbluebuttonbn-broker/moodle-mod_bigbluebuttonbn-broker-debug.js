@@ -38,8 +38,8 @@ M.mod_bigbluebuttonbn.broker = {
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
 
-    joinRedirect: function(join_url) {
-        window.open(join_url);
+    joinRedirect: function(joinUrl) {
+        window.open(joinUrl);
     },
 
     recordingActionPerform: function(data) {

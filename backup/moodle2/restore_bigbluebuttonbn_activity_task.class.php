@@ -76,10 +76,10 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task
     }
 
     /**
-    * Define the restoring rules for logs belonging to the activity to be executed by the link decoder.
-    *
-    * @return array
-    */
+     * Define the restoring rules for logs belonging to the activity to be executed by the link decoder.
+     *
+     * @return array
+     */
     public static function define_restore_log_rules() {
         $rules = array();
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'add', 'view.php?id={course_module}', '{bigbluebuttonbn}');
@@ -90,10 +90,10 @@ class restore_bigbluebuttonbn_activity_task extends restore_activity_task
     }
 
     /**
-    * Define the restoring rules for course associated to the activity to be executed by the link decoder.
-    *
-    * @return array
-    */
+     * Define the restoring rules for course associated to the activity to be executed by the link decoder.
+     *
+     * @return array
+     */
     public static function define_restore_log_rules_for_course() {
         $rules = array();
         $rules[] = new restore_log_rule('bigbluebuttonbn', 'view all', 'index.php?id={course}', null);
