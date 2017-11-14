@@ -1438,6 +1438,9 @@ function bigbluebuttonbn_get_tags($id) {
  * @return string containing the sql used for getting the target bigbluebuttonbn instances
  */
 function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid = null, $subset = true) {
+    if (empty($courseid)) {
+        $courseid = 0;
+    }
     if ($bigbluebuttonbnid === null) {
         return "course = '{$courseid}'";
     }
@@ -1447,17 +1450,18 @@ function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid
     return "id <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
 }
 
-function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid, $bigbluebuttonbnid = null, $subset = true) {
+function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
+    $sql = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_DELETE . "' AND meta like '%has_recordings%' AND meta like '%true%'";
+    if (empty($courseid)) {
+        $courseid = 0;
+    }
     if ($bigbluebuttonbnid === null) {
-        return "courseid = '{$courseid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
-            "' AND meta like '%has_recordings%' AND meta like '%true%'";
+        return $sql . " AND courseid = {$courseid}";
     }
     if ($subset) {
-        return "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '".BIGBLUEBUTTONBN_LOG_EVENT_DELETE.
-            "' AND meta like '%has_recordings%' AND meta like '%true%'";
+        return $sql . " AND bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
     }
-    return "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '".
-        BIGBLUEBUTTONBN_LOG_EVENT_DELETE."' AND meta like '%has_recordings%' AND meta like '%true%'";
+    return $sql . " AND courseid = {$courseid} AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}'";
 }
 
 function bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid = null, $subset = true,
