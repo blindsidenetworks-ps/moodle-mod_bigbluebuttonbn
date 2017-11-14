@@ -1016,7 +1016,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
 }
 
 function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
-    return ($bbbsession['managerecordings'] && (double)$bbbsession['serverversion'] >= 1.0);
+    return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0 || bigbluebuttonbn_is_bn_server()));
 }
 
 function bigbluebuttonbn_get_recording_data_row_date($recording) {
