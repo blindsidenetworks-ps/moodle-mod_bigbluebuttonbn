@@ -95,7 +95,7 @@ switch (strtolower($action)) {
         }
         // As the meeting doesn't exist, try to create it.
         $response = bigbluebuttonbn_get_create_meeting_array(
-            bigbluebutton_bbb_view_create_meeting_data($bbbsession, $bigbluebuttonbn),
+            bigbluebutton_bbb_view_create_meeting_data($bbbsession),
             bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
             $bbbsession['presentation']['name'],
             $bbbsession['presentation']['url']
@@ -180,9 +180,9 @@ function bigbluebutton_bbb_view_close_window_manually() {
     echo get_string('view_message_tab_close', 'bigbluebuttonbn');
 }
 
-function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebuttonbn) {
+function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     $data = ['meetingID' => $bbbsession['meetingid'],
-              'name' => $bbbsession['meetingname'],
+              'name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
               'attendeePW' => $bbbsession['viewerPW'],
               'moderatorPW' => $bbbsession['modPW'],
               'logoutURL' => $bbbsession['logoutURL'],
@@ -190,7 +190,7 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession, $bigbluebutton
     $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
     $data['welcome'] = trim($bbbsession['welcome']);
     // Set the duration for the meeting.
-    $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bigbluebuttonbn->closingtime);
+    $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
     if ($durationtime > 0) {
         $data['duration'] = $durationtime;
         $data['welcome'] .= '<br><br>';
@@ -233,7 +233,7 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
                  'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
                  'bbb-origin-tag' => $bbbsession['originTag'],
                  'bbb-context' => $bbbsession['course']->fullname,
-                 'bbb-recording-name' => $bbbsession['meetingname'],
+                 'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
                  'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
                  'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
                 ];
