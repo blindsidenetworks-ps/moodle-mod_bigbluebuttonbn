@@ -39,7 +39,6 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.pinginterval === 0) {
             this.pinginterval = 10000;
         }
-
         if (this.bigbluebuttonbn.profile_features.includes('all') || this.bigbluebuttonbn.profile_features.includes('showroom')) {
             this.initRoom();
         }
@@ -47,15 +46,15 @@ M.mod_bigbluebuttonbn.rooms = {
 
     initRoom: function() {
         if (this.bigbluebuttonbn.activity !== 'open') {
-            var status_bar = [M.util.get_string('view_message_conference_has_ended', 'bigbluebuttonbn')];
+            var statusBar = [M.util.get_string('view_message_conference_has_ended', 'bigbluebuttonbn')];
             if (this.bigbluebuttonbn.activity !== 'ended') {
-                status_bar = [
+                statusBar = [
                     M.util.get_string('view_message_conference_not_started', 'bigbluebuttonbn'),
                     this.bigbluebuttonbn.opening,
                     this.bigbluebuttonbn.closing
                   ];
             }
-            Y.DOM.addHTML(Y.one('#status_bar'), this.initStatusBar(status_bar));
+            Y.DOM.addHTML(Y.one('#status_bar'), this.initStatusBar(statusBar));
             return;
         }
         this.updateRoom();
@@ -68,7 +67,6 @@ M.mod_bigbluebuttonbn.rooms = {
         }
         var id = this.bigbluebuttonbn.meetingid;
         var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
-
         this.datasource.sendRequest({
             request: 'action=meeting_info&id=' + id + '&bigbluebuttonbn=' + bnid + '&forced=' + forced,
             callback: {
@@ -96,83 +94,78 @@ M.mod_bigbluebuttonbn.rooms = {
         });
     },
 
-    initStatusBar: function(status_message) {
-        var status_bar_span = Y.DOM.create('<span id="status_bar_span">');
-
-        if (status_message.constructor !== Array) {
-            Y.DOM.setText(status_bar_span, status_message);
-            return status_bar_span;
+    initStatusBar: function(statusMessage) {
+        var statusBarSpan = Y.DOM.create('<span id="status_bar_span">');
+        if (statusMessage.constructor !== Array) {
+            Y.DOM.setText(statusBarSpan, statusMessage);
+            return statusBarSpan;
         }
-
-        for (var message in status_message) {
-            if (!status_message.hasOwnProperty(message)) {
+        for (var message in statusMessage) {
+            if (!statusMessage.hasOwnProperty(message)) {
                 continue; // Skip keys from the prototype.
             }
-            var status_bar_span_span = Y.DOM.create('<span id="status_bar_span_span">');
-            Y.DOM.setText(status_bar_span_span, status_message[message]);
-            Y.DOM.addHTML(status_bar_span, status_bar_span_span);
-            Y.DOM.addHTML(status_bar_span, Y.DOM.create('<br>'));
+            var statusBarSpanSpan = Y.DOM.create('<span id="status_bar_span_span">');
+            Y.DOM.setText(statusBarSpanSpan, statusMessage[message]);
+            Y.DOM.addHTML(statusBarSpan, statusBarSpanSpan);
+            Y.DOM.addHTML(statusBarSpan, Y.DOM.create('<br>'));
         }
-        return status_bar_span;
+        return statusBarSpan;
     },
 
     initControlPanel: function(data) {
-        var control_panel_div = Y.DOM.create('<div>');
-
-        Y.DOM.setAttribute(control_panel_div, 'id', 'control_panel_div');
-        var control_panel_div_html = '';
+        var controlPanelDiv = Y.DOM.create('<div>');
+        Y.DOM.setAttribute(controlPanelDiv, 'id', 'control_panel_div');
+        var controlPanelDivHtml = '';
         if (data.running) {
-            control_panel_div_html += this.msgStartedAt(data.info.startTime) + ' ';
-            control_panel_div_html += this.msgAttendeesIn(data.info.moderatorCount, data.info.participantCount);
+            controlPanelDivHtml += this.msgStartedAt(data.info.startTime) + ' ';
+            controlPanelDivHtml += this.msgAttendeesIn(data.info.moderatorCount, data.info.participantCount);
         }
-        Y.DOM.addHTML(control_panel_div, control_panel_div_html);
-
-        return (control_panel_div);
+        Y.DOM.addHTML(controlPanelDiv, controlPanelDivHtml);
+        return (controlPanelDiv);
     },
 
     msgStartedAt: function(startTime) {
-        var start_timestamp = (parseInt(startTime, 10) - parseInt(startTime, 10) % 1000);
-        var date = new Date(start_timestamp);
+        var startTimestamp = (parseInt(startTime, 10) - parseInt(startTime, 10) % 1000);
+        var date = new Date(startTimestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
         var started_at = M.util.get_string('view_message_session_started_at', 'bigbluebuttonbn');
-
         return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
     msgModeratorsIn: function(moderators) {
-        var msg_moderators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
+        var msgModerators = M.util.get_string('view_message_moderators', 'bigbluebuttonbn');
         if (moderators == 1) {
-            msg_moderators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
+            msgModerators = M.util.get_string('view_message_moderator', 'bigbluebuttonbn');
         }
-        return msg_moderators;
+        return msgModerators;
     },
 
     msgViewersIn: function(viewers) {
-        var msg_viewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
+        var msgViewers = M.util.get_string('view_message_viewers', 'bigbluebuttonbn');
         if (viewers == 1) {
-            msg_viewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
+            msgViewers = M.util.get_string('view_message_viewer', 'bigbluebuttonbn');
         }
-        return msg_viewers;
+        return msgViewers;
     },
 
     msgAttendeesIn: function(moderators, participants) {
-        var msg_moderators, viewers, msg_viewers, msg;
+        var msgModerators, viewers, msgViewers, msg;
         if (!this.hasParticipants(participants)) {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
-        msg_moderators = this.msgModeratorsIn(moderators);
+        msgModerators = this.msgModeratorsIn(moderators);
         viewers = participants - moderators;
-        msg_viewers = this.msgViewersIn(viewers);
+        msgViewers = this.msgViewersIn(viewers);
         msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
-            return msg + ' <b>' + moderators + '</b> ' + msg_moderators + ' and <b>' + viewers + '</b> ' + msg_viewers + '.';
+            return msg + ' <b>' + moderators + '</b> ' + msgModerators + ' and <b>' + viewers + '</b> ' + msgViewers + '.';
         }
         msg = M.util.get_string('view_message_session_has_user', 'bigbluebuttonbn');
         if (moderators > 0) {
-            return msg + ' <b>1</b> ' + msg_moderators + '.';
+            return msg + ' <b>1</b> ' + msgModerators + '.';
         }
-        return msg + ' <b>1</b> ' + msg_viewers + '.';
+        return msg + ' <b>1</b> ' + msgViewers + '.';
     },
 
     hasParticipants: function(participants) {
@@ -180,44 +173,38 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     initJoinButton: function(status) {
-        var join_button_input = Y.DOM.create('<input>');
-
-        Y.DOM.setAttribute(join_button_input, 'id', 'join_button_input');
-        Y.DOM.setAttribute(join_button_input, 'type', 'button');
-        Y.DOM.setAttribute(join_button_input, 'value', status.join_button_text);
-        Y.DOM.setAttribute(join_button_input, 'class', 'btn btn-primary');
-
+        var joinButtonInput = Y.DOM.create('<input>');
+        Y.DOM.setAttribute(joinButtonInput, 'id', 'join_button_input');
+        Y.DOM.setAttribute(joinButtonInput, 'type', 'button');
+        Y.DOM.setAttribute(joinButtonInput, 'value', status.join_button_text);
+        Y.DOM.setAttribute(joinButtonInput, 'class', 'btn btn-primary');
         var input_html = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
-        Y.DOM.setAttribute(join_button_input, 'onclick', input_html);
-
+        Y.DOM.setAttribute(joinButtonInput, 'onclick', input_html);
         if (!status.can_join) {
             // Disable join button.
-            Y.DOM.setAttribute(join_button_input, 'disabled', true);
-            var status_bar_span = Y.one('#status_bar_span');
+            Y.DOM.setAttribute(joinButtonInput, 'disabled', true);
+            var statusBarSpan = Y.one('#status_bar_span');
             // Create a img element.
             var spinning_wheel = Y.DOM.create('<img>');
             Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
             Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/i/processing16.gif');
             // Add the spinning wheel.
-            Y.DOM.addHTML(status_bar_span, '&nbsp;');
-            Y.DOM.addHTML(status_bar_span, spinning_wheel);
+            Y.DOM.addHTML(statusBarSpan, '&nbsp;');
+            Y.DOM.addHTML(statusBarSpan, spinning_wheel);
         }
-
-        return join_button_input;
+        return joinButtonInput;
     },
 
     initEndButton: function(status) {
-        var end_button_input = Y.DOM.create('<input>');
-
-        Y.DOM.setAttribute(end_button_input, 'id', 'end_button_input');
-        Y.DOM.setAttribute(end_button_input, 'type', 'button');
-        Y.DOM.setAttribute(end_button_input, 'value', status.end_button_text);
-        Y.DOM.setAttribute(end_button_input, 'class', 'btn btn-secondary');
+        var endButtonInput = Y.DOM.create('<input>');
+        Y.DOM.setAttribute(endButtonInput, 'id', 'end_button_input');
+        Y.DOM.setAttribute(endButtonInput, 'type', 'button');
+        Y.DOM.setAttribute(endButtonInput, 'value', status.end_button_text);
+        Y.DOM.setAttribute(endButtonInput, 'class', 'btn btn-secondary');
         if (status.can_end) {
-            Y.DOM.setAttribute(end_button_input, 'onclick', 'M.mod_bigbluebuttonbn.broker.endMeeting();');
+            Y.DOM.setAttribute(endButtonInput, 'onclick', 'M.mod_bigbluebuttonbn.broker.endMeeting();');
         }
-
-        return end_button_input;
+        return endButtonInput;
     },
 
     endMeeting: function() {
@@ -242,7 +229,7 @@ M.mod_bigbluebuttonbn.rooms = {
 
     windowClose: function() {
         window.onunload = function() {
-            /* global: opener */
+            /** global: opener */
             opener.M.mod_bigbluebuttonbn.rooms.remoteUpdate(5000);
         };
         window.close();
@@ -257,7 +244,6 @@ M.mod_bigbluebuttonbn.rooms = {
                         M.mod_bigbluebuttonbn.rooms.cleanRoom();
                         M.mod_bigbluebuttonbn.rooms.updateRoom();
                     }
-
                     return setTimeout(((function() {
                         return function() {
                             M.mod_bigbluebuttonbn.rooms.waitModerator(payload);
@@ -271,8 +257,8 @@ M.mod_bigbluebuttonbn.rooms = {
         });
     },
 
-    join: function(join_url) {
-        M.mod_bigbluebuttonbn.broker.joinRedirect(join_url);
+    join: function(joinUrl) {
+        M.mod_bigbluebuttonbn.broker.joinRedirect(joinUrl);
         // Update view.
         setTimeout(function() {
             M.mod_bigbluebuttonbn.rooms.cleanRoom();

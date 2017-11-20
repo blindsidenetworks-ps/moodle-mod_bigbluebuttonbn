@@ -20,9 +20,9 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.helpers = {
 
-    element_tag: {},
-    element_fa_class: {},
-    element_action_reversed: {},
+    elementTag: {},
+    elementFaClass: {},
+    elementActionReversed: {},
 
     /**
      * Initialise helpers code.
@@ -30,9 +30,9 @@ M.mod_bigbluebuttonbn.helpers = {
      * @method init
      */
     init: function() {
-        this.element_tag = this.initElementTag();
-        this.element_fa_class = this.initElementFAClass();
-        this.element_action_reversed = this.initElementActionReversed();
+        this.elementTag = this.initElementTag();
+        this.elementFaClass = this.initElementFAClass();
+        this.elementActionReversed = this.initElementActionReversed();
     },
 
     toggleSpinningWheelOn: function(data) {
@@ -53,7 +53,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.setAttribute('data-title', button.getAttribute('title'));
         button.setAttribute('title', text);
         button.setAttribute('data-class', button.getAttribute('class'));
-        button.setAttribute('class', this.element_fa_class.process);
+        button.setAttribute('class', this.elementFaClass.process);
     },
 
     toggleSpinningWheelOnCompatible: function(link, text) {
@@ -106,7 +106,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     updateData: function(data) {
         var action, elementid, link, linkdataonclick, button, buttondatatext, buttondatatag;
-        action = this.element_action_reversed[data.action];
+        action = this.elementActionReversed[data.action];
         if (action === data.action) {
             return;
         }
@@ -116,16 +116,16 @@ M.mod_bigbluebuttonbn.helpers = {
         linkdataonclick = link.getAttribute('data-onclick').replace(this.capitalize(data.action), this.capitalize(action));
         link.setAttribute('data-onclick', linkdataonclick);
         buttondatatext = M.util.get_string('view_recording_list_actionbar_' + action, 'bigbluebuttonbn');
-        buttondatatag = this.element_tag[action];
+        buttondatatag = this.elementTag[action];
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.updateDataCompatible(link.one('> img'), this.element_tag[data.action], buttondatatag, buttondatatext);
+            this.updateDataCompatible(link.one('> img'), this.elementTag[data.action], buttondatatag, buttondatatext);
             return;
         }
         button.setAttribute('data-aria-label', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
-        button.setAttribute('data-class', this.element_fa_class[action]);
+        button.setAttribute('data-class', this.elementFaClass[action]);
     },
 
     updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
@@ -138,7 +138,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     updateId: function(data) {
         var action, elementid, link, button, id;
-        action = this.element_action_reversed[data.action];
+        action = this.elementActionReversed[data.action];
         if (action === data.action) {
             return;
         }
@@ -204,7 +204,7 @@ M.mod_bigbluebuttonbn.helpers = {
 
     reloadPreview: function(data) {
         var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
-        thumbnails.each(function (thumbnail) {
+        thumbnails.each(function(thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');
             thumbnailsrc = thumbnailsrc.substring(0, thumbnailsrc.indexOf('?'));
             thumbnailsrc += '?' + new Date().getTime();
