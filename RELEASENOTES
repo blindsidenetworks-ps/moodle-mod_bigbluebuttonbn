@@ -1,5 +1,10 @@
+2.2 (2017101003)
+Bug: Fix for issue when using BN servers, Recording name and description could not be edited.
+Bug: Fix for issue with html in the name when multilanguage filter is used.
+Bug: Fix for issue when editing instance the passwords were overriden.
+
 2.2 (2017101002)
-Bug: Fix for issue raised in the previos release.
+Bug: Fix for issue raised in the previous release.
 
 2.2 (2017101001)
 Enhancement: A general warning message can be set up by configuration.
