@@ -348,7 +348,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
-    if (!isset($bigbluebuttonbn->timecreated) || !$bigbluebuttonbn->timecreated) {
+    if (!isset($bigbluebuttonbn->instance)) {
         $bigbluebuttonbn->timecreated = time();
         $bigbluebuttonbn->timemodified = 0;
         // As it is a new activity, assign passwords.
