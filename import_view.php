@@ -17,9 +17,10 @@
 /**
  * View for importing BigBlueButtonBN recordings.
  *
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2015-2017 Blindside Networks Inc
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');

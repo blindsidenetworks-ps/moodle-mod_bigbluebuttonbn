@@ -17,10 +17,11 @@
 /**
  * Library calls for Moodle and BigBlueButton.
  *
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -262,6 +263,8 @@ function bigbluebuttonbn_get_post_actions() {
 }
 
 /**
+ * Print an overview of all bigbluebuttonbn instances for the courses.
+ *
  * @param array $courses
  * @param array $htmlarray Passed by reference
  */
@@ -283,7 +286,7 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
 }
 
 /**
- * @global object
+ * Print an overview of a bigbluebuttonbn instance.
  *
  * @param array $bigbluebuttonbn
  * @param int $now
@@ -317,8 +320,6 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
  * this activity in a course listing.
  * See get_array_of_activities() in course/lib.php.
  *
- * @global object
- *
  * @param object $coursemodule
  *
  * @return null|cached_cm_info
@@ -341,8 +342,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 
 /**
  * Runs any processes that must run before a bigbluebuttonbn insert/update.
- *
- * @global object
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
@@ -376,8 +375,6 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 /**
  * Runs any processes that must be run after a bigbluebuttonbn insert/update.
  *
- * @global object
- *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
@@ -389,8 +386,6 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
 
 /**
  * Generates a message on insert/update which is sent to all users enrolled.
- *
- * @global object
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
@@ -405,8 +400,6 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
 
 /**
  * Generates an event after a bigbluebuttonbn insert/update.
- *
- * @global object
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
  **/
@@ -493,6 +486,9 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
     send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
 }
 
+/**
+ * Helper for validating pluginfile.
+ */
 function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
@@ -506,6 +502,9 @@ function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
     return true;
 }
 
+/**
+ * Helper for getting pluginfile.
+ */
 function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args) {
     $filename = bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args);
     if (!$filename) {
@@ -520,6 +519,9 @@ function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $arg
     return $file;
 }
 
+/**
+ * Helper for getting pluginfile name.
+ */
 function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
     global $DB;
     if (count($args) > 1) {

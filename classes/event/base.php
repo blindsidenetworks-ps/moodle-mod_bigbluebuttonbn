@@ -18,9 +18,9 @@
  * The mod_bigbluebuttonbn abstract base event.
  *
  * @package   mod_bigbluebuttonbn
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2017 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 namespace mod_bigbluebuttonbn\event;
@@ -29,13 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_bigbluebuttonbn abstract base event class.
- *
- * Most mod_assign events can extend this class.
- *
- * @package   mod_bigbluebuttonbn
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2017 - present, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Most mod_bigbluebuttonbn events can extend this class.
  */
 abstract class base extends \core\event\base {
 

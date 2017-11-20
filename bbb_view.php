@@ -17,9 +17,10 @@
 /**
  * View for BigBlueButton interaction.
  *
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2015-2017 Blindside Networks Inc
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
@@ -148,6 +149,9 @@ switch (strtolower($action)) {
         bigbluebutton_bbb_view_close_window();
 }
 
+/**
+ * Helper for getting the playback url that corresponds to an specific type.
+ */
 function bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype) {
     if ($href != '' || $mid == '' || $rid == '') {
         return $href;
@@ -159,6 +163,9 @@ function bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype) {
     return bigbluebutton_bbb_view_playback_href_lookup($recordings[$rid]['playbacks'], $rtype);
 }
 
+/**
+ * Helper for looking up playback url in the recording playback array.
+ */
 function bigbluebutton_bbb_view_playback_href_lookup($playbacks, $type) {
     foreach ($playbacks as $playback) {
         if ($playback['type'] == $type) {
@@ -168,6 +175,9 @@ function bigbluebutton_bbb_view_playback_href_lookup($playbacks, $type) {
     return '';
 }
 
+/**
+ * Helper for closing the tab or window when the user lefts the meeting.
+ */
 function bigbluebutton_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
 
@@ -176,10 +186,16 @@ function bigbluebutton_bbb_view_close_window() {
     echo $OUTPUT->footer();
 }
 
+/**
+ * Helper for showing a message when the tab or window can not be closed.
+ */
 function bigbluebutton_bbb_view_close_window_manually() {
     echo get_string('view_message_tab_close', 'bigbluebuttonbn');
 }
 
+/**
+ * Helper for preparing data used for creating the meeting.
+ */
 function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     $data = ['meetingID' => $bbbsession['meetingid'],
               'name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
@@ -211,6 +227,9 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     return $data;
 }
 
+/**
+ * Helper for returning the flag to know if the meeting is recorded.
+ */
 function bigbluebutton_bbb_view_create_meeting_data_record($record) {
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
         return 'true';
@@ -218,6 +237,9 @@ function bigbluebutton_bbb_view_create_meeting_data_record($record) {
     return 'false';
 }
 
+/**
+ * Helper for returning the duration expected for the meeting.
+ */
 function bigbluebutton_bbb_view_create_meeting_data_duration($closingtime) {
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
         return bigbluebuttonbn_get_duration($closingtime);
@@ -225,6 +247,9 @@ function bigbluebutton_bbb_view_create_meeting_data_duration($closingtime) {
     return 0;
 }
 
+/**
+ * Helper for preparing metadata used while creating the meeting.
+ */
 function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
     global $USER;
     $metadata = ['bbb-origin' => $bbbsession['origin'],
@@ -254,6 +279,9 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
     return $metadata;
 }
 
+/**
+ * Helper for preparing data used while joining the meeting.
+ */
 function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn) {
     // Update the cache.
     $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_FORCED);
@@ -280,6 +308,9 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
     header('Location: '.$joinurl);
 }
 
+/**
+ * Helper for showinf error messages if any.
+ */
 function bigbluebutton_bbb_view_errors($serrors, $id) {
     global $CFG, $OUTPUT;
     $errors = (array) json_decode(urldecode($serrors));
