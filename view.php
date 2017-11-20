@@ -17,10 +17,11 @@
 /**
  * View a BigBlueButton room.
  *
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
@@ -49,7 +50,8 @@ bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn,
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
-bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, $bbbsession);
+$bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
 // Validates if the BigBlueButton server is working.
 $serverversion = bigbluebuttonbn_get_server_version();
@@ -114,7 +116,7 @@ echo $OUTPUT->header();
 
 bigbluebuttonbn_view_groups($bbbsession);
 
-bigbluebuttonbn_view_render($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession, $bigbluebuttonbn));
+bigbluebuttonbn_view_render($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession));
 
 // Output finishes.
 echo $OUTPUT->footer();
@@ -125,11 +127,8 @@ echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
 // Initialize session variable used across views.
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
-function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbsession) {
+function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     global $CFG, $USER;
-
-    // BigBluebuttonBN activity data.
-    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 
     // User data.
     $bbbsession['username'] = fullname($USER);
@@ -138,7 +137,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
 
     // User roles.
     $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
-    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+    $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
     $bbbsession['moderator'] = bigbluebuttonbn_is_moderator(
         $context, json_encode($participantlist), $bbbsession['userID'], $bbbsession['roles']);
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
@@ -146,36 +145,36 @@ function bigbluebuttonbn_view_bbbsession_set($context, $bigbluebuttonbn, &$bbbse
     $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
 
     // Server data.
-    $bbbsession['modPW'] = $bigbluebuttonbn->moderatorpass;
-    $bbbsession['viewerPW'] = $bigbluebuttonbn->viewerpass;
+    $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
+    $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
 
     // Database info related to the activity.
     $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
         $bbbsession['bigbluebuttonbn']->id;
     $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
-    $bbbsession['meetingdescription'] = $bigbluebuttonbn->intro;
+    $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
 
     $bbbsession['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
-        $bbbsession['userlimit'] = intval($bigbluebuttonbn->userlimit);
+        $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
     }
-    $bbbsession['voicebridge'] = $bigbluebuttonbn->voicebridge;
-    if ($bigbluebuttonbn->voicebridge > 0) {
-        $bbbsession['voicebridge'] = 70000 + $bigbluebuttonbn->voicebridge;
+    $bbbsession['voicebridge'] = $bbbsession['bigbluebuttonbn']->voicebridge;
+    if ($bbbsession['bigbluebuttonbn']->voicebridge > 0) {
+        $bbbsession['voicebridge'] = 70000 + $bbbsession['bigbluebuttonbn']->voicebridge;
     }
-    $bbbsession['wait'] = $bigbluebuttonbn->wait;
-    $bbbsession['record'] = $bigbluebuttonbn->record;
+    $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
+    $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
 
-    $bbbsession['welcome'] = $bigbluebuttonbn->welcome;
+    $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
     if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
         $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
     }
-    if ($bigbluebuttonbn->record) {
+    if ($bbbsession['bigbluebuttonbn']->record) {
         $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
     }
 
-    $bbbsession['openingtime'] = $bigbluebuttonbn->openingtime;
-    $bbbsession['closingtime'] = $bigbluebuttonbn->closingtime;
+    $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
+    $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
 
     // Additional info related to the course.
     $bbbsession['context'] = $context;
@@ -197,23 +196,23 @@ function bigbluebuttonbn_view_bbbsession_roles($context, $userid) {
     return bigbluebuttonbn_get_user_roles($context, $userid);
 }
 
-function bigbluebuttonbn_view_get_activity_status(&$bbbsession, $bigbluebuttonbn) {
+function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
     $now = time();
-    if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime) {
+    if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
         // The activity has not been opened.
         return 'not_started';
     }
 
-    if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
+    if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
         // The activity has been closed.
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-            $bbbsession['context'], $bigbluebuttonbn->presentation);
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
         return 'ended';
     }
 
     // The activity is open.
     $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-        $bbbsession['context'], $bigbluebuttonbn->presentation, $bigbluebuttonbn->id);
+        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
     return 'open';
 }
 

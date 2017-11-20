@@ -17,10 +17,11 @@
 /**
  * View all BigBlueButton instances in this course.
  *
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
@@ -122,7 +123,6 @@ echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
 echo html_writer::table($table);
 echo $OUTPUT->footer();
 
-// Functions.
 function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
     $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
     $paramgroup = '';

@@ -17,10 +17,11 @@
 /**
  * Class for the structure used for restore BigBlueButtonBN.
  *
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,8 +45,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     }
 
     /**
-     * @param data
-     * @return array
+     * Process a bigbluebuttonbn restore.
+     *
+     * @param object $data The data in object form
+     * @return void
      */
     protected function process_bigbluebuttonbn($data) {
         global $DB;
@@ -59,9 +62,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     }
 
     /**
+     * Process a bigbluebuttonbn_logs restore (additional table).
      *
-     * @param data
-     * @return array
+     * @param object $data The data in object form
+     * @return void
      */
     protected function process_bigbluebuttonbn_logs($data) {
         global $DB;

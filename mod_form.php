@@ -18,10 +18,10 @@
  * Config all BigBlueButtonBN instances in this course.
  *
  * @package   mod_bigbluebuttonbn
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @copyright 2010-2017 Blindside Networks Inc.
+ * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -132,6 +132,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         return $errors;
     }
 
+    /**
+     * Function for showing the block for selecting profiles.
+     */
     private function bigbluebuttonbn_mform_add_block_profiles($mform, $profiles) {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
@@ -142,6 +145,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Function for showing the block for general settings.
+     */
     private function bigbluebuttonbn_mform_add_block_general($mform, $cfg) {
         global $CFG;
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
@@ -166,6 +172,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Function for showing details of the room settings for the room.
+     */
     private function bigbluebuttonbn_mform_add_block_room_room($mform, $cfg) {
         $field = ['type' => 'textarea', 'name' => 'welcome', 'data_type' => PARAM_TEXT,
             'description_key' => 'mod_form_field_welcome'];
@@ -210,6 +219,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['recording_default']);
     }
 
+    /**
+     * Function for showing details of the recording settings for the room.
+     */
     private function bigbluebuttonbn_mform_add_block_room_recordings($mform, $cfg) {
         $field = ['type' => 'hidden', 'name' => 'recordings_html', 'data_type' => PARAM_INT,
                   'description_key' => null];
@@ -239,6 +251,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['recordings_imported_default']);
     }
 
+    /**
+     * Function for showing the block for room settings.
+     */
     private function bigbluebuttonbn_mform_add_block_room(&$mform, $cfg) {
         if ($cfg['voicebridge_editable'] || $cfg['waitformoderator_editable'] ||
             $cfg['userlimit_editable'] || $cfg['recording_editable']) {
@@ -251,6 +266,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Function for showing the block for preuploaded presentation.
+     */
     private function bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg) {
         if ($cfg['preuploadpresentation_enabled']) {
             $mform->addElement('header', 'preuploadpresentation',
@@ -267,6 +285,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Function for showing the block for setting participant roles.
+     */
     private function bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $data) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $participantlist = $data['participant_list'];
@@ -310,6 +331,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
     }
 
+    /**
+     * Function for showing the block for integration with the calendar.
+     */
     private function bigbluebuttonbn_mform_add_block_schedule($mform, $data) {
         $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
         if (isset($data['activity']->openingtime) && $data['activity']->openingtime != 0 ||
@@ -324,6 +348,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setDefault('closingtime', 0);
     }
 
+    /**
+     * Function for showing an element.
+     */
     private function bigbluebuttonbn_mform_add_element($mform, $type, $name, $datatype,
             $descriptionkey, $defaultvalue = null, $options = null, $rule = null) {
         if ($type === 'hidden') {

@@ -18,15 +18,19 @@
  * The mod_bigbluebuttonbn recording edited event.
  *
  * @package   mod_bigbluebuttonbn
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_bigbluebuttonbn recording edited event.
+ * (triggered when a recording is updated).
+ */
 class bigbluebuttonbn_recording_edited extends base
 {
     /**
