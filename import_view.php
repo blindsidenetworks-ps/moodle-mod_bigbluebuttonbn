@@ -37,7 +37,6 @@ if (!$bn) {
 $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bn), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-
 $context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
@@ -48,28 +47,11 @@ if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
 }
 
 $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-
-$output = '';
-
-// Print the page header.
-$PAGE->set_context($context);
-$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
-$PAGE->set_title(format_string($bigbluebuttonbn->name));
-$PAGE->set_cacheable(false);
-$PAGE->set_heading($course->fullname);
-$PAGE->set_pagelayout('incourse');
-
-$output .= $OUTPUT->header();
-
-$output .= '<h4>Import recording links</h4>';
-
 $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
 $selected = bigbluebuttonbn_selected_course($options, $tc);
-if (empty($options)) {
-    $output .= html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
-} else {
-    $output .= html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected));
-
+$body = html_writer::tag('div', get_string('view_error_import_no_courses', 'bigbluebuttonbn'));
+if (!empty($options)) {
+    $body = html_writer::tag('div', html_writer::select($options, 'import_recording_links_select', $selected));
     // Get course recordings.
     $bigbluebuttonbnid = null;
     if ($course->id == $selected) {
@@ -77,33 +59,28 @@ if (empty($options)) {
     }
     $recordings = bigbluebuttonbn_get_allrecordings($selected, $bigbluebuttonbnid, false,
             (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled'));
-
     // Exclude the ones that are already imported.
     if (!empty($recordings)) {
         $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
             $course->id, $bigbluebuttonbn->id);
     }
-
     // Store recordings (indexed) in a session variable.
     $SESSION->bigbluebuttonbn_importrecordings = $recordings;
-
     // Proceed with rendering.
     if (!empty($recordings)) {
-        $output .= html_writer::tag('span', '',
+        $body .= html_writer::tag('span', '',
             ['id' => 'import_recording_links_table', 'name' => 'import_recording_links_table']);
-        $output .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['import']);
+        $body .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['import']);
     } else {
-        $output .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
+        $body .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     }
-    $output .= html_writer::start_tag('br');
-    $output .= html_writer::tag('input', '',
+    $body .= html_writer::start_tag('br');
+    $body .= html_writer::tag('input', '',
         array('type' => 'button', 'class' => 'btn btn-secondary',
               'value' => get_string('view_recording_button_return', 'bigbluebuttonbn'),
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$cm->id.'\''));
-
     // JavaScript for locales.
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-
     // Require JavaScript modules.
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-imports', 'M.mod_bigbluebuttonbn.imports.init',
         array(array('bn' => $bn, 'tc' => $selected)));
@@ -111,11 +88,19 @@ if (empty($options)) {
         array());
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings', 'M.mod_bigbluebuttonbn.recordings.init',
         array('recordings_html' => true));
-
 }
-
+// Print the page header.
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
+$PAGE->set_title(format_string($bigbluebuttonbn->name));
+$PAGE->set_cacheable(false);
+$PAGE->set_heading($course->fullname);
+$PAGE->set_pagelayout('incourse');
+// Render output.
+$output = $OUTPUT->header();
+$output .= html_writer::tag('h4', get_string('view_recording_button_import', 'bigbluebuttonbn'));
+$output .= $body;
 $output .= $OUTPUT->footer();
-
 // Finally, render the output.
 echo $output;
 
