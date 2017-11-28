@@ -28,6 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the restore steps that will be used by the restore_url_activity_task.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step
 {

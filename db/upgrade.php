@@ -26,6 +26,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Performs data migrations and updates on upgrade.
+ *
+ * @param   integer   $oldversion
+ * @return  boolean
+ */
 function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     global $DB;
     $dbman = $DB->get_manager();
@@ -98,6 +104,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     return true;
 }
 
+/**
+ * Generic helper function for adding or changing a field in a table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablename
+ * @param   string    $fieldname
+ * @param   array    $fielddefinition
+ */
 function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
     $table = new xmldb_table($tablename);
     $field = new xmldb_field($fieldname);
@@ -114,6 +128,13 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
     $dbman->add_field($table, $field, true, true);
 }
 
+/**
+ * Generic helper function for dropping a field from a table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablename
+ * @param   string    $fieldname
+ */
 function xmldb_bigbluebuttonbn_drop_field($dbman, $tablename, $fieldname) {
     $table = new xmldb_table($tablename);
     $field = new xmldb_field($fieldname);
@@ -122,6 +143,14 @@ function xmldb_bigbluebuttonbn_drop_field($dbman, $tablename, $fieldname) {
     }
 }
 
+/**
+ * Generic helper function for renaming a field in a table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablename
+ * @param   string    $fieldnameold
+ * @param   string    $fieldnamenew
+ */
 function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $fieldnamenew) {
     $table = new xmldb_table($tablename);
     $field = new xmldb_field($fieldnameold);
@@ -130,6 +159,13 @@ function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $
     }
 }
 
+/**
+ * Generic helper function for renaming a table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablenameold
+ * @param   string    $tablenamenew
+ */
 function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew) {
     $table = new xmldb_table($tablenameold);
     if ($dbman->table_exists($table)) {

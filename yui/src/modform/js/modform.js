@@ -27,14 +27,15 @@ M.mod_bigbluebuttonbn.modform = {
      * Initialise the broker code.
      *
      * @method init
+     * @param Object bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.strings = {
-            as: M.util.get_string('mod_form_field_participant_list_text_as','bigbluebuttonbn'),
-            viewer: M.util.get_string('mod_form_field_participant_bbb_role_viewer','bigbluebuttonbn'),
-            moderator: M.util.get_string('mod_form_field_participant_bbb_role_moderator','bigbluebuttonbn'),
-            remove: M.util.get_string('mod_form_field_participant_list_action_remove','bigbluebuttonbn')
+            as: M.util.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
+            viewer: M.util.get_string('mod_form_field_participant_bbb_role_viewer', 'bigbluebuttonbn'),
+            moderator: M.util.get_string('mod_form_field_participant_bbb_role_moderator', 'bigbluebuttonbn'),
+            remove: M.util.get_string('mod_form_field_participant_list_action_remove', 'bigbluebuttonbn')
         };
         this.updateInstanceTypeProfile();
         this.participantListInit();
@@ -138,8 +139,8 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participantListUpdate: function() {
-        var participant_list = document.getElementsByName('participants')[0];
-        participant_list.value = JSON.stringify(this.bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
+        var participantList = document.getElementsByName('participants')[0];
+        participantList.value = JSON.stringify(this.bigbluebuttonbn.participant_list).replace(/"/g, '&quot;');
     },
 
     participantRemove: function(selectionTypeValue, selectionValue) {
@@ -174,19 +175,19 @@ M.mod_bigbluebuttonbn.modform = {
     },
 
     participantAdd: function() {
-        var selection_type = document.getElementById('bigbluebuttonbn_participant_selection_type');
+        var selectionType = document.getElementById('bigbluebuttonbn_participant_selection_type');
         var selection = document.getElementById('bigbluebuttonbn_participant_selection');
         // Lookup to see if it has been added already.
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == selection_type.value &&
+            if (this.bigbluebuttonbn.participant_list[i].selectiontype == .value &&
                 this.bigbluebuttonbn.participant_list[i].selectionid == selection.value) {
                 return;
             }
         }
         // Add it to memory.
-        this.participantAddToMemory(selection_type.value, selection.value);
+        this.participantAddToMemory(selectionType.value, selection.value);
         // Add it to the form.
-        this.participantAddToForm(selection_type.value, selection.value, 'viewer');
+        this.participantAddToForm(.value, selection.value, 'viewer');
         // Update in the form.
         this.participantListUpdate();
     },

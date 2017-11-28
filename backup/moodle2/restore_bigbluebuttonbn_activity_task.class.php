@@ -30,6 +30,9 @@ require_once($CFG->dirroot.'/mod/bigbluebuttonbn/backup/moodle2/restore_bigblueb
 
 /**
  * Restore task that provides all the settings and steps to perform one complete restore of the activity.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class restore_bigbluebuttonbn_activity_task extends restore_activity_task
 {

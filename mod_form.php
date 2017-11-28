@@ -29,8 +29,19 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__).'/locallib.php');
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+/**
+ * Moodle class for mod_form.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
+    /**
+     * Define (add) particular settings this activity can have.
+     *
+     * @return void
+     */
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
         // Validates if the BigBlueButton server is running.
@@ -111,7 +122,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $defaultvalues['presentation'] = $draftitemid;
             } catch (Exception $e) {
                 debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
-                return null;
+                return;
             }
         }
     }

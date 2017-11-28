@@ -18,8 +18,8 @@
  * The mod_bigbluebuttonbn locallib/notifier.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2017 - present, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -29,6 +29,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+/**
+ * Helper class for sending notifications.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
 class notifier {
 
     public static function notification_process($context, $bigbluebuttonbn, $action) {

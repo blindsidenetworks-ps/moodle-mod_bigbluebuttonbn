@@ -28,8 +28,10 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn abstract base event class.
- * Most mod_bigbluebuttonbn events can extend this class.
+ * The mod_bigbluebuttonbn abstract base event class. Most mod_bigbluebuttonbn events can extend this class.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 abstract class base extends \core\event\base {
 

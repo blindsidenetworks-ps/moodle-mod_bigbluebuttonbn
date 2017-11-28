@@ -28,8 +28,10 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn live_session.
- * (Experimental: for being triggered when external events are received).
+ * The mod_bigbluebuttonbn live_session (Experimental: for being triggered when external events are received).
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class bigbluebuttonbn_live_session_event extends base
 {

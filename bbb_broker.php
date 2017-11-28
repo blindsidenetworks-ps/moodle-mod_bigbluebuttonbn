@@ -299,7 +299,7 @@ function bigbluebuttonbn_broker_recording_play($params) {
 
 /**
  * Callback for recording action.
- *(publush/unpublish/protect/unprotect/edit/delete)
+ * (publush/unpublish/protect/unprotect/edit/delete)
  */
 function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom) {
     if (!$bbbsession['managerecordings']) {
@@ -330,7 +330,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
 /**
  * Helper for performing actions on recordings.
- *(publush/unpublish/protect/unprotect/edit/delete)
+ * (publush/unpublish/protect/unprotect/edit/delete)
  */
 function bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings) {
     if ($action == 'recording_publish') {

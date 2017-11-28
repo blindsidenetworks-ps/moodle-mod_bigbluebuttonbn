@@ -27,7 +27,7 @@ M.mod_bigbluebuttonbn.broker = {
      * Initialise the broker code.
      *
      * @method init
-     * @param bigbluebuttonbn
+     * @param Object bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({

@@ -30,6 +30,9 @@ require_once($CFG->dirroot.'/mod/bigbluebuttonbn/backup/moodle2/backup_bigbluebu
 
 /**
  * Backup task that provides all the settings and steps to perform one complete backup of the activity.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class backup_bigbluebuttonbn_activity_task extends backup_activity_task
 {

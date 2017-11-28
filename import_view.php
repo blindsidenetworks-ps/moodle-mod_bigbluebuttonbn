@@ -104,6 +104,13 @@ $output .= $OUTPUT->footer();
 // Finally, render the output.
 echo $output;
 
+/**
+ * Validate selected course coming as a parameter.
+ *
+ * @param array   $options
+ * @param string  $tc
+ * @return string
+ */
 function bigbluebuttonbn_selected_course($options, $tc = '') {
     if (array_key_exists($tc, $options)) {
         return $tc;

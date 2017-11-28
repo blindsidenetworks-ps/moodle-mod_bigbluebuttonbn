@@ -30,6 +30,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 require_once($CFG->libdir.'/adminlib.php');
 
+/**
+ * Helper class for rendering HTML for settings.php.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
 class renderer {
 
     private $settings;

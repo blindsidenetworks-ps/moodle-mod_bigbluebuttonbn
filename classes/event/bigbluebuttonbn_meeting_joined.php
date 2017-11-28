@@ -28,8 +28,10 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn meeting joined event.
- * (triggered by bbb_view.php when the user joins the session).
+ * The mod_bigbluebuttonbn meeting joined event (triggered by bbb_view.php when the user joins the session).
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class bigbluebuttonbn_meeting_joined extends base
 {

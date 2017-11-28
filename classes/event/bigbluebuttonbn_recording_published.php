@@ -28,8 +28,10 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording published event.
- * (triggered when a recording is published).
+ * The mod_bigbluebuttonbn recording published event (triggered when a recording is published).
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class bigbluebuttonbn_recording_published extends base
 {

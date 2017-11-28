@@ -29,6 +29,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+/**
+ * Handles the global configuration based on config.php.
+ *
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ */
 class config {
 
     /**

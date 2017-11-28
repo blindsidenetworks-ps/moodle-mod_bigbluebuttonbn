@@ -29,6 +29,7 @@ M.mod_bigbluebuttonbn.rooms = {
      * Initialise the broker code.
      *
      * @method init
+     * @param Object bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({
@@ -129,8 +130,8 @@ M.mod_bigbluebuttonbn.rooms = {
         var date = new Date(startTimestamp);
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var started_at = M.util.get_string('view_message_session_started_at', 'bigbluebuttonbn');
-        return started_at + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
+        var startedAt = M.util.get_string('view_message_session_started_at', 'bigbluebuttonbn');
+        return startedAt + ' <b>' + hours + ':' + (minutes < 10 ? '0' : '') + minutes + '</b>.';
     },
 
     msgModeratorsIn: function(moderators) {
@@ -178,19 +179,19 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(joinButtonInput, 'type', 'button');
         Y.DOM.setAttribute(joinButtonInput, 'value', status.join_button_text);
         Y.DOM.setAttribute(joinButtonInput, 'class', 'btn btn-primary');
-        var input_html = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
-        Y.DOM.setAttribute(joinButtonInput, 'onclick', input_html);
+        var inputHtml = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
+        Y.DOM.setAttribute(joinButtonInput, 'onclick', inputHtml);
         if (!status.can_join) {
             // Disable join button.
             Y.DOM.setAttribute(joinButtonInput, 'disabled', true);
             var statusBarSpan = Y.one('#status_bar_span');
             // Create a img element.
-            var spinning_wheel = Y.DOM.create('<img>');
-            Y.DOM.setAttribute(spinning_wheel, 'id', 'spinning_wheel');
-            Y.DOM.setAttribute(spinning_wheel, 'src', 'pix/i/processing16.gif');
+            var spinningWheel = Y.DOM.create('<img>');
+            Y.DOM.setAttribute(spinningWheel, 'id', 'spinning_wheel');
+            Y.DOM.setAttribute(spinningWheel, 'src', 'pix/i/processing16.gif');
             // Add the spinning wheel.
             Y.DOM.addHTML(statusBarSpan, '&nbsp;');
-            Y.DOM.addHTML(statusBarSpan, spinning_wheel);
+            Y.DOM.addHTML(statusBarSpan, spinningWheel);
         }
         return joinButtonInput;
     },
