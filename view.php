@@ -50,6 +50,8 @@ bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn,
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
+// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
+bigbluebuttonbn_verify_passwords($bigbluebuttonbn);
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
@@ -510,4 +512,15 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
     }
 
     return '';
+}
+
+// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
+function bigbluebuttonbn_verify_passwords(&$bigbluebuttonbn) {
+    global $DB;
+    if (empty($bigbluebuttonbn->moderatorpass) || empty($bigbluebuttonbn->viewerpass)) {
+        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+        // Store passwords in the database.
+        $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+    }
 }

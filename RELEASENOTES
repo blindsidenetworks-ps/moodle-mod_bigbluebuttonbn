@@ -1,3 +1,9 @@
+2.2 (2017101005)
+Hot-Fix: Fix for issue with internal passwords not being generated for instances created with 2017101003.
+
+2.2 (2017101004)
+Hot-Fix: Fix for issue with internal passwords not being generated on instance creation.
+
 2.2 (2017101003)
 Bug: Fix for issue when using BN servers, Recording name and description could not be edited.
 Bug: Fix for issue with html in the name when multilanguage filter is used.

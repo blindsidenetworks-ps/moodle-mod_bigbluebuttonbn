@@ -347,12 +347,12 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
-    if (!isset($bigbluebuttonbn->instance)) {
+    if ((integer)$bigbluebuttonbn->instance == 0) {
         $bigbluebuttonbn->timecreated = time();
         $bigbluebuttonbn->timemodified = 0;
         // As it is a new activity, assign passwords.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
-        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
     }
     if (!isset($bigbluebuttonbn->wait)) {
         $bigbluebuttonbn->wait = 0;

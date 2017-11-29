@@ -776,9 +776,11 @@ function bigbluebuttonbn_generate_nonce() {
     return md5($mt.$rand);
 }
 
-function bigbluebuttonbn_random_password($length = 8) {
+function bigbluebuttonbn_random_password($length = 8, $unique = "") {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
-    $password = substr(str_shuffle($chars), 0, $length);
+    do {
+        $password = substr(str_shuffle($chars), 0, $length);
+    } while ($unique == $password);
     return $password;
 }
 
