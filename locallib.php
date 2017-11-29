@@ -341,6 +341,8 @@ function bigbluebuttonbn_recording_build_sorter($a, $b) {
 }
 
 /**
+ * Perform deleteRecordings on BBB.
+ *
  * @param string $recordids
  */
 function bigbluebuttonbn_delete_recordings($recordids) {
@@ -357,6 +359,8 @@ function bigbluebuttonbn_delete_recordings($recordids) {
 }
 
 /**
+ * Perform publishRecordings on BBB.
+ *
  * @param string $recordids
  * @param string $publish
  */
@@ -374,6 +378,8 @@ function bigbluebuttonbn_publish_recordings($recordids, $publish = 'true') {
 }
 
 /**
+ * Perform updateRecordings on BBB.
+ *
  * @param string $recordids
  * @param array $params ['key'=>param_key, 'value']
  */
@@ -391,6 +397,8 @@ function bigbluebuttonbn_update_recordings($recordids, $params) {
 }
 
 /**
+ * Perform end on BBB.
+ *
  * @param string $meetingid
  * @param string $modpw
  */
@@ -407,18 +415,25 @@ function bigbluebuttonbn_end_meeting($meetingid, $modpw) {
 }
 
 /**
+ * Perform isMeetingRunning on BBB.
+ *
  * @param string $meetingid
  */
 function bigbluebuttonbn_is_meeting_running($meetingid) {
+    /* As a workaround to isMeetingRunning that always return SUCCESS but only returns true
+     * when at least one user is in the session, we use getMeetingInfo instead.
+     */
     $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('isMeetingRunning', ['meetingID' => $meetingid])
+        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
       );
-    if ($xml && $xml->returncode == 'SUCCESS') {
-        return ($xml->running == 'true');
-    }
-    return false;
+    return ($xml && $xml->returncode == 'SUCCESS');
 }
 
+/**
+ * Perform api request on BBB.
+ *
+ * @param void
+ */
 function bigbluebuttonbn_get_server_version() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(
         \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url()
