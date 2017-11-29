@@ -1,3 +1,6 @@
+2.2 (2017101005)
+Hot-Fix: Fix for issue with internal passwords not being generated for instances created with 2017101003.
+
 2.2 (2017101004)
 Hot-Fix: Fix for issue with internal passwords not being generated on instance creation.
 
