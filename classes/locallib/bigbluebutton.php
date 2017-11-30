@@ -38,6 +38,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 class bigbluebutton {
 
     /**
+     * Performs HTTP request on the BigBlueButton server.
+     *
      * @param string $action
      * @param array  $data
      * @param array  $metadata

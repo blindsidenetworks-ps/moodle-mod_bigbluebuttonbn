@@ -123,6 +123,15 @@ echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
 echo html_writer::table($table);
 echo $OUTPUT->footer();
 
+/**
+ * Displays the general view.
+ *
+ * @param boolean $moderator
+ * @param object $course
+ * @param object $bigbluebuttonbn
+ * @param object $groupobj
+ * @return array
+ */
 function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
     $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
     $paramgroup = '';
@@ -162,6 +171,12 @@ function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonb
     return array($bigbluebuttonbn->section, $joinurl, $group, $users, $viewerlist, $moderatorlist, $recording, $actions);
 }
 
+/**
+ * Count the number of users in the meeting.
+ *
+ * @param array $meetinginfo
+ * @return integer
+ */
 function bigbluebuttonbn_index_display_room_users($meetinginfo) {
     $users = '';
     if (count($meetinginfo['attendees']) && count($meetinginfo['attendees']->attendee)) {
@@ -170,6 +185,13 @@ function bigbluebuttonbn_index_display_room_users($meetinginfo) {
     return $users;
 }
 
+/**
+ * Returns attendee list.
+ *
+ * @param array $meetinginfo
+ * @param string $role
+ * @return string
+ */
 function bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, $role) {
     $attendeelist = '';
     if (count($meetinginfo['attendees']) && count($meetinginfo['attendees']->attendee)) {
@@ -183,6 +205,12 @@ function bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, $r
     return $attendeelist;
 }
 
+/**
+ * Returns indication of recording enabled.
+ *
+ * @param array $meetinginfo
+ * @return string
+ */
 function bigbluebuttonbn_index_display_room_recordings($meetinginfo) {
     $recording = '';
     if (isset($meetinginfo['recording']) && $meetinginfo['recording'] === 'true') {
@@ -192,6 +220,15 @@ function bigbluebuttonbn_index_display_room_recordings($meetinginfo) {
     return $recording;
 }
 
+/**
+ * Returns room actions.
+ *
+ * @param boolean $moderator
+ * @param object $course
+ * @param object $bigbluebuttonbn
+ * @param object $groupobj
+ * @return string
+ */
 function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
     $actions = '';
     if ($moderator) {

@@ -38,14 +38,28 @@ require_once($CFG->libdir.'/adminlib.php');
  */
 class renderer {
 
+   /**
+    * @var $settings stores the settings as they come from settings.php
+    */
     private $settings;
 
+    /**
+     * Constructor.
+     *
+     * @param object $settings
+     * @return void
+     */
     public function __construct(&$settings) {
         $this->settings = $settings;
     }
 
     /**
-     * @return
+     * Render the header for a group.
+     *
+     * @param string $name
+     * @param string $itemname
+     * @param string $itemdescription
+     * @return void
      */
     public function render_group_header($name, $itemname = null, $itemdescription = null) {
         if ($itemname == null) {
@@ -59,7 +73,11 @@ class renderer {
     }
 
     /**
-     * @return
+     * Render an element in a group.
+     *
+     * @param string $name
+     * @param object $item
+     * @return void
      */
     public function render_group_element($name, $item) {
         global $CFG;
@@ -69,9 +87,14 @@ class renderer {
     }
 
     /**
+     * Render a text element in a group.
+     *
+     * @param string    $name
+     * @param object    $default
+     * @param string    $type
      * @return Object
      */
-    public function& render_group_element_text($name, $default = null, $type = PARAM_RAW) {
+    public function render_group_element_text($name, $default = null, $type = PARAM_RAW) {
         $item = new \admin_setting_configtext('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
@@ -80,9 +103,13 @@ class renderer {
     }
 
     /**
+     * Render a checkbox element in a group.
+     *
+     * @param string    $name
+     * @param object    $default
      * @return Object
      */
-    public function& render_group_element_checkbox($name, $default = null) {
+    public function render_group_element_checkbox($name, $default = null) {
         $item = new \admin_setting_configcheckbox('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
@@ -91,9 +118,14 @@ class renderer {
     }
 
     /**
+     * Render a multiselect element in a group.
+     *
+     * @param string    $name
+     * @param object    $defaultsetting
+     * @param object    $choices
      * @return Object
      */
-    public function& render_group_element_configmultiselect($name, $defaultsetting, $choices) {
+    public function render_group_element_configmultiselect($name, $defaultsetting, $choices) {
         $item = new \admin_setting_configmultiselect('bigbluebuttonbn_' . $name,
                 get_string('config_' . $name, 'bigbluebuttonbn'),
                 get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
@@ -102,6 +134,8 @@ class renderer {
     }
 
     /**
+     * Validate if general section will be shown.
+     *
      * @return boolean
      */
     public static function section_general_shown() {
@@ -111,6 +145,8 @@ class renderer {
     }
 
     /**
+     * Validate if record meeting section  will be shown.
+     *
      * @return boolean
      */
     public static function section_record_meeting_shown() {
@@ -121,16 +157,19 @@ class renderer {
     }
 
     /**
+     * Validate if import recording section will be shown.
+     *
      * @return boolean
      */
     public static function section_import_recordings_shown() {
         global $CFG;
         return (!isset($CFG->bigbluebuttonbn['importrecordings_enabled']) ||
                 !isset($CFG->bigbluebuttonbn['importrecordings_from_deleted_enabled']));
-
     }
 
     /**
+     * Validate if show recording section will be shown.
+     *
      * @return boolean
      */
     public static function section_show_recordings_shown() {
@@ -144,6 +183,8 @@ class renderer {
     }
 
     /**
+     * Validate if wait moderator section will be shown.
+     *
      * @return boolean
      */
     public static function section_wait_moderator_shown() {
@@ -155,6 +196,8 @@ class renderer {
     }
 
     /**
+     * Validate if static voice bridge section will be shown.
+     *
      * @return boolean
      */
     public static function section_static_voice_bridge_shown() {
@@ -163,6 +206,8 @@ class renderer {
     }
 
     /**
+     * Validate if preupload presentation section will be shown.
+     *
      * @return boolean
      */
     public static function section_preupload_presentation_shown() {
@@ -171,6 +216,8 @@ class renderer {
     }
 
     /**
+     * Validate if user limit section will be shown.
+     *
      * @return boolean
      */
     public static function section_user_limit_shown() {
@@ -180,6 +227,8 @@ class renderer {
     }
 
     /**
+     * Validate if scheduled duration section will be shown.
+     *
      * @return boolean
      */
     public static function section_scheduled_duration_shown() {
@@ -188,6 +237,8 @@ class renderer {
     }
 
     /**
+     * Validate if moderator default section will be shown.
+     *
      * @return boolean
      */
     public static function section_moderator_default_shown() {
@@ -196,6 +247,8 @@ class renderer {
     }
 
     /**
+     * Validate if send notification section will be shown.
+     *
      * @return boolean
      */
     public static function section_send_notifications_shown() {
@@ -204,6 +257,8 @@ class renderer {
     }
 
     /**
+     * Validate if settings extended section will be shown.
+     *
      * @return boolean
      */
     public static function section_settings_extended_shown() {

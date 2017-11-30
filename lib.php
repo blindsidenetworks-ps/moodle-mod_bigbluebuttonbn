@@ -68,21 +68,41 @@ $CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
  * Remove this block when restored
  */
 
+ /** @var BIGBLUEBUTTONBN_DEFAULT_SERVER_URL string of default bigbluebutton server url */
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+/** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
-
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_CREATE string of event create for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = 'Create';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string of event join for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = 'Join';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT string of event logout for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_IMPORT string of event import for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_DELETE string of event delete for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 
+/**
+ * Indicates API features that the forum supports.
+ *
+ * @uses FEATURE_IDNUMBER
+ * @uses FEATURE_GROUPS
+ * @uses FEATURE_GROUPINGS
+ * @uses FEATURE_GROUPMEMBERSONLY
+ * @uses FEATURE_MOD_INTRO
+ * @uses FEATURE_BACKUP_MOODLE2
+ * @uses FEATURE_COMPLETION_TRACKS_VIEWS
+ * @uses FEATURE_GRADE_HAS_GRADE
+ * @uses FEATURE_GRADE_OUTCOMES
+ * @uses FEATURE_SHOW_DESCRIPTION
+ * @param string $feature
+ * @return mixed True if yes (some features may use other values)
+ */
 function bigbluebuttonbn_supports($feature) {
-
     if (!$feature) {
         return null;
     }
-
     $features = array(
         (string) FEATURE_IDNUMBER => true,
         (string) FEATURE_GROUPS => true,
@@ -95,11 +115,9 @@ function bigbluebuttonbn_supports($feature) {
         (string) FEATURE_GRADE_OUTCOMES => false,
         (string) FEATURE_SHOW_DESCRIPTION => true,
     );
-
     if (isset($features[(string) $feature])) {
         return $features[$feature];
     }
-
     return null;
 }
 
@@ -179,6 +197,14 @@ function bigbluebuttonbn_delete_instance($id) {
     return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
 }
 
+/**
+ * Given an ID of an instance of this module,
+ * this function will permanently delete the data that depends on it.
+ *
+ * @param object $bigbluebuttonbn Id of the module instance
+ *
+ * @return bool Success/Failure
+ */
 function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     global $DB, $USER;
     $log = new stdClass();
@@ -200,12 +226,18 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
     }
     return true;
 }
+
 /**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
  * $return->time = the time they did it
  * $return->info = a short text description.
+ *
+ * @param object $course
+ * @param object $user
+ * @param object $mod
+ * @param object $bigbluebuttonbn
  *
  * @return bool
  */
@@ -224,6 +256,11 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
 /**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
+ *
+ * @param object $course
+ * @param object $user
+ * @param object $mod
+ * @param object $bigbluebuttonbn
  *
  * @return bool
  */
@@ -267,6 +304,8 @@ function bigbluebuttonbn_get_post_actions() {
  *
  * @param array $courses
  * @param array $htmlarray Passed by reference
+ *
+ * @return void
  */
 function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
     if (empty($courses) || !is_array($courses)) {
@@ -290,6 +329,8 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
  *
  * @param array $bigbluebuttonbn
  * @param int $now
+ *
+ * @return string
  */
 function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     global $CFG;
@@ -344,6 +385,8 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * Runs any processes that must run before a bigbluebuttonbn insert/update.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
@@ -376,6 +419,8 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * Runs any processes that must be run after a bigbluebuttonbn insert/update.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
  **/
 function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
@@ -388,6 +433,8 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
  * Generates a message on insert/update which is sent to all users enrolled.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
  **/
 function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
     $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
@@ -402,6 +449,8 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  * Generates an event after a bigbluebuttonbn insert/update.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
@@ -438,6 +487,8 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
  * or if there is none, set the presentation field will be set to blank.
  *
  * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return string
  */
 function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
     $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
@@ -488,6 +539,10 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 
 /**
  * Helper for validating pluginfile.
+ * @param stdClass $context       context object
+ * @param string   $filearea      file area
+ *
+ * @return false|null false if file not valid
  */
 function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -504,6 +559,14 @@ function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
 
 /**
  * Helper for getting pluginfile.
+ *
+ * @param stdClass $course        course object
+ * @param stdClass $cm            course module object
+ * @param stdClass $context       context object
+ * @param string   $filearea      file area
+ * @param array    $args          extra arguments
+ *
+ * @return object
  */
 function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args) {
     $filename = bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args);
@@ -521,6 +584,13 @@ function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $arg
 
 /**
  * Helper for getting pluginfile name.
+ *
+ * @param stdClass $course        course object
+ * @param stdClass $cm            course module object
+ * @param stdClass $context       context object
+ * @param array    $args          extra arguments
+ *
+ * @return array
  */
 function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
     global $DB;

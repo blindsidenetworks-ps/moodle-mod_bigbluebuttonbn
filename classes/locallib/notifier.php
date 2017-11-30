@@ -36,10 +36,16 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class notifier {
-
+    /**
+     * Starts the notification process.
+     *
+     * @param object $context
+     * @param object $bigbluebuttonbn
+     * @param string $action
+     * @return void
+     */
     public static function notification_process($context, $bigbluebuttonbn, $action) {
         global $USER;
-
         // Prepare message.
         $msg = (object) array();
         // Build the message_body.
@@ -55,11 +61,16 @@ class notifier {
         $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
         $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($USER);
-
         // Send notification to all users enrolled.
         self::notification_send($context, $USER, $bigbluebuttonbn, self::notification_msg_html($msg));
     }
 
+    /**
+     * Prepares html message body.
+     *
+     * @param object $msg
+     * @return string
+     */
     public static function notification_msg_html($msg) {
         $messagetext = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
@@ -84,11 +95,18 @@ class notifier {
         return $messagetext;
     }
 
+    /**
+     * Sends the message.
+     *
+     * @param object $context
+     * @param object $sender
+     * @param object $bigbluebuttonbn
+     * @param string $message
+     * @return void
+     */
     public static function notification_send($context, $sender, $bigbluebuttonbn, $message = '') {
         global $DB;
-
         $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-
         // Complete message.
         $msg = (object) array();
         $msg->user_name = fullname($sender);
@@ -97,7 +115,6 @@ class notifier {
         $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-
         $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
         foreach ($users as $user) {
             if ($user->id != $sender->id) {
@@ -105,5 +122,4 @@ class notifier {
             }
         }
     }
-
 }

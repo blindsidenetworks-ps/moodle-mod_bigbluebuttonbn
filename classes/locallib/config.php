@@ -38,6 +38,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 class config {
 
     /**
+     * Returns moodle version.
+     *
      * @return string
      */
     public static function get_moodle_version_major() {
@@ -47,6 +49,8 @@ class config {
     }
 
     /**
+     * Returns configuration default values.
+     *
      * @return array
      */
     public static function defaultvalues() {
@@ -91,6 +95,9 @@ class config {
     }
 
     /**
+     * Returns default value for an specific setting.
+     *
+     * @param string $setting
      * @return string
      */
     public static function defaultvalue($setting) {
@@ -102,6 +109,9 @@ class config {
     }
 
     /**
+     * Returns value for an specific setting.
+     *
+     * @param string $setting
      * @return string
      */
     public static function get($setting) {
@@ -116,6 +126,8 @@ class config {
     }
 
     /**
+     * Validates if recording settings are enabled.
+     *
      * @return boolean
      */
     public static function recordings_enabled() {
@@ -123,6 +135,8 @@ class config {
     }
 
     /**
+     * Wraps current settings in an array.
+     *
      * @return array
      */
     public static function get_options() {
