@@ -179,7 +179,7 @@ M.mod_bigbluebuttonbn.modform = {
         var selection = document.getElementById('bigbluebuttonbn_participant_selection');
         // Lookup to see if it has been added already.
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
-            if (this.bigbluebuttonbn.participant_list[i].selectiontype == .value &&
+            if (this.bigbluebuttonbn.participant_list[i].selectiontype == selectionType.value &&
                 this.bigbluebuttonbn.participant_list[i].selectionid == selection.value) {
                 return;
             }
@@ -187,7 +187,7 @@ M.mod_bigbluebuttonbn.modform = {
         // Add it to memory.
         this.participantAddToMemory(selectionType.value, selection.value);
         // Add it to the form.
-        this.participantAddToForm(.value, selection.value, 'viewer');
+        this.participantAddToForm(selectionType.value, selection.value, 'viewer');
         // Update in the form.
         this.participantListUpdate();
     },
