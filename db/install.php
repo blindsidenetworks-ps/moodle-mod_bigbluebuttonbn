@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file replaces the legacy STATEMENTS section in db/install.xml, lib.php/modulename_install() post installation hook and partially defaults.php.
+ * This file replaces the legacy STATEMENTS section in db/install.xml, lib.php/modulename_install()
+ * post installation hook and partially defaults.php.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc

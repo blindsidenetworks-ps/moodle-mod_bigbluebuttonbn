@@ -648,7 +648,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'],
-            (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
+            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 400 Bad Request. '.$error);
@@ -719,7 +719,7 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'],
-            (string)\mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
+            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 400 Bad Request. '.$error);

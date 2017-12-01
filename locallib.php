@@ -296,8 +296,8 @@ function bigbluebuttonbn_get_recordings_array_filter($rids, &$recordings) {
  * @param string $bigbluebuttonbnid
  * @param bool   $subset
  *
- * @return associative array with imported recordings indexed by recordID, each recording is a non sequential associative
- * array that corresponds to the actual recording in BBB
+ * @return associative array with imported recordings indexed by recordID, each recording
+ * is a non sequential associative array that corresponds to the actual recording in BBB
  */
 function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid = null, $subset = true) {
     global $DB;
@@ -796,11 +796,11 @@ function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
         return array();
     }
     foreach ($rules as $key => $rule) {
-        if ( $rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid']) ) {
+        if ($rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid'])) {
             continue;
         }
         $role = bigbluebuttonbn_get_role($rule['selectionid']);
-        if ( $role == null ) {
+        if ($role == null) {
             unset($rules[$key]);
             continue;
         }
@@ -1293,26 +1293,26 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
         return;
     }
     $editable = bigbluebuttonbn_get_recording_data_row_editable($bbbsession);
-    $row = new stdClass();
+    $rowdata = new stdClass();
     // Set recording_types.
-    $row->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
+    $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
     // Set activity name.
-    $row->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
+    $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
     // Set activity description.
-    $row->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
+    $rowdata->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
     // Set recording_preview.
-    $row->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
+    $rowdata->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
     // Set date.
-    $row->date = bigbluebuttonbn_get_recording_data_row_date($recording);
+    $rowdata->date = bigbluebuttonbn_get_recording_data_row_date($recording);
     // Set formatted date.
-    $row->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($row->date);
+    $rowdata->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($rowdata->date);
     // Set formatted duration.
-    $row->duration_formatted = $row->duration = bigbluebuttonbn_get_recording_data_row_duration($recording);
+    $rowdata->duration_formatted = $rowdata->duration = bigbluebuttonbn_get_recording_data_row_duration($recording);
     // Set actionbar, if user is allowed to manage recordings.
     if ($bbbsession['managerecordings']) {
-        $row->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
+        $rowdata->actionbar = bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
     }
-    return $row;
+    return $rowdata;
 }
 
 /**
@@ -1382,7 +1382,7 @@ function bigbluebuttonbn_get_recording_data_row_duration($recording) {
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
     foreach ($tools as $tool) {
-        if ( $tool == 'protect' && !isset($recording['protected']) ) {
+        if ($tool == 'protect' && !isset($recording['protected'])) {
             continue;
         }
         $buttonpayload = bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool);
@@ -1706,9 +1706,9 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
     if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
         // There are recordings for this meeting.
         foreach ($recordings as $recording) {
-            $row = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-            if ($row != null) {
-                array_push($tabledata, $row);
+            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+            if ($rowdata != null) {
+                array_push($tabledata, $rowdata);
             }
         }
     }
@@ -1749,7 +1749,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
         // There are recordings for this meeting.
         foreach ($recordings as $recording) {
-            if ( !bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) ) {
+            if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
                 continue;
             }
             bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, $table);
@@ -1806,7 +1806,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    if ( isset($recording['imported']) || !isset($bbbsession['group']) || $recording['meetingID'] == $bbbsession['meetingid'] ) {
+    if (isset($recording['imported']) || !isset($bbbsession['group']) || $recording['meetingID'] == $bbbsession['meetingid']) {
         return true;
     }
     return false;
