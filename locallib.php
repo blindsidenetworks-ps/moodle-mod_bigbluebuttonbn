@@ -1644,14 +1644,11 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $sender = get_admin();
     // Prepare message.
-    $msg = new stdClass();
-    // Build the message_body.
-    $msg->activity_type = '';
-    $msg->activity_title = $bigbluebuttonbn->name;
-    $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.
-        $msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
+    $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
+        ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
         get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-    \mod_bigbluebuttonbn\locallib\notifier::notification_send($sender, $bigbluebuttonbn, $messagetext);
+    $context = context_course::instance($bigbluebuttonbn->course);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_send($context, $sender, $bigbluebuttonbn, $messagetext);
 }
 
 /**
