@@ -362,8 +362,10 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
     if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
         $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
         $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
-        if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
-            $output .= bigbluebuttonbn_view_render_imported($bbbsession);
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+            if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
+                $output .= bigbluebuttonbn_view_render_imported($bbbsession);
+            }
         }
     }
     return $output;

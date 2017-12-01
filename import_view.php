@@ -46,6 +46,11 @@ if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
     return;
 }
 
+if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+    print_error(get_string('view_message_importrecordings_disabled', 'bigbluebuttonbn'));
+    return;
+}
+
 $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
 $selected = bigbluebuttonbn_selected_course($options, $tc);
