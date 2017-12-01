@@ -530,7 +530,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
     $file = bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args);
-    if (!$file) {
+    if (empty($file)) {
         return false;
     }
     // Finally send the file.

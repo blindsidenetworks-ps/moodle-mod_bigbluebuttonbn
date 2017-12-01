@@ -70,7 +70,7 @@ if (!empty($options)) {
     if (!empty($recordings)) {
         $body .= html_writer::tag('span', '',
             ['id' => 'import_recording_links_table', 'name' => 'import_recording_links_table']);
-        $body .= bigbluebutton_output_recording_table($bbbsession, $recordings, ['import']);
+        $body .= bigbluebuttonbn_output_recording_table($bbbsession, $recordings, ['import']);
     } else {
         $body .= html_writer::tag('div', get_string('view_error_import_no_recordings', 'bigbluebuttonbn'));
     }

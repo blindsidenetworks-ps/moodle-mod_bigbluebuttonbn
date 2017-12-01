@@ -1279,6 +1279,15 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
     return $configxmlarray['configToken'];
 }
 
+/**
+ * Helper function builds a row for the data used by the recording table.
+ *
+ * @param array $bbbsession
+ * @param array $recording
+ * @param array $tools
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['protect', 'publish', 'delete']) {
     if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
         return;
@@ -1306,10 +1315,24 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     return $row;
 }
 
+/**
+ * Helper function evaluates if a row for the data used by the recording table is editable.
+ *
+ * @param array $bbbsession
+ *
+ * @return boolean
+ */
 function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
     return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0 || bigbluebuttonbn_is_bn_server()));
 }
 
+/**
+ * Helper function converts recording date used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ *
+ * @return integer
+ */
 function bigbluebuttonbn_get_recording_data_row_date($recording) {
     if (!isset($recording['startTime'])) {
         return 0;
@@ -1317,6 +1340,13 @@ function bigbluebuttonbn_get_recording_data_row_date($recording) {
     return floatval($recording['startTime']);
 }
 
+/**
+ * Helper function format recording date used in row for the data used by the recording table.
+ *
+ * @param integer $starttime
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_date_formatted($starttime) {
     global $USER;
     $starttime = $starttime - ($starttime % 1000);
@@ -1325,6 +1355,13 @@ function bigbluebuttonbn_get_recording_data_row_date_formatted($starttime) {
     return userdate($starttime / 1000, $dateformat, usertimezone($USER->timezone));
 }
 
+/**
+ * Helper function converts recording duration used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ *
+ * @return integer
+ */
 function bigbluebuttonbn_get_recording_data_row_duration($recording) {
     $firstplayback = array_values($recording['playbacks'])[0];
     $length = 0;
@@ -1334,6 +1371,14 @@ function bigbluebuttonbn_get_recording_data_row_duration($recording) {
     return intval($length);
 }
 
+/**
+ * Helper function builds recording actionbar used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param array $tools
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
     foreach ($tools as $tool) {
@@ -1351,6 +1396,15 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     return $head . $actionbar . $tail;
 }
 
+/**
+ * Helper function returns the corresponding payload for an actionbar button used in row
+ * for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param array $tool
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
     if ($tool == 'protect') {
         return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
@@ -1361,6 +1415,14 @@ function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $t
     return array('action' => $tool, 'tag' => $tool);
 }
 
+/**
+ * Helper function returns the payload for protect action button used in row
+ * for the data used by the recording table.
+ *
+ * @param string $protected
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
     if ($protected == 'true') {
         return array('action' => 'unprotect', 'tag' => 'lock');
@@ -1368,6 +1430,14 @@ function bigbluebuttonbn_get_recording_data_row_action_protect($protected) {
     return array('action' => 'protect', 'tag' => 'unlock');
 }
 
+/**
+ * Helper function returns the payload for publish action button used in row
+ * for the data used by the recording table.
+ *
+ * @param string $published
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
     if ($published == 'true') {
         return array('action' => 'unpublish', 'tag' => 'hide');
@@ -1375,6 +1445,13 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
     return array('action' => 'publish', 'tag' => 'show');
 }
 
+/**
+ * Helper function builds recording preview used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     $visibility = '';
     if ($recording['published'] === 'false') {
@@ -1398,6 +1475,14 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     return $recordingpreview;
 }
 
+/**
+ * Helper function renders recording types to be used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param integer $bigbluebuttonbnid
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebuttonbnid) {
     $dataimported = 'false';
     $title = '';
@@ -1421,6 +1506,15 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
     return $recordingtypes;
 }
 
+/**
+ * Helper function renders the link used for recording type in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param integer $bigbluebuttonbnid
+ * @param array $playback
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid, $playback) {
     global $CFG, $OUTPUT;
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
@@ -1442,6 +1536,14 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonb
     return $OUTPUT->action_link('#', $title, null, $linkattributes);
 }
 
+/**
+ * Helper function renders the name for recording used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param boolean $editable
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable) {
     $payload = array();
     if ($editable) {
@@ -1463,6 +1565,14 @@ function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $edita
     return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $newsource, $payload);
 }
 
+/**
+ * Helper function renders the description for recording used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param boolean $editable
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable) {
     $payload = array();
     if ($editable) {
@@ -1483,6 +1593,16 @@ function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $ed
     return bigbluebuttonbn_get_recording_data_row_text($recording, '', $newsource, $payload);
 }
 
+/**
+ * Helper function renders text element for recording used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param string $text
+ * @param string $source
+ * @param array $data
+ *
+ * @return string
+ */
 function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source, $data) {
     $htmltext = '<span>' . htmlentities($text) . '</span>';
     if (empty($data)) {
@@ -1500,6 +1620,14 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source,
     return $head . $htmltext . $htmllink . $tail;
 }
 
+/**
+ * Helper function render a button for the recording action bar
+ *
+ * @param object $recording
+ * @param array $data
+ *
+ * @return string
+ */
 function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     global $OUTPUT;
     if (!$data) {
@@ -1531,6 +1659,13 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     return $OUTPUT->action_link('#', get_string($data['action']), null, $linkattributes);
 }
 
+/**
+ * Helper function builds the data used for headers by the recording table.
+ *
+ * @param array $bbbsession
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
     // Set strings to show.
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
@@ -1556,6 +1691,15 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     return $recordingsbncolumns;
 }
 
+/**
+ * Helper function builds the data used by the recording table.
+ *
+ * @param array $bbbsession
+ * @param array $recordings
+ * @param array $tools
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     $tabledata = array();
     // Build table content.
@@ -1571,6 +1715,15 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
     return $tabledata;
 }
 
+/**
+ * Helper function builds the recording table.
+ *
+ * @param array $bbbsession
+ * @param array $recordings
+ * @param array $tools
+ *
+ * @return object
+ */
 function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     // Set strings to show.
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
@@ -1605,6 +1758,16 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     return $table;
 }
 
+/**
+ * Helper function builds the recording table row and insert into table.
+ *
+ * @param array $bbbsession
+ * @param array $recording
+ * @param array $tools
+ * @param object $table
+ *
+ * @return array
+ */
 function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, &$table) {
     $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
     if ($rowdata == null) {
@@ -1634,6 +1797,14 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
     array_push($table->data, $row);
 }
 
+/**
+ * Helper function evaluates if recording row should be included in the table.
+ *
+ * @param array $bbbsession
+ * @param array $recording
+ *
+ * @return boolean
+ */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
     if ( isset($recording['imported']) || !isset($bbbsession['group']) || $recording['meetingID'] == $bbbsession['meetingid'] ) {
         return true;
@@ -1641,6 +1812,13 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
     return false;
 }
 
+/**
+ * Helper function triggers a send notification when the recording is ready.
+ *
+ * @param object $bigbluebuttonbn
+ *
+ * @return void
+ */
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $sender = get_admin();
     // Prepare message.
@@ -1667,6 +1845,14 @@ function bigbluebuttonbn_is_bn_server() {
     return ($hends[$hendslength - 1] == 'com' && $hends[$hendslength - 2] == 'blindsidenetworks');
 }
 
+/**
+ * Helper function returns a list of courses a user has access to, wrapped in an array that can be used
+ * by a html select.
+ *
+ * @param array $bbbsession
+ *
+ * @return array
+ */
 function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     if ($bbbsession['administrator']) {
         $courses = get_courses('all', 'c.fullname ASC', 'c.id,c.shortname,c.fullname');
@@ -1682,13 +1868,22 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     return $coursesforselect;
 }
 
-function bigbluebutton_output_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
+/**
+ * Helper function renders recording table.
+ *
+ * @param array $bbbsession
+ * @param array $recordings
+ * @param array $tools
+ *
+ * @return array
+ */
+function bigbluebuttonbn_output_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
     if (isset($recordings) && !empty($recordings)) {
         // There are recordings for this meeting.
         $table = bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools);
     }
     if (!isset($table) || !isset($table->data)) {
-        // Render a table qith "No recordings".
+        // Render a table with "No recordings".
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
             array('id' => 'bigbluebuttonbn_html_table'));
     }
@@ -1836,6 +2031,15 @@ function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $s
     return bigbluebuttonbn_get_recordings_array(array_keys($records));
 }
 
+/**
+ * Helper function iterates an array with recordings and unset those already imported.
+ *
+ * @param array $recordings
+ * @param integer $courseid
+ * @param integer $bigbluebuttonbnid
+ *
+ * @return array
+ */
 function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $courseid, $bigbluebuttonbnid) {
     $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, true);
     foreach ($recordings as $key => $recording) {

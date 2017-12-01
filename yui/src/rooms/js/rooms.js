@@ -15,6 +15,7 @@
 
 /** global: M */
 /** global: Y */
+/** global: opener */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
@@ -230,7 +231,6 @@ M.mod_bigbluebuttonbn.rooms = {
 
     windowClose: function() {
         window.onunload = function() {
-            /** global: opener */
             opener.M.mod_bigbluebuttonbn.rooms.remoteUpdate(5000);
         };
         window.close();

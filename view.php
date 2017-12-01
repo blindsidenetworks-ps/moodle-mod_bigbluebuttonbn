@@ -519,7 +519,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvar
     // If there are meetings with recordings load the data to the table.
     if ($bbbsession['bigbluebuttonbn']->recordings_html) {
         // Render a plain html table.
-        return bigbluebutton_output_recording_table($bbbsession, $recordings)."\n";
+        return bigbluebuttonbn_output_recording_table($bbbsession, $recordings)."\n";
     }
     // JavaScript variables for recordings with YUI.
     $jsvars += array(

@@ -38,16 +38,15 @@ require_once($CFG->libdir.'/adminlib.php');
  */
 class renderer {
 
-   /**
-    * @var $settings stores the settings as they come from settings.php
-    */
+    /**
+     * @var $settings stores the settings as they come from settings.php
+     */
     private $settings;
 
     /**
      * Constructor.
      *
      * @param object $settings
-     * @return void
      */
     public function __construct(&$settings) {
         $this->settings = $settings;
@@ -59,13 +58,14 @@ class renderer {
      * @param string $name
      * @param string $itemname
      * @param string $itemdescription
+     *
      * @return void
      */
     public function render_group_header($name, $itemname = null, $itemdescription = null) {
-        if ($itemname == null) {
+        if ($itemname === null) {
             $itemname = get_string('config_' . $name, 'bigbluebuttonbn');
         }
-        if ($itemdescription == null) {
+        if ($itemdescription === null) {
             $itemdescription = get_string('config_' .$name . '_description', 'bigbluebuttonbn');
         }
         $item = new \admin_setting_heading('bigbluebuttonbn_config_' . $name, $itemname, $itemdescription);
@@ -77,6 +77,7 @@ class renderer {
      *
      * @param string $name
      * @param object $item
+     *
      * @return void
      */
     public function render_group_element($name, $item) {
@@ -92,6 +93,7 @@ class renderer {
      * @param string    $name
      * @param object    $default
      * @param string    $type
+     *
      * @return Object
      */
     public function render_group_element_text($name, $default = null, $type = PARAM_RAW) {
@@ -107,6 +109,7 @@ class renderer {
      *
      * @param string    $name
      * @param object    $default
+     *
      * @return Object
      */
     public function render_group_element_checkbox($name, $default = null) {
@@ -123,6 +126,7 @@ class renderer {
      * @param string    $name
      * @param object    $defaultsetting
      * @param object    $choices
+     *
      * @return Object
      */
     public function render_group_element_configmultiselect($name, $defaultsetting, $choices) {
