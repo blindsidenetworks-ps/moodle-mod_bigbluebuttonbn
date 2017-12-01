@@ -1623,14 +1623,14 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source,
 /**
  * Helper function render a button for the recording action bar
  *
- * @param object $recording
+ * @param array $recording
  * @param array $data
  *
  * @return string
  */
 function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     global $OUTPUT;
-    if (!$data) {
+    if (empty($data)) {
         return '';
     }
     $target = $data['action'];
