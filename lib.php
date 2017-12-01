@@ -266,7 +266,7 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  */
 function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
     global $DB;
-    $completed = $DB->count_recorda('bigbluebuttonbn_logs', array('courseid' => $course->id,
+    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
         'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ),
         '*', IGNORE_MULTIPLE);
     return $completed > 0;

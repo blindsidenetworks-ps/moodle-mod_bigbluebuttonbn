@@ -1651,7 +1651,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').' '.
         $msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
         get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-    bigbluebuttonbn_send_notification($sender, $bigbluebuttonbn, $messagetext);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_send($sender, $bigbluebuttonbn, $messagetext);
 }
 
 /**
