@@ -1382,7 +1382,7 @@ function bigbluebuttonbn_get_recording_data_row_duration($recording) {
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
     foreach ($tools as $tool) {
-        if ($tool == 'protect' && !isset($recording['protected'])) {
+        if ($tool == 'protect' && (!isset($recording['protected']) || isset($recording['imported']))) {
             continue;
         }
         $buttonpayload = bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool);
