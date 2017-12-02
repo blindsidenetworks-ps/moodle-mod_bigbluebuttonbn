@@ -36,7 +36,7 @@ $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
-$params['forced'] = optional_param('forced', 'false', PARAM_TEXT);
+$params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
 $params['meta'] = optional_param('meta', '', PARAM_TEXT);
 
 if (empty($params['action'])) {
@@ -87,7 +87,7 @@ try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
     if ($a == 'meeting_info') {
-        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['forced'] == 'true'));
+        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
         echo $meetinginfo;
         return;
     }

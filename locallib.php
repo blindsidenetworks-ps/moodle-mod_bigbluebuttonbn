@@ -1982,9 +1982,9 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigblu
  */
 function bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
-        $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
-        $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
-        return ($recordings + $recordingsimported);
+    $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
+    $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
+    return ($recordings + $recordingsimported);
 }
 
 /**
