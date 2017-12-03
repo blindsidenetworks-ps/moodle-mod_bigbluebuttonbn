@@ -1382,10 +1382,15 @@ function bigbluebuttonbn_get_recording_data_row_duration($recording) {
 function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
     $actionbar = '';
     foreach ($tools as $tool) {
-        if ($tool == 'protect' && (!isset($recording['protected']) || isset($recording['imported']))) {
-            continue;
-        }
         $buttonpayload = bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool);
+        if ($tool == 'protect') {
+            if (isset($recording['imported'])) {
+                $buttonpayload['disabled'] = 'disabled';
+            }
+            if (!isset($recording['protected'])) {
+                $buttonpayload['disabled'] = 'invisible';
+            }
+        }
         $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $buttonpayload);
     }
     $head = html_writer::start_tag('div', array(
@@ -1407,7 +1412,11 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
  */
 function bigbluebuttonbn_get_recording_data_row_actionbar_payload($recording, $tool) {
     if ($tool == 'protect') {
-        return bigbluebuttonbn_get_recording_data_row_action_protect($recording['protected']);
+        $protected = 'false';
+        if (isset($recording['protected'])) {
+            $protected = $recording['protected'];
+        }
+        return bigbluebuttonbn_get_recording_data_row_action_protect($protected);
     }
     if ($tool == 'publish') {
         return bigbluebuttonbn_get_recording_data_row_action_publish($recording['published']);
@@ -1642,15 +1651,23 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recording_icons_enabled')) {
         // With icon for $manageaction.
         $iconattributes = array('id' => $id, 'class' => 'iconsmall');
-        $icon = new pix_icon('i/'.$data['tag'],
-            get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
-            'moodle', $iconattributes);
         $linkattributes = array(
             'id' => $id,
             'onclick' => $onclick,
-            'data-action' => $data['action'],
-            'data-links' => bigbluebuttonbn_get_count_recording_imported_instances($recording['recordID'])
+            'data-action' => $data['action']
           );
+        if (!isset($recording['imported'])) {
+            $linkattributes['data-links'] = bigbluebuttonbn_count_recording_imported_instances(
+              $recording['recordID']);
+        }
+        if (isset($data['disabled'])) {
+            $iconattributes['class'] .= ' fa-' . $data['disabled'];
+            $linkattributes['class'] = 'disabled';
+            unset($linkattributes['onclick']);
+        }
+        $icon = new pix_icon('i/'.$data['tag'],
+            get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
+            'moodle', $iconattributes);
         return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
     }
     // With text for $manageaction.
@@ -2057,7 +2074,7 @@ function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
  *
  * @return integer
  */
-function bigbluebuttonbn_get_count_recording_imported_instances($recordid) {
+function bigbluebuttonbn_count_recording_imported_instances($recordid) {
     global $DB;
     $sql = 'SELECT COUNT(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
     return $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordid}%"));

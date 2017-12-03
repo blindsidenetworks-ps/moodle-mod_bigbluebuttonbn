@@ -11,3 +11,13 @@
     width: auto;
     z-index: 99999;
 }
+
+.fa-disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.fa-invisible {
+    visibility: hidden;
+    cursor: not-allowed;
+}
