@@ -317,12 +317,15 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
     // Renders general warning when configured.
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
-    $output  = bigbluebuttonbn_view_render_warning(
-        (string)$cfg['general_warning_message'],
-        (string)$cfg['general_warning_box_type'],
-        (string)$cfg['general_warning_button_href'],
-        (string)$cfg['general_warning_button_text'],
-        (string)$cfg['general_warning_button_class']);
+    $output  = '';
+    if (bigbluebuttonbn_view_warning_shown($bbbsession)) {
+        $output .= bigbluebuttonbn_view_render_warning(
+            (string)$cfg['general_warning_message'],
+            (string)$cfg['general_warning_box_type'],
+            (string)$cfg['general_warning_button_href'],
+            (string)$cfg['general_warning_button_text'],
+            (string)$cfg['general_warning_button_class']);
+    }
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
     if ($enabledfeatures['showroom']) {
@@ -372,6 +375,25 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
 }
 
 /**
+ * Evaluates if the warning box should be shown.
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_view_warning_shown($bbbsession) {
+    if (is_siteadmin($bbbsession['userID'])) {
+        return true;
+    }
+    $generalwarningroles = explode(',', \mod_bigbluebuttonbn\locallib\config::get('general_warning_roles'));
+    $userroles = bigbluebuttonbn_get_user_roles($bbbsession['context'], $bbbsession['userID']);
+    foreach ($userroles as $userrole) {
+        if (in_array($userrole->shortname, $generalwarningroles)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Renders the general warning message.
  *
  * @param string $message
@@ -379,6 +401,7 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
  * @param string $href
  * @param string $text
  * @param string $class
+ *
  * @return string
  */
 function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $text='', $class='') {
@@ -390,7 +413,7 @@ function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $
     }
     $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
       'bigbluebuttonbn_view_general_warning')."\n";
-    $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>'.$message."\n";
+    $output .= '  '.$message."\n";
     $output .= '  <div class="singlebutton">'."\n";
     if (!empty($href)) {
         $output .= bigbluebuttonbn_view_render_warning_button($href, $text, $class);
@@ -406,6 +429,7 @@ function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $
  * @param string $href
  * @param string $text
  * @param string $class
+ *
  * @return string
  */
 function bigbluebuttonbn_view_render_warning_button($href, $text = '', $class = '') {
@@ -429,6 +453,7 @@ function bigbluebuttonbn_view_render_warning_button($href, $text = '', $class = 
  * @param array $bbbsession
  * @param string $activity
  * @param array $jsvars
+ *
  * @return string
  */
 function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
@@ -470,6 +495,7 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
  * Validates if the view includes recordings.
  *
  * @param array $bbbsession
+ *
  * @return boolean
  */
 function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
@@ -486,6 +512,7 @@ function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
  * @param array $bbbsession
  * @param boolean $showroom
  * @param array $jsvars
+ *
  * @return string
  */
 function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvars) {
@@ -536,6 +563,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvar
  * Renders the view for importing recordings.
  *
  * @param array $bbbsession
+ *
  * @return string
  */
 function bigbluebuttonbn_view_render_imported(&$bbbsession) {
@@ -556,6 +584,7 @@ function bigbluebuttonbn_view_render_imported(&$bbbsession) {
  * Renders the content for ended meeting.
  *
  * @param array $bbbsession
+ *
  * @return string
  */
 function bigbluebuttonbn_view_ended(&$bbbsession) {
@@ -576,6 +605,7 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
  * Make sure the passwords have been setup.
  *
  * @param object $bigbluebuttonbn
+ *
  * @return void
  */
 function bigbluebuttonbn_verify_passwords(&$bigbluebuttonbn) {

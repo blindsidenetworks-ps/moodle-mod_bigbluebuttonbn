@@ -292,15 +292,21 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
   /*
    * When general_warning_message value is different than "", the string is shown
    * as a warning message to privileged users (administrators and Teachers or users allowed to edit).
-   * $CFG->bigbluebuttonbn['general_warning_message'] = "This will may have recordings enabled when upgraded to premium.";
+   * $CFG->bigbluebuttonbn['general_warning_message'] = "Would you like to record your BigBlueButton sessions for later viewing? ";
+   *
+   * The warning box is always shown to administrators, but it is also possible to define other roles
+   * to whom the it will be shown. The roles are based on the shortnames defined by Moodle:
+   *     'manager,coursecreator,editingteacher,teacher,student,guest,user,frontpage'
+   * $CFG->bigbluebuttonbn['general_warning_roles'] = 'editingteacher,teacher';
    *
    * As the general_warning_message is shown in a box, its type can be defined with general_warning_type
    * The default type is 'info' which is normaly rendered in blue when using a bootstrap theme.
+   * All the modifiers for boxed in bootstrap can be used [info|success|warning|danger].
    * $CFG->bigbluebuttonbn['general_warning_box_type'] = 'info';
    *
    * Additionally, when general_warning_button_href value is different than "", a button
    * can also be shown right after the message.
-   * $CFG->bigbluebuttonbn['general_warning_button_href'] = "http://google.ca/";
+   * $CFG->bigbluebuttonbn['general_warning_button_href'] = "http://blindsidenetworks.com/";
    *
    * Finally, the text and class for the button can be modified
    * $CFG->bigbluebuttonbn['general_warning_button_text'] = "Upgrade your site";
