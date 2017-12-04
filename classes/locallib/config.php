@@ -57,7 +57,6 @@ class config {
         return array(
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
-            'importrecordings_enabled' => 'false',
             'voicebridge_editable' => 'false',
             'importrecordings_enabled' => 'false',
             'importrecordings_from_deleted_enabled' => 'false',
@@ -132,7 +131,16 @@ class config {
      * @return boolean
      */
     public static function recordings_enabled() {
-        return (self::get('recordings_enabled') === 'true');
+        return (boolean)self::get('recordings_enabled');
+    }
+
+    /**
+     * Validates if imported recording settings are enabled.
+     *
+     * @return boolean
+     */
+    public static function importrecordings_enabled() {
+        return (boolean)self::get('importrecordings_enabled');
     }
 
     /**

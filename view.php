@@ -338,6 +338,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
+    } else if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
+        $output .= bigbluebuttonbn_view_render_warning($recordingsdisabled, 'danger');
     }
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
@@ -354,13 +357,6 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
  */
 function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $enabledfeatures, &$jsvars) {
     if ($type == BIGBLUEBUTTONBN_TYPE_ROOM_ONLY) {
-        return '';
-    }
-    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
-        if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
-            return bigbluebuttonbn_view_render_warning(
-                get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
-        }
         return '';
     }
     $output = '';

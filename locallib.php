@@ -1335,7 +1335,7 @@ function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
  * @return boolean
  */
 function bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession) {
-    return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0));
+    return ((double)$bbbsession['serverversion'] >= 1.0);
 }
 
 /**
@@ -1698,24 +1698,25 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
     // Initialize table headers.
     $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
-    $recordingsbncolumns[] = array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true);
+    $columns[] = array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true);
     $activity = get_string('view_recording_activity', 'bigbluebuttonbn');
-    $recordingsbncolumns[] = array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true);
+    $columns[] = array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $description = get_string('view_recording_description', 'bigbluebuttonbn');
-    $recordingsbncolumns[] = array('key' => 'description', 'label' => $description, 'sortable' => true, 'width' => '250px', 'allowHTML' => true);
+    $columns[] = array('key' => 'description', 'label' => $description, 'sortable' => true,
+        'width' => '250px', 'allowHTML' => true);
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
         $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
-        $recordingsbncolumns[] = array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true);
+        $columns[] = array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true);
     }
     $date = get_string('view_recording_date', 'bigbluebuttonbn');
-    $recordingsbncolumns[] = array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    $columns[] = array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true);
     $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
-    $recordingsbncolumns[] = array('key' => 'duration', 'label' => $duration, 'width' => '50px');
+    $columns[] = array('key' => 'duration', 'label' => $duration, 'width' => '50px');
     if ($bbbsession['managerecordings']) {
         $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
-        $recordingsbncolumns[] = array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px', 'allowHTML' => true);
+        $columns[] = array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px', 'allowHTML' => true);
     }
-    return $recordingsbncolumns;
+    return $columns;
 }
 
 /**
@@ -2148,9 +2149,12 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     }
     $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
     // Evaluates if recordings are enabled for the Moodle site.
-    $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
+    $enabledfeatures['showrecordings'] = false;
+    if (\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
+    }
     $enabledfeatures['importrecordings'] = false;
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+    if (\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
         $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
     }
     return $enabledfeatures;
