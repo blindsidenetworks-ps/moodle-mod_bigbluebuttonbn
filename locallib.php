@@ -1292,16 +1292,17 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
         return;
     }
-    $editable = bigbluebuttonbn_get_recording_data_row_editable($bbbsession);
     $rowdata = new stdClass();
     // Set recording_types.
     $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
     // Set activity name.
-    $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable);
+    $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
-    $rowdata->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable);
-    // Set recording_preview.
-    $rowdata->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
+    $rowdata->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $bbbsession);
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        // Set recording_preview.
+        $rowdata->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
+    }
     // Set date.
     $rowdata->date = bigbluebuttonbn_get_recording_data_row_date($recording);
     // Set formatted date.
@@ -1323,7 +1324,18 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
  * @return boolean
  */
 function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
-    return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0 || bigbluebuttonbn_is_bn_server()));
+    return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0 || $bbbsession['bnserver']));
+}
+
+/**
+ * Helper function evaluates if recording preview should be included.
+ *
+ * @param array $bbbsession
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession) {
+    return ($bbbsession['managerecordings'] && ((double)$bbbsession['serverversion'] >= 1.0));
 }
 
 /**
@@ -1549,13 +1561,13 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonb
  * Helper function renders the name for recording used in row for the data used by the recording table.
  *
  * @param array $recording
- * @param boolean $editable
+ * @param array $bbbsession
  *
  * @return string
  */
-function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $editable) {
+function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession) {
     $payload = array();
-    if ($editable) {
+    if (bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
         $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
             'action' => 'edit', 'tag' => 'edit',
             'target' => 'name');
@@ -1578,13 +1590,13 @@ function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $edita
  * Helper function renders the description for recording used in row for the data used by the recording table.
  *
  * @param array $recording
- * @param boolean $editable
+ * @param array $bbbsession
  *
  * @return string
  */
-function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $editable) {
+function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $bbbsession) {
     $payload = array();
-    if ($editable) {
+    if (bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
         $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
             'action' => 'edit', 'tag' => 'edit',
             'target' => 'description');
@@ -1684,26 +1696,24 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
  * @return array
  */
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
-    // Set strings to show.
-    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
-    $activity = get_string('view_recording_activity', 'bigbluebuttonbn');
-    $description = get_string('view_recording_description', 'bigbluebuttonbn');
-    $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
-    $date = get_string('view_recording_date', 'bigbluebuttonbn');
-    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
-    $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
     // Initialize table headers.
-    $recordingsbncolumns = array(
-        array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true),
-        array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true),
-        array('key' => 'description', 'label' => $description, 'sortable' => true, 'width' => '250px', 'allowHTML' => true),
-        array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true),
-        array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true),
-        array('key' => 'duration', 'label' => $duration, 'width' => '50px'),
-        );
+    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $recordingsbncolumns[] = array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true);
+    $activity = get_string('view_recording_activity', 'bigbluebuttonbn');
+    $recordingsbncolumns[] = array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true);
+    $description = get_string('view_recording_description', 'bigbluebuttonbn');
+    $recordingsbncolumns[] = array('key' => 'description', 'label' => $description, 'sortable' => true, 'width' => '250px', 'allowHTML' => true);
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
+        $recordingsbncolumns[] = array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true);
+    }
+    $date = get_string('view_recording_date', 'bigbluebuttonbn');
+    $recordingsbncolumns[] = array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
+    $recordingsbncolumns[] = array('key' => 'duration', 'label' => $duration, 'width' => '50px');
     if ($bbbsession['managerecordings']) {
-        array_push($recordingsbncolumns, array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px',
-            'allowHTML' => true));
+        $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
+        $recordingsbncolumns[] = array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px', 'allowHTML' => true);
     }
     return $recordingsbncolumns;
 }
@@ -1742,22 +1752,28 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
  * @return object
  */
 function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
-    // Set strings to show.
-    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
-    $description = get_string('view_recording_description', 'bigbluebuttonbn');
-    $date = get_string('view_recording_date', 'bigbluebuttonbn');
-    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
-    $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
-    $playback = get_string('view_recording_playback', 'bigbluebuttonbn');
-    $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
     // Declare the table.
     $table = new html_table();
     $table->data = array();
     // Initialize table headers.
-    $table->head = array($playback, $recording, $description, $preview, $date, $duration);
+    $playback = get_string('view_recording_playback', 'bigbluebuttonbn');
+    $table->head[] = $playback;
+    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $table->head[] = $recording;
+    $description = get_string('view_recording_description', 'bigbluebuttonbn');
+    $table->head[] = $description;
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
+        $table->head[] = $preview;
+    }
+    $date = get_string('view_recording_date', 'bigbluebuttonbn');
+    $table->head[] = $date;
+    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
+    $table->head[] = $duration;
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     $table->size = array('', '', '', '', '', '');
     if ($bbbsession['managerecordings']) {
+        $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
         $table->head[] = $actionbar;
         $table->align[] = 'left';
         $table->size[] = (count($tools) * 40) . 'px';
@@ -1802,12 +1818,14 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
         $texttail = '</em>';
     }
     $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
-    $row->cells = array(
-        $texthead . $rowdata->recording . $texttail,
-        $texthead . $rowdata->activity . $texttail, $texthead . $rowdata->description . $texttail,
-        $rowdata->preview, $texthead . $rowdata->date_formatted . $texttail,
-        $rowdata->duration_formatted
-      );
+    $row->cells[] = $texthead . $rowdata->recording . $texttail;
+    $row->cells[] = $texthead . $rowdata->activity . $texttail;
+    $row->cells[] = $texthead . $rowdata->description . $texttail;
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $row->cells[] = $rowdata->preview;
+    }
+    $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
+    $row->cells[] = $rowdata->duration_formatted;
     if ($bbbsession['managerecordings']) {
         $row->cells[] = $rowdata->actionbar;
     }
