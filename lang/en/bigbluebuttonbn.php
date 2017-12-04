@@ -266,7 +266,7 @@ $string['view_recording_format_presentation'] = 'presentation';
 $string['view_recording_format_video'] = 'video';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
-$string['view_message_norecordings'] = 'There are no recording for this meeting.';
+$string['view_message_norecordings'] = 'There are no recording to show.';
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 

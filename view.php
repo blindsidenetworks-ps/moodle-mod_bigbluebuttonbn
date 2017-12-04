@@ -528,13 +528,15 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvar
             $bbbsession['bigbluebuttonbn']->recordings_deleted
           );
     }
-    // Get recording links.
-    $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
-        $bbbsession['course']->id, $bigbluebuttonbnid, $showroom
-      );
-    /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
-     * recordings are not included. */
-    $recordings += $recordingsimported;
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+        // Get recording links.
+        $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
+            $bbbsession['course']->id, $bigbluebuttonbnid, $showroom
+          );
+        /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
+         * recordings are not included. */
+        $recordings += $recordingsimported;
+    }
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
