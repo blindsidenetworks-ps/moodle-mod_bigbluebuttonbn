@@ -46,7 +46,7 @@ if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
     return;
 }
 
-if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+if (!(boolean)\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
     print_error(get_string('view_message_importrecordings_disabled', 'bigbluebuttonbn'));
     return;
 }
