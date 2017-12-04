@@ -150,7 +150,15 @@ M.mod_bigbluebuttonbn.recordings = {
             source: 'found',
             goalstate: false
         };
-        this.recordingAction(element, (this.recordingIsImported(element) == 'false'), extras);
+        var requireConfirmation = true;
+        if (this.recordingIsImported(element)) {
+            // When recordingDelete is performed on imported recordings use default response for validation.
+            requireConfirmation = false;
+            extras.source = 'status';
+            extras.goalstate = true;
+            extras.attempts = 1;
+        }
+        this.recordingAction(element, requireConfirmation, extras);
     },
 
     recordingImport: function(element) {
@@ -320,7 +328,7 @@ M.mod_bigbluebuttonbn.recordings = {
     recordingIsImported: function(element) {
         var nodeelement = Y.one(element);
         var node = nodeelement.ancestor('tr');
-        return node.getAttribute('data-imported');
+        return (node.getAttribute('data-imported') === 'true');
     }
 };
 // This file is part of Moodle - http://moodle.org/
