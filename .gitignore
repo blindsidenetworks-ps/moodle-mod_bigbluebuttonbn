@@ -6,3 +6,4 @@ deploy*
 vendor*
 moodle-plugin-ci/
 output*
+/node_modules/
