@@ -352,24 +352,23 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
  * @return string
  */
 function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $enabledfeatures, &$jsvars) {
-    $output = '';
-    // Evaluates if the recordings are enterely disabled.
+    if ($type == BIGBLUEBUTTONBN_TYPE_ROOM_ONLY) {
+        return '';
+    }
     if (!(boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
         if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
-            $output .= bigbluebuttonbn_view_render_warning(
+            return bigbluebuttonbn_view_render_warning(
                 get_string('view_message_recordings_disabled', 'bigbluebuttonbn'), 'danger');
         }
-        return $output;
+        return '';
     }
-    // Recordings are rendered either if it is a 'recordings only' instance or it is set to be recorded.
+    $output = '';
+    if ($type == BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
+        $output  = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+    }
     if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
-        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures['showroom'], $jsvars);
-        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
-            if ($enabledfeatures['importrecordings'] && $bbbsession['importrecordings']) {
-                $output .= bigbluebuttonbn_view_render_imported($bbbsession);
-            }
-        }
+        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
+        $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
     }
     return $output;
 }
@@ -510,28 +509,28 @@ function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
  * Renders the view for recordings.
  *
  * @param array $bbbsession
- * @param boolean $showroom
+ * @param boolean $enabledfeatures
  * @param array $jsvars
  *
  * @return string
  */
-function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvars) {
+function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, &$jsvars) {
     $bigbluebuttonbnid = null;
-    if ($showroom) {
+    if ($enabledfeatures['showroom']) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
     // Get recordings.
     $recordings = array();
     if ( bigbluebuttonbn_view_include_recordings($bbbsession) ) {
         $recordings = bigbluebuttonbn_get_recordings(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
+            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
             $bbbsession['bigbluebuttonbn']->recordings_deleted
           );
     }
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+    if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $showroom
+            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom']
           );
         /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
          * recordings are not included. */
@@ -565,18 +564,22 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $showroom, &$jsvar
  * Renders the view for importing recordings.
  *
  * @param array $bbbsession
+ * @param array $enabledfeatures
  *
  * @return string
  */
-function bigbluebuttonbn_view_render_imported(&$bbbsession) {
+function bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures) {
     global $CFG;
+    if (!$enabledfeatures['importrecordings'] || !$bbbsession['importrecordings']) {
+        return '';
+    }
     $button = html_writer::tag('input', '',
         array('type' => 'button',
               'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
               'class' => 'btn btn-secondary',
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.
                   $bbbsession['bigbluebuttonbn']->id.'\''));
-    $output = html_writer::start_tag('br');
+    $output  = html_writer::start_tag('br');
     $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
     $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
     return $output;

@@ -2131,7 +2131,10 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
     // Evaluates if recordings are enabled for the Moodle site.
     $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
-    $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+    $enabledfeatures['importrecordings'] = false;
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_enabled')) {
+        $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+    }
     return $enabledfeatures;
 }
 
