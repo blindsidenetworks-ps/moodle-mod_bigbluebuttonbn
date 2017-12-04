@@ -29,7 +29,7 @@ M.mod_bigbluebuttonbn.modform = {
      * Initialise the broker code.
      *
      * @method init
-     * @param Object bigbluebuttonbn
+     * @param {object} bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
         this.bigbluebuttonbn = bigbluebuttonbn;

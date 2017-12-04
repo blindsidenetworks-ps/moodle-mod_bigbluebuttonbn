@@ -32,7 +32,7 @@ M.mod_bigbluebuttonbn.recordings = {
      * Initialise recordings code.
      *
      * @method init
-     * @param Object data
+     * @param {object} data
      */
     init: function(data) {
         this.datasource = new Y.DataSource.Get({

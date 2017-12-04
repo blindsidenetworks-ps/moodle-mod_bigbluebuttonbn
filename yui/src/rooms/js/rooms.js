@@ -30,7 +30,7 @@ M.mod_bigbluebuttonbn.rooms = {
      * Initialise the broker code.
      *
      * @method init
-     * @param Object bigbluebuttonbn
+     * @param {object} bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({
