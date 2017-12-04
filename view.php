@@ -490,21 +490,6 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
 }
 
 /**
- * Validates if the view includes recordings.
- *
- * @param array $bbbsession
- *
- * @return boolean
- */
-function bigbluebuttonbn_view_include_recordings(&$bbbsession) {
-    if ($bbbsession['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY &&
-        $bbbsession['bigbluebuttonbn']->recordings_imported) {
-        return false;
-    }
-    return true;
-}
-
-/**
  * Renders the view for recordings.
  *
  * @param array $bbbsession
@@ -519,13 +504,10 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
     // Get recordings.
-    $recordings = array();
-    if ( bigbluebuttonbn_view_include_recordings($bbbsession) ) {
-        $recordings = bigbluebuttonbn_get_recordings(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
-            $bbbsession['bigbluebuttonbn']->recordings_deleted
-          );
-    }
+    $recordings = bigbluebuttonbn_get_recordings(
+        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
+        $bbbsession['bigbluebuttonbn']->recordings_deleted
+      );
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
