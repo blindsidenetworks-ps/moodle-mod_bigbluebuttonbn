@@ -70,8 +70,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
         $mform = &$this->_form;
-        $currentactivity = &$this->current;
-        $jsvars = [];
+        $jsvars = array();
         $jsvars['instance_type_room_only'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
         $jsvars['instance_type_profiles'] = bigbluebuttonbn_get_instance_type_profiles();
         $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instance_type_profiles']);
@@ -84,9 +83,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, ['participant_list' => $participantlist]);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
         // Add block 'Schedule'.
-        $this->bigbluebuttonbn_mform_add_block_schedule($mform, ['activity' => $currentactivity]);
+        $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Add standard buttons, common to all modules.
@@ -335,12 +334,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      *
      * @param object $mform
      * @param array $cfg
-     * @param array $data
+     * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $data) {
+    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
-        $participantlist = $data['participant_list'];
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');
         $mform->addElement('hidden', 'participants', json_encode($participantlist));
@@ -385,20 +383,20 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for integration with the calendar.
      *
      * @param object $mform
-     * @param array $data
+     * @param object $activity
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_schedule(&$mform, $data) {
+    private function bigbluebuttonbn_mform_add_block_schedule(&$mform, &$activity) {
         $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
-        if (isset($data['activity']->openingtime) && $data['activity']->openingtime != 0 ||
-            isset($data['activity']->closingtime) && $data['activity']->closingtime != 0) {
+        if (isset($activity->openingtime) && $activity->openingtime != 0 ||
+            isset($activity->closingtime) && $activity->closingtime != 0) {
             $mform->setExpanded('schedule');
         }
-        $mform->addElement('date_time_selector', 'openingtime', get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
-            array('optional' => true));
+        $mform->addElement('date_time_selector', 'openingtime',
+            get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('openingtime', 0);
-        $mform->addElement('date_time_selector', 'closingtime', get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
-            array('optional' => true));
+        $mform->addElement('date_time_selector', 'closingtime',
+            get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('closingtime', 0);
     }
 

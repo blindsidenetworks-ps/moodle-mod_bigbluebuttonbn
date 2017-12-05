@@ -60,10 +60,10 @@ M.mod_bigbluebuttonbn.modform = {
         this.showFieldset('id_room', showAll || features.includes('showroom'));
         // Show recordings settings validation.
         this.showFieldset('id_recordings', showAll || features.includes('showrecordings'));
-        this.showInput('id_recordings_imported', features.includes('showrecordings'));
+        // Show recordings imported settings validation.
+        this.showInput('id_recordings_imported', showAll || features.includes('showrecordings'));
         // Preuploadpresentation feature validation.
-        this.showFieldset('id_preuploadpresentation', showAll ||
-            features.includes('preuploadpresentation'));
+        this.showFieldset('id_preuploadpresentation', showAll || features.includes('preuploadpresentation'));
         // Participants feature validation.
         this.showFieldset('id_permissions', showAll || features.includes('permissions'));
         // Schedule feature validation.
