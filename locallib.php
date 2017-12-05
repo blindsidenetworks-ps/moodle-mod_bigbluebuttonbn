@@ -1289,6 +1289,9 @@ function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
  * @return array
  */
 function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools = ['protect', 'publish', 'delete']) {
+    if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
+        return;
+    }
     if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
         return;
     }
@@ -1736,7 +1739,7 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
         // There are recordings for this meeting.
         foreach ($recordings as $recording) {
             $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-            if ($rowdata != null) {
+            if (!empty($rowdata)) {
                 array_push($tabledata, $rowdata);
             }
         }
@@ -1779,8 +1782,9 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     }
     // There are recordings for this meeting.
     foreach ($recordings as $recording) {
-        if (bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
-            $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools);
+        $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+        if (!empty($rowdata)) {
+            $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata);
             array_push($table->data, $row);
         }
     }
@@ -1792,15 +1796,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
  *
  * @param array $bbbsession
  * @param array $recording
- * @param array $tools
+ * @param object $rowdata
  *
  * @return object
  */
-function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools) {
-    $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-    if ($rowdata == null) {
-        return;
-    }
+function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata) {
     $row = new html_table_row();
     $row->id = 'recording-td-'.$recording['recordID'];
     $row->attributes['data-imported'] = 'false';
