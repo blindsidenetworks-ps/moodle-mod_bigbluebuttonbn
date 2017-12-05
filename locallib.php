@@ -1774,14 +1774,16 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->size[] = (count($tools) * 40) . 'px';
     }
     // Build table content.
-    if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
-        // There are recordings for this meeting.
-        foreach ($recordings as $recording) {
-            if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
-                continue;
-            }
-            bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, $table);
+    if (!isset($recordings) || array_key_exists('messageKey', $recordings)) {
+        return $table;
+    }
+    // There are recordings for this meeting.
+    foreach ($recordings as $recording) {
+        if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
+            continue;
         }
+        $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools);
+        array_push($table->data, $row);
     }
     return $table;
 }
@@ -1792,11 +1794,10 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
  * @param array $bbbsession
  * @param array $recording
  * @param array $tools
- * @param object $table
  *
- * @return array
+ * @return object
  */
-function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools, &$table) {
+function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools) {
     $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
     if ($rowdata == null) {
         return;
@@ -1825,7 +1826,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
     if ($bbbsession['managerecordings']) {
         $row->cells[] = $rowdata->actionbar;
     }
-    array_push($table->data, $row);
+    return $row;
 }
 
 /**
