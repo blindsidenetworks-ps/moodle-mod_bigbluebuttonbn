@@ -493,7 +493,7 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
  * Renders the view for recordings.
  *
  * @param array $bbbsession
- * @param boolean $enabledfeatures
+ * @param array $enabledfeatures
  * @param array $jsvars
  *
  * @return string

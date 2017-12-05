@@ -1824,8 +1824,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools
     $row->cells[] = $texthead . $rowdata->recording . $texttail;
     $row->cells[] = $texthead . $rowdata->activity . $texttail;
     $row->cells[] = $texthead . $rowdata->description . $texttail;
-    $previewenabled = bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession);
-    if ($previewenabled) {
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
         $row->cells[] = $rowdata->preview;
     }
     $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
