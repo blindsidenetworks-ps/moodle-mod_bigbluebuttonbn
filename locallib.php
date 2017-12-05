@@ -1774,10 +1774,6 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->size[] = (count($tools) * 40) . 'px';
     }
     // Build table content.
-    if (!isset($recordings) || array_key_exists('messageKey', $recordings)) {
-        return $table;
-    }
-    // There are recordings for this meeting.
     foreach ($recordings as $recording) {
         $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
         if (!empty($rowdata)) {
