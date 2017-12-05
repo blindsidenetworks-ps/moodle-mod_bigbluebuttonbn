@@ -299,14 +299,19 @@ function bigbluebuttonbn_get_recordings_array_filter($rids, &$recordings) {
  * @return associative array with imported recordings indexed by recordID, each recording
  * is a non sequential associative array that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid = null, $subset = true) {
+function bigbluebuttonbn_get_recordings_imported_array($courseid = 0, $bigbluebuttonbnid = null,
+        $subset = true) {
     global $DB;
-    $select = "courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND log = '" .
-        BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
-    if ($bigbluebuttonbnid === null) {
-        $select = "courseid = '{$courseid}' AND log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
+    if (empty($courseid)) {
+        $courseid = 0;
+    }
+    $select = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
+    if (empty($bigbluebuttonbnid)) {
+        $select .= " AND courseid = '{$courseid}'";
     } else if ($subset) {
-        $select = "bigbluebuttonbnid = '{$bigbluebuttonbnid}' AND log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
+        $select .= " AND bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
+    } else {
+        $select .= " AND courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}'";
     }
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
     $recordsimportedarray = array();
@@ -1829,7 +1834,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    // When groups are enabled, exclude those to which the user doesn't have access to. 
+    // When groups are enabled, exclude those to which the user doesn't have access to.
     // if (!isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
     //    return false;
     // }
@@ -1963,7 +1968,7 @@ function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid
     if (empty($courseid)) {
         $courseid = 0;
     }
-    if ($bigbluebuttonbnid === null) {
+    if (empty($bigbluebuttonbnid)) {
         return "course = '{$courseid}'";
     }
     if ($subset) {
@@ -1987,7 +1992,7 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigblu
     if (empty($courseid)) {
         $courseid = 0;
     }
-    if ($bigbluebuttonbnid === null) {
+    if (empty($bigbluebuttonbnid)) {
         return $sql . " AND courseid = {$courseid}";
     }
     if ($subset) {
@@ -2007,7 +2012,7 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigblu
  * @return associative array containing the recordings indexed by recordID, each recording is also a
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid = null, $subset = true,
+function bigbluebuttonbn_get_allrecordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
     $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
     $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
@@ -2026,7 +2031,7 @@ function bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid = null,
  * @return associative array containing the recordings indexed by recordID, each recording is also a
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
+function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
     global $DB;
     $select = bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
