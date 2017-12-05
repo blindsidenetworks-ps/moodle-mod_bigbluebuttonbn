@@ -1779,11 +1779,10 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     }
     // There are recordings for this meeting.
     foreach ($recordings as $recording) {
-        if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
-            continue;
+        if (bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
+            $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools);
+            array_push($table->data, $row);
         }
-        $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $tools);
-        array_push($table->data, $row);
     }
     return $table;
 }
