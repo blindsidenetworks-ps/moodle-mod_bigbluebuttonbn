@@ -1292,9 +1292,6 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     if (!bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
         return;
     }
-    if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
-        return;
-    }
     $rowdata = new stdClass();
     // Set recording_types.
     $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
@@ -1837,10 +1834,14 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    if (isset($recording['imported']) || !isset($bbbsession['group']) || $recording['meetingID'] == $bbbsession['meetingid']) {
-        return true;
+    // When groups are enabled, exclude those to which the user doesn't have access to. 
+    // if (!isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
+    //    return false;
+    // }
+    if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
+        return false;
     }
-    return false;
+    return true;
 }
 
 /**
