@@ -1698,24 +1698,23 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
     $columns = array();
     // Initialize table headers.
-    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
-    $columns[] = array('key' => 'recording', 'label' => $recording, 'width' => '125px', 'allowHTML' => true);
-    $activity = get_string('view_recording_activity', 'bigbluebuttonbn');
-    $columns[] = array('key' => 'activity', 'label' => $activity, 'sortable' => true, 'width' => '175px', 'allowHTML' => true);
-    $description = get_string('view_recording_description', 'bigbluebuttonbn');
-    $columns[] = array('key' => 'description', 'label' => $description, 'sortable' => true,
-        'width' => '250px', 'allowHTML' => true);
+    $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_recording', 'bigbluebuttonbn'),
+        'width' => '125px', 'allowHTML' => true);
+    $columns[] = array('key' => 'activity', 'label' => get_string('view_recording_activity', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '175px', 'allowHTML' => true);
+    $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '250px', 'allowHTML' => true);
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
-        $columns[] = array('key' => 'preview', 'label' => $preview, 'width' => '250px', 'allowHTML' => true);
+        $columns[] = array('key' => 'preview', 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
+            'width' => '250px', 'allowHTML' => true);
     }
-    $date = get_string('view_recording_date', 'bigbluebuttonbn');
-    $columns[] = array('key' => 'date', 'label' => $date, 'sortable' => true, 'width' => '225px', 'allowHTML' => true);
-    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
-    $columns[] = array('key' => 'duration', 'label' => $duration, 'width' => '50px');
+    $columns[] = array('key' => 'date', 'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    $columns[] = array('key' => 'duration', 'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
+        'width' => '50px');
     if ($bbbsession['managerecordings']) {
-        $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
-        $columns[] = array('key' => 'actionbar', 'label' => $actionbar, 'width' => '120px', 'allowHTML' => true);
+        $columns[] = array('key' => 'actionbar', 'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
+            'width' => '120px', 'allowHTML' => true);
     }
     return $columns;
 }
