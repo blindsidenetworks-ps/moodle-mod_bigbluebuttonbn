@@ -1758,25 +1758,18 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table = new html_table();
     $table->data = array();
     // Initialize table headers.
-    $playback = get_string('view_recording_playback', 'bigbluebuttonbn');
-    $table->head[] = $playback;
-    $recording = get_string('view_recording_recording', 'bigbluebuttonbn');
-    $table->head[] = $recording;
-    $description = get_string('view_recording_description', 'bigbluebuttonbn');
-    $table->head[] = $description;
+    $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        $preview = get_string('view_recording_preview', 'bigbluebuttonbn');
-        $table->head[] = $preview;
+        $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
     }
-    $date = get_string('view_recording_date', 'bigbluebuttonbn');
-    $table->head[] = $date;
-    $duration = get_string('view_recording_duration', 'bigbluebuttonbn');
-    $table->head[] = $duration;
+    $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     $table->size = array('', '', '', '', '', '');
     if ($bbbsession['managerecordings']) {
-        $actionbar = get_string('view_recording_actionbar', 'bigbluebuttonbn');
-        $table->head[] = $actionbar;
+        $table->head[] = get_string('view_recording_actionbar', 'bigbluebuttonbn');
         $table->align[] = 'left';
         $table->size[] = (count($tools) * 40) . 'px';
     }
