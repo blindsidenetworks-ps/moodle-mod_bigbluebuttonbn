@@ -299,20 +299,9 @@ function bigbluebuttonbn_get_recordings_array_filter($rids, &$recordings) {
  * @return associative array with imported recordings indexed by recordID, each recording
  * is a non sequential associative array that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings_imported_array($courseid = 0, $bigbluebuttonbnid = null,
-        $subset = true) {
+function bigbluebuttonbn_get_recordings_imported_array($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
     global $DB;
-    if (empty($courseid)) {
-        $courseid = 0;
-    }
-    $select = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
-    if (empty($bigbluebuttonbnid)) {
-        $select .= " AND courseid = '{$courseid}'";
-    } else if ($subset) {
-        $select .= " AND bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
-    } else {
-        $select .= " AND courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}'";
-    }
+    $select = bigbluebuttonbn_get_recordings_imported_sql_select($courseid, $bigbluebuttonbnid, $subset);
     $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
     $recordsimportedarray = array();
     foreach ($recordsimported as $recordimported) {
@@ -619,7 +608,7 @@ function bigbluebuttonbn_get_user_roles($context, $userid) {
     if ($userroles) {
         $where = '';
         foreach ($userroles as $userrole) {
-            $where .= (empty($where) ? ' WHERE' : ' OR').' id='.$userrole->roleid;
+            $where .= (empty($where) ? ' WHERE' : ' OR').' id=' . $userrole->roleid;
         }
         $userroles = $DB->get_records_sql('SELECT * FROM {role}'.$where);
     }
@@ -938,9 +927,8 @@ function bigbluebuttonbn_get_error_key($messagekey, $defaultkey = null) {
 function bigbluebuttonbn_voicebridge_unique($voicebridge) {
     global $DB;
     if ($voicebridge != 0) {
-        $table = 'bigbluebuttonbn';
-        $select = 'voicebridge = '.$voicebridge;
-        if ($DB->get_records_select($table, $select)) {
+        $select = 'voicebridge = ' . $voicebridge;
+        if ($DB->get_records_select('bigbluebuttonbn', $select)) {
             return false;
         }
     }
@@ -1987,7 +1975,7 @@ function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid
  *
  * @return string containing the sql used for getting the target bigbluebuttonbn instances
  */
-function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
+function bigbluebuttonbn_get_recordings_deleted_sql_select($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
     $sql = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_DELETE . "' AND meta like '%has_recordings%' AND meta like '%true%'";
     if (empty($courseid)) {
         $courseid = 0;
@@ -2002,6 +1990,30 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigblu
 }
 
 /**
+ * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
+ * in the getRecordings request considering only those that belong to imported recordings.
+ *
+ * @param string $courseid
+ * @param string $bigbluebuttonbnid
+ * @param bool   $subset
+ *
+ * @return string containing the sql used for getting the target bigbluebuttonbn instances
+ */
+function bigbluebuttonbn_get_recordings_imported_sql_select($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
+    $sql = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
+    if (empty($courseid)) {
+        $courseid = 0;
+    }
+    if (empty($bigbluebuttonbnid)) {
+        return $sql . " AND courseid = '{$courseid}'";
+    }
+    if ($subset) {
+        return $sql . " AND bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
+    }
+    return $sql . " AND courseid = '{$courseid}' AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}'";
+}
+
+/**
  * Helper function to get recordings  and imported recordings together.
  *
  * @param string $courseid
@@ -2012,8 +2024,7 @@ function bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid = 0, $bigblu
  * @return associative array containing the recordings indexed by recordID, each recording is also a
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_allrecordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false) {
+function bigbluebuttonbn_get_allrecordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true, $includedeleted = false) {
     $recordings = bigbluebuttonbn_get_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
     $recordingsimported = bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
     return ($recordings + $recordingsimported);
@@ -2031,15 +2042,14 @@ function bigbluebuttonbn_get_allrecordings($courseid = 0, $bigbluebuttonbnid = n
  * @return associative array containing the recordings indexed by recordID, each recording is also a
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
-function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false) {
+function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true, $includedeleted = false) {
     global $DB;
     $select = bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
     $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
     /* Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in
      * the getRecordings request. */
     if ($includedeleted) {
-        $selectdeleted = bigbluebuttonbn_get_recordings_sql_selectdeleted($courseid, $bigbluebuttonbnid, $subset);
+        $selectdeleted = bigbluebuttonbn_get_recordings_deleted_sql_select($courseid, $bigbluebuttonbnid, $subset);
         $bigbluebuttonbnsdel = $DB->get_records_select_menu('bigbluebuttonbn_logs', $selectdeleted, null,
             'bigbluebuttonbnid', 'bigbluebuttonbnid, meetingid');
         if (!empty($bigbluebuttonbnsdel)) {
