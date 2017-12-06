@@ -66,6 +66,14 @@ M.mod_bigbluebuttonbn.modform = {
         this.showFieldset('id_permissions', showAll || features.includes('permissions'));
         // Schedule feature validation.
         this.showFieldset('id_schedule', showAll || features.includes('schedule'));
+        // Common module settings validation.
+        this.showFieldset('id_modstandardelshdr', showAll || features.includes('modstandardelshdr'));
+        // Restrict access validation.
+        this.showFieldset('id_availabilityconditionsheader', showAll || features.includes('availabilityconditionsheader'));
+        // Tags validation.
+        this.showFieldset('id_tagshdr', showAll || features.includes('tagshdr'));
+        // Competencies validation.
+        this.showFieldset('id_competenciessection', showAll || features.includes('competenciessection'));
     },
 
     showFieldset: function(id, show) {

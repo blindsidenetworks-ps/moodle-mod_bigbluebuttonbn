@@ -2136,7 +2136,8 @@ function bigbluebuttonbn_get_instance_type_profiles() {
                 'features' => array('all')),
             array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups')),
+                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
             array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
                 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
     );
