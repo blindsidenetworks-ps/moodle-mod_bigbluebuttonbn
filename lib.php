@@ -389,6 +389,20 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
+    bigbluebuttonbn_process_pre_save_instance($bigbluebuttonbn);
+    bigbluebuttonbn_process_pre_save_checkboxes($bigbluebuttonbn);
+    bigbluebuttonbn_process_pre_save_common($bigbluebuttonbn);
+    $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
+}
+
+/**
+ * Runs process for defining the instance (insert/update).
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
+function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
         $bigbluebuttonbn->timecreated = time();
@@ -397,6 +411,16 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
     }
+}
+
+/**
+ * Runs process for assigning default value to checkboxes.
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
+function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->wait)) {
         $bigbluebuttonbn->wait = 0;
     }
@@ -412,7 +436,21 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->recordings_imported)) {
         $bigbluebuttonbn->recordings_imported = 0;
     }
-    $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
+}
+
+/**
+ * Runs process for wipping common settings when 'recordings only'.
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
+function bigbluebuttonbn_process_pre_save_common(&$bigbluebuttonbn) {
+    // Make sure common settings are removed when 'recordings only'.
+    if ($bigbluebuttonbn->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        $bigbluebuttonbn->groupmode = 0;
+        $bigbluebuttonbn->groupingid = 0;
+    }
 }
 
 /**
