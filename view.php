@@ -257,20 +257,18 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         $groupname = groups_get_group_name($bbbsession['group']);
     }
     // Assign group default values.
-    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-        $bbbsession['bigbluebuttonbn']->id.'['.$bbbsession['group'].']';
-    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name.' ('.$groupname.')';
+    $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
+    $bbbsession['meetingname'] .= ' ('.$groupname.')';
     if (count($groups) == 0) {
         // Only the All participants group exists.
-        bigbluebuttonbn_view_message_box($bbbsession,
-            get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info', false);
+        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info');
         return;
     }
     if (count($groups) == 1) {
         // There is only one group and the user has access to it.
         return;
     }
-    bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'), 'warning');
+    bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'));
     $urltoroot = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id;
     groups_print_activity_menu($bbbsession['cm'], $urltoroot);
     echo '<br><br>';
@@ -285,7 +283,7 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
  * @param boolean $onlymoderator
  * @return void
  */
-function bigbluebuttonbn_view_message_box(&$bbbsession, $message, $type='warning', $onlymoderator=false) {
+function bigbluebuttonbn_view_message_box(&$bbbsession, $message, $type = 'warning', $onlymoderator = false) {
     global $OUTPUT;
     if ($onlymoderator && !$bbbsession['moderator'] && !$bbbsession['administrator']) {
         return;

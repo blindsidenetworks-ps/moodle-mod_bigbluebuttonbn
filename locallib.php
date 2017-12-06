@@ -1822,11 +1822,15 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
+    if ($bbbsession['managerecordings']) {
+        // Users with recording management priviledges can see all of them.
+        return true;
+    }
     // When groups are enabled, exclude those to which the user doesn't have access to.
-    // if (!isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
-    //    return false;
-    // }
-    if (!$bbbsession['managerecordings'] && $recording['published'] != 'true') {
+    if (!isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
+        return false;
+    }
+    if ($recording['published'] != 'true') {
         return false;
     }
     return true;
