@@ -1513,8 +1513,7 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
           'data-meetingid' => $recording['meetingID'], 'data-recordingid' => $recording['recordID'],
           'title' => $title, $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
-        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid,
-            $playback).'&#32;';
+        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid, $playback).'&#32;';
     }
     $recordingtypes .= html_writer::end_tag('div');
     return $recordingtypes;

@@ -2,6 +2,7 @@
     height: 51px;
     padding: 4px;
     width: 66px;
+    float: left;
 }
 
 .thumbnail:hover {
