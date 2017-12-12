@@ -344,15 +344,7 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
             'url' => trim((string) $format->url), 'length' => (string) $format->length);
         // Add preview per format when existing.
         if ($format->preview) {
-            $imagesarray = array();
-            foreach ($format->preview->images->image as $image) {
-                $imagearray = array('url' => trim((string) $image));
-                foreach ($image->attributes() as $attkey => $attvalue) {
-                    $imagearray[$attkey] = (string) $attvalue;
-                }
-                array_push($imagesarray, $imagearray);
-            }
-            $playbackarray[(string) $format->type]['preview'] = $imagesarray;
+            $playbackarray[(string) $format->type]['preview'] = bigbluebuttonbn_get_recording_preview_images($format->preview);
         }
     }
     // Add the metadata to the recordings array.
@@ -365,6 +357,25 @@ function bigbluebuttonbn_get_recording_array_value($recording) {
         $recordingarray['protected'] = (string) $recording->protected;
     }
     return $recordingarray + $metadataarray;
+}
+
+/**
+ * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
+ *
+ * @param object $preview
+ *
+ * @return array
+ */
+function bigbluebuttonbn_get_recording_preview_images($preview) {
+    $imagesarray = array();
+    foreach ($preview->images->image as $image) {
+        $imagearray = array('url' => trim((string) $image));
+        foreach ($image->attributes() as $attkey => $attvalue) {
+            $imagearray[$attkey] = (string) $attvalue;
+        }
+        array_push($imagesarray, $imagearray);
+    }
+    return $imagesarray;
 }
 
 /**
@@ -1287,7 +1298,7 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     }
     $rowdata = new stdClass();
     // Set recording_types.
-    $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession['bigbluebuttonbn']->id);
+    $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
     // Set activity name.
     $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
@@ -1493,11 +1504,11 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
  * Helper function renders recording types to be used in row for the data used by the recording table.
  *
  * @param array $recording
- * @param integer $bigbluebuttonbnid
+ * @param array $bbbsession
  *
  * @return string
  */
-function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebuttonbnid) {
+function bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession) {
     $dataimported = 'false';
     $title = '';
     if (isset($recording['imported'])) {
@@ -1513,7 +1524,10 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
           'data-meetingid' => $recording['meetingID'], 'data-recordingid' => $recording['recordID'],
           'title' => $title, $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
-        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid, $playback).'&#32;';
+        if ($playback['type'] == 'statistics' && (isset($recording['imported']) || (!$bbbsession['administrator'] && !$bbbsession['moderator']))) {
+            continue;
+        }
+        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback).'&#32;';
     }
     $recordingtypes .= html_writer::end_tag('div');
     return $recordingtypes;
@@ -1523,17 +1537,17 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bigbluebutton
  * Helper function renders the link used for recording type in row for the data used by the recording table.
  *
  * @param array $recording
- * @param integer $bigbluebuttonbnid
+ * @param array $bbbsession
  * @param array $playback
  *
  * @return string
  */
-function bigbluebuttonbn_get_recording_data_row_type($recording, $bigbluebuttonbnid, $playback) {
+function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback) {
     global $CFG, $OUTPUT;
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
-    $href = $CFG->wwwroot.'/mod/bigbluebuttonbn/bbb_view.php?action=play&bn='.$bigbluebuttonbnid.
-      '&mid='.$recording['meetingID'].'&rid='.$recording['recordID'].'&rtype='.$playback['type'];
+    $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
+      '&mid='.$recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode(trim($playback['url']));
     }
