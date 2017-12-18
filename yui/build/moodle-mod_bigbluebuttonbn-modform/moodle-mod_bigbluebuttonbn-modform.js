@@ -58,6 +58,7 @@ M.mod_bigbluebuttonbn.modform = {
         var showAll = features.includes('all');
         // Show room settings validation.
         this.showFieldset('id_room', showAll || features.includes('showroom'));
+        this.showInput('id_record', showAll || features.includes('showrecordings'));
         // Show recordings settings validation.
         this.showFieldset('id_recordings', showAll || features.includes('showrecordings'));
         // Show recordings imported settings validation.
