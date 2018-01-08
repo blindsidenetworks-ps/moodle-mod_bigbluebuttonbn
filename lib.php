@@ -51,7 +51,6 @@ if (file_exists(dirname(__FILE__).'/config.php')) {
     require_once(dirname(__FILE__).'/config.php');
     // Old BigBlueButtonBN cfg schema. For backward compatibility.
     global $BIGBLUEBUTTONBN_CFG;
-
     if (isset($BIGBLUEBUTTONBN_CFG)) {
         foreach ((array) $BIGBLUEBUTTONBN_CFG as $key => $value) {
             $cfgkey = str_replace("bigbluebuttonbn_", "", $key);

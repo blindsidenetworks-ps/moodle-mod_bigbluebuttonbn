@@ -138,6 +138,19 @@ class renderer {
     }
 
     /**
+     * Render a general warning message.
+     *
+     * @param string    $msg
+     *
+     * @return Object
+     */
+    public function render_warning_message($msg) {
+        $item = new \admin_setting_heading('bigbluebuttonbn_global_deprecated',
+                get_string('config_warning', 'bigbluebuttonbn'), $msg);
+        $this->settings->add($item);
+    }
+
+    /**
      * Validate if general section will be shown.
      *
      * @return boolean

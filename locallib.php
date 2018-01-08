@@ -2301,6 +2301,21 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
 }
 
 /**
+ * Helper function renders general warning message for settings (if any).
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebutonbn_settings_general_warning(&$renderer) {
+    global $BIGBLUEBUTTONBN_CFG;
+    if (isset($BIGBLUEBUTTONBN_CFG)) {
+        $msg = get_string('config_warning_bigbluebuttonbn_cfg_deprecated', 'bigbluebuttonbn');
+        $renderer->render_warning_message($msg);
+    }
+}
+
+/**
  * Helper function renders general settings if the feature is enabled.
  *
  * @param object $renderer
