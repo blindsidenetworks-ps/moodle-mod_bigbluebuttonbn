@@ -140,7 +140,7 @@ class renderer {
     /**
      * Render a general warning message.
      *
-     * @param string    $msg
+     * @param string    $message
      *
      * @return Object
      */
