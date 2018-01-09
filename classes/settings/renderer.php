@@ -144,10 +144,15 @@ class renderer {
      *
      * @return Object
      */
-    public function render_warning_message($msg) {
-        $item = new \admin_setting_heading('bigbluebuttonbn_global_deprecated',
-                get_string('config_warning', 'bigbluebuttonbn'), $msg);
+    public function render_warning_message($message, $type = 'warning') {
+        global $OUTPUT;
+        $output = $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
+            'bigbluebuttonbn_view_general_warning')."\n";
+        $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>' . $message . "\n";
+        $output .= $OUTPUT->box_end() . "\n";
+        $item = new \admin_setting_heading('bigbluebuttonbn_global_deprecated', '', $output);
         $this->settings->add($item);
+        return $item;
     }
 
     /**

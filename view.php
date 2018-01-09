@@ -408,14 +408,14 @@ function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $
         return $output;
     }
     $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
-      'bigbluebuttonbn_view_general_warning')."\n";
-    $output .= '  '.$message."\n";
-    $output .= '  <div class="singlebutton">'."\n";
+      'bigbluebuttonbn_view_general_warning') . "\n";
+    $output .= '    ' . $message . "\n";
+    $output .= '  <div class="singlebutton">' . "\n";
     if (!empty($href)) {
         $output .= bigbluebuttonbn_view_render_warning_button($href, $text, $class);
     }
-    $output .= '  </div>'."\n";
-    $output .= $OUTPUT->box_end()."\n";
+    $output .= '  </div>' . "\n";
+    $output .= $OUTPUT->box_end() . "\n";
     return $output;
 }
 
