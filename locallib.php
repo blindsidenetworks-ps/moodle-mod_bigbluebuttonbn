@@ -609,7 +609,7 @@ function bigbluebuttonbn_end_meeting_if_running($bigbluebuttonbn) {
  * Returns user roles in a context.
  *
  * @param context $context
- * @param context $userid
+ * @param integer $userid
  *
  * @return array $userroles
  */
@@ -1835,15 +1835,20 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
+    // Users with recording management priviledges can see all of them.
     if ($bbbsession['managerecordings']) {
-        // Users with recording management priviledges can see all of them.
+        return true;
+    }
+    // Exclude unpublished recordings.
+    if ($recording['published'] != 'true') {
+        return false;
+    }
+    // Imported recordings are always shown as long as they are published.
+    if (isset($recording['imported'])) {
         return true;
     }
     // When groups are enabled, exclude those to which the user doesn't have access to.
-    if (!isset($recording['imported']) && isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
-        return false;
-    }
-    if ($recording['published'] != 'true') {
+    if (isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
         return false;
     }
     return true;

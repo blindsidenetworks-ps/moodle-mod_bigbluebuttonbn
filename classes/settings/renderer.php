@@ -141,6 +141,7 @@ class renderer {
      * Render a general warning message.
      *
      * @param string    $message
+     * @param string    $type
      *
      * @return Object
      */
