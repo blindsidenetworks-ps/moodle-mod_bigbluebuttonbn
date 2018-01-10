@@ -33,6 +33,8 @@ require_once(dirname(__FILE__).'/locallib.php');
 if ($ADMIN->fulltree) {
     // Configuration for BigBlueButton.
     $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
+    // Renders general warning message for settings.
+    bigbluebutonbn_settings_general_warning($renderer);
     // Renders general settings.
     bigbluebutonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.

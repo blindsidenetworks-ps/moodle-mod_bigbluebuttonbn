@@ -1,3 +1,18 @@
+2.2 (2017101007)
+Enhancement: Added alert boxed warning message in configuration that is shown when the old cfg global variable is used.
+Enhancement: Added filter for restricting access to links when recordings include multiple formats.
+Bug: Fix for issue with recording option showing up on 'Room/Activity only' instances.
+
+2.2 (2017101006)
+Bug: Make sure the common settings are wipped out when type is changed to 'recordings only'
+Bug: Fixed issue with import recordings not working with postgresql
+Bug: Fixed issue with recordings_imported_enabled not being shownin mod_form
+Bug: Fixed issue with filter for recordings when groups enabled
+Bug: Fixed issue with previews shown even with servers not implementing the feature
+Bug: Fixed general warning to be shown only to selected roles
+Bug: Fixed issue with 'protect' button not shown on imported links
+Bug: Fixed issue with turning on/off importing links by configuration
+
 2.2 (2017101005)
 Bug: Fix for issue with internal passwords not being generated for instances created with 2017101003.
 Bug: Fix for issue with notifications not being send when the recording is ready.

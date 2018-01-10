@@ -1524,10 +1524,7 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession) {
           'data-meetingid' => $recording['meetingID'], 'data-recordingid' => $recording['recordID'],
           'title' => $title, $visibility => $visibility));
     foreach ($recording['playbacks'] as $playback) {
-        if ($playback['type'] == 'statistics' && (isset($recording['imported']) || (!$bbbsession['administrator'] && !$bbbsession['moderator']))) {
-            continue;
-        }
-        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback).'&#32;';
+        $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback);
     }
     $recordingtypes .= html_writer::end_tag('div');
     return $recordingtypes;
@@ -1544,6 +1541,9 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession) {
  */
 function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback) {
     global $CFG, $OUTPUT;
+    if (!bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
+        return '';
+    }
     $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
@@ -1560,7 +1560,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         'data-href' => $href,
         'class' => 'btn btn-sm btn-default'
       );
-    return $OUTPUT->action_link('#', $title, null, $linkattributes);
+    return $OUTPUT->action_link('#', $title, null, $linkattributes) . '&#32;';
 }
 
 /**
@@ -2301,6 +2301,21 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
 }
 
 /**
+ * Helper function renders general warning message for settings (if any).
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebutonbn_settings_general_warning(&$renderer) {
+    global $BIGBLUEBUTTONBN_CFG;
+    if (isset($BIGBLUEBUTTONBN_CFG)) {
+        $msg = get_string('config_warning_bigbluebuttonbn_cfg_deprecated', 'bigbluebuttonbn');
+        $renderer->render_warning_message($msg);
+    }
+}
+
+/**
  * Helper function renders general settings if the feature is enabled.
  *
  * @param object $renderer
@@ -2554,4 +2569,29 @@ function bigbluebutonbn_settings_extended(&$renderer) {
 function bigbluebuttonbn_encode_meetingid($seed) {
     global $CFG;
     return sha1($CFG->wwwroot . $seed . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+}
+
+/**
+ * Helper function renders the link used for recording type in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param array $bbbsession
+ * @param array $playback
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback) {
+    // All types that are not statistics are included.
+    if ($playback['type'] != 'statistics') {
+        return true;
+    }
+    // Exclude imported recordings.
+    if (isset($recording['imported'])) {
+        return false;
+    }
+    // Exclude non moderators.
+    if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        return false;
+    }
+    return true;
 }

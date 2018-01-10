@@ -131,6 +131,7 @@ $string['config_meetingevents_enabled'] = 'Register meeting events';
 $string['config_meetingevents_enabled_description'] = 'Register meeting events feature is enabled.';
 
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
+$string['config_warning_bigbluebuttonbn_cfg_deprecated'] = 'BigBlueButtonBN is making use of config.php with a global variable that has been deprecated. Please convert the file as it will not be supported in future versions';
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
@@ -264,6 +265,7 @@ $string['view_recording_button_import'] = 'Import recording links';
 $string['view_recording_button_return'] = 'Go back';
 $string['view_recording_format_presentation'] = 'presentation';
 $string['view_recording_format_video'] = 'video';
+$string['view_recording_format_statistics'] = 'statistics';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
