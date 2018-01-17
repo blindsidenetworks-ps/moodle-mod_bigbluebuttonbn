@@ -24,16 +24,17 @@ With the latest version of this plugin you can
 Note that on previous versions of Moodle you will need to use the specific version of this plugin.
 
 - For Moodle 1.9 use version 1.0.9 (2013071000).
-- For Moodle 2.0, 2.1, 2.2, 2.3, 2.4 and 2.5 use version 1.1.1 (2015062101)
+- For Moodle 2.0 to 2.5 use version 1.1.1 (2015062101)
 - For Moodle 2.6 use version 2.0.4 (2015080611).
-- For Moodle 2.7+ use version 2.1.3 (2016051907).
+- For Moodle 2.7 to 3.4 use version 2.1.14 (2016051919).
+- For Moodle 3.0+ can use version 2.2-rc (2017101007).
 
 
 Prerequisites
 =============
 You need:
 
-1.  A server running Moodle 2.6+
+1.  A server running Moodle
 2.  A BigBlueButton 0.8 (or later) server running on a separate server (not on the same server as your Moodle site)
 
 Blindside Networks provides you a test BigBlueButton server for testing this plugin.  To use this test server, just accept the default settings when configuring the activity module.  The default settings are
@@ -52,7 +53,7 @@ This GitHub repository at
 
 https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn/
 
-contains the latest source. We recommend to download the latest snapshot from the Moodle Plugin Database.
+contains the latest source. We recommend to download the latest snapshot from the Moodle Plugin Directory.
 
 
 Note: You may want to install the RecordingsBN activity module to access recordings as well.

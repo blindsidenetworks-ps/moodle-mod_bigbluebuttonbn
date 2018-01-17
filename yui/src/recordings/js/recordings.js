@@ -37,7 +37,7 @@ M.mod_bigbluebuttonbn.recordings = {
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
         });
         if (data.recordings_html === false &&
-            (data.profile_features.includes('all') || data.profile_features.includes('showrecordings'))) {
+            (data.profile_features.indexOf('all') != -1 || data.profile_features.indexOf('showrecordings') != -1)) {
             this.locale = data.locale;
             this.datatable.columns = data.columns;
             this.datatable.data = this.datatableInitFormatDates(data.data);
@@ -88,7 +88,9 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingAction: function(element, confirmation, extras) {
         var payload = this.recordingElementPayload(element);
-        payload = Object.assign(payload, extras);
+        for (var attrname in extras) {
+            payload[attrname] = extras[attrname];
+        }
         // The action doesn't require confirmation.
         if (!confirmation) {
             this.recordingActionPerform(payload);

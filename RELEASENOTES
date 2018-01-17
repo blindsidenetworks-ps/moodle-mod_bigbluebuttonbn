@@ -1,3 +1,6 @@
+2.2 (2017101008)
+Bug: Fix for issue with JS not supported by IE11!.
+
 2.2 (2017101007)
 Enhancement: Added alert boxed warning message in configuration that is shown when the old cfg global variable is used.
 Enhancement: Added filter for restricting access to links when recordings include multiple formats.
