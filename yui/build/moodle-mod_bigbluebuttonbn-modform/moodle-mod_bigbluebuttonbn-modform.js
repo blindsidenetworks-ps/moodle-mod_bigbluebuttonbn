@@ -56,26 +56,36 @@ M.mod_bigbluebuttonbn.modform = {
     applyInstanceTypeProfile: function(profileType) {
         var showAll = this.isFeatureEnabled(profileType, 'all');
         // Show room settings validation.
-        this.showFieldset('id_room', showAll || this.isFeatureEnabled(profileType, 'showroom'));
-        this.showInput('id_record', showAll || this.isFeatureEnabled(profileType, 'showrecordings'));
+        this.showFieldset('id_room', showAll ||
+                          this.isFeatureEnabled(profileType, 'showroom'));
+        this.showInput('id_record', showAll ||
+                       this.isFeatureEnabled(profileType, 'showrecordings'));
         // Show recordings settings validation.
-        this.showFieldset('id_recordings', showAll || this.isFeatureEnabled(profileType, 'showrecordings'));
+        this.showFieldset('id_recordings', showAll ||
+                          this.isFeatureEnabled(profileType, 'showrecordings'));
         // Show recordings imported settings validation.
-        this.showInput('id_recordings_imported', showAll || this.isFeatureEnabled(profileType, 'showrecordings'));
+        this.showInput('id_recordings_imported', showAll ||
+                       this.isFeatureEnabled(profileType, 'showrecordings'));
         // Preuploadpresentation feature validation.
-        this.showFieldset('id_preuploadpresentation', showAll || this.isFeatureEnabled(profileType, 'preuploadpresentation'));
+        this.showFieldset('id_preuploadpresentation', showAll ||
+                          this.isFeatureEnabled(profileType, 'preuploadpresentation'));
         // Participants feature validation.
-        this.showFieldset('id_permissions', showAll || this.isFeatureEnabled(profileType, 'permissions'));
+        this.showFieldset('id_permissions', showAll ||
+                          this.isFeatureEnabled(profileType, 'permissions'));
         // Schedule feature validation.
-        this.showFieldset('id_schedule', showAll || this.isFeatureEnabled(profileType, 'schedule'));
+        this.showFieldset('id_schedule', showAll ||
+                          this.isFeatureEnabled(profileType, 'schedule'));
         // Common module settings validation.
-        this.showFieldset('id_modstandardelshdr', showAll || this.isFeatureEnabled(profileType, 'modstandardelshdr'));
+        this.showFieldset('id_modstandardelshdr', showAll ||
+                          this.isFeatureEnabled(profileType, 'modstandardelshdr'));
         // Restrict access validation.
-        this.showFieldset('id_availabilityconditionsheader', showAll || this.isFeatureEnabled(profileType, 'availabilityconditionsheader'));
+        this.showFieldset('id_availabilityconditionsheader', showAll ||
+                          this.isFeatureEnabled(profileType, 'availabilityconditionsheader'));
         // Tags validation.
         this.showFieldset('id_tagshdr', showAll || this.isFeatureEnabled(profileType, 'tagshdr'));
         // Competencies validation.
-        this.showFieldset('id_competenciessection', showAll || this.isFeatureEnabled(profileType, 'competenciessection'));
+        this.showFieldset('id_competenciessection', showAll ||
+                          this.isFeatureEnabled(profileType, 'competenciessection'));
     },
 
     isFeatureEnabled: function(profileType, feature) {

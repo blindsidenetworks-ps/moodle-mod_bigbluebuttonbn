@@ -41,7 +41,8 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.pinginterval === 0) {
             this.pinginterval = 10000;
         }
-        if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 || this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
+        if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
+            this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
         }
     },

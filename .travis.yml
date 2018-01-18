@@ -1,6 +1,6 @@
 language: php
 
-sudo: false
+sudo: required
 
 addons:
   firefox: "47.0.1"
