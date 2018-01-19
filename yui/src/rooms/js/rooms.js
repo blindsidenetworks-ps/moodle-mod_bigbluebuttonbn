@@ -41,7 +41,8 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.pinginterval === 0) {
             this.pinginterval = 10000;
         }
-        if (this.bigbluebuttonbn.profile_features.includes('all') || this.bigbluebuttonbn.profile_features.includes('showroom')) {
+        if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
+            this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
         }
     },
@@ -237,25 +238,24 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     waitModerator: function(payload) {
-        this.datasource.sendRequest({
-            request: "action=meeting_info&id=" + payload.id + "&bigbluebuttonbn=" + payload.bnid,
-            callback: {
-                success: function(e) {
-                    if (e.data.running) {
-                        M.mod_bigbluebuttonbn.rooms.cleanRoom();
-                        M.mod_bigbluebuttonbn.rooms.updateRoom();
+        var pooling = setInterval(function() {
+            M.mod_bigbluebuttonbn.rooms.datasource.sendRequest({
+                request: "action=meeting_info&id=" + payload.id + "&bigbluebuttonbn=" + payload.bnid,
+                callback: {
+                    success: function(e) {
+                        if (e.data.running) {
+                            M.mod_bigbluebuttonbn.rooms.cleanRoom();
+                            M.mod_bigbluebuttonbn.rooms.updateRoom();
+                            clearInterval(pooling);
+                            return;
+                        }
+                    },
+                    failure: function(e) {
+                        payload.message = e.error.message;
                     }
-                    return setTimeout(((function() {
-                        return function() {
-                            M.mod_bigbluebuttonbn.rooms.waitModerator(payload);
-                        };
-                    })(this)), M.mod_bigbluebuttonbn.rooms.pinginterval);
-                },
-                failure: function(e) {
-                    payload.message = e.error.message;
                 }
-            }
-        });
+            });
+        }, this.pinginterval);
     },
 
     join: function(joinUrl) {
