@@ -18,6 +18,7 @@ Feature: room activity only instance
     Then I should see "TestActivity"
     When I follow "TestActivity"
     Then I should see "TestActivity"
-    And "#join_button" "css_element" should be visible
+    And "#bigbluebuttonbn_view_message_box" "css_element" should be visible
+    And "#bigbluebuttonbn_view_action_button_box" "css_element" should be visible
     And I should not see "Recordings"
     And "#bigbluebuttonbn_html_table" "css_element" should not be visible
