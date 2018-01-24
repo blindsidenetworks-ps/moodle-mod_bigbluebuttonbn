@@ -608,7 +608,7 @@ function bigbluebuttonbn_end_meeting_if_running($bigbluebuttonbn) {
 /**
  * Returns user roles in a context.
  *
- * @param object<context> $context
+ * @param object $context
  * @param integer $userid
  *
  * @return array $userroles

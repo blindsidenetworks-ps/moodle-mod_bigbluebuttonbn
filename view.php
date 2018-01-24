@@ -192,7 +192,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
 /**
  * Setup the bbbsession variable that is used all accross the plugin.
  *
- * @param object<context> $context
+ * @param object $context
  * @param integer $userid
  * @return array
  */
