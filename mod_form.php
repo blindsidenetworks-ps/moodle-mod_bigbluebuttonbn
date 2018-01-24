@@ -96,16 +96,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['participant_list'] = $participantlist;
         $jsvars['icons_enabled'] = (boolean)$cfg['recording_icons_enabled'];
         $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
-        if ($cfg['version_major'] < '2016052300') {
-            // Valid before v3.1.
-            $contents = get_string('delete');
-            $options = array('class' => 'btn btn-link icon smallicon',
-                'alt' => $contents,
-                'title' => $contents,
-                'src' => $jsvars['pix_icon_delete']
-              );
-            $jsvars['pix_icon_delete'] = html_writer::tag('img', '', $options);
-        }
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
     }
