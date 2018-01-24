@@ -381,7 +381,7 @@ function bigbluebuttonbn_get_recording_preview_images($preview) {
 /**
  * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
  *
- * @param object $metadata
+ * @param array $metadata
  *
  * @return array
  */
@@ -608,7 +608,7 @@ function bigbluebuttonbn_end_meeting_if_running($bigbluebuttonbn) {
 /**
  * Returns user roles in a context.
  *
- * @param context $context
+ * @param object<context> $context
  * @param integer $userid
  *
  * @return array $userroles

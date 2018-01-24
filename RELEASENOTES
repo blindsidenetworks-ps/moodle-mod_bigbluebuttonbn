@@ -1,5 +1,6 @@
 2.2 (2017101008)
 Bug: Fix for issue with JS not supported by IE11!.
+Bug: Fix for flicking page when waiting for moderator enabled.
 
 2.2 (2017101007)
 Enhancement: Added alert boxed warning message in configuration that is shown when the old cfg global variable is used.
