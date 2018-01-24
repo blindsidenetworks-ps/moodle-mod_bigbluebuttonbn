@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/lib.php');
 
 /** @var BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
 const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
@@ -1960,8 +1961,10 @@ function bigbluebuttonbn_html2text($html, $len = 0) {
  * @return string containing the tags separated by commas
  */
 function bigbluebuttonbn_get_tags($id) {
-    $tagsarray = core_tag_tag::get_item_tags_array('core', 'course_modules', $id);
-    return implode(',', $tagsarray);
+    if (class_exists('core_tag_tag')) {
+        return implode(',', core_tag_tag::get_item_tags_array('core', 'course_modules', $id));
+    }
+    return implode(',', tag_get_tags('bigbluebuttonbn', $id));
 }
 
 /**

@@ -2,6 +2,10 @@ language: php
 
 sudo: required
 
+branches:
+  only:
+    - master
+
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
