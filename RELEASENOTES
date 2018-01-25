@@ -1,3 +1,9 @@
+2.2.1 (2017101009)
+Bug: Fixed issue with voice bridge not accepted when editing the instance
+Bug: Added fa-circle as the default icon for Totara
+Bug: Fixed icon for delete action broken in Participant List
+Bug: Fixed issue with tags not working when class core_tag_tag not defined
+
 2.2 (2017101008)
 Bug: Fix for issue with JS not supported by IE11!.
 Bug: Fix for flicking page when waiting for moderator enabled.
@@ -8,9 +14,9 @@ Enhancement: Added filter for restricting access to links when recordings includ
 Bug: Fix for issue with recording option showing up on 'Room/Activity only' instances.
 
 2.2 (2017101006)
-Bug: Make sure the common settings are wipped out when type is changed to 'recordings only'
+Bug: Make sure the common settings are wiped out when type is changed to 'recordings only'
 Bug: Fixed issue with import recordings not working with postgresql
-Bug: Fixed issue with recordings_imported_enabled not being shownin mod_form
+Bug: Fixed issue with recordings_imported_enabled not being shown in mod_form
 Bug: Fixed issue with filter for recordings when groups enabled
 Bug: Fixed issue with previews shown even with servers not implementing the feature
 Bug: Fixed general warning to be shown only to selected roles
@@ -26,8 +32,8 @@ Hot-Fix: Fix for issue with internal passwords not being generated on instance c
 
 2.2 (2017101003)
 Bug: Fix for issue when using BN servers, Recording name and description could not be edited.
-Bug: Fix for issue with html in the name when multilanguage filter is used.
-Bug: Fix for issue when editing instance the passwords were overriden.
+Bug: Fix for issue with html in the name when multi-language filter is used.
+Bug: Fix for issue when editing instance the passwords were overridden.
 
 2.2 (2017101002)
 Bug: Fix for issues raised in the previous release.
