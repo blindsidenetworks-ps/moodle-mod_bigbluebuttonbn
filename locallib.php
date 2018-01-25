@@ -936,15 +936,19 @@ function bigbluebuttonbn_get_error_key($messagekey, $defaultkey = null) {
  *
  * @return string
  */
-function bigbluebuttonbn_voicebridge_unique($voicebridge) {
+function bigbluebuttonbn_voicebridge_unique($instance, $voicebridge) {
     global $DB;
-    if ($voicebridge != 0) {
-        $select = 'voicebridge = ' . $voicebridge;
-        if ($DB->get_records_select('bigbluebuttonbn', $select)) {
-            return false;
-        }
+    if ($voicebridge == 0) {
+        return true;
     }
-    return true;
+    $select = 'voicebridge = ' . $voicebridge;
+    if ($instance != 0) {
+        $select .= ' AND id <>' . $instance;
+    }
+    if (!$DB->get_records_select('bigbluebuttonbn', $select)) {
+        return true;
+    }
+    return false;
 }
 
 /**

@@ -138,7 +138,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
         }
         if (isset($data['voicebridge'])) {
-            if (!bigbluebuttonbn_voicebridge_unique($data['voicebridge'])) {
+            if (!bigbluebuttonbn_voicebridge_unique($data['instance'], $data['voicebridge'])) {
                 $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
             }
         }
