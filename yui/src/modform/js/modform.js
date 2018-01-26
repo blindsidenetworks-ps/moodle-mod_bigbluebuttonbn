@@ -88,7 +88,7 @@ M.mod_bigbluebuttonbn.modform = {
 
     isFeatureEnabled: function(profileType, feature) {
         var features = this.bigbluebuttonbn.instance_type_profiles[profileType].features;
-        return(features.indexOf(feature) != -1);
+        return (features.indexOf(feature) != -1);
     },
 
     showFieldset: function(id, show) {
