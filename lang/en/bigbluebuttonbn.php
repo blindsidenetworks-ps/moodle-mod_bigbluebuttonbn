@@ -365,7 +365,6 @@ $string['instance_type_default'] = 'Room/Activity with recordings';
 $string['instance_type_room_only'] = 'Room/Activity only';
 $string['instance_type_recording_only'] = 'Recordings only';
 
-$string['email_title_notification_has_been'] = 'has been';
 $string['email_body_notification_meeting_has_been'] = 'has been';
 $string['email_body_notification_meeting_details'] = 'Details';
 $string['email_body_notification_meeting_title'] = 'Title';
