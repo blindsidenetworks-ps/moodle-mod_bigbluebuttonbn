@@ -1483,21 +1483,21 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
-    $visibility = '';
+    $options = array('id' => 'preview-'.$recording['recordID'], 'class' => 'container');
     if ($recording['published'] === 'false') {
-        $visibility = 'hidden ';
+        $options['hidden'] = 'hidden';
     }
-    $recordingpreview = html_writer::start_tag('div',
-        array('id' => 'preview-'.$recording['recordID'], $visibility => $visibility));
+    $recordingpreview = html_writer::start_tag('div', $options);
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
+            $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
             foreach ($playback['preview'] as $image) {
                 $recordingpreview .= html_writer::empty_tag('img',
-                    array('src' => trim($image['url']) . '?' . time(), 'class' => 'thumbnail'));
+                    array('src' => trim($image['url']) . '?' . time(), 'class' => 'thumbnail col-sm'));
             }
-            $recordingpreview .= html_writer::empty_tag('br');
+            $recordingpreview .= html_writer::end_tag('div');
             $recordingpreview .= html_writer::tag('div',
-                get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-muted small'));
+                get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'row text-muted small'));
             break;
         }
     }

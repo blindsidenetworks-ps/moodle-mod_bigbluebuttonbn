@@ -2,4 +2,5 @@ Bug: Fixed issue with voice bridge not accepted when editing the instance
 Bug: Added fa-circle as the default icon for Totara
 Bug: Fixed icon for delete action broken in Participant List
 Bug: Fixed issue with tags not working when class core_tag_tag not defined
-Feature: Recording preview can now be enabled/disabled by configuration
+Bug: Fixed flickering on recording preview
+Feature: Recording preview can now be enabled/disabled by configuration (Updates the db)
