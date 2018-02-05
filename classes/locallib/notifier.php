@@ -72,7 +72,7 @@ class notifier {
      * @return string
      */
     public static function notification_msg_html($msg) {
-        $messagetext = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
+        $messagetext = '<p>'.$msg->activity_type.' "'.$msg->activity_title.'" '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
         $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
             get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
