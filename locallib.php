@@ -1344,7 +1344,7 @@ function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
  * @return boolean
  */
 function bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession) {
-    return ((double)$bbbsession['serverversion'] >= 1.0);
+    return ((double)$bbbsession['serverversion'] >= 1.0 && $bbbsession['bigbluebuttonbn']->recordings_preview == '1');
 }
 
 /**
@@ -2406,6 +2406,10 @@ function bigbluebutonbn_settings_showrecordings(&$renderer) {
             $renderer->render_group_element_checkbox('recordings_imported_default', 0));
         $renderer->render_group_element('recordings_imported_editable',
             $renderer->render_group_element_checkbox('recordings_imported_editable', 1));
+        $renderer->render_group_element('recordings_preview_default',
+            $renderer->render_group_element_checkbox('recordings_preview_default', 1));
+        $renderer->render_group_element('recordings_preview_editable',
+            $renderer->render_group_element_checkbox('recordings_preview_editable', 0));
     }
 }
 

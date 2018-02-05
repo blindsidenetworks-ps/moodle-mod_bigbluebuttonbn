@@ -82,6 +82,8 @@ class config {
             'recordings_deleted_editable' => 'false',
             'recordings_imported_default' => 'false',
             'recordings_imported_editable' => 'false',
+            'recordings_preview_default' => 'true',
+            'recordings_preview_editable' => 'false',
             'recording_default' => 'true',
             'recording_editable' => 'true',
             'recording_icons_enabled' => 'true',
@@ -149,7 +151,7 @@ class config {
      * @return array
      */
     public static function get_options() {
-        return [
+        return array(
                'version_major' => self::get_moodle_version_major(),
                'voicebridge_editable' => self::get('voicebridge_editable'),
                'waitformoderator_default' => self::get('waitformoderator_default'),
@@ -165,6 +167,8 @@ class config {
                'recordings_deleted_editable' => self::get('recordings_deleted_editable'),
                'recordings_imported_default' => self::get('recordings_imported_default'),
                'recordings_imported_editable' => self::get('recordings_imported_editable'),
+               'recordings_preview_default' => self::get('recordings_preview_default'),
+               'recordings_preview_editable' => self::get('recordings_preview_editable'),
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
@@ -173,6 +177,6 @@ class config {
                'general_warning_button_text' => self::get('general_warning_button_text'),
                'general_warning_button_href' => self::get('general_warning_button_href'),
                'general_warning_button_class' => self::get('general_warning_button_class'),
-          ];
+          );
     }
 }
