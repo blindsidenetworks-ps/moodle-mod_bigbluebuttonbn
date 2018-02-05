@@ -101,13 +101,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101000, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2017101008) {
+    if ($oldversion < 2017101009) {
         // Add field recordings_preview.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
             $fielddefinition);
-        upgrade_mod_savepoint(true, 2017101008, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2017101009, 'bigbluebuttonbn');
     }
     return true;
 }
