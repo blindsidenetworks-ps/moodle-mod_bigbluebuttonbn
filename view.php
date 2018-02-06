@@ -318,7 +318,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $output  = '';
     if (bigbluebuttonbn_view_warning_shown($bbbsession)) {
-        $output .= bigbluebuttonbn_view_render_warning(
+        $output .= bigbluebuttonbn_render_warning(
             (string)$cfg['general_warning_message'],
             (string)$cfg['general_warning_box_type'],
             (string)$cfg['general_warning_button_href'],
@@ -338,7 +338,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     } else if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
         $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
-        $output .= bigbluebuttonbn_view_render_warning($recordingsdisabled, 'danger');
+        $output .= bigbluebuttonbn_render_warning($recordingsdisabled, 'danger');
     }
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
@@ -387,60 +387,6 @@ function bigbluebuttonbn_view_warning_shown($bbbsession) {
         }
     }
     return false;
-}
-
-/**
- * Renders the general warning message.
- *
- * @param string $message
- * @param string $type
- * @param string $href
- * @param string $text
- * @param string $class
- *
- * @return string
- */
-function bigbluebuttonbn_view_render_warning($message, $type='info', $href='', $text='', $class='') {
-    global $OUTPUT;
-    $output = "\n";
-    // Evaluates if config_warning is enabled.
-    if (empty($message)) {
-        return $output;
-    }
-    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
-      'bigbluebuttonbn_view_general_warning') . "\n";
-    $output .= '    ' . $message . "\n";
-    $output .= '  <div class="singlebutton">' . "\n";
-    if (!empty($href)) {
-        $output .= bigbluebuttonbn_view_render_warning_button($href, $text, $class);
-    }
-    $output .= '  </div>' . "\n";
-    $output .= $OUTPUT->box_end() . "\n";
-    return $output;
-}
-
-/**
- * Renders the general warning button.
- *
- * @param string $href
- * @param string $text
- * @param string $class
- *
- * @return string
- */
-function bigbluebuttonbn_view_render_warning_button($href, $text = '', $class = '') {
-    if ($text == '') {
-        $text = get_string('ok', 'moodle');
-    }
-    if ($class == '') {
-        $class = 'btn btn-secondary';
-    }
-    $output  = '  <form method="post" action="' . $href . '" class="form-inline">'."\n";
-    $output .= '      <button type="submit" class="' . $class . '"'."\n";
-    $output .= '          title=""'."\n";
-    $output .= '          >' . $text . '</button>'."\n";
-    $output .= '  </form>'."\n";
-    return $output;
 }
 
 /**

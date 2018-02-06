@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 require_once(dirname(__FILE__).'/lib.php');
-require_once(dirname(__FILE__).'/lib.php');
 
 /** @var BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
 const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
@@ -2610,4 +2609,62 @@ function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession
         return false;
     }
     return true;
+}
+
+/**
+ * Renders the general warning message.
+ *
+ * @param string $message
+ * @param string $type
+ * @param string $href
+ * @param string $text
+ * @param string $class
+ *
+ * @return string
+ */
+function bigbluebuttonbn_render_warning($message, $type='info', $href='', $text='', $class='') {
+    global $OUTPUT;
+    $output = "\n";
+    // Evaluates if config_warning is enabled.
+    if (empty($message)) {
+        return $output;
+    }
+    $output .= $OUTPUT->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
+      'bigbluebuttonbn_view_general_warning') . "\n";
+    $output .= '    ' . $message . "\n";
+    $output .= '  <div class="singlebutton pull-right">' . "\n";
+    if (!empty($href)) {
+        $output .= bigbluebuttonbn_render_warning_button($href, $text, $class);
+    }
+    $output .= '  </div>' . "\n";
+    $output .= $OUTPUT->box_end() . "\n";
+    return $output;
+}
+
+/**
+ * Renders the general warning button.
+ *
+ * @param string $href
+ * @param string $text
+ * @param string $class
+ * @param string $title
+ *
+ * @return string
+ */
+function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $title = '') {
+    if ($text == '') {
+        $text = get_string('ok', 'moodle');
+    }
+    if ($title == '') {
+        $title = $text;
+    }
+    if ($class == '') {
+        $class = 'btn btn-secondary';
+    }
+    $output  = '  <form method="post" action="' . $href . '" class="form-inline">'."\n";
+    $output .= '      <button type="submit" class="' . $class . '"'."\n";
+    $output .= '          title="' . $title . '"'."\n";
+    $output .= '          >' . $text . '</button>'."\n";
+    $output .= '  </form>'."\n";
+    return $output;
 }
