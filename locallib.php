@@ -839,11 +839,10 @@ function bigbluebuttonbn_get_participant_selection_data() {
  * @param context $context
  * @param string $participants
  * @param integer $userid
- * @param array $userroles
  *
  * @return boolean
  */
-function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $userroles = null) {
+function bigbluebuttonbn_is_moderator($context, $participants, $userid = null) {
     global $USER;
     if (empty($participants)) {
         // The room that is being used comes from a previous version.
@@ -856,8 +855,9 @@ function bigbluebuttonbn_is_moderator($context, $participants, $userid = null, $
     if (empty($userid)) {
         $userid = $USER->id;
     }
-    if (empty($userroles)) {
-        $userroles = get_user_roles($context, $userid, true);
+    $userroles = bigbluebuttonbn_get_guest_role();
+    if (!isguestuser()) {
+        $userroles = bigbluebuttonbn_get_user_roles($context, $userid);
     }
     return bigbluebuttonbn_is_moderator_validator($participantlist, $userid , $userroles);
 }

@@ -83,7 +83,8 @@ if ($submit === 'end') {
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     // User roles.
-    $moderator = bigbluebuttonbn_is_moderator($context, $bigbluebuttonbn->participants);
+    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+    $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
     $administrator = is_siteadmin();
     if ($moderator || $administrator) {
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
@@ -92,7 +93,8 @@ if ($submit === 'end') {
         if ($g != '0') {
             $meetingid .= '['.$g.']';
         }
-        bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getEndMeetingURL($meetingid));
+
+        bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
         redirect('index.php?id='.$id);
     }
 }
@@ -101,7 +103,8 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
     if ($bigbluebuttonbn->visible) {
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
         // User roles.
-        $moderator = bigbluebuttonbn_is_moderator($context, $bigbluebuttonbn->participants);
+        $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+        $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
         $administrator = is_siteadmin();
         $canmoderate = ($administrator || $moderator);
         // Add a the data for the bigbluebuttonbn instance.
@@ -232,15 +235,15 @@ function bigbluebuttonbn_index_display_room_recordings($meetinginfo) {
 function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
     $actions = '';
     if ($moderator) {
-        $actions .= '<form name="form1" method="post" action="">'.'/n';
-        $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'.'/n';
-        $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'.'/n';
+        $actions .= '<form name="form1" method="post" action="">'."\n";
+        $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'."\n";
+        $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'."\n";
         if ($groupobj != null) {
-            $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'.'/n';
+            $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'."\n";
         }
-        $actions .= '  <INPUT type="submit" name="submit" value="end" onclick="return confirm(\''.
-            get_string('index_confirm_end', 'bigbluebuttonbn').'\')">'.'/n';
-        $actions .= '</form>'.'/n';
+        $actions .= '  <INPUT type="submit" name="submit" value="' . get_string('view_conference_action_end', 'bigbluebuttonbn') .
+            '" class="btn btn-primary btn-sm" onclick="return confirm(\'' . get_string('index_confirm_end', 'bigbluebuttonbn').'\')">'."\n";
+        $actions .= '</form>'."\n";
     }
     return $actions;
 }

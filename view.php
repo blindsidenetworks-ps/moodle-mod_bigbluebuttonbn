@@ -139,12 +139,11 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     // User data.
     $bbbsession['username'] = fullname($USER);
     $bbbsession['userID'] = $USER->id;
-    $bbbsession['roles'] = bigbluebuttonbn_view_bbbsession_roles($context, $USER->id);
     // User roles.
     $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
     $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
     $bbbsession['moderator'] = bigbluebuttonbn_is_moderator(
-        $context, json_encode($participantlist), $bbbsession['userID'], $bbbsession['roles']);
+        $context, json_encode($participantlist), $bbbsession['userID']);
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
         || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
     $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
@@ -187,20 +186,6 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['originServerCommonName'] = '';
     $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
     $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
-}
-
-/**
- * Setup the bbbsession variable that is used all accross the plugin.
- *
- * @param object $context
- * @param integer $userid
- * @return array
- */
-function bigbluebuttonbn_view_bbbsession_roles($context, $userid) {
-    if (isguestuser()) {
-        return bigbluebuttonbn_get_guest_role();
-    }
-    return bigbluebuttonbn_get_user_roles($context, $userid);
 }
 
 /**
