@@ -2318,7 +2318,7 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_general_warning(&$renderer) {
+function bigbluebuttonbn_settings_general_warning(&$renderer) {
     global $BIGBLUEBUTTONBN_CFG;
     if (isset($BIGBLUEBUTTONBN_CFG)) {
         $msg = get_string('config_warning_bigbluebuttonbn_cfg_deprecated', 'bigbluebuttonbn');
@@ -2333,7 +2333,7 @@ function bigbluebutonbn_settings_general_warning(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_general(&$renderer) {
+function bigbluebuttonbn_settings_general(&$renderer) {
     // Configuration for BigBlueButton.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_general_shown()) {
         $renderer->render_group_header('general');
@@ -2351,7 +2351,7 @@ function bigbluebutonbn_settings_general(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_record(&$renderer) {
+function bigbluebuttonbn_settings_record(&$renderer) {
     // Configuration for 'recording' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_record_meeting_shown()) {
         $renderer->render_group_header('recording');
@@ -2371,7 +2371,7 @@ function bigbluebutonbn_settings_record(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_importrecordings(&$renderer) {
+function bigbluebuttonbn_settings_importrecordings(&$renderer) {
     // Configuration for 'import recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_import_recordings_shown()) {
         $renderer->render_group_header('importrecordings');
@@ -2389,7 +2389,7 @@ function bigbluebutonbn_settings_importrecordings(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_showrecordings(&$renderer) {
+function bigbluebuttonbn_settings_showrecordings(&$renderer) {
     // Configuration for 'show recordings' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_show_recordings_shown()) {
         $renderer->render_group_header('recordings');
@@ -2419,7 +2419,7 @@ function bigbluebutonbn_settings_showrecordings(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_waitmoderator(&$renderer) {
+function bigbluebuttonbn_settings_waitmoderator(&$renderer) {
     // Configuration for wait for moderator feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_wait_moderator_shown()) {
         $renderer->render_group_header('waitformoderator');
@@ -2441,7 +2441,7 @@ function bigbluebutonbn_settings_waitmoderator(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_voicebridge(&$renderer) {
+function bigbluebuttonbn_settings_voicebridge(&$renderer) {
     // Configuration for "static voice bridge" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_static_voice_bridge_shown()) {
         $renderer->render_group_header('voicebridge');
@@ -2457,7 +2457,7 @@ function bigbluebutonbn_settings_voicebridge(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_preupload(&$renderer) {
+function bigbluebuttonbn_settings_preupload(&$renderer) {
     // Configuration for "preupload presentation" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_preupload_presentation_shown()) {
         // This feature only works if curl is installed.
@@ -2482,7 +2482,7 @@ function bigbluebutonbn_settings_preupload(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_userlimit(&$renderer) {
+function bigbluebuttonbn_settings_userlimit(&$renderer) {
     // Configuration for "user limit" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_user_limit_shown()) {
         $renderer->render_group_header('userlimit');
@@ -2500,7 +2500,7 @@ function bigbluebutonbn_settings_userlimit(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_duration(&$renderer) {
+function bigbluebuttonbn_settings_duration(&$renderer) {
     // Configuration for "scheduled duration" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_scheduled_duration_shown()) {
         $renderer->render_group_header('scheduled');
@@ -2520,7 +2520,7 @@ function bigbluebutonbn_settings_duration(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_participants(&$renderer) {
+function bigbluebuttonbn_settings_participants(&$renderer) {
     // Configuration for defining the default role/user that will be moderator on new activities.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_moderator_default_shown()) {
         $renderer->render_group_header('participant');
@@ -2541,7 +2541,7 @@ function bigbluebutonbn_settings_participants(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_notifications(&$renderer) {
+function bigbluebuttonbn_settings_notifications(&$renderer) {
     // Configuration for "send notifications" feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_send_notifications_shown()) {
         $renderer->render_group_header('sendnotifications');
@@ -2557,7 +2557,7 @@ function bigbluebutonbn_settings_notifications(&$renderer) {
  *
  * @return void
  */
-function bigbluebutonbn_settings_extended(&$renderer) {
+function bigbluebuttonbn_settings_extended(&$renderer) {
     // Configuration for extended BN capabilities.
     if (!bigbluebuttonbn_is_bn_server()) {
         return;

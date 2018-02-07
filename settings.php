@@ -34,26 +34,26 @@ if ($ADMIN->fulltree) {
     // Configuration for BigBlueButton.
     $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
     // Renders general warning message for settings.
-    bigbluebutonbn_settings_general_warning($renderer);
+    bigbluebuttonbn_settings_general_warning($renderer);
     // Renders general settings.
-    bigbluebutonbn_settings_general($renderer);
+    bigbluebuttonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.
     if (\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
         // Renders settings for record feature.
-        bigbluebutonbn_settings_record($renderer);
+        bigbluebuttonbn_settings_record($renderer);
         // Renders settings for import recordings.
-        bigbluebutonbn_settings_importrecordings($renderer);
+        bigbluebuttonbn_settings_importrecordings($renderer);
         // Renders settings for showing recordings.
-        bigbluebutonbn_settings_showrecordings($renderer);
+        bigbluebuttonbn_settings_showrecordings($renderer);
     }
     // Renders settings for meetings.
-    bigbluebutonbn_settings_waitmoderator($renderer);
-    bigbluebutonbn_settings_voicebridge($renderer);
-    bigbluebutonbn_settings_preupload($renderer);
-    bigbluebutonbn_settings_userlimit($renderer);
-    bigbluebutonbn_settings_duration($renderer);
-    bigbluebutonbn_settings_participants($renderer);
-    bigbluebutonbn_settings_notifications($renderer);
+    bigbluebuttonbn_settings_waitmoderator($renderer);
+    bigbluebuttonbn_settings_voicebridge($renderer);
+    bigbluebuttonbn_settings_preupload($renderer);
+    bigbluebuttonbn_settings_userlimit($renderer);
+    bigbluebuttonbn_settings_duration($renderer);
+    bigbluebuttonbn_settings_participants($renderer);
+    bigbluebuttonbn_settings_notifications($renderer);
     // Renders settings for extended capabilities.
-    bigbluebutonbn_settings_extended($renderer);
+    bigbluebuttonbn_settings_extended($renderer);
 }
