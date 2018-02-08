@@ -71,9 +71,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
         $mform = &$this->_form;
         $jsvars = array();
-        $jsvars['instance_type_room_only'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
-        $jsvars['instance_type_profiles'] = bigbluebuttonbn_get_instance_type_profiles();
-        $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instance_type_profiles']);
+        $jsvars['instanceTypeRoomOnly'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
+        $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles();
+        $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instanceTypeProfiles']);
         // Data for participant selection.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
         // Add block 'General'.
@@ -92,10 +92,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->add_action_buttons();
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-        $jsvars['participant_data'] = bigbluebuttonbn_get_participant_data($context);
-        $jsvars['participant_list'] = $participantlist;
-        $jsvars['icons_enabled'] = (boolean)$cfg['recording_icons_enabled'];
-        $jsvars['pix_icon_delete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+        $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context);
+        $jsvars['participantList'] = $participantlist;
+        $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
+        $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
     }
