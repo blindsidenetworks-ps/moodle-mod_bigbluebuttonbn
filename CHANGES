@@ -3,4 +3,5 @@ Bug: Added fa-circle as the default icon for Totara
 Bug: Fixed icon for delete action broken in Participant List
 Bug: Fixed issue with tags not working when class core_tag_tag not defined
 Bug: Fixed flickering on recording preview
+Bug: Fixed issue with JavaScript for modform not working with participantList in old versions.
 Feature: Recording preview can now be enabled/disabled by configuration (Updates the db)
