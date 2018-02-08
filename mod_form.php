@@ -364,13 +364,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('html', "\n\n");
         // Declare the table.
         $htmltable = new html_table();
-        if ($cfg['version_major'] < '2016052300') {
-            // This is required before v3.1.
-            $htmltable->head  = array('', '', '', '');
-            $htmltable->align = array('left', 'left', 'left', 'left');
-        }
+        $htmltable->align = array('left', 'left', 'left', 'left');
         $htmltable->id = 'participant_list_table';
-        $htmltable->data = array();
+        $htmltable->data = array(array());
         // Render elements for participant list.
         $htmlparticipantlist = html_writer::table($htmltable);
         $mform->addElement('html', "\n\n");

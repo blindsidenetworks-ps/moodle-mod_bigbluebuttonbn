@@ -144,6 +144,7 @@ M.mod_bigbluebuttonbn.modform = {
 
     participantListInit: function() {
         var selectionTypeValue, selectionValue, selectionRole, participantSelectionTypes;
+        this.participantListClear();
         for (var i = 0; i < this.bigbluebuttonbn.participant_list.length; i++) {
             selectionTypeValue = this.bigbluebuttonbn.participant_list[i].selectiontype;
             selectionValue = this.bigbluebuttonbn.participant_list[i].selectionid;
@@ -159,6 +160,15 @@ M.mod_bigbluebuttonbn.modform = {
         }
         // Update in the form.
         this.participantListUpdate();
+    },
+
+    participantListClear: function() {
+        var table, rows;
+        table = document.getElementById('participant_list_table');
+        rows = table.getElementsByTagName('tr');
+        for (var i = rows.length; i > 0; i--) {
+            table.deleteRow(0);
+        }
     },
 
     participantListUpdate: function() {
