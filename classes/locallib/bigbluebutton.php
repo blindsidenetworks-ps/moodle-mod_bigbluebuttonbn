@@ -46,17 +46,39 @@ class bigbluebutton {
      * @return string
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
-        $baseurl = \mod_bigbluebuttonbn\locallib\config::get('server_url').'api/'.$action.'?';
+        $baseurl = bigbluebutton::sanitized_url() . $action . '?';
         $params = '';
-
         foreach ($data as $key => $value) {
-            $params .= '&'.$key.'='.urlencode($value);
+            $params .= '&' . $key . '=' . urlencode($value);
         }
-
         foreach ($metadata as $key => $value) {
-            $params .= '&'.'meta_'.$key.'='.urlencode($value);
+            $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
         }
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . bigbluebutton::sanitized_secret());
+    }
 
-        return $baseurl.$params.'&checksum='.sha1($action.$params.\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+    /**
+     * Makes sure the url used doesn't is in the format required.
+     *
+     * @return string
+     */
+    public static function sanitized_url() {
+        $serverurl = trim(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
+        if (substr($serverurl, -1) == '/') {
+            $serverurl = rtrim($serverurl, '/');
+        }
+        if (substr($serverurl, -4) == '/api') {
+            $serverurl = rtrim($serverurl, '/api');
+        }
+        return $serverurl . '/api/';
+    }
+
+    /**
+     * Makes sure the shared_secret used doesn't have trailing white characters.
+     *
+     * @return string
+     */
+    public static function sanitized_secret() {
+        return trim(\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
     }
 }
