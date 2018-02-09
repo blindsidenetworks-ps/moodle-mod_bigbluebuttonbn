@@ -1,7 +1,7 @@
 .thumbnail {
     float: left;
     height: 51px;
-    padding: 0px 4px 0px 0px;
+    padding: 0 4px 0 0;
     transition: transform .2s; /* Animation */
     width: 66px;
 }
