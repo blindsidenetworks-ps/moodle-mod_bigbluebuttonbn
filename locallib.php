@@ -931,6 +931,7 @@ function bigbluebuttonbn_get_error_key($messagekey, $defaultkey = null) {
 /**
  * Helper evaluates if a voicebridge number is unique.
  *
+ * @param integer $instance
  * @param integer $voicebridge
  *
  * @return string

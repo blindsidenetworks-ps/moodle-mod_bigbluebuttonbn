@@ -46,7 +46,7 @@ class bigbluebutton {
      * @return string
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
-        $baseurl = bigbluebutton::sanitized_url() . $action . '?';
+        $baseurl = self::sanitized_url() . $action . '?';
         $params = '';
         foreach ($data as $key => $value) {
             $params .= '&' . $key . '=' . urlencode($value);
@@ -54,7 +54,7 @@ class bigbluebutton {
         foreach ($metadata as $key => $value) {
             $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
         }
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . bigbluebutton::sanitized_secret());
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 
     /**

@@ -241,8 +241,10 @@ function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigblu
         if ($groupobj != null) {
             $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'."\n";
         }
-        $actions .= '  <INPUT type="submit" name="submit" value="' . get_string('view_conference_action_end', 'bigbluebuttonbn') .
-            '" class="btn btn-primary btn-sm" onclick="return confirm(\'' . get_string('index_confirm_end', 'bigbluebuttonbn').'\')">'."\n";
+        $actions .= '  <INPUT type="submit" name="submit" value="' .
+            get_string('view_conference_action_end', 'bigbluebuttonbn') .
+            '" class="btn btn-primary btn-sm" onclick="return confirm(\'' .
+            get_string('index_confirm_end', 'bigbluebuttonbn') . '\')">' . "\n";
         $actions .= '</form>'."\n";
     }
     return $actions;
