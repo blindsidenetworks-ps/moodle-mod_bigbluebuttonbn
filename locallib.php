@@ -2320,11 +2320,7 @@ function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
  * @return void
  */
 function bigbluebuttonbn_settings_general_warning(&$renderer) {
-    global $BIGBLUEBUTTONBN_CFG;
-    if (isset($BIGBLUEBUTTONBN_CFG)) {
-        $renderer->render_warning_message('general_warning',
-             get_string('config_warning_bigbluebuttonbn_cfg_deprecated', 'bigbluebuttonbn'));
-    }
+    return;
 }
 
 /**
