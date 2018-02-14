@@ -503,17 +503,22 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     }
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
-    $event->name = $bigbluebuttonbn->name;
-    $event->courseid = $bigbluebuttonbn->course;
-    $event->groupid = 0;
-    $event->userid = 0;
-    $event->modulename = 'bigbluebuttonbn';
-    $event->instance = $bigbluebuttonbn->id;
-    $event->timestart = $bigbluebuttonbn->openingtime;
-    $event->durationtime = 0;
+    $event->type        = CALENDAR_EVENT_TYPE_ACTION;
+    $event->name        = $bigbluebuttonbn->name;
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
+    $event->courseid    = $bigbluebuttonbn->course;
+    $event->groupid     = 0;
+    $event->userid      = 0;
+    $event->modulename  = 'bigbluebuttonbn';
+    $event->instance    = $bigbluebuttonbn->id;
+    $event->eventtype   = BIGBLUEBUTTON_EVENT_MEETING_CREATED;
+    $event->timestart   = $bigbluebuttonbn->openingtime;
+    $event->timesort    = $bigbluebuttonbn->openingtime;
+    $event->timeduration = 0;
     if ($bigbluebuttonbn->closingtime) {
-        $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
+        $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
+    $event->durationtime = $event->timeduration;
     $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     if ($event->id) {

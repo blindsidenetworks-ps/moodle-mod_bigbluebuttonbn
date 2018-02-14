@@ -33,6 +33,17 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage recordings';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
+$string['search:activity'] = 'BigBlueButtonBN - activity information';
+$string['modulename'] = 'BigBlueButtonBN';
+$string['modulenameplural'] = 'BigBlueButtonBN';
+$string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
+
+Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
+
+To view later recordings, add a RecordingsBN resource to this course.';
+$string['modulename_link'] = 'BigBlueButtonBN/view';
+$string['pluginadministration'] = 'BigBlueButton administration';
+$string['pluginname'] = 'BigBlueButtonBN';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
@@ -208,20 +219,9 @@ $string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted 
 $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 
-$string['modulename'] = 'BigBlueButtonBN';
-$string['modulenameplural'] = 'BigBlueButtonBN';
-$string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
-
-Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
-
-To view later recordings, add a RecordingsBN resource to this course.';
-$string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
 $string['ends_at'] = 'Ends';
-$string['pluginadministration'] = 'BigBlueButton administration';
-$string['pluginname'] = 'BigBlueButtonBN';
-$string['serverhost'] = 'Server Name';
 $string['view_error_no_group_student'] = 'You have not been enrolled in a group. Please contact your Teacher or the Administrator.';
 $string['view_error_no_group_teacher'] = 'There are no groups configured yet. Please set up groups or contact the Administrator.';
 $string['view_error_no_group'] = 'There are no groups configured yet. Please set up groups before trying to join the meeting.';
