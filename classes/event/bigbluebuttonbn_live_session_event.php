@@ -52,7 +52,7 @@ class bigbluebuttonbn_live_session_event extends base
      * @return string
      */
     public static function get_name() {
-        return 'BigBlueButtonBN live session event';
+        return get_string('event_live_session', 'bigbluebuttonbn');
     }
 
     /**

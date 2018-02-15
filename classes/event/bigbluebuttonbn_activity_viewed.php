@@ -40,7 +40,7 @@ class bigbluebuttonbn_activity_viewed extends base
      * Init method.
      */
     protected function init() {
-        parent::init();
+        parent::init('r', self::LEVEL_PARTICIPATING);
         $this->description = "The user with id '$this->userid' viewed the bigbluebuttonbn activity " .
             "with id '$this->objectid' for the course id '$this->courseid'.";
     }
@@ -51,7 +51,7 @@ class bigbluebuttonbn_activity_viewed extends base
      * @return string
      */
     public static function get_name() {
-        return 'BigBlueButtonBN activity viewed';
+        return get_string('event_activity_viewed', 'bigbluebuttonbn');
     }
 
     /**

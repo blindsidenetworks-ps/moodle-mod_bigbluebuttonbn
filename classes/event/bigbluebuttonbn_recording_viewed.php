@@ -51,7 +51,7 @@ class bigbluebuttonbn_recording_viewed extends base
      * @return string
      */
     public static function get_name() {
-        return 'Recording viewed';
+        return get_string('event_recording_viewed', 'bigbluebuttonbn');
     }
 
     /**

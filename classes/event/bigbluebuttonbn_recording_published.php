@@ -40,7 +40,7 @@ class bigbluebuttonbn_recording_published extends base
      * Init method.
      */
     protected function init() {
-        parent::init();
+        parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '$this->userid' has published a recording with id ".
             "'$this->other' in the course id '$this->contextinstanceid'.";
     }
@@ -51,7 +51,7 @@ class bigbluebuttonbn_recording_published extends base
      * @return string
      */
     public static function get_name() {
-        return 'Recording published';
+        return get_string('event_recording_published', 'bigbluebuttonbn');
     }
 
     /**

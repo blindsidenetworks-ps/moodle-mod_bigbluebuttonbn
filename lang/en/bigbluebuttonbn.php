@@ -348,18 +348,22 @@ $string['view_recording_modal_button'] = 'Apply';
 $string['view_recording_modal_title'] = 'Set values for recording';
 
 $string['event_activity_created'] = 'Activity created';
-$string['event_activity_deleted'] = 'Activity deleted';
-$string['event_activity_modified'] = 'Activity modified';
 $string['event_activity_viewed'] = 'Activity viewed';
-$string['event_activity_viewed_all'] = 'Activity management viewed';
+$string['event_activity_deleted'] = 'Activity deleted';
+$string['event_activity_updated'] = 'Activity updated';
 $string['event_meeting_created'] = 'Meeting created';
 $string['event_meeting_ended'] = 'Meeting forcibly ended';
 $string['event_meeting_joined'] = 'Meeting joined';
 $string['event_meeting_left'] = 'Meeting left';
+$string['event_recording_viewed'] = 'Recording viewed';
+$string['event_recording_edited'] = 'Recording edited';
 $string['event_recording_deleted'] = 'Recording deleted';
 $string['event_recording_imported'] = 'Recording imported';
 $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
+$string['event_recording_protected'] = 'Recording protected';
+$string['event_recording_unprotected'] = 'Recording unprotected';
+$string['event_live_session'] = 'Live session event';
 
 $string['instance_type_default'] = 'Room/Activity with recordings';
 $string['instance_type_room_only'] = 'Room/Activity only';

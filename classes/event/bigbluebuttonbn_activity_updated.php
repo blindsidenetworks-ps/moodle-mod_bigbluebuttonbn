@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn meeting created event.
+ * The mod_bigbluebuttonbn updated event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,30 +28,30 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn meeting created event (triggered by bbb_view.php when the meeting is created before join).
+ * The mod_bigbluebuttonbn activity updated event (triggered by view.php).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_meeting_created extends base
+class bigbluebuttonbn_activity_updated extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init();
-        $this->description = "The user with id '$this->userid' created a bigbluebutton meeting for".
-            "the bigbluebuttonbn activity with id '$this->objectid' for the course id '$this->contextinstanceid'.";
+        parent::init('u', self::LEVEL_OTHER);
+        $this->description = "The user with id '$this->userid' updated the bigbluebuttonbn activity " .
+            "with id '$this->objectid' for the course id '$this->courseid'.";
     }
 
     /**
-     * Return localised event name.
+     * Return event name.
      *
      * @return string
      */
     public static function get_name() {
-        return get_string('event_meeting_created', 'bigbluebuttonbn');
+        return get_string('event_activity_updated', 'bigbluebuttonbn');
     }
 
     /**

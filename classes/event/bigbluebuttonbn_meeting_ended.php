@@ -52,7 +52,7 @@ class bigbluebuttonbn_meeting_ended extends base
      * @return string
      */
     public static function get_name() {
-        return 'BigBlueButtonBN meeting forcibly ended';
+        return get_string('event_meeting_ended', 'bigbluebuttonbn');
     }
 
     /**
