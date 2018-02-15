@@ -1119,7 +1119,7 @@ function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm, $options =
     if (array_key_exists('other', $options)) {
         $eventproperties['other'] = $options['other'];
     }
-    $event = call_user_func_array('\mod_bigbluebuttonbn\event\\'.$eventtype.'::create',
+    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_'.$eventtype.'::create',
       array($eventproperties));
     $event->trigger();
 }
