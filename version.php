@@ -30,5 +30,5 @@ $plugin->version = 2017101009.01;
 $plugin->requires = 2015111610;
 $plugin->cron = 0;
 $plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.2.1';
+$plugin->maturity = MATURITY_ALPHA;
+$plugin->release = '2.3dev';
