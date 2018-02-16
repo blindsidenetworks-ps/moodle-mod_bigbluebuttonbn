@@ -83,7 +83,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add standard elements, common to all modules.
@@ -333,11 +333,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for setting participant roles.
      *
      * @param object $mform
-     * @param array $cfg
      * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $participantlist) {
+    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');

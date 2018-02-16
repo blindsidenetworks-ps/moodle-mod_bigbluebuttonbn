@@ -42,7 +42,8 @@ abstract class activity_base extends \core_analytics\local\indicator\community_o
      * @return string[]
      */
     protected function feedback_viewed_events() {
-        return array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed', '\mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined',
+        return array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed',
+            '\mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined',
             '\mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left');
     }
 

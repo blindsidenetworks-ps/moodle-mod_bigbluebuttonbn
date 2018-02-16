@@ -29,13 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 
 if (class_exists('\core_search\base_activity')) {
     // Default core class for search.
-    abstract class base_activity extends \core_search\base_activity {}
+    abstract class base_activity extends \core_search\base_activity {
+    }
 } else if (class_exists('\core_search\area\base_activity')) {
-    // core class for search in Moodle 3.1.
-    abstract class base_activity extends \core_search\area\base_activity {}
+    // The core class for search in Moodle 3.1.
+    abstract class base_activity extends \core_search\area\base_activity {
+    }
 } else {
     // For bypassing non implemented core class for search (Totara and Moodle 3.0).
-    abstract class base_activity {}
+    abstract class base_activity {
+    }
 }
 
 /**
@@ -45,7 +48,7 @@ if (class_exists('\core_search\base_activity')) {
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity extends \core_search\base_activity {
+class activity extends \mod_bigbluebuttonbn\search\base_activity {
 
     /**
      * Returns true if this area uses file indexing.
