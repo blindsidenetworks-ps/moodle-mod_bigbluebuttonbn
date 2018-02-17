@@ -298,9 +298,9 @@ M.mod_bigbluebuttonbn.recordings = {
             return;
         }
         if (data.action == 'import') {
-          row = Y.one('div#recording-actionbar-' + data.recordingid).ancestor('td').ancestor('tr');
-          row.remove();
-          return;
+            row = Y.one('div#recording-actionbar-' + data.recordingid).ancestor('td').ancestor('tr');
+            row.remove();
+            return;
         }
         if (data.action == 'play') {
             M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
