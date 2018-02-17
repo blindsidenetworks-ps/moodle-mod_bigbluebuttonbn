@@ -21,4 +21,4 @@ Feature: room activity with recordings instance
     And "#bigbluebuttonbn_view_message_box" "css_element" should be visible
     And "#bigbluebuttonbn_view_action_button_box" "css_element" should be visible
     And I should see "Recordings"
-    And "#bigbluebuttonbn_html_table" "css_element" should be visible
+    And "#bigbluebuttonbn_recordings_table" "css_element" should be visible

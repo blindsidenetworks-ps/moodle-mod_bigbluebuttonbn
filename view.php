@@ -318,7 +318,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
     if ($enabledfeatures['showrecordings']) {
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
         $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
+        $output .= html_writer::end_tag('div');
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     } else if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
@@ -344,11 +346,17 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
     }
     $output = '';
     if ($type == BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
-        $output  = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_header'));
+        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        $output .= html_writer::end_tag('div');
     }
     if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_content'));
         $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
         $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
+        $output .= html_writer::end_tag('div');
     }
     return $output;
 }
@@ -449,7 +457,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
-            array('id' => 'bigbluebuttonbn_html_table'));
+            array('id' => 'bigbluebuttonbn_recordings_table'));
     }
     // There are recordings for this meeting.
     // JavaScript variables for recordings.
@@ -467,7 +475,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
             'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
           );
     // Render a YUI table.
-    return html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
+    return html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
 }
 
 /**
@@ -489,7 +497,7 @@ function bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures) {
               'class' => 'btn btn-secondary',
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.
                   $bbbsession['bigbluebuttonbn']->id.'\''));
-    $output  = html_writer::start_tag('br');
+    $output  = html_writer::empty_tag('br');
     $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
     $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
     return $output;

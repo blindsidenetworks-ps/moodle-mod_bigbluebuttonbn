@@ -1932,10 +1932,10 @@ function bigbluebuttonbn_output_recording_table($bbbsession, $recordings, $tools
     if (!isset($table) || !isset($table->data)) {
         // Render a table with "No recordings".
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
-            array('id' => 'bigbluebuttonbn_html_table'));
+            array('id' => 'bigbluebuttonbn_recordings_table'));
     }
     // Render the table.
-    return html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_html_table'));
+    return html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_recordings_table'));
 }
 
 /**
