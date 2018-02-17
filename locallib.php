@@ -42,40 +42,26 @@ const BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY = 2;
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 /** @var BIGBLUEBUTTONBN_ROLE_MODERATOR string defines the bigbluebutton moderator role */
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
-/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_CREATED string defines the bigbluebuttonbn activity_created event */
-const BIGBLUEBUTTON_EVENT_ACTIVITY_CREATED = 'activity_created';
-/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED string defines the bigbluebuttonbn activity_viewed event */
-const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
-/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_UPDATED string defines the bigbluebuttonbn activity_updated event */
-const BIGBLUEBUTTON_EVENT_ACTIVITY_UPDATED = 'activity_updated';
-/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_DELETED string defines the bigbluebuttonbn activity_deleted event */
-const BIGBLUEBUTTON_EVENT_ACTIVITY_DELETED = 'activity_deleted';
-/** @var BIGBLUEBUTTON_EVENT_MEETING_CREATED string defines the bigbluebuttonbn meeting_created event */
-const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
-/** @var BIGBLUEBUTTON_EVENT_MEETING_ENDED string defines the bigbluebuttonbn meeting_ended event */
-const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
-/** @var BIGBLUEBUTTON_EVENT_MEETING_JOINED string defines the bigbluebuttonbn meeting_joined event */
-const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
-/** @var BIGBLUEBUTTON_EVENT_MEETING_LEFT string defines the bigbluebuttonbn meeting_left event */
-const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_DELETED string defines the bigbluebuttonbn recording_deleted event */
-const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED string defines the bigbluebuttonbn recording_imported event */
-const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED string defines the bigbluebuttonbn recording_protected event */
-const BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED = 'recording_protected';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED string defines the bigbluebuttonbn recording_published event */
-const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED string defines the bigbluebuttonbn recording_unprotected event */
-const BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED = 'recording_unprotected';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED string defines the bigbluebuttonbn recording_unpublished event */
-const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_EDITED string defines the bigbluebuttonbn recording_edited event */
-const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
-/** @var BIGBLUEBUTTON_EVENT_RECORDING_VIEWED string defines the bigbluebuttonbn recording_viewed event */
-const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
-/** @var BIGBLUEBUTTON_EVENT_LIVE_SESSION string defines the bigbluebuttonbn live_session event */
-const BIGBLUEBUTTON_EVENT_LIVE_SESSION = 'live_session';
+/** @var BIGBLUEBUTTONBN_EVENTS array defines the bigbluebuttonbn events */
+const BIGBLUEBUTTONBN_EVENTS = array(
+    'create' => 'activity_created',
+    'view' => 'activity_viewed',
+    'update' => 'activity_updated',
+    'delete' => 'activity_deleted',
+    'meeting_create' => 'meeting_created',
+    'meeting_end' => 'meeting_ended',
+    'meeting_join' => 'meeting_joined',
+    'meeting_left' => 'meeting_left',
+    'recording_delete' => 'recording_deleted',
+    'recording_import' => 'recording_imported',
+    'recording_protect' => 'recording_protected',
+    'recording_publish' => 'recording_published',
+    'recording_unprotect' => 'recording_unprotected',
+    'recording_unpublish' => 'recording_unpublished',
+    'recording_edit' => 'recording_edited',
+    'recording_play' => 'recording_viewed',
+    'live_session' => 'live_session'
+);
 
 /**
  * Register a bigbluebuttonbn event
@@ -1039,60 +1025,6 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
 }
 
 /**
- * Helper returns an array with all possible bigbluebuttonbn events.
- *
- * @return array
- */
-function bigbluebuttonbn_events() {
-    return array(
-        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_CREATED,
-        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED,
-        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_UPDATED,
-        (string) BIGBLUEBUTTON_EVENT_ACTIVITY_DELETED,
-        (string) BIGBLUEBUTTON_EVENT_MEETING_CREATED,
-        (string) BIGBLUEBUTTON_EVENT_MEETING_ENDED,
-        (string) BIGBLUEBUTTON_EVENT_MEETING_JOINED,
-        (string) BIGBLUEBUTTON_EVENT_MEETING_LEFT,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_DELETED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED,
-        (string) BIGBLUEBUTTON_EVENT_RECORDING_VIEWED,
-        (string) BIGBLUEBUTTON_EVENT_LIVE_SESSION
-    );
-}
-
-/**
- * Helper returns an array with the actions and their corresponding bigbluebuttonbn events.
- *
- * @return array
- */
-function bigbluebuttonbn_events_action() {
-    return array(
-        'create' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_CREATED,
-        'view' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED,
-        'update' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_UPDATED,
-        'delete' => (string) BIGBLUEBUTTON_EVENT_ACTIVITY_DELETED,
-        'meeting_create' => (string) BIGBLUEBUTTON_EVENT_MEETING_CREATED,
-        'meeting_end' => (string) BIGBLUEBUTTON_EVENT_MEETING_ENDED,
-        'meeting_join' => (string) BIGBLUEBUTTON_EVENT_MEETING_JOINED,
-        'meeting_left' => (string) BIGBLUEBUTTON_EVENT_MEETING_LEFT,
-        'recording_delete' => (string) BIGBLUEBUTTON_EVENT_RECORDING_DELETED,
-        'recording_import' => (string) BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED,
-        'recording_protect' => (string) BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED,
-        'recording_publish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED,
-        'recording_unprotect' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED,
-        'recording_unpublish' => (string) BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED,
-        'recording_edit' => (string) BIGBLUEBUTTON_EVENT_RECORDING_EDITED,
-        'recording_play' => (string) BIGBLUEBUTTON_EVENT_RECORDING_VIEWED,
-        'live_action' => (string) BIGBLUEBUTTON_EVENT_LIVE_SESSION
-    );
-}
-
-/**
  * Helper register a bigbluebuttonbn event.
  *
  * @param string $eventtype
@@ -1102,13 +1034,13 @@ function bigbluebuttonbn_events_action() {
  *
  * @return void
  */
-function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm, $options = []) {
-    $events = bigbluebuttonbn_events();
-    if (!in_array($eventtype, $events)) {
+function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $options = []) {
+    if (!in_array($eventtype, BIGBLUEBUTTONBN_EVENTS)) {
         // No log will be created.
         return;
     }
-    $context = context_module::instance($cm->id);
+    $viewinstance = bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbn->id);
+    $context = context_module::instance($viewinstance['cm']->id);
     $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
     if (array_key_exists('timecreated', $options)) {
         $eventproperties['timecreated'] = $options['timecreated'];

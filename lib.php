@@ -137,6 +137,8 @@ function bigbluebuttonbn_add_instance($data) {
     $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
     // Complete the process.
     bigbluebuttonbn_process_post_save($data);
+    // Log action performed.
+    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['create'], $data);
     return $data->id;
 }
 
@@ -159,6 +161,8 @@ function bigbluebuttonbn_update_instance($data) {
     $DB->update_record('bigbluebuttonbn', $data);
     // Complete the process.
     bigbluebuttonbn_process_post_save($data);
+    // Log action performed.
+    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['update'], $data);
     return true;
 }
 
@@ -187,6 +191,7 @@ function bigbluebuttonbn_delete_instance($id) {
         return false;
     }
     // Log action performed.
+    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['delete'], $bigbluebuttonbn);
     return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
 }
 
@@ -503,7 +508,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->userid      = 0;
     $event->modulename  = 'bigbluebuttonbn';
     $event->instance    = $bigbluebuttonbn->id;
-    $event->eventtype   = BIGBLUEBUTTON_EVENT_MEETING_CREATED;
+    $event->eventtype   = BIGBLUEBUTTONBN_EVENTS['meeting_create'];
     $event->timestart   = $bigbluebuttonbn->openingtime;
     $event->timesort    = $bigbluebuttonbn->openingtime;
     $event->timeduration = 0;
