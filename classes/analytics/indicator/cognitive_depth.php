@@ -43,7 +43,7 @@ class cognitive_depth extends activity_base {
      *
      * @return object
      */
-    public static function get_name() {
+    public static function get_name() : \lang_string{
         return new \lang_string('indicator:cognitivedepth', 'mod_bigbluebuttonbn');
     }
 

@@ -33,7 +33,10 @@ $string['bigbluebuttonbn:join'] = 'Join a meeting';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage recordings';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['search:activity'] = 'BigBlueButtonBN - activity information';
+$string['indicator:cognitivedepth'] = 'BigBlueButtonBN cognitive';
+$string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a BigBlueButtonBN activity.';
+$string['indicator:socialbreadth'] = 'BigBlueButtonBN social';
+$string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in a BigBlueButtonBN activity.';
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
@@ -44,6 +47,7 @@ To view later recordings, add a RecordingsBN resource to this course.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
+$string['search:activity'] = 'BigBlueButtonBN - activity information';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
