@@ -41,8 +41,8 @@ class bigbluebuttonbn_meeting_ended extends base
     protected function init() {
         parent::init();
         $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-            "'$this->objectid' for the course id '$this->contextinstanceid' has been forcibly ".
-            "ended by the user with id '$this->userid'.";
+            "'##objectid' for the course id '##contextinstanceid' has been forcibly ".
+            "ended by the user with id '##userid'.";
     }
 
     /**

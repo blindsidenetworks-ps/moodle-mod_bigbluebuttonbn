@@ -40,8 +40,8 @@ class bigbluebuttonbn_recording_imported extends base
      */
     protected function init() {
         parent::init();
-        $this->description = "The user with id '$this->userid' has imported a recording with id ".
-            "'$this->other' in the course id '$this->contextinstanceid'.";
+        $this->description = "The user with id '##userid' has imported a recording with id ".
+            "'##other' in the course id '##contextinstanceid'.";
     }
 
     /**

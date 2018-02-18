@@ -40,9 +40,9 @@ class bigbluebuttonbn_live_session_event extends base
      */
     protected function init() {
         parent::init();
-        $this->description = "The user with id '$this->userid' triggered action $this->other in a ".
+        $this->description = "The user with id '##userid' triggered action ##other in a ".
         "bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-        "'$this->objectid' for the course id '$this->contextinstanceid'.";
+        "'##objectid' for the course id '##contextinstanceid'.";
     }
 
     /**

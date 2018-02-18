@@ -40,8 +40,8 @@ class bigbluebuttonbn_activity_management_viewed extends base
      */
     protected function init() {
         parent::init();
-        $this->description = "The user with id '$this->userid' viewed the bigbluebuttonbn activity management page for ".
-        "the course module id '$this->contextinstanceid'.";
+        $this->description = "The user with id '##userid' viewed the bigbluebuttonbn activity management page for ".
+        "the course module id '##contextinstanceid'.";
     }
 
     /**
