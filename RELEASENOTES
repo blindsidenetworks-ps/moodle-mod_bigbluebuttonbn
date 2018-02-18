@@ -1,3 +1,6 @@
+2.2.2 (2017101010)
+Bug: Fixed issue with events not being properly described.
+
 2.2.1 (2017101009)
 Bug: Fixed issue with voice bridge not accepted when editing the instance.
 Bug: Added fa-circle as the default icon for Totara.

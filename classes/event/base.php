@@ -83,7 +83,7 @@ abstract class base extends \core\event\base {
           );
         $string = $this->description;
         foreach ($vars as $key => $value) {
-          $string = str_replace("##" . $key, $value, $string);
+            $string = str_replace("##" . $key, $value, $string);
         }
         return $string;
     }

@@ -4,7 +4,7 @@ sudo: required
 
 branches:
   only:
-    - master
+    - v2.2-stable
 
 addons:
   firefox: "47.0.1"
