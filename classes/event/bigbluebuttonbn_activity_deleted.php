@@ -41,8 +41,8 @@ class bigbluebuttonbn_activity_deleted extends base
      */
     protected function init() {
         parent::init('d', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' deleted the bigbluebuttonbn activity " .
-            "with id '$this->objectid' for the course id '$this->courseid'.";
+        $this->description = "The user with id '##userid' deleted the bigbluebuttonbn activity " .
+            "with id '##objectid' for the course id '##courseid'.";
     }
 
     /**

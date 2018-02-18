@@ -75,7 +75,18 @@ abstract class base extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return $this->description;
+        $vars = array(
+            'userid' => $this->userid,
+            'courseid' => $this->courseid,
+            'objectid' => $this->objectid,
+            'contextinstanceid' => $this->contextinstanceid,
+            'other' => $this->other
+          );
+        $string = $this->description;
+        foreach ($vars as $key => $value) {
+            $string = str_replace("##" . $key, $value, $string);
+        }
+        return $string;
     }
 
     /**

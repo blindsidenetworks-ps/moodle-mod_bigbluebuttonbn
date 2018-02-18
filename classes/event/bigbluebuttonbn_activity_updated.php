@@ -41,8 +41,8 @@ class bigbluebuttonbn_activity_updated extends base
      */
     protected function init() {
         parent::init('u', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' updated the bigbluebuttonbn activity " .
-            "with id '$this->objectid' for the course id '$this->courseid'.";
+        $this->description = "The user with id '##userid' updated the bigbluebuttonbn activity " .
+            "with id '##objectid' for the course id '##courseid'.";
     }
 
     /**

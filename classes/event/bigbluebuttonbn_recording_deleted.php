@@ -41,8 +41,8 @@ class bigbluebuttonbn_recording_deleted extends base
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' has deleted a recording with id ".
-            "'$this->other' from the course id '$this->contextinstanceid'.";
+        $this->description = "The user with id '##userid' has deleted a recording with id ".
+            "'##other' from the course id '##contextinstanceid'.";
     }
 
     /**
