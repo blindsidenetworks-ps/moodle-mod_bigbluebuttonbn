@@ -120,26 +120,25 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $data  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn  An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
-function bigbluebuttonbn_add_instance($data) {
+function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($data);
+    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
     // Insert a record.
-    $data->id = $DB->insert_record('bigbluebuttonbn', $data);
+    $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
-    $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+    $meetingid = bigbluebuttonbn_encode_meetingid($bigbluebuttonbn->id);
     // Set the meetingid column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
     // Complete the process.
-    bigbluebuttonbn_process_post_save($data);
+    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     // Log action performed.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['create'], $data);
-    return $data->id;
+    return $bigbluebuttonbn->id;
 }
 
 /**
@@ -147,22 +146,22 @@ function bigbluebuttonbn_add_instance($data) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $data  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn  An object from the form in mod_form.php
  * @return bool Success/Fail
  */
-function bigbluebuttonbn_update_instance($data) {
+function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($data);
+    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $data->id = $data->instance;
-    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
+    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
     // Update a record.
-    $DB->update_record('bigbluebuttonbn', $data);
+    $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Complete the process.
-    bigbluebuttonbn_process_post_save($data);
+    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     // Log action performed.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['update'], $data);
+    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['update'], $bigbluebuttonbn);
     return true;
 }
 
@@ -466,6 +465,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
     bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
+    bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn);
 }
 
 /**
@@ -526,6 +526,15 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     calendar_event::create($event);
 }
 
+function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
+    if (!empty($bigbluebuttonbn->completionexpected)) {
+        \core_completion\api::update_completion_date_event(
+            $bigbluebuttonbn->coursemodule,
+            'bigbluebuttonbn',
+            $bigbluebuttonbn->id, $bigbluebuttonbn->completionexpected
+          );
+    }
+}
 /**
  * Get a full path to the file attached as a preuploaded presentation
  * or if there is none, set the presentation field will be set to blank.

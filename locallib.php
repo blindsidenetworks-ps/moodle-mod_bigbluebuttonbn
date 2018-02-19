@@ -1029,18 +1029,19 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
  *
  * @param string $eventtype
  * @param object $bigbluebuttonbn
- * @param object $cm
  * @param array $options
  *
  * @return void
  */
 function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $options = []) {
+    global $DB;
     if (!in_array($eventtype, BIGBLUEBUTTONBN_EVENTS)) {
         // No log will be created.
         return;
     }
-    $viewinstance = bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbn->id);
-    $context = context_module::instance($viewinstance['cm']->id);
+    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
     $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
     if (array_key_exists('timecreated', $options)) {
         $eventproperties['timecreated'] = $options['timecreated'];
@@ -1051,7 +1052,7 @@ function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $options = []) 
     if (array_key_exists('other', $options)) {
         $eventproperties['other'] = $options['other'];
     }
-    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_'.$eventtype.'::create',
+    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_' . $eventtype . '::create',
       array($eventproperties));
     $event->trigger();
 }
