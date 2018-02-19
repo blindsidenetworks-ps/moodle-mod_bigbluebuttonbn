@@ -38,30 +38,30 @@ env:
 
 matrix:
   include:
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.4
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.4
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.5
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.5
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.4
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.4
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.5
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.5
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    #- php: 5.6
+    #  env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
 
 before_install:
   - phpenv config-rm xdebug.ini
