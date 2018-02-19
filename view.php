@@ -44,7 +44,7 @@ require_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
 
-bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['view'], $bigbluebuttonbn);
+bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
 // Additional info related to the course.
 $bbbsession['course'] = $course;

@@ -42,26 +42,6 @@ const BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY = 2;
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 /** @var BIGBLUEBUTTONBN_ROLE_MODERATOR string defines the bigbluebutton moderator role */
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
-/** @var BIGBLUEBUTTONBN_EVENTS array defines the bigbluebuttonbn events */
-const BIGBLUEBUTTONBN_EVENTS = array(
-    'create' => 'activity_created',
-    'view' => 'activity_viewed',
-    'update' => 'activity_updated',
-    'delete' => 'activity_deleted',
-    'meeting_create' => 'meeting_created',
-    'meeting_end' => 'meeting_ended',
-    'meeting_join' => 'meeting_joined',
-    'meeting_left' => 'meeting_left',
-    'recording_delete' => 'recording_deleted',
-    'recording_import' => 'recording_imported',
-    'recording_protect' => 'recording_protected',
-    'recording_publish' => 'recording_published',
-    'recording_unprotect' => 'recording_unprotected',
-    'recording_unpublish' => 'recording_unpublished',
-    'recording_edit' => 'recording_edited',
-    'recording_play' => 'recording_viewed',
-    'live_session' => 'live_session'
-);
 
 /**
  * Register a bigbluebuttonbn event
@@ -1035,7 +1015,7 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
  */
 function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $options = []) {
     global $DB;
-    if (!in_array($eventtype, BIGBLUEBUTTONBN_EVENTS)) {
+    if (!in_array($eventtype, \mod_bigbluebuttonbn\event\events::$events)) {
         // No log will be created.
         return;
     }

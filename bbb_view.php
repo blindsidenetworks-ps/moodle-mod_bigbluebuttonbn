@@ -71,7 +71,7 @@ switch (strtolower($action)) {
             break;
         }
         // Moodle event logger: Create an event for meeting left.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['meeting_left'], $bigbluebuttonbn);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_left'], $bigbluebuttonbn);
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Close the tab or window where BBB was opened.
@@ -131,7 +131,7 @@ switch (strtolower($action)) {
             break;
         }
         // Moodle event logger: Create an event for meeting created.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['meeting_create'], $bigbluebuttonbn);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
         // Internal logger: Insert a record with the meeting created.
         bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
         // Since the meeting is already running, we just join the session.
@@ -140,7 +140,7 @@ switch (strtolower($action)) {
     case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
         // Moodle event logger: Create an event for meeting left.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['recording_play'], $bigbluebuttonbn, ['other' => $rid]);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn, ['other' => $rid]);
         // Execute the redirect.
         header('Location: '.urldecode($href));
         break;
@@ -326,7 +326,7 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID']);
     // Moodle event logger: Create an event for meeting joined.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['meeting_join'], $bigbluebuttonbn);
+    bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.
     bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_JOIN);
     // Before executing the redirect, increment the number of participants.

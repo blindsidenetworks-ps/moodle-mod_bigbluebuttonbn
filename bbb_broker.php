@@ -234,7 +234,7 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
     bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
     // Moodle event logger: Create an event for meeting ended.
     if (isset($bbbsession['bigbluebuttonbn'])) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['meeting_end'], $bbbsession['bigbluebuttonbn']);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bbbsession['bigbluebuttonbn']);
     }
     // Update the cache.
     bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_UPDATE_CACHE);
@@ -375,7 +375,7 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     $action = strtolower($params['action']);
     // Excecute action.
-    $eventlog = BIGBLUEBUTTONBN_EVENTS[$action];
+    $eventlog = \mod_bigbluebuttonbn\event\events::$events[$action];
     $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings);
     if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
@@ -694,7 +694,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
     if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['recording_import'], $bbbsession['bigbluebuttonbn'],
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_import'], $bbbsession['bigbluebuttonbn'],
             ['other' => $params['id']]);
     }
     $callbackresponsedata = json_encode($callbackresponse);
@@ -732,7 +732,7 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
     try {
         foreach ($decodedparameters->events as $event) {
             $options = ['timecreated' => $event->timestamp, 'userid' => $event->user, 'other' => $event->event];
-            bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['live_session'], $bigbluebuttonbn, $options);
+            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['live_session'], $bigbluebuttonbn, $options);
         }
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {

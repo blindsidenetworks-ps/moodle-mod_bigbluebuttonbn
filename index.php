@@ -87,7 +87,7 @@ if ($submit === 'end') {
     $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
     $administrator = is_siteadmin();
     if ($moderator || $administrator) {
-        bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['meeting_end'], $bigbluebuttonbn);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
         echo get_string('index_ending', 'bigbluebuttonbn');
         $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
         if ($g != '0') {
