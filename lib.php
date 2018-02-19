@@ -161,7 +161,6 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     // Complete the process.
     bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     // Log action performed.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['update'], $bigbluebuttonbn);
     return true;
 }
 
@@ -190,7 +189,6 @@ function bigbluebuttonbn_delete_instance($id) {
         return false;
     }
     // Log action performed.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTONBN_EVENTS['delete'], $bigbluebuttonbn);
     return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
 }
 
