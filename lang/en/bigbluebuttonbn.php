@@ -29,9 +29,9 @@ $string['activityoverview'] = 'You have upcoming bigbluebuttonbn sessions';
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
 $string['bbbdurationwarning'] = 'The maximum duration for this session is %duration% minutes.';
 $string['bbbrecordwarning'] = 'This session may be recorded.';
-$string['bigbluebuttonbn:join'] = 'Join a meeting';
-$string['bigbluebuttonbn:managerecordings'] = 'Manage recordings';
-$string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
+$string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activity';
+$string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
+$string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 
 $string['config_general'] = 'General configuration';
