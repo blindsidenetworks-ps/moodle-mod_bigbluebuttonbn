@@ -1840,10 +1840,6 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    // Users with recording management priviledges can see all of them.
-    if ($bbbsession['managerecordings']) {
-        return true;
-    }
     // Exclude unpublished recordings.
     if ($recording['published'] != 'true') {
         return false;
