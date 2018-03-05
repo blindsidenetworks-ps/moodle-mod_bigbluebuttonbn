@@ -299,17 +299,11 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     // JavaScript variables.
     $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
         'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
-    // Renders general warning when configured.
-    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $output  = '';
-    if (bigbluebuttonbn_view_warning_shown($bbbsession)) {
-        $output .= bigbluebuttonbn_render_warning(
-            (string)$cfg['general_warning_message'],
-            (string)$cfg['general_warning_box_type'],
-            (string)$cfg['general_warning_button_href'],
-            (string)$cfg['general_warning_button_text'],
-            (string)$cfg['general_warning_button_class']);
-    }
+    // Renders warning messages when configured.
+    $output .= bigbluebuttonbn_view_warning_default_server($bbbsession);
+    $output .= bigbluebuttonbn_view_warning_general($bbbsession);
+    // Renders the rest of the page.
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
     if ($enabledfeatures['showroom']) {
@@ -539,4 +533,41 @@ function bigbluebuttonbn_verify_passwords(&$bigbluebuttonbn) {
         // Store passwords in the database.
         $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     }
+}
+
+/**
+ * Renders a default server warning message when using test-install.
+ *
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
+    if (!is_siteadmin($bbbsession['userID'])) {
+        return '';
+    }
+    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+        return '';
+    }
+    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
+}
+
+/**
+ * Renders a general warning message when it is configured.
+ *
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_warning_general(&$bbbsession) {
+    if (!bigbluebuttonbn_view_warning_shown($bbbsession)) {
+        return '';
+    }
+    return bigbluebuttonbn_render_warning(
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_message'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_box_type'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_href'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_text'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_class')
+      );
 }
