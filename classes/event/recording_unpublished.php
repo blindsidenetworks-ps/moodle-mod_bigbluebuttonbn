@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording imported event.
+ * The mod_bigbluebuttonbn recording unpublished event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,20 +28,20 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording imported event (triggered when a recording is imported).
+ * The mod_bigbluebuttonbn recording unpublished event (triggered when a recording is unpublished).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_imported extends base
+class recording_unpublished extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' has imported a recording with id ".
+        $this->description = "The user with id '##userid' has unpublished a recording with id ".
             "'##other' in the course id '##courseid'.";
     }
 
@@ -51,7 +51,7 @@ class bigbluebuttonbn_recording_imported extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_imported', 'bigbluebuttonbn');
+        return get_string('event_recording_unpublished', 'bigbluebuttonbn');
     }
 
     /**

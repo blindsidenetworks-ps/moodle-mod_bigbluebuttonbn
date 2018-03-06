@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording unprotected event.
+ * The mod_bigbluebuttonbn recording viewed event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,21 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording unprotected event (triggered when a recording is unprotected).
+ * The mod_bigbluebuttonbn recording viewed event (triggered when a recording is viewed).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_unprotected extends base
+class recording_viewed extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' has unprotected a recording with id ".
-            "'##other' in the course id '##courseid'.";
+        $this->description = "The user with id '##userid' has viewed a recording with id ".
+            "'##other' from the course id '##courseid'.";
     }
 
     /**
@@ -51,7 +51,7 @@ class bigbluebuttonbn_recording_unprotected extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_unprotected', 'bigbluebuttonbn');
+        return get_string('event_recording_viewed', 'bigbluebuttonbn');
     }
 
     /**

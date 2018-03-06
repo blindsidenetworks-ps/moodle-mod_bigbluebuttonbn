@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_deleted extends base
+class recording_deleted extends base
 {
     /**
      * Init method.

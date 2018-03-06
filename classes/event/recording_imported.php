@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn live session event.
+ * The mod_bigbluebuttonbn recording imported event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,22 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn live_session (Experimental: for being triggered when external events are received).
+ * The mod_bigbluebuttonbn recording imported event (triggered when a recording is imported).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_live_session_event extends base
+class recording_imported extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' triggered action ##other in a ".
-        "bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-        "'##objectid' for the course id '##courseid'.";
+        $this->description = "The user with id '##userid' has imported a recording with id ".
+            "'##other' in the course id '##courseid'.";
     }
 
     /**
@@ -52,7 +51,7 @@ class bigbluebuttonbn_live_session_event extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_live_session', 'bigbluebuttonbn');
+        return get_string('event_recording_imported', 'bigbluebuttonbn');
     }
 
     /**

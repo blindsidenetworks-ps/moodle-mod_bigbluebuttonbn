@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording viewed event.
+ * The mod_bigbluebuttonbn meeting ended event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,21 +28,22 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording viewed event (triggered when a recording is viewed).
+ * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_viewed extends base
+class meeting_ended extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' has viewed a recording with id ".
-            "'##other' from the course id '##courseid'.";
+        $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
+            "'##objectid' for the course id '##courseid' has been forcibly ".
+            "ended by the user with id '##userid'.";
     }
 
     /**
@@ -51,7 +52,7 @@ class bigbluebuttonbn_recording_viewed extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_viewed', 'bigbluebuttonbn');
+        return get_string('event_meeting_ended', 'bigbluebuttonbn');
     }
 
     /**

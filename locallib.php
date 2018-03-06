@@ -1009,7 +1009,7 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
  *
  * @param string $type
  * @param object $bigbluebuttonbn
- * @param array $options
+ * @param array $options [timecreated, userid, other]
  *
  * @return void
  */
@@ -1032,7 +1032,7 @@ function bigbluebuttonbn_event_log($type, $bigbluebuttonbn, $options = []) {
     if (array_key_exists('other', $options)) {
         $params['other'] = $options['other'];
     }
-    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_' . $type . '::create',
+    $event = call_user_func_array('\mod_bigbluebuttonbn\event\\' . $type . '::create',
         array($params));
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
