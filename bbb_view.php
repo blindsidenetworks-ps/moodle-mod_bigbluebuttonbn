@@ -140,7 +140,8 @@ switch (strtolower($action)) {
     case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
         // Moodle event logger: Create an event for meeting left.
-        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn, ['other' => $rid]);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn,
+            ['other' => $rid]);
         // Execute the redirect.
         header('Location: '.urldecode($href));
         break;

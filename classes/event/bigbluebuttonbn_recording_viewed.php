@@ -42,7 +42,7 @@ class bigbluebuttonbn_recording_viewed extends base
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '##userid' has viewed a recording with id ".
-            "'##other' from the course id '##contextinstanceid'.";
+            "'##other' from the course id '##courseid'.";
     }
 
     /**

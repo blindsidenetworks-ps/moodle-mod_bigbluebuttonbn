@@ -42,7 +42,7 @@ class bigbluebuttonbn_recording_published extends base
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '##userid' has published a recording with id ".
-            "'##other' in the course id '##contextinstanceid'.";
+            "'##other' in the course id '##courseid'.";
     }
 
     /**

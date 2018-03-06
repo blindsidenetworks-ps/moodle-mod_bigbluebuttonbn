@@ -138,7 +138,6 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
     // Complete the process.
     bigbluebuttonbn_process_post_save($bigbluebuttonbn);
-    // Log action performed.
     return $bigbluebuttonbn->id;
 }
 
@@ -161,7 +160,6 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Complete the process.
     bigbluebuttonbn_process_post_save($bigbluebuttonbn);
-    // Log action performed.
     return true;
 }
 

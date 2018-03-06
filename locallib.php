@@ -1007,33 +1007,36 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
 /**
  * Helper register a bigbluebuttonbn event.
  *
- * @param string $eventtype
+ * @param string $type
  * @param object $bigbluebuttonbn
  * @param array $options
  *
  * @return void
  */
-function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $options = []) {
+function bigbluebuttonbn_event_log($type, $bigbluebuttonbn, $options = []) {
     global $DB;
-    if (!in_array($eventtype, \mod_bigbluebuttonbn\event\events::$events)) {
+    if (!in_array($type, \mod_bigbluebuttonbn\event\events::$events)) {
         // No log will be created.
         return;
     }
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
-    $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
+    $params = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
     if (array_key_exists('timecreated', $options)) {
-        $eventproperties['timecreated'] = $options['timecreated'];
+        $params['timecreated'] = $options['timecreated'];
     }
     if (array_key_exists('userid', $options)) {
-        $eventproperties['userid'] = $options['userid'];
+        $params['userid'] = $options['userid'];
     }
     if (array_key_exists('other', $options)) {
-        $eventproperties['other'] = $options['other'];
+        $params['other'] = $options['other'];
     }
-    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_' . $eventtype . '::create',
-      array($eventproperties));
+    $event = call_user_func_array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_' . $type . '::create',
+        array($params));
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
     $event->trigger();
 }
 

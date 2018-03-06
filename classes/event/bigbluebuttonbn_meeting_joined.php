@@ -43,7 +43,7 @@ class bigbluebuttonbn_meeting_joined extends base
         parent::init('r', self::LEVEL_PARTICIPATING);
         $this->description = "The user with id '##userid' has joined a bigbluebutton meeting for ".
             "the bigbluebuttonbn activity with id '##objectid' for the course id ".
-            "'##contextinstanceid'.";
+            "'##courseid'.";
     }
 
     /**

@@ -42,7 +42,7 @@ class bigbluebuttonbn_meeting_created extends base
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '##userid' created a bigbluebutton meeting for ".
-            "the bigbluebuttonbn activity with id '##objectid' for the course id '##contextinstanceid'.";
+            "the bigbluebuttonbn activity with id '##objectid' for the course id '##courseid'.";
     }
 
     /**

@@ -43,7 +43,7 @@ class bigbluebuttonbn_live_session_event extends base
         parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '##userid' triggered action ##other in a ".
         "bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-        "'##objectid' for the course id '##contextinstanceid'.";
+        "'##objectid' for the course id '##courseid'.";
     }
 
     /**

@@ -377,11 +377,11 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
 
     $action = strtolower($params['action']);
     // Excecute action.
-    $eventlog = \mod_bigbluebuttonbn\event\events::$events[$action];
     $callbackresponse = bigbluebuttonbn_broker_recording_action_perform($action, $params, $recordings);
     if ($callbackresponse['status']) {
         // Moodle event logger: Create an event for action performed on recording.
-        bigbluebuttonbn_event_log($eventlog, $bbbsession['bigbluebuttonbn'], ['other' => $params['id']]);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events[$action], $bbbsession['bigbluebuttonbn'],
+            ['other' => $params['id']]);
     }
     $callbackresponsedata = json_encode($callbackresponse);
     return "{$params['callback']}({$callbackresponsedata});";
@@ -733,8 +733,8 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
     // Store the events.
     try {
         foreach ($decodedparameters->events as $event) {
-            $options = ['timecreated' => $event->timestamp, 'userid' => $event->user, 'other' => $event->event];
-            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['live_session'], $bigbluebuttonbn, $options);
+            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['live_session'], $bigbluebuttonbn,
+                ['timecreated' => $event->timestamp, 'userid' => $event->user, 'other' => $event->event]);
         }
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {

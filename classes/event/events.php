@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn locallib/bigbluebutton.
+ * The mod_bigbluebuttonbn event/events.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
- * Wrapper for executing http requests on a BigBlueButton server.
+ * The mod_bigbluebuttonbn class for event name definition.
  *
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -55,8 +55,4 @@ class events {
         'recording_play' => 'recording_viewed',
         'live_session' => 'live_session'
     );
-
-    public static function get_event($key) {
-        return (string)self::$events[$key];
-    }
 }
