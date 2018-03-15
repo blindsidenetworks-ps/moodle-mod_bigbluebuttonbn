@@ -2192,12 +2192,12 @@ function bigbluebuttonbn_get_localcode() {
  *
  * @return array
  */
-function bigbluebuttonbn_views_validator($id, $bigbluebuttonbnid) {
+function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
     if ($id) {
-        return bigbluebuttonbn_views_instance_id($id);
+        return bigbluebuttonbn_view_instance_id($id);
     }
     if ($bigbluebuttonbnid) {
-        return bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid);
+        return bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
     }
     return;
 }
@@ -2209,7 +2209,7 @@ function bigbluebuttonbn_views_validator($id, $bigbluebuttonbnid) {
  *
  * @return array
  */
-function bigbluebuttonbn_views_instance_id($id) {
+function bigbluebuttonbn_view_instance_id($id) {
     global $DB;
     $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -2224,7 +2224,7 @@ function bigbluebuttonbn_views_instance_id($id) {
  *
  * @return array
  */
-function bigbluebuttonbn_views_instance_bigbluebuttonbn($bigbluebuttonbnid) {
+function bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
     global $DB;
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);

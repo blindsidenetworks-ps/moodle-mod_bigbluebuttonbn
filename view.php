@@ -28,10 +28,10 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 $id = required_param('id', PARAM_INT);
-$bn = optional_param('n', 0, PARAM_INT);
+$bn = optional_param('bn', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 
-$viewinstance = bigbluebuttonbn_views_validator($id, $bn);
+$viewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$viewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
@@ -39,10 +39,9 @@ if (!$viewinstance) {
 $cm = $viewinstance['cm'];
 $course = $viewinstance['course'];
 $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
+$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
-
-$context = context_module::instance($cm->id);
 
 bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 

@@ -35,7 +35,7 @@ $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 
-$bbbviewinstance = bigbluebuttonbn_views_validator($id, $bn);
+$bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
