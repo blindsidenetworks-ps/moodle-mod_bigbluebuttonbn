@@ -227,14 +227,11 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         return;
     }
     // Separate or visible group mode.
-    $groups = groups_get_all_groups($bbbsession['course']->id);
+    $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
     if (empty($groups)) {
         // No groups in this course.
         bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'), 'info', true);
         return;
-    }
-    if ($groupmode == SEPARATEGROUPS) {
-        $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
     }
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
     $groupname = get_string('allparticipants');
@@ -249,11 +246,10 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info');
         return;
     }
-    if (count($groups) == 1) {
-        // There is only one group and the user has access to it.
-        return;
+    $context = context_module::instance($bbbsession['cm']->id);
+    if (has_capability('moodle/site:accessallgroups', $context)) {
+        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'));
     }
-    bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'));
     $urltoroot = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id;
     groups_print_activity_menu($bbbsession['cm'], $urltoroot);
     echo '<br><br>';
