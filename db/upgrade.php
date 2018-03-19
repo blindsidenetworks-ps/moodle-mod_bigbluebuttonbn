@@ -114,13 +114,11 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2017101010) {
         // Fix for CONTRIB-7221.
         if ($oldversion == 2017101003) {
-            /**
-             * A bug intorduced in 2017101003 causes new instances to be created without moderator/attendee passwords.
-             * A work around was put in place in version 2017101004 that was relabeled to 2017101005, however,
-             * the new code was removed in version 2017101010 as this portion of code was added to upgrade. That introduced
-             * a new edge case. There is now a timeout error when the plugin is upgraded in realy large Moodle sites.
-             * The script should only be considered when migrating from this version.
-             */
+            // A bug intorduced in 2017101003 causes new instances to be created without BBB passwords.
+            // A workaround was put in place in version 2017101004 that was relabeled to 2017101005.
+            // However, as the code was relocated to upgrade.php in version 2017101010, a new issue came up.
+            // There is now a timeout error when the plugin is upgraded in large Moodle sites.
+            // The script should only be considered when migrating from this version.
             $sql  = "SELECT * FROM {bigbluebuttonbn} ";
             $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
             $instances = $DB->get_records_sql($sql, array('', ''));
