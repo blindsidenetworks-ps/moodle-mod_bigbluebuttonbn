@@ -18,8 +18,8 @@
  * Class for the structure used for restore BigBlueButtonBN.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
@@ -29,8 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Define all the restore steps that will be used by the restore_url_activity_task.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step
 {

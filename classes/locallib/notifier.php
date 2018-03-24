@@ -32,8 +32,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 /**
  * Helper class for sending notifications.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class notifier {
     /**
@@ -72,7 +72,7 @@ class notifier {
      * @return string
      */
     public static function notification_msg_html($msg) {
-        $messagetext = '<p>'.$msg->activity_type.' &quot;'.$msg->activity_title.'&quot; '.
+        $messagetext = '<p>'.$msg->activity_type.' "'.$msg->activity_title.'" '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
         $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
             get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";

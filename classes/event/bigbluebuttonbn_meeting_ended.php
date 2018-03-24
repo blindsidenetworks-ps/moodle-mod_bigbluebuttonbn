@@ -18,8 +18,8 @@
  * The mod_bigbluebuttonbn meeting ended event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -30,8 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class bigbluebuttonbn_meeting_ended extends base
 {
@@ -51,7 +52,7 @@ class bigbluebuttonbn_meeting_ended extends base
      * @return string
      */
     public static function get_name() {
-        return 'BigBlueButtonBN meeting forcibly ended';
+        return get_string('event_meeting_ended', 'bigbluebuttonbn');
     }
 
     /**

@@ -18,8 +18,8 @@
  * The mod_bigbluebuttonbn recording published event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -30,8 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_bigbluebuttonbn recording published event (triggered when a recording is published).
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class bigbluebuttonbn_recording_published extends base
 {
@@ -39,7 +40,7 @@ class bigbluebuttonbn_recording_published extends base
      * Init method.
      */
     protected function init() {
-        parent::init();
+        parent::init('r', self::LEVEL_OTHER);
         $this->description = "The user with id '$this->userid' has published a recording with id ".
             "'$this->other' in the course id '$this->contextinstanceid'.";
     }
@@ -50,7 +51,7 @@ class bigbluebuttonbn_recording_published extends base
      * @return string
      */
     public static function get_name() {
-        return 'Recording published';
+        return get_string('event_recording_published', 'bigbluebuttonbn');
     }
 
     /**

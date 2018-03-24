@@ -15,20 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * View and administrate BigBlueButton playback recordings.
+ * Cognitive depth indicator - BigBlueButtonBN.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
+
+namespace mod_bigbluebuttonbn\analytics\indicator;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Custom uninstallation procedure.
+ * Cognitive depth indicator - bigbluebuttonbn.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-function xmldb_bigbluebuttonbn_uninstall() {
-    return true;
+class cognitive_depth extends activity_base {
+
+    /**
+     * Returns the name.
+     *
+     * If there is a corresponding '_help' string this will be shown as well.
+     *
+     * @return object
+     */
+    public static function get_name() {
+        return new \lang_string('indicator:cognitivedepth', 'mod_bigbluebuttonbn');
+    }
+
+    public function get_indicator_type() {
+        return self::INDICATOR_COGNITIVE;
+    }
+
+    public function get_cognitive_depth_level(\cm_info $cm) {
+        return self::COGNITIVE_LEVEL_4;
+    }
 }

@@ -1,24 +1,21 @@
 .thumbnail {
-    height: 51px;
-    padding: 4px;
-    width: 66px;
     float: left;
+    height: 51px;
+    padding: 0 4px 0 0;
+    transition: transform .2s; /* Animation */
+    width: 66px;
 }
 
 .thumbnail:hover {
-    display: inline-block;
-    height: auto;
-    position: absolute;
-    width: auto;
-    z-index: 99999;
+    transform: scale(2.0); /* (200% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
 }
 
 .fa-disabled {
-    opacity: 0.2;
     cursor: not-allowed;
+    opacity: 0.2;
 }
 
 .fa-invisible {
-    visibility: hidden;
     cursor: not-allowed;
+    visibility: hidden;
 }

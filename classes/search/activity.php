@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn meeting created event.
+ * Search area for mod_bigbluebuttonbn activities.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -23,43 +23,39 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\event;
+namespace mod_bigbluebuttonbn\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+if (class_exists('\core_search\base_activity')) {
+    // Default core class for search.
+    abstract class base_activity extends \core_search\base_activity {
+    }
+} else if (class_exists('\core_search\area\base_activity')) {
+    // The core class for search in Moodle 3.1.
+    abstract class base_activity extends \core_search\area\base_activity {
+    }
+} else {
+    // For bypassing non implemented core class for search (Totara and Moodle 3.0).
+    abstract class base_activity {
+    }
+}
+
 /**
- * The mod_bigbluebuttonbn meeting created event (triggered by bbb_view.php when the meeting is created before join).
+ * Search area for mod_bigbluebuttonbn activities.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_meeting_created extends base
-{
-    /**
-     * Init method.
-     */
-    protected function init() {
-        parent::init();
-        $this->description = "The user with id '$this->userid' created a bigbluebutton meeting for".
-            "the bigbluebuttonbn activity with id '$this->objectid' for the course id '$this->contextinstanceid'.";
-    }
+class activity extends \mod_bigbluebuttonbn\search\base_activity {
 
     /**
-     * Return localised event name.
+     * Returns true if this area uses file indexing.
      *
-     * @return string
+     * @return bool
      */
-    public static function get_name() {
-        return get_string('event_meeting_created', 'bigbluebuttonbn');
-    }
-
-    /**
-     * Return objectid mapping.
-     *
-     * @return string
-     */
-    public static function get_objectid_mapping() {
-        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+    public function uses_file_indexing() {
+        return true;
     }
 }

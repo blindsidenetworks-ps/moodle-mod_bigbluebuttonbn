@@ -18,8 +18,8 @@
  * The mod_bigbluebuttonbn locallib/bigbluebutton.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -32,8 +32,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 /**
  * Wrapper for executing http requests on a BigBlueButton server.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class bigbluebutton {
 
@@ -46,17 +46,39 @@ class bigbluebutton {
      * @return string
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
-        $baseurl = \mod_bigbluebuttonbn\locallib\config::get('server_url').'api/'.$action.'?';
+        $baseurl = self::sanitized_url() . $action . '?';
         $params = '';
-
         foreach ($data as $key => $value) {
-            $params .= '&'.$key.'='.urlencode($value);
+            $params .= '&' . $key . '=' . urlencode($value);
         }
-
         foreach ($metadata as $key => $value) {
-            $params .= '&'.'meta_'.$key.'='.urlencode($value);
+            $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
         }
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
+    }
 
-        return $baseurl.$params.'&checksum='.sha1($action.$params.\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+    /**
+     * Makes sure the url used doesn't is in the format required.
+     *
+     * @return string
+     */
+    public static function sanitized_url() {
+        $serverurl = trim(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
+        if (substr($serverurl, -1) == '/') {
+            $serverurl = rtrim($serverurl, '/');
+        }
+        if (substr($serverurl, -4) == '/api') {
+            $serverurl = rtrim($serverurl, '/api');
+        }
+        return $serverurl . '/api/';
+    }
+
+    /**
+     * Makes sure the shared_secret used doesn't have trailing white characters.
+     *
+     * @return string
+     */
+    public static function sanitized_secret() {
+        return trim(\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
     }
 }

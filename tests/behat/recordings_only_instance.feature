@@ -20,4 +20,4 @@ Feature: recordings only instance
     Then I should see "TestActivity"
     And "#bigbluebuttonbn_view_message_box" "css_element" should not be visible
     And "#bigbluebuttonbn_view_action_button_box" "css_element" should not be visible
-    And "#bigbluebuttonbn_html_table" "css_element" should be visible
+    And "#bigbluebuttonbn_recordings_table" "css_element" should be visible

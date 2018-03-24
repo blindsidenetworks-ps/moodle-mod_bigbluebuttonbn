@@ -18,8 +18,8 @@
  * Configuration file for bigbluebuttonbn.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -258,6 +258,18 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * capability can be enabled/disabled by the user creating or editing the resource for recordings.
  * $CFG->bigbluebuttonbn['recordings_imported_editable'] = 1;
  */
+
+ /*
+  * When the value is set to 1 (checked) the bigbluebuttonbn resources
+  * will show the recodings with thumbnails.
+  * $CFG->bigbluebuttonbn['recordings_preview_default'] = 1;
+  */
+
+  /*
+   * When the value is set to 1 (checked) the 'preview ui' capability can be
+   * enabled/disabled by the user creating or editing the resource.
+   * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
+   */
 
 /*
  *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS

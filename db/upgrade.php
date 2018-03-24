@@ -18,8 +18,8 @@
  * Upgrade logic.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -101,6 +101,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101000, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2017101009) {
+        // Add field recordings_preview.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
+            $fielddefinition);
+        upgrade_mod_savepoint(true, 2017101009, 'bigbluebuttonbn');
+    }
     return true;
 }
 
@@ -110,7 +118,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
  * @param   object    $dbman
  * @param   string    $tablename
  * @param   string    $fieldname
- * @param   array    $fielddefinition
+ * @param   array     $fielddefinition
  */
 function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
     $table = new xmldb_table($tablename);

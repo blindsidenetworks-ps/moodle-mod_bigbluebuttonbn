@@ -18,8 +18,8 @@
  * Library calls for Moodle and BigBlueButton.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -31,6 +31,7 @@ global $CFG;
 require_once($CFG->dirroot.'/calendar/lib.php');
 require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/mod/lti/OAuth.php');
+require_once($CFG->dirroot.'/tag/lib.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/datalib.php');
@@ -38,6 +39,7 @@ require_once($CFG->libdir.'/coursecatlib.php');
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
+
 
 if (file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
     require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
@@ -49,14 +51,6 @@ if (!isset($CFG->bigbluebuttonbn)) {
 
 if (file_exists(dirname(__FILE__).'/config.php')) {
     require_once(dirname(__FILE__).'/config.php');
-    // Old BigBlueButtonBN cfg schema. For backward compatibility.
-    global $BIGBLUEBUTTONBN_CFG;
-    if (isset($BIGBLUEBUTTONBN_CFG)) {
-        foreach ((array) $BIGBLUEBUTTONBN_CFG as $key => $value) {
-            $cfgkey = str_replace("bigbluebuttonbn_", "", $key);
-            $CFG->bigbluebuttonbn[$cfgkey] = $value;
-        }
-    }
 }
 
 /*
@@ -435,6 +429,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->recordings_imported)) {
         $bigbluebuttonbn->recordings_imported = 0;
     }
+    if (!isset($bigbluebuttonbn->recordings_preview)) {
+        $bigbluebuttonbn->recordings_preview = 0;
+    }
 }
 
 /**
@@ -498,17 +495,22 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     }
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
-    $event->name = $bigbluebuttonbn->name;
-    $event->courseid = $bigbluebuttonbn->course;
-    $event->groupid = 0;
-    $event->userid = 0;
-    $event->modulename = 'bigbluebuttonbn';
-    $event->instance = $bigbluebuttonbn->id;
-    $event->timestart = $bigbluebuttonbn->openingtime;
-    $event->durationtime = 0;
+    $event->type        = CALENDAR_EVENT_TYPE_ACTION;
+    $event->name        = $bigbluebuttonbn->name;
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
+    $event->courseid    = $bigbluebuttonbn->course;
+    $event->groupid     = 0;
+    $event->userid      = 0;
+    $event->modulename  = 'bigbluebuttonbn';
+    $event->instance    = $bigbluebuttonbn->id;
+    $event->eventtype   = BIGBLUEBUTTON_EVENT_MEETING_CREATED;
+    $event->timestart   = $bigbluebuttonbn->openingtime;
+    $event->timesort    = $bigbluebuttonbn->openingtime;
+    $event->timeduration = 0;
     if ($bigbluebuttonbn->closingtime) {
-        $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
+        $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
+    $event->durationtime = $event->timeduration;
     $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     if ($event->id) {
@@ -669,6 +671,78 @@ function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
     return $areas;
+}
+
+/**
+ * Mark the activity completed (if required) and trigger the course_module_viewed event.
+ *
+ * @param  stdClass $bigbluebuttonbn        bigbluebuttonbn object
+ * @param  stdClass $course     course object
+ * @param  stdClass $cm         course module object
+ * @param  stdClass $context    context object
+ * @since Moodle 3.0
+ */
+function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
+
+    // Trigger course_module_viewed event.
+    $params = array(
+        'context' => $context,
+        'objectid' => $bigbluebuttonbn->id
+    );
+
+    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($params);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
+    $event->trigger();
+
+    // Completion.
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
+    return $updates;
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
+                                                       \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \mod_bigbluebuttonbn('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
 }
 
 /**

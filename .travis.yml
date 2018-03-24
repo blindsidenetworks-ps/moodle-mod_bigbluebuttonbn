@@ -1,14 +1,18 @@
 language: php
 
-sudo: false
+sudo: required
+
+branches:
+  only:
+    - master
 
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
   apt:
     packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
+      - oracle-java9-installer
+      - oracle-java9-set-default
 
 cache:
   directories:
@@ -61,29 +65,13 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  #- nvm install node 8.9.0
-  ## Install node manually as is broken since Nov 1, 2017
-  - sudo apt-get install -y build-essential libssl-dev curl
-  - curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
-  - bash install_nvm.sh
-  - source ~/.profile
-  - nvm install 8.9.0
-  - nvm alias default 8.9.0
-  - nvm use default
   - cd ../..
   ## Standard script
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^${MOODLE_PLUGIN_CI}
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  ### Custom script for bypassing codechecker failing due BIGBLUEBUTTONBN_CFG
-  ##- git clone https://github.com/jfederico/moodle-plugin-ci.git ci
-  ##- cd ci
-  ##- composer config repositories.moodle-plugin-ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-plugin-ci", "no-api":true}'
-  ##- composer config repositories.moodle-local-codechecker '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_codechecker", "no-api":true}'
-  ##- composer config repositories.moodle-local_ci '{"type":"vcs", "url":"https://github.com/jfederico/moodle-local_ci", "no-api":true}'
-  ##- composer require --prefer-dist moodlehq/moodle-local_ci:dev-master#279e6b521f16c55b22ffff4ca00726ef291ee3e2
-  ##- composer require --prefer-dist moodlehq/moodle-local_codechecker:dev-master#4f32c02e6d6b19be7431fd33ea175d2f93929387
-  ##- cd ..
+  ## Workaround for bypassing codechecker error due the use of BIGBLUEBUTTON_CFG
+  - sudo sed -i "s/'MNET_REMOTE_CLIENT',/'MNET_REMOTE_CLIENT', 'BIGBLUEBUTTONBN_CFG',/g" "$(grep -rl MNET_REMOTE_CLIENT ./ci/vendor)"
 
 install:
   - moodle-plugin-ci install
@@ -92,19 +80,15 @@ script:
   - moodle-plugin-ci phplint
   - moodle-plugin-ci phpcpd
   - moodle-plugin-ci phpmd
-  #- moodle-plugin-ci codechecker ## Failing due BIGBLUEBUTTONBN_CFG
+  - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   # Specific for version 1
-  - 'if [ ${MOODLE_PLUGIN_CI} = "1" ]; then
-        moodle-plugin-ci csslint;
-        moodle-plugin-ci shifter;
-        moodle-plugin-ci jshint;
-     fi'
+  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci csslint; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci shifter; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci jshint; fi
   # Specific for version 2
-  - 'if [ ${MOODLE_PLUGIN_CI} = "2" ]; then
-        moodle-plugin-ci savepoints;
-        moodle-plugin-ci mustache;
-        moodle-plugin-ci grunt;
-        moodle-plugin-ci behat;
-     fi'
+  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci savepoints; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci mustache; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci grunt; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi

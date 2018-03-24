@@ -18,8 +18,8 @@
  * Intermediator for managing actions executed by the BigBlueButton server.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -602,9 +602,7 @@ function bigbluebuttonbn_broker_recording_action_delete($params, $recordings) {
     }
     // Second: Execute the actual delete.
     return array(
-        'status' => bigbluebuttonbn_delete_recordings(
-            $params['id']
-        )
+        'status' => bigbluebuttonbn_delete_recordings($params['id'])
       );
 }
 
