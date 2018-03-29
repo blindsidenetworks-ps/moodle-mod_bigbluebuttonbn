@@ -1840,8 +1840,8 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-    // Exclude unpublished recordings.
-    if ($recording['published'] != 'true') {
+    // Exclude unpublished recordings, only if user has no rights to manage them.
+    if ($recording['published'] != 'true' && !$bbbsession['managerecordings']) {
         return false;
     }
     // Imported recordings are always shown as long as they are published.
