@@ -9,10 +9,6 @@ branches:
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
-  apt:
-    packages:
-      - oracle-java9-installer
-      - oracle-java9-set-default
 
 cache:
   directories:
