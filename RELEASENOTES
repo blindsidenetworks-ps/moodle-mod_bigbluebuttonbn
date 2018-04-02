@@ -1,3 +1,8 @@
+2.2.3 (2017101011)
+Bug: Fixed issue with Groups not working properly in BigBlueButtonBN (CONTRIB-7220).
+Bug: Fixed issue with Time out when migrating from 2.1.14 to 2.2.2 (CONTRIB-7221).
+Bug: Fixed issue with When recordings are unpublished they disappear (CONTRIB-7234).
+
 2.2.2 (2017101010)
 Bug: Fixed issue with YUI datatable not deleting recordings correctly.
 Bug: Fixed issue with events not being properly described.

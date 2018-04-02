@@ -1,7 +1,3 @@
-Bug: Fixed issue with YUI datatable not deleting recordings correctly.
-Bug: Fixed issue with events not being properly described.
-Bug: Fixed issue with guest users not being able to view or use rooms.
-Bug: Fixed issue with thumbnails overriding a css class on Essential theme.
-Bug: Fixed issue with separated groups showing all the recordings when the user is allowed to manage them.
-Feature: Show a warning message to administrators when using the BBB server pre-configured by default.
-DB migration: Fix issue with internal passwords that may have not been generated on instance creation.
+Bug: Fixed issue with Groups not working properly in BigBlueButtonBN (CONTRIB-7220)
+Bug: Fixed issue with Time out when migrating from 2.1.14 to 2.2.2 (CONTRIB-7221)
+Bug: Fixed issue with When recordings are unpublished they disappear (CONTRIB-7234)
