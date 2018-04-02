@@ -112,14 +112,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2017101009, 'bigbluebuttonbn');
     }
     if ($oldversion < 2017101010) {
-        $sql  = "SELECT * FROM {bigbluebuttonbn} ";
-        $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
-        $instances = $DB->get_records_sql($sql, array('', ''));
-        foreach ($instances as $instance) {
-            $instance->moderatorpass = bigbluebuttonbn_random_password(12);
-            $instance->viewerpass = bigbluebuttonbn_random_password(12, $instance->moderatorpass);
-            // Store passwords in the database.
-            $DB->update_record('bigbluebuttonbn', $instance);
+        // Fix for CONTRIB-7221.
+        if ($oldversion == 2017101003) {
+            // A bug intorduced in 2017101003 causes new instances to be created without BBB passwords.
+            // A workaround was put in place in version 2017101004 that was relabeled to 2017101005.
+            // However, as the code was relocated to upgrade.php in version 2017101010, a new issue came up.
+            // There is now a timeout error when the plugin is upgraded in large Moodle sites.
+            // The script should only be considered when migrating from this version.
+            $sql  = "SELECT * FROM {bigbluebuttonbn} ";
+            $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
+            $instances = $DB->get_records_sql($sql, array('', ''));
+            foreach ($instances as $instance) {
+                $instance->moderatorpass = bigbluebuttonbn_random_password(12);
+                $instance->viewerpass = bigbluebuttonbn_random_password(12, $instance->moderatorpass);
+                // Store passwords in the database.
+                $DB->update_record('bigbluebuttonbn', $instance);
+            }
         }
         upgrade_mod_savepoint(true, 2017101010, 'bigbluebuttonbn');
     }
