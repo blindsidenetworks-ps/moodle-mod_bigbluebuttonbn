@@ -705,7 +705,7 @@ function bigbluebuttonbn_get_roles_select(context $context = null) {
  */
 function bigbluebuttonbn_get_role($id) {
     $roles = (array) role_get_names();
-    if (is_numeric($id)) {
+    if (is_numeric($id) && isset($roles[$id])) {
         return (object)$roles[$id];
     }
     foreach ($roles as $role) {
@@ -904,7 +904,7 @@ function bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $user
     }
     // Looks for roles.
     $role = bigbluebuttonbn_get_role($participant->selectionid);
-    if (array_key_exists($role->id, $userroles)) {
+    if ($role != null && array_key_exists($role->id, $userroles)) {
         return true;
     }
     return false;
