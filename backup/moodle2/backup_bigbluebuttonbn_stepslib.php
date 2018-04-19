@@ -41,6 +41,9 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
      */
     protected function define_structure() {
 
+        // To know if we are including userinfo.
+        $userinfo = $this->get_setting_value('userinfo');
+
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
                             'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
@@ -61,7 +64,11 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define sources.
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
-        $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+
+        // This source definition only happen if we are including user info
+        if ($userinfo) {
+            $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+        }
 
         // Define id annotations.
         $log->annotate_ids('user', 'userid');
