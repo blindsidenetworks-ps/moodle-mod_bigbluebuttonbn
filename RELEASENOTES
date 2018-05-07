@@ -1,3 +1,7 @@
+2.2.4 (2017101012)
+Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).
+Bug: Fixed issue with recordings are accessible from copied activities (CONTRIB-7118).
+
 2.2.3 (2017101011)
 Bug: Fixed issue with Groups not working properly in BigBlueButtonBN (CONTRIB-7220).
 Bug: Fixed issue with Time out when migrating from 2.1.14 to 2.2.2 (CONTRIB-7221).
