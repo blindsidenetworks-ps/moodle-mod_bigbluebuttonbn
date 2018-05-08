@@ -79,7 +79,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggleSpinningWheelOffCompatible(link);
+            this.toggleSpinningWheelOffCompatible(link.one('> img'));
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -90,8 +90,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggleSpinningWheelOffCompatible: function(link) {
-        var button = link.one('> img');
+    toggleSpinningWheelOffCompatible: function(button) {
         if (button === null) {
             // Button doesn't have an icon.
             return;
@@ -129,11 +128,14 @@ M.mod_bigbluebuttonbn.helpers = {
     },
 
     updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
-        var buttondatasrc;
-        buttondatasrc = button.getAttribute('data-src').replace(this.capitalize(action), this.capitalize(buttondatatag));
+        if (button === null) {
+            // Button doesn't have an icon.
+            return;
+        }
+        var buttondatasrc = button.getAttribute('data-src');
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
-        button.setAttribute('data-src', buttondatasrc);
+        button.setAttribute('data-src', buttondatasrc.replace(buttondatatag, action));
     },
 
     updateId: function(data) {

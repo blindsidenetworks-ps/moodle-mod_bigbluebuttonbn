@@ -219,7 +219,7 @@ M.mod_bigbluebuttonbn.recordings = {
         nodeelement.setAttribute('data-action', 'edit');
         nodeelement.setAttribute('data-goalstate', text);
         nodeelement.hide();
-        M.mod_bigbluebuttonbn.recordings.recordingUpdate(nodeelement.getDOMNode());
+        this.recordingUpdate(nodeelement.getDOMNode());
         node.one('> span').setHTML(text).show();
         node.one('> a').show();
     },
@@ -321,7 +321,7 @@ M.mod_bigbluebuttonbn.recordings = {
         alert.show();
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
-            M.mod_bigbluebuttonbn.recordings.recordingEditCompletion(data, true);
+            this.recordingEditCompletion(data, true);
         }
     },
 
