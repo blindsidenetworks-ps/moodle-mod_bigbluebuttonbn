@@ -1,6 +1,9 @@
 2.2.4 (2017101012)
 Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).
 Bug: Fixed issue with recordings are accessible from copied activities (CONTRIB-7118).
+Bug: Fixed issue with edit name or description of an recording under firefox (CONTRIB-7279).
+Bug: Fixed issue with Hide/Show images not changing when publishing unpublishing recordings (CONTRIB-7297).
+Bug: Fixed issue when preview is disabled, on publish/unpublish recordings js fails (CONTRIB-7298).
 
 2.2.3 (2017101011)
 Bug: Fixed issue with Groups not working properly in BigBlueButtonBN (CONTRIB-7220).
