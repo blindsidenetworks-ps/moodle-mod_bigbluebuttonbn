@@ -204,8 +204,8 @@ M.mod_bigbluebuttonbn.helpers = {
         return actions;
     },
 
-    reloadPreview: function(data) {
-        var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
+    reloadPreview: function(recordingid) {
+        var thumbnails = Y.one('#preview-' + recordingid).all('> img');
         thumbnails.each(function(thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');
             thumbnailsrc = thumbnailsrc.substring(0, thumbnailsrc.indexOf('?'));
