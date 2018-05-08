@@ -187,41 +187,43 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
         inputtext.setAttribute('data-value', text.getHTML());
-        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recordingEditKeydown(this);');
-        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(this);');
+        inputtext.on('keydown', M.mod_bigbluebuttonbn.recordings.recordingEditKeydown);
+        inputtext.on('focusout', M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout);
         node.append(inputtext);
+        inputtext.focus();
     },
 
-    recordingEditKeydown: function(element) {
-        if (event.keyCode == 13) {
-            this.recordingEditPerform(element);
+    recordingEditKeydown: function(event) {
+        var keyCode = event.which || event.keyCode;
+        if (keyCode == 13) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditPerform(event);
             return;
         }
-        if (event.keyCode == 27) {
-            this.recordingEditOnfocusout(element);
+        if (keyCode == 27) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event);
+            return;
         }
     },
 
-    recordingEditOnfocusout: function(element) {
-        var inputtext = Y.one(element);
+    recordingEditOnfocusout: function(event) {
+        var inputtext = event.currentTarget;
         var node = inputtext.ancestor('div');
         inputtext.hide();
         node.one('> span').show();
         node.one('> a').show();
     },
 
-    recordingEditPerform: function(element) {
-        var inputtext = Y.one(element);
+    recordingEditPerform: function(event) {
+        var inputtext = event.currentTarget;
         var node = inputtext.ancestor('div');
-        var text = element.value;
+        var text = inputtext.get('value');
         // Perform the update.
         inputtext.setAttribute('data-action', 'edit');
         inputtext.setAttribute('data-goalstate', text);
+        inputtext.hide();
         M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
-        node.one('> span').setHTML(text);
-        var link = node.one('> a');
-        link.show();
-        link.focus();
+        node.one('> span').setHTML(text).show();
+        node.one('> a').show();
     },
 
     recordingEditCompletion: function(data, failed) {
@@ -321,7 +323,7 @@ M.mod_bigbluebuttonbn.recordings = {
         alert.show();
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
-            this.recordingEditCompletion(data, true);
+            M.mod_bigbluebuttonbn.recordings.recordingEditCompletion(data, true);
         }
     },
 
