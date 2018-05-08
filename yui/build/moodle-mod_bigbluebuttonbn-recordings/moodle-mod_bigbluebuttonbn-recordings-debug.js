@@ -192,7 +192,7 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.on('keydown', M.mod_bigbluebuttonbn.recordings.recordingEditKeydown);
         inputtext.on('focusout', M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout);
         node.append(inputtext);
-        inputtext.focus();
+        inputtext.focus().select();
     },
 
     recordingEditKeydown: function(event) {
@@ -203,7 +203,6 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (keyCode == 27) {
             M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event.currentTarget);
-            return;
         }
     },
 
