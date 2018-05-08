@@ -189,41 +189,40 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
         inputtext.setAttribute('data-value', text.getHTML());
-        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recordingEditKeydown(this);');
-        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(this);');
+        inputtext.on('keydown', M.mod_bigbluebuttonbn.recordings.recordingEditKeydown);
+        inputtext.on('focusout', M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout);
         node.append(inputtext);
+        inputtext.focus().select();
     },
 
-    recordingEditKeydown: function(element) {
-        if (event.keyCode == 13) {
-            this.recordingEditPerform(element);
+    recordingEditKeydown: function(event) {
+        var keyCode = event.which || event.keyCode;
+        if (keyCode == 13) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditPerform(event.currentTarget);
             return;
         }
-        if (event.keyCode == 27) {
-            this.recordingEditOnfocusout(element);
+        if (keyCode == 27) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event.currentTarget);
         }
     },
 
-    recordingEditOnfocusout: function(element) {
-        var inputtext = Y.one(element);
-        var node = inputtext.ancestor('div');
-        inputtext.hide();
+    recordingEditOnfocusout: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        nodeelement.hide();
         node.one('> span').show();
         node.one('> a').show();
     },
 
-    recordingEditPerform: function(element) {
-        var inputtext = Y.one(element);
-        var node = inputtext.ancestor('div');
-        var text = element.value;
+    recordingEditPerform: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        var text = nodeelement.get('value');
         // Perform the update.
-        inputtext.setAttribute('data-action', 'edit');
-        inputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
-        node.one('> span').setHTML(text);
-        var link = node.one('> a');
-        link.show();
-        link.focus();
+        nodeelement.setAttribute('data-action', 'edit');
+        nodeelement.setAttribute('data-goalstate', text);
+        nodeelement.hide();
+        this.recordingUpdate(nodeelement.getDOMNode());
+        node.one('> span').setHTML(text).show();
+        node.one('> a').show();
     },
 
     recordingEditCompletion: function(data, failed) {
@@ -310,8 +309,12 @@ M.mod_bigbluebuttonbn.recordings = {
         M.mod_bigbluebuttonbn.helpers.updateData(data);
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         M.mod_bigbluebuttonbn.helpers.updateId(data);
-        if (data.action === 'publish' || data.action === 'unpublish') {
-            this.recordingPublishUnpublishCompletion(data);
+        if (data.action === 'publish') {
+            this.recordingPublishCompletion(data.recordingid);
+            return;
+        }
+        if (data.action === 'unpublish') {
+            this.recordingUnpublishCompletion(data.recordingid);
         }
     },
 
@@ -327,18 +330,25 @@ M.mod_bigbluebuttonbn.recordings = {
         }
     },
 
-    recordingPublishUnpublishCompletion: function(data) {
-        var playbacks, preview;
-        playbacks = Y.one('#playbacks-' + data.recordingid);
-        preview = Y.one('#preview-' + data.recordingid);
-        if (data.action == 'unpublish') {
-            playbacks.hide();
-            preview.hide();
+    recordingPublishCompletion: function(recordingid) {
+        var playbacks = Y.one('#playbacks-' + recordingid);
+        playbacks.show();
+        var preview = Y.one('#preview-' + recordingid);
+        if (preview == null) {
             return;
         }
-        playbacks.show();
         preview.show();
-        M.mod_bigbluebuttonbn.helpers.reloadPreview(data);
+        M.mod_bigbluebuttonbn.helpers.reloadPreview(recordingid);
+    },
+
+    recordingUnpublishCompletion: function(recordingid) {
+        var playbacks = Y.one('#playbacks-' + recordingid);
+        playbacks.hide();
+        var preview = Y.one('#preview-' + recordingid);
+        if (preview == null) {
+            return;
+        }
+        preview.hide();
     },
 
     recordingIsImported: function(element) {
@@ -428,7 +438,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggleSpinningWheelOffCompatible(link);
+            this.toggleSpinningWheelOffCompatible(link.one('> img'));
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -439,8 +449,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggleSpinningWheelOffCompatible: function(link) {
-        var button = link.one('> img');
+    toggleSpinningWheelOffCompatible: function(button) {
         if (button === null) {
             // Button doesn't have an icon.
             return;
@@ -478,11 +487,14 @@ M.mod_bigbluebuttonbn.helpers = {
     },
 
     updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
-        var buttondatasrc;
-        buttondatasrc = button.getAttribute('data-src').replace(this.capitalize(action), this.capitalize(buttondatatag));
+        if (button === null) {
+            // Button doesn't have an icon.
+            return;
+        }
+        var buttondatasrc = button.getAttribute('data-src');
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
-        button.setAttribute('data-src', buttondatasrc);
+        button.setAttribute('data-src', buttondatasrc.replace(buttondatatag, action));
     },
 
     updateId: function(data) {
@@ -551,8 +563,8 @@ M.mod_bigbluebuttonbn.helpers = {
         return actions;
     },
 
-    reloadPreview: function(data) {
-        var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
+    reloadPreview: function(recordingid) {
+        var thumbnails = Y.one('#preview-' + recordingid).all('> img');
         thumbnails.each(function(thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');
             thumbnailsrc = thumbnailsrc.substring(0, thumbnailsrc.indexOf('?'));
