@@ -309,8 +309,12 @@ M.mod_bigbluebuttonbn.recordings = {
         M.mod_bigbluebuttonbn.helpers.updateData(data);
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         M.mod_bigbluebuttonbn.helpers.updateId(data);
-        if (data.action === 'publish' || data.action === 'unpublish') {
-            this.recordingPublishUnpublishCompletion(data);
+        if (data.action === 'publish') {
+            this.recordingPublishCompletion(data.recordingid);
+            return;
+        }
+        if (data.action === 'unpublish') {
+            this.recordingUnpublishCompletion(data.recordingid);
         }
     },
 
@@ -326,18 +330,25 @@ M.mod_bigbluebuttonbn.recordings = {
         }
     },
 
-    recordingPublishUnpublishCompletion: function(data) {
-        var playbacks, preview;
-        playbacks = Y.one('#playbacks-' + data.recordingid);
-        preview = Y.one('#preview-' + data.recordingid);
-        if (data.action == 'unpublish') {
-            playbacks.hide();
-            preview.hide();
+    recordingPublishCompletion: function(recordingid) {
+        var playbacks = Y.one('#playbacks-' + recordingid);
+        playbacks.show();
+        var preview = Y.one('#preview-' + recordingid);
+        if (preview == null) {
             return;
         }
-        playbacks.show();
         preview.show();
-        M.mod_bigbluebuttonbn.helpers.reloadPreview(data);
+        M.mod_bigbluebuttonbn.helpers.reloadPreview(recordingid);
+    },
+
+    recordingUnpublishCompletion: function(recordingid) {
+        var playbacks = Y.one('#playbacks-' + recordingid);
+        playbacks.hide();
+        var preview = Y.one('#preview-' + recordingid);
+        if (preview == null) {
+            return;
+        }
+        preview.hide();
     },
 
     recordingIsImported: function(element) {
@@ -552,8 +563,8 @@ M.mod_bigbluebuttonbn.helpers = {
         return actions;
     },
 
-    reloadPreview: function(data) {
-        var thumbnails = Y.one('#preview-' + data.recordingid).all('> img');
+    reloadPreview: function(recordingid) {
+        var thumbnails = Y.one('#preview-' + recordingid).all('> img');
         thumbnails.each(function(thumbnail) {
             var thumbnailsrc = thumbnail.getAttribute('src');
             thumbnailsrc = thumbnailsrc.substring(0, thumbnailsrc.indexOf('?'));
