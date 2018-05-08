@@ -215,13 +215,12 @@ M.mod_bigbluebuttonbn.recordings = {
         var node = inputtext.ancestor('div');
         var text = element.value;
         // Perform the update.
-        inputtext.setAttribute('data-action', 'edit');
-        inputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
-        node.one('> span').setHTML(text);
-        var link = node.one('> a');
-        link.show();
-        link.focus();
+        nodeelement.setAttribute('data-action', 'edit');
+        nodeelement.setAttribute('data-goalstate', text);
+        nodeelement.hide();
+        this.recordingUpdate(nodeelement.getDOMNode());
+        node.one('> span').setHTML(text).show();
+        node.one('> a').show();
     },
 
     recordingEditCompletion: function(data, failed) {

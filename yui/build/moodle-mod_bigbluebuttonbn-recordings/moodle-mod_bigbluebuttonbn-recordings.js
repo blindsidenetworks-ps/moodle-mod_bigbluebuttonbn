@@ -217,13 +217,12 @@ M.mod_bigbluebuttonbn.recordings = {
         var node = inputtext.ancestor('div');
         var text = element.value;
         // Perform the update.
-        inputtext.setAttribute('data-action', 'edit');
-        inputtext.setAttribute('data-goalstate', text);
-        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
-        node.one('> span').setHTML(text);
-        var link = node.one('> a');
-        link.show();
-        link.focus();
+        nodeelement.setAttribute('data-action', 'edit');
+        nodeelement.setAttribute('data-goalstate', text);
+        nodeelement.hide();
+        this.recordingUpdate(nodeelement.getDOMNode());
+        node.one('> span').setHTML(text).show();
+        node.one('> a').show();
     },
 
     recordingEditCompletion: function(data, failed) {
@@ -428,7 +427,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button = link.one('> i');
         if (button === null) {
             // For backward compatibility.
-            this.toggleSpinningWheelOffCompatible(link);
+            this.toggleSpinningWheelOffCompatible(link.one('> img'));
             return;
         }
         button.setAttribute('aria-label', button.getAttribute('data-aria-label'));
@@ -439,8 +438,7 @@ M.mod_bigbluebuttonbn.helpers = {
         button.removeAttribute('data-class');
     },
 
-    toggleSpinningWheelOffCompatible: function(link) {
-        var button = link.one('> img');
+    toggleSpinningWheelOffCompatible: function(button) {
         if (button === null) {
             // Button doesn't have an icon.
             return;
@@ -478,11 +476,14 @@ M.mod_bigbluebuttonbn.helpers = {
     },
 
     updateDataCompatible: function(button, action, buttondatatag, buttondatatext) {
-        var buttondatasrc;
-        buttondatasrc = button.getAttribute('data-src').replace(this.capitalize(action), this.capitalize(buttondatatag));
+        if (button === null) {
+            // Button doesn't have an icon.
+            return;
+        }
+        var buttondatasrc = button.getAttribute('data-src');
         button.setAttribute('data-alt', buttondatatext);
         button.setAttribute('data-title', buttondatatext);
-        button.setAttribute('data-src', buttondatasrc);
+        button.setAttribute('data-src', buttondatasrc.replace(buttondatatag, action));
     },
 
     updateId: function(data) {
