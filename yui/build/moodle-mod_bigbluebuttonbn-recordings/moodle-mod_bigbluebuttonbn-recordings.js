@@ -198,32 +198,30 @@ M.mod_bigbluebuttonbn.recordings = {
     recordingEditKeydown: function(event) {
         var keyCode = event.which || event.keyCode;
         if (keyCode == 13) {
-            M.mod_bigbluebuttonbn.recordings.recordingEditPerform(event);
+            M.mod_bigbluebuttonbn.recordings.recordingEditPerform(event.currentTarget);
             return;
         }
         if (keyCode == 27) {
-            M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event);
+            M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event.currentTarget);
             return;
         }
     },
 
-    recordingEditOnfocusout: function(event) {
-        var inputtext = event.currentTarget;
-        var node = inputtext.ancestor('div');
-        inputtext.hide();
+    recordingEditOnfocusout: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        nodeelement.hide();
         node.one('> span').show();
         node.one('> a').show();
     },
 
-    recordingEditPerform: function(event) {
-        var inputtext = event.currentTarget;
-        var node = inputtext.ancestor('div');
-        var text = inputtext.get('value');
+    recordingEditPerform: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        var text = nodeelement.get('value');
         // Perform the update.
-        inputtext.setAttribute('data-action', 'edit');
-        inputtext.setAttribute('data-goalstate', text);
-        inputtext.hide();
-        M.mod_bigbluebuttonbn.recordings.recordingUpdate(inputtext.getDOMNode());
+        nodeelement.setAttribute('data-action', 'edit');
+        nodeelement.setAttribute('data-goalstate', text);
+        nodeelement.hide();
+        M.mod_bigbluebuttonbn.recordings.recordingUpdate(nodeelement.getDOMNode());
         node.one('> span').setHTML(text).show();
         node.one('> a').show();
     },
