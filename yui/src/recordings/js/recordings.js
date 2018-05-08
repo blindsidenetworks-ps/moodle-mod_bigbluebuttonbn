@@ -332,7 +332,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var playbacks = Y.one('#playbacks-' + recordingid);
         playbacks.show();
         var preview = Y.one('#preview-' + recordingid);
-        if (preview == null) {
+        if (preview === null) {
             return;
         }
         preview.show();
@@ -343,7 +343,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var playbacks = Y.one('#playbacks-' + recordingid);
         playbacks.hide();
         var preview = Y.one('#preview-' + recordingid);
-        if (preview == null) {
+        if (preview === null) {
             return;
         }
         preview.hide();
