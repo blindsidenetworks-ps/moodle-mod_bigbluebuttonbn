@@ -43,13 +43,16 @@ class provider implements
       \core_privacy\local\metadata\provider,
       \core_privacy\local\request\plugin\provider {
 
+    // This trait must be included.
+    use \core_privacy\local\legacy_polyfill;
+
     /**
      * Returns metadata.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function _get_metadata(collection $collection) : collection {
 
         $collection->add_database_table('bigbluebuttonbn_logs', [
             'userid' => 'privacy:metadata:logs:userid',
@@ -84,6 +87,19 @@ class provider implements
 
 
         return $collection;
+    }
+
+    public static function _delete_data_for_user(approved_contextlist $contextlist) {
+        global $DB;
+
+        if (empty($contextlist->count())) {
+            return;
+        }
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
+            $DB->delete_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $instanceid, 'userid' => $userid]);
+        }
     }
 
 }
