@@ -18,7 +18,7 @@
  * Language File.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
+ * @copyright 2010-2018 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
@@ -33,6 +33,17 @@ $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activit
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
+
+$string['privacy:metadata:logs'] = 'A record of the events logged whhen using the plugin';
+$string['privacy:metadata:logs:userid'] = 'The user ID of the user who triggered the event';
+$string['privacy:metadata:logs:timecreated'] = 'The time at which the log was created';
+$string['privacy:metadata:logs:meetingid'] = 'The meeting ID the user had access to';
+$string['privacy:metadata:logs:log'] = 'The ID for the event triggered by the user';
+$string['privacy:metadata:logs:meta'] = 'Extra information the event manager may require';
+$string['privacy:metadata:participants'] = 'A list of rules that define the role users will in the live meeting. A user ID may be stored as permissions can be granted per role or user';
+$string['privacy:metadata:bigbluebutton_server'] = 'In order to integrate with a remote BigBlueButton service, user data needs to be exchanged with the server.';
+$string['privacy:metadata:bigbluebutton_server:userid'] = 'The userid is sent from Moodle to allow you to create and/or join a session in the remote system.';
+$string['privacy:metadata:bigbluebutton_server:fullname'] = 'Your full name is sent to the remote system to allow a better user experience.';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
