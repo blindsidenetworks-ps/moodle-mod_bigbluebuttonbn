@@ -39,8 +39,6 @@ $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEX
 $params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
 $params['meta'] = optional_param('meta', '', PARAM_TEXT);
 
-require_login(0, false);
-
 if (empty($params['action'])) {
     header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
     return;
