@@ -26,6 +26,10 @@
 namespace mod_bigbluebuttonbn\privacy;
 
 use core_privacy\local\metadata\collection;
+use \core_privacy\local\metadata\provider as metadataprovider;
+use \core_privacy\local\request\contextlist;
+use \core_privacy\local\request\plugin\provider as pluginprovider;
+use \core_privacy\local\request\approved_contextlist;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,9 +43,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
 */
-class provider implements
-      \core_privacy\local\metadata\provider,
-      \core_privacy\local\request\plugin\provider {
+class provider implements metadataprovider, pluginprovider {
 
     // This trait must be included.
     use \core_privacy\local\legacy_polyfill;
@@ -54,6 +56,22 @@ class provider implements
      */
     public static function _get_metadata(collection $collection) : collection {
 
+        /**
+         * The table bigbluebuttonbn stores only the room properties, but there may be chance
+         * for some personal information to be stored in the form of metadata in the column
+         * 'participants' as the rules may be set to define the role specif users would
+         * have in BBB. It is fair to say that only the userid is stored, which is useless if
+         * the user is removed. But if this is a concern a refactoring on the way the rules are stored
+         * will be required.
+         */
+        $collection->add_database_table('bigbluebuttonbn', [
+            'participants' => 'privacy:metadata:participants',
+        ], 'privacy:metadata');
+
+        /**
+         * The table bigbluebuttonbn_logs stores events triggered by users when using the plugin.
+         * Some personal information along with the resource accessed is stored.
+         */
         $collection->add_database_table('bigbluebuttonbn_logs', [
             'userid' => 'privacy:metadata:logs:userid',
             'timecreated' => 'privacy:metadata:logs:timecreated',
@@ -63,42 +81,194 @@ class provider implements
         ], 'privacy:metadata:logs');
 
         /**
-         * The table bigbluebuttonbn stores only the room properties, but there may be chance
-         * for some personal information to be stored in the form of metadata in the column
-         * 'participants' as the rules may be set to define the role specif users would
-         * have in BBB. It is fair to say that only the userid is stored, which is useless if
-         * the user is removed. But if this is a concern a refactoring on the way the rules are stored
-         * will be required.
-         */
-        $collection->add_subsystem_link(
-            'core_files',
-            [],
-            'privacy:metadata:participants'
-        );
-
-        /**
          * Personal information has to be passed to BigBlueButton
-         * this includes the user ID and user fullname
+         * this includes the user ID and fullname
          */
-        $collection->add_external_location_link('bigbluebutton_server', [
-                'userid' => 'privacy:metadata:bigbluebutton_server:userid',
-                'fullname' => 'privacy:metadata:bigbluebutton_server:fullname',
-            ], 'privacy:metadata:bigbluebutton_server');
-
+        $collection->add_external_location_link('bigbluebutton', [
+                'userid' => 'privacy:metadata:bigbluebutton:userid',
+                'fullname' => 'privacy:metadata:bigbluebutton:fullname',
+            ], 'privacy:metadata:bigbluebutton');
 
         return $collection;
     }
 
+    /**
+     * Get the list of contexts that contain user information for the specified user.
+     *
+     * @param   int           $userid       The user to search.
+     * @return  contextlist   $contextlist  The list of contexts used in this plugin.
+     */
+    public static function _get_contexts_for_userid(int $userid) : contextlist {
+        // Fetch all bigbluebuttonbn logs.
+        $sql = "SELECT c.id
+                  FROM {context} c
+            INNER JOIN {course_modules} cm
+                    ON cm.id = c.instanceid
+                   AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m
+                    ON m.id = cm.module
+                   AND m.name = :modname
+            INNER JOIN {bigbluebuttonbn} bigbluebuttonbn
+                    ON bigbluebuttonbn.id = cm.instance
+            INNER JOIN {bigbluebuttonbn_logs} bigbluebuttonbnlogs
+                    ON bigbluebuttonbnlogs.bigbluebuttonbnid = bigbluebuttonbn.id
+                 WHERE bigbluebuttonbnlogs.userid = :userid";
+
+        $params = [
+            'modname' => 'bigbluebuttonbn',
+            'contextlevel' => CONTEXT_MODULE,
+            'userid' => $userid,
+        ];
+        $contextlist = new contextlist();
+        $contextlist->add_from_sql($sql, $params);
+
+        return $contextlist;
+    }
+
+    /**
+     * Export personal data for the given approved_contextlist. User and context information is contained within the contextlist.
+     *
+     * @param approved_contextlist $contextlist a list of contexts approved for export.
+     */
+    public static function _export_user_data(approved_contextlist $contextlist) {
+        self::export_user_data_bigbliebuttonbn_logs($contextlist);
+    }
+
+
+    /**
+     * Delete all data for all users in the specified context.
+     *
+     * @param \context $context the context to delete in.
+     */
+    public static function _delete_data_for_all_users_in_context(\context $context) {
+        global $DB;
+
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
+        $DB->delete_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $instanceid]);
+    }
+
+    /**
+     * Delete all user data for the specified user, in the specified contexts.
+     *
+     * @param approved_contextlist $contextlist a list of contexts approved for deletion.
+     */
     public static function _delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
 
         if (empty($contextlist->count())) {
             return;
         }
+
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
+            if (!$context instanceof \context_module) {
+                return;
+            }
             $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
             $DB->delete_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $instanceid, 'userid' => $userid]);
+        }
+    }
+
+    /**
+     * Export personal data for the given approved_contextlist related to bigbluebuttonbn logs.
+     *
+     * @param approved_contextlist $contextlist a list of contexts approved for export.
+     */
+    protected static function _export_user_data_bigbliebuttonbn_logs(approved_contextlist $contextlist) {
+        global $DB;
+
+        // Filter out any contexts that are not related to modules.
+        $cmids = array_reduce($contextlist->get_contexts(), function($carry, $context) {
+            if ($context->contextlevel == CONTEXT_MODULE) {
+                $carry[] = $context->instanceid;
+            }
+            return $carry;
+        }, []);
+
+        if (empty($cmids)) {
+            return;
+        }
+
+        $user = $contextlist->get_user();
+
+        // Get all the bigbluebuttonbn activities associated with the above course modules.
+        $instanceidstocmids = self::get_instance_ids_to_cmids_from_cmids($cmids);
+        $instanceids = array_keys($instanceidstocmids);
+
+        list($insql, $inparams) = $DB->get_in_or_equal($instanceids, SQL_PARAMS_NAMED);
+        $params = array_merge($inparams, ['userid' => $user->id]);
+        $recordset = $DB->get_recordset_select('bigbluebuttonbn_logs', "bigbluebuttonbnid $insql AND userid = :userid", $params, 'dateupdated, id');
+        self::recordset_loop_and_export($recordset, 'bigbluebuttonbnid', [], function($carry, $record) use ($user, $instanceidstocmids) {
+            $carry[] = [
+                'gradepercent' => $record->gradepercent,
+                'originalgrade' => $record->originalgrade,
+                'datesubmitted' => transform::datetime($record->datesubmitted),
+                'dateupdated' => transform::datetime($record->dateupdated)
+            ];
+            return $carry;
+        }, function($instanceid, $data) use ($user, $instanceidstocmids) {
+            $context = \context_module::instance($instanceidstocmids[$instanceid]);
+            $contextdata = helper::get_context_data($context, $user);
+            $finaldata = (object) array_merge((array) $contextdata, ['submissions' => $data]);
+            helper::export_context_files($context, $user);
+            writer::with_context($context)->export_data([], $finaldata);
+        });
+    }
+
+    /**
+     * Return a dict of bigbluebuttonbn IDs mapped to their course module ID.
+     *
+     * @param array $cmids The course module IDs.
+     * @return array In the form of [$bigbluebuttonbnid => $cmid].
+     */
+    protected static function get_instance_ids_to_cmids_from_cmids(array $cmids) {
+        global $DB;
+
+        list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+        $sql = "SELECT bigbluebuttonbn.id, cm.id AS cmid
+                 FROM {bigbluebuttonbn} bigbluebuttonbn
+                 JOIN {modules} m
+                   ON m.name = :bigbluebuttonbn
+                 JOIN {course_modules} cm
+                   ON cm.instance = bigbluebuttonbn.id
+                  AND cm.module = m.id
+                WHERE cm.id $insql";
+        $params = array_merge($inparams, ['bigbluebuttonbn' => 'bigbluebuttonbn']);
+
+        return $DB->get_records_sql_menu($sql, $params);
+    }
+
+    /**
+     * Loop and export from a recordset.
+     *
+     * @param \moodle_recordset $recordset The recordset.
+     * @param string $splitkey The record key to determine when to export.
+     * @param mixed $initial The initial data to reduce from.
+     * @param callable $reducer The function to return the dataset, receives current dataset, and the current record.
+     * @param callable $export The function to export the dataset, receives the last value from $splitkey and the dataset.
+     * @return void
+     */
+    protected static function recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
+                                                        callable $reducer, callable $export) {
+        $data = $initial;
+        $lastid = null;
+
+        foreach ($recordset as $record) {
+            if ($lastid && $record->{$splitkey} != $lastid) {
+                $export($lastid, $data);
+                $data = $initial;
+            }
+            $data = $reducer($data, $record);
+            $lastid = $record->{$splitkey};
+        }
+        $recordset->close();
+
+        if (!empty($lastid)) {
+            $export($lastid, $data);
         }
     }
 
