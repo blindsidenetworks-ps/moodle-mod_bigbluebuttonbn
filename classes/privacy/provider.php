@@ -36,13 +36,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
-* Privacy class for requesting user data.
-*
-* @package   mod_bigbluebuttonbn
-* @copyright 2018 - present, Blindside Networks Inc
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-* @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
-*/
+ * Privacy class for requesting user data.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2018 - present, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
 class provider implements metadataprovider, pluginprovider {
 
     // This trait must be included.
@@ -56,34 +56,27 @@ class provider implements metadataprovider, pluginprovider {
      */
     public static function _get_metadata(collection $collection) : collection {
 
-        /**
-         * The table bigbluebuttonbn stores only the room properties, but there may be chance
-         * for some personal information to be stored in the form of metadata in the column
-         * 'participants' as the rules may be set to define the role specif users would
-         * have in BBB. It is fair to say that only the userid is stored, which is useless if
-         * the user is removed. But if this is a concern a refactoring on the way the rules are stored
-         * will be required.
-         */
+         // The table bigbluebuttonbn stores only the room properties.
+         // However, there is a chance that some personal information is stored as metadata.
+         // This would be done in the column 'participants' where rules can be set to define BBB roles.
+         // It is fair to say that only the userid is stored, which is useless if user is removed.
+         // But if this is a concern a refactoring on the way the rules are stored will be required.
         $collection->add_database_table('bigbluebuttonbn', [
-            'participants' => 'privacy:metadata:participants',
-        ], 'privacy:metadata');
+            'participants' => 'privacy:metadata:bigbluebuttonbn:participants',
+        ], 'privacy:metadata:bigbluebuttonbn');
 
-        /**
-         * The table bigbluebuttonbn_logs stores events triggered by users when using the plugin.
-         * Some personal information along with the resource accessed is stored.
-         */
+        // The table bigbluebuttonbn_logs stores events triggered by users when using the plugin.
+        // Some personal information along with the resource accessed is stored.
         $collection->add_database_table('bigbluebuttonbn_logs', [
-            'userid' => 'privacy:metadata:logs:userid',
-            'timecreated' => 'privacy:metadata:logs:timecreated',
-            'meetingid' => 'privacy:metadata:logs:meetingid',
-            'log' => 'privacy:metadata:logs:log',
-            'meta' => 'privacy:metadata:logs:meta',
-        ], 'privacy:metadata:logs');
+            'userid' => 'privacy:metadata:bigbluebuttonbn_logs:userid',
+            'timecreated' => 'privacy:metadata:bigbluebuttonbn_logs:timecreated',
+            'meetingid' => 'privacy:metadata:bigbluebuttonbn_logs:meetingid',
+            'log' => 'privacy:metadata:bigbluebuttonbn_logs:log',
+            'meta' => 'privacy:metadata:bigbluebuttonbn_logs:meta',
+        ], 'privacy:metadata:bigbluebuttonbn_logs');
 
-        /**
-         * Personal information has to be passed to BigBlueButton
-         * this includes the user ID and fullname
-         */
+        // Personal information has to be passed to BigBlueButton.
+        // This includes the user ID and fullname.
         $collection->add_external_location_link('bigbluebutton', [
                 'userid' => 'privacy:metadata:bigbluebutton:userid',
                 'fullname' => 'privacy:metadata:bigbluebutton:fullname',
@@ -201,22 +194,26 @@ class provider implements metadataprovider, pluginprovider {
 
         list($insql, $inparams) = $DB->get_in_or_equal($instanceids, SQL_PARAMS_NAMED);
         $params = array_merge($inparams, ['userid' => $user->id]);
-        $recordset = $DB->get_recordset_select('bigbluebuttonbn_logs', "bigbluebuttonbnid $insql AND userid = :userid", $params, 'dateupdated, id');
-        self::recordset_loop_and_export($recordset, 'bigbluebuttonbnid', [], function($carry, $record) use ($user, $instanceidstocmids) {
-            $carry[] = [
-                'gradepercent' => $record->gradepercent,
-                'originalgrade' => $record->originalgrade,
-                'datesubmitted' => transform::datetime($record->datesubmitted),
-                'dateupdated' => transform::datetime($record->dateupdated)
-            ];
-            return $carry;
-        }, function($instanceid, $data) use ($user, $instanceidstocmids) {
-            $context = \context_module::instance($instanceidstocmids[$instanceid]);
-            $contextdata = helper::get_context_data($context, $user);
-            $finaldata = (object) array_merge((array) $contextdata, ['submissions' => $data]);
-            helper::export_context_files($context, $user);
-            writer::with_context($context)->export_data([], $finaldata);
-        });
+        $recordset = $DB->get_recordset_select(
+            'bigbluebuttonbn_logs', "bigbluebuttonbnid $insql AND userid = :userid", $params, 'dateupdated, id');
+        self::recordset_loop_and_export($recordset, 'bigbluebuttonbnid', [],
+            function($carry, $record) use ($user, $instanceidstocmids) {
+                $carry[] = [
+                    'gradepercent' => $record->gradepercent,
+                    'originalgrade' => $record->originalgrade,
+                    'datesubmitted' => transform::datetime($record->datesubmitted),
+                    'dateupdated' => transform::datetime($record->dateupdated)
+                  ];
+                return $carry;
+            },
+            function($instanceid, $data) use ($user, $instanceidstocmids) {
+                $context = \context_module::instance($instanceidstocmids[$instanceid]);
+                $contextdata = helper::get_context_data($context, $user);
+                $finaldata = (object) array_merge((array) $contextdata, ['submissions' => $data]);
+                helper::export_context_files($context, $user);
+                writer::with_context($context)->export_data([], $finaldata);
+            }
+        );
     }
 
     /**
