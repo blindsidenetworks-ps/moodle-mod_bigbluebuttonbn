@@ -43,7 +43,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
      */
     public function test_get_metadata() {
         $this->resetAfterTest(true);
-        
+
         $collection = new collection('mod_bigbluebuttonbn');
         $newcollection = provider::get_metadata($collection);
         $itemcollection = $newcollection->get_collection();
@@ -74,6 +74,63 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $this->assertArrayHasKey('userid', $privacyfields);
         $this->assertArrayHasKey('fullname', $privacyfields);
         $this->assertEquals('privacy:metadata:bigbluebutton', $bigbluebuttonserver->get_summary());
+    }
+
+    /**
+     * Test for provider::get_contexts_for_userid().
+     */
+    public function test_get_contexts_for_userid() {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        // The bigbluebuttonbn activity the user will have submitted something for.
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+
+        // Another bigbluebuttonbn activity that has no user activity.
+        //$this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+
+        // Create a user which will make a submission.
+        //$user = $this->getDataGenerator()->create_user();
+
+        //$this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user->id);
+
+        // Check the contexts supplied are correct.
+        //$contextlist = provider::get_contexts_for_userid($user->id);
+        //$this->assertCount(2, $contextlist);
+
+        //$contextformodule = $contextlist->current();
+        //$cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+        //$this->assertEquals($cmcontext->id, $contextformodule->id);
+
+        //$contextlist->next();
+        //$contextforsystem = $contextlist->current();
+        //$this->assertEquals(SYSCONTEXTID, $contextforsystem->id);
+    }
+
+    /**
+     * Mimicks the creation of an bigbluebuttonbn log.
+     *
+     * There is no API we can use to insert an bigbluebuttonbn log, so we
+     * will simply insert directly into the database.
+     *
+     * @param int $courseid
+     * @param int $bigbluebuttonbnid
+     * @param int $userid
+     */
+    protected function create_bigbluebuttonbn_log(int $courseid, int $bigbluebuttonbnid, int $userid) {
+        global $DB;
+
+        $bigbluebuttonbnlogdata = [
+            'courseid' => $courseid,
+            'bigbluebuttonbnid' => $bigbluebuttonbnid,
+            'userid' => $userid,
+            'meetingid' => sha1($bigbluebuttonbnid) . '-' . $courseid . '-' . $bigbluebuttonbnid,
+            'timecreated' => time(),
+            'meta' => NULL
+        ];
+
+        $DB->insert_record('bigbluebuttonbn_logs', $bigbluebuttonbnlogdata);
     }
 
 }
