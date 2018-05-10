@@ -142,7 +142,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update field meetingid (Fix for CONTRIB-7302).
         $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => NULL, 'previous' => 'introformat');
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'meetingid',
             $fielddefinition);
         // Update field recordings_imported (Fix for CONTRIB-7302).
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
