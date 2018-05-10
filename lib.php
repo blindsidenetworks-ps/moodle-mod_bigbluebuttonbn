@@ -533,12 +533,14 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
  * @return string
  */
 function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
-    $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
+    if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
+        return '';
+    }
     $context = context_module::instance($bigbluebuttonbn->coursemodule);
     // Set the filestorage object.
     $fs = get_file_storage();
     // Save the file if it exists that is currently in the draft area.
-    file_save_draft_area_files($draftitemid, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
+    file_save_draft_area_files($bigbluebuttonbn->presentation, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
     // Get the file if it exists.
     $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
         'itemid, filepath, filename', false);
