@@ -109,6 +109,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
             $fielddefinition);
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2017101009, 'bigbluebuttonbn');
     }
     if ($oldversion < 2017101010) {
@@ -129,7 +130,32 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
                 $DB->update_record('bigbluebuttonbn', $instance);
             }
         }
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2017101010, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2017101012) {
+        // Update field type (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
+            $fielddefinition);
+        // Update field meetingid (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'introformat');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'meetingid',
+            $fielddefinition);
+        // Update field recordings_imported (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
+            $fielddefinition);
+        // Add field recordings_preview.(Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
+            $fielddefinition);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2017101012, 'bigbluebuttonbn');
     }
     return true;
 }
