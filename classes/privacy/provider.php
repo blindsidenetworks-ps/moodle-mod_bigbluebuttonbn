@@ -154,11 +154,10 @@ class provider implements metadataprovider, pluginprovider {
      */
     public static function _delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
-
-        if (empty($contextlist->count())) {
+        $count = $contextlist->count();
+        if (empty($count)) {
             return;
         }
-
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             if (!$context instanceof \context_module) {

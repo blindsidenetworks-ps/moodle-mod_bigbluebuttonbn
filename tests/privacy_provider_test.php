@@ -28,6 +28,10 @@ use mod_bigbluebuttonbn\privacy\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
+if (!class_exists("\\core_privacy\\tests\\provider_testcase", true)) {
+    die();
+}
+
 /**
  * Privacy provider tests class.
  *
@@ -49,26 +53,26 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $itemcollection = $newcollection->get_collection();
         $this->assertCount(3, $itemcollection);
 
-        $bigbluebuttonbntable = array_shift($itemcollection);
-        $this->assertEquals('bigbluebuttonbn', $bigbluebuttonbntable->get_name());
+        $instancetable = array_shift($itemcollection);
+        $this->assertEquals('bigbluebuttonbn', $instancetable->get_name());
 
-        $bigbluebuttonbnlogstable = array_shift($itemcollection);
-        $this->assertEquals('bigbluebuttonbn_logs', $bigbluebuttonbnlogstable->get_name());
+        $instancelogstable = array_shift($itemcollection);
+        $this->assertEquals('bigbluebuttonbn_logs', $instancelogstable->get_name());
 
         $bigbluebuttonserver = array_shift($itemcollection);
         $this->assertEquals('bigbluebutton', $bigbluebuttonserver->get_name());
 
-        $privacyfields = $bigbluebuttonbntable->get_privacy_fields();
+        $privacyfields = $instancetable->get_privacy_fields();
         $this->assertArrayHasKey('participants', $privacyfields);
-        $this->assertEquals('privacy:metadata:bigbluebuttonbn', $bigbluebuttonbntable->get_summary());
+        $this->assertEquals('privacy:metadata:bigbluebuttonbn', $instancetable->get_summary());
 
-        $privacyfields = $bigbluebuttonbnlogstable->get_privacy_fields();
+        $privacyfields = $instancelogstable->get_privacy_fields();
         $this->assertArrayHasKey('userid', $privacyfields);
         $this->assertArrayHasKey('timecreated', $privacyfields);
         $this->assertArrayHasKey('meetingid', $privacyfields);
         $this->assertArrayHasKey('log', $privacyfields);
         $this->assertArrayHasKey('meta', $privacyfields);
-        $this->assertEquals('privacy:metadata:bigbluebuttonbn_logs', $bigbluebuttonbnlogstable->get_summary());
+        $this->assertEquals('privacy:metadata:bigbluebuttonbn_logs', $instancelogstable->get_summary());
 
         $privacyfields = $bigbluebuttonserver->get_privacy_fields();
         $this->assertArrayHasKey('userid', $privacyfields);
@@ -142,27 +146,18 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         $this->resetAfterTest();
 
-        $course = $this->getDataGenerator()->create_course();
-
-        $bigbluebuttonbn = $this->getDataGenerator()->create_module('lti', array('course' => $course->id));
-
-        // Create users that will make submissions.
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-
-        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
-        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user2->id);
+        $e = $this->get_bigbluebuttonbn_environemnt();
 
         // Before deletion, we should have 2 responses.
-        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $e['instance']->id]);
         $this->assertEquals(2, $count);
 
         // Delete data based on context.
-        $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+        $cmcontext = context_module::instance($e['instance']->cmid);
         provider::delete_data_for_all_users_in_context($cmcontext);
 
         // After deletion, the bigbluebuttonbn logs for that activity should have been deleted.
-        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $e['instance']->id]);
         $this->assertEquals(0, $count);
     }
 
@@ -174,35 +169,50 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         $this->resetAfterTest();
 
-        $course = $this->getDataGenerator()->create_course();
+        $e = $this->get_bigbluebuttonbn_environemnt();
 
-        $bigbluebuttonbn = $this->getDataGenerator()->create_module('lti', array('course' => $course->id));
-
-        // Create users that will make submissions.
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-
-        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
-        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user2->id);
-
-        // Before deletion, we should have 2 responses.
-        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
-        $this->assertEquals(2, $count);
-
-        $context = \context_module::instance($bigbluebuttonbn->cmid);
-        $contextlist = new \core_privacy\local\request\approved_contextlist($user1, 'bigbluebuttonbn',
+        // Delete data for the first user.
+        $context = \context_module::instance($e['instance']->cmid);
+        $contextlist = new \core_privacy\local\request\approved_contextlist($e['users'][0], 'bigbluebuttonbn',
             [$context->id]);
         provider::delete_data_for_user($contextlist);
 
         // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
-        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user1->id]);
+        $count = $DB->count_records('bigbluebuttonbn_logs',
+            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
         $this->assertEquals(0, $count);
 
         // Check the logs for the other user is still there.
         $bigbluebuttonbnlogs = $DB->get_records('bigbluebuttonbn_logs');
         $this->assertCount(1, $bigbluebuttonbnlogs);
         $lastlog = reset($bigbluebuttonbnlogs);
-        $this->assertEquals($user2->id, $lastlog->userid);
+        $this->assertEquals($e['users'][1]->id, $lastlog->userid);
+    }
+
+    /**
+     * Prepares the environment for testing.
+     *
+     * @return array $e
+     */
+    protected function get_bigbluebuttonbn_environemnt() {
+        $e = array();
+
+        // Create a course.
+        $e['course'] = $this->getDataGenerator()->create_course();
+
+        // Create a bigbluebuttonbn instance.
+        $e['instance'] = $this->getDataGenerator()->create_module('bigbluebuttonbn',
+            array('course' => $e['course']->id));
+
+        // Create users that will use the bigbluebuttonbn instance.
+        $e['users'][] = $this->getDataGenerator()->create_user();
+        $e['users'][] = $this->getDataGenerator()->create_user();
+
+        // Create the bigbluebuttonbn logs.
+        $this->create_bigbluebuttonbn_log($e['course']->id, $e['instance']->id, $e['users'][0]->id);
+        $this->create_bigbluebuttonbn_log($e['course']->id, $e['instance']->id, $e['users'][1]->id);
+
+        return $e;
     }
 
     /**
@@ -218,7 +228,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
     protected function create_bigbluebuttonbn_log(int $courseid, int $bigbluebuttonbnid, int $userid) {
         global $DB;
 
-        $bigbluebuttonbnlogdata = [
+        $logdata = [
             'courseid' => $courseid,
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'userid' => $userid,
@@ -228,6 +238,6 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
             'meta' => null
         ];
 
-        $DB->insert_record('bigbluebuttonbn_logs', $bigbluebuttonbnlogdata);
+        $DB->insert_record('bigbluebuttonbn_logs', $logdata);
     }
 }

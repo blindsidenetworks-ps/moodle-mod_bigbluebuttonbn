@@ -38,42 +38,24 @@ defined('MOODLE_INTERNAL') || die();
 class mod_bigbluebuttonbn_generator extends testing_module_generator {
 
     public function create_instance($record = null, array $options = null) {
-        $record = (object)(array)$record;
-
-        if (!isset($record->type)) {
-            $record->type = 0;
+        $now = time();
+        $defaults = array(
+            "type" => 0,
+            "meetingid" => sha1(rand()),
+            "record" => true,
+            "moderatorpass" => "mp",
+            "viewerpass" => "ap",
+            "participants" => "{}",
+            "timecreated" => $now,
+            "timemodified" => $now,
+            "presentation" => null
+        );
+        $record = (array)$record;
+        foreach ($defaults as $key => $value) {
+            if (!isset($record[$key])) {
+                $record[$key] = $value;
+            }
         }
-        if (!isset($record->meetingid)) {
-            $record->meetingid = sha1(rand());
-        }
-        if (!isset($record->record)) {
-            $record->record = true;
-        }
-
-        if (!isset($record->moderatorpass)) {
-            $record->moderatorpass = 'mp';
-        }
-
-        if (!isset($record->viewerpass)) {
-            $record->viewerpass = 'vp';
-        }
-
-        if (!isset($record->participants)) {
-            $record->participants = '{}';
-        }
-
-        if (!isset($record->timecreated)) {
-            $record->timecreated = time();
-        }
-
-        if (!isset($record->timemodified)) {
-            $record->timemodified = time();
-        }
-
-        if (!isset($record->presentation)) {
-            $record->presentation = null;
-        }
-
-        return parent::create_instance($record, (array)$options);
+        return parent::create_instance((object)$record, (array)$options);
     }
 }
