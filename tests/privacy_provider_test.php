@@ -225,7 +225,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
             'meetingid' => sha1($bigbluebuttonbnid) . '-' . $courseid . '-' . $bigbluebuttonbnid,
             'timecreated' => time(),
             'log' => 'create',
-            'meta' => NULL
+            'meta' => null
         ];
 
         $DB->insert_record('bigbluebuttonbn_logs', $bigbluebuttonbnlogdata);

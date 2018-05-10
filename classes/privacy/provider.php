@@ -59,7 +59,7 @@ class provider implements metadataprovider, pluginprovider {
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function _get_metadata(collection $collection) : collection {
+    public static function _get_metadata(collection $collection) {
 
          // The table bigbluebuttonbn stores only the room properties.
          // However, there is a chance that some personal information is stored as metadata.
@@ -96,7 +96,7 @@ class provider implements metadataprovider, pluginprovider {
      * @param   int           $userid       The user to search.
      * @return  contextlist   $contextlist  The list of contexts used in this plugin.
      */
-    public static function _get_contexts_for_userid(int $userid) : contextlist {
+    public static function _get_contexts_for_userid(int $userid) {
         // Fetch all bigbluebuttonbn logs.
         $sql = "SELECT c.id
                   FROM {context} c
@@ -273,5 +273,4 @@ class provider implements metadataprovider, pluginprovider {
             $export($lastid, $data);
         }
     }
-
 }
