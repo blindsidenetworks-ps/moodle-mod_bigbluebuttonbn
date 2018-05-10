@@ -84,28 +84,125 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         $course = $this->getDataGenerator()->create_course();
 
-        // The bigbluebuttonbn activity the user will have submitted something for.
+        // The bigbluebuttonbn activity the user will have to work with.
         $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
 
         // Another bigbluebuttonbn activity that has no user activity.
-        //$this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+        $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
 
         // Create a user which will make a submission.
-        //$user = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_user();
 
-        //$this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user->id);
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user->id);
 
         // Check the contexts supplied are correct.
-        //$contextlist = provider::get_contexts_for_userid($user->id);
-        //$this->assertCount(2, $contextlist);
+        $contextlist = provider::get_contexts_for_userid($user->id);
+        $this->assertCount(1, $contextlist);
 
-        //$contextformodule = $contextlist->current();
-        //$cmcontext = context_module::instance($bigbluebuttonbn->cmid);
-        //$this->assertEquals($cmcontext->id, $contextformodule->id);
+        $contextformodule = $contextlist->current();
+        $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+        $this->assertEquals($cmcontext->id, $contextformodule->id);
+    }
 
-        //$contextlist->next();
-        //$contextforsystem = $contextlist->current();
-        //$this->assertEquals(SYSCONTEXTID, $contextforsystem->id);
+    /**
+     * Test for provider::export_user_data().
+     */
+    public function test_export_for_context_logs() {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        // The bigbluebuttonbn activity the user will have to work with.
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+
+        // Create users which will make submissions.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user2->id);
+
+        // Export all of the data for the context for user 1.
+        $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+        $this->export_context_data_for_user($user1->id, $cmcontext, 'mod_bigbluebuttonbn');
+        $writer = \core_privacy\local\request\writer::with_context($cmcontext);
+
+        $this->assertTrue($writer->has_any_data());
+
+        $data = $writer->get_data();
+        $this->assertCount(2, $data->logs);
+    }
+
+    /**
+     * Test for provider::delete_data_for_all_users_in_context().
+     */
+    public function test_delete_data_for_all_users_in_context() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('lti', array('course' => $course->id));
+
+        // Create users that will make submissions.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user2->id);
+
+        // Before deletion, we should have 2 responses.
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
+        $this->assertEquals(2, $count);
+
+        // Delete data based on context.
+        $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+        provider::delete_data_for_all_users_in_context($cmcontext);
+
+        // After deletion, the bigbluebuttonbn logs for that activity should have been deleted.
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Test for provider::delete_data_for_user().
+     */
+    public function test_delete_data_for_user() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('lti', array('course' => $course->id));
+
+        // Create users that will make submissions.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user1->id);
+        $this->create_bigbluebuttonbn_log($course->id, $bigbluebuttonbn->id, $user2->id);
+
+        // Before deletion, we should have 2 responses.
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id]);
+        $this->assertEquals(2, $count);
+
+        $context = \context_module::instance($bigbluebuttonbn->cmid);
+        $contextlist = new \core_privacy\local\request\approved_contextlist($user1, 'bigbluebuttonbn',
+            [$context->id]);
+        provider::delete_data_for_user($contextlist);
+
+        // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
+        $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user1->id]);
+        $this->assertEquals(0, $count);
+
+        // Check the logs for the other user is still there.
+        $bigbluebuttonbnlogs = $DB->get_records('bigbluebuttonbn_logs');
+        $this->assertCount(1, $bigbluebuttonbnlogs);
+        $lastlog = reset($bigbluebuttonbnlogs);
+        $this->assertEquals($user2->id, $lastlog->userid);
     }
 
     /**
@@ -127,10 +224,10 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
             'userid' => $userid,
             'meetingid' => sha1($bigbluebuttonbnid) . '-' . $courseid . '-' . $bigbluebuttonbnid,
             'timecreated' => time(),
+            'log' => 'create',
             'meta' => NULL
         ];
 
         $DB->insert_record('bigbluebuttonbn_logs', $bigbluebuttonbnlogdata);
     }
-
 }

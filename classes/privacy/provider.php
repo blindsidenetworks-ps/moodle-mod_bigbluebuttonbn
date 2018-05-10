@@ -27,9 +27,12 @@ namespace mod_bigbluebuttonbn\privacy;
 
 use core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\plugin\provider as pluginprovider;
 use \core_privacy\local\request\approved_contextlist;
+use \core_privacy\local\request\contextlist;
+use \core_privacy\local\request\helper;
+use \core_privacy\local\request\transform;
+use \core_privacy\local\request\writer;
+use \core_privacy\local\request\plugin\provider as pluginprovider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -124,7 +127,7 @@ class provider implements metadataprovider, pluginprovider {
      * @param approved_contextlist $contextlist a list of contexts approved for export.
      */
     public static function _export_user_data(approved_contextlist $contextlist) {
-        self::export_user_data_bigbliebuttonbn_logs($contextlist);
+        self::_export_user_data_bigbliebuttonbn_logs($contextlist);
     }
 
 
@@ -195,21 +198,21 @@ class provider implements metadataprovider, pluginprovider {
         list($insql, $inparams) = $DB->get_in_or_equal($instanceids, SQL_PARAMS_NAMED);
         $params = array_merge($inparams, ['userid' => $user->id]);
         $recordset = $DB->get_recordset_select(
-            'bigbluebuttonbn_logs', "bigbluebuttonbnid $insql AND userid = :userid", $params, 'dateupdated, id');
+            'bigbluebuttonbn_logs', "bigbluebuttonbnid $insql AND userid = :userid", $params, 'timecreated, id');
         self::recordset_loop_and_export($recordset, 'bigbluebuttonbnid', [],
             function($carry, $record) use ($user, $instanceidstocmids) {
                 $carry[] = [
-                    'gradepercent' => $record->gradepercent,
-                    'originalgrade' => $record->originalgrade,
-                    'datesubmitted' => transform::datetime($record->datesubmitted),
-                    'dateupdated' => transform::datetime($record->dateupdated)
+                    'timecreated' => transform::datetime($record->timecreated),
+                    'meetingid' => $record->meetingid,
+                    'log' => $record->log,
+                    'meta' => $record->meta,
                   ];
                 return $carry;
             },
             function($instanceid, $data) use ($user, $instanceidstocmids) {
                 $context = \context_module::instance($instanceidstocmids[$instanceid]);
                 $contextdata = helper::get_context_data($context, $user);
-                $finaldata = (object) array_merge((array) $contextdata, ['submissions' => $data]);
+                $finaldata = (object) array_merge((array) $contextdata, ['logs' => $data]);
                 helper::export_context_files($context, $user);
                 writer::with_context($context)->export_data([], $finaldata);
             }

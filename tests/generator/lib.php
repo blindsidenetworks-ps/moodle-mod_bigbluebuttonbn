@@ -70,6 +70,10 @@ class mod_bigbluebuttonbn_generator extends testing_module_generator {
             $record->timemodified = time();
         }
 
+        if (!isset($record->presentation)) {
+            $record->presentation = null;
+        }
+
         return parent::create_instance($record, (array)$options);
     }
 }
