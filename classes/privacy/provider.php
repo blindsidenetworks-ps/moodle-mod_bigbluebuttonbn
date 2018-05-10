@@ -25,8 +25,6 @@
 
 namespace mod_bigbluebuttonbn\privacy;
 
-use \core_access\context;
-use \core_access\context_module;
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
 use \core_privacy\local\request\approved_contextlist;
