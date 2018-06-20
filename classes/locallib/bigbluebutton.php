@@ -54,6 +54,22 @@ class bigbluebutton {
         foreach ($metadata as $key => $value) {
             $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
         }
+		
+		$enable_html5 = trim(\mod_bigbluebuttonbn\locallib\config::get('enable_html5'));
+		
+		if($enable_html5){
+			// from https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn/pull/37
+			$parsed_url = parse_url($baseurl);
+			$statusHTML5 = file_get_contents($parsed_url["scheme"]."://".$parsed_url["host"]."/html5client/check");
+			
+			if($statusHTML5 == '{"html5clientStatus":"running"}') {
+				// HTML5 client is running => joining HTML5 client
+				$clientURL = $parsed_url["scheme"]."://".$parsed_url["host"]."/html5client/join";
+				$params = $params.'&clientURL='.urlencode($clientURL);
+			}
+			
+		}
+		
         return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 

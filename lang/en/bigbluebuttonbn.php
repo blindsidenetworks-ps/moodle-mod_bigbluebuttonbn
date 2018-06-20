@@ -389,3 +389,6 @@ $string['view_error_meeting_not_running'] = 'Something went wrong, the meeting i
 $string['view_error_current_state_not_found'] = 'Current state was not found. The recording may have been deleted or the BigBlueButton server is not compatible with the action performed.';
 $string['view_error_action_not_completed'] = 'Action could not be completed';
 $string['view_warning_default_server'] = 'This Moodle server is making use of the BigBlueButton testing server that comes pre-configured by default. It should be replaced for production.';
+
+$string['config_enable_html5'] =  'Default HTML5 Client';
+$string['config_enable_html5_description'] = 'This settings will enable HTML5 client by default instead of Flash client but it will check whether HTML5 is running or not. If running then it will redirect to HTML5 client otherwise fallback to Flash.';

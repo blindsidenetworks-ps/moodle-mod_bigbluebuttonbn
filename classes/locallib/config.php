@@ -57,6 +57,7 @@ class config {
         return array(
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+			'enable_html5' => 'false',
             'voicebridge_editable' => 'false',
             'importrecordings_enabled' => 'false',
             'importrecordings_from_deleted_enabled' => 'false',
@@ -161,6 +162,7 @@ class config {
                'preuploadpresentation_enabled' => self::get('preuploadpresentation_enabled'),
                'sendnotifications_enabled' => self::get('sendnotifications_enabled'),
                'recordings_enabled' => self::get('recordings_enabled'),
+			   'enable_html5' => self::get('enable_html5'),
                'recordings_html_default' => self::get('recordings_html_default'),
                'recordings_html_editable' => self::get('recordings_html_editable'),
                'recordings_deleted_default' => self::get('recordings_deleted_default'),
