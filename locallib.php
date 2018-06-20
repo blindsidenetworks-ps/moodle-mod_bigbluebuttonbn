@@ -2258,6 +2258,8 @@ function bigbluebuttonbn_settings_general(&$renderer) {
             $renderer->render_group_element_text('server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL));
         $renderer->render_group_element('shared_secret',
             $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET));
+		$renderer->render_group_element('enable_html5',
+            $renderer->render_group_element_checkbox('enable_html5', 0));
     }
 }
 
