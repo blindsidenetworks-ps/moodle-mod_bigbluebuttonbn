@@ -1384,12 +1384,17 @@ function bigbluebuttonbn_get_recording_data_row_date_formatted($starttime) {
  * @return integer
  */
 function bigbluebuttonbn_get_recording_data_row_duration($recording) {
-    $firstplayback = array_values($recording['playbacks'])[0];
-    $length = 0;
-    if (isset($firstplayback['length'])) {
-        $length = $firstplayback['length'];
+    foreach (array_values($recording['playbacks']) as $playback) {
+        // Ignore restricted playbacks.
+        if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'true') {
+            continue;
+        }
+        // Take the lenght form the fist playback with an actual value.
+        if (!empty($playback['length'])) {
+            return intval($playback['length']);
+        }
     }
-    return intval($length);
+    return 0;
 }
 
 /**
@@ -2593,6 +2598,10 @@ function bigbluebuttonbn_encode_meetingid($seed) {
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback) {
+    // All types that are not restricted are included.
+    if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
+        return true;
+    }
     // All types that are not statistics are included.
     if ($playback['type'] != 'statistics') {
         return true;

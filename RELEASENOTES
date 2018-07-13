@@ -1,3 +1,6 @@
+2.2.5 (2017101013)
+Bug: Fixed issue with recording lenght shown as 0 in some cases (CONTRIB-7383).
+
 2.2.4 (2017101012)
 Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).
 Bug: Fixed issue with recordings are accessible from copied activities (CONTRIB-7118).

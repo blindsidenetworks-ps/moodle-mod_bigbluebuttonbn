@@ -1,7 +1,1 @@
-Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).
-Bug: Fixed issue with recordings are accessible from copied activities (CONTRIB-7118).
-Bug: Fixed issue with edit name or description of an recording under firefox (CONTRIB-7279).
-Bug: Fixed issue with Hide/Show images not changing when publishing unpublishing recordings (CONTRIB-7297).
-Bug: Fixed issue when preview is disabled, on publish/unpublish recordings js fails (CONTRIB-7298).
-Bug: Fixed issue with diverged install and upgrade schema (CONTRIB-7302).
-Feature: Added support for privacy API in compliance with GDPR (CONTRIB-7290).
+Bug: Fixed issue with recording lenght shown as 0 in some cases (CONTRIB-7383).
