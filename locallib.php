@@ -578,7 +578,6 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', 
         if (is_null($data) || is_array($data)) {
             return $c->post($url);
         }
-
         $options = array();
         $options['CURLOPT_HTTPHEADER'] = array(
                  'Content-Type: '.$contenttype,
@@ -587,6 +586,10 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', 
                );
 
         return $c->post($url, $data, $options);
+    }
+    if ($method == 'HEAD') {
+        $c->head($url, array('followlocation' => true, 'timeout' => 1));
+        return $c->get_info();
     }
     return $c->get($url);
 }
@@ -1495,18 +1498,33 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
     $recordingpreview = html_writer::start_tag('div', $options);
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
-            $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
-            foreach ($playback['preview'] as $image) {
-                $recordingpreview .= html_writer::empty_tag('img',
-                    array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail col-sm'));
-            }
-            $recordingpreview .= html_writer::end_tag('div');
-            $recordingpreview .= html_writer::tag('div',
-                get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'row text-muted small'));
+            $recordingpreview .= bigbluebuttonbn_get_recording_data_row_preview_images($playback);
             break;
         }
     }
     $recordingpreview .= html_writer::end_tag('div');
+    return $recordingpreview;
+}
+
+/**
+ * Helper function builds element with actual images used in recording preview row based on a selected playback.
+ *
+ * @param array $playback
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
+    $recordingpreview = html_writer::start_tag('div', array('class' => 'row'));
+    foreach ($playback['preview'] as $image) {
+        if (!bigbluebuttonbn_validate_resource(trim($image['url']))) {
+            return '';
+        }
+        $recordingpreview .= html_writer::empty_tag('img',
+            array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail col-sm'));
+    }
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::tag('div',
+        get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'row text-muted small'));
     return $recordingpreview;
 }
 
@@ -1554,23 +1572,47 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     if (!bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
         return '';
     }
-    $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
+    $id = 'recording-play-' . $playback['type'] . '-' . $recording['recordID'];
+    $text = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
+    $class = 'btn btn-sm btn-default';
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
+    $title = null;
+    if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
+        $class = 'btn btn-sm btn-warning';
+        $onclick = '';
+        $title = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+    }
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
       '&mid='.$recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode(trim($playback['url']));
     }
-    $id = 'recording-play-' . $playback['type'] . '-' . $recording['recordID'];
     $linkattributes = array(
         'id' => $id,
         'onclick' => $onclick,
         'data-action' => 'play',
         'data-target' => $playback['type'],
         'data-href' => $href,
-        'class' => 'btn btn-sm btn-default'
+        'class' => $class,
+        'title' => $title
       );
-    return $OUTPUT->action_link('#', $title, null, $linkattributes) . '&#32;';
+    return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
+}
+
+/**
+ * Helper function validates a remote resource.
+ *
+ * @param string $url
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_validate_resource($url) {
+    $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
+    if (isset($curlinfo['http_code']) && $curlinfo['http_code'] != 200) {
+        error_log("Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code']);
+        return false;
+    }
+    return true;
 }
 
 /**

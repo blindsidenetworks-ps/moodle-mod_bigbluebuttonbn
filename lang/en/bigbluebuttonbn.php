@@ -284,6 +284,7 @@ $string['view_recording_button_return'] = 'Go back';
 $string['view_recording_format_presentation'] = 'presentation';
 $string['view_recording_format_video'] = 'video';
 $string['view_recording_format_statistics'] = 'statistics';
+$string['view_recording_format_errror_unreachable'] = 'The URL for this format is unreachable.';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
