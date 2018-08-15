@@ -1491,7 +1491,7 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
-    $options = array('id' => 'preview-'.$recording['recordID'], 'class' => 'container');
+    $options = array('id' => 'preview-'.$recording['recordID']);
     if ($recording['published'] === 'false') {
         $options['hidden'] = 'hidden';
     }
@@ -1514,17 +1514,21 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
-    $recordingpreview = html_writer::start_tag('div', array('class' => 'row'));
+    $recordingpreview  = html_writer::start_tag('div', array('class' => 'container-fluid'));
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
     foreach ($playback['preview'] as $image) {
         if (!bigbluebuttonbn_validate_resource(trim($image['url']))) {
             return '';
         }
-        $recordingpreview .= html_writer::empty_tag('img',
-            array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail col-sm'));
+        $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
+        $recordingpreview .= html_writer::empty_tag('img', array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail pull-left'));
+        $recordingpreview .= html_writer::end_tag('div');
     }
     $recordingpreview .= html_writer::end_tag('div');
-    $recordingpreview .= html_writer::tag('div',
-        get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'row text-muted small'));
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
+    $recordingpreview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-center text-muted small'));
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::end_tag('div');
     return $recordingpreview;
 }
 
@@ -1852,7 +1856,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
  */
 function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata) {
     $row = new html_table_row();
-    $row->id = 'recording-td-'.$recording['recordID'];
+    $row->id = 'recording-tr-'.$recording['recordID'];
     $row->attributes['data-imported'] = 'false';
     $texthead = '';
     $texttail = '';
