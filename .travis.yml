@@ -87,4 +87,4 @@ script:
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci savepoints; fi
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci mustache; fi
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci grunt; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi
+  #- if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi

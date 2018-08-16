@@ -215,7 +215,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingEditPerform: function(nodeelement) {
         var node = nodeelement.ancestor('div');
-        var text = nodeelement.get('value');
+        var text = nodeelement.get('value').trim();
         // Perform the update.
         nodeelement.setAttribute('data-action', 'edit');
         nodeelement.setAttribute('data-goalstate', text);
@@ -242,9 +242,10 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingPlay: function(element) {
         var nodeelement = Y.one(element);
-        var dataMessage = nodeelement.getAttribute('data-message');
-        if (dataMessage !== '') {
-            M.mod_bigbluebuttonbn.helpers.alertError(dataMessage);
+        if (nodeelement.getAttribute('data-href') === '') {
+            M.mod_bigbluebuttonbn.helpers.alertError(
+                M.util.get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn')
+              );
             return;
         }
         var extras = {

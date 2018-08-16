@@ -1521,12 +1521,14 @@ function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
             return '';
         }
         $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
-        $recordingpreview .= html_writer::empty_tag('img', array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail pull-left'));
+        $recordingpreview .= html_writer::empty_tag('img',
+            array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail pull-left'));
         $recordingpreview .= html_writer::end_tag('div');
     }
     $recordingpreview .= html_writer::end_tag('div');
     $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
-    $recordingpreview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'text-center text-muted small'));
+    $recordingpreview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'),
+        array('class' => 'text-center text-muted small'));
     $recordingpreview .= html_writer::end_tag('div');
     $recordingpreview .= html_writer::end_tag('div');
     return $recordingpreview;
@@ -1592,9 +1594,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
       );
     if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
         $linkattributes['class'] = 'btn btn-sm btn-warning';
-        //$linkattributes['onclick'] = '';
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
-        $linkattributes['data-message'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+        unset($linkattributes['data-href']);
     }
     return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
 }
@@ -1609,7 +1610,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
 function bigbluebuttonbn_validate_resource($url) {
     $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
     if (isset($curlinfo['http_code']) && $curlinfo['http_code'] != 200) {
-        error_log("Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code']);
+        $error = "Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code'];
+        debugging($error, DEBUG_DEVELOPER);
         return false;
     }
     return true;
