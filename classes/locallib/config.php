@@ -124,7 +124,7 @@ class config {
         if (isset($CFG->{'bigbluebuttonbn_'.$setting})) {
             return (string)$CFG->{'bigbluebuttonbn_'.$setting};
         }
-        return  self::defaultvalue($setting);
+        return self::defaultvalue($setting);
     }
 
     /**
@@ -154,6 +154,8 @@ class config {
         return array(
                'version_major' => self::get_moodle_version_major(),
                'voicebridge_editable' => self::get('voicebridge_editable'),
+               'importrecordings_enabled' => self::get('importrecordings_enabled'),
+               'importrecordings_from_deleted_enabled' => self::get('importrecordings_from_deleted_enabled'),
                'waitformoderator_default' => self::get('waitformoderator_default'),
                'waitformoderator_editable' => self::get('waitformoderator_editable'),
                'userlimit_default' => self::get('userlimit_default'),

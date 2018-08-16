@@ -442,7 +442,11 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
           );
         /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
          * recordings are not included. */
-        $recordings += $recordingsimported;
+        if ($bbbsession['bigbluebuttonbn']->recordings_imported) {
+            $recordings = $recordingsimported;
+        } else {
+            $recordings += $recordingsimported;
+        }
     }
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
