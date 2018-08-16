@@ -315,6 +315,7 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (data.action === 'unpublish') {
             this.recordingUnpublishCompletion(data.recordingid);
+            return;
         }
     },
 

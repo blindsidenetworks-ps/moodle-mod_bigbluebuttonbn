@@ -1580,7 +1580,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     $text = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $class = 'btn btn-sm btn-default';
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
-    $title = null;
+    $title = '';
     if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
         $class = 'btn btn-sm btn-warning';
         $onclick = '';

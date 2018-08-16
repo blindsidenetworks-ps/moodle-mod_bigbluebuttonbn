@@ -326,6 +326,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     }
     $meta = json_decode($params['meta'], true);
     foreach (array_keys($meta) as $key) {
+        $callbackresponse[$key] = '';
         if (isset($recording[$key])) {
             $callbackresponse[$key] = $recording[$key];
         }
