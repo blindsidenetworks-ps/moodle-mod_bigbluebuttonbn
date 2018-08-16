@@ -216,5 +216,13 @@ M.mod_bigbluebuttonbn.helpers = {
 
     capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+
+    alertError: function(message) {
+        var alert = new M.core.alert({
+            title: M.util.get_string('error', 'moodle'),
+            message: message
+        });
+        alert.show();
     }
 };

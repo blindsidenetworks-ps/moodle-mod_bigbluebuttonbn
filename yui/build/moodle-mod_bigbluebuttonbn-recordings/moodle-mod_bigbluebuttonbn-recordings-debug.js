@@ -242,6 +242,11 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingPlay: function(element) {
         var nodeelement = Y.one(element);
+        var dataMessage = nodeelement.getAttribute('data-message');
+        if (dataMessage !== '') {
+            M.mod_bigbluebuttonbn.helpers.alertError(dataMessage);
+            return;
+        }
         var extras = {
             target: nodeelement.getAttribute('data-target'),
             source: 'published',
@@ -320,11 +325,7 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     recordingActionFailover: function(data) {
-        var alert = new M.core.alert({
-            title: M.util.get_string('error', 'moodle'),
-            message: data.message
-        });
-        alert.show();
+        M.mod_bigbluebuttonbn.helpers.alertError(data.message);
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
             this.recordingEditCompletion(data, true);
@@ -576,6 +577,14 @@ M.mod_bigbluebuttonbn.helpers = {
 
     capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+
+    alertError: function(message) {
+        var alert = new M.core.alert({
+            title: M.util.get_string('error', 'moodle'),
+            message: message
+        });
+        alert.show();
     }
 };
 

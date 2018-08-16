@@ -1576,30 +1576,26 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     if (!bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
         return '';
     }
-    $id = 'recording-play-' . $playback['type'] . '-' . $recording['recordID'];
     $text = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
-    $class = 'btn btn-sm btn-default';
-    $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
-    $title = '';
-    if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
-        $class = 'btn btn-sm btn-warning';
-        $onclick = '';
-        $title = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
-    }
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
       '&mid='.$recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode(trim($playback['url']));
     }
     $linkattributes = array(
-        'id' => $id,
-        'onclick' => $onclick,
+        'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
+        'class' => 'btn btn-sm btn-default',
+        'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
         'data-action' => 'play',
         'data-target' => $playback['type'],
         'data-href' => $href,
-        'class' => $class,
-        'title' => $title
       );
+    if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
+        $linkattributes['class'] = 'btn btn-sm btn-warning';
+        //$linkattributes['onclick'] = '';
+        $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+        $linkattributes['data-message'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+    }
     return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
 }
 
