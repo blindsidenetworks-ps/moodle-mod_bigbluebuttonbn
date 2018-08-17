@@ -496,28 +496,36 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
+    $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->id, 0, false, MUST_EXIST);
+    $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
+        'instance' => $bigbluebuttonbn->id));
     // Delete evento to the calendar when/if openingtime is NOT set.
     if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
-        $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
+        $calendarevent = calendar_event::load($eventid);
+        $calendarevent->delete();
         return;
     }
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
-    $event->name = $bigbluebuttonbn->name;
+    $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
+    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    $event->name = $bigbluebuttonbn->name . ' (' . get_string('starts_at', 'bigbluebuttonbn') . ')';
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $cm->id);
     $event->courseid = $bigbluebuttonbn->course;
     $event->groupid = 0;
     $event->userid = 0;
     $event->modulename = 'bigbluebuttonbn';
     $event->instance = $bigbluebuttonbn->id;
     $event->timestart = $bigbluebuttonbn->openingtime;
-    $event->durationtime = 0;
+    $event->timeduration = 0;
     if ($bigbluebuttonbn->closingtime) {
-        $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
+        $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
-    $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
-        'instance' => $bigbluebuttonbn->id));
-    if ($event->id) {
-        $calendarevent = calendar_event::load($event->id);
+    $event->timesort = $event->timestart + $event->timeduration;
+    $event->visible = instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn);
+    $event->priority = null;
+    if ($eventid) {
+        $calendarevent = calendar_event::load($eventid);
         $calendarevent->update($event);
         return;
     }
@@ -685,4 +693,38 @@ function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
         'mod_bigbluebuttonbn:i/bigbluebutton' => 'fa-bigbluebutton',
     ];
+}
+
+function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
+        \core_calendar\action_factory $factory) {
+    global $CFG;
+ 
+    require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+ 
+    if (!empty($cm->customdata['timeclose']) && $cm->customdata['timeclose'] < time()) {
+        // The bigbluebuttonbn has closed so the user can no longer submit anything.
+        return null;
+    }
+ 
+    // Restore bigbluebuttonbn object from cached values in $cm, we only need id, timeclose and timeopen.
+    $customdata = $cm->customdata ?: [];
+    $customdata['id'] = $cm->instance;
+    $customdata['timeopen'] = $event->timestart;
+    $customdata['timeclose'] = 0;
+    if ($event->timeduration != 0) {
+        $customdata['timeclose'] = $event->timestart + $event->timeduration;
+    }
+    $bigbluebuttonbn = (object)($customdata);
+ 
+    // Check that the bigbluebuttonbn activity is open.
+    list($actionable, $warnings) = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
+ 
+    return $factory->create_instance(
+        get_string('view_room', 'bigbluebuttonbn'),
+        new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id)),
+        1,
+        $actionable
+    );
 }

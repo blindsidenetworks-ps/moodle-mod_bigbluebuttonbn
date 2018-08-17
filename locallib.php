@@ -72,6 +72,8 @@ const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
 const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
 /** @var BIGBLUEBUTTON_EVENT_RECORDING_VIEWED string defines the bigbluebuttonbn recording_viewed event */
 const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
+const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
 
 /**
  * Register a bigbluebuttonbn event
@@ -2717,4 +2719,37 @@ function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $
     $output .= '          >' . $text . '</button>'."\n";
     $output .= '  </form>'."\n";
     return $output;
+}
+
+function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
+    $open = true;
+    $closed = false;
+    $warnings = array();
+
+    $timenow = time();
+    $timeopen = $bigbluebuttonbn->timeopen;
+    $timeclose = $bigbluebuttonbn->timeclose;
+    if (!empty($timeopen) && $timeopen > $timenow) {
+        $open = false;
+    }
+    if (!empty($timeclose) && $timenow > $timeclose) {
+        $closed = true;
+    }
+
+    if (!$open || $closed) {
+        if (!empty($context) && has_capability('moodle/category:manage', $context)) {
+            return array(true, $warnings);
+        }
+
+        if (!$open) {
+            $warnings['notopenyet'] = userdate($timeopen);
+        }
+        if ($closed) {
+            $warnings['expired'] = userdate($timeclose);
+        }
+        return array(false, $warnings);
+    }
+
+    // BigBlueButtonBN Room is available.
+    return array(true, $warnings);
 }
