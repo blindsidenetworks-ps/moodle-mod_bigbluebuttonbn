@@ -181,7 +181,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params, $updatecache)
  * @param boolean $running
  * @param boolean $participantcount
  *
- * @return boolean
+ * @return array
  */
 function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount) {
     $status = array("can_join" => false);

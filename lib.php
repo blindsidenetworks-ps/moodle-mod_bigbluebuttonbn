@@ -695,36 +695,36 @@ function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     ];
 }
 
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
 function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
         \core_calendar\action_factory $factory) {
-    global $CFG;
- 
+    global $CFG, $DB;
+
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
- 
-    if (!empty($cm->customdata['timeclose']) && $cm->customdata['timeclose'] < time()) {
-        // The bigbluebuttonbn has closed so the user can no longer submit anything.
-        return null;
-    }
- 
-    // Restore bigbluebuttonbn object from cached values in $cm, we only need id, timeclose and timeopen.
-    $customdata = $cm->customdata ?: [];
-    $customdata['id'] = $cm->instance;
-    $customdata['timeopen'] = $event->timestart;
-    $customdata['timeclose'] = 0;
-    if ($event->timeduration != 0) {
-        $customdata['timeclose'] = $event->timestart + $event->timeduration;
-    }
-    $bigbluebuttonbn = (object)($customdata);
- 
+
     // Check that the bigbluebuttonbn activity is open.
-    list($actionable, $warnings) = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
- 
-    return $factory->create_instance(
-        get_string('view_room', 'bigbluebuttonbn'),
-        new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id)),
-        1,
-        $actionable
-    );
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
+    $actionable = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
+
+    $string = get_string('view_room', 'bigbluebuttonbn');
+    $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+    if (groups_get_activity_groupmode($cm) == NOGROUPS) {
+        // No groups mode.
+        $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
+        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+    }
+
+    return $factory->create_instance($string, $url, 1, $actionable);
 }

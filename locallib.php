@@ -493,21 +493,6 @@ function bigbluebuttonbn_end_meeting($meetingid, $modpw) {
 }
 
 /**
- * Perform isMeetingRunning on BBB.
- *
- * @param string $meetingid
- */
-function bigbluebuttonbn_is_meeting_running($meetingid) {
-    /* As a workaround to isMeetingRunning that always return SUCCESS but only returns true
-     * when at least one user is in the session, we use getMeetingInfo instead.
-     */
-    $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
-      );
-    return ($xml && $xml->returncode == 'SUCCESS');
-}
-
-/**
  * Perform api request on BBB.
  *
  * @return string
@@ -1164,6 +1149,22 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $updatecache = false) {
       );
     $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
     return $meetinginfo;
+}
+
+/**
+ * Perform isMeetingRunning on BBB.
+ *
+ * @param string $meetingid
+ * @param boolean $updatecache
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_is_meeting_running($meetingid, $updatecache = false) {
+    /* As a workaround to isMeetingRunning that always return SUCCESS but only returns true
+     * when at least one user is in the session, we use getMeetingInfo instead.
+     */
+    $meetinginfo = bigbluebuttonbn_get_meeting_info($meetingid, $updatecache);
+    return ($meetinginfo['returncode'] === 'SUCCESS');
 }
 
 /**
@@ -2721,14 +2722,35 @@ function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $
     return $output;
 }
 
+/**
+ * Check if a BigBlueButtonBN is available to be used by the current user.
+ *
+ * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+ *
+ * @return boolean                     status if room available and current user allowed to join
+ */
 function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
+    list($roomavailable, $warnings) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    list($usercanjoin, $message) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+
+    return ($roomavailable && $usercanjoin);
+}
+
+/**
+ * Helper for evaluating if scheduled activity is avaiable.
+ *
+ * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+ *
+ * @return array                       status (room available or not and possible warnings)
+ */
+function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
     $open = true;
     $closed = false;
     $warnings = array();
 
     $timenow = time();
-    $timeopen = $bigbluebuttonbn->timeopen;
-    $timeclose = $bigbluebuttonbn->timeclose;
+    $timeopen = $bigbluebuttonbn->openingtime;
+    $timeclose = $bigbluebuttonbn->closingtime;
     if (!empty($timeopen) && $timeopen > $timenow) {
         $open = false;
     }
@@ -2737,10 +2759,6 @@ function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
     }
 
     if (!$open || $closed) {
-        if (!empty($context) && has_capability('moodle/category:manage', $context)) {
-            return array(true, $warnings);
-        }
-
         if (!$open) {
             $warnings['notopenyet'] = userdate($timeopen);
         }
@@ -2750,6 +2768,39 @@ function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
         return array(false, $warnings);
     }
 
-    // BigBlueButtonBN Room is available.
     return array(true, $warnings);
+}
+
+
+/**
+ * Helper for evaluating if meeting can be joined.
+ *
+ * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+ * @param  integer   $userid
+ *
+ * @return array     status (user allowed to join or not and possible message)
+ */
+function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $meetingid = null, $userid = null) {
+
+    // By default, use a meetingid without groups.
+    if (empty($meetingid)) {
+        $meetingid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->courseid . '-' . $bigbluebuttonbn->id;
+    }
+
+    // When meeting is running, all authorized users can join right in.
+    if (bigbluebuttonbn_is_meeting_running($meetingid)) {
+        return array(true, get_string('view_message_conference_in_progress', 'bigbluebuttonbn'));
+    }
+
+    // When meeting is not running, see if the user can join.
+    $context = context_course::instance($bigbluebuttonbn->course);
+    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+    $isadmin = is_siteadmin($userid);
+    $ismoderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $userid);
+    // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
+    if ($isadmin || $ismoderator || !$bigbluebuttonbn->wait) {
+        return array(true, get_string('view_message_conference_room_ready', 'bigbluebuttonbn'));
+    }
+    // Otherwise, no join allowed.
+    return array(false, get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'));
 }
