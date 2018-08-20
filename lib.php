@@ -496,13 +496,14 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
-    $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->id, 0, false, MUST_EXIST);
     $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
-    // Delete evento to the calendar when/if openingtime is NOT set.
+    // Delete the event from calendar when/if openingtime is NOT set.
     if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
-        $calendarevent = calendar_event::load($eventid);
-        $calendarevent->delete();
+        if ($eventid) {
+            $calendarevent = calendar_event::load($eventid);
+            $calendarevent->delete();
+        }
         return;
     }
     // Add evento to the calendar as openingtime is set.
@@ -510,7 +511,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
     $event->type = CALENDAR_EVENT_TYPE_ACTION;
     $event->name = $bigbluebuttonbn->name . ' (' . get_string('starts_at', 'bigbluebuttonbn') . ')';
-    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $cm->id);
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
     $event->courseid = $bigbluebuttonbn->course;
     $event->groupid = 0;
     $event->userid = 0;
@@ -524,7 +525,9 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->timesort = $event->timestart + $event->timeduration;
     $event->visible = instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn);
     $event->priority = null;
+    // Update the event in calendar when/if eventid was found.
     if ($eventid) {
+        $event->id = $eventid;
         $calendarevent = calendar_event::load($eventid);
         $calendarevent->update($event);
         return;

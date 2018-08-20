@@ -23,14 +23,21 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-use core_privacy\local\metadata\collection;
-use mod_bigbluebuttonbn\privacy\provider;
-
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+
+use core_privacy\tests\provider_testcase;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\writer;
+use mod_bigbluebuttonbn\privacy\provider;
 
 if (!class_exists("\\core_privacy\\tests\\provider_testcase", true)) {
     die();
 }
+
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
 
 /**
  * Privacy provider tests class.
@@ -89,10 +96,10 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $course = $this->getDataGenerator()->create_course();
 
         // The bigbluebuttonbn activity the user will have to work with.
-        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course));
 
         // Another bigbluebuttonbn activity that has no user activity.
-        $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+        $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course));
 
         // Create a user which will make a submission.
         $user = $this->getDataGenerator()->create_user();
@@ -117,7 +124,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $course = $this->getDataGenerator()->create_course();
 
         // The bigbluebuttonbn activity the user will have to work with.
-        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course->id));
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course));
 
         // Create users which will make submissions.
         $user1 = $this->getDataGenerator()->create_user();

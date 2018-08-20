@@ -29,6 +29,8 @@ env:
     - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
 
@@ -87,4 +89,4 @@ script:
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci savepoints; fi
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci mustache; fi
   - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci grunt; fi
-  #- if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi
+  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi
