@@ -37,6 +37,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_bigbluebuttonbn_generator extends testing_module_generator {
 
+    /**
+     * Creates an instance of bigbluebuttonbn for testing purposes.
+     *
+     * @param array|stdClass $record data for module being generated.
+     * @param null|array $options general options for course module.
+     * @return stdClass record from module-defined table with additional field cmid
+     */
     public function create_instance($record = null, array $options = null) {
         $now = time();
         $defaults = array(

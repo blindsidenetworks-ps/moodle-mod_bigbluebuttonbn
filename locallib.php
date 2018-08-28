@@ -2730,8 +2730,8 @@ function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $
  * @return boolean                     status if room available and current user allowed to join
  */
 function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
-    list($roomavailable, $warnings) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
-    list($usercanjoin, $message) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
 
     return ($roomavailable && $usercanjoin);
 }
@@ -2775,10 +2775,11 @@ function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
 /**
  * Helper for evaluating if meeting can be joined.
  *
- * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
- * @param  integer   $userid
+ * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+ * @param  string   $meetingid
+ * @param  integer  $userid
  *
- * @return array     status (user allowed to join or not and possible message)
+ * @return array    status (user allowed to join or not and possible message)
  */
 function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $meetingid = null, $userid = null) {
 
