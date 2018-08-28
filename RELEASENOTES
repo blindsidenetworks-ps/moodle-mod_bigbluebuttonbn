@@ -1,5 +1,8 @@
 2.2.5 (2017101013)
 Bug: Fixed issue with recording lenght shown as 0 in some cases (CONTRIB-7383).
+Bug: Fixed issus with activities not listed in Timeline tab of Course overview block (CONTRIB-7377).
+Bug: Fixed issue with thumbnails overriding a css class in Boost theme.
+Enhancement: Validates and notifies when recordings are incorrectly migrated from one BBB server to another.
 
 2.2.4 (2017101012)
 Bug: Fixed issue with error message shown for some rooms when displayed (CONTRIB-7243).

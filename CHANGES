@@ -1,1 +1,4 @@
 Bug: Fixed issue with recording lenght shown as 0 in some cases (CONTRIB-7383).
+Bug: Fixed issus with activities not listed in Timeline tab of Course overview block (CONTRIB-7377).
+Bug: Fixed issue with thumbnails overriding a css class in Boost theme.
+Enhancement: Validates and notifies when recordings are incorrectly migrated from one BBB server to another.
