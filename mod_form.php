@@ -83,7 +83,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add standard elements, common to all modules.
@@ -175,13 +175,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             'maxlength="64" size="32"');
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        if ($cfg['version_major'] < '2015051100') {
-            // This is valid before v2.9.
-            $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
-        } else {
-            // This is valid after v2.9.
-            $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
-        }
+        $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
         if ($cfg['sendnotifications_enabled']) {
@@ -333,11 +327,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for setting participant roles.
      *
      * @param object $mform
-     * @param array $cfg
      * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $participantlist) {
+    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');

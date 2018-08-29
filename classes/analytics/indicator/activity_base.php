@@ -106,7 +106,7 @@ abstract class activity_base extends \core_analytics\local\indicator\community_o
      *
      * @return bool
      */
-    protected function feedback_check_grades() {
+    public function feedback_check_grades() {
         // BigBlueButtonBN's feedback is not contained in grades.
         return false;
     }

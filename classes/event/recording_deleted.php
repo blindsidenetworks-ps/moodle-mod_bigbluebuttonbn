@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording unpublished event.
+ * The mod_bigbluebuttonbn recording deleted event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,21 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording unpublished event (triggered when a recording is unpublished).
+ * The mod_bigbluebuttonbn recording deleted event (triggered when a recording is deleted).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_unpublished extends base
+class recording_deleted extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' has unpublished a recording with id ".
-            "'$this->other' in the course id '$this->contextinstanceid'.";
+        $this->description = "The user with id '##userid' has deleted a recording with id ".
+            "'##other' from the course id '##courseid'.";
     }
 
     /**
@@ -51,7 +51,7 @@ class bigbluebuttonbn_recording_unpublished extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_unpublished', 'bigbluebuttonbn');
+        return get_string('event_recording_deleted', 'bigbluebuttonbn');
     }
 
     /**

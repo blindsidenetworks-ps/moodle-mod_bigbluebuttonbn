@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn deleted event.
+ * The mod_bigbluebuttonbn event/events.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -27,39 +27,32 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+
 /**
- * The mod_bigbluebuttonbn activity deleted event (triggered by view.php).
+ * The mod_bigbluebuttonbn class for event name definition.
  *
- * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_activity_deleted extends base
-{
-    /**
-     * Init method.
-     */
-    protected function init() {
-        parent::init('d', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' deleted the bigbluebuttonbn activity " .
-            "with id '$this->objectid' for the course id '$this->courseid'.";
-    }
-
-    /**
-     * Return event name.
-     *
-     * @return string
-     */
-    public static function get_name() {
-        return get_string('event_activity_deleted', 'bigbluebuttonbn');
-    }
-
-    /**
-     * Return objectid mapping.
-     *
-     * @return string
-     */
-    public static function get_objectid_mapping() {
-        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
-    }
+class events {
+    public static $events = array(
+        'create' => 'activity_created',
+        'view' => 'activity_viewed',
+        'update' => 'activity_updated',
+        'delete' => 'activity_deleted',
+        'meeting_create' => 'meeting_created',
+        'meeting_end' => 'meeting_ended',
+        'meeting_join' => 'meeting_joined',
+        'meeting_left' => 'meeting_left',
+        'recording_delete' => 'recording_deleted',
+        'recording_import' => 'recording_imported',
+        'recording_protect' => 'recording_protected',
+        'recording_publish' => 'recording_published',
+        'recording_unprotect' => 'recording_unprotected',
+        'recording_unpublish' => 'recording_unpublished',
+        'recording_edit' => 'recording_edited',
+        'recording_play' => 'recording_viewed',
+        'live_session' => 'live_session'
+    );
 }

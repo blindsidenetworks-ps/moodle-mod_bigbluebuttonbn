@@ -1,8 +1,7 @@
-Bug: Fixed issue with voice bridge not accepted when editing the instance
-Bug: Added fa-circle as the default icon for Totara
-Bug: Fixed icon for delete action broken in Participant List
-Bug: Fixed issue with tags not working when class core_tag_tag not defined
-Bug: Fixed flickering on recording preview
-Bug: Fixed issue with JavaScript for modform not working with participantList in old versions
-Bug: Fixed issue with not correctly formed BBB url and trailing white characters in shared_secret
-Feature: Recording preview can now be enabled/disabled by configuration (Updates the db)
+Bug: Fixed issue with YUI datatable not deleting recordings correctly.
+Bug: Fixed issue with events not being properly described.
+Bug: Fixed issue with guest users not being able to view or use rooms.
+Bug: Fixed issue with thumbnails overriding a css class on Essential theme.
+Bug: Fixed issue with separated groups showing all the recordings when the user is allowed to manage them.
+Feature: Show a warning message to administrators when using the BBB server pre-configured by default.
+DB migration: Fix issue with internal passwords that may have not been generated on instance creation.

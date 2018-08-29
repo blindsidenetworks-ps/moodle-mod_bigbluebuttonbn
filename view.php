@@ -28,10 +28,10 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 $id = required_param('id', PARAM_INT);
-$bn = optional_param('n', 0, PARAM_INT);
+$bn = optional_param('bn', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 
-$viewinstance = bigbluebuttonbn_views_validator($id, $bn);
+$viewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$viewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
@@ -39,19 +39,16 @@ if (!$viewinstance) {
 $cm = $viewinstance['cm'];
 $course = $viewinstance['course'];
 $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
+$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
-$context = context_module::instance($cm->id);
-
-bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $cm);
+bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
 // Additional info related to the course.
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
-// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
-bigbluebuttonbn_verify_passwords($bigbluebuttonbn);
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
@@ -227,14 +224,11 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         return;
     }
     // Separate or visible group mode.
-    $groups = groups_get_all_groups($bbbsession['course']->id);
+    $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
     if (empty($groups)) {
         // No groups in this course.
         bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'), 'info', true);
         return;
-    }
-    if ($groupmode == SEPARATEGROUPS) {
-        $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
     }
     $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
     $groupname = get_string('allparticipants');
@@ -249,11 +243,10 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
         bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), 'info');
         return;
     }
-    if (count($groups) == 1) {
-        // There is only one group and the user has access to it.
-        return;
+    $context = context_module::instance($bbbsession['cm']->id);
+    if (has_capability('moodle/site:accessallgroups', $context)) {
+        bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'));
     }
-    bigbluebuttonbn_view_message_box($bbbsession, get_string('view_groups_selection_warning', 'bigbluebuttonbn'));
     $urltoroot = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id;
     groups_print_activity_menu($bbbsession['cm'], $urltoroot);
     echo '<br><br>';
@@ -299,17 +292,11 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     // JavaScript variables.
     $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
         'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
-    // Renders general warning when configured.
-    $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
     $output  = '';
-    if (bigbluebuttonbn_view_warning_shown($bbbsession)) {
-        $output .= bigbluebuttonbn_render_warning(
-            (string)$cfg['general_warning_message'],
-            (string)$cfg['general_warning_box_type'],
-            (string)$cfg['general_warning_button_href'],
-            (string)$cfg['general_warning_button_text'],
-            (string)$cfg['general_warning_button_class']);
-    }
+    // Renders warning messages when configured.
+    $output .= bigbluebuttonbn_view_warning_default_server($bbbsession);
+    $output .= bigbluebuttonbn_view_warning_general($bbbsession);
+    // Renders the rest of the page.
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
     if ($enabledfeatures['showroom']) {
@@ -318,7 +305,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
     if ($enabledfeatures['showrecordings']) {
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
         $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
+        $output .= html_writer::end_tag('div');
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
     } else if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
@@ -344,11 +333,17 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
     }
     $output = '';
     if ($type == BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
-        $output  = html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_header'));
+        $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
+        $output .= html_writer::end_tag('div');
     }
     if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_content'));
         $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
         $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
+        $output .= html_writer::end_tag('div');
     }
     return $output;
 }
@@ -449,7 +444,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
-            array('id' => 'bigbluebuttonbn_html_table'));
+            array('id' => 'bigbluebuttonbn_recordings_table'));
     }
     // There are recordings for this meeting.
     // JavaScript variables for recordings.
@@ -467,7 +462,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
             'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
           );
     // Render a YUI table.
-    return html_writer::div('', '', array('id' => 'bigbluebuttonbn_yui_table'));
+    return html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
 }
 
 /**
@@ -489,7 +484,7 @@ function bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures) {
               'class' => 'btn btn-secondary',
               'onclick' => 'window.location=\''.$CFG->wwwroot.'/mod/bigbluebuttonbn/import_view.php?bn='.
                   $bbbsession['bigbluebuttonbn']->id.'\''));
-    $output  = html_writer::start_tag('br');
+    $output  = html_writer::empty_tag('br');
     $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
     $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
     return $output;
@@ -515,20 +510,39 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
     return '';
 }
 
-// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
 /**
- * Make sure the passwords have been setup.
+ * Renders a default server warning message when using test-install.
  *
- * @param object $bigbluebuttonbn
+ * @param array $bbbsession
  *
- * @return void
+ * @return string
  */
-function bigbluebuttonbn_verify_passwords(&$bigbluebuttonbn) {
-    global $DB;
-    if (empty($bigbluebuttonbn->moderatorpass) || empty($bigbluebuttonbn->viewerpass)) {
-        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
-        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
-        // Store passwords in the database.
-        $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
+    if (!is_siteadmin($bbbsession['userID'])) {
+        return '';
     }
+    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+        return '';
+    }
+    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
+}
+
+/**
+ * Renders a general warning message when it is configured.
+ *
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_warning_general(&$bbbsession) {
+    if (!bigbluebuttonbn_view_warning_shown($bbbsession)) {
+        return '';
+    }
+    return bigbluebuttonbn_render_warning(
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_message'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_box_type'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_href'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_text'),
+        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_class')
+      );
 }
