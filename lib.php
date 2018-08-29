@@ -275,6 +275,17 @@ function bigbluebuttonbn_get_extra_capabilities() {
 }
 
 /**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * @param $data the data submitted from the reset course.
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_userdata($data) {
+    // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
+    // See MDL-9367.
+    return array();
+}
+
+/**
  * List of view style log actions.
  *
  * @return string[]
@@ -289,7 +300,7 @@ function bigbluebuttonbn_get_view_actions() {
  * @return string[]
  */
 function bigbluebuttonbn_get_post_actions() {
-    return array('update', 'add', 'create', 'join', 'end', 'left', 'publish', 'unpublish', 'delete');
+    return array('update', 'add', 'delete');
 }
 
 /**
@@ -671,6 +682,78 @@ function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
     return $areas;
+}
+
+/**
+ * Mark the activity completed (if required) and trigger the course_module_viewed event.
+ *
+ * @param  stdClass $bigbluebuttonbn        bigbluebuttonbn object
+ * @param  stdClass $course     course object
+ * @param  stdClass $cm         course module object
+ * @param  stdClass $context    context object
+ * @since Moodle 3.0
+ */
+function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
+
+    // Trigger course_module_viewed event.
+    $params = array(
+        'context' => $context,
+        'objectid' => $bigbluebuttonbn->id
+    );
+
+    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($params);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
+    $event->trigger();
+
+    // Completion.
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
+    return $updates;
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
+                                                       \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \mod_bigbluebuttonbn('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
 }
 
 /**

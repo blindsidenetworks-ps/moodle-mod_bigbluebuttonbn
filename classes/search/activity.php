@@ -29,13 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 
 if (class_exists('\core_search\base_activity')) {
     // Default core class for search.
-    abstract class base_activity extends \core_search\base_activity {}
+    abstract class base_activity extends \core_search\base_activity {
+    }
 } else if (class_exists('\core_search\area\base_activity')) {
-    // core class for search in Moodle 3.1.
-    abstract class base_activity extends \core_search\area\base_activity {}
+    // Core class for search in Moodle 3.1.
+    abstract class base_activity extends \core_search\area\base_activity {
+    }
 } else {
     // For bypassing non implemented core class for search (Totara and Moodle 3.0).
-    abstract class base_activity {}
+    abstract class base_activity {
+    }
 }
 
 /**
