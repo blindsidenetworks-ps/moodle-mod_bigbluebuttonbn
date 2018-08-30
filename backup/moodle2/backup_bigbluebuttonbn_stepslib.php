@@ -66,7 +66,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         // Define sources.
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
 
-        // This source definition only happen if we are including user info
+        // This source definition only happen if we are including user info.
         if ($userinfo) {
             $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
         }

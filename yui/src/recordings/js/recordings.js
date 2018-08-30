@@ -187,33 +187,33 @@ M.mod_bigbluebuttonbn.recordings = {
         inputtext.setAttribute('id', link.getAttribute('id'));
         inputtext.setAttribute('value', text.getHTML());
         inputtext.setAttribute('data-value', text.getHTML());
-        inputtext.setAttribute('onkeydown', 'M.mod_bigbluebuttonbn.recordings.recordingEditKeydown(this);');
-        inputtext.setAttribute('onfocusout', 'M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(this);');
+        inputtext.on('keydown', M.mod_bigbluebuttonbn.recordings.recordingEditKeydown);
+        inputtext.on('focusout', M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout);
         node.append(inputtext);
+        inputtext.focus().select();
     },
 
-    recordingEditKeydown: function(element) {
-        if (event.keyCode == 13) {
-            this.recordingEditPerform(element);
+    recordingEditKeydown: function(event) {
+        var keyCode = event.which || event.keyCode;
+        if (keyCode == 13) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditPerform(event.currentTarget);
             return;
         }
-        if (event.keyCode == 27) {
-            this.recordingEditOnfocusout(element);
+        if (keyCode == 27) {
+            M.mod_bigbluebuttonbn.recordings.recordingEditOnfocusout(event.currentTarget);
         }
     },
 
-    recordingEditOnfocusout: function(element) {
-        var inputtext = Y.one(element);
-        var node = inputtext.ancestor('div');
-        inputtext.hide();
+    recordingEditOnfocusout: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        nodeelement.hide();
         node.one('> span').show();
         node.one('> a').show();
     },
 
-    recordingEditPerform: function(element) {
-        var inputtext = Y.one(element);
-        var node = inputtext.ancestor('div');
-        var text = element.value;
+    recordingEditPerform: function(nodeelement) {
+        var node = nodeelement.ancestor('div');
+        var text = nodeelement.get('value').trim();
         // Perform the update.
         nodeelement.setAttribute('data-action', 'edit');
         nodeelement.setAttribute('data-goalstate', text);
@@ -240,6 +240,12 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingPlay: function(element) {
         var nodeelement = Y.one(element);
+        if (nodeelement.getAttribute('data-href') === '') {
+            M.mod_bigbluebuttonbn.helpers.alertError(
+                M.util.get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn')
+              );
+            return;
+        }
         var extras = {
             target: nodeelement.getAttribute('data-target'),
             source: 'published',
@@ -313,15 +319,12 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (data.action === 'unpublish') {
             this.recordingUnpublishCompletion(data.recordingid);
+            return;
         }
     },
 
     recordingActionFailover: function(data) {
-        var alert = new M.core.alert({
-            title: M.util.get_string('error', 'moodle'),
-            message: data.message
-        });
-        alert.show();
+        M.mod_bigbluebuttonbn.helpers.alertError(data.message);
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
             this.recordingEditCompletion(data, true);
@@ -332,7 +335,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var playbacks = Y.one('#playbacks-' + recordingid);
         playbacks.show();
         var preview = Y.one('#preview-' + recordingid);
-        if (preview == null) {
+        if (preview === null) {
             return;
         }
         preview.show();
@@ -343,7 +346,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var playbacks = Y.one('#playbacks-' + recordingid);
         playbacks.hide();
         var preview = Y.one('#preview-' + recordingid);
-        if (preview == null) {
+        if (preview === null) {
             return;
         }
         preview.hide();

@@ -490,33 +490,39 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     global $DB;
-    // Delete evento to the calendar when/if openingtime is NOT set.
+    $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
+        'instance' => $bigbluebuttonbn->id));
+    // Delete the event from calendar when/if openingtime is NOT set.
     if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
-        $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id));
+        if ($eventid) {
+            $calendarevent = calendar_event::load($eventid);
+            $calendarevent->delete();
+        }
         return;
     }
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
-    $event->type        = CALENDAR_EVENT_TYPE_ACTION;
-    $event->name        = $bigbluebuttonbn->name;
+    $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
+    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    $event->name = $bigbluebuttonbn->name . ' (' . get_string('starts_at', 'bigbluebuttonbn') . ')';
     $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
-    $event->courseid    = $bigbluebuttonbn->course;
-    $event->groupid     = 0;
-    $event->userid      = 0;
-    $event->modulename  = 'bigbluebuttonbn';
-    $event->instance    = $bigbluebuttonbn->id;
-    $event->eventtype   = \mod_bigbluebuttonbn\event\events::$events['meeting_create'];
-    $event->timestart   = $bigbluebuttonbn->openingtime;
-    $event->timesort    = $bigbluebuttonbn->openingtime;
+    $event->courseid = $bigbluebuttonbn->course;
+    $event->groupid = 0;
+    $event->userid = 0;
+    $event->modulename = 'bigbluebuttonbn';
+    $event->instance = $bigbluebuttonbn->id;
+    $event->timestart = $bigbluebuttonbn->openingtime;
     $event->timeduration = 0;
     if ($bigbluebuttonbn->closingtime) {
         $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
-    $event->durationtime = $event->timeduration;
-    $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
-        'instance' => $bigbluebuttonbn->id));
-    if ($event->id) {
-        $calendarevent = calendar_event::load($event->id);
+    $event->timesort = $event->timestart + $event->timeduration;
+    $event->visible = instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn);
+    $event->priority = null;
+    // Update the event in calendar when/if eventid was found.
+    if ($eventid) {
+        $event->id = $eventid;
+        $calendarevent = calendar_event::load($eventid);
         $calendarevent->update($event);
         return;
     }
@@ -541,12 +547,14 @@ function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
  * @return string
  */
 function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
-    $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
+    if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
+        return '';
+    }
     $context = context_module::instance($bigbluebuttonbn->coursemodule);
     // Set the filestorage object.
     $fs = get_file_storage();
     // Save the file if it exists that is currently in the draft area.
-    file_save_draft_area_files($draftitemid, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
+    file_save_draft_area_files($bigbluebuttonbn->presentation, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
     // Get the file if it exists.
     $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
         'itemid, filepath, filename', false);
@@ -691,4 +699,37 @@ function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
         'mod_bigbluebuttonbn:i/bigbluebutton' => 'fa-bigbluebutton',
     ];
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
+        \core_calendar\action_factory $factory) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+
+    // Check that the bigbluebuttonbn activity is open.
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
+    $actionable = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
+
+    $string = get_string('view_room', 'bigbluebuttonbn');
+    $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+    if (groups_get_activity_groupmode($cm) == NOGROUPS) {
+        // No groups mode.
+        $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
+        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+    }
+
+    return $factory->create_instance($string, $url, 1, $actionable);
 }

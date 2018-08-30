@@ -42,6 +42,38 @@ const BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY = 2;
 const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
 /** @var BIGBLUEBUTTONBN_ROLE_MODERATOR string defines the bigbluebutton moderator role */
 const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
+/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED string defines the bigbluebuttonbn activity_viewed event */
+const BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED = 'activity_viewed';
+/** @var BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED string defines the bigbluebuttonbn activity_management_viewed event */
+const BIGBLUEBUTTON_EVENT_ACTIVITY_MANAGEMENT_VIEWED = 'activity_management_viewed';
+/** @var BIGBLUEBUTTON_EVENT_LIVE_SESSION string defines the bigbluebuttonbn live_session event */
+const BIGBLUEBUTTON_EVENT_LIVE_SESSION = 'live_session';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_CREATED string defines the bigbluebuttonbn meeting_created event */
+const BIGBLUEBUTTON_EVENT_MEETING_CREATED = 'meeting_created';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_ENDED string defines the bigbluebuttonbn meeting_ended event */
+const BIGBLUEBUTTON_EVENT_MEETING_ENDED = 'meeting_ended';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_JOINED string defines the bigbluebuttonbn meeting_joined event */
+const BIGBLUEBUTTON_EVENT_MEETING_JOINED = 'meeting_joined';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_LEFT string defines the bigbluebuttonbn meeting_left event */
+const BIGBLUEBUTTON_EVENT_MEETING_LEFT = 'meeting_left';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_DELETED string defines the bigbluebuttonbn recording_deleted event */
+const BIGBLUEBUTTON_EVENT_RECORDING_DELETED = 'recording_deleted';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED string defines the bigbluebuttonbn recording_imported event */
+const BIGBLUEBUTTON_EVENT_RECORDING_IMPORTED = 'recording_imported';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED string defines the bigbluebuttonbn recording_protected event */
+const BIGBLUEBUTTON_EVENT_RECORDING_PROTECTED = 'recording_protected';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED string defines the bigbluebuttonbn recording_published event */
+const BIGBLUEBUTTON_EVENT_RECORDING_PUBLISHED = 'recording_published';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED string defines the bigbluebuttonbn recording_unprotected event */
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPROTECTED = 'recording_unprotected';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED string defines the bigbluebuttonbn recording_unpublished event */
+const BIGBLUEBUTTON_EVENT_RECORDING_UNPUBLISHED = 'recording_unpublished';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_EDITED string defines the bigbluebuttonbn recording_edited event */
+const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
+/** @var BIGBLUEBUTTON_EVENT_RECORDING_VIEWED string defines the bigbluebuttonbn recording_viewed event */
+const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
+/** @var BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
+const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
 
 /**
  * Register a bigbluebuttonbn event
@@ -461,21 +493,6 @@ function bigbluebuttonbn_end_meeting($meetingid, $modpw) {
 }
 
 /**
- * Perform isMeetingRunning on BBB.
- *
- * @param string $meetingid
- */
-function bigbluebuttonbn_is_meeting_running($meetingid) {
-    /* As a workaround to isMeetingRunning that always return SUCCESS but only returns true
-     * when at least one user is in the session, we use getMeetingInfo instead.
-     */
-    $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
-      );
-    return ($xml && $xml->returncode == 'SUCCESS');
-}
-
-/**
  * Perform api request on BBB.
  *
  * @return string
@@ -548,7 +565,6 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', 
         if (is_null($data) || is_array($data)) {
             return $c->post($url);
         }
-
         $options = array();
         $options['CURLOPT_HTTPHEADER'] = array(
                  'Content-Type: '.$contenttype,
@@ -557,6 +573,10 @@ function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', 
                );
 
         return $c->post($url, $data, $options);
+    }
+    if ($method == 'HEAD') {
+        $c->head($url, array('followlocation' => true, 'timeout' => 1));
+        return $c->get_info();
     }
     return $c->get($url);
 }
@@ -1086,6 +1106,22 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $updatecache = false) {
 }
 
 /**
+ * Perform isMeetingRunning on BBB.
+ *
+ * @param string $meetingid
+ * @param boolean $updatecache
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_is_meeting_running($meetingid, $updatecache = false) {
+    /* As a workaround to isMeetingRunning that always return SUCCESS but only returns true
+     * when at least one user is in the session, we use getMeetingInfo instead.
+     */
+    $meetinginfo = bigbluebuttonbn_get_meeting_info($meetingid, $updatecache);
+    return ($meetinginfo['returncode'] === 'SUCCESS');
+}
+
+/**
  * Publish an imported recording.
  *
  * @param string $id
@@ -1308,12 +1344,17 @@ function bigbluebuttonbn_get_recording_data_row_date_formatted($starttime) {
  * @return integer
  */
 function bigbluebuttonbn_get_recording_data_row_duration($recording) {
-    $firstplayback = array_values($recording['playbacks'])[0];
-    $length = 0;
-    if (isset($firstplayback['length'])) {
-        $length = $firstplayback['length'];
+    foreach (array_values($recording['playbacks']) as $playback) {
+        // Ignore restricted playbacks.
+        if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'true') {
+            continue;
+        }
+        // Take the lenght form the fist playback with an actual value.
+        if (!empty($playback['length'])) {
+            return intval($playback['length']);
+        }
     }
-    return intval($length);
+    return 0;
 }
 
 /**
@@ -1407,24 +1448,45 @@ function bigbluebuttonbn_get_recording_data_row_action_publish($published) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview($recording) {
-    $options = array('id' => 'preview-'.$recording['recordID'], 'class' => 'container');
+    $options = array('id' => 'preview-'.$recording['recordID']);
     if ($recording['published'] === 'false') {
         $options['hidden'] = 'hidden';
     }
     $recordingpreview = html_writer::start_tag('div', $options);
     foreach ($recording['playbacks'] as $playback) {
         if (isset($playback['preview'])) {
-            $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
-            foreach ($playback['preview'] as $image) {
-                $recordingpreview .= html_writer::empty_tag('img',
-                    array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail col-sm'));
-            }
-            $recordingpreview .= html_writer::end_tag('div');
-            $recordingpreview .= html_writer::tag('div',
-                get_string('view_recording_preview_help', 'bigbluebuttonbn'), array('class' => 'row text-muted small'));
+            $recordingpreview .= bigbluebuttonbn_get_recording_data_row_preview_images($playback);
             break;
         }
     }
+    $recordingpreview .= html_writer::end_tag('div');
+    return $recordingpreview;
+}
+
+/**
+ * Helper function builds element with actual images used in recording preview row based on a selected playback.
+ *
+ * @param array $playback
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
+    $recordingpreview  = html_writer::start_tag('div', array('class' => 'container-fluid'));
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
+    foreach ($playback['preview'] as $image) {
+        if (!bigbluebuttonbn_validate_resource(trim($image['url']))) {
+            return '';
+        }
+        $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
+        $recordingpreview .= html_writer::empty_tag('img',
+            array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail pull-left'));
+        $recordingpreview .= html_writer::end_tag('div');
+    }
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
+    $recordingpreview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'),
+        array('class' => 'text-center text-muted small'));
+    $recordingpreview .= html_writer::end_tag('div');
     $recordingpreview .= html_writer::end_tag('div');
     return $recordingpreview;
 }
@@ -1473,23 +1535,43 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     if (!bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
         return '';
     }
-    $title = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
-    $onclick = 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);';
+    $text = get_string('view_recording_format_'.$playback['type'], 'bigbluebuttonbn');
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
       '&mid='.$recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
         $href .= '&href='.urlencode(trim($playback['url']));
     }
-    $id = 'recording-play-' . $playback['type'] . '-' . $recording['recordID'];
     $linkattributes = array(
-        'id' => $id,
-        'onclick' => $onclick,
+        'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
+        'class' => 'btn btn-sm btn-default',
+        'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
         'data-action' => 'play',
         'data-target' => $playback['type'],
         'data-href' => $href,
-        'class' => 'btn btn-sm btn-default'
       );
-    return $OUTPUT->action_link('#', $title, null, $linkattributes) . '&#32;';
+    if (!bigbluebuttonbn_validate_resource(trim($playback['url']))) {
+        $linkattributes['class'] = 'btn btn-sm btn-warning';
+        $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+        unset($linkattributes['data-href']);
+    }
+    return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
+}
+
+/**
+ * Helper function validates a remote resource.
+ *
+ * @param string $url
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_validate_resource($url) {
+    $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
+    if (isset($curlinfo['http_code']) && $curlinfo['http_code'] != 200) {
+        $error = "Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code'];
+        debugging($error, DEBUG_DEVELOPER);
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -1729,7 +1811,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
  */
 function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata) {
     $row = new html_table_row();
-    $row->id = 'recording-td-'.$recording['recordID'];
+    $row->id = 'recording-tr-'.$recording['recordID'];
     $row->attributes['data-imported'] = 'false';
     $texthead = '';
     $texttail = '';
@@ -2513,6 +2595,10 @@ function bigbluebuttonbn_encode_meetingid($seed) {
  * @return boolean
  */
 function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback) {
+    // All types that are not restricted are included.
+    if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
+        return true;
+    }
     // All types that are not statistics are included.
     if ($playback['type'] != 'statistics') {
         return true;
@@ -2584,4 +2670,88 @@ function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $
     $output .= '          >' . $text . '</button>'."\n";
     $output .= '  </form>'."\n";
     return $output;
+}
+
+/**
+ * Check if a BigBlueButtonBN is available to be used by the current user.
+ *
+ * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+ *
+ * @return boolean                     status if room available and current user allowed to join
+ */
+function bigbluebuttonbn_get_availability_status($bigbluebuttonbn) {
+    list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+
+    return ($roomavailable && $usercanjoin);
+}
+
+/**
+ * Helper for evaluating if scheduled activity is avaiable.
+ *
+ * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+ *
+ * @return array                       status (room available or not and possible warnings)
+ */
+function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
+    $open = true;
+    $closed = false;
+    $warnings = array();
+
+    $timenow = time();
+    $timeopen = $bigbluebuttonbn->openingtime;
+    $timeclose = $bigbluebuttonbn->closingtime;
+    if (!empty($timeopen) && $timeopen > $timenow) {
+        $open = false;
+    }
+    if (!empty($timeclose) && $timenow > $timeclose) {
+        $closed = true;
+    }
+
+    if (!$open || $closed) {
+        if (!$open) {
+            $warnings['notopenyet'] = userdate($timeopen);
+        }
+        if ($closed) {
+            $warnings['expired'] = userdate($timeclose);
+        }
+        return array(false, $warnings);
+    }
+
+    return array(true, $warnings);
+}
+
+
+/**
+ * Helper for evaluating if meeting can be joined.
+ *
+ * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+ * @param  string   $meetingid
+ * @param  integer  $userid
+ *
+ * @return array    status (user allowed to join or not and possible message)
+ */
+function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $meetingid = null, $userid = null) {
+
+    // By default, use a meetingid without groups.
+    if (empty($meetingid)) {
+        $meetingid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->courseid . '-' . $bigbluebuttonbn->id;
+    }
+
+    // When meeting is running, all authorized users can join right in.
+    if (bigbluebuttonbn_is_meeting_running($meetingid)) {
+        return array(true, get_string('view_message_conference_in_progress', 'bigbluebuttonbn'));
+    }
+
+    // When meeting is not running, see if the user can join.
+    $context = context_course::instance($bigbluebuttonbn->course);
+    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+    $isadmin = is_siteadmin($userid);
+    $ismoderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $userid);
+    // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
+    if ($isadmin || $ismoderator || !$bigbluebuttonbn->wait) {
+        return array(true, get_string('view_message_conference_room_ready', 'bigbluebuttonbn'));
+    }
+    // Otherwise, no join allowed.
+    return array(false, get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'));
 }
