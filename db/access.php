@@ -40,7 +40,7 @@ $capabilities = array(
         ),
 
         // Ability to join a meeting.
-        'mod/bigbluebuttonbn:join' => array(
+        'mod/bigbluebuttonbn:view' => array(
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'legacy' => array(

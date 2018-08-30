@@ -37,7 +37,72 @@ defined('MOODLE_INTERNAL') || die();
 abstract class activity_base extends \core_analytics\local\indicator\community_of_inquiry_activity {
 
     /**
-     * No need to fetch grades for resources.
+     * feedback_viewed_events
+     *
+     * @return string[]
+     */
+    protected function feedback_viewed_events() {
+        return array('\mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed',
+            '\mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_joined',
+            '\mod_bigbluebuttonbn\event\bigbluebuttonbn_meeting_left');
+    }
+
+    /**
+     * feedback_replied_events
+     *
+     * @return string[]
+     */
+    protected function feedback_replied_events() {
+        return array('\mod_bigbluebuttonbn\event\message_sent');
+    }
+
+    /**
+     * feedback_post_action
+     *
+     * @param \cm_info $cm
+     * @param int $contextid
+     * @param int $userid
+     * @param string[] $eventnames
+     * @param int $after
+     * @return bool
+     */
+    protected function feedback_post_action(\cm_info $cm, $contextid, $userid, $eventnames, $after = false) {
+
+        if (empty($this->activitylogs[$contextid][$userid])) {
+            return false;
+        }
+
+        $logs = $this->activitylogs[$contextid][$userid];
+
+        if (empty($logs['\mod_bigbluebuttonbn\event\message_sent'])) {
+            // No feedback viewed if there is no submission.
+            return false;
+        }
+
+        // First user message time.
+        $firstmessage = $logs['\mod_bigbluebuttonbn\event\message_sent']->timecreated[0];
+
+        // We consider feedback another user messages.
+        foreach ($this->activitylogs[$contextid] as $anotheruserid => $logs) {
+            if ($anotheruserid == $userid) {
+                continue;
+            }
+            if (empty($logs['\mod_bigbluebuttonbn\event\message_sent'])) {
+                continue;
+            }
+            $firstmessagesenttime = $logs['\mod_bigbluebuttonbn\event\message_sent']->timecreated[0];
+
+            if (parent::feedback_post_action($cm, $contextid, $userid, $eventnames, $firstmessagesenttime)) {
+                return true;
+            }
+            // Continue with the next user.
+        }
+
+        return false;
+    }
+
+    /**
+     * feedback_check_grades
      *
      * @return bool
      */
