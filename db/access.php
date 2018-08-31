@@ -28,38 +28,39 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-        'mod/bigbluebuttonbn:addinstance' => array(
-                'riskbitmask' => RISK_XSS,
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
-                'archetypes' => array(
-                        'manager' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                ),
-                'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    // Ability to add a new bigbluebuttonbn instance.
+    'mod/bigbluebuttonbn:addinstance' => array(
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
         ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
 
-        // Ability to join a meeting.
-        'mod/bigbluebuttonbn:join' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'manager' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                        'student' => CAP_ALLOW,
-                        'guest' => CAP_ALLOW,
-                ),
+    // Ability to join a meeting.
+    'mod/bigbluebuttonbn:join' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'guest' => CAP_ALLOW,
         ),
+    ),
 
-        // Ability to manage recordings.
-        'mod/bigbluebuttonbn:managerecordings' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'manager' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                ),
+    // Ability to manage recordings.
+    'mod/bigbluebuttonbn:managerecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
         ),
+    ),
 );

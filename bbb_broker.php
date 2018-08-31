@@ -183,7 +183,7 @@ function bigbluebuttonbn_broker_meeting_info($bbbsession, $params, $updatecache)
  * @param boolean $running
  * @param boolean $participantcount
  *
- * @return boolean
+ * @return array
  */
 function bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount) {
     $status = array("can_join" => false);
@@ -327,8 +327,9 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
     }
     $meta = json_decode($params['meta'], true);
     foreach (array_keys($meta) as $key) {
+        $callbackresponse[$key] = '';
         if (isset($recording[$key])) {
-            $callbackresponse[$key] = $recording[$key];
+            $callbackresponse[$key] = trim($recording[$key]);
         }
     }
     return $callbackresponse;
