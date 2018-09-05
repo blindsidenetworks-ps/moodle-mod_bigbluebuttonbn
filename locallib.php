@@ -1611,13 +1611,27 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
  * @return boolean
  */
 function bigbluebuttonbn_validate_resource($url) {
+    $urlhost = parse_url($url, PHP_URL_HOST);
+    $serverurlhost = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'), PHP_URL_HOST);
+    // Skip validation when the recording URL host is the same as the configured BBB server.
+    if ($urlhost == $serverurlhost) {
+        return true;
+    }
+    // Skip validation when the recording URL was already validated.
+    $validatedurls = bigbluebuttonbn_cache_get('recordings_cache', 'validated_urls', array());
+    if (array_key_exists($urlhost, $validatedurls)) {
+        return $validatedurls[$urlhost];
+    }
+    // Validate the recording URL.
+    $validatedurls[$urlhost] = true;
     $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
-    if (isset($curlinfo['http_code']) && $curlinfo['http_code'] != 200) {
+    if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
         $error = "Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code'];
         debugging($error, DEBUG_DEVELOPER);
-        return false;
+        $validatedurls[$urlhost] = false;
     }
-    return true;
+    bigbluebuttonbn_cache_set('recordings_cache', 'validated_urls', $validatedurls);
+    return $validatedurls[$urlhost];
 }
 
 /**
@@ -2771,7 +2785,6 @@ function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
     return array(true, $warnings);
 }
 
-
 /**
  * Helper for evaluating if meeting can be joined.
  *
@@ -2804,4 +2817,34 @@ function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $meetingid = nu
     }
     // Otherwise, no join allowed.
     return array(false, get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn'));
+}
+
+/**
+ * Helper for getting a value from a bigbluebuttonbn cache.
+ *
+ * @param  string   $name       BigBlueButtonBN cache
+ * @param  string   $key        Key to be retrieved
+ * @param  integer  $default    Default value in case key is not found or it is empty
+ *
+ * @return variable key value
+ */
+function bigbluebuttonbn_cache_get($name, $key, $default = null) {
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
+    $result = $cache->get($key);
+    if (!empty($result)) {
+        return $result;
+    }
+    return $default;
+}
+
+/**
+ * Helper for setting a value in a bigbluebuttonbn cache.
+ *
+ * @param  string   $name       BigBlueButtonBN cache
+ * @param  string   $key        Key to be created/updated
+ * @param  variable $value      Default value to be set
+ */
+function bigbluebuttonbn_cache_set($name, $key, $value) {
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
+    $result = $cache->set($key, $value);
 }
