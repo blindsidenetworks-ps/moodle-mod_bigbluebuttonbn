@@ -1626,7 +1626,7 @@ function bigbluebuttonbn_validate_resource($url) {
     $validatedurls[$urlhost] = true;
     $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
     if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
-        $error = "Resource " . $url . " is unreachable. Server responded with code " . $curlinfo['http_code'];
+        $error = "Resources hosted by " . $urlhost . " are unreachable. Server responded with code " . $curlinfo['http_code'];
         debugging($error, DEBUG_DEVELOPER);
         $validatedurls[$urlhost] = false;
     }
