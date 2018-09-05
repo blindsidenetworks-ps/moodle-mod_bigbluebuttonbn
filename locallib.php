@@ -2776,20 +2776,20 @@ function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
  * Helper for evaluating if meeting can be joined.
  *
  * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
- * @param  string   $meetingid
+ * @param  string   $mid
  * @param  integer  $userid
  *
  * @return array    status (user allowed to join or not and possible message)
  */
-function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $meetingid = null, $userid = null) {
+function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $mid = null, $userid = null) {
 
     // By default, use a meetingid without groups.
-    if (empty($meetingid)) {
-        $meetingid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->courseid . '-' . $bigbluebuttonbn->id;
+    if (empty($mid)) {
+        $mid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id;
     }
 
     // When meeting is running, all authorized users can join right in.
-    if (bigbluebuttonbn_is_meeting_running($meetingid)) {
+    if (bigbluebuttonbn_is_meeting_running($mid)) {
         return array(true, get_string('view_message_conference_in_progress', 'bigbluebuttonbn'));
     }
 
