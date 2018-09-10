@@ -134,7 +134,9 @@ switch (strtolower($action)) {
         // Moodle event logger: Create an event for meeting created.
         bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $cm);
         // Internal logger: Insert a record with the meeting created.
-        bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_CREATE);
+        $overrides = array('meetingid' => $bbbsession['meetingid']);
+        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
         bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
         break;
@@ -329,7 +331,8 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $cm);
     // Internal logger: Instert a record with the meeting created.
-    bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_JOIN);
+    $overrides = array('meetingid' => $bbbsession['meetingid']);
+    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides);
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],
         ($bbbsession['administrator'] || $bbbsession['moderator']));

@@ -73,6 +73,10 @@ $CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 /** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_ADD string of event add for bigbluebuttonbn_logs */
+const BIGBLUEBUTTONBN_LOG_EVENT_ADD = 'Add';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_EDIT string of event edit for bigbluebuttonbn_logs */
+const BIGBLUEBUTTONBN_LOG_EVENT_EDIT = 'Edit';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_CREATE string of event create for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = 'Create';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string of event join for bigbluebuttonbn_logs */
@@ -140,9 +144,11 @@ function bigbluebuttonbn_add_instance($data) {
     // Insert a record.
     $data->id = $DB->insert_record('bigbluebuttonbn', $data);
     // Encode meetingid.
-    $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+    $data->meetingid = bigbluebuttonbn_encode_meetingid($data->id);
     // Set the meetingid column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $data->meetingid, array('id' => $data->id));
+    // Log insert action.
+    bigbluebuttonbn_log($data, BIGBLUEBUTTONBN_LOG_EVENT_ADD);
     // Complete the process.
     bigbluebuttonbn_process_post_save($data);
     return $data->id;
@@ -165,6 +171,10 @@ function bigbluebuttonbn_update_instance($data) {
     $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $data);
+    // Get the meetingid column in the bigbluebuttonbn table.
+    $data->meetingid = (string)$DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $data->id));
+    // Log update action.
+    bigbluebuttonbn_log($data, BIGBLUEBUTTONBN_LOG_EVENT_EDIT);
     // Complete the process.
     bigbluebuttonbn_process_post_save($data);
     return true;
@@ -207,25 +217,12 @@ function bigbluebuttonbn_delete_instance($id) {
  * @return bool Success/Failure
  */
 function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
-    global $DB, $USER;
-    $log = new stdClass();
-    $log->meetingid = $bigbluebuttonbn->meetingid;
-    $log->courseid = $bigbluebuttonbn->course;
-    $log->bigbluebuttonbnid = $bigbluebuttonbn->id;
-    $log->userid = $USER->id;
-    $log->timecreated = time();
-    $log->log = BIGBLUEBUTTONBN_LOG_EVENT_DELETE;
+    global $DB;
     $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
     $sql .= "WHERE bigbluebuttonbnid = ? AND log = ? AND ". $DB->sql_compare_text('meta') . " = ?";
     $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, BIGBLUEBUTTONBN_LOG_EVENT_CREATE, "{\"record\":true}"));
-    $log->meta = "{\"has_recordings\":false}";
-    if (!empty($logs)) {
-        $log->meta = "{\"has_recordings\":true}";
-    }
-    if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
-        return false;
-    }
-    return true;
+    $meta = "{\"has_recordings\":" . empty($logs) ? "true" : "false" . "}";
+    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTONBN_LOG_EVENT_DELETE, [], $meta);
 }
 
 /**
@@ -729,4 +726,35 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
     }
 
     return $factory->create_instance($string, $url, 1, $actionable);
+}
+
+/**
+ * Register a bigbluebuttonbn event
+ *
+ * @param array  $bbbsession
+ * @param string $event
+ * @param array  $overrides
+ * @param string $meta
+ *
+ * @return bool Success/Failure
+ */
+function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $meta = null) {
+    global $DB, $USER;
+    $log = new stdClass();
+    // Default values.
+    $log->courseid = $bigbluebuttonbn->course;
+    $log->bigbluebuttonbnid = $bigbluebuttonbn->id;
+    $log->userid = $USER->id;
+    $log->meetingid = $bigbluebuttonbn->meetingid;
+    $log->timecreated = time();
+    $log->log = $event;
+    $log->meta = $meta;
+    // Overrides.
+    foreach ($overrides as $key => $value) {
+        $log->$key = $value;
+    }
+    if ($DB->insert_record('bigbluebuttonbn_logs', $log)) {
+        return true;
+    }
+    return false;
 }

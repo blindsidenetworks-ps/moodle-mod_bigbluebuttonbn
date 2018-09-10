@@ -76,38 +76,6 @@ const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
 const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
 
 /**
- * Register a bigbluebuttonbn event
- *
- * @param array  $bbbsession
- * @param string $event
- * @param array  $overrides
- * @param string $meta
- *
- * @return void
- */
-function bigbluebuttonbn_logs(array $bbbsession, $event, array $overrides = [], $meta = null) {
-    global $DB;
-    $log = new stdClass();
-    // Default values.
-    $log->courseid = $bbbsession['course']->id;
-    $log->bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
-    $log->userid = $bbbsession['userID'];
-    $log->meetingid = $bbbsession['meetingid'];
-    $log->timecreated = time();
-    // Overrides.
-    foreach ($overrides as $key => $value) {
-        $log->$key = $value;
-    }
-    $log->log = $event;
-    if (isset($meta)) {
-        $log->meta = $meta;
-    } else if ($event == BIGBLUEBUTTONBN_LOG_EVENT_CREATE) {
-        $log->meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
-    }
-    $DB->insert_record('bigbluebuttonbn_logs', $log);
-}
-
-/**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
  *
  * @param string $meetingid
@@ -740,56 +708,61 @@ function bigbluebuttonbn_get_participant_data($context) {
  */
 function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
     if ($bigbluebuttonbn == null) {
-        return bigbluebuttonbn_get_participant_list_default($context);
+        return array();
     }
-    return bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn);
+    if (empty($bigbluebuttonbn->participants)) {
+        $bigbluebuttonbn->participants = "[]";
+    }
+    $rules = json_decode($bigbluebuttonbn->participants, true);
+    if (empty($rules)) {
+        $rules = bigbluebuttonbn_get_participant_list_default($context, bigbluebuttonbn_instance_ownerid($bigbluebuttonbn));
+    }
+    $rulesencoded = bigbluebuttonbn_get_participant_rules_encoded($rules);
+    return $rulesencoded;
 }
 
 /**
  * Returns an array to populate a list of participants used in mod_form.php with default values.
  *
  * @param context $context
+ * @param integer $ownerid
  *
  * @return array
  */
-function bigbluebuttonbn_get_participant_list_default($context) {
-    global $USER;
-    $participantlistarray = array();
-    $participantlistarray[] = array(
+function bigbluebuttonbn_get_participant_list_default($context, $ownerid = null) {
+    $participantlist = array();
+    $participantlist[] = array(
         'selectiontype' => 'all',
         'selectionid' => 'all',
-        'role' => BIGBLUEBUTTONBN_ROLE_VIEWER);
-    $moderatordefaults = explode(',', \mod_bigbluebuttonbn\locallib\config::get('participant_moderator_default'));
-    foreach ($moderatordefaults as $moderatordefault) {
-        if ($moderatordefault == '0') {
-            if (is_enrolled($context, $USER->id)) {
-                $participantlistarray[] = array(
+        'role' => BIGBLUEBUTTONBN_ROLE_VIEWER
+      );
+    $defaultrules = explode(',', \mod_bigbluebuttonbn\locallib\config::get('participant_moderator_default'));
+    foreach ($defaultrules as $defaultrule) {
+        if ($defaultrule == '0') {
+            if (!empty($ownerid) && is_enrolled($context, $ownerid)) {
+                $participantlist[] = array(
                     'selectiontype' => 'user',
-                    'selectionid' => $USER->id,
+                    'selectionid' => (string)$ownerid,
                     'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
             }
             continue;
         }
-        $participantlistarray[] = array(
+        $participantlist[] = array(
               'selectiontype' => 'role',
-              'selectionid' => $moderatordefault,
+              'selectionid' => $defaultrule,
               'role' => BIGBLUEBUTTONBN_ROLE_MODERATOR);
     }
-    return $participantlistarray;
+    return $participantlist;
 }
 
 /**
  * Returns an array to populate a list of participants used in mod_form.php with bigbluebuttonbn values.
  *
- * @param object $bigbluebuttonbn
+ * @param array $rules
  *
  * @return array
  */
-function bigbluebuttonbn_get_participant_rules_encoded($bigbluebuttonbn) {
-    $rules = json_decode($bigbluebuttonbn->participants, true);
-    if (!is_array($rules)) {
-        return array();
-    }
+function bigbluebuttonbn_get_participant_rules_encoded($rules) {
     foreach ($rules as $key => $rule) {
         if ($rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid'])) {
             continue;
@@ -827,18 +800,13 @@ function bigbluebuttonbn_get_participant_selection_data() {
  * Evaluate if a user in a context is moderator based on roles and participation rules.
  *
  * @param context $context
- * @param string $participants
+ * @param array $participants
  * @param integer $userid
  *
  * @return boolean
  */
-function bigbluebuttonbn_is_moderator($context, $participants, $userid = null) {
+function bigbluebuttonbn_is_moderator($context, $participantlist, $userid = null) {
     global $USER;
-    if (empty($participants)) {
-        // The room that is being used comes from a previous version.
-        return has_capability('mod/bigbluebuttonbn:moderate', $context);
-    }
-    $participantlist = json_decode($participants);
     if (!is_array($participantlist)) {
         return false;
     }
@@ -881,19 +849,19 @@ function bigbluebuttonbn_is_moderator_validator($participantlist, $userid, $user
  * @return boolean
  */
 function bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $userroles) {
-    if ($participant->role == BIGBLUEBUTTONBN_ROLE_VIEWER) {
+    if ($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER) {
         return false;
     }
     // Looks for all configuration.
-    if ($participant->selectiontype == 'all') {
+    if ($participant['selectiontype'] == 'all') {
         return true;
     }
     // Looks for users.
-    if ($participant->selectiontype == 'user' && $participant->selectionid == $userid) {
+    if ($participant['selectiontype'] == 'user' && $participant['selectionid'] == $userid) {
         return true;
     }
     // Looks for roles.
-    $role = bigbluebuttonbn_get_role($participant->selectionid);
+    $role = bigbluebuttonbn_get_role($participant['selectionid']);
     if ($role != null && array_key_exists($role->id, $userroles)) {
         return true;
     }
@@ -2810,7 +2778,7 @@ function bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn, $mid = null, $u
     $context = context_course::instance($bigbluebuttonbn->course);
     $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
     $isadmin = is_siteadmin($userid);
-    $ismoderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $userid);
+    $ismoderator = bigbluebuttonbn_is_moderator($context, $participantlist, $userid);
     // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
     if ($isadmin || $ismoderator || !$bigbluebuttonbn->wait) {
         return array(true, get_string('view_message_conference_room_ready', 'bigbluebuttonbn'));
@@ -2847,4 +2815,18 @@ function bigbluebuttonbn_cache_get($name, $key, $default = null) {
 function bigbluebuttonbn_cache_set($name, $key, $value) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
     $result = $cache->set($key, $value);
+}
+
+/**
+ * Helper for getting the owner userid of a bigbluebuttonbn instance.
+ *
+ * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+ *
+ * @return integer ownerid (a valid user id or null if not registered/found)
+ */
+function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
+    global $DB;
+    $filters = array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => 'Add');
+    $ownerid = (integer)$DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
+    return $ownerid;
 }
