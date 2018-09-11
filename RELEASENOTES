@@ -1,6 +1,7 @@
 2.2.6 (2017101014)
 Hot-fix:  Fixed issue with room viewing too slow when several recordings where included (CONTRIB-7435).
 Bug: Fixed regression issue with activities still not listed in Timeline tab (CONTRIB-7377).
+Bug: Fixed issue with default settings for moderator not applied to existent activities (CONTRIB-7437).
 
 2.2.5 (2017101013)
 Bug: Fixed issue with recording length shown as 0 in some cases (CONTRIB-7383).
