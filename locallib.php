@@ -707,8 +707,11 @@ function bigbluebuttonbn_get_participant_data($context) {
  * @return array
  */
 function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
+    global $USER;
     if ($bigbluebuttonbn == null) {
-        return array();
+        return bigbluebuttonbn_get_participant_rules_encoded(
+            bigbluebuttonbn_get_participant_list_default($context, $USER->id)
+        );
     }
     if (empty($bigbluebuttonbn->participants)) {
         $bigbluebuttonbn->participants = "[]";
@@ -717,8 +720,7 @@ function bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context) {
     if (empty($rules)) {
         $rules = bigbluebuttonbn_get_participant_list_default($context, bigbluebuttonbn_instance_ownerid($bigbluebuttonbn));
     }
-    $rulesencoded = bigbluebuttonbn_get_participant_rules_encoded($rules);
-    return $rulesencoded;
+    return bigbluebuttonbn_get_participant_rules_encoded($rules);
 }
 
 /**
