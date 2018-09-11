@@ -1,0 +1,36 @@
+{{=<% %>=}}
+<div>
+    <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
+
+    <ion-list>
+        <ion-list-header>
+            <p class="item-heading">{{ 'plugin.mod_bigbluebuttonbn.summaryofattempts' | translate }}</p>
+        </ion-list-header>
+
+        <%#issues%>
+            <ion-item>
+                <button ion-button block color="light" core-site-plugins-new-content title="<% bigbluebuttonbn.name %>" component="mod_bigbluebuttonbn" method="mobile_issues_view" [args]="{cmid: <% cmid %>, courseid: <% courseid %>}">
+                    {{ 'plugin.mod_bigbluebuttonbn.viewbigbluebuttonbnviews' | translate: {$a: <% numissues %>} }}
+                </button>
+            </ion-item>
+        <%/issues%>
+
+        <%#showget%>
+        <ion-item>
+            <button ion-button block core-course-download-module-main-file moduleId="<% cmid %>" courseId="<% bigbluebuttonbn.course %>" component="mod_bigbluebuttonbn" [files]="[{fileurl: '<% issue.fileurl %>', filename: '<% issue.filename %>', timemodified: '<% issue.timemodified %>', mimetype: '<% issue.mimetype %>'}]">
+                <ion-icon name="cloud-download" item-start></ion-icon>
+                {{ 'plugin.mod_bigbluebuttonbn.getbigbluebuttonbn' | translate }}
+            </button>
+        </ion-item>
+        <%/showget%>
+
+        <%^showget%>
+        <ion-item>
+            <p>{{ 'plugin.mod_bigbluebuttonbn.requiredtimenotmet' | translate }}</p>
+        </ion-item>
+        <%/showget%>
+
+        <!-- Call log WS when the template is loaded. -->
+        <span core-site-plugins-call-ws-on-load name="mod_bigbluebuttonbn_view_bigbluebuttonbn" [params]="{bigbluebuttonbnid: <% bigbluebuttonbn.id %>}" [preSets]="{getFromCache: 0, saveToCache: 0}"></span>
+    </ion-list>
+</div>
