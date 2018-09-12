@@ -224,9 +224,8 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
     /**
      * Mimicks the creation of an bigbluebuttonbn log.
      *
-     * @param int $courseid
-     * @param int $bigbluebuttonbnid
-     * @param int $userid
+     * @param object $bigbluebuttonbn
+     * @param object $user
      */
     protected function create_bigbluebuttonbn_log($bigbluebuttonbn, $user) {
         $overrides = [
