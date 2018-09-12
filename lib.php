@@ -731,7 +731,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
 /**
  * Register a bigbluebuttonbn event
  *
- * @param array  $bbbsession
+ * @param object $bigbluebuttonbn
  * @param string $event
  * @param array  $overrides
  * @param string $meta

@@ -802,7 +802,7 @@ function bigbluebuttonbn_get_participant_selection_data() {
  * Evaluate if a user in a context is moderator based on roles and participation rules.
  *
  * @param context $context
- * @param array $participants
+ * @param array $participantlist
  * @param integer $userid
  *
  * @return boolean
