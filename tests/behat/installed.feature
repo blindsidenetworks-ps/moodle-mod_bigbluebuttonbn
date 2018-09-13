@@ -5,8 +5,8 @@ Feature: Installation succeeds
   I need the installation to work
 
   Scenario: Check the Plugins overview for the name of this plugin
-    Given I log in as "admin"
-    And I navigate to "Plugins overview" node in "Site administration > Plugins"
+    When I log in as "admin"
+    And I navigate to "Plugins > Plugins overview" in site administration
     Then the following should exist in the "plugins-control-panel" table:
         |BigBlueButtonBN|
         |mod_bigbluebutton|
