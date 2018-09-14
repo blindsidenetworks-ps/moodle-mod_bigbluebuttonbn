@@ -38,8 +38,8 @@ class bigbluebuttonbn_activity_management_viewed extends base
     /**
      * Init method.
      */
-    protected function init() {
-        parent::init();
+    protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
+        parent::init($crud, $edulevel);
         $this->description = "The user with id '##userid' viewed the bigbluebuttonbn activity management page for ".
         "the course module id '##contextinstanceid'.";
     }

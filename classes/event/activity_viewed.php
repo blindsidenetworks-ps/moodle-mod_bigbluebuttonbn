@@ -39,8 +39,8 @@ class activity_viewed extends base
     /**
      * Init method.
      */
-    protected function init() {
-        parent::init('r', self::LEVEL_PARTICIPATING);
+    protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
+        parent::init($crud, $edulevel);
         $this->description = "The user with id '##userid' viewed the bigbluebuttonbn activity " .
             "with id '##objectid' for the course id '##courseid'.";
     }

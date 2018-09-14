@@ -39,8 +39,8 @@ class recording_imported extends base
     /**
      * Init method.
      */
-    protected function init() {
-        parent::init('r', self::LEVEL_OTHER);
+    protected function init($crud = 'r', $edulevel = self::LEVEL_OTHER) {
+        parent::init($crud, $edulevel);
         $this->description = "The user with id '##userid' has imported a recording with id ".
             "'##other' in the course id '##courseid'.";
     }

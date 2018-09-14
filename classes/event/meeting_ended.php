@@ -39,8 +39,8 @@ class meeting_ended extends base
     /**
      * Init method.
      */
-    protected function init() {
-        parent::init('r', self::LEVEL_OTHER);
+    protected function init($crud = 'r', $edulevel = self::LEVEL_OTHER) {
+        parent::init($crud, $edulevel);
         $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
             "'##objectid' for the course id '##courseid' has been forcibly ".
             "ended by the user with id '##userid'.";
