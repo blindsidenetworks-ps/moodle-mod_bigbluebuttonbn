@@ -23,6 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -30,7 +31,7 @@ use \Firebase\JWT\JWT;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
-$params['action'] = optional_param('action', '', PARAM_TEXT);
+$params['action'] = required_param('action', PARAM_TEXT);
 $params['callback'] = optional_param('callback', '', PARAM_TEXT);
 $params['id'] = optional_param('id', '', PARAM_TEXT);
 $params['idx'] = optional_param('idx', '', PARAM_TEXT);
@@ -55,6 +56,7 @@ if ($params['bigbluebuttonbn']) {
     $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
     $context = context_module::instance($cm->id);
+    $PAGE->set_context($context);
 }
 
 if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
@@ -754,12 +756,6 @@ function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $
  */
 function bigbluebuttonbn_broker_validate_parameters($params) {
     $requiredparams = bigbluebuttonbn_broker_required_parameters();
-    if (!isset($params['callback'])) {
-        return 'This call must include a javascript callback.';
-    }
-    if (!isset($params['action'])) {
-        return 'Action parameter must be included.';
-    }
     $action = strtolower($params['action']);
     if (!array_key_exists($action, $requiredparams)) {
         return 'Action '.$params['action'].' can not be performed.';
@@ -787,27 +783,41 @@ function bigbluebuttonbn_broker_validate_parameters_message($params, $requiredpa
  * Helper for definig rules for validating required parameters.
  */
 function bigbluebuttonbn_broker_required_parameters() {
-    $params['server_ping'] = ['id' => 'The meetingID must be specified.'];
-    $params['meeting_info'] = ['id' => 'The meetingID must be specified.'];
-    $params['meeting_end'] = ['id' => 'The meetingID must be specified.'];
-    $params['recording_play'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_info'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_links'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_publish'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_unpublish'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_delete'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_protect'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_unprotect'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_edit'] = ['id' => 'The recordingID must be specified.',
-            'meta' => 'A meta parameter should be included'];
-    $params['recording_import'] = ['id' => 'The recordingID must be specified.'];
+    $params['server_ping'] = bigbluebuttonbn_broker_required_parameters_default('meetingID');
+    $params['meeting_info'] = bigbluebuttonbn_broker_required_parameters_default('meetingID');
+    $params['meeting_end'] = bigbluebuttonbn_broker_required_parameters_default('meetingID');
+    $params['recording_play'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_info'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_links'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_publish'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_unpublish'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_delete'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_protect'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_unprotect'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_import'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_edit'] = bigbluebuttonbn_broker_required_parameters_default('recordingID');
+    $params['recording_edit']['meta'] = 'A meta parameter should be included';
     $params['recording_ready'] = [
+            'bigbluebuttonbn' => 'An id for the bigbluebuttonbn instance should be included.',
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ];
     $params['live_session_events'] = [
+            'bigbluebuttonbn' => 'An id for the bigbluebuttonbn instance should be included.',
             'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
           ];
     return $params;
+}
+
+/**
+ * Helper for definig default rules for validating required parameters.
+ *
+ * @return array
+ */
+function bigbluebuttonbn_broker_required_parameters_default($id) {
+    return [
+              'id' => "The {$id} must be specified.",
+              'callback' => 'This call must include a javascript callback.'
+           ];
 }
 
 /**

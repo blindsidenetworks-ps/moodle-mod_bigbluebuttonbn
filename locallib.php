@@ -1902,7 +1902,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $sender = get_admin();
     // Prepare message.
     $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
-        ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
+        ' "' . $bigbluebuttonbn->name . '" '.
         get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
     $context = context_course::instance($bigbluebuttonbn->course);
     \mod_bigbluebuttonbn\locallib\notifier::notification_send($context, $sender, $bigbluebuttonbn, $messagetext);
