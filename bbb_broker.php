@@ -655,6 +655,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
         header('HTTP/1.0 400 Bad Request. '.$error);
         return;
     }
+
     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
     $meetingidelements = explode('[', $decodedparameters->meeting_id);
     $meetingidelements = explode('-', $meetingidelements[0]);
@@ -665,8 +666,14 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     }
     // Sends the messages.
     try {
+      //That if was for trying to workaround the several emails sent for one record ready
+      if(bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0)){
         bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
-        header('HTTP/1.0 202 Accepted');
+      }
+      $overrides = array('meetingid' => $bigbluebuttonbn->meetingid);
+      $meta = '{"recordID":'.$decodedparameters->record_id.'}';
+      bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
+      header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 503 Service Unavailable. '.$error);
