@@ -125,7 +125,7 @@ try {
         return;
     }
     if ($a == 'recording_ready') {
-        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;
     }
     if ($a == 'live_session_events') {
@@ -645,7 +645,7 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
  *
  * @return void
  */
-function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'],
@@ -667,7 +667,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn, $cm) 
     // Sends the messages.
     try {
       //That if was for trying to workaround the several emails sent for one record ready
-      if(bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id == 0)){
+      if(bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0)){
         bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
       }
       $overrides = array('meetingid' => $bigbluebuttonbn->meetingid);
