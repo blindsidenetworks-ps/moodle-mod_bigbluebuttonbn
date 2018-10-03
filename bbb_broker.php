@@ -674,10 +674,10 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
         $meta = '{"recordID":'.$decodedparameters->record_id.'}';
         bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
         header('HTTP/1.0 202 Accepted');
-        } catch (Exception $e) {
+    } catch (Exception $e) {
           $error = 'Caught exception: '.$e->getMessage();
           header('HTTP/1.0 503 Service Unavailable. '.$error);
-        }
+    }
 }
 
 /**
