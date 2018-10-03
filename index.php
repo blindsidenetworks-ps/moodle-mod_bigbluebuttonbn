@@ -84,7 +84,7 @@ if ($submit === 'end') {
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     // User roles.
     $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-    $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
+    $moderator = bigbluebuttonbn_is_moderator($context, $participantlist);
     $administrator = is_siteadmin();
     if ($moderator || $administrator) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
@@ -104,7 +104,7 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
         // User roles.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-        $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
+        $moderator = bigbluebuttonbn_is_moderator($context, $participantlist);
         $administrator = is_siteadmin();
         $canmoderate = ($administrator || $moderator);
         // Add a the data for the bigbluebuttonbn instance.

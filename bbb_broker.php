@@ -694,7 +694,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     $importrecordings[$params['id']]['imported'] = true;
     $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
     $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
-    bigbluebuttonbn_logs($bbbsession, BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
+    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
     if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_import'], $bbbsession['bigbluebuttonbn'],
