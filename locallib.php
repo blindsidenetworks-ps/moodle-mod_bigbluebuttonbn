@@ -74,6 +74,10 @@ const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
 const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
 /** @var BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
 const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
+/** @var BIGBLUEBUTTON_CLIENTTYPE_FLASH integer that defines the bigbluebuttonbn default web client based on Adobe FLASH */
+const BIGBLUEBUTTON_CLIENTTYPE_FLASH = 0;
+/** @var BIGBLUEBUTTON_CLIENTTYPE_HTML5 integer that defines the bigbluebuttonbn default web client based on Adobe HTML5 */
+const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
 
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
@@ -87,14 +91,14 @@ const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
  *
  * @return string
  */
-function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null, $clienttype=0) {
+function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null, $clienttype=BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
               'logoutURL' => $logouturl,
             ];
     // Choose between Adobe Flash or HTML5 Client
-    if ( $clienttype == 1 ) {
+    if ( $clienttype == BIGBLUEBUTTON_CLIENTTYPE_HTML5 ) {
     	$data['joinViaHtml5'] = 'true';
     }
 
@@ -2606,7 +2610,7 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
         $clienttype_default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
 
 	// Flash or HTML5  meeting
-        $clienttype_select_choices = array(0 => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), 1 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+        $clienttype_select_choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
         $renderer->render_group_element('clienttype_default',
             $renderer->render_group_element_configselect('clienttype_default',
                 $clienttype_default, $clienttype_select_choices));

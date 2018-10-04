@@ -69,7 +69,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = context_course::instance($course->id);
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
-error_log("RABSER DEBUG ".print_r($cfg,true));
         $mform = &$this->_form;
         $jsvars = array();
         $jsvars['instanceTypeRoomOnly'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
@@ -394,7 +393,7 @@ error_log("RABSER DEBUG ".print_r($cfg,true));
             $field['description_key'] = 'mod_form_field_block_clienttype';
 
             // Flash or HTML5  meeting
-            $clienttype_select_choices = array(0 => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), 1 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+            $clienttype_select_choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
 
             $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
