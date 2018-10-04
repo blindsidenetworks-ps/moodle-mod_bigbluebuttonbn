@@ -175,13 +175,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             'maxlength="64" size="32"');
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        if ($cfg['version_major'] < '2015051100') {
-            // This is valid before v2.9.
-            $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
-        } else {
-            // This is valid after v2.9.
-            $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
-        }
+        $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
         if ($cfg['sendnotifications_enabled']) {
@@ -269,7 +263,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['recordings_deleted_default']);
         $field = ['type' => 'hidden', 'name' => 'recordings_imported', 'data_type' => PARAM_INT,
                   'description_key' => null];
-        if ($cfg['recordings_imported_editable']) {
+        if ($cfg['importrecordings_enabled'] && $cfg['recordings_imported_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_recordings_imported';
         }

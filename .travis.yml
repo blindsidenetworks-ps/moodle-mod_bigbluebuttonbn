@@ -2,17 +2,13 @@ language: php
 
 sudo: required
 
-branches:
-  only:
-    - master
+#branches:
+#  only:
+#    - master
 
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
-  apt:
-    packages:
-      - oracle-java9-installer
-      - oracle-java9-set-default
 
 cache:
   directories:
@@ -22,53 +18,42 @@ cache:
 php:
   - 7.0
   - 7.1
+  - 7.2
 
 env:
   global:
     - COVERAGE=false
   matrix:
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    #- MOODLE_BRANCH=master DB=mysqli
+    #- MOODLE_BRANCH=master DB=pgsql
 
 matrix:
-  include:
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-
+  exclude:
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli 
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql 
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    
 before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
   ## Standard script
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^${MOODLE_PLUGIN_CI}
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  #- composer create-project -n --no-dev --prefer-dist jfederico/moodle-plugin-ci ci ^2
+  #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci && cd ci && composer install && cd ..
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
   ## Workaround for bypassing codechecker error due the use of BIGBLUEBUTTON_CFG
   - sudo sed -i "s/'MNET_REMOTE_CLIENT',/'MNET_REMOTE_CLIENT', 'BIGBLUEBUTTONBN_CFG',/g" "$(grep -rl MNET_REMOTE_CLIENT ./ci/vendor)"
@@ -83,12 +68,7 @@ script:
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
-  # Specific for version 1
-  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci csslint; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci shifter; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "1" ]; then moodle-plugin-ci jshint; fi
-  # Specific for version 2
-  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci savepoints; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci mustache; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci grunt; fi
-  - if [ ${MOODLE_PLUGIN_CI} = "2" ]; then moodle-plugin-ci behat; fi
+  - moodle-plugin-ci savepoints
+  #- moodle-plugin-ci mustache
+  - moodle-plugin-ci grunt
+  #- moodle-plugin-ci behat

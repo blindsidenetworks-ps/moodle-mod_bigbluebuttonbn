@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(dirname(dirname(__FILE__)).'/locallib.php');
+
 /**
  * Performs data migrations and updates on upgrade.
  *
@@ -107,7 +109,53 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
             $fielddefinition);
+        // Update db version tag.
         upgrade_mod_savepoint(true, 2017101009, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2017101010) {
+        // Fix for CONTRIB-7221.
+        if ($oldversion == 2017101003) {
+            // A bug intorduced in 2017101003 causes new instances to be created without BBB passwords.
+            // A workaround was put in place in version 2017101004 that was relabeled to 2017101005.
+            // However, as the code was relocated to upgrade.php in version 2017101010, a new issue came up.
+            // There is now a timeout error when the plugin is upgraded in large Moodle sites.
+            // The script should only be considered when migrating from this version.
+            $sql  = "SELECT * FROM {bigbluebuttonbn} ";
+            $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
+            $instances = $DB->get_records_sql($sql, array('', ''));
+            foreach ($instances as $instance) {
+                $instance->moderatorpass = bigbluebuttonbn_random_password(12);
+                $instance->viewerpass = bigbluebuttonbn_random_password(12, $instance->moderatorpass);
+                // Store passwords in the database.
+                $DB->update_record('bigbluebuttonbn', $instance);
+            }
+        }
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2017101010, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2017101012) {
+        // Update field type (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
+            $fielddefinition);
+        // Update field meetingid (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'introformat');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'meetingid',
+            $fielddefinition);
+        // Update field recordings_imported (Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
+            $fielddefinition);
+        // Add field recordings_preview.(Fix for CONTRIB-7302).
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
+            $fielddefinition);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2017101012, 'bigbluebuttonbn');
     }
     return true;
 }

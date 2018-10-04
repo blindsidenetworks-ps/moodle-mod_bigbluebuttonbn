@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn deleted event.
+ * The mod_bigbluebuttonbn recording viewed event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,30 +28,30 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn activity deleted event (triggered by view.php).
+ * The mod_bigbluebuttonbn recording viewed event (triggered when a recording is viewed).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_activity_deleted extends base
+class recording_viewed extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init('d', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' deleted the bigbluebuttonbn activity " .
-            "with id '$this->objectid' for the course id '$this->courseid'.";
+        parent::init('r', self::LEVEL_OTHER);
+        $this->description = "The user with id '##userid' has viewed a recording with id ".
+            "'##other' from the course id '##courseid'.";
     }
 
     /**
-     * Return event name.
+     * Return localised event name.
      *
      * @return string
      */
     public static function get_name() {
-        return get_string('event_activity_deleted', 'bigbluebuttonbn');
+        return get_string('event_recording_viewed', 'bigbluebuttonbn');
     }
 
     /**

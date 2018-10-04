@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn meeting ended event.
+ * The mod_bigbluebuttonbn recording unpublished event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,22 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
+ * The mod_bigbluebuttonbn recording unpublished event (triggered when a recording is unpublished).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_meeting_ended extends base
+class recording_unpublished extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init();
-        $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-            "'$this->objectid' for the course id '$this->contextinstanceid' has been forcibly ".
-            "ended by the user with id '$this->userid'.";
+        parent::init('r', self::LEVEL_OTHER);
+        $this->description = "The user with id '##userid' has unpublished a recording with id ".
+            "'##other' in the course id '##courseid'.";
     }
 
     /**
@@ -52,7 +51,7 @@ class bigbluebuttonbn_meeting_ended extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_meeting_ended', 'bigbluebuttonbn');
+        return get_string('event_recording_unpublished', 'bigbluebuttonbn');
     }
 
     /**

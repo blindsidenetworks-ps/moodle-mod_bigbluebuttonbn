@@ -34,15 +34,15 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class bigbluebuttonbn_recording_imported extends base
+class recording_imported extends base
 {
     /**
      * Init method.
      */
     protected function init() {
         parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '$this->userid' has imported a recording with id ".
-            "'$this->other' in the course id '$this->contextinstanceid'.";
+        $this->description = "The user with id '##userid' has imported a recording with id ".
+            "'##other' in the course id '##courseid'.";
     }
 
     /**
