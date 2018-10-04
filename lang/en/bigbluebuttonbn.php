@@ -397,3 +397,15 @@ $string['view_error_action_not_completed'] = 'Action could not be completed';
 $string['view_warning_default_server'] = 'This Moodle server is making use of the BigBlueButton testing server that comes pre-configured by default. It should be replaced for production.';
 
 $string['view_room'] = 'View room';
+
+$string['mod_form_block_clienttype'] = 'Web Client Technology';
+$string['mod_form_block_clienttype_flash'] = 'Client based on Adobe Flash technology';
+$string['mod_form_block_clienttype_html5'] = 'Client based on HTML5 technology';
+$string['mod_form_field_block_clienttype'] = 'Web Client Technology';
+
+$string['config_clienttype'] = 'Configuration for "Web Client" type';
+$string['config_clienttype_default'] = 'Default Web Client type';
+$string['config_clienttype_default_description'] = 'Choose between the classical Adobe Flash client or the new HTML5 one.';
+$string['config_clienttype_description'] = 'This setting enable/disable the Web Client choice for each room.';
+$string['config_clienttype_editable'] = 'The Web Client choice can be edited';
+$string['config_clienttype_editable_description'] = 'This option enable the choice of the Web Client (AdobeFlash/HTML5) from the room editing form.';

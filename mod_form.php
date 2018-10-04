@@ -69,6 +69,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = context_course::instance($course->id);
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
+error_log("RABSER DEBUG ".print_r($cfg,true));
         $mform = &$this->_form;
         $jsvars = array();
         $jsvars['instanceTypeRoomOnly'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
@@ -86,6 +87,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
+        // Add block 'client Type'.
+        $this->bigbluebuttonbn_mform_add_block_clienttype($mform, $cfg);
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Add standard buttons, common to all modules.
@@ -373,6 +376,33 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('static', 'static_participant_list',
             get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
         $mform->addElement('html', "\n\n");
+    }
+
+    /**
+     * Function for showing the client type
+     *
+     * @param object $mform
+     * @param object $cfg
+     * @return void
+     */
+    private function bigbluebuttonbn_mform_add_block_clienttype(&$mform, &$cfg) {
+        $field = ['type' => 'hidden', 'name' => 'clienttype', 'data_type' => PARAM_INT,
+            'description_key' => null];
+        if ($cfg['clienttype_editable']) {
+            $field['type'] = 'select';
+            $field['data_type'] = PARAM_TEXT;
+            $field['description_key'] = 'mod_form_field_block_clienttype';
+
+            // Flash or HTML5  meeting
+            $clienttype_select_choices = array(0 => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), 1 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+
+            $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], $cfg['clienttype_default'] ,$clienttype_select_choices);
+        } else {
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'], null,$cfg['clienttype_default']);
+	}
+
     }
 
     /**

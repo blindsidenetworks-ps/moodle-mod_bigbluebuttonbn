@@ -265,11 +265,31 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
   * $CFG->bigbluebuttonbn['recordings_preview_default'] = 1;
   */
 
-  /*
-   * When the value is set to 1 (checked) the 'preview ui' capability can be
-   * enabled/disabled by the user creating or editing the resource.
-   * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
-   */
+ /*
+  * When the value is set to 1 (checked) the 'preview ui' capability can be
+  * enabled/disabled by the user creating or editing the resource.
+  * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
+  */
+
+ /*
+  * The WebClient by default is the Flash one (value = 0) or
+  * the HTML5 one (value = 1)
+  * $CFG->bigbluebuttonbn['clienttype_default'] = 0;
+  */
+
+ /*
+  * When the value is set to 1 (checked) the 'clienttype'
+  * capability is enabled, meaning that the administrator can choose the default web client type
+  * and if can be editable in each room through the plugin configuration
+  * $CFG->bigbluebuttonbn['clienttype_enabled'] = 0;
+  */
+
+ /*
+  * When the value is set to 1 (checked) the WebClient can be chosen
+  * the user creating or editing the resource.
+  * $CFG->bigbluebuttonbn['clienttype_editable'] = 0;
+  */
+
 
 /*
  *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS

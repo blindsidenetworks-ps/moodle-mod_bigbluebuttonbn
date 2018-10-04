@@ -93,6 +93,8 @@ class config {
             'general_warning_button_text' => '',
             'general_warning_button_href' => '',
             'general_warning_button_class' => '',
+            'clienttype_default' => '0',
+            'clienttype_editable' => 'true',
         );
     }
 
@@ -179,6 +181,8 @@ class config {
                'general_warning_button_text' => self::get('general_warning_button_text'),
                'general_warning_button_href' => self::get('general_warning_button_href'),
                'general_warning_button_class' => self::get('general_warning_button_class'),
+               'clienttype_editable' => self::get('clienttype_editable'),
+               'clienttype_default' => self::get('clienttype_default'),
           );
     }
 }

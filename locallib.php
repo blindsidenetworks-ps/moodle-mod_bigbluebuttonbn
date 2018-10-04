@@ -87,12 +87,17 @@ const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
  *
  * @return string
  */
-function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null) {
+function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null, $clienttype=0) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
               'logoutURL' => $logouturl,
             ];
+    // Choose between Adobe Flash or HTML5 Client
+    if ( $clienttype == 1 ) {
+    	$data['joinViaHtml5'] = 'true';
+    }
+
     if (!is_null($configtoken)) {
         $data['configToken'] = $configtoken;
     }
@@ -2580,6 +2585,31 @@ function bigbluebuttonbn_settings_notifications(&$renderer) {
         $renderer->render_group_header('sendnotifications');
         $renderer->render_group_element('sendnotifications_enabled',
             $renderer->render_group_element_checkbox('sendnotifications_enabled', 1));
+    }
+}
+
+/**
+ * Helper function renders client type settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_clienttype(&$renderer) {
+    // Configuration for "clienttype" feature.
+    if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_clienttype_shown()) {
+        $renderer->render_group_header('clienttype');
+        $renderer->render_group_element('clienttype_editable',
+            $renderer->render_group_element_checkbox('clienttype_editable', 1));
+
+        // Web Client default
+        $clienttype_default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
+
+	// Flash or HTML5  meeting
+        $clienttype_select_choices = array(0 => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), 1 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+        $renderer->render_group_element('clienttype_default',
+            $renderer->render_group_element_configselect('clienttype_default',
+                $clienttype_default, $clienttype_select_choices));
     }
 }
 

@@ -185,6 +185,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['originServerCommonName'] = '';
     $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
     $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
+    $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
 }
 
 /**
