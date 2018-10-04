@@ -64,8 +64,7 @@ abstract class base extends \core\event\base {
      * Init method.
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
-        protected function init() {
-        $this->data['crud'] = $crud;	        $this->data['crud'] = 'r';
+        $this->data['crud'] = $crud;
         $this->data['edulevel'] = $edulevel;
         $this->data['objecttable'] = 'bigbluebuttonbn';
     }
