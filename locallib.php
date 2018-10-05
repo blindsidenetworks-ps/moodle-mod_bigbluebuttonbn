@@ -100,7 +100,7 @@ function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $c
             ];
     // Choose between Adobe Flash or HTML5 Client.
     if ( $clienttype == BIGBLUEBUTTON_CLIENTTYPE_HTML5 ) {
-       $data['joinViaHtml5'] = 'true';
+        $data['joinViaHtml5'] = 'true';
     }
 
     if (!is_null($configtoken)) {
