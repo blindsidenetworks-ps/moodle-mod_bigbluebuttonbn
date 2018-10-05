@@ -91,13 +91,14 @@ const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
  *
  * @return string
  */
-function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null, $clienttype=BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
+function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null,
+                                      $userid = null, $clienttype=BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
               'logoutURL' => $logouturl,
             ];
-    // Choose between Adobe Flash or HTML5 Client
+    // Choose between Adobe Flash or HTML5 Client.
     if ( $clienttype == BIGBLUEBUTTON_CLIENTTYPE_HTML5 ) {
     	$data['joinViaHtml5'] = 'true';
     }
@@ -2606,14 +2607,16 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
         $renderer->render_group_element('clienttype_editable',
             $renderer->render_group_element_checkbox('clienttype_editable', 1));
 
-        // Web Client default
-        $clienttype_default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
+        // Web Client default.
+        $default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
 
-	// Flash or HTML5  meeting
-        $clienttype_select_choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'), BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+        $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH =>
+                            get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
+                         BIGBLUEBUTTON_CLIENTTYPE_HTML5 => 
+                            get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
         $renderer->render_group_element('clienttype_default',
             $renderer->render_group_element_configselect('clienttype_default',
-                $clienttype_default, $clienttype_select_choices));
+                $default, $choices));
     }
 }
 
