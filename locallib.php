@@ -100,7 +100,7 @@ function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $c
             ];
     // Choose between Adobe Flash or HTML5 Client.
     if ( $clienttype == BIGBLUEBUTTON_CLIENTTYPE_HTML5 ) {
-    	$data['joinViaHtml5'] = 'true';
+       $data['joinViaHtml5'] = 'true';
     }
 
     if (!is_null($configtoken)) {
@@ -2610,10 +2610,8 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
         // Web Client default.
         $default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
 
-        $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH =>
-                            get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
-                         BIGBLUEBUTTON_CLIENTTYPE_HTML5 => 
-                            get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+        $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
+                         BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
         $renderer->render_group_element('clienttype_default',
             $renderer->render_group_element_configselect('clienttype_default',
                 $default, $choices));
