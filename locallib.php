@@ -92,7 +92,7 @@ const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
  * @return string
  */
 function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null,
-                                      $userid = null, $clienttype=BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
+                                      $userid = null, $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
