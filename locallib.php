@@ -2177,7 +2177,7 @@ function bigbluebuttonbn_count_recording_imported_instances($recordid) {
 function bigbluebuttonbn_get_count_callback_event_log($recordid) {
     global $DB;
     $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
-    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordID%', "%{$recordid}%"));
+    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%"));
 }
 
 /**
