@@ -671,7 +671,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
             bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
         }
         $overrides = array('meetingid' => $decodedparameters->meeting_id);
-        $meta = '{"recordingid":'.$decodedparameters->record_id.'}';
+        $meta = '{"recordid":'.$decodedparameters->record_id.'}';
         bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
