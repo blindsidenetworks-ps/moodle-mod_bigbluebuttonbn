@@ -272,6 +272,13 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
+ * When the value is set to 1 (checked) the 'clienttype' capability is enabled,
+ * meaning that the administrator may be able to choose the default web client type
+ * and wheter it can be editable in each room through the plugin configuration
+ * $CFG->bigbluebuttonbn['clienttype_enabled'] = 0;
+ */
+
+/*
  * The WebClient selected by default is Flash (value = 0)
  * [flash=0|html5=1]
  * $CFG->bigbluebuttonbn['clienttype_default'] = 0;

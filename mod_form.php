@@ -385,6 +385,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     private function bigbluebuttonbn_mform_add_block_clienttype(&$mform, &$cfg) {
+        // Validates if clienttype capability is enabled.
+        if (!$cfg['clienttype_enabled']) {
+            return;
+        }
+        // Validates if the html5client is supported by the BigBlueButton Server.
+        if (!bigbluebuttonbn_has_html5_client()) {
+            return;
+        }
         $field = ['type' => 'hidden', 'name' => 'clienttype', 'data_type' => PARAM_INT,
             'description_key' => null];
         if ($cfg['clienttype_editable']) {
@@ -398,10 +406,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
                                     $field['description_key'], $cfg['clienttype_default'], $choices);
-        } else {
-            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-                                    null, $cfg['clienttype_default']);
+            return;
         }
+        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                                null, $cfg['clienttype_default']);
     }
 
     /**

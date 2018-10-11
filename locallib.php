@@ -2204,7 +2204,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
             array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
                     'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
+                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype')),
             array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
                 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
     );
@@ -2234,6 +2234,11 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     $enabledfeatures['importrecordings'] = false;
     if (\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
         $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+    }
+    // Evaluates if clienttype is enabled for the Moodle site.
+    $enabledfeatures['clienttype'] = false;
+    if (\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
+        $enabledfeatures['clienttype'] = (in_array('all', $features) || in_array('clienttype', $features));
     }
     return $enabledfeatures;
 }
@@ -2866,4 +2871,15 @@ function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
     $filters = array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => 'Add');
     $ownerid = (integer)$DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
     return $ownerid;
+}
+
+/**
+ * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_has_html5_client() {
+    $checkurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::root() . "html5client/check";
+    $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($checkurl, 'HEAD');
+    return (isset($curlinfo['http_code']) && $curlinfo['http_code'] == 200);
 }
