@@ -311,7 +311,8 @@ class renderer {
      */
     public static function section_clienttype_shown() {
         global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['clienttype_enabled']));
+        return (!isset($CFG->bigbluebuttonbn['clienttype_default']) ||
+                !isset($CFG->bigbluebuttonbn['clienttype_editable']));
     }
 
     /**

@@ -2605,7 +2605,7 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
     if ((boolean)\mod_bigbluebuttonbn\settings\renderer::section_clienttype_shown()) {
         $renderer->render_group_header('clienttype');
         $renderer->render_group_element('clienttype_editable',
-            $renderer->render_group_element_checkbox('clienttype_editable', 1));
+            $renderer->render_group_element_checkbox('clienttype_editable', 0));
 
         // Web Client default.
         $default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
