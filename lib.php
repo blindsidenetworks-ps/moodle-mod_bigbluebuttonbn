@@ -140,6 +140,7 @@ function bigbluebuttonbn_add_instance($data) {
     // Excecute preprocess.
     bigbluebuttonbn_process_pre_save($data);
     // Pre-set initial values.
+    $data->meetingid = 0;
     $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Insert a record.
     $data->id = $DB->insert_record('bigbluebuttonbn', $data);
