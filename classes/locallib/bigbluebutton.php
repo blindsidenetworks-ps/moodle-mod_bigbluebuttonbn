@@ -89,6 +89,10 @@ class bigbluebutton {
      */
     public static function root() {
         $pserverurl = parse_url(trim(\mod_bigbluebuttonbn\locallib\config::get('server_url')));
-        return $pserverurl['scheme'] . "://" . $pserverurl['host'] . (isset($pserverurl['port']) ? ":" . $pserverurl['port'] : "") . "/";
+        $pserverurlport = "";
+        if (isset($pserverurl['port'])) {
+            $pserverurlport = ":" . $pserverurl['port'];
+        }
+        return $pserverurl['scheme'] . "://" . $pserverurl['host'] . $pserverurlport . "/";
     }
 }
