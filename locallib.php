@@ -2871,7 +2871,7 @@ function bigbluebuttonbn_cache_get($name, $key, $default = null) {
  */
 function bigbluebuttonbn_cache_set($name, $key, $value) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
-    $result = $cache->set($key, $value);
+    $cache->set($key, $value);
 }
 
 /**
