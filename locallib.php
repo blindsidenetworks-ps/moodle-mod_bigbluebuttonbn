@@ -88,6 +88,7 @@ const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
  * @param string $logouturl
  * @param string $configtoken
  * @param string $userid
+ * @param string $clienttype
  *
  * @return string
  */
