@@ -825,6 +825,8 @@ function bigbluebuttonbn_broker_required_parameters() {
 /**
  * Helper for definig default rules for validating required parameters.
  *
+ * @param string $id
+ *
  * @return array
  */
 function bigbluebuttonbn_broker_required_parameters_default($id) {

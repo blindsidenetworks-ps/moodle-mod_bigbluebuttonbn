@@ -1,3 +1,9 @@
+
+2.2.7 (2017101015)
+Bug: Fixed issue with recording-ready notifications sometimes sent more than once (CONTRIB-7438).
+Bug: Fixed issue with rooms not being created when using Oracle (CONTRIB-7481).
+Enhancement: Added support for HTML5 client that now can be set to be used by default or per room (CONTRIB-7413).
+
 2.2.6 (2017101014)
 Hot-fix:  Fixed issue with room viewing too slow when several recordings where included (CONTRIB-7435).
 Bug: Fixed regression issue with activities still not listed in Timeline tab (CONTRIB-7377).

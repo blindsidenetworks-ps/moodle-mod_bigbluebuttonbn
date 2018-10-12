@@ -138,6 +138,23 @@ class renderer {
     }
 
     /**
+     * Render a select element in a group.
+     *
+     * @param string    $name
+     * @param object    $defaultsetting
+     * @param object    $choices
+     *
+     * @return Object
+     */
+    public function render_group_element_configselect($name, $defaultsetting, $choices) {
+        $item = new \admin_setting_configselect('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $defaultsetting, $choices);
+        return $item;
+    }
+
+    /**
      * Render a general warning message.
      *
      * @param string    $name
@@ -285,6 +302,24 @@ class renderer {
     public static function section_send_notifications_shown() {
         global $CFG;
         return (!isset($CFG->bigbluebuttonbn['sendnotifications_enabled']));
+    }
+
+    /**
+     * Validate if clienttype section will be shown.
+     *
+     * @return boolean
+     */
+    public static function section_clienttype_shown() {
+        global $CFG;
+        if (!isset($CFG->bigbluebuttonbn['clienttype_enabled']) ||
+            !$CFG->bigbluebuttonbn['clienttype_enabled']) {
+            return false;
+        }
+        if (!bigbluebuttonbn_has_html5_client()) {
+            return false;
+        }
+        return (!isset($CFG->bigbluebuttonbn['clienttype_default']) ||
+                !isset($CFG->bigbluebuttonbn['clienttype_editable']));
     }
 
     /**
