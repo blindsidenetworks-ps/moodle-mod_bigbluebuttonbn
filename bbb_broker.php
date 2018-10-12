@@ -666,17 +666,19 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     }
     // Sends the messages.
     try {
-        if (!isset($decodedparameters->record_id) || is_null($decodedparameters->record_id)) {
-            // Workaround for CONTRIB-7438. We make sure messages are send only once.
-            if (bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
-                bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
-            }
-            $overrides = array('meetingid' => $decodedparameters->meeting_id);
-            $meta = '{"recordid":'.$decodedparameters->record_id.'}';
-            bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
-        } else {
-          bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+
+        if (!isset($decodedparameters->record_id)) {
+            bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+            header('HTTP/1.0 202 Accepted');
+            return;
         }
+        // Workaround for CONTRIB-7438. We make sure messages are send only once.
+        if (bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
+            bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+        }
+        $overrides = array('meetingid' => $decodedparameters->meeting_id);
+        $meta = '{"recordid":'.$decodedparameters->record_id.'}';
+        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
