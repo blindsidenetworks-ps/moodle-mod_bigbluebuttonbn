@@ -87,7 +87,8 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_DELETE string of event delete for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
-
+/** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
+const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
 /**
  * Indicates API features that the forum supports.
  *

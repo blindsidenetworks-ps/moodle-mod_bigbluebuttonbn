@@ -1071,6 +1071,7 @@ function bigbluebuttonbn_event_log($eventtype, $bigbluebuttonbn, $cm, $options =
         return;
     }
     $context = context_module::instance($cm->id);
+
     $eventproperties = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
     if (array_key_exists('timecreated', $options)) {
         $eventproperties['timecreated'] = $options['timecreated'];
@@ -2174,6 +2175,19 @@ function bigbluebuttonbn_count_recording_imported_instances($recordid) {
     global $DB;
     $sql = 'SELECT COUNT(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
     return $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordid}%"));
+}
+
+/**
+ * Helper function to get how much callback events are logged.
+ *
+ * @param string $recordid
+ *
+ * @return integer
+ */
+function bigbluebuttonbn_get_count_callback_event_log($recordid) {
+    global $DB;
+    $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
+    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%"));
 }
 
 /**
