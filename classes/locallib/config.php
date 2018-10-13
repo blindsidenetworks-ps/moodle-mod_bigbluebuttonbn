@@ -154,7 +154,6 @@ class config {
      * @return boolean
      */
     public static function clienttype_enabled() {
-        $clienttypeenabled = self::get('clienttype_enabled');
         return (boolean)self::get('clienttype_enabled');
     }
 
