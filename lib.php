@@ -396,6 +396,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
+        $bigbluebuttonbn->meetingid = 0;
         $bigbluebuttonbn->timecreated = time();
         $bigbluebuttonbn->timemodified = 0;
         // As it is a new activity, assign passwords.
