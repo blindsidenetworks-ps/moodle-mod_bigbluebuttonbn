@@ -87,7 +87,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add block 'client Type'.
-        $this->bigbluebuttonbn_mform_add_block_clienttype($mform, $cfg);        
+        $this->bigbluebuttonbn_mform_add_block_clienttype($mform, $cfg);
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Add standard buttons, common to all modules.
@@ -402,7 +402,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
                                 null, $cfg['clienttype_default']);
     }
-    
+
     /**
      * Function for showing the block for integration with the calendar.
      *

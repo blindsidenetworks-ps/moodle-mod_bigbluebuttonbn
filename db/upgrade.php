@@ -165,7 +165,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101015, 'bigbluebuttonbn');
-    }    
+    }
     return true;
 }
 

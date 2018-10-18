@@ -189,7 +189,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
         $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
-    }    
+    }
 }
 
 /**

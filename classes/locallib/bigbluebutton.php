@@ -94,5 +94,5 @@ class bigbluebutton {
             $pserverurlport = ":" . $pserverurl['port'];
         }
         return $pserverurl['scheme'] . "://" . $pserverurl['host'] . $pserverurlport . "/";
-    }    
+    }
 }

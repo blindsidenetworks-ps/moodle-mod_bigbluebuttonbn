@@ -129,7 +129,7 @@ try {
         return;
     }
     if ($a == 'live_session_events') {
-        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
@@ -722,11 +722,10 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
  *
  * @param array $params
  * @param object $bigbluebuttonbn
- * @param object $cm
  *
  * @return void
  */
-function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'],

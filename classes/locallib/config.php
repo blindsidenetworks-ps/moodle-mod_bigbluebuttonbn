@@ -156,7 +156,7 @@ class config {
     public static function clienttype_enabled() {
         return (boolean)self::get('clienttype_enabled');
     }
-    
+
     /**
      * Wraps current settings in an array.
      *
