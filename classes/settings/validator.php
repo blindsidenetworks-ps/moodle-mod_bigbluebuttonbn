@@ -165,6 +165,24 @@ class validator {
     }
 
     /**
+     * Validate if clienttype section will be shown.
+     *
+     * @return boolean
+     */
+    public static function section_clienttype_shown() {
+        global $CFG;
+        if (!isset($CFG->bigbluebuttonbn['clienttype_enabled']) ||
+            !$CFG->bigbluebuttonbn['clienttype_enabled']) {
+            return false;
+        }
+        if (!bigbluebuttonbn_has_html5_client()) {
+            return false;
+        }
+        return (!isset($CFG->bigbluebuttonbn['clienttype_default']) ||
+                !isset($CFG->bigbluebuttonbn['clienttype_editable']));
+    }
+
+    /**
      * Validate if settings extended section will be shown.
      *
      * @return boolean

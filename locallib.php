@@ -74,6 +74,10 @@ const BIGBLUEBUTTON_EVENT_RECORDING_EDITED = 'recording_edited';
 const BIGBLUEBUTTON_EVENT_RECORDING_VIEWED = 'recording_viewed';
 /** @var BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
 const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
+/** @var BIGBLUEBUTTON_CLIENTTYPE_FLASH integer that defines the bigbluebuttonbn default web client based on Adobe FLASH */
+const BIGBLUEBUTTON_CLIENTTYPE_FLASH = 0;
+/** @var BIGBLUEBUTTON_CLIENTTYPE_HTML5 integer that defines the bigbluebuttonbn default web client based on HTML5 */
+const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
 
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
@@ -84,15 +88,21 @@ const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
  * @param string $logouturl
  * @param string $configtoken
  * @param string $userid
+ * @param string $clienttype
  *
  * @return string
  */
-function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null, $userid = null) {
+function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null,
+        $userid = null, $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
               'logoutURL' => $logouturl,
             ];
+    // Choose between Adobe Flash or HTML5 Client.
+    if ( $clienttype == BIGBLUEBUTTON_CLIENTTYPE_HTML5 ) {
+        $data['joinViaHtml5'] = 'true';
+    }
     if (!is_null($configtoken)) {
         $data['configToken'] = $configtoken;
     }
@@ -2161,7 +2171,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
             array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
                     'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
+                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype')),
             array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
                 'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
     );
@@ -2191,6 +2201,11 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     $enabledfeatures['importrecordings'] = false;
     if (\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
         $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+    }
+    // Evaluates if clienttype is enabled for the Moodle site.
+    $enabledfeatures['clienttype'] = false;
+    if (\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
+        $enabledfeatures['clienttype'] = (in_array('all', $features) || in_array('clienttype', $features));
     }
     return $enabledfeatures;
 }
@@ -2547,6 +2562,29 @@ function bigbluebuttonbn_settings_notifications(&$renderer) {
 }
 
 /**
+ * Helper function renders client type settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_clienttype(&$renderer) {
+    // Configuration for "clienttype" feature.
+    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_clienttype_shown()) {
+        $renderer->render_group_header('clienttype');
+        $renderer->render_group_element('clienttype_editable',
+            $renderer->render_group_element_checkbox('clienttype_editable', 0));
+        // Web Client default.
+        $default = intval((int)\mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
+        $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
+                         BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+        $renderer->render_group_element('clienttype_default',
+            $renderer->render_group_element_configselect('clienttype_default',
+                $default, $choices));
+    }
+}
+
+/**
  * Helper function renders extended settings if any of the features there is enabled.
  *
  * @param object $renderer
@@ -2794,4 +2832,15 @@ function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
     $filters = array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => 'Add');
     $ownerid = (integer)$DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
     return $ownerid;
+}
+
+/**
+ * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
+ *
+ * @return boolean
+ */
+function bigbluebuttonbn_has_html5_client() {
+    $checkurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::root() . "html5client/check";
+    $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($checkurl, 'HEAD');
+    return (isset($curlinfo['http_code']) && $curlinfo['http_code'] == 200);
 }
