@@ -2136,6 +2136,19 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
 }
 
 /**
+ * Helper function to get how much callback events are logged.
+ *
+ * @param string $recordid
+ *
+ * @return integer
+ */
+function bigbluebuttonbn_get_count_callback_event_log($recordid) {
+    global $DB;
+    $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
+    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%"));
+}
+
+/**
  * Helper function returns an array with the profiles (with features per profile) for the different types
  * of bigbluebuttonbn instances.
  *
@@ -2766,7 +2779,7 @@ function bigbluebuttonbn_cache_get($name, $key, $default = null) {
  */
 function bigbluebuttonbn_cache_set($name, $key, $value) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
-    $result = $cache->set($key, $value);
+    $cache->set($key, $value);
 }
 
 /**
