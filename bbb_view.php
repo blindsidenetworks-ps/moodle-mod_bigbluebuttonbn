@@ -85,7 +85,7 @@ switch (strtolower($action)) {
         // See if the session is in progress.
         if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
             // Since the meeting is already running, we just join the session.
-            bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
+            bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn);
             break;
         }
         // If user is not administrator nor moderator (user is steudent) and waiting is required.
@@ -137,7 +137,7 @@ switch (strtolower($action)) {
         $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
-        bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
+        bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn);
         break;
     case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
@@ -310,10 +310,9 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
  * Helper for preparing data used while joining the meeting.
  *
  * @param  array    $bbbsession
- * @param  object   $cm
  * @param object   $bigbluebuttonbn
  */
-function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn) {
+function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn) {
     // Update the cache.
     $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
@@ -327,7 +326,7 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
         $password = $bbbsession['modPW'];
     }
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
-        $password, $bbbsession['logoutURL'], null, $bbbsession['userID']);
+        $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype']);
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.

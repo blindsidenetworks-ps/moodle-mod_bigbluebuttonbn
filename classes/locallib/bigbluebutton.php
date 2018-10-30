@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 class bigbluebutton {
 
     /**
-     * Performs HTTP request on the BigBlueButton server.
+     * Returns the right URL for the action specified.
      *
      * @param string $action
      * @param array  $data
@@ -80,5 +80,19 @@ class bigbluebutton {
      */
     public static function sanitized_secret() {
         return trim(\mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+    }
+
+    /**
+     * Returns the BigBlueButton server root URL.
+     *
+     * @return string
+     */
+    public static function root() {
+        $pserverurl = parse_url(trim(\mod_bigbluebuttonbn\locallib\config::get('server_url')));
+        $pserverurlport = "";
+        if (isset($pserverurl['port'])) {
+            $pserverurlport = ":" . $pserverurl['port'];
+        }
+        return $pserverurl['scheme'] . "://" . $pserverurl['host'] . $pserverurlport . "/";
     }
 }

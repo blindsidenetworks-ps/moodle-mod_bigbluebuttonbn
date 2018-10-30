@@ -57,42 +57,45 @@ class config {
         return array(
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
-            'voicebridge_editable' => 'false',
-            'importrecordings_enabled' => 'false',
-            'importrecordings_from_deleted_enabled' => 'false',
-            'waitformoderator_default' => 'false',
-            'waitformoderator_editable' => 'true',
+            'voicebridge_editable' => false,
+            'importrecordings_enabled' => false,
+            'importrecordings_from_deleted_enabled' => false,
+            'waitformoderator_default' => false,
+            'waitformoderator_editable' => true,
             'waitformoderator_ping_interval' => '10',
             'waitformoderator_cache_ttl' => '60',
             'userlimit_default' => '0',
-            'userlimit_editable' => 'false',
-            'preuploadpresentation_enabled' => 'false',
-            'sendnotifications_enabled' => 'false',
-            'recordingready_enabled' => 'false',
-            'recordingstatus_enabled' => 'false',
-            'meetingevents_enabled' => 'false',
+            'userlimit_editable' => false,
+            'preuploadpresentation_enabled' => false,
+            'sendnotifications_enabled' => false,
+            'recordingready_enabled' => false,
+            'recordingstatus_enabled' => false,
+            'meetingevents_enabled' => false,
             'participant_moderator_default' => '0',
-            'scheduled_duration_enabled' => 'false',
+            'scheduled_duration_enabled' => false,
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',
-            'recordings_enabled' => 'true',
-            'recordings_html_default' => 'false',
-            'recordings_html_editable' => 'false',
-            'recordings_deleted_default' => 'false',
-            'recordings_deleted_editable' => 'false',
-            'recordings_imported_default' => 'false',
-            'recordings_imported_editable' => 'false',
-            'recordings_preview_default' => 'true',
-            'recordings_preview_editable' => 'false',
-            'recording_default' => 'true',
-            'recording_editable' => 'true',
-            'recording_icons_enabled' => 'true',
+            'recordings_enabled' => true,
+            'recordings_html_default' => false,
+            'recordings_html_editable' => false,
+            'recordings_deleted_default' => false,
+            'recordings_deleted_editable' => false,
+            'recordings_imported_default' => false,
+            'recordings_imported_editable' => false,
+            'recordings_preview_default' => true,
+            'recordings_preview_editable' => false,
+            'recording_default' => true,
+            'recording_editable' => true,
+            'recording_icons_enabled' => true,
             'general_warning_message' => '',
             'general_warning_roles' => 'editingteacher,teacher',
             'general_warning_box_type' => 'info',
             'general_warning_button_text' => '',
             'general_warning_button_href' => '',
             'general_warning_button_class' => '',
+            'clienttype_enabled' => false,
+            'clienttype_default' => '0',
+            'clienttype_editable' => true,
         );
     }
 
@@ -146,6 +149,15 @@ class config {
     }
 
     /**
+     * Validates if clienttype settings are enabled.
+     *
+     * @return boolean
+     */
+    public static function clienttype_enabled() {
+        return (boolean)self::get('clienttype_enabled');
+    }
+
+    /**
      * Wraps current settings in an array.
      *
      * @return array
@@ -179,6 +191,9 @@ class config {
                'general_warning_button_text' => self::get('general_warning_button_text'),
                'general_warning_button_href' => self::get('general_warning_button_href'),
                'general_warning_button_class' => self::get('general_warning_button_class'),
+               'clienttype_enabled' => self::get('clienttype_enabled'),
+               'clienttype_editable' => self::get('clienttype_editable'),
+               'clienttype_default' => self::get('clienttype_default'),
           );
     }
 }

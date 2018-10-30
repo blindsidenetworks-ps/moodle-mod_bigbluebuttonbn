@@ -129,7 +129,7 @@ try {
         return;
     }
     if ($a == 'live_session_events') {
-        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
@@ -662,7 +662,20 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     }
     // Sends the messages.
     try {
-        bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+        // Workaround for CONTRIB-7438.
+        // Proceed as before when no record_id is provided.
+        if (!isset($decodedparameters->record_id)) {
+            bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+            header('HTTP/1.0 202 Accepted');
+            return;
+        }
+        // We make sure messages are send only once.
+        if (bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
+            bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+        }
+        $overrides = array('meetingid' => $decodedparameters->meeting_id);
+        $meta = '{"recordid":'.$decodedparameters->record_id.'}';
+        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
@@ -709,11 +722,10 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
  *
  * @param array $params
  * @param object $bigbluebuttonbn
- * @param object $cm
  *
  * @return void
  */
-function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn, $cm) {
+function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = JWT::decode($params['signed_parameters'],

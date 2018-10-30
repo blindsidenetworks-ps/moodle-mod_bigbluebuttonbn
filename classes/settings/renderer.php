@@ -138,6 +138,23 @@ class renderer {
     }
 
     /**
+     * Render a select element in a group.
+     *
+     * @param string    $name
+     * @param object    $defaultsetting
+     * @param object    $choices
+     *
+     * @return Object
+     */
+    public function render_group_element_configselect($name, $defaultsetting, $choices) {
+        $item = new \admin_setting_configselect('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $defaultsetting, $choices);
+        return $item;
+    }
+
+    /**
      * Render a general warning message.
      *
      * @param string    $name

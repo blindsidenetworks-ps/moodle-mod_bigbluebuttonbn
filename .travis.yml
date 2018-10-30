@@ -8,7 +8,7 @@ sudo: required
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.3"
+  postgresql: "9.4"
 
 cache:
   directories:
@@ -32,31 +32,28 @@ env:
     - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
-    #- MOODLE_BRANCH=master DB=mysqli
-    #- MOODLE_BRANCH=master DB=pgsql
+    - MOODLE_BRANCH=master DB=mysqli
+    - MOODLE_BRANCH=master DB=pgsql
 
 matrix:
   exclude:
     - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli 
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
     - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql 
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
     - php: 7.2
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
     - php: 7.2
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    
+
 before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
   ## Standard script
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
-  #- composer create-project -n --no-dev --prefer-dist jfederico/moodle-plugin-ci ci ^2
   #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci && cd ci && composer install && cd ..
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  ## Workaround for bypassing codechecker error due the use of BIGBLUEBUTTON_CFG
-  - sudo sed -i "s/'MNET_REMOTE_CLIENT',/'MNET_REMOTE_CLIENT', 'BIGBLUEBUTTONBN_CFG',/g" "$(grep -rl MNET_REMOTE_CLIENT ./ci/vendor)"
 
 install:
   - moodle-plugin-ci install
@@ -69,6 +66,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
-  #- moodle-plugin-ci mustache
+  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
-  #- moodle-plugin-ci behat
+  - moodle-plugin-ci behat

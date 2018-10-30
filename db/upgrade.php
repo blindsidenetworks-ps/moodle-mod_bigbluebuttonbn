@@ -157,6 +157,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101012, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2017101015) {
+        // Add field for client technology choice.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'clienttype',
+            $fielddefinition);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2017101015, 'bigbluebuttonbn');
+    }
     return true;
 }
 

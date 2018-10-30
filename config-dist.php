@@ -48,19 +48,24 @@ global $CFG;
 
 /*
  * 1. GENERAL CONFIGURATION
+ ** ------------------------------------------------------------------ **
+ **/
+
+/*
+ * 1.1. BIGBLUEBUTTON SERVER CONFIGURATION
  *
  * First, you need to configure the credentials for accessing the
  * bigbluebutton server.
  * The URL of your BigBlueButton server must end with /bigbluebutton/.
  * This default URL is for a BigBlueButton server provided by Blindside
- *  Networks that you can use for testing.
+ * Networks that you can use for testing.
  **/
 
 $CFG->bigbluebuttonbn['server_url'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
 
 /*
- * 2. CONFIGURATION FOR "RECORDING" FEATURE
+ * 1.2. CONFIGURATION FOR "RECORDING" FEATURE
  *
  * Same as for the General Configuration, you need first to set the
  * parameter values.
@@ -89,7 +94,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 3. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
+ * 1.3. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
  *
  * The "Import recordings" feature should only be used by Administrators
  * or Teachers (or anyone with edition capabilities in the
@@ -111,7 +116,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
+ * 1.4. CONFIGURATION FOR "WAIT FOR MODERATOR" FEATURE
  *
  * This feature makes the rooms or activity work as a traditional classroom
  * cloed until the moderator (teacher) comes to unlock the room. The students
@@ -150,7 +155,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 5. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
+ * 1.5. CONFIGURATION FOR "STATIC VOICE BRIDGE" FEATURE
  *
  **/
 /*
@@ -160,7 +165,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 6. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
+ * 1.6. CONFIGURATION FOR "PRE-UPLOAD PRESENTATION" FEATURE
  *
  **/
 /*
@@ -174,7 +179,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 7. CONFIGURATION FOR "USER LIMIT" FEATURE
+ * 1.7. CONFIGURATION FOR "USER LIMIT" FEATURE
  *
  * It is possible to establish a limit of users per session. This limit can be
  * applied to each room or activity, or globally.
@@ -194,7 +199,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 8. CONFIGURATION FOR "PERMISSIONS" FEATURE
+ * 1.8. CONFIGURATION FOR "PERMISSIONS" FEATURE
  *
  * Defines a rule applied by default to all the new rooms or activities created
  * for defining the users who will have access to the meeting session as Moderators.
@@ -209,7 +214,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
+ * 1.9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
  *
  **/
 /*
@@ -220,7 +225,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 10. GENERAL CONFIGURATION FOR RECORDINGS UI
+ * 1.10. GENERAL CONFIGURATION FOR RECORDINGS UI
  *
  **/
 /*
@@ -259,25 +264,50 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * $CFG->bigbluebuttonbn['recordings_imported_editable'] = 1;
  */
 
- /*
-  * When the value is set to 1 (checked) the bigbluebuttonbn resources
-  * will show the recodings with thumbnails.
-  * $CFG->bigbluebuttonbn['recordings_preview_default'] = 1;
-  */
-
-  /*
-   * When the value is set to 1 (checked) the 'preview ui' capability can be
-   * enabled/disabled by the user creating or editing the resource.
-   * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
-   */
+/*
+ * When the value is set to 1 (checked) the bigbluebuttonbn resources
+ * will show the recodings with thumbnails.
+ * $CFG->bigbluebuttonbn['recordings_preview_default'] = 1;
+ */
 
 /*
- *  CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
+ * When the value is set to 1 (checked) the 'preview ui' capability can be
+ * enabled/disabled by the user creating or editing the resource.
+ * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
+ */
+
+/*
+ * 1.11. GENERAL CONFIGURATION FOR CLIENT TYPE SELECTION
+ *
+ **/
+
+/*
+ * When the value is set to 1 (checked) the 'clienttype' capability is enabled,
+ * meaning that the administrator may be able to choose the default web client type
+ * and wheter it can be editable in each room through the plugin configuration
+ * $CFG->bigbluebuttonbn['clienttype_enabled'] = 0;
+ */
+
+/*
+ * The WebClient selected by default is Flash (value = 0)
+ * [flash=0|html5=1]
+ * $CFG->bigbluebuttonbn['clienttype_default'] = 0;
+ */
+
+/*
+ * When the value is set to 1 (checked) the WebClient can be chosen by
+ * the user creating or editing the resource.
+ * $CFG->bigbluebuttonbn['clienttype_editable'] = 0;
+ */
+
+
+/*
+ *  2. CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
  ** ------------------------------------------------------------------ **
  **/
 
 /*
- * 11. CONFIGURATION FOR "RECORDING READY" FEATURE
+ * 2.1. CONFIGURATION FOR "RECORDING READY" FEATURE
  *
  **/
 /*
@@ -289,7 +319,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 12. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
+ * 2.2. CONFIGURATION FOR "REGISTER MEETING EVENTS" FEATURE
  *
  **/
 /*
@@ -301,7 +331,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 13. CONFIGURATION FOR "GENERAL WARNING MESSAGE
+ * 2.3. CONFIGURATION FOR "GENERAL WARNING MESSAGE" FEATURE
  *
  **/
 /*
