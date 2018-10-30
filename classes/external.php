@@ -156,8 +156,9 @@ class mod_bigbluebuttonbn_external extends external_api {
                 $bigbluebuttonbn->name = external_format_string($bigbluebuttonbn->name, $context->id);
 
                 list($bigbluebuttonbn->intro, $bigbluebuttonbn->introformat) = external_format_text($bigbluebuttonbn->intro,
-                                                                $bigbluebuttonbn->introformat, $context->id, 'mod_bigbluebuttonbn', 'intro', null);
-                $bigbluebuttonbn->introfiles = external_util::get_area_files($context->id, 'mod_bigbluebuttonbn', 'intro', false, false);
+                    $bigbluebuttonbn->introformat, $context->id, 'mod_bigbluebuttonbn', 'intro', null);
+                $bigbluebuttonbn->introfiles = external_util::get_area_files($context->id,
+                    'mod_bigbluebuttonbn', 'intro', false, false);
 
                 $returnedbigbluebuttonbns[] = $bigbluebuttonbn;
             }

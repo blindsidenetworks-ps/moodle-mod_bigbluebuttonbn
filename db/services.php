@@ -39,8 +39,8 @@ $functions = array(
     'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => array(
         'classname'     => 'mod_bigbluebuttonbn_external',
         'methodname'    => 'get_bigbluebuttonbns_by_courses',
-        'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided all bigbluebuttonbns that the user
-                            can view will be returned.',
+        'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided
+                            all bigbluebuttonbns that the user can view will be returned.',
         'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),

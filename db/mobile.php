@@ -28,14 +28,14 @@ defined('MOODLE_INTERNAL') || die;
 $addons = array(
     "mod_bigbluebuttonbn" => array(
         "handlers" => array( // Different places where the add-on will display content.
-            'coursebigbluebuttonbn' => array( // Handler unique name (can be anything)
+            'coursebigbluebuttonbn' => array( // Handler unique name (can be anything).
                 'displaydata' => array(
                     'title' => 'pluginname',
                     'icon' => $CFG->wwwroot . '/mod/bigbluebuttonbn/pix/icon.gif',
                     'class' => '',
                 ),
-                'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the add-on)
-                'method' => 'mobile_course_view' // Main function in \mod_bigbluebuttonbn\output\mobile
+                'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the add-on).
+                'method' => 'mobile_course_view' // Main function in \mod_bigbluebuttonbn\output\mobile.
             )
         ),
         'lang' => array(
