@@ -66,6 +66,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
-  #- moodle-plugin-ci mustache
+  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat
