@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * @author    Darko Miletic  (darko.miletic@gmail.com)
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -63,4 +64,16 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
         ),
     ),
+
+    'mod/bigbluebuttonbn:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
 );
