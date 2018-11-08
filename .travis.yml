@@ -5,10 +5,6 @@ sudo: required
 addons:
   firefox: "47.0.1"
   postgresql: "9.4"
-  apt:
-    packages:
-    - oracle-java8-installer
-    - oracle-java8-set-default
 
 cache:
   directories:
@@ -66,6 +62,5 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat
