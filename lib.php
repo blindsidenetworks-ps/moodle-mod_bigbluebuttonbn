@@ -146,7 +146,7 @@ function bigbluebuttonbn_add_instance($data) {
     // Insert a record.
     $data->id = $DB->insert_record('bigbluebuttonbn', $data);
     // Encode meetingid.
-    $data->meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+    $data->meetingid = bigbluebuttonbn_unique_meetingid_seed();
     // Set the meetingid column in the bigbluebuttonbn table.
     $DB->set_field('bigbluebuttonbn', 'meetingid', $data->meetingid, array('id' => $data->id));
     // Log insert action.
