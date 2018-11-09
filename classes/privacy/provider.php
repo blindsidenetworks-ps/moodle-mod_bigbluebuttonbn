@@ -95,6 +95,10 @@ class provider implements metadataprovider, pluginprovider {
      * @return  contextlist   $contextlist  The list of contexts used in this plugin.
      */
     public static function _get_contexts_for_userid(int $userid) {
+        // If user was already deleted, do nothing.
+        if (!\core_user::get_user($userid)) {
+            return;
+        }
         // Fetch all bigbluebuttonbn logs.
         $sql = "SELECT c.id
                   FROM {context} c
@@ -117,7 +121,6 @@ class provider implements metadataprovider, pluginprovider {
         ];
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
-
         return $contextlist;
     }
 
@@ -129,7 +132,6 @@ class provider implements metadataprovider, pluginprovider {
     public static function _export_user_data(approved_contextlist $contextlist) {
         self::_export_user_data_bigbliebuttonbn_logs($contextlist);
     }
-
 
     /**
      * Delete all data for all users in the specified context.
