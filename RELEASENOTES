@@ -4,6 +4,7 @@ Bug: Fixed issue with recording-ready notifications sometimes sent more than onc
 Bug: Fixed issue with rooms not being created when using Oracle (CONTRIB-7481).
 Bug: Fixed issue with privacy requests not being processed when the user was already deleted (CONTRIB-7527).
 Bug: Fixed issue with recordings from other Moodle server may be wrongly included (CONTRIB-7528).
+Bug. Fixed issue with warning message in Moodle 3.2 and previous when instance was created or updated (CONTRIB-7512).
 Enhancement: Added support for HTML5 client that now can be set to be used by default or per room (CONTRIB-7413).
 
 2.2.6 (2017101014)
