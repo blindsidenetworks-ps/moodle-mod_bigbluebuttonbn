@@ -39,7 +39,8 @@ $addons = array(
             )
         ),
         'lang' => array(
-            array('pluginname', 'bigbluebuttonbn')
+            array('pluginname', 'bigbluebuttonbn'),
+            array('view_conference_action_join', 'bigbluebuttonbn')
         )
     )
 );
