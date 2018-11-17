@@ -52,12 +52,12 @@ class mobile {
         global $OUTPUT, $USER, $DB, $SESSION, $CFG;
 
         $args = (object) $args;
-        $issues = array();
+        $errors = array();
         $showget = true;
 
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
         if (!$viewinstance) {
-            $issues[] = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
+            $errors[] = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
             // Only show error in mobile.
             $showget = false;
         }
@@ -83,15 +83,15 @@ class mobile {
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
             if ($bbbsession['administrator']) {
-                $issues[] = get_string('view_error_unable_join', 'bigbluebuttonbn',
+                $errors[] = get_string('view_error_unable_join', 'bigbluebuttonbn',
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             }
             if ($bbbsession['moderator']) {
-                $issues[] = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                $errors[] = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn',
                     $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
             }
 
-            $issues[] = get_string('view_error_unable_join_student', 'bigbluebuttonbn',
+            $errors[] = get_string('view_error_unable_join_student', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
 
             // Only show error in mobile.
@@ -130,14 +130,12 @@ class mobile {
 
         // TODO:: Implement logic of bbb_view for join to session.
 
-
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
             'bbbsession' => $bbbsession['joinURL'],
-            'showget' => $showget && count($issues) > 0,
-            'issues' => $issues,
-            'issue' => $issues[0],
-            'numissues' => count($issues),
+            'errors' => $errors,
+            'error' => $errors[0],
+            'showget' => $showget && count($issues) > 0,// TODO it can be deleted.
             'cmid' => $cm->id,
             'courseid' => $args->courseid
         );

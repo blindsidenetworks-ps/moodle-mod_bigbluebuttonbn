@@ -35,10 +35,17 @@
 <div>
     <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
-        <ion-item>
-            <button ion-button block onclick="window.open('<% bbbsession %>', '_blank');">
-                {{ 'plugin.mod_bigbluebuttonbn.view_conference_action_join' | translate }}
-            </button>
-        </ion-item>
+         <%#errors%>
+            <ion-item>
+                <% error %>
+            </ion-item>
+        <%/errors%>
+        <%^errors%>
+            <ion-item>
+                <button ion-button block onclick="window.open('<% bbbsession %>', '_blank');">
+                    {{ 'plugin.mod_bigbluebuttonbn.view_conference_action_join' | translate }}
+                </button>
+            </ion-item>
+        <%/errors%>
     </ion-list>
 </div>
