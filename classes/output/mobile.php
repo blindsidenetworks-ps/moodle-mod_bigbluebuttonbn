@@ -53,13 +53,10 @@ class mobile {
 
         $args = (object) $args;
         $errors = array();
-        $showget = true;
 
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
         if (!$viewinstance) {
             $errors[] = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
-            // Only show error in mobile.
-            $showget = false;
         }
 
         $cm = $viewinstance['cm'];
@@ -93,9 +90,6 @@ class mobile {
 
             $errors[] = get_string('view_error_unable_join_student', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
-
-            // Only show error in mobile.
-            $showget = false;
         }
         $bbbsession['serverversion'] = (string) $serverversion;
 
@@ -107,12 +101,9 @@ class mobile {
         if (!has_capability('moodle/category:manage', $context) &&
             !has_capability('mod/bigbluebuttonbn:join', $context)) {
 
-            // TODO:: Check error message.
-            // Only show error in mobile.
-            $showget = false;
+            // TODO:: Check error message.;
         }
 
-        // TODO:: Check urls required for mobile app.
         // Operation URLs.
         $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
         $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$args->cmid .
@@ -128,14 +119,60 @@ class mobile {
         // Initialize session variable used across views.
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
-        // TODO:: Implement logic of bbb_view for join to session.
+        // Logic of bbb_view for join to session.
+        // See if the session is in progress.
+        if (!bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
+
+            // As the meeting doesn't exist, try to create it.
+            $response = bigbluebuttonbn_get_create_meeting_array(
+                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_data($bbbsession),
+                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
+                $bbbsession['presentation']['name'],
+                $bbbsession['presentation']['url']
+            );
+
+            // TODO:: Validate creation of meeting previously.
+            // Moodle event logger: Create an event for meeting created.
+            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
+            // Internal logger: Insert a record with the meeting created.
+            $overrides = array('meetingid' => $bbbsession['meetingid']);
+            $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+            bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
+        }
+
+        // If user is not administrator nor moderator (user is steudent) and waiting is required.
+        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
+            // TODO:: Add error.
+        }
+
+        // It is part of build url.
+        // Update the cache.
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
+            // No more users allowed to join.
+            // TODO:: Add error.
+        }
+
+        $urltojoin = null;
+        if (count($errors) == 0) {
+            // Moodle event logger: Create an event for meeting joined.
+            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
+            // Internal logger: Instert a record with the meeting created.
+            $overrides = array('meetingid' => $bbbsession['meetingid']);
+            bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides);
+            // Before executing the redirect, increment the number of participants.
+            bigbluebuttonbn_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']));
+
+            // Build final url to BBB.
+            $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
+        }
 
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
-            'bbbsession' => $bbbsession['joinURL'],
+            'bbbsession' => (object) $bbbsession,
+            'urltojoin' => $urltojoin,
             'errors' => $errors,
             'error' => $errors[0],
-            'showget' => $showget && count($issues) > 0,// TODO it can be deleted.
             'cmid' => $cm->id,
             'courseid' => $args->courseid
         );
@@ -149,7 +186,7 @@ class mobile {
             ),
             'javascript' => '',
             'otherdata' => '',
-            'files' => $issues
+            'files' => $errors
         );
     }
 

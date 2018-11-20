@@ -105,4 +105,118 @@ class mobileview {
         return($bbbsession);
     }
 
+    /**
+     * Build url for join to session.
+     * This method is similar to "bigbluebutton_bbb_view_join_meeting" in bbb_view.
+     * @param $bbbsession
+     * @return string
+     */
+    public static function build_url_join_session($bbbsession) {
+        $password = $bbbsession['viewerPW'];
+        if ($bbbsession['administrator'] || $bbbsession['moderator']) {
+            $password = $bbbsession['modPW'];
+        }
+        $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
+            $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype']);
+
+        return($joinurl);
+    }
+
+    /**
+     * Helper for preparing metadata used while creating the meeting.
+     *
+     * @param  array    $bbbsession
+     * @return array
+     */
+    public static function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
+        global $USER;
+        $metadata = ['bbb-origin' => $bbbsession['origin'],
+            'bbb-origin-version' => $bbbsession['originVersion'],
+            'bbb-origin-server-name' => $bbbsession['originServerName'],
+            'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
+            'bbb-origin-tag' => $bbbsession['originTag'],
+            'bbb-context' => $bbbsession['course']->fullname,
+            'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
+            'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
+            'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+        ];
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
+            $metadata["bn-recording-status"] = json_encode(
+                array(
+                    'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
+                    'context' => $bbbsession['bigbluebuttonbnURL']
+                )
+            );
+        }
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
+            $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+        }
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+            $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
+        }
+        return $metadata;
+    }
+
+    /**
+     * Helper for preparing data used for creating the meeting.
+     *
+     * @param  array    $bbbsession
+     * @return object
+     */
+    public static function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
+        $data = ['meetingID' => $bbbsession['meetingid'],
+            'name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
+            'attendeePW' => $bbbsession['viewerPW'],
+            'moderatorPW' => $bbbsession['modPW'],
+            'logoutURL' => $bbbsession['logoutURL'],
+        ];
+        $data['record'] = self::bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+        $data['welcome'] = trim($bbbsession['welcome']);
+        // Set the duration for the meeting.
+        $durationtime = self::bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
+        if ($durationtime > 0) {
+            $data['duration'] = $durationtime;
+            $data['welcome'] .= '<br><br>';
+            $data['welcome'] .= str_replace(
+                '%duration%',
+                (string) $durationtime,
+                get_string('bbbdurationwarning', 'bigbluebuttonbn')
+            );
+        }
+        $voicebridge = intval($bbbsession['voicebridge']);
+        if ($voicebridge > 0 && $voicebridge < 79999) {
+            $data['voiceBridge'] = $voicebridge;
+        }
+        $maxparticipants = intval($bbbsession['userlimit']);
+        if ($maxparticipants > 0) {
+            $data['maxParticipants'] = $maxparticipants;
+        }
+        return $data;
+    }
+
+    /**
+     * Helper for returning the flag to know if the meeting is recorded.
+     *
+     * @param  boolean    $record
+     * @return string
+     */
+    public static function bigbluebutton_bbb_view_create_meeting_data_record($record) {
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
+            return 'true';
+        }
+        return 'false';
+    }
+
+    /**
+     * Helper for returning the duration expected for the meeting.
+     *
+     * @param  string    $closingtime
+     * @return integer
+     */
+    public static function bigbluebutton_bbb_view_create_meeting_data_duration($closingtime) {
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
+            return bigbluebuttonbn_get_duration($closingtime);
+        }
+        return 0;
+    }
 }
