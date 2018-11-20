@@ -776,12 +776,11 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
     $actionable = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
 
     $string = get_string('view_room', 'bigbluebuttonbn');
-    $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
     if (groups_get_activity_groupmode($cm) == NOGROUPS) {
         // No groups mode.
         $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
     }
+    $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php', array('action' => 'join', 'id' => $cm->id, 'bn' => $bigbluebuttonbn->id));
 
     return $factory->create_instance($string, $url, 1, $actionable);
 }
