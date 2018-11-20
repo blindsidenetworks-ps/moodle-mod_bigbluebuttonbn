@@ -780,7 +780,8 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
         // No groups mode.
         $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
     }
-    $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php', array('action' => 'join', 'id' => $cm->id, 'bn' => $bigbluebuttonbn->id));
+    $urlparams = array('action' => 'join', 'id' => $cm->id, 'bn' => $bigbluebuttonbn->id);
+    $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php', $urlparams);
 
     return $factory->create_instance($string, $url, 1, $actionable);
 }
