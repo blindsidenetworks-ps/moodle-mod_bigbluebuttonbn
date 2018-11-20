@@ -120,6 +120,11 @@ class mobile {
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
         // Logic of bbb_view for join to session.
+        // If user is not administrator nor moderator (user is steudent) and waiting is required.
+        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
+            // TODO:: Add error.
+        }
+
         // See if the session is in progress.
         if (!bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
 
@@ -140,12 +145,7 @@ class mobile {
             bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         }
 
-        // If user is not administrator nor moderator (user is steudent) and waiting is required.
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            // TODO:: Add error.
-        }
-
-        // It is part of build url.
+        // It is part of 'bigbluebutton_bbb_view_join_meeting' in bbb_view.
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
@@ -186,7 +186,7 @@ class mobile {
             ),
             'javascript' => '',
             'otherdata' => '',
-            'files' => $errors
+            'files' => ''
         );
     }
 
