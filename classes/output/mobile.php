@@ -100,8 +100,7 @@ class mobile {
         // Validate if the user is in a role allowed to join.
         if (!has_capability('moodle/category:manage', $context) &&
             !has_capability('mod/bigbluebuttonbn:join', $context)) {
-
-            // TODO:: Check error message.;
+            $errors[] = get_string('view_nojoin', 'bigbluebuttonbn');
         }
 
         // Operation URLs.
@@ -122,7 +121,7 @@ class mobile {
         // Logic of bbb_view for join to session.
         // If user is not administrator nor moderator (user is steudent) and waiting is required.
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            // TODO:: Add error.
+            $errors[] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
         }
 
         // See if the session is in progress.
@@ -150,7 +149,7 @@ class mobile {
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
             // No more users allowed to join.
-            // TODO:: Add error.
+            $errors[] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
         }
 
         $urltojoin = null;
