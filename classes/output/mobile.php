@@ -79,19 +79,27 @@ class mobile {
         // Set common variables for session.
         $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
+        // Check activity status.
+        $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
+        if ($activitystatus == 'not_started') {
+            $error = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
+            return(self::mobile_print_error($error));
+        }
+        if ($activitystatus == 'ended') {
+            $error = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
+            return(self::mobile_print_error($error));
+        }
+
         // Validates if the BigBlueButton server is working.
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
 
             if ($bbbsession['administrator']) {
-                $error = get_string('view_error_unable_join', 'bigbluebuttonbn',
-                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                $error = get_string('view_error_unable_join', 'bigbluebuttonbn');
             } else if ($bbbsession['moderator']) {
-                $error = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn',
-                    $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+                $error = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
             } else {
-                $error = get_string('view_error_unable_join_student', 'bigbluebuttonbn',
-                    $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+                $error = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
             }
 
             return(self::mobile_print_error($error));

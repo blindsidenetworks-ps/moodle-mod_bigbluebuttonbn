@@ -123,6 +123,26 @@ class mobileview {
     }
 
     /**
+     * Return the status of an activity [open|not_started|ended].
+     *
+     * @param array $bbbsession
+     * @return string
+     */
+    public static function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
+        $now = time();
+        if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
+            // The activity has not been opened.
+            return 'not_started';
+        }
+        if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
+            // The activity has been closed.
+            return 'ended';
+        }
+        // The activity is open.
+        return 'open';
+    }
+
+    /**
      * Helper for preparing metadata used while creating the meeting.
      *
      * @param  array    $bbbsession
