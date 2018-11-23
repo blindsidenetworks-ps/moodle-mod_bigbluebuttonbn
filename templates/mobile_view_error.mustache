@@ -27,5 +27,12 @@
         <ion-item>
             <% error %>
         </ion-item>
+        <% starts_at %>
+                <%#not_started%>
+                    <ion-item text-wrap>
+                        <p><% not_started.starts_at %></p>
+                        <p><% not_started.ends_at %></p>
+                    </ion-item>
+                <%/not_started%>
     </ion-list>
 </div>

@@ -83,7 +83,12 @@ class mobile {
         $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
         if ($activitystatus == 'not_started') {
             $error = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
-            return(self::mobile_print_error($error));
+
+            $not_started = array();
+            $not_started['starts_at'] = get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime);
+            $not_started['ends_at'] = get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
+
+            return(self::mobile_print_error($error, $not_started));
         }
         if ($activitystatus == 'ended') {
             $error = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
@@ -222,11 +227,19 @@ class mobile {
         );
     }
 
-    protected static function mobile_print_error($error) {
+    /**
+     * Returns the view for errors and messages.
+     * @param  string $error Error to display.
+     * @param  array $not_started Extra messages for not started session.
+     *
+     * @return array       HTML, javascript and otherdata
+     */
+    protected static function mobile_print_error($error, $not_started = array()) {
 
         global $OUTPUT;
         $data = array(
-            'error' => $error
+            'error' => $error,
+            'not_started' => $not_started
         );
 
         return array(
