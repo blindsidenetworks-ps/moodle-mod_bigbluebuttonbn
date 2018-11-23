@@ -141,7 +141,28 @@ class mobile {
                 $bbbsession['presentation']['url']
             );
 
-            // TODO:: Validate creation of meeting previously.
+            if (empty($response)) {
+                // The server is unreachable.
+                if ($bbbsession['administrator']) {
+                    $e = get_string('view_error_unable_join', 'bigbluebuttonbn');
+                } else if ($bbbsession['moderator']) {
+                    $e = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
+                } else {
+                    $e = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
+                }
+                return(self::mobile_print_error($e));
+            }
+            if ($response['returncode'] == 'FAILED') {
+                // The meeting was not created.
+                $printerrorkey = bigbluebuttonbn_get_error_key($response['messageKey'],  'view_error_create');
+                $e = get_string($printerrorkey, 'bigbluebuttonbn');
+                return(self::mobile_print_error($e));
+            }
+            if ($response['hasBeenForciblyEnded'] == 'true') {
+                $e = get_string('index_error_forciblyended', 'bigbluebuttonbn');
+                return(self::mobile_print_error($e));
+            }
+
             // Moodle event logger: Create an event for meeting created.
             bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
             // Internal logger: Insert a record with the meeting created.
