@@ -85,8 +85,14 @@ class mobile {
             $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
             $notstarted = array();
-            $notstarted['starts_at'] = get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime);
-            $notstarted['ends_at'] = get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
+            $notstarted['starts_at'] = '';
+            $notstarted['ends_at'] = '';
+            if (!empty($bigbluebuttonbn->openingtime)) {
+                $notstarted['starts_at'] = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bigbluebuttonbn->openingtime);
+            }
+            if (!empty($bigbluebuttonbn->closingtime)) {
+                $notstarted['ends_at'] = get_string('mod_form_field_closingtime', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
+            }
 
             return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted));
         }
