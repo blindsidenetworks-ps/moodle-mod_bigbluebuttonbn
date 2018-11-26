@@ -15,29 +15,23 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_bigbluebuttonbn/mobile_view_issues
+    @template mod_bigbluebuttonbn/mobile_view_notification
 
-    This template renders the mobile page.
-
-    Example context (json):
-    {
-        "issues": [
-          {
-            "timecreated": "2012-04-23T18:25:43.511Z",
-            "grade": 25
-          }
-        ]
-    }
+    This template renders the notifications for mobile page.
 
 }}
 {{=<% %>=}}
 <div>
+    <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
-        <%#issues%>
-            <ion-item>
-                <p class="item-heading">{{ <%timecreated%> | coreToLocaleString }}</p>
-                <p><%grade%></p>
-            </ion-item>
-        <%/issues%>
+        <ion-item>
+            <% message %>
+        </ion-item>
+                <%#not_started%>
+                    <ion-item text-wrap>
+                        <p><% not_started.starts_at %></p>
+                        <p><% not_started.ends_at %></p>
+                    </ion-item>
+                <%/not_started%>
     </ion-list>
 </div>

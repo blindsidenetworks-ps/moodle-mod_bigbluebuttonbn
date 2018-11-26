@@ -82,17 +82,17 @@ class mobile {
         // Check activity status.
         $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
         if ($activitystatus == 'not_started') {
-            $error = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
+            $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
             $notstarted = array();
             $notstarted['starts_at'] = get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime);
             $notstarted['ends_at'] = get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
 
-            return(self::mobile_print_error($error, $notstarted));
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted));
         }
         if ($activitystatus == 'ended') {
-            $error = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
-            return(self::mobile_print_error($error));
+            $message = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
         // Validates if the BigBlueButton server is working.
@@ -140,7 +140,7 @@ class mobile {
         // If user is not administrator nor moderator (user is student) and waiting is required.
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
             $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-            return(self::mobile_print_error($message));
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
         // See if the session is in progress.
@@ -190,7 +190,7 @@ class mobile {
         if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
             // No more users allowed to join.
             $message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-            return(self::mobile_print_error($message));
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
         // Moodle event logger: Create an event for meeting joined.
@@ -228,17 +228,47 @@ class mobile {
     }
 
     /**
-     * Returns the view for errors and messages.
+     * Returns the view for errors.
      * @param  string $error Error to display.
+     *
+     * @return array       HTML, javascript and otherdata
+     */
+    protected static function mobile_print_error($error) {
+
+        global $OUTPUT;
+        $data = array(
+            'error' => $error
+        );
+
+        return array(
+            'templates' => array(
+                array(
+                    'id' => 'main',
+                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_error', $data),
+                ),
+            ),
+            'javascript' => '',
+            'otherdata' => '',
+            'files' => ''
+        );
+    }
+
+    /**
+     * Returns the view for messages.
+     * @param $bigbluebuttonbn
+     * @param $cm
+     * @param  string $message Message to display.
      * @param  array $notstarted Extra messages for not started session.
      *
      * @return array       HTML, javascript and otherdata
      */
-    protected static function mobile_print_error($error, $notstarted = array()) {
+    protected static function mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted = array()) {
 
         global $OUTPUT;
         $data = array(
-            'error' => $error,
+            'bigbluebuttonbn' => $bigbluebuttonbn,
+            'cmid' => $cm->id,
+            'message' => $message,
             'not_started' => $notstarted
         );
 

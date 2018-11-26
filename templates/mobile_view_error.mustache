@@ -17,22 +17,14 @@
 {{!
     @template mod_bigbluebuttonbn/mobile_view_error
 
-    This template renders the error and messages for mobile page.
+    This template renders the error for mobile page.
 
 }}
 {{=<% %>=}}
 <div>
-    <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
         <ion-item>
             <% error %>
         </ion-item>
-        <% starts_at %>
-                <%#not_started%>
-                    <ion-item text-wrap>
-                        <p><% not_started.starts_at %></p>
-                        <p><% not_started.ends_at %></p>
-                    </ion-item>
-                <%/not_started%>
     </ion-list>
 </div>
