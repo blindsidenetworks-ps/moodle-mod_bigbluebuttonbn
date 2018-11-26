@@ -88,10 +88,18 @@ class mobile {
             $notstarted['starts_at'] = '';
             $notstarted['ends_at'] = '';
             if (!empty($bigbluebuttonbn->openingtime)) {
-                $notstarted['starts_at'] = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' . userdate($bigbluebuttonbn->openingtime);
+                $notstarted['starts_at'] = sprintf(
+                    '%s: %s',
+                    get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
+                    userdate($bigbluebuttonbn->openingtime)
+                );
             }
             if (!empty($bigbluebuttonbn->closingtime)) {
-                $notstarted['ends_at'] = get_string('mod_form_field_closingtime', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
+                $notstarted['ends_at'] = sprintf(
+                    '%s: %s',
+                    get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
+                    userdate($bigbluebuttonbn->closingtime)
+                );
             }
 
             return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted));
