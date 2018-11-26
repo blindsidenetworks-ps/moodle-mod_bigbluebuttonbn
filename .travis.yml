@@ -2,6 +2,10 @@ language: php
 
 sudo: required
 
+#branches:
+#  only:
+#    - master
+
 addons:
   firefox: "47.0.1"
   postgresql: "9.4"
@@ -44,11 +48,11 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
-  - nvm use 8.9
   - cd ../..
+  ## Standard script
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci && cd ci && composer install && cd ..
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
@@ -60,7 +64,8 @@ script:
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
-  - moodle-plugin-ci savepoints
   - moodle-plugin-ci phpunit
+  - moodle-plugin-ci savepoints
+  #- moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat
