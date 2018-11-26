@@ -207,16 +207,6 @@ class mobile {
             return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
-        // Moodle event logger: Create an event for meeting joined.
-        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
-
-        // Internal logger: Insert a record with the meeting created.
-        $overrides = array('meetingid' => $bbbsession['meetingid']);
-        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides);
-
-        // Increment the number of participants.
-        bigbluebuttonbn_participant_joined($bbbsession['meetingid'], ($bbbsession['administrator'] || $bbbsession['moderator']));
-
         // Build final url to BBB.
         $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
 
