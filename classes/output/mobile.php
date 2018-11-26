@@ -276,7 +276,7 @@ class mobile {
             'templates' => array(
                 array(
                     'id' => 'main',
-                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_error', $data),
+                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_notification', $data),
                 ),
             ),
             'javascript' => '',
