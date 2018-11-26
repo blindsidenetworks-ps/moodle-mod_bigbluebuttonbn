@@ -84,11 +84,11 @@ class mobile {
         if ($activitystatus == 'not_started') {
             $error = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
-            $not_started = array();
-            $not_started['starts_at'] = get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime);
-            $not_started['ends_at'] = get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
+            $notstarted = array();
+            $notstarted['starts_at'] = get_string('starts_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime);
+            $notstarted['ends_at'] = get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime);
 
-            return(self::mobile_print_error($error, $not_started));
+            return(self::mobile_print_error($error, $notstarted));
         }
         if ($activitystatus == 'ended') {
             $error = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
@@ -230,16 +230,16 @@ class mobile {
     /**
      * Returns the view for errors and messages.
      * @param  string $error Error to display.
-     * @param  array $not_started Extra messages for not started session.
+     * @param  array $notstarted Extra messages for not started session.
      *
      * @return array       HTML, javascript and otherdata
      */
-    protected static function mobile_print_error($error, $not_started = array()) {
+    protected static function mobile_print_error($error, $notstarted = array()) {
 
         global $OUTPUT;
         $data = array(
             'error' => $error,
-            'not_started' => $not_started
+            'not_started' => $notstarted
         );
 
         return array(

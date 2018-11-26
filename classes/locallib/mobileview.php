@@ -24,6 +24,8 @@
 
 namespace mod_bigbluebuttonbn\locallib;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
