@@ -37,34 +37,30 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 class mobileview {
 
     /**
-     * Setup the bbbsession variable that is used all accross the plugin.
-     *
-     * @param object $context
-     * @param array $bbbsession
-     * @return array $bbbsession
+     * Return standard array with configurations required for BBB server.
+     * @param $context
+     * @param $bbbsession
+     * @return mixed
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
 
         global $CFG, $USER;
-        // User data.
         $bbbsession['username'] = fullname($USER);
         $bbbsession['userID'] = $USER->id;
-        // User roles.
         $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
         $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
         $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
         $bbbsession['managerecordings'] = ($bbbsession['administrator']
             || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
         $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
-        // Server data.
         $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
         $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
-        // Database info related to the activity.
         $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
             $bbbsession['bigbluebuttonbn']->id;
         $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
         $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
-        // Extra data for setting up the Meeting.
         $bbbsession['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
             $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
@@ -84,9 +80,7 @@ class mobileview {
         }
         $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
         $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
-        // Additional info related to the course.
         $bbbsession['context'] = $context;
-        // Metadata (origin).
         $bbbsession['origin'] = 'Moodle';
         $bbbsession['originVersion'] = $CFG->release;
         $parsedurl = parse_url($CFG->wwwroot);
@@ -95,7 +89,6 @@ class mobileview {
         $bbbsession['originServerCommonName'] = '';
         $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
         $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
-        // Setting for clienttype, assign flash if not enabled, or default if not editable.
         $bbbsession['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
         if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable')) {
             $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
@@ -109,7 +102,7 @@ class mobileview {
 
     /**
      * Build url for join to session.
-     * This method is similar to "bigbluebutton_bbb_view_join_meeting" in bbb_view.
+     * This method is similar to "bigbluebutton_bbb_view_join_meeting()" in bbb_view.
      * @param $bbbsession
      * @return string
      */
@@ -152,6 +145,7 @@ class mobileview {
      */
     public static function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
         global $USER;
+        // Create standard metadata.
         $metadata = ['bbb-origin' => $bbbsession['origin'],
             'bbb-origin-version' => $bbbsession['originVersion'],
             'bbb-origin-server-name' => $bbbsession['originServerName'],
@@ -162,6 +156,7 @@ class mobileview {
             'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
             'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
         ];
+        // Check recording status.
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
             $metadata["bn-recording-status"] = json_encode(
                 array(
@@ -180,10 +175,10 @@ class mobileview {
     }
 
     /**
-     * Helper for preparing data used for creating the meeting.
-     *
-     * @param  array    $bbbsession
+     * Helper to prepare data used for create meeting.
+     * @param $bbbsession
      * @return array
+     * @throws \coding_exception
      */
     public static function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
         $data = ['meetingID' => $bbbsession['meetingid'],
