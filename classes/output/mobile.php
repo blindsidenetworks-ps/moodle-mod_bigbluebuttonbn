@@ -43,16 +43,18 @@ class mobile {
 
     /**
      * Returns the bigbluebuttonbn course view for the mobile app.
-     * @param  array $args Arguments from tool_mobile_get_content WS
-     *
-     * @return array       HTML, javascript and otherdata
+     * @param $args
+     * @return array HTML, javascript and other data.
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @throws \require_login_exception
+     * @throws \required_capability_exception
      */
     public static function mobile_course_view($args) {
 
-        global $OUTPUT, $USER, $DB, $SESSION, $CFG;
+        global $OUTPUT, $SESSION, $CFG;
 
         $args = (object) $args;
-
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
         if (!$viewinstance) {
             $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
@@ -70,14 +72,12 @@ class mobile {
         // Add view event.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
-        // Additional info related to the course.
+        // Create array bbbsession with configuration for BBB server.
+        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
         $bbbsession['course'] = $course;
         $bbbsession['coursename'] = $course->fullname;
         $bbbsession['cm'] = $cm;
         $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-
-        // Set common variables for session.
-        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
         // Check activity status.
         $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
@@ -109,8 +109,9 @@ class mobile {
             return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
-        // Validates if the BigBlueButton server is working.
+        // Check if the BBB server is working.
         $serverversion = bigbluebuttonbn_get_server_version();
+        $bbbsession['serverversion'] = (string) $serverversion;
         if (is_null($serverversion)) {
 
             if ($bbbsession['administrator']) {
@@ -123,7 +124,6 @@ class mobile {
 
             return(self::mobile_print_error($error));
         }
-        $bbbsession['serverversion'] = (string) $serverversion;
 
         // Mark viewed by user (if required).
         $completion = new \completion_info($course);
@@ -157,10 +157,10 @@ class mobile {
             return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
-        // See if the session is in progress.
+        // See if the BBB session is already in progress.
         if (!bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
 
-            // As the meeting doesn't exist, try to create it.
+            // The meeting doesnt exist in BBB server, must be created.
             $response = bigbluebuttonbn_get_create_meeting_array(
                 \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_data($bbbsession),
                 \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
@@ -169,7 +169,7 @@ class mobile {
             );
 
             if (empty($response)) {
-                // The server is unreachable.
+                // The BBB server is failing.
                 if ($bbbsession['administrator']) {
                     $e = get_string('view_error_unable_join', 'bigbluebuttonbn');
                 } else if ($bbbsession['moderator']) {
@@ -180,9 +180,9 @@ class mobile {
                 return(self::mobile_print_error($e));
             }
             if ($response['returncode'] == 'FAILED') {
-                // The meeting was not created.
-                $printerrorkey = bigbluebuttonbn_get_error_key($response['messageKey'],  'view_error_create');
-                $e = get_string($printerrorkey, 'bigbluebuttonbn');
+                // The meeting could not be created.
+                $errorkey = bigbluebuttonbn_get_error_key($response['messageKey'],  'view_error_create');
+                $e = get_string($errorkey, 'bigbluebuttonbn');
                 return(self::mobile_print_error($e));
             }
             if ($response['hasBeenForciblyEnded'] == 'true') {
@@ -190,9 +190,9 @@ class mobile {
                 return(self::mobile_print_error($e));
             }
 
-            // Moodle event logger: Create an event for meeting created.
+            // Event meeting created.
             bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
-            // Internal logger: Insert a record with the meeting created.
+            // Insert a record that meeting was created.
             $overrides = array('meetingid' => $bbbsession['meetingid']);
             $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
             bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);

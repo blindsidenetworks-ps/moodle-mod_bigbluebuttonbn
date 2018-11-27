@@ -183,7 +183,7 @@ class mobileview {
      * Helper for preparing data used for creating the meeting.
      *
      * @param  array    $bbbsession
-     * @return object
+     * @return array
      */
     public static function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
         $data = ['meetingID' => $bbbsession['meetingid'],
