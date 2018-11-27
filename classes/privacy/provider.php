@@ -272,4 +272,51 @@ class provider implements metadataprovider, pluginprovider {
             $export($lastid, $data);
         }
     }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function _get_users_in_context(userlist $userlist) {
+
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+
+        $params = [
+            'instanceid'    => $context->instanceid,
+            'modulename'    => 'bigbluebuttonbn',
+        ];
+
+        $sql = "SELECT bn.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {bigbluebuttonbn} bn ON bn.id = cm.instance
+                  JOIN {bigbluebuttonbn_logs} bnl ON bnl.bigbluebuttonbnid = bn.id
+                 WHERE cm.id = :instanceid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     */
+    public static function _delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+        $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
+        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $cm->instance]);
+
+        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        $params = array_merge(['bigbluebuttonbnid' => $bigbluebuttonbn->id], $userinparams);
+        $sql = "bigbluebuttonbnid = :bigbluebuttonbnid AND userid {$userinsql}";
+
+        $DB->delete_records_select('bigbluebuttonbn_logs', $sql, $params);
+    }
 }
