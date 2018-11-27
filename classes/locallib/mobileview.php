@@ -39,65 +39,68 @@ class mobileview {
     /**
      * Return standard array with configurations required for BBB server.
      * @param $context
-     * @param $bbbsession
+     * @param $session
      * @return mixed
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
+    public static function bigbluebuttonbn_view_bbbsession_set($context, &$session) {
 
         global $CFG, $USER;
-        $bbbsession['username'] = fullname($USER);
-        $bbbsession['userID'] = $USER->id;
-        $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
-        $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
-        $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
-        $bbbsession['managerecordings'] = ($bbbsession['administrator']
+
+        $session['username'] = fullname($USER);
+        $session['userID'] = $USER->id;
+        $session['administrator'] = is_siteadmin($session['userID']);
+        $participantlist = bigbluebuttonbn_get_participant_list($session['bigbluebuttonbn'], $context);
+        $session['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
+        $session['managerecordings'] = ($session['administrator']
             || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-        $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
-        $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
-        $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
-        $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-            $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
-        $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
-        $bbbsession['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
+        $session['importrecordings'] = ($session['managerecordings']);
+        $session['modPW'] = $session['bigbluebuttonbn']->moderatorpass;
+        $session['viewerPW'] = $session['bigbluebuttonbn']->viewerpass;
+        $session['meetingid'] = $session['bigbluebuttonbn']->meetingid.'-'.$session['course']->id.'-'.
+            $session['bigbluebuttonbn']->id;
+        $session['meetingname'] = $session['bigbluebuttonbn']->name;
+        $session['meetingdescription'] = $session['bigbluebuttonbn']->intro;
+        $session['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
-            $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
+            $session['userlimit'] = intval($session['bigbluebuttonbn']->userlimit);
         }
-        $bbbsession['voicebridge'] = $bbbsession['bigbluebuttonbn']->voicebridge;
-        if ($bbbsession['bigbluebuttonbn']->voicebridge > 0) {
-            $bbbsession['voicebridge'] = 70000 + $bbbsession['bigbluebuttonbn']->voicebridge;
+        $session['voicebridge'] = $session['bigbluebuttonbn']->voicebridge;
+        if ($session['bigbluebuttonbn']->voicebridge > 0) {
+            $session['voicebridge'] = 70000 + $session['bigbluebuttonbn']->voicebridge;
         }
-        $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
-        $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
-        $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
-        if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-            $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
+        $session['wait'] = $session['bigbluebuttonbn']->wait;
+        $session['record'] = $session['bigbluebuttonbn']->record;
+        $session['welcome'] = $session['bigbluebuttonbn']->welcome;
+        if (!isset($session['welcome']) || $session['welcome'] == '') {
+            $session['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
         }
-        if ($bbbsession['bigbluebuttonbn']->record) {
-            $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+        if ($session['bigbluebuttonbn']->record) {
+            $session['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
         }
-        $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
-        $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
-        $bbbsession['context'] = $context;
-        $bbbsession['origin'] = 'Moodle';
-        $bbbsession['originVersion'] = $CFG->release;
+        $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
+        $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
+        $session['context'] = $context;
+        $session['origin'] = 'Moodle';
+        $session['originVersion'] = $CFG->release;
         $parsedurl = parse_url($CFG->wwwroot);
-        $bbbsession['originServerName'] = $parsedurl['host'];
-        $bbbsession['originServerUrl'] = $CFG->wwwroot;
-        $bbbsession['originServerCommonName'] = '';
-        $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
-        $bbbsession['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
+        $session['originServerName'] = $parsedurl['host'];
+        $session['originServerUrl'] = $CFG->wwwroot;
+        $session['originServerCommonName'] = '';
+        $session['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
+        $session['bnserver'] = bigbluebuttonbn_is_bn_server();
+        $session['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
+
         if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable')) {
-            $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
-        }
-        if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
-            $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+            $session['clienttype'] = $session['bigbluebuttonbn']->clienttype;
         }
 
-        return($bbbsession);
+        if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
+            $session['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+        }
+
+        return($session);
     }
 
     /**
@@ -144,9 +147,11 @@ class mobileview {
      * @return array
      */
     public static function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
+
         global $USER;
         // Create standard metadata.
-        $metadata = ['bbb-origin' => $bbbsession['origin'],
+        $metadatabbb = [
+            'bbb-origin' => $bbbsession['origin'],
             'bbb-origin-version' => $bbbsession['originVersion'],
             'bbb-origin-server-name' => $bbbsession['originServerName'],
             'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
@@ -158,7 +163,7 @@ class mobileview {
         ];
         // Check recording status.
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
-            $metadata["bn-recording-status"] = json_encode(
+            $metadatabbb["bn-recording-status"] = json_encode(
                 array(
                     'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
                     'context' => $bbbsession['bigbluebuttonbnURL']
@@ -166,12 +171,12 @@ class mobileview {
             );
         }
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
-            $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+            $metadatabbb['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
         }
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
-            $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
+            $metadatabbb['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
         }
-        return $metadata;
+        return $metadatabbb;
     }
 
     /**

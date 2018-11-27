@@ -73,11 +73,11 @@ class mobile {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
         // Create array bbbsession with configuration for BBB server.
-        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
         $bbbsession['course'] = $course;
         $bbbsession['coursename'] = $course->fullname;
         $bbbsession['cm'] = $cm;
         $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
         // Check activity status.
         $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
