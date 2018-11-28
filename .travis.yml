@@ -51,7 +51,7 @@ before_install:
   - cd ../..
   ## Standard script
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   #- git clone https://github.com/jfederico/moodle-plugin-ci.git ci && cd ci && composer install && cd ..
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 

@@ -2609,15 +2609,17 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
 }
 
 /**
- * Helper function returns an encoded meetingid.
- *
- * @param string $seed
+ * Helper function returns a sha1 encoded string that is unique and will be used as a seed for meetingid.
  *
  * @return string
  */
-function bigbluebuttonbn_encode_meetingid($seed) {
-    global $CFG;
-    return sha1($CFG->wwwroot . $seed . \mod_bigbluebuttonbn\locallib\config::get('shared_secret'));
+function bigbluebuttonbn_unique_meetingid_seed() {
+    global $DB;
+    do {
+        $encodedseed = sha1(bigbluebuttonbn_random_password(12));
+        $meetingid = (string)$DB->get_field('bigbluebuttonbn', 'meetingid', array('meetingid' => $encodedseed));
+    } while ($meetingid == $encodedseed);
+    return $encodedseed;
 }
 
 /**
