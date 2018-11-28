@@ -278,7 +278,7 @@ class provider implements metadataprovider, pluginprovider {
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
-    public static function _get_users_in_context(userlist $userlist) {
+    public static function get_users_in_context(\core_privacy\local\request\userlist $userlist) {
 
         $context = $userlist->get_context();
 
@@ -291,7 +291,7 @@ class provider implements metadataprovider, pluginprovider {
             'modulename'    => 'bigbluebuttonbn',
         ];
 
-        $sql = "SELECT bn.userid
+        $sql = "SELECT bnl.userid
                   FROM {course_modules} cm
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
                   JOIN {bigbluebuttonbn} bn ON bn.id = cm.instance
@@ -306,7 +306,7 @@ class provider implements metadataprovider, pluginprovider {
      *
      * @param   approved_userlist       $userlist The approved context and user information to delete information for.
      */
-    public static function _delete_data_for_users(approved_userlist $userlist) {
+    public static function delete_data_for_users(\core_privacy\local\request\approved_userlist $userlist) {
         global $DB;
 
         $context = $userlist->get_context();
