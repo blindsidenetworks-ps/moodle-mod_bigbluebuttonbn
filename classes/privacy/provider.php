@@ -282,8 +282,7 @@ class provider implements metadataprovider, pluginprovider {
 
         $context = $userlist->get_context();
 
-        // For php 5.4.
-        if (!is_a($context, \context_module)) {
+        if (!is_a($context, \context_module::class)) {
             return;
         }
 
