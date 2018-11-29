@@ -1,3 +1,5 @@
+2.2.8 (2017101016)
+Enhancement: Added support for new privacy methods in Moodle 3.6, 3.5.3, 3.4.6 (CONTRIB-7549).
 
 2.2.7 (2017101015)
 Bug: Fixed issue with recording-ready notifications sometimes sent more than once (CONTRIB-7438).
