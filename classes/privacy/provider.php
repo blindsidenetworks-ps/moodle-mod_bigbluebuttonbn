@@ -282,7 +282,7 @@ class provider implements metadataprovider, pluginprovider {
 
         $context = $userlist->get_context();
 
-        if (!is_a($context, \context_module::class)) {
+        if (!$context instanceof \context_module) {
             return;
         }
 
@@ -311,10 +311,9 @@ class provider implements metadataprovider, pluginprovider {
 
         $context = $userlist->get_context();
         $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $cm->instance]);
 
         list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
-        $params = array_merge(['bigbluebuttonbnid' => $bigbluebuttonbn->id], $userinparams);
+        $params = array_merge(['bigbluebuttonbnid' => $cm->instance], $userinparams);
         $sql = "bigbluebuttonbnid = :bigbluebuttonbnid AND userid {$userinsql}";
 
         $DB->delete_records_select('bigbluebuttonbn_logs', $sql, $params);

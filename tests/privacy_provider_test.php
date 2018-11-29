@@ -178,9 +178,9 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         // Ensure correct users are found in relevant contexts.
         $this->assertCount(2, $userlist);
-        $expected = [$user1->id, $user2->id];
+        $expected = [intval($user1->id), intval($user2->id)];
         $actual = $userlist->get_userids();
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(sort($expected), sort($actual));
     }
 
     /**
