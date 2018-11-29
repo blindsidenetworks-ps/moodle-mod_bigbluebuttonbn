@@ -73,7 +73,7 @@ M.mod_bigbluebuttonbn.recordings = {
                     last:'Ultima',
                     goToLabel:'Pagina:',
                     goToAction:'Ir',
-                    perPage:'Columnas:',
+                    perPage:'Filas:',
                     showAll:'Mostrar todo'
                 }
             );
