@@ -61,12 +61,33 @@ M.mod_bigbluebuttonbn.recordings = {
         return data;
     },
 
+    initExtraLanguage: function (Y1) {
+        if (Y1.config.lang.startsWith('es-') || (Y1.config.lang == 'es')) {
+            Y1.Intl.add(
+                'datatable-paginator',
+                Y1.config.lang,
+                {
+                    first:'Primera',
+                    prev:'Previa',
+                    next:'Próxima',
+                    last:'Ultima',
+                    goToLabel:'Pagina:',
+                    goToAction:'Ir',
+                    perPage:'Columnas:',
+                    showAll:'Mostrar todo'
+                }
+            );
+        }
+    },
+
     datatableInit: function() {
         var columns = this.datatable.columns;
         var data = this.datatable.data;
+        var func = this.initExtraLanguage;
         YUI({
             lang: this.locale
-        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+        }).use('intl', 'datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+            func(Y);
             var table = new Y.DataTable({
                 width: "1195px",
                 columns: columns,
