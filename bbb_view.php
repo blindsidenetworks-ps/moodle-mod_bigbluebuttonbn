@@ -34,6 +34,7 @@ $mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
+$timeline = optional_param('timeline', 0, PARAM_INT);
 
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
@@ -44,6 +45,49 @@ $cm = $bbbviewinstance['cm'];
 $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
 $context = context_module::instance($cm->id);
+
+if ($timeline) {
+    // If the user came from timeline, the $bbbsession should be created here.
+    $bbbsession['course'] = $course;
+    $bbbsession['coursename'] = $course->fullname;
+    $bbbsession['cm'] = $cm;
+    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+    bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+
+    // Check activity status.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    // TODO.
+    /*if ($activitystatus == 'not_started') {
+        $actionable = false;
+    }
+    if ($activitystatus == 'ended') {
+        $actionable = false;
+    }*/
+
+    // Validates if the BigBlueButton server is working.
+    $serverversion = bigbluebuttonbn_get_server_version();
+    if (is_null($serverversion)) {
+        $actionable = false;
+    } else {
+        $bbbsession['serverversion'] = (string) $serverversion;
+
+        // Operation URLs.
+        $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+        $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$cm->id .
+            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+            'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+            '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
+            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+        // Initialize session variable used across views.
+        // TODO check if this is need it.
+        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+    }
+} elseif (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
 
 // Print the page header.
 $PAGE->set_context($context);
