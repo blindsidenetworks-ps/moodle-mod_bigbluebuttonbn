@@ -81,8 +81,8 @@ if ($timeline) {
 
     // Operation URLs.
     $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
-    // The user should be back to Dashboard.
-    $bbbsession['logoutURL'] = $CFG->wwwroot . '/my/';
+    // The logoutURL will be the activity view page, because in case there are errors, we need to show them.
+    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
     $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
         'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
     $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
