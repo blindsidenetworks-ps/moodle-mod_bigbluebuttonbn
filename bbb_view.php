@@ -81,8 +81,8 @@ if ($timeline) {
 
     // Operation URLs.
     $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
-    // The logoutURL will be the activity view page, because in case there are errors, we need to show them.
-    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
     $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
         'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
     $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
@@ -92,7 +92,7 @@ if ($timeline) {
     // Initialize session variable used across views.
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
-} elseif (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
+} else if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
