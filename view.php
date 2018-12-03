@@ -306,9 +306,14 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     // Renders warning messages when configured.
     $output .= bigbluebuttonbn_view_warning_default_server($bbbsession);
     $output .= bigbluebuttonbn_view_warning_general($bbbsession);
+
     // Renders the rest of the page.
     $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
-    $output .= $OUTPUT->heading($bbbsession['meetingdescription'], 5);
+    // Renders the completed description.
+    $desc = file_rewrite_pluginfile_urls($bbbsession['meetingdescription'], 'pluginfile.php',
+        $bbbsession['context']->id, 'mod_bigbluebuttonbn', 'intro', null);
+    $output .= $OUTPUT->heading($desc, 5);
+
     if ($enabledfeatures['showroom']) {
         $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
