@@ -60,22 +60,20 @@ M.mod_bigbluebuttonbn.recordings = {
     },
 
     initExtraLanguage: function (Y1) {
-        if (Y1.config.lang.startsWith('es-') || (Y1.config.lang == 'es')) {
-            Y1.Intl.add(
-                'datatable-paginator',
-                Y1.config.lang,
-                {
-                    first:'Primera',
-                    prev:'Previa',
-                    next:'Próxima',
-                    last:'Ultima',
-                    goToLabel:'Pagina:',
-                    goToAction:'Ir',
-                    perPage:'Filas:',
-                    showAll:'Mostrar todo'
-                }
-            );
-        }
+        Y1.Intl.add(
+            'datatable-paginator',
+            Y1.config.lang,
+            {
+                first: M.util.get_string('view_recording_yui_first', 'bigbluebuttonbn'),
+                prev:  M.util.get_string('view_recording_yui_prev', 'bigbluebuttonbn'),
+                next:  M.util.get_string('view_recording_yui_next', 'bigbluebuttonbn'),
+                last:  M.util.get_string('view_recording_yui_last', 'bigbluebuttonbn'),
+                goToLabel:  M.util.get_string('view_recording_yui_page', 'bigbluebuttonbn'),
+                goToAction:  M.util.get_string('view_recording_yui_go', 'bigbluebuttonbn'),
+                perPage:  M.util.get_string('view_recording_yui_rows', 'bigbluebuttonbn'),
+                showAll:  M.util.get_string('view_recording_yui_show_all', 'bigbluebuttonbn')
+            }
+        );
     },
 
     datatableInit: function() {
