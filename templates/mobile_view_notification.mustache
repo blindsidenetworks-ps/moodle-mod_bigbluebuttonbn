@@ -15,29 +15,23 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_bigbluebuttonbn/mobile_view_page
+    @template mod_bigbluebuttonbn/mobile_view_notification
 
-    This template renders the mobile page.
+    This template renders the notifications for mobile page.
 
 }}
 {{=<% %>=}}
 <div>
     <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
-         <%#errors%>
-            <ion-item text-wrap>
-                <% error %>
-            </ion-item>
-        <%/errors%>
-        <%^errors%>
-            <ion-item text-wrap>
-                {{ 'plugin.mod_bigbluebuttonbn.view_message_conference_room_ready' | translate }}
-            </ion-item>
-            <ion-item>
-                <button ion-button block onclick="window.open('<% urltojoin %>', '_system');">
-                    {{ 'plugin.mod_bigbluebuttonbn.view_conference_action_join' | translate }}
-                </button>
-            </ion-item>
-        <%/errors%>
+        <ion-item text-wrap>
+            <% message %>
+        </ion-item>
+                <%#not_started%>
+                    <ion-item text-wrap>
+                        <p><% not_started.starts_at %></p>
+                        <p><% not_started.ends_at %></p>
+                    </ion-item>
+                <%/not_started%>
     </ion-list>
 </div>
