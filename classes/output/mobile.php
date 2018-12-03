@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use context_module;
 use mod_bigbluebuttonbn_external;
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Mobile output class for bigbluebuttonbn
@@ -42,44 +43,177 @@ class mobile {
 
     /**
      * Returns the bigbluebuttonbn course view for the mobile app.
-     * @param  array $args Arguments from tool_mobile_get_content WS
-     *
-     * @return array       HTML, javascript and otherdata
+     * @param $args
+     * @return array HTML, javascript and other data.
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @throws \require_login_exception
+     * @throws \required_capability_exception
      */
     public static function mobile_course_view($args) {
-        global $OUTPUT, $USER, $DB;
+
+        global $OUTPUT, $SESSION, $CFG;
 
         $args = (object) $args;
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $args->cmid);
+        $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
+        if (!$viewinstance) {
+            $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
+            return(self::mobile_print_error($error));
+        }
 
-        // Capabilities check.
-        require_login($args->courseid , false , $cm, true, true);
-
+        $cm = $viewinstance['cm'];
+        $course = $viewinstance['course'];
+        $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
         $context = context_module::instance($cm->id);
 
-        require_capability ('mod/bigbluebuttonbn:view', $context);
-        if ($args->userid != $USER->id) {
-            require_capability('mod/bigbluebuttonbn:manage', $context);
-        }
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
+        require_login($course->id, false , $cm, true, true);
+        require_capability('mod/bigbluebuttonbn:join', $context);
 
-        $showget = true;
-        if ($bigbluebuttonbn->requiredtime && !has_capability('mod/bigbluebuttonbn:manage', $context)) {
-            if (bigbluebuttonbn_get_course_time($bigbluebuttonbn->course) < ($bigbluebuttonbn->requiredtime * 60)) {
-                $showget = false;
+        // Add view event.
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
+
+        // Create array bbbsession with configuration for BBB server.
+        $bbbsession['course'] = $course;
+        $bbbsession['coursename'] = $course->fullname;
+        $bbbsession['cm'] = $cm;
+        $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+
+        // Check activity status.
+        $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
+        if ($activitystatus == 'not_started') {
+            $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
+
+            $notstarted = array();
+            $notstarted['starts_at'] = '';
+            $notstarted['ends_at'] = '';
+            if (!empty($bigbluebuttonbn->openingtime)) {
+                $notstarted['starts_at'] = sprintf(
+                    '%s: %s',
+                    get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
+                    userdate($bigbluebuttonbn->openingtime)
+                );
             }
+            if (!empty($bigbluebuttonbn->closingtime)) {
+                $notstarted['ends_at'] = sprintf(
+                    '%s: %s',
+                    get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
+                    userdate($bigbluebuttonbn->closingtime)
+                );
+            }
+
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted));
+        }
+        if ($activitystatus == 'ended') {
+            $message = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
         }
 
-        $bigbluebuttonbn->name = format_string($bigbluebuttonbn->name);
-        list($bigbluebuttonbn->intro, $bigbluebuttonbn->introformat) =
-                        external_format_text($bigbluebuttonbn->intro, $bigbluebuttonbn->introformat, $context->id,
-                                                'mod_bigbluebuttonbn', 'intro');
+        // Check if the BBB server is working.
+        $serverversion = bigbluebuttonbn_get_server_version();
+        $bbbsession['serverversion'] = (string) $serverversion;
+        if (is_null($serverversion)) {
+
+            if ($bbbsession['administrator']) {
+                $error = get_string('view_error_unable_join', 'bigbluebuttonbn');
+            } else if ($bbbsession['moderator']) {
+                $error = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
+            } else {
+                $error = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
+            }
+
+            return(self::mobile_print_error($error));
+        }
+
+        // Mark viewed by user (if required).
+        $completion = new \completion_info($course);
+        $completion->set_module_viewed($cm);
+
+        // Validate if the user is in a role allowed to join.
+        if (!has_capability('moodle/category:manage', $context) &&
+            !has_capability('mod/bigbluebuttonbn:join', $context)) {
+            $error = get_string('view_nojoin', 'bigbluebuttonbn');
+            return(self::mobile_print_error($error));
+        }
+
+        // Operation URLs.
+        $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+        $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$args->cmid .
+            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+            'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+            '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $args->cmid .
+            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+
+        // Initialize session variable used across views.
+        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+
+        // Logic of bbb_view for join to session.
+        // If user is not administrator nor moderator (user is student) and waiting is required.
+        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
+            $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+        }
+
+        // See if the BBB session is already in progress.
+        if (!bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
+
+            // The meeting doesnt exist in BBB server, must be created.
+            $response = bigbluebuttonbn_get_create_meeting_array(
+                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_data($bbbsession),
+                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
+                $bbbsession['presentation']['name'],
+                $bbbsession['presentation']['url']
+            );
+
+            if (empty($response)) {
+                // The BBB server is failing.
+                if ($bbbsession['administrator']) {
+                    $e = get_string('view_error_unable_join', 'bigbluebuttonbn');
+                } else if ($bbbsession['moderator']) {
+                    $e = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
+                } else {
+                    $e = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
+                }
+                return(self::mobile_print_error($e));
+            }
+            if ($response['returncode'] == 'FAILED') {
+                // The meeting could not be created.
+                $errorkey = bigbluebuttonbn_get_error_key($response['messageKey'],  'view_error_create');
+                $e = get_string($errorkey, 'bigbluebuttonbn');
+                return(self::mobile_print_error($e));
+            }
+            if ($response['hasBeenForciblyEnded'] == 'true') {
+                $e = get_string('index_error_forciblyended', 'bigbluebuttonbn');
+                return(self::mobile_print_error($e));
+            }
+
+            // Event meeting created.
+            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
+            // Insert a record that meeting was created.
+            $overrides = array('meetingid' => $bbbsession['meetingid']);
+            $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+            bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
+        }
+
+        // It is part of 'bigbluebutton_bbb_view_join_meeting' in bbb_view.
+        // Update the cache.
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
+            // No more users allowed to join.
+            $message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+        }
+
+        // Build final url to BBB.
+        $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
+
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
-            'showget' => $showget && count($issues) > 0,
-            'issues' => $issues,
-            'issue' => $issues[0],
-            'numissues' => count($issues),
+            'bbbsession' => (object) $bbbsession,
+            'urltojoin' => $urltojoin,
             'cmid' => $cm->id,
             'courseid' => $args->courseid
         );
@@ -93,55 +227,65 @@ class mobile {
             ),
             'javascript' => '',
             'otherdata' => '',
-            'files' => $issues
+            'files' => ''
         );
     }
 
     /**
-     * Returns the bigbluebuttonbn issues view for the mobile app.
-     * @param  array $args Arguments from tool_mobile_get_content WS
+     * Returns the view for errors.
+     * @param  string $error Error to display.
      *
      * @return array       HTML, javascript and otherdata
      */
-    public static function mobile_issues_view($args) {
-        global $OUTPUT, $USER, $DB;
+    protected static function mobile_print_error($error) {
 
-        $args = (object) $args;
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $args->cmid);
-
-        // Capabilities check.
-        require_login($args->courseid , false , $cm, true, true);
-
-        $context = context_module::instance($cm->id);
-
-        require_capability ('mod/bigbluebuttonbn:view', $context);
-        if ($args->userid != $USER->id) {
-            require_capability('mod/bigbluebuttonbn:manage', $context);
-        }
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
-
-        // Get bigbluebuttonbns from external (taking care of exceptions).
-        try {
-            $issued = mod_bigbluebuttonbn_external::issue_bigbluebuttonbn($cm->instance);
-            $bigbluebuttonbns = mod_bigbluebuttonbn_external::get_issued_bigbluebuttonbns($cm->instance);
-            $issues = array_values($bigbluebuttonbns['issues']); // Make it mustache compatible.
-        } catch (Exception $e) {
-            $issues = array();
-        }
-
+        global $OUTPUT;
         $data = array(
-            'issues' => $issues
+            'error' => $error
         );
 
         return array(
             'templates' => array(
                 array(
                     'id' => 'main',
-                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_issues', $data),
+                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_error', $data),
                 ),
             ),
             'javascript' => '',
-            'otherdata' => ''
+            'otherdata' => '',
+            'files' => ''
+        );
+    }
+
+    /**
+     * Returns the view for messages.
+     * @param $bigbluebuttonbn
+     * @param $cm
+     * @param  string $message Message to display.
+     * @param  array $notstarted Extra messages for not started session.
+     *
+     * @return array       HTML, javascript and otherdata
+     */
+    protected static function mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted = array()) {
+
+        global $OUTPUT;
+        $data = array(
+            'bigbluebuttonbn' => $bigbluebuttonbn,
+            'cmid' => $cm->id,
+            'message' => $message,
+            'not_started' => $notstarted
+        );
+
+        return array(
+            'templates' => array(
+                array(
+                    'id' => 'main',
+                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_notification', $data),
+                ),
+            ),
+            'javascript' => '',
+            'otherdata' => '',
+            'files' => ''
         );
     }
 }
