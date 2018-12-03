@@ -29,6 +29,7 @@ global $CFG;
 use core_privacy\tests\provider_testcase;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 use mod_bigbluebuttonbn\privacy\provider;
@@ -56,7 +57,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $this->resetAfterTest(true);
 
         $collection = new collection('mod_bigbluebuttonbn');
-        $newcollection = provider::get_metadata($collection);
+        $newcollection = \mod_bigbluebuttonbn\privacy\provider::get_metadata($collection);
         $itemcollection = $newcollection->get_collection();
         $this->assertCount(3, $itemcollection);
 
@@ -107,7 +108,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user);
 
         // Check the contexts supplied are correct.
-        $contextlist = provider::get_contexts_for_userid($user->id);
+        $contextlist = \mod_bigbluebuttonbn\privacy\provider::get_contexts_for_userid($user->id);
         $this->assertCount(1, $contextlist);
 
         $contextformodule = $contextlist->current();
@@ -146,6 +147,43 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
     }
 
     /**
+     * Test that only users with relevant contexts are fetched.
+     */
+    public function test_get_users_in_context() {
+        // For backward compatibility with old versions of Moodle.
+        if (!class_exists('\core_privacy\local\request\userlist')) {
+            return;
+        }
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        // The bigbluebuttonbn activity the user will have to work with.
+        $bigbluebuttonbn = $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course));
+
+        // Create users which will make submissions.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
+        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
+        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user2);
+
+        // Export all of the data for the context for user 1.
+        $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
+
+        $userlist = new \core_privacy\local\request\userlist($cmcontext, 'mod_bigbluebuttonbn');
+        \mod_bigbluebuttonbn\privacy\provider::get_users_in_context($userlist);
+
+        // Ensure correct users are found in relevant contexts.
+        $this->assertCount(2, $userlist);
+        $expected = [intval($user1->id), intval($user2->id)];
+        $actual = $userlist->get_userids();
+        $this->assertEquals(sort($expected), sort($actual));
+    }
+
+    /**
      * Test for provider::delete_data_for_all_users_in_context().
      */
     public function test_delete_data_for_all_users_in_context() {
@@ -161,7 +199,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         // Delete data based on context.
         $cmcontext = context_module::instance($e['instance']->cmid);
-        provider::delete_data_for_all_users_in_context($cmcontext);
+        \mod_bigbluebuttonbn\privacy\provider::delete_data_for_all_users_in_context($cmcontext);
 
         // After deletion, the bigbluebuttonbn logs for that activity should have been deleted.
         $count = $DB->count_records('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $e['instance']->id]);
@@ -182,7 +220,39 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $context = \context_module::instance($e['instance']->cmid);
         $contextlist = new \core_privacy\local\request\approved_contextlist($e['users'][0], 'bigbluebuttonbn',
             [$context->id]);
-        provider::delete_data_for_user($contextlist);
+        \mod_bigbluebuttonbn\privacy\provider::delete_data_for_user($contextlist);
+
+        // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
+        $count = $DB->count_records('bigbluebuttonbn_logs',
+            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
+        $this->assertEquals(0, $count);
+
+        // Check the logs for the other user is still there.
+        $count = $DB->count_records('bigbluebuttonbn_logs',
+            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
+        $this->assertEquals(1, $count);
+    }
+
+    /**
+     * Test that data for users in approved userlist is deleted.
+     */
+    public function test_delete_data_for_users() {
+        global $DB;
+
+        // For backward compatibility with old versions of Moodle.
+        if (!class_exists('\core_privacy\local\request\approved_userlist')) {
+            return;
+        }
+
+        $this->resetAfterTest();
+
+        $e = $this->get_bigbluebuttonbn_environemnt();
+
+        // Delete user 1 and 2 data from chat 1 context only.
+        $context = \context_module::instance($e['instance']->cmid);
+        $approveduserids = [$e['users'][0]->id];
+        $approvedlist = new \core_privacy\local\request\approved_userlist($context, 'mod_bigbluebuttonbn', $approveduserids);
+        \mod_bigbluebuttonbn\privacy\provider::delete_data_for_users($approvedlist);
 
         // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
         $count = $DB->count_records('bigbluebuttonbn_logs',
