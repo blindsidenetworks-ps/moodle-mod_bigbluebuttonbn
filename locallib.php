@@ -2167,28 +2167,32 @@ function bigbluebuttonbn_get_count_callback_event_log($recordid) {
  * @return array
  */
 function bigbluebuttonbn_get_instance_type_profiles($context = null) {
-    if($context) { // ecastro ULPGC.
+    if ($context) { // Ecastro ULPGC.
         $instanceprofiles = array();
-        if(has_capability('mod/bigbluebuttonbn:room', $context)) {
-            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+        if (has_capability('mod/bigbluebuttonbn:room', $context)) {
+            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY,
+                'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
                     'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                     'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection'));
         }
-        if(has_capability('mod/bigbluebuttonbn:record', $context)) {
-            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ALL] = array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+        if (has_capability('mod/bigbluebuttonbn:record', $context)) {
+            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ALL] = array('id' => BIGBLUEBUTTONBN_TYPE_ALL,
+                'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
                 'features' => array('all'));
         }
-        $instanceprofiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
-            'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'));
-
+        $instanceprofiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
+            'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
+            'features' => array('showrecordings', 'importrecordings'));
     } else {
         $instanceprofiles = array(
-            BIGBLUEBUTTONBN_TYPE_AL =>
-                array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+            BIGBLUEBUTTONBN_TYPE_ALL =>
+                array('id' => BIGBLUEBUTTONBN_TYPE_ALL,
+                    'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
                     'features' => array('all')),
             BIGBLUEBUTTONBN_TYPE_ROOM_ONLY =>
-                array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY,
+                    'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                     'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
                         'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                         'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
