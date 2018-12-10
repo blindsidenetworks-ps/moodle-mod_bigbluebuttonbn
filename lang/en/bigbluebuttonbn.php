@@ -33,6 +33,8 @@ $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activit
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:view'] = 'View a room/activity';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
+$string['bigbluebuttonbn:room'] = 'Create instances with live meeting capabilities';
+$string['bigbluebuttonbn:record'] = 'Create instances with recording capabilities';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 $string['indicator:cognitivedepth'] = 'BigBlueButtonBN cognitive';
 $string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a BigBlueButtonBN activity.';
@@ -167,6 +169,7 @@ $string['config_warning_curl_not_installed'] = 'This feature requires the CURL e
 $string['config_warning_bigbluebuttonbn_cfg_deprecated'] = 'BigBlueButtonBN is making use of config.php with a global variable that has been deprecated. Please convert the file as it will not be supported in future versions';
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_disabled'] = 'disabled';

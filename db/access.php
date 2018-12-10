@@ -65,6 +65,7 @@ $capabilities = array(
         ),
     ),
 
+    // Ability to access instances, regardless of the type.
     'mod/bigbluebuttonbn:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -76,4 +77,29 @@ $capabilities = array(
         )
     ),
 
+    // Ability to create instances with live meeting capabilities.
+    'mod/bigbluebuttonbn:room' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
+
+    // Ability to create instances with recording capabilities.
+    'mod/bigbluebuttonbn:record' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
 );

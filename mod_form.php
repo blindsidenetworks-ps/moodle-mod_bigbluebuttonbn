@@ -71,8 +71,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
         $mform = &$this->_form;
         $jsvars = array();
-        $jsvars['instanceTypeRoomOnly'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
-        $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles();
+        // NOTE FOR German. REMOVE BEFORE EVEN CREATING THE PR
+        // Get only those that are allowed.
+        $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+            has_capability('mod/bigbluebuttonbn:room'), has_capability('mod/bigbluebuttonbn:recording', $context));
+        $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
+        // If none is allowed, fail and return
+        if (empty($jsvars['instanceTypeProfiles'])) {
+            print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            return;
+        }
         $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instanceTypeProfiles']);
         // Data for participant selection.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
@@ -157,8 +166,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
-                bigbluebuttonbn_get_instance_profiles_array($profiles),
-                array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
+                $profiles, array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
     }
