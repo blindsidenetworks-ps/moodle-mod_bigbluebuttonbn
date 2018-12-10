@@ -96,6 +96,8 @@ class config {
             'clienttype_enabled' => false,
             'clienttype_default' => '0',
             'clienttype_editable' => true,
+            'muteonstart_default' => false,
+            'muteonstart_editable' => false,
         );
     }
 
@@ -194,6 +196,8 @@ class config {
                'clienttype_enabled' => self::get('clienttype_enabled'),
                'clienttype_editable' => self::get('clienttype_editable'),
                'clienttype_default' => self::get('clienttype_default'),
+               'muteonstart_editable' => self::get('muteonstart_editable'),
+               'muteonstart_default' => self::get('muteonstart_default'),
           );
     }
 }
