@@ -166,6 +166,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101015, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2018040107) {
+        // Add field for Mute on start feature.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'muteonstart',
+            $fielddefinition);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2018040107, 'bigbluebuttonbn');
+    }
     return true;
 }
 
