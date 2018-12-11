@@ -24,6 +24,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     datasource: null,
     locale: 'en',
+    windowVideoPlay: null,
     datatable: {},
 
     /**
@@ -253,6 +254,11 @@ M.mod_bigbluebuttonbn.recordings = {
             attempts: 1,
             dataset: nodeelement.getData()
         };
+
+        // New window for video play must be created previous to ajax requests.
+        this.windowVideoPlay = window.open("","_blank");
+        // Prevent malicious modification over window opener to use window.open().
+        this.windowVideoPlay.opener = null;
         this.recordingAction(element, false, extras);
     },
 
@@ -307,7 +313,8 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (data.action == 'play') {
             M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
-            window.open(data.dataset.href, "_self");
+            // Update url in window video to show the video.
+            this.windowVideoPlay.location.href = data.dataset.href;
             return;
         }
         M.mod_bigbluebuttonbn.helpers.updateData(data);
