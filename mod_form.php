@@ -243,7 +243,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'] = 'mod_form_field_muteonstart';
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], $cfg['muteonstart_editable']);
+            $field['description_key'], $cfg['muteonstart_default']);
     }
 
     /**
