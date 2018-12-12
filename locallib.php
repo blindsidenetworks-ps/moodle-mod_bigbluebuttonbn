@@ -2602,7 +2602,7 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
         $renderer->render_group_element('muteonstart_default',
             $renderer->render_group_element_checkbox('muteonstart_default', 0));
         $renderer->render_group_element('muteonstart_editable',
-            $renderer->render_group_element_checkbox('muteonstart_editable', 0));
+            $renderer->render_group_element_checkbox('muteonstart_editable', 1));
     }
 }
 
