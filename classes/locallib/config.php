@@ -97,7 +97,7 @@ class config {
             'clienttype_default' => '0',
             'clienttype_editable' => true,
             'muteonstart_default' => false,
-            'muteonstart_editable' => false,
+            'muteonstart_editable' => true,
         );
     }
 
