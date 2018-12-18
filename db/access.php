@@ -91,7 +91,7 @@ $capabilities = array(
     ),
 
     // Ability to create instances with recording capabilities.
-    'mod/bigbluebuttonbn:record' => array(
+    'mod/bigbluebuttonbn:recording' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

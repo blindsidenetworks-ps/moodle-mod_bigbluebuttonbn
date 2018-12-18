@@ -2238,6 +2238,22 @@ function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recor
 }
 
 /**
+ * Helper function returns an array with the profiles (with features per profile) for the different types
+ * of bigbluebuttonbn instances.
+ *
+ * @param array $profiles
+ *
+ * @return array
+ */
+function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
+    $profilesarray = array();
+    foreach ($profiles as $key => $profile) {
+        $profilesarray[$profile['id']] = $profile['name'];
+    }
+    return $profilesarray;
+}
+
+/**
  * Helper function returns time in a formatted string.
  *
  * @param integer $time

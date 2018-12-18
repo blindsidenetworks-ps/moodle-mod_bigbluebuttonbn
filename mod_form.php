@@ -72,8 +72,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform = &$this->_form;
         $jsvars = array();
         // Get only those that are allowed.
+        $createroom = has_capability('mod/bigbluebuttonbn:room', $context);
+        $createrecording = has_capability('mod/bigbluebuttonbn:recording', $context);
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-            has_capability('mod/bigbluebuttonbn:room'), has_capability('mod/bigbluebuttonbn:recording', $context));
+            $createroom, $createrecording);
         $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
         // If none is allowed, fail and return
         if (empty($jsvars['instanceTypeProfiles'])) {
@@ -165,7 +167,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
-                $profiles, array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
+            bigbluebuttonbn_get_instance_profiles_array($profiles),
+            array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
     }
