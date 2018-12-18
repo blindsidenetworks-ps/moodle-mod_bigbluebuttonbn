@@ -71,7 +71,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
         $mform = &$this->_form;
         $jsvars = array();
-        // NOTE FOR German. REMOVE BEFORE EVEN CREATING THE PR
         // Get only those that are allowed.
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
             has_capability('mod/bigbluebuttonbn:room'), has_capability('mod/bigbluebuttonbn:recording', $context));
