@@ -2216,22 +2216,27 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
 
 /**
  * Helper function returns an array with the profiles (with features per profile) for the different types
- * of bigbluebuttonbn instances.
+ * of bigbluebuttonbn instances allowed for the user.
  *
  * @param array $profiles
  *
  * @return array
  */
-function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
-    if (is_null($profiles) || empty($profiles)) {
-        $profiles = bigbluebuttonbn_get_instance_type_profiles();
+function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recording) {
+    $profiles = bigbluebuttonbn_get_instance_type_profiles();
+    $allowed = array();
+    if ($room) {
+        $allowed[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY] = $profiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]['name'];
     }
-    $profilesarray = array();
-    foreach ($profiles as $key => $profile) {
-        $profilesarray += array("{$key}" => $profile['name']);
+    if ($recording) {
+        $allowed[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY] = $profiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]['name'];
     }
-    return $profilesarray;
+    if ($room && $recording) {
+        $allowed[BIGBLUEBUTTONBN_TYPE_ALL] = $profiles[BIGBLUEBUTTONBN_TYPE_ALL]['name'];
+    }
+    return $allowed;
 }
+
 
 /**
  * Helper function returns time in a formatted string.
