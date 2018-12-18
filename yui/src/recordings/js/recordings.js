@@ -23,9 +23,9 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.recordings = {
 
     datasource: null,
+    datatable: {},
     locale: 'en',
     windowVideoPlay: null,
-    datatable: {},
 
     /**
      * Initialise recordings code.
