@@ -2166,14 +2166,18 @@ function bigbluebuttonbn_get_count_callback_event_log($recordid) {
  */
 function bigbluebuttonbn_get_instance_type_profiles() {
     $instanceprofiles = array(
-            array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                'features' => array('all')),
-            array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
-                'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype')),
-            array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
-                'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
+        BIGBLUEBUTTONBN_TYPE_ALL => array('id' => BIGBLUEBUTTONBN_TYPE_ALL,
+                  'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+                  'features' => array('all')),
+        BIGBLUEBUTTONBN_TYPE_ROOM_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY,
+                  'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                  'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
+                      'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                      'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
+                      'clienttype')),
+        BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
+                  'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
+                  'features' => array('showrecordings', 'importrecordings'))
     );
     return $instanceprofiles;
 }
@@ -2188,8 +2192,8 @@ function bigbluebuttonbn_get_instance_type_profiles() {
  */
 function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     $enabledfeatures = array();
-    $features = $typeprofiles[0]['features'];
-    if (!is_null($type)) {
+    $features = $typeprofiles[BIGBLUEBUTTONBN_TYPE_ALL]['features'];
+    if (!is_null($type) && key_exists($type, $typeprofiles)) {
         $features = $typeprofiles[$type]['features'];
     }
     $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
@@ -2223,8 +2227,8 @@ function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
         $profiles = bigbluebuttonbn_get_instance_type_profiles();
     }
     $profilesarray = array();
-    foreach ($profiles as $profile) {
-        $profilesarray += array("{$profile['id']}" => $profile['name']);
+    foreach ($profiles as $key => $profile) {
+        $profilesarray += array("{$key}" => $profile['name']);
     }
     return $profilesarray;
 }
