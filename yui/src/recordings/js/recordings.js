@@ -60,12 +60,31 @@ M.mod_bigbluebuttonbn.recordings = {
         return data;
     },
 
+    initExtraLanguage: function (Y1) {
+        Y1.Intl.add(
+            'datatable-paginator',
+            Y1.config.lang,
+            {
+                first: M.util.get_string('view_recording_yui_first', 'bigbluebuttonbn'),
+                prev:  M.util.get_string('view_recording_yui_prev', 'bigbluebuttonbn'),
+                next:  M.util.get_string('view_recording_yui_next', 'bigbluebuttonbn'),
+                last:  M.util.get_string('view_recording_yui_last', 'bigbluebuttonbn'),
+                goToLabel:  M.util.get_string('view_recording_yui_page', 'bigbluebuttonbn'),
+                goToAction:  M.util.get_string('view_recording_yui_go', 'bigbluebuttonbn'),
+                perPage:  M.util.get_string('view_recording_yui_rows', 'bigbluebuttonbn'),
+                showAll:  M.util.get_string('view_recording_yui_show_all', 'bigbluebuttonbn')
+            }
+        );
+    },
+
     datatableInit: function() {
         var columns = this.datatable.columns;
         var data = this.datatable.data;
+        var func = this.initExtraLanguage;
         YUI({
             lang: this.locale
-        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+        }).use('intl', 'datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+            func(Y);
             var table = new Y.DataTable({
                 width: "1195px",
                 columns: columns,

@@ -364,6 +364,14 @@ $string['view_recording_preview'] = 'Preview';
 $string['view_recording_preview_help'] = 'Hover over an image to view it in full size';
 $string['view_recording_modal_button'] = 'Apply';
 $string['view_recording_modal_title'] = 'Set values for recording';
+$string['view_recording_yui_first'] = 'First';
+$string['view_recording_yui_prev'] = 'Previous';
+$string['view_recording_yui_next'] = 'Next';
+$string['view_recording_yui_last'] = 'Last';
+$string['view_recording_yui_page'] = 'Page';
+$string['view_recording_yui_go'] = 'Go';
+$string['view_recording_yui_rows'] = 'Rows';
+$string['view_recording_yui_show_all'] = 'Show all';
 
 $string['event_activity_created'] = 'Activity created';
 $string['event_activity_viewed'] = 'Activity viewed';
