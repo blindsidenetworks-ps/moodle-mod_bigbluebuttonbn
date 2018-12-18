@@ -1,7 +1,7 @@
 .buildpath
 .project
 .settings*
-config.php
+/config.php
 deploy*
 vendor*
 moodle-plugin-ci/
