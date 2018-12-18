@@ -81,6 +81,7 @@ class mobileview {
         }
         $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
         $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
+        $session['muteonstart'] = $session['bigbluebuttonbn']->muteonstart;
         $session['context'] = $context;
         $session['origin'] = 'Moodle';
         $session['originVersion'] = $CFG->release;
@@ -212,6 +213,9 @@ class mobileview {
         $maxparticipants = intval($bbbsession['userlimit']);
         if ($maxparticipants > 0) {
             $data['maxParticipants'] = $maxparticipants;
+        }
+        if ($bbbsession['muteonstart']) {
+            $data['muteOnStart'] = 'true';
         }
         return $data;
     }

@@ -2589,6 +2589,24 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
 }
 
 /**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_muteonstart(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_muteonstart_shown()) {
+        $renderer->render_group_header('muteonstart');
+        $renderer->render_group_element('muteonstart_default',
+            $renderer->render_group_element_checkbox('muteonstart_default', 0));
+        $renderer->render_group_element('muteonstart_editable',
+            $renderer->render_group_element_checkbox('muteonstart_editable', 0));
+    }
+}
+
+/**
  * Helper function renders extended settings if any of the features there is enabled.
  *
  * @param object $renderer
