@@ -319,7 +319,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * When the value is set to 1 (checked) the 'mute on start'
  * capability can be enabled/disabled by the user creating or editing
  * the room or activity.
- * $CFG->bigbluebuttonbn['muteonstart_editable'] = 1;
+ * $CFG->bigbluebuttonbn['muteonstart_editable'] = 0;
  */
 
 /*
