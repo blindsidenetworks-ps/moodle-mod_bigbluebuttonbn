@@ -108,114 +108,31 @@ $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_brok
 $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $id .
     '&bn=' . $bbbsession['bigbluebuttonbn']->id;
 
+// Check status and set extra values.
+$activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+if ($activitystatus == 'ended') {
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+} else if ($activitystatus == 'open') {
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+}
+
+// Initialize session variable used across views.
+$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+
 // Output starts.
 echo $OUTPUT->header();
 
 bigbluebuttonbn_view_groups($bbbsession);
 
-bigbluebuttonbn_view_render($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession));
+bigbluebuttonbn_view_render($bbbsession, $activitystatus);
 
 // Output finishes.
 echo $OUTPUT->footer();
 
 // Shows version as a comment.
 echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
-
-// Initialize session variable used across views.
-$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-
-/**
- * Setup the bbbsession variable that is used all accross the plugin.
- *
- * @param object $context
- * @param array $bbbsession
- * @return void
- */
-function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
-    global $CFG, $USER;
-    // User data.
-    $bbbsession['username'] = fullname($USER);
-    $bbbsession['userID'] = $USER->id;
-    // User roles.
-    $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
-    $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
-    $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
-    $bbbsession['managerecordings'] = ($bbbsession['administrator']
-        || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-    $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
-    // Server data.
-    $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
-    $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
-    // Database info related to the activity.
-    $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-        $bbbsession['bigbluebuttonbn']->id;
-    $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
-    $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
-    // Extra data for setting up the Meeting.
-    $bbbsession['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
-        $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
-    }
-    $bbbsession['voicebridge'] = $bbbsession['bigbluebuttonbn']->voicebridge;
-    if ($bbbsession['bigbluebuttonbn']->voicebridge > 0) {
-        $bbbsession['voicebridge'] = 70000 + $bbbsession['bigbluebuttonbn']->voicebridge;
-    }
-    $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
-    $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
-    $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
-    if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-        $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
-    }
-    if ($bbbsession['bigbluebuttonbn']->record) {
-        $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
-    }
-    $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
-    $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
-    $bbbsession['muteonstart'] = $bbbsession['bigbluebuttonbn']->muteonstart;
-    // Additional info related to the course.
-    $bbbsession['context'] = $context;
-    // Metadata (origin).
-    $bbbsession['origin'] = 'Moodle';
-    $bbbsession['originVersion'] = $CFG->release;
-    $parsedurl = parse_url($CFG->wwwroot);
-    $bbbsession['originServerName'] = $parsedurl['host'];
-    $bbbsession['originServerUrl'] = $CFG->wwwroot;
-    $bbbsession['originServerCommonName'] = '';
-    $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-    $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
-    // Setting for clienttype, assign flash if not enabled, or default if not editable.
-    $bbbsession['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
-    if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable')) {
-        $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
-    }
-    if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
-        $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
-    }
-}
-
-/**
- * Return the status of an activity [open|not_started|ended].
- *
- * @param array $bbbsession
- * @return string
- */
-function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
-    $now = time();
-    if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
-        // The activity has not been opened.
-        return 'not_started';
-    }
-    if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
-        // The activity has been closed.
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
-        return 'ended';
-    }
-    // The activity is open.
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
-    return 'open';
-}
 
 /**
  * Displays the view for groups.
