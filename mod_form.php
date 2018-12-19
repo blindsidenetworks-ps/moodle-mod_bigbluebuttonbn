@@ -75,7 +75,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
             has_capability('mod/bigbluebuttonbn:room', $context), has_capability('mod/bigbluebuttonbn:record', $context));
         $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
-        // If none is allowed, fail and return
+        // If none is allowed, fail and return.
         if (empty($jsvars['instanceTypeProfiles'])) {
             print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
