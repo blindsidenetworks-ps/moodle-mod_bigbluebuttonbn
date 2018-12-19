@@ -108,21 +108,31 @@ $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_brok
 $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $id .
     '&bn=' . $bbbsession['bigbluebuttonbn']->id;
 
+// Check status and set extra values.
+$activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+if ($activitystatus == 'ended') {
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+} else if ($activitystatus == 'open') {
+    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+}
+
+// Initialize session variable used across views.
+$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+
 // Output starts.
 echo $OUTPUT->header();
 
 bigbluebuttonbn_view_groups($bbbsession);
 
-bigbluebuttonbn_view_render($bbbsession, bigbluebuttonbn_view_get_activity_status($bbbsession));
+bigbluebuttonbn_view_render($bbbsession, $activitystatus);
 
 // Output finishes.
 echo $OUTPUT->footer();
 
 // Shows version as a comment.
 echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
-
-// Initialize session variable used across views.
-$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
 /**
  * Displays the view for groups.

@@ -48,16 +48,20 @@ $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
 $context = context_module::instance($cm->id);
 
+require_login($course, true, $cm);
+
+$bbbsession = null;
+if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
+
 if ($timeline) {
-    // If the user come from timeline, the $bbbsession should be created here.
+    // If the user come from timeline, the $bbbsession should be created or overriden here.
     $bbbsession['course'] = $course;
     $bbbsession['coursename'] = $course->fullname;
     $bbbsession['cm'] = $cm;
     $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
     bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
-
-    // Check status and set extra values.
-    bigbluebuttonbn_view_get_activity_status($bbbsession);
 
     // Validates if the BigBlueButton server is working.
     $serverversion = bigbluebuttonbn_get_server_version();
@@ -76,7 +80,6 @@ if ($timeline) {
             $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
         exit;
     }
-
     $bbbsession['serverversion'] = (string) $serverversion;
 
     // Operation URLs.
@@ -89,11 +92,19 @@ if ($timeline) {
         '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
     $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
         '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+
+    // Check status and set extra values.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    if ($activitystatus == 'ended') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+    } else if ($activitystatus == 'open') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
+
     // Initialize session variable used across views.
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-
-} else if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
 // Print the page header.
@@ -103,13 +114,6 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 $PAGE->blocks->show_only_fake_blocks();
-
-require_login($course, true, $cm);
-
-$bbbsession = null;
-if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-}
 
 switch (strtolower($action)) {
     case 'logout':

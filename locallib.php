@@ -2971,12 +2971,8 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
     }
     if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
         // The activity has been closed.
-        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
         return 'ended';
     }
     // The activity is open.
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
     return 'open';
 }
