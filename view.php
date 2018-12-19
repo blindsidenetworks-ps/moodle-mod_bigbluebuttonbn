@@ -479,7 +479,16 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
             'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
           );
     // Render a YUI table.
-    return html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
+    $reset = get_string('reset');
+    $search = get_string('search');
+    $output = "<form id='bigbluebuttonbn_recordings_searchform'>
+                 <input id='searchtext' type='text'>
+                 <input id='searchsubmit' type='submit' value='{$search}'>
+                 <input id='searchreset' type='submit' value='{$reset}'>
+               </form>";
+    $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
+
+    return $output;
 }
 
 /**
