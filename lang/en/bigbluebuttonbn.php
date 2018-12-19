@@ -166,6 +166,13 @@ $string['config_meetingevents_enabled_description'] = 'Register meeting events f
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
 $string['config_warning_bigbluebuttonbn_cfg_deprecated'] = 'BigBlueButtonBN is making use of config.php with a global variable that has been deprecated. Please convert the file as it will not be supported in future versions';
 
+$string['config_muteonstart'] = 'Configuration for "Mute on Start" feature';
+$string['config_muteonstart_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
+$string['config_muteonstart_default'] = 'Mute on start enabled by default';
+$string['config_muteonstart_default_description'] = 'If enabled the session will be muted on start.';
+$string['config_muteonstart_editable'] = 'Mute on start can be edited';
+$string['config_muteonstart_editable_description'] = 'Mute on start by default can be edited when the instance is added or updated.';
+
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
@@ -224,6 +231,7 @@ $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
 $string['mod_form_field_instanceprofiles'] = 'Instance type';
 $string['mod_form_field_instanceprofiles_help'] = 'Select the type for this BigBlueButtonBN instance.';
+$string['mod_form_field_muteonstart'] = 'Mute on start';
 $string['mod_form_field_notification'] = 'Send notification';
 $string['mod_form_field_notification_help'] = 'Send a notification to users enrolled to let them know that this activity has been created or modified';
 $string['mod_form_field_notification_created_help'] = 'Send a notification to users enrolled to let them know that this activity has been created';
@@ -235,6 +243,7 @@ $string['mod_form_field_recordings_html'] = 'Show the table in plain html';
 $string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted activities';
 $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
+
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';

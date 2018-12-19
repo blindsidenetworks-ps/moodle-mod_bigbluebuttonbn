@@ -192,4 +192,15 @@ class validator {
         return (!isset($CFG->bigbluebuttonbn['recordingready_enabled']) ||
                 !isset($CFG->bigbluebuttonbn['meetingevents_enabled']));
     }
+
+    /**
+     * Validate if muteonstart section will be shown.
+     *
+     * @return boolean
+     */
+    public static function section_muteonstart_shown() {
+        global $CFG;
+        return (!isset($CFG->bigbluebuttonbn['muteonstart_default']) ||
+            !isset($CFG->bigbluebuttonbn['muteonstart_editable']));
+    }
 }

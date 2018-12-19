@@ -293,6 +293,9 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     if ($maxparticipants > 0) {
         $data['maxParticipants'] = $maxparticipants;
     }
+    if ($bbbsession['muteonstart']) {
+        $data['muteOnStart'] = 'true';
+    }
     return $data;
 }
 

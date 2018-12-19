@@ -300,6 +300,27 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * $CFG->bigbluebuttonbn['clienttype_editable'] = 0;
  */
 
+/*
+ * 1.12. CONFIGURATION FOR "MUTE ON START" FEATURE
+ *
+ * This feature makes the rooms muted on start. When the users joins to the session,
+ * they will be muted.
+ *
+ **/
+
+/*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have the 'mute on start' capability enabled by
+ * default.
+ * $CFG->bigbluebuttonbn['muteonstart_default'] = 0;
+ */
+
+/*
+ * When the value is set to 1 (checked) the 'mute on start'
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['muteonstart_editable'] = 0;
+ */
 
 /*
  *  2. CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS

@@ -442,6 +442,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->recordings_preview)) {
         $bigbluebuttonbn->recordings_preview = 0;
     }
+    if (!isset($bigbluebuttonbn->muteonstart)) {
+        $bigbluebuttonbn->muteonstart = 0;
+    }
 }
 
 /**
