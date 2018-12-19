@@ -26,6 +26,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
+global $SESSION;
+
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
@@ -34,6 +36,7 @@ $mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
+$timeline = optional_param('timeline', 0, PARAM_INT);
 
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
@@ -45,6 +48,65 @@ $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
 $context = context_module::instance($cm->id);
 
+require_login($course, true, $cm);
+
+$bbbsession = null;
+if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
+
+if ($timeline) {
+    // If the user come from timeline, the $bbbsession should be created or overriden here.
+    $bbbsession['course'] = $course;
+    $bbbsession['coursename'] = $course->fullname;
+    $bbbsession['cm'] = $cm;
+    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+    bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+
+    // Validates if the BigBlueButton server is working.
+    $serverversion = bigbluebuttonbn_get_server_version();
+    if (is_null($serverversion)) {
+        if ($bbbsession['administrator']) {
+            print_error('view_error_unable_join', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            exit;
+        }
+        if ($bbbsession['moderator']) {
+            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+            exit;
+        }
+        print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+            $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+        exit;
+    }
+    $bbbsession['serverversion'] = (string) $serverversion;
+
+    // Operation URLs.
+    $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+        'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+        '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+
+    // Check status and set extra values.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    if ($activitystatus == 'ended') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+    } else if ($activitystatus == 'open') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
+
+    // Initialize session variable used across views.
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+}
+
 // Print the page header.
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
@@ -52,13 +114,6 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 $PAGE->blocks->show_only_fake_blocks();
-
-require_login($course, true, $cm);
-
-$bbbsession = null;
-if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-}
 
 switch (strtolower($action)) {
     case 'logout':
