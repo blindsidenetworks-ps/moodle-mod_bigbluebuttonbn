@@ -167,8 +167,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
-            bigbluebuttonbn_get_instance_profiles_array($profiles),
-            array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
+                bigbluebuttonbn_get_instance_profiles_array($profiles),
+                array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
     }
