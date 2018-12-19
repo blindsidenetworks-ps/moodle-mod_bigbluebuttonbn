@@ -71,8 +71,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
         $mform = &$this->_form;
         $jsvars = array();
-        $jsvars['instanceTypeRoomOnly'] = BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
-        $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles();
+        // Get only those that are allowed.
+        $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context);
+        $createrecording = has_capability('mod/bigbluebuttonbn:recording', $context);
+        $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+            $createroom, $createrecording);
+        $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
+        // If none is allowed, fail and return
+        if (empty($jsvars['instanceTypeProfiles'])) {
+            print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            return;
+        }
         $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instanceTypeProfiles']);
         // Data for participant selection.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);

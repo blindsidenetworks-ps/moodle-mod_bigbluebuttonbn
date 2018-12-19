@@ -46,7 +46,7 @@ M.mod_bigbluebuttonbn.modform = {
     updateInstanceTypeProfile: function() {
         var selectedType, profileType;
         selectedType = Y.one('#id_type');
-        profileType = this.bigbluebuttonbn.instanceTypeRoomOnly;
+        profileType = this.bigbluebuttonbn.instanceTypeDefault;
         if (selectedType !== null) {
             profileType = selectedType.get('value');
         }
