@@ -78,7 +78,7 @@ $capabilities = array(
     ),
 
     // Ability to create instances with live meeting capabilities.
-    'mod/bigbluebuttonbn:room' => array(
+    'mod/bigbluebuttonbn:meeting' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

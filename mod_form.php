@@ -72,7 +72,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform = &$this->_form;
         $jsvars = array();
         // Get only those that are allowed.
-        $createroom = has_capability('mod/bigbluebuttonbn:room', $context);
+        $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context);
         $createrecording = has_capability('mod/bigbluebuttonbn:recording', $context);
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
             $createroom, $createrecording);
