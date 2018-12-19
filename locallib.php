@@ -2182,6 +2182,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
     return $instanceprofiles;
 }
 
+
 /**
  * Helper function returns an array with enabled features for an specific profile type.
  *
@@ -2216,19 +2217,38 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
 
 /**
  * Helper function returns an array with the profiles (with features per profile) for the different types
+ * of bigbluebuttonbn instances that the user is allowed to create.
+ *
+ * @param boolean $room
+ * @param boolean $recording
+ *
+ * @return array
+ */
+function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recording) {
+    $profiles = bigbluebuttonbn_get_instance_type_profiles();
+    if (!$room) {
+        unset($profiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]);
+        unset($profiles[BIGBLUEBUTTONBN_TYPE_ALL]);
+    }
+    if (!$recording) {
+        unset($profiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
+        unset($profiles[BIGBLUEBUTTONBN_TYPE_ALL]);
+    }
+    return $profiles;
+}
+
+/**
+ * Helper function returns an array with the profiles (with features per profile) for the different types
  * of bigbluebuttonbn instances.
  *
  * @param array $profiles
  *
  * @return array
  */
-function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
-    if (is_null($profiles) || empty($profiles)) {
-        $profiles = bigbluebuttonbn_get_instance_type_profiles();
-    }
+function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
     $profilesarray = array();
     foreach ($profiles as $key => $profile) {
-        $profilesarray += array("{$key}" => $profile['name']);
+        $profilesarray[$profile['id']] = $profile['name'];
     }
     return $profilesarray;
 }

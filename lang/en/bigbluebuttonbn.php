@@ -33,6 +33,8 @@ $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activit
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:view'] = 'View a room/activity';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
+$string['bigbluebuttonbn:meeting'] = 'Create instances with live meeting capabilities';
+$string['bigbluebuttonbn:recording'] = 'Create instances with recording capabilities';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 $string['indicator:cognitivedepth'] = 'BigBlueButtonBN cognitive';
 $string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a BigBlueButtonBN activity.';
@@ -174,6 +176,7 @@ $string['config_muteonstart_editable'] = 'Mute on start can be edited';
 $string['config_muteonstart_editable_description'] = 'Mute on start by default can be edited when the instance is added or updated.';
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_disabled'] = 'disabled';
