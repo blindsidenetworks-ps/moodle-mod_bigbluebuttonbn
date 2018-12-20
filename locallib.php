@@ -2936,6 +2936,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
     $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
+    $bbbsession['muteonstart'] = $bbbsession['bigbluebuttonbn']->muteonstart;
     // Additional info related to the course.
     $bbbsession['context'] = $context;
     // Metadata (origin).
