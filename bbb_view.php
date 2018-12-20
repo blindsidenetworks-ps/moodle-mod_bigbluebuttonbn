@@ -129,6 +129,17 @@ switch (strtolower($action)) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_left'], $bigbluebuttonbn);
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        // Check the origin page.
+        $sql = "SELECT meta FROM {bigbluebuttonbn_logs} 
+                  where userid = ? AND (log = 'Join' OR log = 'Create') 
+                  ORDER BY ID DESC LIMIT 1";
+        $params = array('userid' => $SESSION->bigbluebuttonbn_bbbsession['userID']);
+        $lastaccess = $DB->get_field_sql($sql, $params);
+        $lastaccess = json_decode($lastaccess);
+        // If the user acceded from Timeline it should be redirected to the Dashboard.
+        if ($lastaccess->origin) {
+            redirect($CFG->wwwroot . '/my/');
+        }
         // Close the tab or window where BBB was opened.
         bigbluebutton_bbb_view_close_window();
         break;
@@ -189,10 +200,16 @@ switch (strtolower($action)) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
         // Internal logger: Insert a record with the meeting created.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
-        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+        // Check the origin page.
+        $origin = BIGBLUEBUTTON_ORIGIN_BASE;
+        if ($timeline) {
+            $origin = BIGBLUEBUTTON_ORIGIN_TIMELINE;
+        }
+        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').', "origin":'.$origin.'}';
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
+
         // Since the meeting is already running, we just join the session.
-        bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn);
+        bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
         break;
     case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
@@ -370,7 +387,7 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
  * @param  array    $bbbsession
  * @param object   $bigbluebuttonbn
  */
-function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn) {
+function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0) {
     // Update the cache.
     $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
@@ -389,7 +406,8 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn) {
     bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.
     $overrides = array('meetingid' => $bbbsession['meetingid']);
-    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides);
+    $meta = '{"origin":'.$origin.'}';
+    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],
         ($bbbsession['administrator'] || $bbbsession['moderator']));
