@@ -137,7 +137,7 @@ switch (strtolower($action)) {
         $lastaccess = $DB->get_field_sql($sql, $params);
         $lastaccess = json_decode($lastaccess);
         // If the user acceded from Timeline it should be redirected to the Dashboard.
-        if ($lastaccess->origin) {
+        if (isset($lastaccess->origin) && $lastaccess->origin == BIGBLUEBUTTON_ORIGIN_TIMELINE) {
             redirect($CFG->wwwroot . '/my/');
         }
         // Close the tab or window where BBB was opened.
