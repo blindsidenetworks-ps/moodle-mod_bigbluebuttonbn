@@ -131,7 +131,7 @@ switch (strtolower($action)) {
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Check the origin page.
         $sql = "SELECT meta FROM {bigbluebuttonbn_logs}
-                  where userid = ? AND (log = 'Join' OR log = 'Create')
+                  WHERE userid = ? AND log = 'Join'
                   ORDER BY ID DESC LIMIT 1";
         $params = array('userid' => $SESSION->bigbluebuttonbn_bbbsession['userID']);
         $lastaccess = $DB->get_field_sql($sql, $params);
@@ -205,7 +205,7 @@ switch (strtolower($action)) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
         // Internal logger: Insert a record with the meeting created.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
-        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').', "origin":'.$origin.'}';
+        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
         bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
