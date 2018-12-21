@@ -752,7 +752,7 @@ function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array
  */
 function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
-        'mod_bigbluebuttonbn:i/bigbluebutton' => 'fa-bigbluebutton',
+        'mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
     ];
 }
 
