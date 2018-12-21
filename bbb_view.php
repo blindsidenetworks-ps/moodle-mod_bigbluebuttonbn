@@ -133,7 +133,7 @@ switch (strtolower($action)) {
         $sql = "SELECT meta FROM {bigbluebuttonbn_logs}
                   WHERE userid = ? AND log = 'Join'
                   ORDER BY ID DESC LIMIT 1";
-        $params = array('userid' => $SESSION->bigbluebuttonbn_bbbsession['userID']);
+        $params = array('userid' => $bbbsession['userID']);
         $lastaccess = $DB->get_field_sql($sql, $params);
         $lastaccess = json_decode($lastaccess);
         // If the user acceded from Timeline it should be redirected to the Dashboard.
