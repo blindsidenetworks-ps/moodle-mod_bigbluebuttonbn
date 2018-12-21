@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $icons = array(
     'mod_bigbluebuttonbn|icon' => array(
             'data' => array(
-                    'classes' => 'fa-circle',
+                    'classes' => 'icon-bigbluebutton',
                 ),
         ),
 );

@@ -694,7 +694,7 @@ function bigbluebuttonbn_get_file_areas() {
  */
 function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
-        'mod_bigbluebuttonbn:i/bigbluebutton' => 'fa-bigbluebutton',
+        'mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
     ];
 }
 
