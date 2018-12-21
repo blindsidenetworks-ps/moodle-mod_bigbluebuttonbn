@@ -78,6 +78,10 @@ const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
 const BIGBLUEBUTTON_CLIENTTYPE_FLASH = 0;
 /** @var BIGBLUEBUTTON_CLIENTTYPE_HTML5 integer that defines the bigbluebuttonbn default web client based on HTML5 */
 const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
+/** @var BIGBLUEBUTTON_ORIGIN_BASE integer set to 0 defines that the user acceded the session from activity page */
+const BIGBLUEBUTTON_ORIGIN_BASE = 0;
+/** @var BIGBLUEBUTTON_ORIGIN_TIMELINE integer set to 1 defines that the user acceded the session from Timeline */
+const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
 
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
