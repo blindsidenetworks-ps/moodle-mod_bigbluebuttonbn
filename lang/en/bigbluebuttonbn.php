@@ -232,6 +232,7 @@ $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
 $string['ends_at'] = 'Ends';
+$string['calendarstarts'] = '{$a} is scheduled for';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
 $string['serverhost'] = 'Server Name';
