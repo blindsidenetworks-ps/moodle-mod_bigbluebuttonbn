@@ -1,1 +1,2 @@
-Enhancement: Added support for new privacy methods in Moodle 3.6, 3.5.3, 3.4.6 (CONTRIB-7549).
+Bug: Fixed issue with media files not shown in the description (CONTRIB-7454).
+Bug: Fixed issue with date-time shown in calendar and timeline (CONTRIB-7589).
