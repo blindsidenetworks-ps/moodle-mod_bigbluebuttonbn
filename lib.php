@@ -516,7 +516,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event = new stdClass();
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
     $event->type = CALENDAR_EVENT_TYPE_ACTION;
-    $event->name = $bigbluebuttonbn->name . ' (' . get_string('starts_at', 'bigbluebuttonbn') . ')';
+    $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
     $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
     $event->courseid = $bigbluebuttonbn->course;
     $event->groupid = 0;
@@ -525,10 +525,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->instance = $bigbluebuttonbn->id;
     $event->timestart = $bigbluebuttonbn->openingtime;
     $event->timeduration = 0;
-    if ($bigbluebuttonbn->closingtime) {
-        $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
-    }
-    $event->timesort = $event->timestart + $event->timeduration;
+    $event->timesort = $event->timestart;
     $event->visible = instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn);
     $event->priority = null;
     // Update the event in calendar when/if eventid was found.
