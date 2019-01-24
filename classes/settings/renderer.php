@@ -177,4 +177,31 @@ class renderer {
         $this->settings->add($item);
         return $item;
     }
+
+    /**
+     * Render a general manage file for use as default presentation.
+     *
+     * @param string    $name
+     *
+     * @return Object
+     */
+    public function render_filemanager_default_file_presentation($name) {
+
+        $filemanageroptions = array();
+        $filemanageroptions['accepted_types'] = '*';
+        $filemanageroptions['maxbytes'] = 0;
+        $filemanageroptions['subdirs'] = 0;
+        $filemanageroptions['maxfiles'] = 1;
+        $filemanageroptions['mainfile'] = true;
+
+        $filemanager = new \admin_setting_configstoredfile('mod_bigbluebuttonbn/presentationdefault',
+            get_string('config_' . $name, 'bigbluebuttonbn'),
+            get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+            'presentationdefault',
+            0,
+            $filemanageroptions);
+
+        $this->settings->add($filemanager);
+        return $filemanager;
+    }
 }

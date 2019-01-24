@@ -953,7 +953,42 @@ function bigbluebuttonbn_get_duration($closingtime) {
  * @return array
  */
 function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
+    global $CFG;
     if (empty($presentation)) {
+        if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
+
+            $fs = get_file_storage();
+            $files = $fs->get_area_files(context_system::instance()->id,
+                'mod_bigbluebuttonbn',
+                'presentationdefault',
+                0,
+                "filename",
+                false
+            );
+
+            if (count($files) > 0) {
+                $file = reset($files);
+
+                // Create the nonce component for granting a temporary public access.
+                $cache = cache::make_from_params(cache_store::MODE_APPLICATION,
+                    'mod_bigbluebuttonbn',
+                    'presentationdefault_cache');
+                $pnoncekey = sha1($id);
+                /* The item id was adapted for granting public access to the presentation once in order
+                 * to allow BigBlueButton to gather the file. */
+                $pnoncevalue = bigbluebuttonbn_generate_nonce();
+                $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
+
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
+                    $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+
+                $result = array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+                    'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
+                var_dump($result);
+                return($result);
+            }
+        }
+
         return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
     }
     $fs = get_file_storage();
@@ -978,7 +1013,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
     $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
         $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
     return array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
-            'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
+        'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
 }
 
 /**
@@ -2510,6 +2545,24 @@ function bigbluebuttonbn_settings_preupload(&$renderer) {
         if (extension_loaded('curl')) {
             $renderer->render_group_element('preuploadpresentation_enabled',
                 $renderer->render_group_element_checkbox('preuploadpresentation_enabled', 0));
+        }
+    }
+}
+
+/**
+ * Helper function renders preuploaded presentation manage file if the feature is enabled.
+ * This allow to select a file for use as default in all BBB instances if preuploaded presetantion is enable.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_preupload_manage_default_file(&$renderer) {
+    // Configuration for "preupload presentation" feature.
+    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_preupload_presentation_shown()) {
+        if (extension_loaded('curl')) {
+            // This feature only works if curl is installed.
+            $renderer->render_filemanager_default_file_presentation("presentation_default");
         }
     }
 }
