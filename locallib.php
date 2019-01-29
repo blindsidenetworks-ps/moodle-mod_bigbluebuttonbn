@@ -957,6 +957,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
     if (empty($presentation)) {
         if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
 
+            # Item has not presentation configured. Check if is configured some by default in general setting.
             $fs = get_file_storage();
             $files = $fs->get_area_files(context_system::instance()->id,
                 'mod_bigbluebuttonbn',
@@ -966,9 +967,14 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
                 false
             );
 
-            if (count($files) > 0) {
-                $file = reset($files);
+            if (count($files) == 0) {
+                return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
+            }
 
+            $file = reset($files);
+            unset($files);
+            $pnoncevalue = null;
+            if (!is_null($id)) {
                 // Create the nonce component for granting a temporary public access.
                 $cache = cache::make_from_params(cache_store::MODE_APPLICATION,
                     'mod_bigbluebuttonbn',
@@ -978,15 +984,15 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
                  * to allow BigBlueButton to gather the file. */
                 $pnoncevalue = bigbluebuttonbn_generate_nonce();
                 $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
-
-                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
-                    $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
-
-                $result = array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
-                    'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
-                var_dump($result);
-                return($result);
             }
+
+            $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
+                $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
+
+            $result = array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+                'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
+
+            return($result);
         }
 
         return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
