@@ -40,7 +40,8 @@ require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
 
 
-if (file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
+if (!class_exists('\Firebase\JWT\JWT') &&
+    file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
     require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
 }
 

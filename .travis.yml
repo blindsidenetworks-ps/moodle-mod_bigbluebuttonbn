@@ -31,6 +31,8 @@ env:
     - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
 
@@ -60,6 +62,11 @@ matrix:
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
     - php: 5.6
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+  exclude:
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
 
 before_install:
   - phpenv config-rm xdebug.ini
