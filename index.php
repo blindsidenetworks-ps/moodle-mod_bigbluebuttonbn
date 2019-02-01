@@ -73,8 +73,8 @@ $table->head = array($strweek, $headingname, $headinggroup, $headingusers, $head
     $headingrecording, $headingactions);
 $table->align = array('center', 'left', 'center', 'center', 'center', 'center', 'center');
 
-$submit = optional_param('submit', '', PARAM_TEXT);
-if ($submit === 'end') {
+$action = optional_param('action', '', PARAM_TEXT);
+if ($action === 'end') {
     // A request to end the meeting.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $a), '*', MUST_EXIST);
     if (!$bigbluebuttonbn) {
@@ -162,14 +162,14 @@ function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonb
     $viewerlist = '';
     $moderatorlist = '';
     $recording = '';
-    $actions = '';
+    $actions = bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonbn, $groupobj);
     // The meeting info was returned.
     if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
         $users = bigbluebuttonbn_index_display_room_users($meetinginfo);
         $viewerlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'VIEWER');
         $moderatorlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'MODERATOR');
         $recording = bigbluebuttonbn_index_display_room_recordings($meetinginfo);
-        $actions = bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj);
+        $actions .= bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj);
     }
     return array($bigbluebuttonbn->section, $joinurl, $group, $users, $viewerlist, $moderatorlist, $recording, $actions);
 }
@@ -238,6 +238,7 @@ function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigblu
         $actions .= '<form name="form1" method="post" action="">'."\n";
         $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'."\n";
         $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'."\n";
+        $actions .= '  <INPUT type="hidden" name="action" value="end">'."\n";
         if ($groupobj != null) {
             $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'."\n";
         }
@@ -247,5 +248,32 @@ function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigblu
             get_string('index_confirm_end', 'bigbluebuttonbn') . '\')">' . "\n";
         $actions .= '</form>'."\n";
     }
+    return $actions;
+}
+
+/**
+ * Add Join Session button.
+ *
+ * @param boolean $moderator
+ * @param object $course
+ * @param object $bigbluebuttonbn
+ * @param object $groupobj
+ * @return string
+ */
+function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonbn, $groupobj = null) {
+
+    $actions = '';
+    // TODO Add proper validations.
+    $cm = get_fast_modinfo($course->id)->instances['bigbluebuttonbn'][$bigbluebuttonbn->id];
+    $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php');
+
+    $actions .= '<form action="'.$url->out().'" target="_blank">'."\n";
+    $actions .= '<input type="hidden" name="action" value="join">'."\n";
+    $actions .= '<input type="hidden" name="id" value="'.$cm->id.'">'."\n";
+    $actions .= '<input type="hidden" name="bn" value="'.$bigbluebuttonbn->id.'">'."\n";
+    $actions .= '<input type="hidden" name="timeline" value="1">'."\n";
+    $actions .= '<input type="submit" value="'.get_string('view_conference_action_join', 'bigbluebuttonbn').'" />'."\n";
+    $actions .= '</form>';
+
     return $actions;
 }
