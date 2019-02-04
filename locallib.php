@@ -957,7 +957,8 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
     if (empty($presentation)) {
         if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
 
-            # Item has not presentation configured. Check if is configured some by default in general setting.
+            // Item has not presentation but presentation is enabled..
+            // Check if exist some file by default in general mod setting ("presentationdefault").
             $fs = get_file_storage();
             $files = $fs->get_area_files(context_system::instance()->id,
                 'mod_bigbluebuttonbn',
@@ -968,9 +969,11 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
             );
 
             if (count($files) == 0) {
+                // Not exist file by default in "presentationbydefault" setting.
                 return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
             }
 
+            // Exists file in general setting to use as default for presentation. Cache image for temp public access.
             $file = reset($files);
             unset($files);
             $pnoncevalue = null;
@@ -979,7 +982,7 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
                 $cache = cache::make_from_params(cache_store::MODE_APPLICATION,
                     'mod_bigbluebuttonbn',
                     'presentationdefault_cache');
-                $pnoncekey = sha1($id);
+                $pnoncekey = sha1(context_system::instance()->id);
                 /* The item id was adapted for granting public access to the presentation once in order
                  * to allow BigBlueButton to gather the file. */
                 $pnoncevalue = bigbluebuttonbn_generate_nonce();
@@ -988,11 +991,8 @@ function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = n
 
             $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
                 $file->get_filearea(), $pnoncevalue, $file->get_filepath(), $file->get_filename());
-
-            $result = array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
-                'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
-
-            return($result);
+            return(array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+                'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file)));
         }
 
         return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
