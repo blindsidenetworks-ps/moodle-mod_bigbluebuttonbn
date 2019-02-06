@@ -118,7 +118,7 @@ class notifier {
         $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
         foreach ($users as $user) {
             if ($user->id != $sender->id) {
-                message_post_message($sender, $user, $message, FORMAT_MOODLE);
+                message_post_message($sender, $user, $message, FORMAT_HTML);
             }
         }
     }
