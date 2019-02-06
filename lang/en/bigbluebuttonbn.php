@@ -251,6 +251,7 @@ $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
 $string['ends_at'] = 'Ends';
+$string['calendarstarts'] = '{$a} is scheduled for';
 $string['view_error_no_group_student'] = 'You have not been enrolled in a group. Please contact your Teacher or the Administrator.';
 $string['view_error_no_group_teacher'] = 'There are no groups configured yet. Please set up groups or contact the Administrator.';
 $string['view_error_no_group'] = 'There are no groups configured yet. Please set up groups before trying to join the meeting.';

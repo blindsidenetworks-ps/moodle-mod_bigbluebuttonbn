@@ -32,11 +32,17 @@ env:
     - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
     - MOODLE_BRANCH=master DB=mysqli
     - MOODLE_BRANCH=master DB=pgsql
 
 matrix:
   exclude:
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=mysqli
+    - php: 7.0
+      env: MOODLE_BRANCH=master DB=pgsql
     - php: 7.2
       env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
     - php: 7.2
