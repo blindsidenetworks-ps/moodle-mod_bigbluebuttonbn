@@ -130,6 +130,9 @@ $string['config_preuploadpresentation_description'] = 'These settings enable or 
 $string['config_preuploadpresentation_enabled'] = 'Pre-uploading presentation enabled';
 $string['config_preuploadpresentation_enabled_description'] = 'Preupload presentation feature is enabled in the UI when the room or conference is added or updated.';
 
+$string['config_presentation_default'] = 'Default file for "Pre-upload presentation" feature';
+$string['config_presentation_default_description'] = 'This setting allow to select a file to use as default in all BBB instances if "Pre-upload presentation" is enabled.';
+
 $string['config_participant'] = 'Participant configuration';
 $string['config_participant_description'] = 'These settings define the role by default for participants in a conference.';
 $string['config_participant_moderator_default'] = 'Moderator by default';
@@ -197,6 +200,7 @@ $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'Recording settings';
 $string['mod_form_block_presentation'] = 'Presentation content';
+$string['mod_form_block_presentation_default'] = 'Presentation default content';
 $string['mod_form_block_participants'] = 'Participants';
 $string['mod_form_block_schedule'] = 'Schedule for session';
 $string['mod_form_block_record'] = 'Record settings';
