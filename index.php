@@ -262,6 +262,17 @@ function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigblu
  */
 function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonbn, $groupobj = null) {
 
+    // Check if the activity is open.
+    $now = time();
+    if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime) {
+        // The activity has not been opened.
+        return get_string('view_message_conference_not_started', 'bigbluebuttonbn');
+    }
+    if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
+        // The activity has been closed.
+        return get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
+    }
+
     $actions = '';
     // TODO Add proper validations.
     $cm = get_fast_modinfo($course->id)->instances['bigbluebuttonbn'][$bigbluebuttonbn->id];
