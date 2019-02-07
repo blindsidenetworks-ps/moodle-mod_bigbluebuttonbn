@@ -233,6 +233,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['waitformoderator_default']);
         $field = ['type' => 'hidden', 'name' => 'userlimit', 'data_type' => PARAM_INT, 'description_key' => null];
+
+        // Record button setting.
+        $this->bigbluebuttonbn_mform_add_block_record_button($mform, $cfg);
+
         if ($cfg['userlimit_editable']) {
             $field['type'] = 'text';
             $field['data_type'] = PARAM_TEXT;
@@ -470,5 +474,35 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
+    }
+
+    /**
+     * Function for showing th record button setting if is enabled.
+     *
+     * @param object $mform
+     * @param object $cfg
+     * @return void
+     */
+    private function bigbluebuttonbn_mform_add_block_record_button(&$mform, &$cfg) {
+
+        if (!$cfg['recordbutton_all_from_start_user_can_edit']) {
+            $field = ['type' => 'checkbox',
+                'name' => 'recordbutton_all_from_start_user_can_edit',
+                'data_type' => PARAM_INT,
+                'description_key' => 'mod_form_field_recordbutton_all_from_start'];
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], 0);
+        }
+
+        if (!$cfg['recordbutton_hide_button_user_can_edit']) {
+
+            $field = ['type' => 'checkbox',
+                'name' => 'recordbutton_hide_button_user_can_edit',
+                'data_type' => PARAM_INT,
+                'description_key' => 'mod_form_field_recordbutton_hide_button'];
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                $field['description_key'], 0);
+        }
+
     }
 }

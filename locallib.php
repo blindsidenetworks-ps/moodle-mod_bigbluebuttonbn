@@ -2515,6 +2515,24 @@ function bigbluebuttonbn_settings_waitmoderator(&$renderer) {
 }
 
 /**
+ * Helper function renders record button settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_recordbutton(&$renderer) {
+    // Configuration for wait for moderator feature.
+    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_wait_moderator_shown()) {
+        $renderer->render_group_header('record_button');
+        $renderer->render_group_element_checkbox('recordbutton_all_from_start', 0));
+        $renderer->render_group_element_checkbox('recordbutton_all_from_start_user_can_edit', 0);
+        $renderer->render_group_element_checkbox('recordbutton_hide_button', 0);
+        $renderer->render_group_element_checkbox('recordbutton_hide_button_user_can_edit', 0);
+    }
+}
+
+/**
  * Helper function renders static voice bridge settings if the feature is enabled.
  *
  * @param object $renderer

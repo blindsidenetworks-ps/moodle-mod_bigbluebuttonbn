@@ -104,6 +104,19 @@ class validator {
     }
 
     /**
+     * Validate if record section will be shown.
+     *
+     * @return boolean
+     */
+    public static function section_recordbutton_shown() {
+        global $CFG;
+        return (!isset($CFG->bigbluebuttonbn['recordbutton_all_from_start']) ||
+            !isset($CFG->bigbluebuttonbn['recordbutton_all_from_start_user_can_edit']) ||
+            !isset($CFG->bigbluebuttonbn['recordbutton_hide_button']) ||
+            !isset($CFG->bigbluebuttonbn['recordbutton_hide_button_user_can_edit']));
+    }
+
+    /**
      * Validate if static voice bridge section will be shown.
      *
      * @return boolean
