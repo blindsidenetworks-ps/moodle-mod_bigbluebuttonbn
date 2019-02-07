@@ -37,6 +37,7 @@ $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 $timeline = optional_param('timeline', 0, PARAM_INT);
+$group = optional_param('group', -1, PARAM_INT);
 
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
@@ -102,6 +103,19 @@ if ($timeline) {
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
             $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
     }
+
+    if ($group >= 0) {
+        $bbbsession['group'] = $group;
+        $groupname = get_string('allparticipants');
+        if ($bbbsession['group'] != 0) {
+            $groupname = groups_get_group_name($bbbsession['group']);
+        }
+
+        // Assign group default values.
+        $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
+        $bbbsession['meetingname'] .= ' ('.$groupname.')';
+    }
+
 
     // Initialize session variable used across views.
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;

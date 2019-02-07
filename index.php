@@ -109,15 +109,21 @@ foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
         $canmoderate = ($administrator || $moderator);
         // Add a the data for the bigbluebuttonbn instance.
         $groupobj = null;
-        if (groups_get_activity_groupmode($cm) > 0) {
+
+        $groupmode = groups_get_activity_groupmode($cm) > 0;
+        if ($groupmode) {
             $groupobj = (object) array('id' => 0, 'name' => get_string('allparticipants'));
         }
         $table->data[] = bigbluebuttonbn_index_display_room($canmoderate, $course, $bigbluebuttonbn, $groupobj);
-        // Add a the data for the groups belonging to the bigbluebuttonbn instance, if any.
-        $groups = groups_get_activity_allowed_groups($cm);
-        foreach ($groups as $group) {
-            $table->data[] = bigbluebuttonbn_index_display_room($canmoderate, $course, $bigbluebuttonbn, $group);
+        if ($groupmode) {
+            // Add a the data for the groups belonging to the bigbluebuttonbn instance, if any.
+            $groups = groups_get_activity_allowed_groups($cm);
+            foreach ($groups as $group) {
+                $table->data[] = bigbluebuttonbn_index_display_room($canmoderate, $course, $bigbluebuttonbn, $group);
+            }
         }
+
+
     }
 }
 
@@ -235,7 +241,7 @@ function bigbluebuttonbn_index_display_room_recordings($meetinginfo) {
 function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
     $actions = '';
     if ($moderator) {
-        $actions .= '<form name="form1" method="post" action="">'."\n";
+        $actions .= '<form name="form1" method="post" action="" class="bbb_index_form">'."\n";
         $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'."\n";
         $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'."\n";
         $actions .= '  <INPUT type="hidden" name="action" value="end">'."\n";
@@ -274,15 +280,17 @@ function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonb
     }
 
     $actions = '';
-    // TODO Add proper validations.
     $cm = get_fast_modinfo($course->id)->instances['bigbluebuttonbn'][$bigbluebuttonbn->id];
     $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php');
 
-    $actions .= '<form action="'.$url->out().'" target="_blank">'."\n";
+    $actions .= '<form action="'.$url->out().'" target="_blank" class="bbb_index_form">'."\n";
     $actions .= '<input type="hidden" name="action" value="join">'."\n";
     $actions .= '<input type="hidden" name="id" value="'.$cm->id.'">'."\n";
     $actions .= '<input type="hidden" name="bn" value="'.$bigbluebuttonbn->id.'">'."\n";
     $actions .= '<input type="hidden" name="timeline" value="1">'."\n";
+    if ($groupobj) {
+        $actions .= '<input type="hidden" name="group" value="'.$groupobj->id.'">'."\n";
+    }
     $actions .= '<input type="submit" value="'.get_string('view_conference_action_join', 'bigbluebuttonbn').'" />'."\n";
     $actions .= '</form>';
 
