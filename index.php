@@ -278,6 +278,10 @@ function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonb
         // The activity has been closed.
         return get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
     }
+    // Check if the activity type is Recordings only.
+    if ($bigbluebuttonbn->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        return get_string('instance_type_recording_only', 'bigbluebuttonbn');
+    }
 
     $actions = '';
     $cm = get_fast_modinfo($course->id)->instances['bigbluebuttonbn'][$bigbluebuttonbn->id];
