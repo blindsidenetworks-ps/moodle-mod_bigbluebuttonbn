@@ -291,7 +291,7 @@ function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonb
     $actions .= '<input type="hidden" name="action" value="join">'."\n";
     $actions .= '<input type="hidden" name="id" value="'.$cm->id.'">'."\n";
     $actions .= '<input type="hidden" name="bn" value="'.$bigbluebuttonbn->id.'">'."\n";
-    $actions .= '<input type="hidden" name="timeline" value="1">'."\n";
+    $actions .= '<input type="hidden" name="index" value="1">'."\n";
     if ($groupobj) {
         $actions .= '<input type="hidden" name="group" value="'.$groupobj->id.'">'."\n";
     }
