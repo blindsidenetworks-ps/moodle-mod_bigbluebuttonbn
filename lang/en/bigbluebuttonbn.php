@@ -79,6 +79,14 @@ $string['config_recording_editable'] = 'Recording feature can be edited';
 $string['config_recording_editable_description'] = 'If checked the interface includes an option for enable and disable the recording feature.';
 $string['config_recording_icons_enabled'] = 'Icons for recording management';
 $string['config_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
+$string['config_recording_all_from_start'] = 'Record all from start';
+$string['config_recording_all_from_start_description'] = 'If checked the meeting will record to start';
+$string['config_recording_all_from_start_user_can_edit'] = 'Record all from start can be edited';
+$string['config_recording_all_from_start_user_can_edit_description'] = 'If checked the interface includes an option for enable and disable the record all from start feature.';
+$string['config_recording__hide_button'] = 'Hide recording button';
+$string['config_recording__hide_button_description'] = 'If checked the button for record will be hide';
+$string['config_recording__hide_button_user_can_edit'] = 'Hide recording button can be edited';
+$string['config_recording__hide_button_user_can_edit_description'] = 'If checked the interface includes an option for enable and disable the hide recording button feature.';
 
 $string['config_recordings'] = 'Configuration for "Show recordings" feature';
 $string['config_recordings_description'] = 'These settings are feature specific';

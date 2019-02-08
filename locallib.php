@@ -2441,6 +2441,16 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             $renderer->render_group_element_checkbox('recording_editable', 1));
         $renderer->render_group_element('recording_icons_enabled',
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
+
+        // Add recording start to load and allow/hide stop/pause.
+        $renderer->render_group_element('recording_all_from_start',
+            $renderer->render_group_element_checkbox('recording_all_from_start', 1));
+        $renderer->render_group_element('recording_all_from_start_user_can_edit',
+            $renderer->render_group_element_checkbox('recording_all_from_start_user_can_edit', 1));
+        $renderer->render_group_element('recording__hide_button',
+            $renderer->render_group_element_checkbox('recording__hide_button', 1));
+        $renderer->render_group_element('recording__hide_button_user_can_edit',
+            $renderer->render_group_element_checkbox('recording__hide_button_user_can_edit', 1));
     }
 }
 
@@ -2511,24 +2521,6 @@ function bigbluebuttonbn_settings_waitmoderator(&$renderer) {
             $renderer->render_group_element_text('waitformoderator_ping_interval', 10, PARAM_INT));
         $renderer->render_group_element('waitformoderator_cache_ttl',
             $renderer->render_group_element_text('waitformoderator_cache_ttl', 60, PARAM_INT));
-    }
-}
-
-/**
- * Helper function renders record button settings if the feature is enabled.
- *
- * @param object $renderer
- *
- * @return void
- */
-function bigbluebuttonbn_settings_recordbutton(&$renderer) {
-    // Configuration for wait for moderator feature.
-    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_wait_moderator_shown()) {
-        $renderer->render_group_header('record_button');
-        $renderer->render_group_element_checkbox('recordbutton_all_from_start', 0));
-        $renderer->render_group_element_checkbox('recordbutton_all_from_start_user_can_edit', 0);
-        $renderer->render_group_element_checkbox('recordbutton_hide_button', 0);
-        $renderer->render_group_element_checkbox('recordbutton_hide_button_user_can_edit', 0);
     }
 }
 

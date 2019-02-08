@@ -48,7 +48,6 @@ if ($ADMIN->fulltree) {
     }
     // Renders settings for meetings.
     bigbluebuttonbn_settings_waitmoderator($renderer);
-    bigbluebuttonbn_settings_recordbutton($renderer);
     bigbluebuttonbn_settings_voicebridge($renderer);
     bigbluebuttonbn_settings_preupload($renderer);
     bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
