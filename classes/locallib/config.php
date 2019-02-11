@@ -87,6 +87,10 @@ class config {
             'recording_default' => true,
             'recording_editable' => true,
             'recording_icons_enabled' => true,
+            'recording_all_from_start_default' => false,
+            'recording_all_from_start_user_can_edit' => false,
+            'recording_hide_button_default' => false,
+            'recording_hide_button_user_can_edit' => false,
             'general_warning_message' => '',
             'general_warning_roles' => 'editingteacher,teacher',
             'general_warning_box_type' => 'info',
@@ -98,6 +102,7 @@ class config {
             'clienttype_editable' => true,
             'muteonstart_default' => false,
             'muteonstart_editable' => false,
+
         );
     }
 
@@ -188,6 +193,10 @@ class config {
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
+               'recording_all_from_start_default' => self::get('recording_all_from_start_default'),
+               'recording_all_from_start_user_can_edit' => self::get('recording_all_from_start_user_can_edit'),
+               'recording_hide_button_default' => self::get('recording_hide_button_default'),
+               'recording_hide_button_user_can_edit' => self::get('recording_hide_button_user_can_edit'),
                'general_warning_message' => self::get('general_warning_message'),
                'general_warning_box_type' => self::get('general_warning_box_type'),
                'general_warning_button_text' => self::get('general_warning_button_text'),

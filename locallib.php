@@ -2443,14 +2443,14 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
 
         // Add recording start to load and allow/hide stop/pause.
-        $renderer->render_group_element('recording_all_from_start',
-            $renderer->render_group_element_checkbox('recording_all_from_start', 1));
+        $renderer->render_group_element('recording_all_from_start_default',
+            $renderer->render_group_element_checkbox('recording_all_from_start_default', 0));
         $renderer->render_group_element('recording_all_from_start_user_can_edit',
-            $renderer->render_group_element_checkbox('recording_all_from_start_user_can_edit', 1));
-        $renderer->render_group_element('recording__hide_button',
-            $renderer->render_group_element_checkbox('recording__hide_button', 1));
+            $renderer->render_group_element_checkbox('recording_all_from_start_user_can_edit', 0));
+        $renderer->render_group_element('recording_hide_button_default',
+            $renderer->render_group_element_checkbox('recording_hide_button_default', 0));
         $renderer->render_group_element('recording__hide_button_user_can_edit',
-            $renderer->render_group_element_checkbox('recording__hide_button_user_can_edit', 1));
+            $renderer->render_group_element_checkbox('recording_hide_button_user_can_edit', 0));
     }
 }
 
@@ -3000,12 +3000,30 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
     $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
+
+
+    $bbbsession['record_all_from_start'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+    if ($CFG->bigbluebuttonbn_recording_all_from_start_user_can_edit) {
+        $bbbsession['record_all_from_start'] = $bbbsession['bigbluebuttonbn']->record_all_from_start;
+    }
+
+    $bbbsession['record_hide_button'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+    if ($CFG->bigbluebuttonbn_recording_hide_button_user_can_edit) {
+        $bbbsession['record_hide_button'] = $bbbsession['bigbluebuttonbn']->record_hide_button;
+    }
+
     $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
     if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
         $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
     }
     if ($bbbsession['bigbluebuttonbn']->record) {
-        $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+        // Check if is enable record all from start.
+        if ($bbbsession['record_all_from_start']) {
+            $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
+                    'bigbluebuttonbn');
+        } else {
+            $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+        }
     }
     $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
     $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;

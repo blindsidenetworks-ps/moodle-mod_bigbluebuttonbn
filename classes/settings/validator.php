@@ -58,7 +58,11 @@ class validator {
         global $CFG;
         return (!isset($CFG->bigbluebuttonbn['recording_default']) ||
                 !isset($CFG->bigbluebuttonbn['recording_editable']) ||
-                !isset($CFG->bigbluebuttonbn['recording_icons_enabled']));
+                !isset($CFG->bigbluebuttonbn['recording_icons_enabled']) ||
+                !isset($CFG->bigbluebuttonbn['recording_all_from_start_default']) ||
+                !isset($CFG->bigbluebuttonbn['recording_all_from_start_user_can_edit']) ||
+                !isset($CFG->bigbluebuttonbn['recording_hide_button_default']) ||
+                !isset($CFG->bigbluebuttonbn['recording_hide_button_user_can_edit']) );
     }
 
     /**
@@ -101,19 +105,6 @@ class validator {
                 !isset($CFG->bigbluebuttonbn['waitformoderator_editable']) ||
                 !isset($CFG->bigbluebuttonbn['waitformoderator_ping_interval']) ||
                 !isset($CFG->bigbluebuttonbn['waitformoderator_cache_ttl']));
-    }
-
-    /**
-     * Validate if record section will be shown.
-     *
-     * @return boolean
-     */
-    public static function section_recordbutton_shown() {
-        global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['recordbutton_all_from_start']) ||
-            !isset($CFG->bigbluebuttonbn['recordbutton_all_from_start_user_can_edit']) ||
-            !isset($CFG->bigbluebuttonbn['recordbutton_hide_button']) ||
-            !isset($CFG->bigbluebuttonbn['recordbutton_hide_button_user_can_edit']));
     }
 
     /**

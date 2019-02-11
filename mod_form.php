@@ -234,8 +234,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['waitformoderator_default']);
         $field = ['type' => 'hidden', 'name' => 'userlimit', 'data_type' => PARAM_INT, 'description_key' => null];
 
-        // Record button setting.
-        $this->bigbluebuttonbn_mform_add_block_record_button($mform, $cfg);
 
         if ($cfg['userlimit_editable']) {
             $field['type'] = 'text';
@@ -251,6 +249,29 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['recording_default']);
+
+        // Record all from start and hide button.
+        $field = ['type' => 'hidden', 'name' => 'record_all_from_start', 'data_type' => PARAM_INT, 'description_key' => null];
+        if ($cfg['recording_all_from_start_user_can_edit']) {
+            $field['type'] = 'checkbox';
+            $field['description_key'] = 'mod_form_field_record_all_from_start';
+        }
+        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+            $field['description_key'], $cfg['recording_all_from_start_default']);
+
+        $field = ['type' => 'hidden', 'name' => 'record_hide_button', 'data_type' => PARAM_INT, 'description_key' => null];
+        if ($cfg['recording_hide_button_user_can_edit']) {
+            $field['type'] = 'checkbox';
+            $field['description_key'] = 'mod_form_field_record_hide_button';
+        }
+        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+            $field['description_key'], $cfg['recording_hide_button_default']);
+
+        $mform->hideIf('record_all_from_start', 'record', $condition = 'notchecked', $value = '0');
+        $mform->hideIf('record_hide_button', 'record', $condition = 'notchecked', $value = '0');
+        $mform->hideIf('record_hide_button', 'record_all_from_start', $condition = 'notchecked', $value = '0');
+        // End Record all from start and hide button.
+
         $field = ['type' => 'hidden', 'name' => 'muteonstart', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['muteonstart_editable']) {
             $field['type'] = 'checkbox';
@@ -258,6 +279,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['muteonstart_default']);
+
     }
 
     /**
@@ -474,35 +496,5 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
-    }
-
-    /**
-     * Function for showing th record button setting if is enabled.
-     *
-     * @param object $mform
-     * @param object $cfg
-     * @return void
-     */
-    private function bigbluebuttonbn_mform_add_block_record_button(&$mform, &$cfg) {
-
-        if (!$cfg['recordbutton_all_from_start_user_can_edit']) {
-            $field = ['type' => 'checkbox',
-                'name' => 'recordbutton_all_from_start_user_can_edit',
-                'data_type' => PARAM_INT,
-                'description_key' => 'mod_form_field_recordbutton_all_from_start'];
-            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-                $field['description_key'], 0);
-        }
-
-        if (!$cfg['recordbutton_hide_button_user_can_edit']) {
-
-            $field = ['type' => 'checkbox',
-                'name' => 'recordbutton_hide_button_user_can_edit',
-                'data_type' => PARAM_INT,
-                'description_key' => 'mod_form_field_recordbutton_hide_button'];
-            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-                $field['description_key'], 0);
-        }
-
     }
 }
