@@ -13,8 +13,8 @@
     font-style: normal;
 }
 
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
+[class^="icon-bigbluebutton"]:before,
+[class*=" icon-bigbluebutton"]:before {
     font-family: "bigbluebutton-font";
     font-style: normal;
     font-weight: normal;
