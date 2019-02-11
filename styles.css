@@ -61,3 +61,7 @@
     cursor: not-allowed;
     visibility: hidden;
 }
+
+.bbb_index_form {
+    display: inline-block;
+}

@@ -82,6 +82,8 @@ const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
 const BIGBLUEBUTTON_ORIGIN_BASE = 0;
 /** @var BIGBLUEBUTTON_ORIGIN_TIMELINE integer set to 1 defines that the user acceded the session from Timeline */
 const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
+/** @var BIGBLUEBUTTON_ORIGIN_INDEX integer set to 2 defines that the user acceded the session from Index */
+const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
 
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
