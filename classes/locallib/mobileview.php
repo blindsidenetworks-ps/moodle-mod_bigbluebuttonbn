@@ -89,7 +89,7 @@ class mobileview {
         }
         if ($session['bigbluebuttonbn']->record) {
             // Check if is enable record all from start.
-            if ($session['record_all_from_start']) {
+            if ($session['recordallfromstart']) {
                 $session['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
                         'bigbluebuttonbn');
             } else {
