@@ -431,11 +431,11 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->record)) {
         $bigbluebuttonbn->record = 0;
     }
-    if (!isset($bigbluebuttonbn->record_all_from_start)) {
-        $bigbluebuttonbn->record_all_from_start = 0;
+    if (!isset($bigbluebuttonbn->recordallfromstart)) {
+        $bigbluebuttonbn->recordallfromstart = 0;
     }
-    if (!isset($bigbluebuttonbn->record_hide_button)) {
-        $bigbluebuttonbn->record_hide_button = 0;
+    if (!isset($bigbluebuttonbn->recordhidebutton)) {
+        $bigbluebuttonbn->recordhidebutton = 0;
     }
     if (!isset($bigbluebuttonbn->recordings_html)) {
         $bigbluebuttonbn->recordings_html = 0;

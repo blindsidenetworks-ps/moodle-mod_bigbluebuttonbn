@@ -82,12 +82,12 @@ $string['config_recording_icons_enabled'] = 'Icons for recording management';
 $string['config_recording_icons_enabled_description'] = 'When enabled, the recording management panel shows icons for the publish/unpublish and delete actions.';
 $string['config_recording_all_from_start_default'] = 'Record all from start';
 $string['config_recording_all_from_start_default_description'] = 'If checked the meeting will record to start';
-$string['config_recording_all_from_start_user_can_edit'] = 'Record all from start can be edited';
-$string['config_recording_all_from_start_user_can_edit_description'] = 'If checked the interface includes an option for enable and disable the record all from start feature.';
+$string['config_recording_all_from_start_editable'] = 'Record all from start can be edited';
+$string['config_recording_all_from_start_editable_description'] = 'If checked the interface includes an option for enable and disable the record all from start feature.';
 $string['config_recording_hide_button_default'] = 'Hide recording button';
 $string['config_recording_hide_button_default_description'] = 'If checked the button for record will be hide';
-$string['config_recording_hide_button_user_can_edit'] = 'Hide recording button can be edited';
-$string['config_recording_hide_button_user_can_edit_description'] = 'If checked the interface includes an option for enable and disable the hide recording button feature.';
+$string['config_recording_hide_button_editable'] = 'Hide recording button can be edited';
+$string['config_recording_hide_button_editable_description'] = 'If checked the interface includes an option for enable and disable the hide recording button feature.';
 
 $string['config_recordings'] = 'Configuration for "Show recordings" feature';
 $string['config_recordings_description'] = 'These settings are feature specific';
@@ -259,8 +259,8 @@ $string['mod_form_field_recordings_html'] = 'Show the table in plain html';
 $string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted activities';
 $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
-$string['mod_form_field_record_all_from_start'] = 'Record all from start';
-$string['mod_form_field_record_hide_button'] = 'Hide recording button';
+$string['mod_form_field_recordallfromstart'] = 'Record all from start';
+$string['mod_form_field_recordhidebutton'] = 'Hide recording button';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';

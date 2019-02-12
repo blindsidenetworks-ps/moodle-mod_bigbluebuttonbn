@@ -294,10 +294,10 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
             ];
     $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
     // Check if auto_start_record is enable.
-    if ($data['record'] == 'true' && $bbbsession['record_all_from_start']) {
+    if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
         $data['autoStartRecording'] = 'true';
         // Check if hide_record_button is enable.
-        if ($bbbsession['record_all_from_start'] && $bbbsession['record_hide_button']) {
+        if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
             $data['allowStartStopRecording'] = 'false';
         }
     }

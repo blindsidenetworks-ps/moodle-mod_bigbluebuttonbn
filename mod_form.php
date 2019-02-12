@@ -251,25 +251,25 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['recording_default']);
 
         // Record all from start and hide button.
-        $field = ['type' => 'hidden', 'name' => 'record_all_from_start', 'data_type' => PARAM_INT, 'description_key' => null];
-        if ($cfg['recording_all_from_start_user_can_edit']) {
+        $field = ['type' => 'hidden', 'name' => 'recordallfromstart', 'data_type' => PARAM_INT, 'description_key' => null];
+        if ($cfg['recording_all_from_start_editable']) {
             $field['type'] = 'checkbox';
-            $field['description_key'] = 'mod_form_field_record_all_from_start';
+            $field['description_key'] = 'mod_form_field_recordallfromstart';
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['recording_all_from_start_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'record_hide_button', 'data_type' => PARAM_INT, 'description_key' => null];
-        if ($cfg['recording_hide_button_user_can_edit']) {
+        $field = ['type' => 'hidden', 'name' => 'recordhidebutton', 'data_type' => PARAM_INT, 'description_key' => null];
+        if ($cfg['recording_hide_button_editable']) {
             $field['type'] = 'checkbox';
-            $field['description_key'] = 'mod_form_field_record_hide_button';
+            $field['description_key'] = 'mod_form_field_recordhidebutton';
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['recording_hide_button_default']);
 
-        $mform->hideIf('record_all_from_start', 'record', $condition = 'notchecked', $value = '0');
-        $mform->hideIf('record_hide_button', 'record', $condition = 'notchecked', $value = '0');
-        $mform->hideIf('record_hide_button', 'record_all_from_start', $condition = 'notchecked', $value = '0');
+        $mform->hideIf('recordallfromstart', 'record', $condition = 'notchecked', $value = '0');
+        $mform->hideIf('recordhidebutton', 'record', $condition = 'notchecked', $value = '0');
+        $mform->hideIf('recordhidebutton', 'recordallfromstart', $condition = 'notchecked', $value = '0');
         // End Record all from start and hide button.
 
         $field = ['type' => 'hidden', 'name' => 'muteonstart', 'data_type' => PARAM_INT, 'description_key' => null];

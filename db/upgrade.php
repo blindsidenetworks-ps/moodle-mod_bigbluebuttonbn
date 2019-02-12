@@ -179,13 +179,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Add field for record all from start.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'record_all_from_start',
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordallfromstart',
             $fielddefinition);
 
         // Add field for record hide button.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'record_hide_button',
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordhidebutton',
             $fielddefinition);
 
         // Update db version tag.

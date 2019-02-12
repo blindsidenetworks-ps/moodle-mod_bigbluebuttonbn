@@ -73,14 +73,14 @@ class mobileview {
         $session['wait'] = $session['bigbluebuttonbn']->wait;
         $session['record'] = $session['bigbluebuttonbn']->record;
 
-        $session['record_all_from_start'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
-        if ($CFG->bigbluebuttonbn_recording_all_from_start_user_can_edit) {
-            $session['record_all_from_start'] = $session['bigbluebuttonbn']->record_all_from_start;
+        $session['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+        if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
+            $session['recordallfromstart'] = $session['bigbluebuttonbn']->recordallfromstart;
         }
 
-        $session['record_hide_button'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
-        if ($CFG->bigbluebuttonbn_recording_hide_button_user_can_edit) {
-            $session['record_hide_button'] = $session['bigbluebuttonbn']->record_hide_button;
+        $session['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+        if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
+            $session['recordhidebutton'] = $session['bigbluebuttonbn']->recordhidebutton;
         }
 
         $session['welcome'] = $session['bigbluebuttonbn']->welcome;
@@ -212,10 +212,10 @@ class mobileview {
         ];
         $data['record'] = self::bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
         // Check if auto_start_record is enable.
-        if ($data['record'] == 'true' && $bbbsession['record_all_from_start']) {
+        if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
             $data['autoStartRecording'] = 'true';
             // Check if hide_record_button is enable.
-            if ($bbbsession['record_all_from_start'] && $bbbsession['record_hide_button']) {
+            if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
                 $data['allowStartStopRecording'] = 'false';
             }
         }

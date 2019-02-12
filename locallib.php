@@ -2445,12 +2445,12 @@ function bigbluebuttonbn_settings_record(&$renderer) {
         // Add recording start to load and allow/hide stop/pause.
         $renderer->render_group_element('recording_all_from_start_default',
             $renderer->render_group_element_checkbox('recording_all_from_start_default', 0));
-        $renderer->render_group_element('recording_all_from_start_user_can_edit',
-            $renderer->render_group_element_checkbox('recording_all_from_start_user_can_edit', 0));
+        $renderer->render_group_element('recording_all_from_start_editable',
+            $renderer->render_group_element_checkbox('recording_all_from_start_editable', 0));
         $renderer->render_group_element('recording_hide_button_default',
             $renderer->render_group_element_checkbox('recording_hide_button_default', 0));
-        $renderer->render_group_element('recording__hide_button_user_can_edit',
-            $renderer->render_group_element_checkbox('recording_hide_button_user_can_edit', 0));
+        $renderer->render_group_element('recording_hide_button_editable',
+            $renderer->render_group_element_checkbox('recording_hide_button_editable', 0));
     }
 }
 
@@ -3002,14 +3002,14 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
 
 
-    $bbbsession['record_all_from_start'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
-    if ($CFG->bigbluebuttonbn_recording_all_from_start_user_can_edit) {
-        $bbbsession['record_all_from_start'] = $bbbsession['bigbluebuttonbn']->record_all_from_start;
+    $bbbsession['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+    if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
+        $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
     }
 
-    $bbbsession['record_hide_button'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
-    if ($CFG->bigbluebuttonbn_recording_hide_button_user_can_edit) {
-        $bbbsession['record_hide_button'] = $bbbsession['bigbluebuttonbn']->record_hide_button;
+    $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+    if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
+        $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
     }
 
     $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
@@ -3018,7 +3018,7 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     if ($bbbsession['bigbluebuttonbn']->record) {
         // Check if is enable record all from start.
-        if ($bbbsession['record_all_from_start']) {
+        if ($bbbsession['recordallfromstart']) {
             $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
                     'bigbluebuttonbn');
         } else {
