@@ -118,9 +118,6 @@ if ($activitystatus == 'ended') {
         $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
 }
 
-// Initialize session variable used across views.
-$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
-
 // Output starts.
 echo $OUTPUT->header();
 
@@ -133,6 +130,9 @@ echo $OUTPUT->footer();
 
 // Shows version as a comment.
 echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
+
+// Initialize session variable used across views.
+$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
 /**
  * Displays the view for groups.

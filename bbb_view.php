@@ -37,6 +37,8 @@ $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
 $timeline = optional_param('timeline', 0, PARAM_INT);
+$index = optional_param('index', 0, PARAM_INT);
+$group = optional_param('group', -1, PARAM_INT);
 
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
@@ -55,8 +57,8 @@ if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
-if ($timeline) {
-    // If the user come from timeline, the $bbbsession should be created or overriden here.
+if ($timeline || $index) {
+    // If the user come from timeline or index page, the $bbbsession should be created or overriden here.
     $bbbsession['course'] = $course;
     $bbbsession['coursename'] = $course->fullname;
     $bbbsession['cm'] = $cm;
@@ -101,6 +103,19 @@ if ($timeline) {
     } else if ($activitystatus == 'open') {
         $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
             $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
+
+    // Check group.
+    if ($group >= 0) {
+        $bbbsession['group'] = $group;
+        $groupname = get_string('allparticipants');
+        if ($bbbsession['group'] != 0) {
+            $groupname = groups_get_group_name($bbbsession['group']);
+        }
+
+        // Assign group default values.
+        $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
+        $bbbsession['meetingname'] .= ' ('.$groupname.')';
     }
 
     // Initialize session variable used across views.
@@ -152,6 +167,8 @@ switch (strtolower($action)) {
         $origin = BIGBLUEBUTTON_ORIGIN_BASE;
         if ($timeline) {
             $origin = BIGBLUEBUTTON_ORIGIN_TIMELINE;
+        } else if ($index) {
+            $origin = BIGBLUEBUTTON_ORIGIN_INDEX;
         }
         // See if the session is in progress.
         if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
