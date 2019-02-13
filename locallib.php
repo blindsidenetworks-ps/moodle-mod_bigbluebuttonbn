@@ -3002,8 +3002,6 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
     $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
-
-
     $bbbsession['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
     if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
         $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
