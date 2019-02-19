@@ -310,6 +310,15 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
               'logoutURL' => $bbbsession['logoutURL'],
             ];
     $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+    // Check if auto_start_record is enable.
+    if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
+        $data['autoStartRecording'] = 'true';
+        // Check if hide_record_button is enable.
+        if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
+            $data['allowStartStopRecording'] = 'false';
+        }
+    }
+
     $data['welcome'] = trim($bbbsession['welcome']);
     // Set the duration for the meeting.
     $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
