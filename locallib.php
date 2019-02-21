@@ -865,15 +865,18 @@ function bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $user
     if ($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER) {
         return false;
     }
-    // Looks for all configuration.
+    // Validation for the 'all' rule.
     if ($participant['selectiontype'] == 'all') {
         return true;
     }
-    // Looks for users.
-    if ($participant['selectiontype'] == 'user' && $participant['selectionid'] == $userid) {
-        return true;
+    // Validation for a 'user' rule.
+    if ($participant['selectiontype'] == 'user') {
+        if ($participant['selectionid'] == $userid) {
+            return true;
+        }
+        return false;
     }
-    // Looks for roles.
+    // Validation for a 'role' rule.
     $role = bigbluebuttonbn_get_role($participant['selectionid']);
     if ($role != null && array_key_exists($role->id, $userroles)) {
         return true;
