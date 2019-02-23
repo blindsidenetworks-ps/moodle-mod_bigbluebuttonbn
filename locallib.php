@@ -2358,13 +2358,13 @@ function bigbluebuttonbn_get_localcode() {
  * @return array
  */
 function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
+    $result = null;
     if ($id) {
-        return bigbluebuttonbn_view_instance_id($id);
+        $result =  bigbluebuttonbn_view_instance_id($id);
+    } else if ($bigbluebuttonbnid) {
+        $result = bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
     }
-    if ($bigbluebuttonbnid) {
-        return bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
-    }
-    return;
+    return $result;
 }
 
 /**
