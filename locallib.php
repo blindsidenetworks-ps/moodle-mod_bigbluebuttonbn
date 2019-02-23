@@ -2360,7 +2360,7 @@ function bigbluebuttonbn_get_localcode() {
 function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
     $result = null;
     if ($id) {
-        $result =  bigbluebuttonbn_view_instance_id($id);
+        $result = bigbluebuttonbn_view_instance_id($id);
     } else if ($bigbluebuttonbnid) {
         $result = bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
     }
