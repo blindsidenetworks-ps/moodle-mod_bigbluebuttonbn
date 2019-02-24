@@ -442,3 +442,5 @@ $string['config_clienttype_default_description'] = 'Choose between the classical
 $string['config_clienttype_description'] = 'This setting enable/disable the Web Client choice for each room.';
 $string['config_clienttype_editable'] = 'The Web Client choice can be edited';
 $string['config_clienttype_editable_description'] = 'This option enable the choice of the Web Client (AdobeFlash/HTML5) from the room editing form.';
+$string['index_error_noinstances'] = 'There are no instances of bigbluebuttonbn';
+$string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
