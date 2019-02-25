@@ -48,4 +48,13 @@ class renderer extends plugin_renderer_base {
         return html_writer::table($indexobj->table);
     }
 
+    /**
+     * @param  import_view $widget
+     * @return string
+     */
+    protected function render_import_view(import_view $widget) {
+        $context = $widget->export_for_template($this);
+        return $this->render_from_template('mod_bigbluebuttonbn/import_view', $context);
+    }
+
 }

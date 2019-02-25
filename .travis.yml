@@ -9,6 +9,10 @@ sudo: required
 addons:
   firefox: "47.0.1"
   postgresql: "9.4"
+  apt:
+    packages:
+      - openjdk-8-jre-headless
+      - chromium-chromedriver
 
 cache:
   directories:
@@ -72,6 +76,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
-  #- moodle-plugin-ci mustache
+  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat

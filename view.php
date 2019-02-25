@@ -43,7 +43,6 @@ if (!$viewinstance) {
 $cm = $viewinstance['cm'];
 $course = $viewinstance['course'];
 $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
@@ -56,7 +55,7 @@ $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 // In locallib.
-bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+bigbluebuttonbn_view_bbbsession_set($PAGE->context, $bbbsession);
 
 // Validates if the BigBlueButton server is working.
 $serverversion = bigbluebuttonbn_get_server_version();  // In locallib.
@@ -80,22 +79,23 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Print the page header.
-$PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
 $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
-$PAGE->set_pagelayout('incourse');
 
 /** @var core_renderer $OUTPUT */
 $OUTPUT;
 
 // Validate if the user is in a role allowed to join.
-if (!has_all_capabilities(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $context)) {
+if (!has_all_capabilities(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {
     echo $OUTPUT->header();
-    $msgtext = isguestuser() ? 'view_noguests' : 'view_nojoin';
     echo $OUTPUT->confirm(
-        sprintf('<p>%s</p>%s', get_string($msgtext, plugin::COMPONENT), get_string('liketologin')),
+        sprintf(
+            '<p>%s</p>%s',
+            get_string(isguestuser() ? 'view_noguests' : 'view_nojoin', plugin::COMPONENT),
+            get_string('liketologin')
+        ),
         get_login_url(),
         new moodle_url('/course/view.php', ['id' => $course->id])
     );
