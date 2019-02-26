@@ -103,36 +103,7 @@ if (!has_all_capabilities(['moodle/category:manage', 'mod/bigbluebuttonbn:join']
     exit;
 }
 
-// Operation URLs.
-$bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
-    '/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]
-);
-$bbbsession['logoutURL'] = plugin::necurl(
-    '/mod/bigbluebuttonbn/bbb_view.php',
-    ['action' => 'logout', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-);
-$bbbsession['recordingReadyURL'] = plugin::necurl(
-    '/mod/bigbluebuttonbn/bbb_broker.php',
-    ['action' => 'recording_ready', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-);
-$bbbsession['meetingEventsURL'] = plugin::necurl(
-    '/mod/bigbluebuttonbn/bbb_broker.php',
-    ['action' => 'meeting_events', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-);
-$bbbsession['joinURL'] = plugin::necurl(
-    '/mod/bigbluebuttonbn/bbb_view.php',
-    ['action' => 'join', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-);
-
-// Check status and set extra values.
-$activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);  // In locallib.
-if ($activitystatus == 'ended') {
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
-} else if ($activitystatus == 'open') {
-    $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
-        $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
-}
+$activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id, $bn);
 
 // Output starts.
 echo $OUTPUT->header();
