@@ -20,7 +20,7 @@
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Pablo Pagnone  (pablodp84 [at] gmail [dt] com)
  */
 
 namespace mod_bigbluebuttonbn\search;
@@ -43,11 +43,37 @@ class tags extends \core_search\base_activity {
      * @return bool
      */
     public function uses_file_indexing() {
-        return true;
+        return false;
     }
 
     /**
-     * Overriding method to index tags of module.
+     * Overwritting get_document_recordset()
+     * In this search implementation, we need to re-index all instances (and not only the last modified) because we
+     * are working with core tags and these can be removed from "manage tags" without change the timemodified in
+     * BBB instances.
+     * @param int $modifiedfrom
+     * @param \context|null $context
+     * @return \moodle_recordset|null
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public function get_document_recordset($modifiedfrom = 0, \context $context = null) {
+        global $DB;
+        list ($contextjoin, $contextparams) = $this->get_context_restriction_sql(
+            $context, $this->get_module_name(), 'modtable');
+        if ($contextjoin === null) {
+            return null;
+        }
+
+        $result = $DB->get_recordset_sql('SELECT modtable.* FROM {' . $this->get_module_name() .
+            '} modtable ' . $contextjoin, array_merge($contextparams));
+
+
+        return($result);
+    }
+
+    /**
+     * Overriding method to index tags of module as string separated by comma.
      *
      * @param stdClass $record
      * @param array    $options
@@ -77,10 +103,6 @@ class tags extends \core_search\base_activity {
         } catch (\dml_exception $ex) {
             // Notify it as we run here as admin, we should see everything.
             debugging('Error retrieving ' . $this->areaid . ' ' . $record->id . ' document: ' . $ex->getMessage(), DEBUG_DEVELOPER);
-            return false;
-        }
-
-        if (empty($tagsstring)) {
             return false;
         }
 
