@@ -1857,7 +1857,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table->data = array();
     // Initialize table headers.
     $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
-    $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');'Meeting';
+    $table->head[] = get_string('view_recording_meeting', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
