@@ -68,7 +68,6 @@ class tags extends \core_search\base_activity {
         $result = $DB->get_recordset_sql('SELECT modtable.* FROM {' . $this->get_module_name() .
             '} modtable ' . $contextjoin, array_merge($contextparams));
 
-
         return($result);
     }
 
