@@ -252,6 +252,22 @@ function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
         foreach ($xml->recordings->recording as $recordingxml) {
             $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
             $recordings[$recording['recordID']] = $recording;
+
+            // Check if there is childs.
+            if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
+                foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
+                    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings',
+                        ['recordID' => implode(',', (array) $breakoutroom)]);
+                    $xml = bigbluebuttonbn_wrap_xml_load_file($url);
+                    if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+                        // If there were meetings already created.
+                        foreach ($xml->recordings->recording as $recordingxml) {
+                            $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
+                            $recordings[$recording['recordID']] = $recording;
+                        }
+                    }
+                }
+            }
         }
     }
     return $recordings;
@@ -1294,6 +1310,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     $rowdata = new stdClass();
     // Set recording_types.
     $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
+    // Set meeting name.
+    $rowdata->meeting = bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession);
     // Set activity name.
     $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
@@ -1619,6 +1637,26 @@ function bigbluebuttonbn_is_valid_resource($url) {
 }
 
 /**
+ * Helper function renders the name for meeting used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession) {
+    $payload = array();
+    if (bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
+        $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
+            'action' => 'edit', 'tag' => 'edit',
+            'target' => 'name');
+    }
+    $source = 'meetingName';
+    $metaname = trim($recording['meetingName']);
+    return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $source, $payload);
+}
+
+/**
  * Helper function renders the name for recording used in row for the data used by the recording table.
  *
  * @param array $recording
@@ -1819,6 +1857,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table->data = array();
     // Initialize table headers.
     $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');'Meeting';
     $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
@@ -1868,6 +1907,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
     $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
     $row->cells = array();
     $row->cells[] = $texthead . $rowdata->recording . $texttail;
+    $row->cells[] = $texthead . $rowdata->meeting . $texttail;;
     $row->cells[] = $texthead . $rowdata->activity . $texttail;
     $row->cells[] = $texthead . $rowdata->description . $texttail;
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {

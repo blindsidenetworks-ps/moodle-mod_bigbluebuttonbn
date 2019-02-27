@@ -383,6 +383,7 @@ $string['view_recording_course'] = 'Course';
 $string['view_recording_date'] = 'Date';
 $string['view_recording_description'] = 'Description';
 $string['view_recording_length'] = 'Length';
+$string['view_recording_meeting'] = 'Meeting';
 $string['view_recording_duration'] = 'Duration';
 $string['view_recording_recording'] = 'Recording';
 $string['view_recording_duration_min'] = 'min';
