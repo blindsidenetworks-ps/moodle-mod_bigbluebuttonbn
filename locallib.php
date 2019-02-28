@@ -1799,6 +1799,8 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     // Initialize table headers.
     $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_recording', 'bigbluebuttonbn'),
         'width' => '125px', 'allowHTML' => true);
+    $columns[] = array('key' => 'meeting', 'label' => get_string('view_recording_meeting', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $columns[] = array('key' => 'activity', 'label' => get_string('view_recording_activity', 'bigbluebuttonbn'),
         'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
