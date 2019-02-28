@@ -1646,11 +1646,6 @@ function bigbluebuttonbn_is_valid_resource($url) {
  */
 function bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession) {
     $payload = array();
-    if (bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
-        $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
-            'action' => 'edit', 'tag' => 'edit',
-            'target' => 'name');
-    }
     $source = 'meetingName';
     $metaname = trim($recording['meetingName']);
     return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $source, $payload);
