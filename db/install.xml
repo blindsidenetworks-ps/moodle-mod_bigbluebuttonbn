@@ -17,6 +17,8 @@
         <FIELD NAME="viewerpass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="wait" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="recordallfromstart" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="recordhidebutton" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="welcome" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="voicebridge" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="openingtime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>

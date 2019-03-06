@@ -252,6 +252,22 @@ function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
         foreach ($xml->recordings->recording as $recordingxml) {
             $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
             $recordings[$recording['recordID']] = $recording;
+
+            // Check if there is childs.
+            if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
+                foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
+                    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings',
+                        ['recordID' => implode(',', (array) $breakoutroom)]);
+                    $xml = bigbluebuttonbn_wrap_xml_load_file($url);
+                    if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+                        // If there were meetings already created.
+                        foreach ($xml->recordings->recording as $recordingxml) {
+                            $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
+                            $recordings[$recording['recordID']] = $recording;
+                        }
+                    }
+                }
+            }
         }
     }
     return $recordings;
@@ -870,15 +886,18 @@ function bigbluebuttonbn_is_moderator_validate_rule($participant, $userid, $user
     if ($participant['role'] == BIGBLUEBUTTONBN_ROLE_VIEWER) {
         return false;
     }
-    // Looks for all configuration.
+    // Validation for the 'all' rule.
     if ($participant['selectiontype'] == 'all') {
         return true;
     }
-    // Looks for users.
-    if ($participant['selectiontype'] == 'user' && $participant['selectionid'] == $userid) {
-        return true;
+    // Validation for a 'user' rule.
+    if ($participant['selectiontype'] == 'user') {
+        if ($participant['selectionid'] == $userid) {
+            return true;
+        }
+        return false;
     }
-    // Looks for roles.
+    // Validation for a 'role' rule.
     $role = bigbluebuttonbn_get_role($participant['selectionid']);
     if ($role != null && array_key_exists($role->id, $userroles)) {
         return true;
@@ -1291,6 +1310,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     $rowdata = new stdClass();
     // Set recording_types.
     $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
+    // Set meeting name.
+    $rowdata->meeting = bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession);
     // Set activity name.
     $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
@@ -1616,6 +1637,21 @@ function bigbluebuttonbn_is_valid_resource($url) {
 }
 
 /**
+ * Helper function renders the name for meeting used in row for the data used by the recording table.
+ *
+ * @param array $recording
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession) {
+    $payload = array();
+    $source = 'meetingName';
+    $metaname = trim($recording['meetingName']);
+    return bigbluebuttonbn_get_recording_data_row_text($recording, $metaname, $source, $payload);
+}
+
+/**
  * Helper function renders the name for recording used in row for the data used by the recording table.
  *
  * @param array $recording
@@ -1758,6 +1794,8 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     // Initialize table headers.
     $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_recording', 'bigbluebuttonbn'),
         'width' => '125px', 'allowHTML' => true);
+    $columns[] = array('key' => 'meeting', 'label' => get_string('view_recording_meeting', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $columns[] = array('key' => 'activity', 'label' => get_string('view_recording_activity', 'bigbluebuttonbn'),
         'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
@@ -1816,6 +1854,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table->data = array();
     // Initialize table headers.
     $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_meeting', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
@@ -1865,6 +1904,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
     $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
     $row->cells = array();
     $row->cells[] = $texthead . $rowdata->recording . $texttail;
+    $row->cells[] = $texthead . $rowdata->meeting . $texttail;;
     $row->cells[] = $texthead . $rowdata->activity . $texttail;
     $row->cells[] = $texthead . $rowdata->description . $texttail;
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
@@ -2443,6 +2483,16 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             $renderer->render_group_element_checkbox('recording_editable', 1));
         $renderer->render_group_element('recording_icons_enabled',
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1));
+
+        // Add recording start to load and allow/hide stop/pause.
+        $renderer->render_group_element('recording_all_from_start_default',
+            $renderer->render_group_element_checkbox('recording_all_from_start_default', 0));
+        $renderer->render_group_element('recording_all_from_start_editable',
+            $renderer->render_group_element_checkbox('recording_all_from_start_editable', 0));
+        $renderer->render_group_element('recording_hide_button_default',
+            $renderer->render_group_element_checkbox('recording_hide_button_default', 0));
+        $renderer->render_group_element('recording_hide_button_editable',
+            $renderer->render_group_element_checkbox('recording_hide_button_editable', 0));
     }
 }
 
@@ -2992,12 +3042,28 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     }
     $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
     $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
+    $bbbsession['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+    if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
+        $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
+    }
+
+    $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+    if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
+        $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
+    }
+
     $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
     if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
         $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
     }
     if ($bbbsession['bigbluebuttonbn']->record) {
-        $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+        // Check if is enable record all from start.
+        if ($bbbsession['recordallfromstart']) {
+            $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
+                    'bigbluebuttonbn');
+        } else {
+            $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+        }
     }
     $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
     $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
