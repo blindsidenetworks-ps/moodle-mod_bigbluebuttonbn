@@ -1869,12 +1869,34 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->align[] = 'left';
         $table->size[] = (count($tools) * 40) . 'px';
     }
+    // Get the groups of the user.
+    $usergroups = groups_get_all_groups($bbbsession['course']->id, $bbbsession['userID']);
     // Build table content.
     foreach ($recordings as $recording) {
-        $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-        if (!empty($rowdata)) {
-            $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata);
-            array_push($table->data, $row);
+        $displayrow = true;
+        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+            $groupid = explode('[', $recording['meetingID']);
+            if (isset($groupid[1])) {
+                // If it is a group recording and the user is not moderator/administrator, the recording
+                // should not be included by default.
+                $displayrow = false;
+                $groupid = explode(']', $groupid[1]);
+                if (isset($groupid[0])) {
+                    foreach ($usergroups as $usergroup) {
+                        if($usergroup->id == $groupid[0]) {
+                            // Include recording if the user is in the same group.
+                            $displayrow = true;
+                        }
+                    }
+                }
+            }
+        }
+        if ($displayrow) {
+            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+            if (!empty($rowdata)) {
+                $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata);
+                array_push($table->data, $row);
+            }
         }
     }
     return $table;
