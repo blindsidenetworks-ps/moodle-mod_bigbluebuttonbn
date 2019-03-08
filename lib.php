@@ -73,6 +73,8 @@ const BIGBLUEBUTTONBN_LOG_EVENT_EDIT = 'Edit';
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = 'Create';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string of event join for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = 'Join';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_PLAYED string of event record played for bigbluebuttonbn_logs */
+const BIGBLUEBUTTONBN_LOG_EVENT_PLAYED = 'Played';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT string of event logout for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_IMPORT string of event import for bigbluebuttonbn_logs */
@@ -223,8 +225,6 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description.
  *
  * @param object $course
  * @param object $user
@@ -234,10 +234,7 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  * @return bool
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
-    global $DB;
-    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
-        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ), '*');
-    if ($completed > 0) {
+    if ($completed = bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)) {
         return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.
             get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.
             get_string('view_message_times', 'bigbluebuttonbn');
@@ -249,19 +246,30 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param object $course
- * @param object $user
+ * @param object|int $courseorid
+ * @param object|int $userorid
  * @param object $mod
  * @param object $bigbluebuttonbn
  *
  * @return bool
  */
-function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
+function bigbluebuttonbn_user_complete($courseorid, $userorid, $mod, $bigbluebuttonbn) {
     global $DB;
-    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
-        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ),
-        '*', IGNORE_MULTIPLE);
-    return $completed > 0;
+    if (is_object($courseorid)) {
+        $course = $courseorid;
+    } else {
+        $course = (object)array('id' => $courseorid);
+    }
+    if (is_object($userorid)) {
+        $user = $userorid;
+    } else {
+        $user = (object)array('id' => $userorid);
+    }
+    $sql = "SELECT count(*) FROM {bigbluebuttonbn_logs} ";
+    $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
+    $result = $DB->get_record_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
+                                              BIGBLUEBUTTONBN_LOG_EVENT_JOIN, BIGBLUEBUTTONBN_LOG_EVENT_PLAYED));
+    return (int)$result->count;
 }
 
 /**
@@ -827,12 +835,30 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+    // Get mod info
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
-    // Check that the bigbluebuttonbn activity is open.
+    // Get bigbluebuttonbn activity
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
-    $actionable = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
 
+    // Get if the user has joined in live session or viewed the recorded
+    $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, null, $bigbluebuttonbn);
+    // Get if the room is available
+    list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    // Get if the user can join
+    list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    // Get if the time has already passed
+    $haspassed = $bigbluebuttonbn->openingtime < time();
+
+    // Check if the room is closed and the user has already joined this session or played the record
+    if($haspassed && !$roomavailable && $usercomplete){
+        return null;
+    }
+
+    // Check if the user can join this session
+    $actionable = ($roomavailable && $usercanjoin) || $haspassed;
+
+    // Action data
     $string = get_string('view_room', 'bigbluebuttonbn');
     $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
     if (groups_get_activity_groupmode($cm) == NOGROUPS) {
