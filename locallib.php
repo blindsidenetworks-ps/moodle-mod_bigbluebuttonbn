@@ -1849,6 +1849,7 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
  * @return object
  */
 function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
+    global $DB;
     // Declare the table.
     $table = new html_table();
     $table->data = array();
@@ -1871,14 +1872,33 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     }
     // Get the groups of the user.
     $usergroups = groups_get_all_groups($bbbsession['course']->id, $bbbsession['userID']);
+
     // Build table content.
     foreach ($recordings as $recording) {
+
+        $meetingid = $recording['meetingID'];
+        $shortmeetingid = explode('-', $recording['meetingID']);
+        if (isset($shortmeetingid[0])) {
+            $meetingid = $shortmeetingid[0];
+        }
+        // Check if the record belongs to a Visible Group type.
+        $sql = "SELECT bigbluebuttonbn.id, cm.id, cm.groupmode
+                 FROM {bigbluebuttonbn} bigbluebuttonbn
+                 JOIN {modules} m
+                   ON m.name = :bigbluebuttonbn
+                 JOIN {course_modules} cm
+                   ON cm.instance = bigbluebuttonbn.id
+                  AND cm.module = m.id
+                WHERE bigbluebuttonbn.meetingid = :meetingid";
+        $params = array('bigbluebuttonbn' => 'bigbluebuttonbn', 'meetingid' => $meetingid);
+
+        $groupmode = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
+
         $displayrow = true;
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        if ((isset($groupmode->groupmode) && (int)$groupmode->groupmode != VISIBLEGROUPS) && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
             $groupid = explode('[', $recording['meetingID']);
             if (isset($groupid[1])) {
-                // If it is a group recording and the user is not moderator/administrator, the recording
-                // should not be included by default.
+                // It is a group recording and the user is not moderator/administrator. Recording should not be included by default.
                 $displayrow = false;
                 $groupid = explode(']', $groupid[1]);
                 if (isset($groupid[0])) {
