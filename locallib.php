@@ -1849,6 +1849,7 @@ function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = [
  * @return object
  */
 function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
+    global $DB;
     // Declare the table.
     $table = new html_table();
     $table->data = array();
@@ -1869,12 +1870,53 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->align[] = 'left';
         $table->size[] = (count($tools) * 40) . 'px';
     }
+    // Get the groups of the user.
+    $usergroups = groups_get_all_groups($bbbsession['course']->id, $bbbsession['userID']);
+
     // Build table content.
     foreach ($recordings as $recording) {
-        $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-        if (!empty($rowdata)) {
-            $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata);
-            array_push($table->data, $row);
+
+        $meetingid = $recording['meetingID'];
+        $shortmeetingid = explode('-', $recording['meetingID']);
+        if (isset($shortmeetingid[0])) {
+            $meetingid = $shortmeetingid[0];
+        }
+        // Check if the record belongs to a Visible Group type.
+        $sql = "SELECT bigbluebuttonbn.id, cm.id, cm.groupmode
+                 FROM {bigbluebuttonbn} bigbluebuttonbn
+                 JOIN {modules} m
+                   ON m.name = :bigbluebuttonbn
+                 JOIN {course_modules} cm
+                   ON cm.instance = bigbluebuttonbn.id
+                  AND cm.module = m.id
+                WHERE bigbluebuttonbn.meetingid = :meetingid";
+        $params = array('bigbluebuttonbn' => 'bigbluebuttonbn', 'meetingid' => $meetingid);
+
+        $groupmode = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
+
+        $displayrow = true;
+        if ((isset($groupmode->groupmode) && (int)$groupmode->groupmode != VISIBLEGROUPS) && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
+            $groupid = explode('[', $recording['meetingID']);
+            if (isset($groupid[1])) {
+                // It is a group recording and the user is not moderator/administrator. Recording should not be included by default.
+                $displayrow = false;
+                $groupid = explode(']', $groupid[1]);
+                if (isset($groupid[0])) {
+                    foreach ($usergroups as $usergroup) {
+                        if ($usergroup->id == $groupid[0]) {
+                            // Include recording if the user is in the same group.
+                            $displayrow = true;
+                        }
+                    }
+                }
+            }
+        }
+        if ($displayrow) {
+            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+            if (!empty($rowdata)) {
+                $row = bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowdata);
+                array_push($table->data, $row);
+            }
         }
     }
     return $table;
