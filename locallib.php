@@ -1903,7 +1903,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
                 $groupid = explode(']', $groupid[1]);
                 if (isset($groupid[0])) {
                     foreach ($usergroups as $usergroup) {
-                        if($usergroup->id == $groupid[0]) {
+                        if ($usergroup->id == $groupid[0]) {
                             // Include recording if the user is in the same group.
                             $displayrow = true;
                         }
