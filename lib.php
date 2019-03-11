@@ -835,30 +835,30 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
-    // Get mod info
+    // Get mod info.
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
-    // Get bigbluebuttonbn activity
+    // Get bigbluebuttonbn activity.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
 
-    // Get if the user has joined in live session or viewed the recorded
+    // Get if the user has joined in live session or viewed the recorded.
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, null, $bigbluebuttonbn);
-    // Get if the room is available
+    // Get if the room is available.
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
-    // Get if the user can join
+    // Get if the user can join.
     list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
-    // Get if the time has already passed
+    // Get if the time has already passed.
     $haspassed = $bigbluebuttonbn->openingtime < time();
 
-    // Check if the room is closed and the user has already joined this session or played the record
-    if($haspassed && !$roomavailable && $usercomplete){
+    // Check if the room is closed and the user has already joined this session or played the record.
+    if ($haspassed && !$roomavailable && $usercomplete) {
         return null;
     }
 
-    // Check if the user can join this session
+    // Check if the user can join this session.
     $actionable = ($roomavailable && $usercanjoin) || $haspassed;
 
-    // Action data
+    // Action data.
     $string = get_string('view_room', 'bigbluebuttonbn');
     $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
     if (groups_get_activity_groupmode($cm) == NOGROUPS) {
