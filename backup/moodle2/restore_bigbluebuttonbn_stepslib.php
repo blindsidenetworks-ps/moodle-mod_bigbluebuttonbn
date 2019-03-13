@@ -55,10 +55,18 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
      * @return void
      */
     protected function process_bigbluebuttonbn($data) {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+
         $data = (object) $data;
         $data->course = $this->get_courseid();
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        // As it is a new activity, assign passwords.
+        $data->moderatorpass = bigbluebuttonbn_random_password(12);
+        $data->viewerpass = bigbluebuttonbn_random_password(12, $data->moderatorpass);
+        // Encode meetingid.
+        $data->meetingid = bigbluebuttonbn_unique_meetingid_seed();
         // Insert the bigbluebuttonbn record.
         $newitemid = $DB->insert_record('bigbluebuttonbn', $data);
         // Immediately after inserting "activity" record, call this.
