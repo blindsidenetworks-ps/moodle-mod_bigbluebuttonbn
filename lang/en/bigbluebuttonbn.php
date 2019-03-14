@@ -444,3 +444,6 @@ $string['config_clienttype_editable'] = 'The Web Client choice can be edited';
 $string['config_clienttype_editable_description'] = 'This option enable the choice of the Web Client (AdobeFlash/HTML5) from the room editing form.';
 $string['index_error_noinstances'] = 'There are no instances of bigbluebuttonbn';
 $string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
+
+$string['view_mobile_message_reload_page_creation_time_meeting'] = 'You exceeded the 45 seconds in this page, please reload the page to join correctly to the meeting.';
+$string['view_mobile_message_groups_not_supported'] = 'This instance is enable to work with groups but the mobile app has not support for this. Please open in desktop if you want to use the group support.';

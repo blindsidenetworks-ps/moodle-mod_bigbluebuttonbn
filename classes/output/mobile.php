@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 use context_module;
 use mod_bigbluebuttonbn_external;
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+require_once($CFG->dirroot . '/lib/grouplib.php');
 
 /**
  * Mobile output class for bigbluebuttonbn
@@ -210,13 +211,29 @@ class mobile {
         // Build final url to BBB.
         $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
 
+        // Check groups access and show message.
+        $msjgroup = array();
+        $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+        if ($groupmode != NOGROUPS) {
+            $msjgroup = array("message" => get_string('view_mobile_message_groups_not_supported',
+                'bigbluebuttonbn'));
+        }
+
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
             'bbbsession' => (object) $bbbsession,
+            'msjgroup' => $msjgroup,
             'urltojoin' => $urltojoin,
             'cmid' => $cm->id,
             'courseid' => $args->courseid
         );
+
+        // We want to show a notification when user excedded 45 seconds without click button.
+        $jstimecreatedmeeting = 'setTimeout(function(){
+        document.getElementById("bigbluebuttonbn-mobile-notifications").style.display = "block";
+        document.getElementById("bigbluebuttonbn-mobile-join").disabled = true;
+        document.getElementById("bigbluebuttonbn-mobile-meetingready").style.display = "none";
+        }, 45000);';
 
         return array(
             'templates' => array(
@@ -225,7 +242,7 @@ class mobile {
                     'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_page', $data),
                 ),
             ),
-            'javascript' => '',
+            'javascript' => $jstimecreatedmeeting,
             'otherdata' => '',
             'files' => ''
         );
