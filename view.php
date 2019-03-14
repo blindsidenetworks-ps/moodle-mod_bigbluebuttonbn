@@ -88,7 +88,7 @@ $PAGE->set_heading($course->fullname);
 $OUTPUT;
 
 // Validate if the user is in a role allowed to join.
-if (!has_all_capabilities(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {
+if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {
     echo $OUTPUT->header();
     echo $OUTPUT->confirm(
         sprintf(
