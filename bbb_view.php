@@ -45,12 +45,13 @@ $group = optional_param('group', -1, PARAM_INT);
 
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
-    print_error('view_error_url_missing_parameters', plugin::COMPONENT);
+    print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
 
 $cm = $bbbviewinstance['cm'];
 $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
+$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
@@ -65,26 +66,47 @@ if ($timeline || $index) {
     $bbbsession['coursename'] = $course->fullname;
     $bbbsession['cm'] = $cm;
     $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-    bigbluebuttonbn_view_bbbsession_set($PAGE->context, $bbbsession);
+    bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
     // Validates if the BigBlueButton server is working.
     $serverversion = bigbluebuttonbn_get_server_version();
-    if ($serverversion === null) {
-        $errmsg = 'view_error_unable_join_student';
-        $errurl = '/course/view.php';
-        $errurlparams = ['id' => $bigbluebuttonbn->course];
+    if (is_null($serverversion)) {
         if ($bbbsession['administrator']) {
-            $errmsg = 'view_error_unable_join';
-            $errurl = '/admin/settings.php';
-            $errurlparams = ['section' => 'modsettingbigbluebuttonbn'];
-        } else if ($bbbsession['moderator']) {
-            $errmsg = 'view_error_unable_join_teacher';
+            print_error('view_error_unable_join', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            exit;
         }
-        print_error($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
+        if ($bbbsession['moderator']) {
+            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+            exit;
+        }
+        print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+            $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+        exit;
     }
     $bbbsession['serverversion'] = (string) $serverversion;
 
-    bigbluebuttonbn_view_session_config($bbbsession, $id, $bn);
+    // Operation URLs.
+    $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+        'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+        '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+
+    // Check status and set extra values.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    if ($activitystatus == 'ended') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+    } else if ($activitystatus == 'open') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
 
     // Check group.
     if ($group >= 0) {
@@ -104,8 +126,9 @@ if ($timeline || $index) {
 }
 
 // Print the page header.
-$PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', ['id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id]);
-$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
+$PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 $PAGE->blocks->show_only_fake_blocks();
@@ -125,7 +148,6 @@ switch (strtolower($action)) {
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Check the origin page.
-        // Make sure we use portable DB way of getting the info.
         $records = $DB->get_records(
             'bigbluebuttonbn_logs',
             ['userid' => $bbbsession['userID'], 'log' => 'Join'],
@@ -141,7 +163,7 @@ switch (strtolower($action)) {
         }
         // If the user acceded from Timeline it should be redirected to the Dashboard.
         if (isset($lastaccess->origin) && $lastaccess->origin == BIGBLUEBUTTON_ORIGIN_TIMELINE) {
-            redirect(new moodle_url('/my/index.php'));
+            redirect($CFG->wwwroot . '/my/');
         }
         // Close the tab or window where BBB was opened.
         bigbluebutton_bbb_view_close_window();
@@ -177,17 +199,20 @@ switch (strtolower($action)) {
             $bbbsession['presentation']['url']
         );
         if (empty($response)) {
-            $errmsg = 'view_error_unable_join_student';
-            $linkurl = plugin::necurl(
-                '/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']
-            );
             // The server is unreachable.
             if ($bbbsession['administrator']) {
-                $errmsg = 'view_error_unable_join';
-            } else if ($bbbsession['moderator']) {
-                $errmsg = 'view_error_unable_join_teacher';
+                print_error('view_error_unable_join', 'bigbluebuttonbn',
+                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                break;
             }
-            print_error($errmsg, plugin::COMPONENT, $linkurl);
+            if ($bbbsession['moderator']) {
+                print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                break;
+            }
+            print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            break;
         }
         if ($response['returncode'] == 'FAILED') {
             // The meeting was not created.
