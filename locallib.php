@@ -393,13 +393,16 @@ function bigbluebuttonbn_get_recording_array_meta($metadata) {
  * @return array
  */
 function bigbluebuttonbn_recording_build_sorter($a, $b) {
+    global $CFG;
+    $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+    $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
     if ($a['startTime'] < $b['startTime']) {
-        return -1;
+        return $resultless;
     }
     if ($a['startTime'] == $b['startTime']) {
         return 0;
     }
-    return 1;
+    return $resultmore;
 }
 
 /**
@@ -2493,6 +2496,8 @@ function bigbluebuttonbn_settings_showrecordings(&$renderer) {
             $renderer->render_group_element_checkbox('recordings_preview_default', 1));
         $renderer->render_group_element('recordings_preview_editable',
             $renderer->render_group_element_checkbox('recordings_preview_editable', 0));
+        $renderer->render_group_element('recordings_sortorder',
+            $renderer->render_group_element_checkbox('recordings_sortorder', 0));
     }
 }
 
