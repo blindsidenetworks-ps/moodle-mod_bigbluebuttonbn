@@ -72,12 +72,29 @@ class mobileview {
         }
         $session['wait'] = $session['bigbluebuttonbn']->wait;
         $session['record'] = $session['bigbluebuttonbn']->record;
+
+        $session['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+        if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
+            $session['recordallfromstart'] = $session['bigbluebuttonbn']->recordallfromstart;
+        }
+
+        $session['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+        if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
+            $session['recordhidebutton'] = $session['bigbluebuttonbn']->recordhidebutton;
+        }
+
         $session['welcome'] = $session['bigbluebuttonbn']->welcome;
         if (!isset($session['welcome']) || $session['welcome'] == '') {
             $session['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
         }
         if ($session['bigbluebuttonbn']->record) {
-            $session['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+            // Check if is enable record all from start.
+            if ($session['recordallfromstart']) {
+                $session['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
+                        'bigbluebuttonbn');
+            } else {
+                $session['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+            }
         }
         $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
         $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
@@ -194,6 +211,15 @@ class mobileview {
             'logoutURL' => $bbbsession['logoutURL'],
         ];
         $data['record'] = self::bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+        // Check if auto_start_record is enable.
+        if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
+            $data['autoStartRecording'] = 'true';
+            // Check if hide_record_button is enable.
+            if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
+                $data['allowStartStopRecording'] = 'false';
+            }
+        }
+
         $data['welcome'] = trim($bbbsession['welcome']);
         // Set the duration for the meeting.
         $durationtime = self::bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
