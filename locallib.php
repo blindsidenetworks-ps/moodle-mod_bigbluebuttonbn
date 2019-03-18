@@ -3122,12 +3122,12 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
     $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
     // Setting for clienttype, assign flash if not enabled, or default if not editable.
-    $bbbsession['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
-    if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable')) {
-        $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
+    $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+    if (\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
+        $bbbsession['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
     }
-    if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
-        $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+    if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable') && isset($bbbsession['bigbluebuttonbn']->clienttype)) {
+        $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
     }
 }
 
