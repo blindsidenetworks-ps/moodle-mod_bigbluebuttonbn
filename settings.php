@@ -28,9 +28,9 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(__DIR__.'/locallib.php');
 
-if ($ADMIN->fulltree) {
+if ($hassiteconfig) {
     // Configuration for BigBlueButton.
     $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
     // Renders general warning message for settings.
