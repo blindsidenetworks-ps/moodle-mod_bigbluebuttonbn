@@ -24,11 +24,13 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\plugin;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once(dirname(__FILE__).'/lib.php');
+require_once(__DIR__.'/lib.php');
 
 /** @var BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
 const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
@@ -407,13 +409,16 @@ function bigbluebuttonbn_get_recording_array_meta($metadata) {
  * @return array
  */
 function bigbluebuttonbn_recording_build_sorter($a, $b) {
+    global $CFG;
+    $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+    $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
     if ($a['startTime'] < $b['startTime']) {
-        return -1;
+        return $resultless;
     }
     if ($a['startTime'] == $b['startTime']) {
         return 0;
     }
-    return 1;
+    return $resultmore;
 }
 
 /**
@@ -2440,13 +2445,13 @@ function bigbluebuttonbn_get_localcode() {
  * @return array
  */
 function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
+    $result = null;
     if ($id) {
-        return bigbluebuttonbn_view_instance_id($id);
+        $result = bigbluebuttonbn_view_instance_id($id);
+    } else if ($bigbluebuttonbnid) {
+        $result = bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
     }
-    if ($bigbluebuttonbnid) {
-        return bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
-    }
-    return;
+    return $result;
 }
 
 /**
@@ -2583,6 +2588,8 @@ function bigbluebuttonbn_settings_showrecordings(&$renderer) {
             $renderer->render_group_element_checkbox('recordings_preview_default', 1));
         $renderer->render_group_element('recordings_preview_editable',
             $renderer->render_group_element_checkbox('recordings_preview_editable', 0));
+        $renderer->render_group_element('recordings_sortorder',
+            $renderer->render_group_element_checkbox('recordings_sortorder', 0));
     }
 }
 
@@ -3149,4 +3156,45 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
     }
     // The activity is open.
     return 'open';
+}
+
+/**
+ * @param  array $bbbsession
+ * @param  int $id
+ * @param  int $bn
+ * @return string
+ */
+function bigbluebuttonbn_view_session_config(&$bbbsession, $id, $bn) {
+    // Operation URLs.
+    $bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
+        '/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]
+    );
+    $bbbsession['logoutURL'] = plugin::necurl(
+        '/mod/bigbluebuttonbn/bbb_view.php',
+        ['action' => 'logout', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
+    );
+    $bbbsession['recordingReadyURL'] = plugin::necurl(
+        '/mod/bigbluebuttonbn/bbb_broker.php',
+        ['action' => 'recording_ready', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
+    );
+    $bbbsession['meetingEventsURL'] = plugin::necurl(
+        '/mod/bigbluebuttonbn/bbb_broker.php',
+        ['action' => 'meeting_events', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
+    );
+    $bbbsession['joinURL'] = plugin::necurl(
+        '/mod/bigbluebuttonbn/bbb_view.php',
+        ['action' => 'join', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
+    );
+
+    // Check status and set extra values.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);  // In locallib.
+    if ($activitystatus == 'ended') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+    } else if ($activitystatus == 'open') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
+
+    return $activitystatus;
 }

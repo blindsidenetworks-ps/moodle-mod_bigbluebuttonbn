@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_bigbluebuttonbn/import_view
+
+    This template renders the import recordings page.
+
+    Example context (json):
+    {
+        "backactionurl": "http://localhost/foo",
+        "cmid": 3,
+        "hascontent": true,
+        "selectoptions": [
+          {"selected": true, "value": 1, "label": "First choice"},
+          {"value": 2, "label": "Second choice"}
+        ],
+        "recordings": true,
+        "recordingtable": "<table></table>"
+    }
+}}
+
+<div class="mod_bigbluebuttonbn_import_view">
+    <h4>{{#str}} view_recording_button_import, mod_bigbluebuttonbn {{/str}}</h4>
+    {{^hascontent}}
+        <div>{{#str}} view_error_import_no_courses, mod_bigbluebuttonbn {{/str}}</div>
+    {{/hascontent}}
+    {{#hascontent}}
+        <div>
+            <select id="menuimport_recording_links_select"
+                    class="select custom-select menuimport_recording_links_select"
+                    name="import_recording_links_select">
+                {{#selectoptions}}
+                    <option {{#selected}}selected="selected"{{/selected}} value="{{value}}">{{label}}</option>
+                {{/selectoptions}}
+            </select>
+            {{#recordings}}
+                <span id="import_recording_links_table"></span>
+                {{{recordingtable}}}
+            {{/recordings}}
+            {{^recordings}}
+                <div>{{#str}} view_error_import_no_recordings, mod_bigbluebuttonbn {{/str}}</div>
+            {{/recordings}}
+            <br>
+        </div>
+    {{/hascontent}}
+    <form id="goback-button" action="{{backactionurl}}" method="get">
+        <input type="hidden" name="id" value="{{cmid}}">
+        <input type="submit" class="btn btn-secondary" value="{{#str}} view_recording_button_return, mod_bigbluebuttonbn {{/str}}">
+    </form>
+</div>

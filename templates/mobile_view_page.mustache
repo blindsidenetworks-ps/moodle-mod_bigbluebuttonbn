@@ -19,9 +19,28 @@
 
     This template renders the mobile page.
 
+    Example context (json):
+    {
+        "bigbluebuttonbn.intro": "foo",
+        "cmid": 3,
+        "message": "A message",
+        "errors": [
+          {"error": "aaa"},
+          {"error": "bbb"}
+        ],
+        "urltojoin": "http://foo"
+    }
 }}
 {{=<% %>=}}
 <div>
+    <%#msjgroup%>
+        <div style="color:#856404; background-color: #fff3cd; padding-right: 35px; border-color: #ffeeba; padding: 15px; margin-bottom: 20px;">
+        <% message %>
+        </div>
+    <%/msjgroup%>
+    <div id="bigbluebuttonbn-mobile-notifications" style="display:none; color:#31708f; background-color: #d9edf7; padding-right: 35px; border-color: #bce8f1; padding: 15px; margin-bottom: 20px;">
+    {{ 'plugin.mod_bigbluebuttonbn.view_mobile_message_reload_page_creation_time_meeting' | translate }}
+    </div>
     <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
          <%#errors%>
@@ -30,11 +49,11 @@
             </ion-item>
         <%/errors%>
         <%^errors%>
-            <ion-item text-wrap>
+            <ion-item text-wrap id="bigbluebuttonbn-mobile-meetingready">
                 {{ 'plugin.mod_bigbluebuttonbn.view_message_conference_room_ready' | translate }}
             </ion-item>
             <ion-item>
-                <button ion-button block onclick="window.open('<% urltojoin %>', '_system');">
+                <button id="bigbluebuttonbn-mobile-join" ion-button block onclick="window.open('<% urltojoin %>', '_system');">
                     {{ 'plugin.mod_bigbluebuttonbn.view_conference_action_join' | translate }}
                 </button>
             </ion-item>
