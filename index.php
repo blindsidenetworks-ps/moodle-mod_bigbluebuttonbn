@@ -24,279 +24,62 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\output\renderer;
+use mod_bigbluebuttonbn\output\index;
+
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/locallib.php');
 
 $id = required_param('id', PARAM_INT);
 $a = optional_param('a', 0, PARAM_INT);
 $g = optional_param('g', 0, PARAM_INT);
 
-if (!$id) {
-    print_error('You must specify a course_module ID or an instance ID');
-    return;
+$course = $DB->get_record('course', ['id' => $id]);
+if (!$course) {
+    print_error('invalidcourseid');
 }
-
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course, true);
 
-$context = context_course::instance($course->id);
-
-// Print the header.
-$PAGE->set_url('/mod/bigbluebuttonbn/index.php', array('id' => $id));
-$PAGE->set_title(get_string('modulename', 'bigbluebuttonbn'));
+$PAGE->set_url('/mod/bigbluebuttonbn/index.php', ['id' => $id]);
+$PAGE->set_title(get_string('modulename', plugin::COMPONENT));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_cacheable(false);
 $PAGE->set_pagelayout('incourse');
 
-$PAGE->navbar->add(get_string('modulename', 'bigbluebuttonbn'), "index.php?id=$course->id");
-
-// Get all the appropriate data.
-if (!$bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
-    notice('There are no instances of bigbluebuttonbn', "../../course/view.php?id=$course->id");
-}
-
-// Print the list of instances.
-$timenow = time();
-$strweek = get_string('week');
-$strtopic = get_string('topic');
-$headingname = get_string('index_heading_name', 'bigbluebuttonbn');
-$headinggroup = get_string('index_heading_group', 'bigbluebuttonbn');
-$headingusers = get_string('index_heading_users', 'bigbluebuttonbn');
-$headingviewer = get_string('index_heading_viewer', 'bigbluebuttonbn');
-$headingmoderator = get_string('index_heading_moderator', 'bigbluebuttonbn');
-$headingactions = get_string('index_heading_actions', 'bigbluebuttonbn');
-$headingrecording = get_string('index_heading_recording', 'bigbluebuttonbn');
-
-$table = new html_table();
-$table->head = array($strweek, $headingname, $headinggroup, $headingusers, $headingviewer, $headingmoderator,
-    $headingrecording, $headingactions);
-$table->align = array('center', 'left', 'center', 'center', 'center', 'center', 'center');
+$PAGE->navbar->add($PAGE->title, $PAGE->url);
 
 $action = optional_param('action', '', PARAM_TEXT);
 if ($action === 'end') {
     // A request to end the meeting.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $a), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $a]);
     if (!$bigbluebuttonbn) {
-        print_error("BigBlueButton ID $a is incorrect");
+        print_error('index_error_bbtn', plugin::COMPONENT, '', $a);
     }
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
     // User roles.
-    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-    $moderator = bigbluebuttonbn_is_moderator($context, $participantlist);
+    $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $PAGE->context);
+    $moderator = bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
     $administrator = is_siteadmin();
     if ($moderator || $administrator) {
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
-        echo get_string('index_ending', 'bigbluebuttonbn');
-        $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
-        if ($g != '0') {
-            $meetingid .= '['.$g.']';
+        echo get_string('index_ending', plugin::COMPONENT);
+        $meetingid = sprintf('%s-%d-%d', $bigbluebuttonbn->meetingid, $course->id, $bigbluebuttonbn->id);
+        if ($g != 0) {
+            $meetingid .= sprintf('[%d]', $g);
         }
 
         bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
-        redirect('index.php?id='.$id);
+        redirect($PAGE->url);
     }
 }
 
-foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
-    if ($bigbluebuttonbn->visible) {
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
-        // User roles.
-        $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
-        $moderator = bigbluebuttonbn_is_moderator($context, $participantlist);
-        $administrator = is_siteadmin();
-        $canmoderate = ($administrator || $moderator);
-        // Add a the data for the bigbluebuttonbn instance.
-        $groupobj = null;
-
-        $groupmode = groups_get_activity_groupmode($cm) > 0;
-        if ($groupmode) {
-            $groupobj = (object) array('id' => 0, 'name' => get_string('allparticipants'));
-        }
-        $table->data[] = bigbluebuttonbn_index_display_room($canmoderate, $course, $bigbluebuttonbn, $groupobj);
-        if ($groupmode) {
-            // Add a the data for the groups belonging to the bigbluebuttonbn instance, if any.
-            $groups = groups_get_activity_allowed_groups($cm);
-            foreach ($groups as $group) {
-                $table->data[] = bigbluebuttonbn_index_display_room($canmoderate, $course, $bigbluebuttonbn, $group);
-            }
-        }
-
-
-    }
-}
+/** @var renderer $renderer */
+$renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('index_heading', 'bigbluebuttonbn'));
-echo html_writer::table($table);
+echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
+echo $renderer->render(new index($course));
 echo $OUTPUT->footer();
-
-/**
- * Displays the general view.
- *
- * @param boolean $moderator
- * @param object $course
- * @param object $bigbluebuttonbn
- * @param object $groupobj
- * @return array
- */
-function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
-    $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
-    $paramgroup = '';
-    $groupname = '';
-    if ($groupobj) {
-        $meetingid .= '['.$groupobj->id.']';
-        $paramgroup = '&group='.$groupobj->id;
-        $groupname = $groupobj->name;
-    }
-    $meetinginfo = bigbluebuttonbn_get_meeting_info_array($meetingid);
-    if (empty($meetinginfo)) {
-        // The server was unreachable.
-        print_error(get_string('index_error_unable_display', 'bigbluebuttonbn'));
-        return;
-    }
-    if (isset($meetinginfo['messageKey']) && $meetinginfo['messageKey'] == 'checksumError') {
-        // There was an error returned.
-        print_error(get_string('index_error_checksum', 'bigbluebuttonbn'));
-        return;
-    }
-    // Output Users in the meeting.
-    $joinurl = '<a href="view.php?id='.$bigbluebuttonbn->coursemodule.$paramgroup.'">'.format_string($bigbluebuttonbn->name).'</a>';
-    $group = $groupname;
-    $users = '';
-    $viewerlist = '';
-    $moderatorlist = '';
-    $recording = '';
-    $actions = bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonbn, $groupobj);
-    // The meeting info was returned.
-    if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
-        $users = bigbluebuttonbn_index_display_room_users($meetinginfo);
-        $viewerlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'VIEWER');
-        $moderatorlist = bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, 'MODERATOR');
-        $recording = bigbluebuttonbn_index_display_room_recordings($meetinginfo);
-        $actions .= bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj);
-    }
-    return array($bigbluebuttonbn->section, $joinurl, $group, $users, $viewerlist, $moderatorlist, $recording, $actions);
-}
-
-/**
- * Count the number of users in the meeting.
- *
- * @param array $meetinginfo
- * @return integer
- */
-function bigbluebuttonbn_index_display_room_users($meetinginfo) {
-    $users = '';
-    if (count($meetinginfo['attendees']) && count($meetinginfo['attendees']->attendee)) {
-        $users = count($meetinginfo['attendees']->attendee);
-    }
-    return $users;
-}
-
-/**
- * Returns attendee list.
- *
- * @param array $meetinginfo
- * @param string $role
- * @return string
- */
-function bigbluebuttonbn_index_display_room_users_attendee_list($meetinginfo, $role) {
-    $attendeelist = '';
-    if (count($meetinginfo['attendees']) && count($meetinginfo['attendees']->attendee)) {
-        $attendeecount = 0;
-        foreach ($meetinginfo['attendees']->attendee as $attendee) {
-            if ($attendee->role == $role) {
-                $attendeelist .= ($attendeecount++ > 0 ? ', ' : '').$attendee->fullName;
-            }
-        }
-    }
-    return $attendeelist;
-}
-
-/**
- * Returns indication of recording enabled.
- *
- * @param array $meetinginfo
- * @return string
- */
-function bigbluebuttonbn_index_display_room_recordings($meetinginfo) {
-    $recording = '';
-    if (isset($meetinginfo['recording']) && $meetinginfo['recording'] === 'true') {
-        // If it has been set when meeting created, set the variable on/off.
-        $recording = get_string('index_enabled', 'bigbluebuttonbn');
-    }
-    return $recording;
-}
-
-/**
- * Returns room actions.
- *
- * @param boolean $moderator
- * @param object $course
- * @param object $bigbluebuttonbn
- * @param object $groupobj
- * @return string
- */
-function bigbluebuttonbn_index_display_room_actions($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
-    $actions = '';
-    if ($moderator) {
-        $actions .= '<form name="form1" method="post" action="" class="bbb_index_form">'."\n";
-        $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'."\n";
-        $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'."\n";
-        $actions .= '  <INPUT type="hidden" name="action" value="end">'."\n";
-        if ($groupobj != null) {
-            $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'."\n";
-        }
-        $actions .= '  <INPUT type="submit" name="submit" value="' .
-            get_string('view_conference_action_end', 'bigbluebuttonbn') .
-            '" class="btn btn-primary btn-sm" onclick="return confirm(\'' .
-            get_string('index_confirm_end', 'bigbluebuttonbn') . '\')">' . "\n";
-        $actions .= '</form>'."\n";
-    }
-    return $actions;
-}
-
-/**
- * Add Join Session button.
- *
- * @param boolean $moderator
- * @param object $course
- * @param object $bigbluebuttonbn
- * @param object $groupobj
- * @return string
- */
-function bigbluebuttonbn_index_display_room_join_action($course, $bigbluebuttonbn, $groupobj = null) {
-
-    // Check if the activity is open.
-    $now = time();
-    if (!empty($bigbluebuttonbn->openingtime) && $now < $bigbluebuttonbn->openingtime) {
-        // The activity has not been opened.
-        return get_string('view_message_conference_not_started', 'bigbluebuttonbn');
-    }
-    if (!empty($bigbluebuttonbn->closingtime) && $now > $bigbluebuttonbn->closingtime) {
-        // The activity has been closed.
-        return get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
-    }
-    // Check if the activity type is Recordings only.
-    if ($bigbluebuttonbn->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
-        return get_string('instance_type_recording_only', 'bigbluebuttonbn');
-    }
-
-    $actions = '';
-    $cm = get_fast_modinfo($course->id)->instances['bigbluebuttonbn'][$bigbluebuttonbn->id];
-    $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php');
-
-    $actions .= '<form action="'.$url->out().'" target="_blank" class="bbb_index_form">'."\n";
-    $actions .= '<input type="hidden" name="action" value="join">'."\n";
-    $actions .= '<input type="hidden" name="id" value="'.$cm->id.'">'."\n";
-    $actions .= '<input type="hidden" name="bn" value="'.$bigbluebuttonbn->id.'">'."\n";
-    $actions .= '<input type="hidden" name="index" value="1">'."\n";
-    if ($groupobj) {
-        $actions .= '<input type="hidden" name="group" value="'.$groupobj->id.'">'."\n";
-    }
-    $actions .= '<input type="submit" value="'.get_string('view_conference_action_join', 'bigbluebuttonbn').'" />'."\n";
-    $actions .= '</form>';
-
-    return $actions;
-}

@@ -110,7 +110,8 @@ $string['config_recordings_preview_default'] = 'Preview is enabled by default';
 $string['config_recordings_preview_default_description'] = 'If enabled the table includes a preview of the presentation.';
 $string['config_recordings_preview_editable'] = 'Preview feature can be edited';
 $string['config_recordings_preview_editable_description'] = 'Preview feature can be edited when the instance is added or updated.';
-
+$string['config_recordings_sortorder'] = 'Order the recordings in ascending order.';
+$string['config_recordings_sortorder_description'] = 'By default recordings are displayed in descending order. When checked they will be sorted in ascending order.';
 
 $string['config_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_importrecordings_description'] = 'These settings are feature specific';
@@ -454,3 +455,8 @@ $string['config_clienttype_default_description'] = 'Choose between the classical
 $string['config_clienttype_description'] = 'This setting enable/disable the Web Client choice for each room.';
 $string['config_clienttype_editable'] = 'The Web Client choice can be edited';
 $string['config_clienttype_editable_description'] = 'This option enable the choice of the Web Client (AdobeFlash/HTML5) from the room editing form.';
+$string['index_error_noinstances'] = 'There are no instances of bigbluebuttonbn';
+$string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
+
+$string['view_mobile_message_reload_page_creation_time_meeting'] = 'You exceeded the 45 seconds in this page, please reload the page to join correctly to the meeting.';
+$string['view_mobile_message_groups_not_supported'] = 'This instance is enable to work with groups but the mobile app has not support for this. Please open in desktop if you want to use the group support.';
