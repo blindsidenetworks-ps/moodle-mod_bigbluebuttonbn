@@ -82,7 +82,7 @@ const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 /** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
 /**
- * Indicates API features that the forum supports.
+ * Indicates API features that the bigbluebuttonbn supports.
  *
  * @uses FEATURE_IDNUMBER
  * @uses FEATURE_GROUPS
@@ -275,7 +275,7 @@ function bigbluebuttonbn_get_extra_capabilities() {
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
- * @param $data the data submitted from the reset course.
+ * @param array $data the data submitted from the reset course.
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
@@ -545,6 +545,13 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     calendar_event::create($event);
 }
 
+/**
+ * Generates an event after a bigbluebuttonbn activity is completed.
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
 function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
     if (!empty($bigbluebuttonbn->completionexpected)) {
         \core_completion\api::update_completion_date_event(

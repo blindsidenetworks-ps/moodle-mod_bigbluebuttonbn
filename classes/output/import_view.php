@@ -114,6 +114,7 @@ class import_view implements renderable, templatable {
     }
 
     /**
+     * Defer to template.
      * @param  renderer_base $output
      * @return array
      */

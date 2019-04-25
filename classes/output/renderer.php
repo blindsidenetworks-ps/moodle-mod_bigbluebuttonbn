@@ -41,6 +41,7 @@ defined('MOODLE_INTERNAL') || die();
 class renderer extends plugin_renderer_base {
 
     /**
+     * Renderer for index.
      * @param  index $indexobj
      * @return string
      */
@@ -49,6 +50,7 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renderer for import_view.
      * @param  import_view $widget
      * @return string
      */
