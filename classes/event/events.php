@@ -36,6 +36,11 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class events {
+
+    /**
+     * Event name matcher.
+     * @var $events
+     */
     public static $events = array(
         'create' => 'activity_created',
         'view' => 'activity_viewed',

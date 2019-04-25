@@ -31,11 +31,17 @@ use moodle_exception;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class plugin
+ * Class plugin.
  * @package mod_bigbluebuttonbn
+ * @copyright 2019 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 abstract class plugin {
 
+    /**
+     * Component name.
+     */
     const COMPONENT = 'mod_bigbluebuttonbn';
 
     /**

@@ -47,10 +47,22 @@ class social_breadth extends activity_base {
         return new \lang_string('indicator:socialbreadth', 'mod_bigbluebuttonbn');
     }
 
+    /**
+     * Returns the indicator type.
+     *
+     * @return integer
+     */
     public function get_indicator_type() {
         return self::INDICATOR_SOCIAL;
     }
 
+    /**
+     * Returns the social breadth level.
+     *
+     * @param cm_info $cm
+     *
+     * @return integer
+     */
     public function get_social_breadth_level(\cm_info $cm) {
         return self::SOCIAL_LEVEL_1;
     }
