@@ -274,6 +274,31 @@ function bigbluebuttonbn_get_extra_capabilities() {
 }
 
 /**
+ * Called by course/reset.php
+ * @param object $mform
+ * @return void
+ */
+function bigbluebuttonbn_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
+
+    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_all', get_string('resetbigbluebuttonbnsall','bigbluebuttonbn'));
+
+    $mform->addElement('select', 'reset_bigbluebuttonbn_types', get_string('resetbigbluebuttonbns', 'bigbluebuttonbn'), bigbluebuttonbn_get_bigbluebuttonbn_types_all(), array('multiple' => 'multiple'));
+    $mform->setAdvanced('reset_bigbluebuttonbn_types');
+    $mform->disabledIf('reset_bigbluebuttonbn_types', 'reset_bigbluebuttonbn_all', 'checked');
+
+    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_subscriptions', get_string('resetsubscriptions','bigbluebuttonbn'));
+    $mform->setAdvanced('reset_bigbluebuttonbn_subscriptions');
+
+    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_track_prefs', get_string('resettrackprefs','bigbluebuttonbn'));
+    $mform->setAdvanced('reset_bigbluebuttonbn_track_prefs');
+    $mform->disabledIf('reset_bigbluebuttonbn_track_prefs', 'reset_bigbluebuttonbn_all', 'checked');
+
+    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_ratings', get_string('deleteallratings'));
+    $mform->disabledIf('reset_bigbluebuttonbn_ratings', 'reset_bigbluebuttonbn_all', 'checked');
+}
+
+/**
  * This function is used by the reset_course_userdata function in moodlelib.
  * @param array $data the data submitted from the reset course.
  * @return array status array
