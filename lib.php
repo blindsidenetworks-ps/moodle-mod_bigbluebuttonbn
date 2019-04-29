@@ -274,28 +274,48 @@ function bigbluebuttonbn_get_extra_capabilities() {
 }
 
 /**
+ * Define items to be reset by course/reset.php
+ * @return array
+ */
+function bigbluebuttonbn_reset_course_items() {
+    $items = array("rooms" => 1, "events" => 0, "tags" => 0, "logs" => 0);
+    // Include recordings only if enabled.
+    if (true) {
+        $items["recordings"] = 0;
+    }
+    return $items;
+}
+
+/**
  * Called by course/reset.php
  * @param object $mform
  * @return void
  */
 function bigbluebuttonbn_reset_course_form_definition(&$mform) {
+    $items = bigbluebuttonbn_reset_course_items();
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
+    $strremove = get_string('remove', 'bigbluebuttonbn');
+    foreach ($items as $item => $default) {
+        $mform->addElement(
+            'advcheckbox',
+            'reset_bigbluebuttonbn_' . $item,
+            $strremove . ' ' . get_string($item,'bigbluebuttonbn')
+        );
+    }
+}
 
-    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_all', get_string('resetbigbluebuttonbnsall','bigbluebuttonbn'));
-
-    $mform->addElement('select', 'reset_bigbluebuttonbn_types', get_string('resetbigbluebuttonbns', 'bigbluebuttonbn'), bigbluebuttonbn_get_bigbluebuttonbn_types_all(), array('multiple' => 'multiple'));
-    $mform->setAdvanced('reset_bigbluebuttonbn_types');
-    $mform->disabledIf('reset_bigbluebuttonbn_types', 'reset_bigbluebuttonbn_all', 'checked');
-
-    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_subscriptions', get_string('resetsubscriptions','bigbluebuttonbn'));
-    $mform->setAdvanced('reset_bigbluebuttonbn_subscriptions');
-
-    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_track_prefs', get_string('resettrackprefs','bigbluebuttonbn'));
-    $mform->setAdvanced('reset_bigbluebuttonbn_track_prefs');
-    $mform->disabledIf('reset_bigbluebuttonbn_track_prefs', 'reset_bigbluebuttonbn_all', 'checked');
-
-    $mform->addElement('checkbox', 'reset_bigbluebuttonbn_ratings', get_string('deleteallratings'));
-    $mform->disabledIf('reset_bigbluebuttonbn_ratings', 'reset_bigbluebuttonbn_all', 'checked');
+/**
+ * Course reset form defaults.
+ * @return array
+ */
+function bigbluebuttonbn_reset_course_form_defaults($course) {
+    $formdefaults = array();
+    $items = bigbluebuttonbn_reset_course_items();
+    // All unchecked by default.
+    foreach ($items as $item => $default) {
+        $formdefaults['reset_bigbluebuttonbn_' . $item] =  $default;
+    }
+    return $formdefaults;
 }
 
 /**
@@ -304,10 +324,47 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
+    error_log(json_encode($data));
+    $componentstr = get_string('modulenameplural', 'bigbluebuttonbn');
+    $status = array();
+    $items = bigbluebuttonbn_reset_course_items();
+    $strremoved = get_string('removed', 'bigbluebuttonbn');
     // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
     // See MDL-9367.
-    return array();
+    foreach ($items as $item => $default) {
+        if (!empty($data["reset_bigbluebuttonbn_" . $item])) {
+            call_user_func('bigbluebuttonbn_reset' . $item, $data->courseid);
+            $status[] = array(
+                'component' => $componentstr,
+                'item' => $strremoved . ' ' . get_string($item, 'bigbluebuttonbn'),
+                'error' => false
+            );
+        }
+    }
+    return $status;
 }
+
+function bigbluebuttonbn_reset_rooms($courseid) {
+    global $DB;
+    error_log("Deleting bigbluebuttonbn rooms for course $courseid");
+}
+
+function bigbluebuttonbn_reset_events($courseid) {
+    error_log("Deleting bigbluebuttonbn events for course $courseid");
+}
+
+function bigbluebuttonbn_reset_tags($courseid) {
+    error_log("Deleting bigbluebuttonbn tags for course $courseid");
+}
+
+function bigbluebuttonbn_reset_logs($courseid) {
+    error_log("Deleting bigbluebuttonbn logs for course $courseid");
+}
+
+function bigbluebuttonbn_reset_recordings($courseid) {
+    error_log("Deleting bigbluebuttonbn recordings for course $courseid");
+}
+
 
 /**
  * List of view style log actions.
