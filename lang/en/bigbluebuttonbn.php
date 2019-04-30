@@ -60,6 +60,8 @@ $string['events'] = 'events';
 $string['tags'] = 'tags';
 $string['logs'] = 'logs';
 $string['recordings'] = 'recordings';
+$string['resetlogs_help'] = 'Deleting the logs will cause the lost of references to recordings';
+$string['resetrecordings_help'] = 'Deleting the recordings will make them inaccessible from anywhere asnd it can not be undone';
 
 $string['privacy:metadata:bigbluebuttonbn'] = 'Stores the configuration for the room or activity that defines the features and general behaviour of the BigBlueButton session.';
 $string['privacy:metadata:bigbluebuttonbn:participants'] = 'A list of rules that define the role users will in the live meeting. A user ID may be stored as permissions can be granted per role or user.';
