@@ -381,7 +381,7 @@ function bigbluebuttonbn_reset_getstatus($item) {
 function bigbluebuttonbn_reset_rooms($courseid) {
     global $DB;
     // Remove all the instances.
-    return $DB->delete_records('bigbluebuttonbn', array('courseid' => $courseid));
+    return $DB->delete_records('bigbluebuttonbn', array('course' => $courseid));
 }
 
 /**
