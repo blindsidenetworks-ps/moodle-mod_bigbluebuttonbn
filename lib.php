@@ -298,14 +298,12 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
     $strremove = get_string('remove', 'bigbluebuttonbn');
     foreach ($items as $item => $default) {
-        $mform->addElement(
-            'advcheckbox',
-            'reset_bigbluebuttonbn_' . $item,
-            $strremove . ' ' . get_string($item,'bigbluebuttonbn')
+        $mform->addElement('advcheckbox', "reset_bigbluebuttonbn_{$item}"
+            , $strremove . ' ' . get_string($item, 'bigbluebuttonbn')
         );
         $helpstring = get_string('reset' . $item . '_help', 'bigbluebuttonbn');
         if ($helpstring != "[[reset{$item}_help]]") {
-            $mform->addHelpButton('reset_bigbluebuttonbn_' . $item, 'reset' . $item, 'bigbluebuttonbn');
+            $mform->addHelpButton("reset_bigbluebuttonbn_{$item}", "reset{$item}", 'bigbluebuttonbn');
         }
     }
 }
@@ -320,7 +318,7 @@ function bigbluebuttonbn_reset_course_form_defaults($course) {
     $items = bigbluebuttonbn_reset_course_items();
     // All unchecked by default.
     foreach ($items as $item => $default) {
-        $formdefaults['reset_bigbluebuttonbn_' . $item] =  $default;
+        $formdefaults["reset_bigbluebuttonbn_{$item}"] = $default;
     }
     return $formdefaults;
 }
@@ -350,8 +348,8 @@ function bigbluebuttonbn_reset_userdata($data) {
     }
     foreach ($items as $item => $default) {
         // Remove instances or elements linked to this course, others than recordings.
-        if (!empty($data->{"reset_bigbluebuttonbn_" . $item})) {
-            call_user_func('bigbluebuttonbn_reset_' . $item, $data->courseid);
+        if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
+            call_user_func("bigbluebuttonbn_reset_{$item}", $data->courseid);
             $status[] = bigbluebuttonbn_reset_getstatus($item);
         }
     }
@@ -365,11 +363,9 @@ function bigbluebuttonbn_reset_userdata($data) {
  * @return array status array
  */
 function bigbluebuttonbn_reset_getstatus($item) {
-    return array(
-        'component' => get_string('modulenameplural', 'bigbluebuttonbn'),
-        'item' => get_string('removed', 'bigbluebuttonbn') . ' ' . get_string($item, 'bigbluebuttonbn'),
-        'error' => false
-    );
+    return array('component' => get_string('modulenameplural', 'bigbluebuttonbn')
+        , 'item' => get_string('removed', 'bigbluebuttonbn') . ' ' . get_string($item, 'bigbluebuttonbn')
+        , 'error' => false);
 }
 
 /**
@@ -435,7 +431,7 @@ function bigbluebuttonbn_reset_logs($courseid) {
  */
 function bigbluebuttonbn_reset_recordings($courseid) {
     require_once(__DIR__.'/locallib.php');
-    // Criteria for search ($courseid, $bigbluebuttonbn=null, $subset=false, $includedeleted=true).
+    // Criteria for search [courseid | bigbluebuttonbn=null | subset=false | includedeleted=true].
     $recordings = bigbluebuttonbn_get_recordings($courseid, null, false, true);
     // Remove all the recordings.
     bigbluebuttonbn_delete_recordings(implode(",", array_keys($recordings)));
