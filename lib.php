@@ -358,6 +358,12 @@ function bigbluebuttonbn_reset_userdata($data) {
     return $status;
 }
 
+/**
+ * Returns status used on every defined reset action.
+ *
+ * @param string $item.
+ * @return array status array
+ */
 function bigbluebuttonbn_reset_getstatus($item) {
     return array(
         'component' => get_string('modulenameplural', 'bigbluebuttonbn'),
