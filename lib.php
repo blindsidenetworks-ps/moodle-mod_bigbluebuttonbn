@@ -39,10 +39,13 @@ require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
 
-
-if (!class_exists('\Firebase\JWT\JWT') &&
-    file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
-    require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+// JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
+if (!class_exists('\Firebase\JWT\JWT')) {
+    if (file_exists($CFG->libdir . '/php-jwt/src/JWT.php')) {
+        require_once($CFG->libdir . '/php-jwt/src/JWT.php');
+    } else {
+        require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
+    }
 }
 
 if (!isset($CFG->bigbluebuttonbn)) {

@@ -2,7 +2,7 @@
 <libraries>
     <library>
         <location>vendor/firebase/php-jwt</location>
-        <name>PHP-JWT</name>
+        <name>PHP-JWT is used by BigBlueButtonBN for encoding and decoding callbacks that include JSON Web Tokens (JWT). The library is bundled with the plugin for backward compatibility but is used only with Moodle 3.2 to 3.6</name>
         <version>4.0.0</version>
         <license>BSD</license>
         <licenseversion>3-Clause</licenseversion>
