@@ -311,6 +311,7 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
+ * @param object $course
  * @return array
  */
 function bigbluebuttonbn_reset_course_form_defaults($course) {
@@ -359,7 +360,7 @@ function bigbluebuttonbn_reset_userdata($data) {
 /**
  * Returns status used on every defined reset action.
  *
- * @param string $item.
+ * @param string $item
  * @return array status array
  */
 function bigbluebuttonbn_reset_getstatus($item) {
@@ -371,7 +372,7 @@ function bigbluebuttonbn_reset_getstatus($item) {
 /**
  * Used by the reset_course_userdata for deleting events linked to bigbluebuttonbn instances in the course.
  *
- * @param string $courseid.
+ * @param string $courseid
  * @return array status array
  */
 function bigbluebuttonbn_reset_events($courseid) {
@@ -383,7 +384,7 @@ function bigbluebuttonbn_reset_events($courseid) {
 /**
  * Used by the reset_course_userdata for deleting tags linked to bigbluebuttonbn instances in the course.
  *
- * @param array $courseid.
+ * @param array $courseid
  * @return array status array
  */
 function bigbluebuttonbn_reset_tags($courseid) {
@@ -403,7 +404,7 @@ function bigbluebuttonbn_reset_tags($courseid) {
 /**
  * Used by the reset_course_userdata for deleting bigbluebuttonbn_logs linked to bigbluebuttonbn instances in the course.
  *
- * @param string $courseid.
+ * @param string $courseid
  * @return array status array
  */
 function bigbluebuttonbn_reset_logs($courseid) {
@@ -415,7 +416,7 @@ function bigbluebuttonbn_reset_logs($courseid) {
 /**
  * Used by the reset_course_userdata for deleting recordings in a BBB server linked to bigbluebuttonbn instances in the course.
  *
- * @param string $courseid.
+ * @param string $courseid
  * @return array status array
  */
 function bigbluebuttonbn_reset_recordings($courseid) {
