@@ -4,7 +4,7 @@ Bug: Fix for Join session timeline button don't work (CONTRIB-7538).
 Bug: Fix for Index page does not show actions (CONTRIB-7579).
 Enhancement: Playback recordings should be shown in a new tab (CONTRIB-7386).
 Enhancement: Limit instance type repertoire by capabilities (CONTRIB-7400).
-Enhancement: Media files in the description are not shown (CONTRIB-7440).
+Enhancement: Media files in the description are now shown (CONTRIB-7440).
 Enhancement: Code cleanup and refactoring (CONTRIB-7625).
 New Feature: Being able to define a default presentation file for a Moodle site through settings (CONTRIB-6970).
 New Feature: Users being able to see recordings of only the rooms they have access to (CONTRIB-7225).
