@@ -2174,7 +2174,7 @@ function bigbluebuttonbn_get_recordings_imported_sql_select($courseid = 0, $bigb
 }
 
 /**
- * Helper function to get recordings  and imported recordings together.
+ * Helper function to get recordings and imported recordings together.
  *
  * @param string $courseid
  * @param string $bigbluebuttonbnid

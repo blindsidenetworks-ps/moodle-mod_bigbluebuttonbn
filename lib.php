@@ -279,9 +279,9 @@ function bigbluebuttonbn_get_extra_capabilities() {
  * @return array
  */
 function bigbluebuttonbn_reset_course_items() {
-    $items = array("rooms" => 1, "events" => 0, "tags" => 0, "logs" => 0);
+    $items = array("events" => 0, "tags" => 0, "logs" => 0);
     // Include recordings only if enabled.
-    if (true) {
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
         $items["recordings"] = 0;
     }
     return $items;
@@ -330,24 +330,24 @@ function bigbluebuttonbn_reset_course_form_defaults($course) {
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
-    $status = array();
     $items = bigbluebuttonbn_reset_course_items();
+    $status = array();
     // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
     // See MDL-9367.
-    if ($items['recordings'] && !empty($data->reset_bigbluebuttonbn_recordings)) {
-        // Remove all recordings from a BBB server that are linked to the room/activities in this course.
-        bigbluebuttonbn_reset_recordings($courseid);
+    if (array_key_exists('recordings', $items) && !empty($data->reset_bigbluebuttonbn_recordings)) {
+        // Remove all the recordings from a BBB server that are linked to the room/activities in this course.
+        bigbluebuttonbn_reset_recordings($data->courseid);
         unset($items['recordings']);
         $status[] = bigbluebuttonbn_reset_getstatus('recordings');
     }
     if (!empty($data->reset_bigbluebuttonbn_tags)) {
-        // Remove all tags linked to the room/activities in this course.
+        // Remove all the tags linked to the room/activities in this course.
         bigbluebuttonbn_reset_tags($data->courseid);
         unset($items['tags']);
         $status[] = bigbluebuttonbn_reset_getstatus('tags');
     }
     foreach ($items as $item => $default) {
-        // Remove instances or elements linked to this course, others than recordings.
+        // Remove instances or elements linked to this course, others than recordings or tags.
         if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
             call_user_func("bigbluebuttonbn_reset_{$item}", $data->courseid);
             $status[] = bigbluebuttonbn_reset_getstatus($item);
@@ -366,18 +366,6 @@ function bigbluebuttonbn_reset_getstatus($item) {
     return array('component' => get_string('modulenameplural', 'bigbluebuttonbn')
         , 'item' => get_string('removed', 'bigbluebuttonbn') . ' ' . get_string($item, 'bigbluebuttonbn')
         , 'error' => false);
-}
-
-/**
- * Used by the reset_course_userdata for deleting bigbluebuttonbn instances in the course.
- *
- * @param string $courseid.
- * @return array status array
- */
-function bigbluebuttonbn_reset_rooms($courseid) {
-    global $DB;
-    // Remove all the instances.
-    return $DB->delete_records('bigbluebuttonbn', array('course' => $courseid));
 }
 
 /**
@@ -400,6 +388,7 @@ function bigbluebuttonbn_reset_events($courseid) {
  */
 function bigbluebuttonbn_reset_tags($courseid) {
     global $DB;
+    // Remove all the tags linked to the room/activities in this course.
     if ($bigbluebuttonbns = $DB->get_records('bigbluebuttonbn', array('course' => $courseid))) {
         foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
             if (!$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $courseid)) {
