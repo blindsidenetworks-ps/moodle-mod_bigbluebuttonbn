@@ -51,17 +51,20 @@ To view later recordings, add a RecordingsBN resource to this course.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
-$string['search:activity'] = 'BigBlueButtonBN - activity information';
-$string['search:tags'] = 'BigBlueButtonBN - tags information';
-$string['remove'] = 'Delete';
-$string['removed'] = 'Deleted';
-$string['rooms'] = 'rooms/activities';
-$string['events'] = 'events';
-$string['tags'] = 'tags';
-$string['logs'] = 'custom logs';
-$string['recordings'] = 'recordings';
+
+$string['removedevents'] = 'Deleted events';
+$string['removedtags'] = 'Deleted tags';
+$string['removedlogs'] = 'Deleted custom logs';
+$string['removedrecordings'] = 'Deleted recordings';
+$string['resetevents'] = 'Delete events';
+$string['resettags'] = 'Delete tags';
+$string['resetlogs'] = 'Delete custom logs';
+$string['resetrecordings'] = 'Delete recordings';
 $string['resetlogs_help'] = 'Deleting the logs will cause the lost of references to recordings';
 $string['resetrecordings_help'] = 'Deleting the recordings will make them inaccessible from anywhere and it can not be undone';
+
+$string['search:activity'] = 'BigBlueButtonBN - activity information';
+$string['search:tags'] = 'BigBlueButtonBN - tags information';
 
 $string['privacy:metadata:bigbluebuttonbn'] = 'Stores the configuration for the room or activity that defines the features and general behaviour of the BigBlueButton session.';
 $string['privacy:metadata:bigbluebuttonbn:participants'] = 'A list of rules that define the role users will in the live meeting. A user ID may be stored as permissions can be granted per role or user.';

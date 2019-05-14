@@ -296,13 +296,11 @@ function bigbluebuttonbn_reset_course_items() {
 function bigbluebuttonbn_reset_course_form_definition(&$mform) {
     $items = bigbluebuttonbn_reset_course_items();
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
-    $strremove = get_string('remove', 'bigbluebuttonbn');
     foreach ($items as $item => $default) {
         $mform->addElement('advcheckbox', "reset_bigbluebuttonbn_{$item}"
-            , $strremove . ' ' . get_string($item, 'bigbluebuttonbn')
+            , get_string("reset{$item}", 'bigbluebuttonbn')
         );
-        $helpstring = get_string('reset' . $item . '_help', 'bigbluebuttonbn');
-        if ($helpstring != "[[reset{$item}_help]]") {
+        if ($item == 'logs' || $item == 'recordings') {
             $mform->addHelpButton("reset_bigbluebuttonbn_{$item}", "reset{$item}", 'bigbluebuttonbn');
         }
     }
@@ -365,7 +363,7 @@ function bigbluebuttonbn_reset_userdata($data) {
  */
 function bigbluebuttonbn_reset_getstatus($item) {
     return array('component' => get_string('modulenameplural', 'bigbluebuttonbn')
-        , 'item' => get_string('removed', 'bigbluebuttonbn') . ' ' . get_string($item, 'bigbluebuttonbn')
+        , 'item' => get_string("removed{$item}", 'bigbluebuttonbn')
         , 'error' => false);
 }
 
