@@ -51,6 +51,18 @@ To view later recordings, add a RecordingsBN resource to this course.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
+
+$string['removedevents'] = 'Deleted events';
+$string['removedtags'] = 'Deleted tags';
+$string['removedlogs'] = 'Deleted custom logs';
+$string['removedrecordings'] = 'Deleted recordings';
+$string['resetevents'] = 'Delete events';
+$string['resettags'] = 'Delete tags';
+$string['resetlogs'] = 'Delete custom logs';
+$string['resetrecordings'] = 'Delete recordings';
+$string['resetlogs_help'] = 'Deleting the logs will cause the lost of references to recordings';
+$string['resetrecordings_help'] = 'Deleting the recordings will make them inaccessible from anywhere and it can not be undone';
+
 $string['search:activity'] = 'BigBlueButtonBN - activity information';
 $string['search:tags'] = 'BigBlueButtonBN - tags information';
 

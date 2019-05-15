@@ -44,7 +44,7 @@ class mobile {
 
     /**
      * Returns the bigbluebuttonbn course view for the mobile app.
-     * @param $args
+     * @param mixed $args
      * @return array HTML, javascript and other data.
      * @throws \coding_exception
      * @throws \moodle_exception
@@ -250,7 +250,7 @@ class mobile {
 
     /**
      * Returns the view for errors.
-     * @param  string $error Error to display.
+     * @param string $error Error to display.
      *
      * @return array       HTML, javascript and otherdata
      */
@@ -276,12 +276,11 @@ class mobile {
 
     /**
      * Returns the view for messages.
-     * @param $bigbluebuttonbn
-     * @param $cm
-     * @param  string $message Message to display.
-     * @param  array $notstarted Extra messages for not started session.
-     *
-     * @return array       HTML, javascript and otherdata
+     * @param object $bigbluebuttonbn
+     * @param stdClass $cm
+     * @param string $message Message to display.
+     * @param array $notstarted Extra messages for not started session.
+     * @return array HTML, javascript and otherdata
      */
     protected static function mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted = array()) {
 

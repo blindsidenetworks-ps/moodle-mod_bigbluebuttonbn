@@ -1900,7 +1900,8 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $groupmode = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
 
         $displayrow = true;
-        if ((isset($groupmode->groupmode) && (int)$groupmode->groupmode != VISIBLEGROUPS) && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        if ((isset($groupmode->groupmode) && (int)$groupmode->groupmode != VISIBLEGROUPS)
+            && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
             $groupid = explode('[', $recording['meetingID']);
             if (isset($groupid[1])) {
                 // It is a group recording and the user is not moderator/administrator. Recording should not be included by default.
@@ -2173,7 +2174,7 @@ function bigbluebuttonbn_get_recordings_imported_sql_select($courseid = 0, $bigb
 }
 
 /**
- * Helper function to get recordings  and imported recordings together.
+ * Helper function to get recordings and imported recordings together.
  *
  * @param string $courseid
  * @param string $bigbluebuttonbnid
@@ -3159,9 +3160,11 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
 }
 
 /**
- * @param  array $bbbsession
- * @param  int $id
- * @param  int $bn
+ * Set session URLs.
+ *
+ * @param array $bbbsession
+ * @param int $id
+ * @param int $bn
  * @return string
  */
 function bigbluebuttonbn_view_session_config(&$bbbsession, $id, $bn) {

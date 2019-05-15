@@ -46,7 +46,7 @@ M.mod_bigbluebuttonbn.recordings = {
             this.datatableInit();
             var searchform = Y.one('#bigbluebuttonbn_recordings_searchform');
             if (searchform) {
-                searchform.delegate('click', function (e) {
+                searchform.delegate('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -77,7 +77,7 @@ M.mod_bigbluebuttonbn.recordings = {
         return data;
     },
 
-    initExtraLanguage: function (Y1) {
+    initExtraLanguage: function(Y1) {
         Y1.Intl.add(
             'datatable-paginator',
             Y1.config.lang,
@@ -94,17 +94,17 @@ M.mod_bigbluebuttonbn.recordings = {
         );
     },
 
-    escapeRegex: function( value ) {
+    escapeRegex: function(value) {
         return value.replace( /[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&" );
     },
 
-    filterByText: function (searchvalue) {
+    filterByText: function(searchvalue) {
         if (this.table) {
             this.table.set('data', this.datatable.data);
             if (searchvalue) {
                 var tlist = this.table.data;
                 var rsearch = new RegExp('<span>.*?' + this.escapeRegex(searchvalue) + '.*?</span>', 'i');
-                var filterdata = tlist.filter({asList: true}, function (item) {
+                var filterdata = tlist.filter({asList: true}, function(item) {
                     var activity = item.get('activity');
                     var description = item.get('description');
                     return (
@@ -313,9 +313,8 @@ M.mod_bigbluebuttonbn.recordings = {
             attempts: 1,
             dataset: nodeelement.getData()
         };
-
         // New window for video play must be created previous to ajax requests.
-        this.windowVideoPlay = window.open("","_blank");
+        this.windowVideoPlay = window.open('', '_blank');
         // Prevent malicious modification over window opener to use window.open().
         this.windowVideoPlay.opener = null;
         this.recordingAction(element, false, extras);

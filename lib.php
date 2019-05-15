@@ -39,10 +39,13 @@ require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
 
-
-if (!class_exists('\Firebase\JWT\JWT') &&
-    file_exists(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php')) {
-    require_once(dirname(__FILE__).'/vendor/firebase/php-jwt/src/JWT.php');
+// JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
+if (!class_exists('\Firebase\JWT\JWT')) {
+    if (file_exists($CFG->libdir . '/php-jwt/src/JWT.php')) {
+        require_once($CFG->libdir . '/php-jwt/src/JWT.php');
+    } else {
+        require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
+    }
 }
 
 if (!isset($CFG->bigbluebuttonbn)) {
@@ -84,7 +87,7 @@ const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 /** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
 /**
- * Indicates API features that the forum supports.
+ * Indicates API features that the bigbluebuttonbn supports.
  *
  * @uses FEATURE_IDNUMBER
  * @uses FEATURE_GROUPS
@@ -282,14 +285,155 @@ function bigbluebuttonbn_get_extra_capabilities() {
 }
 
 /**
+ * Define items to be reset by course/reset.php
+ *
+ * @return array
+ */
+function bigbluebuttonbn_reset_course_items() {
+    $items = array("events" => 0, "tags" => 0, "logs" => 0);
+    // Include recordings only if enabled.
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        $items["recordings"] = 0;
+    }
+    return $items;
+}
+
+/**
+ * Called by course/reset.php
+ *
+ * @param object $mform
+ * @return void
+ */
+function bigbluebuttonbn_reset_course_form_definition(&$mform) {
+    $items = bigbluebuttonbn_reset_course_items();
+    $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
+    foreach ($items as $item => $default) {
+        $mform->addElement('advcheckbox', "reset_bigbluebuttonbn_{$item}"
+            , get_string("reset{$item}", 'bigbluebuttonbn')
+        );
+        if ($item == 'logs' || $item == 'recordings') {
+            $mform->addHelpButton("reset_bigbluebuttonbn_{$item}", "reset{$item}", 'bigbluebuttonbn');
+        }
+    }
+}
+
+/**
+ * Course reset form defaults.
+ *
+ * @param object $course
+ * @return array
+ */
+function bigbluebuttonbn_reset_course_form_defaults($course) {
+    $formdefaults = array();
+    $items = bigbluebuttonbn_reset_course_items();
+    // All unchecked by default.
+    foreach ($items as $item => $default) {
+        $formdefaults["reset_bigbluebuttonbn_{$item}"] = $default;
+    }
+    return $formdefaults;
+}
+
+/**
  * This function is used by the reset_course_userdata function in moodlelib.
- * @param $data the data submitted from the reset course.
+ *
+ * @param array $data the data submitted from the reset course.
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
+    $items = bigbluebuttonbn_reset_course_items();
+    $status = array();
     // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
     // See MDL-9367.
-    return array();
+    if (array_key_exists('recordings', $items) && !empty($data->reset_bigbluebuttonbn_recordings)) {
+        // Remove all the recordings from a BBB server that are linked to the room/activities in this course.
+        bigbluebuttonbn_reset_recordings($data->courseid);
+        unset($items['recordings']);
+        $status[] = bigbluebuttonbn_reset_getstatus('recordings');
+    }
+    if (!empty($data->reset_bigbluebuttonbn_tags)) {
+        // Remove all the tags linked to the room/activities in this course.
+        bigbluebuttonbn_reset_tags($data->courseid);
+        unset($items['tags']);
+        $status[] = bigbluebuttonbn_reset_getstatus('tags');
+    }
+    foreach ($items as $item => $default) {
+        // Remove instances or elements linked to this course, others than recordings or tags.
+        if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
+            call_user_func("bigbluebuttonbn_reset_{$item}", $data->courseid);
+            $status[] = bigbluebuttonbn_reset_getstatus($item);
+        }
+    }
+    return $status;
+}
+
+/**
+ * Returns status used on every defined reset action.
+ *
+ * @param string $item
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_getstatus($item) {
+    return array('component' => get_string('modulenameplural', 'bigbluebuttonbn')
+        , 'item' => get_string("removed{$item}", 'bigbluebuttonbn')
+        , 'error' => false);
+}
+
+/**
+ * Used by the reset_course_userdata for deleting events linked to bigbluebuttonbn instances in the course.
+ *
+ * @param string $courseid
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_events($courseid) {
+    global $DB;
+    // Remove all the events.
+    return $DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'courseid' => $courseid));
+}
+
+/**
+ * Used by the reset_course_userdata for deleting tags linked to bigbluebuttonbn instances in the course.
+ *
+ * @param array $courseid
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_tags($courseid) {
+    global $DB;
+    // Remove all the tags linked to the room/activities in this course.
+    if ($bigbluebuttonbns = $DB->get_records('bigbluebuttonbn', array('course' => $courseid))) {
+        foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
+            if (!$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $courseid)) {
+                continue;
+            }
+            $context = context_module::instance($cm->id);
+            core_tag_tag::delete_instances('mod_bigbluebuttonbn', null, $context->id);
+        }
+    }
+}
+
+/**
+ * Used by the reset_course_userdata for deleting bigbluebuttonbn_logs linked to bigbluebuttonbn instances in the course.
+ *
+ * @param string $courseid
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_logs($courseid) {
+    global $DB;
+    // Remove all the logs.
+    return $DB->delete_records('bigbluebuttonbn_logs', array('courseid' => $courseid));
+}
+
+/**
+ * Used by the reset_course_userdata for deleting recordings in a BBB server linked to bigbluebuttonbn instances in the course.
+ *
+ * @param string $courseid
+ * @return array status array
+ */
+function bigbluebuttonbn_reset_recordings($courseid) {
+    require_once(__DIR__.'/locallib.php');
+    // Criteria for search [courseid | bigbluebuttonbn=null | subset=false | includedeleted=true].
+    $recordings = bigbluebuttonbn_get_recordings($courseid, null, false, true);
+    // Remove all the recordings.
+    bigbluebuttonbn_delete_recordings(implode(",", array_keys($recordings)));
 }
 
 /**
@@ -553,6 +697,13 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     calendar_event::create($event);
 }
 
+/**
+ * Generates an event after a bigbluebuttonbn activity is completed.
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
 function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
     if (!empty($bigbluebuttonbn->completionexpected)) {
         \core_completion\api::update_completion_date_event(

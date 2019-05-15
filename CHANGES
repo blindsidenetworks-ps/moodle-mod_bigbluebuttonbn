@@ -1,0 +1,15 @@
+Bug: Fix for instanceTypeProfiles array used by keys but NOT defined so (CONTRIB-7399).
+Bug: Fix for hard-coded strings in recordings table based on YUI datatables (CONTRIB-7518).
+Bug: Fix for Join session timeline button don't work (CONTRIB-7538).
+Bug: Fix for Index page does not show actions (CONTRIB-7579).
+Enhancement: Playback recordings should be shown in a new tab (CONTRIB-7386).
+Enhancement: Limit instance type repertoire by capabilities (CONTRIB-7400).
+Enhancement: Media files in the description are now shown (CONTRIB-7440).
+Enhancement: Code cleanup and refactoring (CONTRIB-7625).
+New Feature: Being able to define a default presentation file for a Moodle site through settings (CONTRIB-6970).
+New Feature: Users being able to see recordings of only the rooms they have access to (CONTRIB-7225).
+New Feature: Add support for mobile application (CONTRIB-7227).
+New Feature: Add support for muteOnStart (CONTRIB-7519).
+New Feature: Add option for forcing all the sessions to be recorded (with no button) (CONTRIB-7520).
+New Feature: Add support for recordings of breakout rooms (CONTRIB-7521).
+New Feature: Recording list should give an option for searching recordings (CONTRIB-7522).

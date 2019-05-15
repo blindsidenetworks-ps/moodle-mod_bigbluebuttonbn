@@ -412,8 +412,9 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
 /**
  * Helper for preparing data used while joining the meeting.
  *
- * @param  array    $bbbsession
+ * @param array    $bbbsession
  * @param object   $bigbluebuttonbn
+ * @param integer  $origin
  */
 function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0) {
     // Update the cache.

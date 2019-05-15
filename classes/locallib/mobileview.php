@@ -38,8 +38,8 @@ class mobileview {
 
     /**
      * Return standard array with configurations required for BBB server.
-     * @param $context
-     * @param $session
+     * @param context $context
+     * @param array $session
      * @return mixed
      * @throws \coding_exception
      * @throws \dml_exception
@@ -124,10 +124,10 @@ class mobileview {
     /**
      * Build url for join to session.
      * This method is similar to "bigbluebutton_bbb_view_join_meeting()" in bbb_view.
-     * @param $bbbsession
+     * @param array $bbbsession
      * @return string
      */
-    public static function build_url_join_session($bbbsession) {
+    public static function build_url_join_session(&$bbbsession) {
         $password = $bbbsession['viewerPW'];
         if ($bbbsession['administrator'] || $bbbsession['moderator']) {
             $password = $bbbsession['modPW'];
@@ -199,7 +199,7 @@ class mobileview {
 
     /**
      * Helper to prepare data used for create meeting.
-     * @param $bbbsession
+     * @param array $bbbsession
      * @return array
      * @throws \coding_exception
      */
@@ -219,7 +219,6 @@ class mobileview {
                 $data['allowStartStopRecording'] = 'false';
             }
         }
-
         $data['welcome'] = trim($bbbsession['welcome']);
         // Set the duration for the meeting.
         $durationtime = self::bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);

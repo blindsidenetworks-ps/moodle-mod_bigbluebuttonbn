@@ -47,10 +47,22 @@ class cognitive_depth extends activity_base {
         return new \lang_string('indicator:cognitivedepth', 'mod_bigbluebuttonbn');
     }
 
+    /**
+     * Returns the indicator type.
+     *
+     * @return integer
+     */
     public function get_indicator_type() {
         return self::INDICATOR_COGNITIVE;
     }
 
+    /**
+     * Returns the cognitive depth level.
+     *
+     * @param cm_info $cm
+     *
+     * @return integer
+     */
     public function get_cognitive_depth_level(\cm_info $cm) {
         return self::COGNITIVE_LEVEL_4;
     }
