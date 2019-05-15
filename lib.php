@@ -190,21 +190,28 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
  */
 function bigbluebuttonbn_delete_instance($id) {
     global $DB;
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id));
-    if (!$bigbluebuttonbn) {
+
+    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
         return false;
     }
+
     // TODO: End the meeting if it is running.
 
-    // Perform delete.
+    $result = true;
+
+    // Delete any dependent records here.
     if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
-        return false;
+        $result = false;
     }
+
     if (!$DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
-        return false;
+        $result = false;
     }
+
     // Log action performed.
-    return bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+    bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+
+    return $result;
 }
 
 /**
@@ -1047,8 +1054,8 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
     foreach ($overrides as $key => $value) {
         $log->$key = $value;
     }
-    if ($DB->insert_record('bigbluebuttonbn_logs', $log)) {
-        return true;
+    if (!$DB->insert_record('bigbluebuttonbn_logs', $log)) {
+        return false;
     }
-    return false;
+    return true;
 }
