@@ -232,6 +232,9 @@ switch (strtolower($action)) {
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn,
             ['other' => $rid]);
+        // Internal logger: Instert a record with the playback played.
+        $overrides = array('meetingid' => $bbbsession['meetingid']);
+        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         // Execute the redirect.
         header('Location: '.urldecode($href));
         break;
