@@ -235,7 +235,18 @@ $string['ends_at'] = 'Ends';
 $string['calendarstarts'] = '{$a} is scheduled for';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
-$string['serverhost'] = 'Server Name';
+
+$string['removedevents'] = 'Deleted events';
+$string['removedtags'] = 'Deleted tags';
+$string['removedlogs'] = 'Deleted custom logs';
+$string['removedrecordings'] = 'Deleted recordings';
+$string['resetevents'] = 'Delete events';
+$string['resettags'] = 'Delete tags';
+$string['resetlogs'] = 'Delete custom logs';
+$string['resetrecordings'] = 'Delete recordings';
+$string['resetlogs_help'] = 'Deleting the logs will cause the lost of references to recordings';
+$string['resetrecordings_help'] = 'Deleting the recordings will make them inaccessible from anywhere and it can not be undone';
+
 $string['view_error_no_group_student'] = 'You have not been enrolled in a group. Please contact your Teacher or the Administrator.';
 $string['view_error_no_group_teacher'] = 'There are no groups configured yet. Please set up groups or contact the Administrator.';
 $string['view_error_no_group'] = 'There are no groups configured yet. Please set up groups before trying to join the meeting.';
