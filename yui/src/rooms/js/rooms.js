@@ -162,7 +162,8 @@ M.mod_bigbluebuttonbn.rooms = {
         msgViewers = this.msgViewersIn(viewers);
         msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
-            return msg + ' <b>' + moderators + '</b> ' + msgModerators + ' and <b>' + viewers + '</b> ' + msgViewers + '.';
+            return msg + ' <b>' + moderators + '</b> ' + msgModerators + ' ' +
+                M.util.get_string('view_message_and', 'bigbluebuttonbn') + ' <b>' + viewers + '</b> ' + msgViewers + '.';
         }
         msg = M.util.get_string('view_message_session_has_user', 'bigbluebuttonbn');
         if (moderators > 0) {
