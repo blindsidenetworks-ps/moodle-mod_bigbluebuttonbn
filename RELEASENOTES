@@ -1,3 +1,9 @@
+2.2.12 (2017101020)
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
+
 2.2.11 (2017101019)
 Bug: Fix for participation rules for users applied as rules for roles (CONTRIB-7627).
 Bug: Fix for some themes broken updated prefix for icon-bigbluebutton (CONTRIB-7616).

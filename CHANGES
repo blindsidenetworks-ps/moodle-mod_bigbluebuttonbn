@@ -1,4 +1,4 @@
-Bug: Fix for participation rules for users applied as rules for roles (CONTRIB-7627).
-Bug: Fix for some themes broken updated prefix for icon-bigbluebutton (CONTRIB-7616).
-Bug: Fix on missing strings for new recording formats (CONTRIB-7617).
-Bug: Fix notification messages send in FOMAT_MOODLE instead of FORMAT_HTML.
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
