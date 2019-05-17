@@ -155,22 +155,23 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     msgAttendeesIn: function(moderators, participants) {
-        var msgModerators, viewers, msgViewers, msg;
+        var msg;
         if (!this.hasParticipants(participants)) {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
-        msgModerators = this.msgModeratorsIn(moderators);
-        viewers = participants - moderators;
-        msgViewers = this.msgViewersIn(viewers);
+        var viewers = participants - moderators;
+        var msgModerators = ' <b>' + moderators + '</b> ' + this.msgModeratorsIn(moderators);
+        var msgViewers = ' <b>' + viewers + '</b> ' + this.msgViewersIn(viewers);
+        var msgAnd = ' ' + M.util.get_string('view_message_and', 'bigbluebuttonbn');
         msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
-            return msg + ' <b>' + moderators + '</b> ' + msgModerators + ' and <b>' + viewers + '</b> ' + msgViewers + '.';
+            return msg + msgModerators + msgAnd + msgViewers + '.';
         }
         msg = M.util.get_string('view_message_session_has_user', 'bigbluebuttonbn');
         if (moderators > 0) {
-            return msg + ' <b>1</b> ' + msgModerators + '.';
+            return msg + msgModerators + '.';
         }
-        return msg + ' <b>1</b> ' + msgViewers + '.';
+        return msg + msgViewers;
     },
 
     hasParticipants: function(participants) {
