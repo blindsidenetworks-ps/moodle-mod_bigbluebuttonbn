@@ -532,7 +532,7 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
 function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'],
+        $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
             \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
@@ -615,7 +615,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'],
+        $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
             \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
