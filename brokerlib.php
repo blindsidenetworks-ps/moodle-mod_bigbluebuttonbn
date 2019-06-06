@@ -556,7 +556,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
             header('HTTP/1.0 202 Accepted');
             return;
         }
-        // We make sure messages are send only once.
+        // We make sure messages are sent only once.
         if (bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
             bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
         }
