@@ -28,7 +28,7 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
+ * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_ajax.php and index.php when the meeting is ended by the user).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc

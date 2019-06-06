@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Intermediator for managing actions executed by the BigBlueButton server.
+ * Intermediator for handling requests from the BigBlueButton server.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -41,11 +41,21 @@ $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEX
 $params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
 $params['meta'] = optional_param('meta', '', PARAM_TEXT);
 
-//require_login(null, true);
-
 if (empty($params['action'])) {
     header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
     return;
+}
+
+/**
+ * The endpoints for ajax requests are now implemented in bbb_ajax.php. The endpoints for the
+ * recording_ready and live_session_events callbacks should be moved to services (CONTRIB-7440),
+ * but in the meanwhile this endpoint remains. But in order to support the transition, request other
+ * than the callbacks are redirected to bbb_ajax.php.
+ */
+if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
+    $url = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?' . http_build_query($params, '', '&');
+    header("Location: " . $url);
+    exit;
 }
 
 $error = bigbluebuttonbn_broker_validate_parameters($params);
@@ -56,76 +66,11 @@ if (!empty($error)) {
 
 if ($params['bigbluebuttonbn']) {
     $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
-    $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
-    $context = context_module::instance($cm->id);
 }
 
-if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
-    if (!isset($SESSION->bigbluebuttonbn_bbbsession) || is_null($SESSION->bigbluebuttonbn_bbbsession)) {
-        header('HTTP/1.0 400 Bad Request. No session variable set');
-        return;
-    }
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-}
-
-$userid = $USER->id;
-if (!isloggedin() && $PAGE->course->id == SITEID) {
-    $userid = guest_user()->id;
-}
-$hascourseaccess = ($PAGE->course->id == SITEID) || can_access_course($PAGE->course, $userid);
-
-if (!$hascourseaccess) {
-    header('HTTP/1.0 401 Unauthorized');
-    return;
-}
-
-$type = null;
-if (isset($bbbsession['bigbluebuttonbn']->type)) {
-    $type = $bbbsession['bigbluebuttonbn']->type;
-}
-
-$typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-$enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
 try {
-    header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
-    if ($a == 'meeting_info') {
-        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
-        echo $meetinginfo;
-        return;
-    }
-    if ($a == 'meeting_end') {
-        $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params);
-        echo $meetingend;
-        return;
-    }
-    if ($a == 'recording_play') {
-        $recordingplay = bigbluebuttonbn_broker_recording_play($params);
-        echo $recordingplay;
-        return;
-    }
-    if ($a == 'recording_links') {
-        $recordinglinks = bigbluebuttonbn_broker_recording_links($bbbsession, $params);
-        echo $recordinglinks;
-        return;
-    }
-    if ($a == 'recording_info') {
-        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabledfeatures['showroom']);
-        echo $recordinginfo;
-        return;
-    }
-    if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
-        $a == 'recording_delete' || $a == 'recording_edit' ||
-        $a == 'recording_protect' || $a == 'recording_unprotect') {
-        $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $enabledfeatures['showroom']);
-        echo $recordingaction;
-        return;
-    }
-    if ($a == 'recording_import') {
-        echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
-        return;
-    }
     if ($a == 'recording_ready') {
         bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;

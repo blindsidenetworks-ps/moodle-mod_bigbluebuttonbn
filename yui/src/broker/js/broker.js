@@ -31,7 +31,7 @@ M.mod_bigbluebuttonbn.broker = {
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
     },
