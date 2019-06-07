@@ -46,12 +46,9 @@ if (empty($params['action'])) {
     return;
 }
 
-/**
- * The endpoints for ajax requests are now implemented in bbb_ajax.php. The endpoints for the
- * recording_ready and live_session_events callbacks should be moved to services (CONTRIB-7440),
- * but in the meanwhile this endpoint remains. But in order to support the transition, request other
- * than the callbacks are redirected to bbb_ajax.php.
- */
+// The endpoints for ajax requests are now implemented in bbb_ajax.php.
+// The endpoints for recording_ready and live_session_event callbacks must be moved to services (CONTRIB-7440).
+// But in order to support the transition, requests other than the callbacks are redirected to bbb_ajax.php.
 if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
     $url = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?' . http_build_query($params, '', '&');
     header("Location: " . $url);
