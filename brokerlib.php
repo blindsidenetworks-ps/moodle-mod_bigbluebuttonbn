@@ -532,7 +532,7 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
 function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'],
+        $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
             \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
@@ -556,7 +556,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
             header('HTTP/1.0 202 Accepted');
             return;
         }
-        // We make sure messages are send only once.
+        // We make sure messages are sent only once.
         if (bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
             bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
         }
@@ -615,7 +615,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = JWT::decode($params['signed_parameters'],
+        $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
             \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();

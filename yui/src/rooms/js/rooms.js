@@ -34,7 +34,7 @@ M.mod_bigbluebuttonbn.rooms = {
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.pinginterval = bigbluebuttonbn.ping_interval;
