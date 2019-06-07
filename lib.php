@@ -275,11 +275,11 @@ function bigbluebuttonbn_user_complete($courseorid, $userorid, $mod, $bigbluebut
     } else {
         $user = (object)array('id' => $userorid);
     }
-    $sql = "SELECT count(*) FROM {bigbluebuttonbn_logs} ";
+    $sql = "SELECT COUNT(*) FROM {bigbluebuttonbn_logs} ";
     $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
-    $result = $DB->get_record_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
+    $result = $DB->count_records_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
                                               BIGBLUEBUTTONBN_LOG_EVENT_JOIN, BIGBLUEBUTTONBN_LOG_EVENT_PLAYED));
-    return (int)$result->count;
+    return $result;
 }
 
 /**
