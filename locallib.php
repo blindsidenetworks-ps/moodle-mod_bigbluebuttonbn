@@ -2382,7 +2382,7 @@ function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recor
  */
 function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
     $profilesarray = array();
-    foreach ($profiles as $key => $profile) {
+    foreach ($profiles as $profile) {
         $profilesarray[$profile['id']] = $profile['name'];
     }
     return $profilesarray;

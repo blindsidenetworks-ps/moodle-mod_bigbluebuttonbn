@@ -317,7 +317,7 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
         $data['autoStartRecording'] = 'true';
         // Check if hide_record_button is enable.
-        if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
+        if ($bbbsession['recordhidebutton']) {
             $data['allowStartStopRecording'] = 'false';
         }
     }

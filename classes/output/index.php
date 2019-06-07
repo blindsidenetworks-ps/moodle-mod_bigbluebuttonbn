@@ -21,6 +21,7 @@
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 namespace mod_bigbluebuttonbn\output;
@@ -54,7 +55,7 @@ class index implements renderable {
      * @throws coding_exception
      */
     public function __construct($course) {
-        global $DB, $PAGE;
+        global $PAGE;
 
         // Get all the appropriate data.
         if (!$bigbluebuttonbns = get_all_instances_in_course('bigbluebuttonbn', $course)) {
@@ -65,9 +66,7 @@ class index implements renderable {
         }
 
         // Print the list of instances.
-        $timenow = time();
         $strweek = get_string('week');
-        $strtopic = get_string('topic');
         $headingname = get_string('index_heading_name', plugin::COMPONENT);
         $headinggroup = get_string('index_heading_group', plugin::COMPONENT);
         $headingusers = get_string('index_heading_users', plugin::COMPONENT);
