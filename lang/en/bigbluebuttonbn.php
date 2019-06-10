@@ -273,6 +273,7 @@ $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 $string['mod_form_field_recordallfromstart'] = 'Record all from start';
 $string['mod_form_field_recordhidebutton'] = 'Hide recording button';
+$string['mod_form_field_nosettings'] = 'No settings can be edited';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
