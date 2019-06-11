@@ -111,15 +111,31 @@ class notifier {
         $msg = (object) array();
         $msg->user_name = fullname($sender);
         $msg->user_email = $sender->email;
-        $msg->course_name = "$course->fullname";
+        $msg->course_name = $course->fullname;
         $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-        $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
-        foreach ($users as $user) {
+        // Process the message sending.
+        foreach (self::users_to_notify($context, $course) as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);
             }
         }
+    }
+
+    /**
+     * Define users to be notified.
+     *
+     * @param object $context
+     * @param object $course
+     * @return array
+     */
+    public static function users_to_notify($context, $course) {
+        $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
+        $modinfo = get_fast_modinfo($course);
+        $coursemodule = $modinfo->get_cm($context->instanceid);
+        $info = new \core_availability\info_module($coursemodule);
+        $filtered = $info->filter_user_list($users);
+        return $filtered;
     }
 }
