@@ -7,7 +7,7 @@ sudo: required
 #    - master
 
 addons:
-  firefox: "47.0.1"
+  firefox: "49.0"
   postgresql: "9.5"
 
 cache:
@@ -27,20 +27,20 @@ env:
   global:
     - COVERAGE=false
   matrix:
-    #- MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    #- MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
-    #- MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    #- MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    #- MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
-    #- MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
-    #- MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
-    #- MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
-    #- MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
-    #- MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
     - MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
     - MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
-    #- MOODLE_BRANCH=master DB=mysqli
-    #- MOODLE_BRANCH=master DB=pgsql
+    - MOODLE_BRANCH=master DB=mysqli
+    - MOODLE_BRANCH=master DB=pgsql
 
 matrix:
   exclude:
