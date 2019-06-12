@@ -7,7 +7,6 @@ sudo: required
 #    - master
 
 addons:
-addons:
   firefox: "47.0.1"
   postgresql: "9.5"
   mysql: "5.6"
