@@ -105,8 +105,7 @@ class notifier {
      * @return void
      */
     public static function notification_send($context, $sender, $bigbluebuttonbn, $message = '') {
-        global $DB;
-        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_cmid($context->instanceid, 'bigbluebuttonbn');
         // Complete message.
         $msg = (object) array();
         $msg->user_name = fullname($sender);
@@ -116,7 +115,7 @@ class notifier {
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         // Process the message sending.
-        foreach (self::users_to_notify($context, $course) as $user) {
+        foreach (self::users_to_notify($context, $cm) as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);
             }
@@ -127,15 +126,17 @@ class notifier {
      * Define users to be notified.
      *
      * @param object $context
-     * @param object $course
+     * @param object $cm
      * @return array
      */
-    public static function users_to_notify($context, $course) {
-        $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
-        $modinfo = get_fast_modinfo($course);
-        $coursemodule = $modinfo->get_cm($context->instanceid);
-        $info = new \core_availability\info_module($coursemodule);
-        $filtered = $info->filter_user_list($users);
-        return $filtered;
+    public static function users_to_notify($context, $cm) {
+        $users = array();
+        // See if there are any users in the lesson.
+        $users = get_enrolled_users($context);
+        error_log(json_encode(array_keys($users)));
+        $info = new \core_availability\info_module($cm);
+        $users = $info->filter_user_list($users);
+        error_log(json_encode(array_keys($users)));
+        return $users;
     }
 }
