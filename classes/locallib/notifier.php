@@ -39,12 +39,11 @@ class notifier {
     /**
      * Starts the notification process.
      *
-     * @param object $context
      * @param object $bigbluebuttonbn
      * @param string $action
      * @return void
      */
-    public static function notification_process($context, $bigbluebuttonbn, $action) {
+    public static function notification_process($bigbluebuttonbn, $action) {
         global $USER;
         // Prepare message.
         $msg = (object) array();
@@ -62,7 +61,7 @@ class notifier {
         $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($USER);
         // Send notification to all users enrolled.
-        self::notification_send($context, $USER, $bigbluebuttonbn, self::notification_msg_html($msg));
+        self::notification_send($USER, $bigbluebuttonbn, self::notification_msg_html($msg));
     }
 
     /**
@@ -98,14 +97,13 @@ class notifier {
     /**
      * Sends the message.
      *
-     * @param object $context
      * @param object $sender
      * @param object $bigbluebuttonbn
      * @param string $message
      * @return void
      */
-    public static function notification_send($context, $sender, $bigbluebuttonbn, $message = '') {
-        list($course, $cm) = get_course_and_cm_from_cmid($context->instanceid, 'bigbluebuttonbn');
+    public static function notification_send($sender, $bigbluebuttonbn, $message = '') {
+        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
         // Complete message.
         $msg = (object) array();
         $msg->user_name = fullname($sender);
@@ -115,7 +113,7 @@ class notifier {
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         // Process the message sending.
-        foreach (self::users_to_notify($context, $cm) as $user) {
+        foreach (self::users_to_notify($cm) as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);
             }
@@ -125,18 +123,16 @@ class notifier {
     /**
      * Define users to be notified.
      *
-     * @param object $context
      * @param object $cm
      * @return array
      */
-    public static function users_to_notify($context, $cm) {
+    public static function users_to_notify($cm) {
+        $context = \context_module::instance($cm->id);
         $users = array();
         // See if there are any users in the lesson.
         $users = get_enrolled_users($context);
-        error_log(json_encode(array_keys($users)));
         $info = new \core_availability\info_module($cm);
         $users = $info->filter_user_list($users);
-        error_log(json_encode(array_keys($users)));
         return $users;
     }
 }
