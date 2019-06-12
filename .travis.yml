@@ -16,8 +16,8 @@ cache:
     - $HOME/.npm
 
 php:
-  - 7.0
-  - 7.1
+  #- 7.0
+  #- 7.1
   - 7.2
 
 services:
@@ -79,6 +79,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
-  - moodle-plugin-ci mustache
+  #- moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat
