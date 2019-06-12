@@ -7,8 +7,8 @@ sudo: required
 #    - master
 
 addons:
-  firefox: "49.0"
-  postgresql: "9.5"
+  firefox: "47.0.1"
+  postgresql: "9.4"
 
 cache:
   directories:
@@ -27,18 +27,18 @@ env:
   global:
     - COVERAGE=false
   matrix:
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+    #- MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
+    #- MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
     - MOODLE_BRANCH=master DB=mysqli
     - MOODLE_BRANCH=master DB=pgsql
 
@@ -79,6 +79,6 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
-  #- moodle-plugin-ci mustache
+  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci behat
