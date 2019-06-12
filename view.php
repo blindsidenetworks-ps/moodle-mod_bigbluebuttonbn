@@ -103,7 +103,7 @@ if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], 
     exit;
 }
 
-$activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id, $bn);
+$activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id);
 
 // Output starts.
 echo $OUTPUT->header();
