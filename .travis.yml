@@ -22,7 +22,12 @@ php:
 
 services:
   - mysql
-  - node_js
+
+before_install:
+  - nvm install 8.10.0
+
+install:
+  - npm install
 
 env:
   global:
