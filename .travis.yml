@@ -15,6 +15,9 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+node_js:
+  - 8.9
+
 php:
   - 7.0
   #- 7.1
@@ -67,8 +70,8 @@ before_install:
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - nvm install 8.9
-  - npm install
+  #- nvm install 8.9
+  #- npm install
 
 install:
   - moodle-plugin-ci install
