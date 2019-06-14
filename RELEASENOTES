@@ -1,3 +1,9 @@
+2.3-beta2 (2019042002)
+Bug: Fix for recording ready notifications not working (CONTRIB-7740).
+Bug: Fix for false positive sent to the logs (CONTRIB-7742).
+Bug: Fix for recording settings showing empty when no feature can be edited (CONTRIB-7701).
+Bug: Fix for notifications to be sent only to users allowed to see the activity (CONTRIB-7733).
+
 2.3-beta1 (2019042001)
 Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
 Bug: Fix for implementation of resetting function (CONTRIB-7695).
