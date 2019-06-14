@@ -2486,17 +2486,6 @@ function bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
 }
 
 /**
- * Helper function renders general warning message for settings (if any).
- *
- * @param object $renderer
- *
- * @return void
- */
-function bigbluebuttonbn_settings_general_warning(&$renderer) {
-    return;
-}
-
-/**
  * Helper function renders general settings if the feature is enabled.
  *
  * @param object $renderer
@@ -3164,10 +3153,9 @@ function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
  *
  * @param array $bbbsession
  * @param int $id
- * @param int $bn
  * @return string
  */
-function bigbluebuttonbn_view_session_config(&$bbbsession, $id, $bn) {
+function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
     // Operation URLs.
     $bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
         '/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]

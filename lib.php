@@ -655,8 +655,7 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     }
-    $context = context_course::instance($bigbluebuttonbn->course);
-    \mod_bigbluebuttonbn\locallib\notifier::notification_process($context, $bigbluebuttonbn, $action);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_process($bigbluebuttonbn, $action);
 }
 
 /**
