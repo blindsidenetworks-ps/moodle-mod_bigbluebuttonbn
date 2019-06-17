@@ -1949,7 +1949,7 @@ function bigbluebuttonbn_is_bn_server() {
  */
 function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     if ($bbbsession['administrator']) {
-        $courses = get_courses('all', 'c.fullname ASC', 'c.id,c.shortname,c.fullname');
+        $courses = get_courses('all', 'c.fullname ASC');
         // It includes the name of the site as a course (category 0), so remove the first one.
         unset($courses['1']);
     } else {
