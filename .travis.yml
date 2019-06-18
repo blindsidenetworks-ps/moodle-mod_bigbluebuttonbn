@@ -2,9 +2,9 @@ language: php
 
 sudo: required
 
-branches:
-  only:
-    - v2.2-stable
+#branches:
+#  only:
+#    - v2.2-stable
 
 addons:
   firefox: "47.0.1"
@@ -18,6 +18,10 @@ cache:
 php:
   - 7.0
   - 7.1
+  - 7.2
+
+services:
+  - mysql
 
 env:
   global:
@@ -33,48 +37,64 @@ env:
     - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
     - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
 
 matrix:
-  include:
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.4
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
   exclude:
     - php: 7.0
-      env: MOODLE_BRANCH=master DB=mysqli MOODLE_PLUGIN_CI=2
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
     - php: 7.0
-      env: MOODLE_BRANCH=master DB=pgsql MOODLE_PLUGIN_CI=2
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+  include:
+    - php: 5.4
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.4
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.4
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.4
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
 
 before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
-  ## Standard script
-  - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^${MOODLE_PLUGIN_CI}
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  - nvm install 8.9
+  - npm install
   ## Workaround for bypassing codechecker error due the use of BIGBLUEBUTTON_CFG
   - sudo sed -i "s/'MNET_REMOTE_CLIENT',/'MNET_REMOTE_CLIENT', 'BIGBLUEBUTTONBN_CFG',/g" "$(grep -rl MNET_REMOTE_CLIENT ./ci/vendor)"
 
