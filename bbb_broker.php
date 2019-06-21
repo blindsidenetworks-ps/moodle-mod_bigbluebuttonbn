@@ -371,10 +371,11 @@ function bigbluebuttonbn_broker_recording_action($bbbsession, $params, $showroom
     }
     // Retrieve array of recordings that includes real and imported.
     $bigbluebuttonbnid = null;
-    if ($showroom) {
+    $subset = $showroom || $bbbsession['bigbluebuttonbn']->recordings_imported;
+    if ($subset) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
-    $recordings = bigbluebuttonbn_get_allrecordings($bbbsession['course']->id, $bigbluebuttonbnid, $showroom,
+    $recordings = bigbluebuttonbn_get_allrecordings($bbbsession['course']->id, $bigbluebuttonbnid, $subset,
         $bbbsession['bigbluebuttonbn']->recordings_deleted);
 
     $action = strtolower($params['action']);
