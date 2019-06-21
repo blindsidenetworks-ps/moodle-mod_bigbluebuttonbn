@@ -450,7 +450,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom']
+            $bbbsession['course']->id, $bbbsession['bigbluebuttonbn']->id
           );
         /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
          * recordings are not included. */
