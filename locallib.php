@@ -2004,7 +2004,7 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
         ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
         get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
     $context = context_course::instance($bigbluebuttonbn->course);
-    \mod_bigbluebuttonbn\locallib\notifier::notification_send($context, $sender, $bigbluebuttonbn, $messagetext);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_send($sender, $bigbluebuttonbn, $messagetext);
 }
 
 /**
@@ -2382,7 +2382,7 @@ function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recor
  */
 function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
     $profilesarray = array();
-    foreach ($profiles as $profile) {
+    foreach ($profiles as $key => $profile) {
         $profilesarray[$profile['id']] = $profile['name'];
     }
     return $profilesarray;
