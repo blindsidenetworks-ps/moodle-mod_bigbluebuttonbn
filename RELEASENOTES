@@ -1,3 +1,7 @@
+2.3-beta2 (2019042003)
+Bug: Fix for issue with importing recordings on 3.7 (CONTRIB-7754).
+Bug: Fix for regression on recording ready notifications (CONTRIB-7740).
+
 2.3-beta2 (2019042002)
 Bug: Fix for recording ready notifications not working (CONTRIB-7740).
 Bug: Fix for false positive sent to the logs (CONTRIB-7742).
