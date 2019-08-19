@@ -1,8 +1,5 @@
-Updates in this release
 Bug: Fix for issue with importing recordings on 3.7 (CONTRIB-7754).
 Bug: Fix for regression on recording ready notifications (CONTRIB-7740).
-
-All updates in 2.3-beta
 Bug: Fix for instanceTypeProfiles array used by keys but NOT defined so (CONTRIB-7399).
 Bug: Fix for hard-coded strings in recordings table based on YUI datatables (CONTRIB-7518).
 Bug: Fix for Join session timeline button don't work (CONTRIB-7538).
