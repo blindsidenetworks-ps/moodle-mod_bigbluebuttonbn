@@ -388,6 +388,9 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
                  'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
                  'bbb-origin-tag' => $bbbsession['originTag'],
                  'bbb-context' => $bbbsession['course']->fullname,
+                 'bbb-context-id' => $bbbsession['course']->id,
+                 'bbb-context-name' => trim(html_to_text($bbbsession['course']->fullname, 0)),
+                 'bbb-context-label' => trim(html_to_text($bbbsession['course']->shortname, 0)),
                  'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
                  'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
                  'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
@@ -404,7 +407,7 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
         $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
     }
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
-        $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
+        $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
     return $metadata;
 }

@@ -2790,7 +2790,7 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
 function bigbluebuttonbn_settings_extended(&$renderer) {
     // Configuration for extended BN capabilities.
     if (!bigbluebuttonbn_is_bn_server()) {
-        return;
+        //return;
     }
     // Configuration for 'notify users when recording ready' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
