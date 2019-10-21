@@ -1,3 +1,9 @@
+2.3 (2019042005)
+Tag: Bumped version and release tags and updated maturity to stable.
+
+2.3-rc1 (2019042004)
+Tag: Bumped version and release tags and updated maturity to release candidate.
+
 2.3-beta2 (2019042003)
 Bug: Fix for issue with importing recordings on 3.7 (CONTRIB-7754).
 Bug: Fix for regression on recording ready notifications (CONTRIB-7740).
