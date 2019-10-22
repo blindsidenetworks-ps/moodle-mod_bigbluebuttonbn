@@ -46,6 +46,8 @@ if (empty($params['action'])) {
     return;
 }
 
+error_log(json_encode($params));
+
 // The endpoints for ajax requests are now implemented in bbb_ajax.php.
 // The endpoints for recording_ready and meeting_events callbacks must be moved to services (CONTRIB-7440).
 // But in order to support the transition, requests other than the callbacks are redirected to bbb_ajax.php.
@@ -55,18 +57,20 @@ if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_even
     exit;
 }
 
-error_log(json_encode($params));
-
 $error = bigbluebuttonbn_broker_validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
     return;
 }
 
-if ($params['bigbluebuttonbn']) {
-    $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
-    $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
+if (!$params['bigbluebuttonbn']) {
+    header('HTTP/1.0 400 Bad Request. '.$error);
+    return;
 }
+$bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+$bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
+$context = context_course::instance($bigbluebuttonbn->course);
+$PAGE->set_context($context);
 
 try {
     $a = strtolower($params['action']);
