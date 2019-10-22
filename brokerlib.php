@@ -613,7 +613,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
  *
  * @return void
  */
-function bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn) {
+function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
@@ -703,7 +703,7 @@ function bigbluebuttonbn_broker_required_parameters() {
     $params['recording_ready'] = [
         'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
     ];
-    $params['live_session_events'] = [
+    $params['meeting_events'] = [
         'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
     ];
     return $params;

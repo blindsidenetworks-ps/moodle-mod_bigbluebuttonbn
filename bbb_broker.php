@@ -55,6 +55,8 @@ if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_even
     exit;
 }
 
+error_log(json_encode($params));
+
 $error = bigbluebuttonbn_broker_validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
@@ -72,8 +74,8 @@ try {
         bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;
     }
-    if ($a == 'live_session_events') {
-        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn);
+    if ($a == 'meeting_events') {
+        bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
