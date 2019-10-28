@@ -561,8 +561,9 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
             bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
         }
         $overrides = array('meetingid' => $decodedparameters->meeting_id);
-        $meta = '{"recordid":"'.$decodedparameters->record_id.'"}';
-        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, $meta);
+        $meta['recordid'] = $decodedparameters->record_id;
+        $meta['callback'] = 'recording_ready';
+        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
@@ -605,42 +606,69 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 }
 
 /**
- * Helper for responding when storing live session events is requested.
+ * Helper for responding when storing live meeting events is requested.
  *
  * @param array $params
  * @param object $bigbluebuttonbn
  *
  * @return void
  */
-function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn) {
+function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        $decodedparameters = \Firebase\JWT\JWT::decode($params['signed_parameters'],
-            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS256'));
+        /** The callback with a POST request includes:
+         *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
+         *  - Content Type: application/json
+         *  - Body: <A JSON Object>
+         */
+
+        // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
+        $headers = getallheaders();
+
+        // Pull the Bearer from the headers.
+        if (!array_key_exists('Authorization', $headers)) {
+            header('HTTP/1.0 400 Bad Request. Authorization failed');
+            return;
+        }
+        $authorization = explode(" ", $headers['Authorization']);
+
+        // Verify the authenticity of the request.
+        $token = \Firebase\JWT\JWT::decode($authorization[1],
+            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'), array('HS512'));
+
+        // Get JSON string from the body.
+        $jsonstr = file_get_contents('php://input');
+
+        // Convert JSON string to a JSON object.
+        $jsonobj = json_decode($jsonstr);
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
         header('HTTP/1.0 400 Bad Request. '.$error);
         return;
     }
-    // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
-    $meetingidelements = explode('[', $decodedparameters->meeting_id);
-    $meetingidelements = explode('-', $meetingidelements[0]);
 
+    // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
+    $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
+    $meetingidelements = explode('-', $meetingidelements[0]);
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
         header('HTTP/1.0 410 Gone. The activity may have been deleted');
         return;
     }
-    // Store the events.
-    try {
-        foreach ($decodedparameters->events as $event) {
-            bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['live_session'], $bigbluebuttonbn,
-                ['timecreated' => $event->timestamp, 'userid' => $event->user, 'other' => $event->event]);
-        }
-        header('HTTP/1.0 202 Accepted');
-    } catch (Exception $e) {
-        $error = "Caught exception: {$e->getMessage()}";
-        header("HTTP/1.0 503 Service Unavailable. {$error}");
+
+    // We make sure events are processed only once.
+    $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
+    $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
+    $meta['callback'] = 'meeting_events';
+    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
+    if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
+        // Store the events.
+        bigbluebuttonbn_store_meeting_events($bigbluebuttonbn, $jsonobj);
+        error_log('HTTP/1.0 202 Accepted. Enqueued.');
+        header('HTTP/1.0 202 Accepted. Enqueued.');
+        return;
     }
+    error_log('HTTP/1.0 202 Accepted. Already processed.');
+    header('HTTP/1.0 202 Accepted. Already processed.');
 }
 
 /**
@@ -651,14 +679,8 @@ function bigbluebuttonbn_broker_meeting_events($params, $bigbluebuttonbn) {
  * @return string
  */
 function bigbluebuttonbn_broker_validate_parameters($params) {
-    $requiredparams = bigbluebuttonbn_broker_required_parameters();
-    if (!isset($params['callback'])) {
-        return 'This call must include a javascript callback.';
-    }
-    if (!isset($params['action'])) {
-        return 'Action parameter must be included.';
-    }
     $action = strtolower($params['action']);
+    $requiredparams = bigbluebuttonbn_broker_required_parameters();
     if (!array_key_exists($action, $requiredparams)) {
         return 'Action '.$params['action'].' can not be performed.';
     }
@@ -685,25 +707,65 @@ function bigbluebuttonbn_broker_validate_parameters_message($params, $requiredpa
  * Helper for definig rules for validating required parameters.
  */
 function bigbluebuttonbn_broker_required_parameters() {
-    $params['server_ping'] = ['id' => 'The meetingID must be specified.'];
-    $params['meeting_info'] = ['id' => 'The meetingID must be specified.'];
-    $params['meeting_end'] = ['id' => 'The meetingID must be specified.'];
-    $params['recording_play'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_info'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_links'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_publish'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_unpublish'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_delete'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_protect'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_unprotect'] = ['id' => 'The recordingID must be specified.'];
-    $params['recording_edit'] = ['id' => 'The recordingID must be specified.',
-        'meta' => 'A meta parameter should be included'];
-    $params['recording_import'] = ['id' => 'The recordingID must be specified.'];
+    $params['server_ping'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The meetingID must be specified.'
+    ];
+    $params['meeting_info'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The meetingID must be specified.'
+    ];
+    $params['meeting_end'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The meetingID must be specified.'
+    ];
+    $params['recording_play'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_info'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_links'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_publish'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_unpublish'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_delete'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_protect'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_unprotect'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
+    $params['recording_edit'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.',
+        'meta' => 'A meta parameter should be included'
+    ];
+    $params['recording_import'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'id' => 'The recordingID must be specified.'
+    ];
     $params['recording_ready'] = [
+        'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
         'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
     ];
     $params['meeting_events'] = [
-        'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
+        'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
     ];
     return $params;
 }

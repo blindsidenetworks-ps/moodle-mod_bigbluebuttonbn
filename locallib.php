@@ -2007,6 +2007,25 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
 }
 
 /**
+ * Helper function enqueues list of meeting events to be stored for later processing.
+ *
+ * @param object $bigbluebuttonbn
+ * @param object $jsonobj
+ *
+ * @return void
+ */
+function bigbluebuttonbn_store_meeting_events($bigbluebuttonbn, $jsonobj) {
+    $attendees = $jsonobj->{'data'}->{'attendees'};
+    foreach ($attendees as $attendee) {
+        $overrides['meetingid'] = $jsonobj->{'meeting_id'};
+        $overrides['userid'] = $attendee->{'ext_user_id'};
+        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
+        $meta['data'] = $attendee;
+        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
+    }
+}
+
+/**
  * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
  *
  * @return boolean
@@ -2289,10 +2308,17 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  *
  * @return integer
  */
-function bigbluebuttonbn_get_count_callback_event_log($recordid) {
+function bigbluebuttonbn_get_count_callback_event_log($recordid, $callbacktype = 'recording_ready') {
     global $DB;
     $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
-    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%"));
+    // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
+    if ($callbacktype == 'recording_ready') {
+        $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
+        return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%",
+            $callbacktype, 'callback'));
+    }
+    $sql .= ' AND meta LIKE ?';
+    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%", $callbacktype));
 }
 
 /**

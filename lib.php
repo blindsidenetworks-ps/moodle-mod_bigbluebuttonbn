@@ -86,6 +86,8 @@ const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 /** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
+/** @var BIGBLUEBUTTON_LOG_EVENT_SUMMARY string defines the bigbluebuttonbn summary event */
+const BIGBLUEBUTTON_LOG_EVENT_SUMMARY = 'Summary';
 /**
  * Indicates API features that the bigbluebuttonbn supports.
  *
