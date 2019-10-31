@@ -158,6 +158,37 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     /**
+     * Add elements for setting the custom completion rules.
+     *
+     * @category completion
+     * @return array List of added element names, or names of wrapping group elements.
+     */
+    public function add_completion_rules() {
+        $mform = $this->_form;
+
+        $group = [
+            $mform->createElement('checkbox', 'completionattendanceenabled', ' ', get_string('completionattendance', 'bigbluebuttonbn')),
+            $mform->createElement('text', 'completionattendance', ' ', ['size' => 3]),
+        ];
+        $mform->setType('completionattendance', PARAM_INT);
+        $mform->addGroup($group, 'completionattendancegroup', get_string('completionattendancegroup','bigbluebuttonbn'), [' '], false);
+        $mform->addHelpButton('completionattendancegroup', 'completionattendance', 'bigbluebuttonbn');
+        $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
+
+        return ['completionattendancegroup'];
+    }
+
+    /**
+     * Called during validation to see whether some module-specific completion rules are selected.
+     *
+     * @param array $data Input data not yet validated.
+     * @return bool True if one or more rules is enabled, false if none are.
+     */
+    public function completion_rule_enabled($data) {
+        return (!empty($data['completionattendanceenabled']) && $data['completionattendance'] != 0);
+    }
+
+    /**
      * Function for showing the block for selecting profiles.
      *
      * @param object $mform
