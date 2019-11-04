@@ -663,11 +663,9 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
         // Store the events.
         bigbluebuttonbn_store_meeting_events($bigbluebuttonbn, $jsonobj);
-        error_log('HTTP/1.0 202 Accepted. Enqueued.');
         header('HTTP/1.0 202 Accepted. Enqueued.');
         return;
     }
-    error_log('HTTP/1.0 202 Accepted. Already processed.');
     header('HTTP/1.0 202 Accepted. Already processed.');
 }
 

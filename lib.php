@@ -68,25 +68,25 @@ $CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 /** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_ADD string of event add for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_ADD string defines the bigbluebuttonbn Add event */
 const BIGBLUEBUTTONBN_LOG_EVENT_ADD = 'Add';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_EDIT string of event edit for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_EDIT string defines the bigbluebuttonbn Edit event */
 const BIGBLUEBUTTONBN_LOG_EVENT_EDIT = 'Edit';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_CREATE string of event create for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_CREATE string defines the bigbluebuttonbn Create event */
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = 'Create';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string of event join for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string defines the bigbluebuttonbn Join event */
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = 'Join';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_PLAYED string of event record played for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_PLAYED string defines the bigbluebuttonbn Playback event */
 const BIGBLUEBUTTONBN_LOG_EVENT_PLAYED = 'Played';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT string of event logout for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT string defines the bigbluebuttonbn Logout event */
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_IMPORT string of event import for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_IMPORT string defines the bigbluebuttonbn Import event */
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
-/** @var BIGBLUEBUTTONBN_LOG_EVENT_DELETE string of event delete for bigbluebuttonbn_logs */
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_DELETE string defines the bigbluebuttonbn Delete event */
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
-/** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
+/** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn Callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
-/** @var BIGBLUEBUTTON_LOG_EVENT_SUMMARY string defines the bigbluebuttonbn summary event */
+/** @var BIGBLUEBUTTON_LOG_EVENT_SUMMARY string defines the bigbluebuttonbn Summary event */
 const BIGBLUEBUTTON_LOG_EVENT_SUMMARY = 'Summary';
 /**
  * Indicates API features that the bigbluebuttonbn supports.
@@ -126,6 +126,54 @@ function bigbluebuttonbn_supports($feature) {
         return $features[$feature];
     }
     return null;
+}
+
+/**
+ * Obtains the automatic completion state for this bigbluebuttonbn based on any conditions
+ * in bigbluebuttonbn settings.
+ *
+ * @global object
+ * @global object
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not. (If no conditions, then return
+ *   value depends on comparison type)
+ */
+function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
+    global $CFG, $DB;
+
+    // Get bigbluebuttonbn details
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
+    if (!$bigbluebuttonbn) {
+        throw new Exception("Can't find bigbluebuttonbn {$cm->instance}");
+    }
+
+    $result = $type; // Default return value
+
+    if ($bigbluebuttonbn->completionattendance) {
+        $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
+        $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? log = ?";
+        $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
+        if (!$logs) {
+            return $result;
+        }
+        $attendancecount = 0;
+        foreach ($logs as $log) {
+            $summary = json_decode($log->meta);
+            $attendancecount += $summary->duration;
+        }
+        $attendancecount /= 60;
+        $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+
+    return $result;
 }
 
 /**
@@ -247,9 +295,9 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  * @return bool
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
-    if ($completed = bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)) {
-        return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.
-            get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.
+    if ($completed = bigbluebuttonbn_user_complete($course, $user, $bigbluebuttonbn)) {
+        return fullname($user) . ' ' . get_string('view_message_has_joined', 'bigbluebuttonbn') . ' ' .
+            get_string('view_message_session_for', 'bigbluebuttonbn') . ' ' . (string) $completed . ' ' .
             get_string('view_message_times', 'bigbluebuttonbn');
     }
     return '';
@@ -261,12 +309,11 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  *
  * @param object|int $courseorid
  * @param object|int $userorid
- * @param object $mod
  * @param object $bigbluebuttonbn
  *
  * @return bool
  */
-function bigbluebuttonbn_user_complete($courseorid, $userorid, $mod, $bigbluebuttonbn) {
+function bigbluebuttonbn_user_complete($courseorid, $userorid, $bigbluebuttonbn) {
     global $DB;
     if (is_object($courseorid)) {
         $course = $courseorid;
@@ -532,10 +579,12 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
  */
 function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $DB;
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $coursemodule->instance),
-        'id, name, intro, introformat');
+
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, intro, introformat, completionattendance';
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', $dbparams, $fields);
     if (!$bigbluebuttonbn) {
-        return null;
+        return false;
     }
     $info = new cached_cm_info();
     $info->name = $bigbluebuttonbn->name;
@@ -543,7 +592,40 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
         $info->content = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $coursemodule->id, false);
     }
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $info->customdata['customcompletionrules']['completionattendance'] = $bigbluebuttonbn->completionattendance;
+    }
+
     return $info;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_bigbluebuttonbn_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionattendance':
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionattendancedesc', 'bigbluebuttonbn', $val);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }
 
 /**
@@ -1008,7 +1090,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
 
     // Get if the user has joined in live session or viewed the recorded.
-    $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, null, $bigbluebuttonbn);
+    $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
     // Get if the room is available.
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
     // Get if the user can join.

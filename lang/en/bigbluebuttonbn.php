@@ -77,9 +77,13 @@ $string['privacy:metadata:bigbluebutton:userid'] = 'The userid of the user acces
 $string['privacy:metadata:bigbluebutton:fullname'] = 'The fullname of the user accessing the BigBlueButton server.';
 
 $string['completionattendance'] = 'Student must attend the meeting for:';
+$string['completionattendance_help'] = 'Attending the meeting for (n) minutes is required for completion';
 $string['completionattendancedesc'] = 'Student must attend the meeting and remain in the session for at least {$a} minute(s)';
 $string['completionattendancegroup'] = 'Require attendance';
-$string['completionattendancehelp'] = 'requiring attendance to complete';
+$string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
+
+$string['minute'] = 'minute';
+$string['minutes'] = 'minutes';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
