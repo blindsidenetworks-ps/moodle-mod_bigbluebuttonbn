@@ -178,6 +178,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform = $this->_form;
+        // Elements for completion by Attendance.
         $group = [
             $mform->createElement('checkbox', 'completionattendanceenabled', '', get_string('completionattendance', 'bigbluebuttonbn') . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
@@ -187,6 +188,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addGroup($group, 'completionattendancegroup', get_string('completionattendancegroup','bigbluebuttonbn'), [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
         $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
+
         return ['completionattendancegroup'];
     }
 

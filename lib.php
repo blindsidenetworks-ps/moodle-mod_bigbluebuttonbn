@@ -154,7 +154,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
 
     if ($bigbluebuttonbn->completionattendance) {
         $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
-        $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? log = ?";
+        $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
         $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
         if (!$logs) {
             return $result;
@@ -162,7 +162,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
         $attendancecount = 0;
         foreach ($logs as $log) {
             $summary = json_decode($log->meta);
-            $attendancecount += $summary->duration;
+            $attendancecount += $summary->data->duration;
         }
         $attendancecount /= 60;
         $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
