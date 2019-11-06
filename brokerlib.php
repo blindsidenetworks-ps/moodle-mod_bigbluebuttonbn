@@ -642,7 +642,6 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
         $jsonstr = file_get_contents('php://input');
 
         // Convert JSON string to a JSON object.
-        error_log("JSON Object Received: $jsonstr");
         $jsonobj = json_decode($jsonstr);
     } catch (Exception $e) {
         $msg = 'Caught exception: ' . $e->getMessage();

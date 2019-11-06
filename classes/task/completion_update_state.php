@@ -54,7 +54,7 @@ class completion_update_state extends adhoc_task {
     public function execute() {
         // Get the custom data.
         $data = $this->get_custom_data();
-        error_log(">>>>>>>>>>>>>>> Task completion_update_state running for {$data->userid}");
+        mtrace("Task completion_update_state running for user {$data->userid}");
         // Process the completion.
         bigbluebuttonbn_completion_update_state($data->bigbluebuttonbn, $data->userid);
     }

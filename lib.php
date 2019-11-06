@@ -143,7 +143,6 @@ function bigbluebuttonbn_supports($feature) {
  */
 function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
-    error_log(">>> bigbluebuttonbn_get_completion_state");
 
     // Get bigbluebuttonbn details.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
@@ -153,11 +152,6 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
 
     // Default return value.
     $result = $type;
-    if ($result) {
-        error_log("Default is COMPLETED");
-    } else {
-        error_log("Default is NOT COMPLETED");
-    }
 
     if ($bigbluebuttonbn->completionattendance) {
         error_log("completionattendance enabled, check for user $userid");
@@ -166,19 +160,16 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
         $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
         if (!$logs) {
             // As completion by attendance was required, the activity hasn't been completed.
-            error_log("No logs registered...");
+            error_log("NOT COMPLETED. No logs registered...");
             return false;
         }
         $attendancecount = 0;
         foreach ($logs as $log) {
-            error_log("processing {$log->meta}");
             $summary = json_decode($log->meta);
             $attendancecount += $summary->data->duration;
-            error_log("so far $attendancecount seconds");
         }
         $attendancecount /= 60;
-        error_log("so $attendancecount minutes");
-        error_log("Activity may be completed with {$attendancecount} minutes of attendance by user $userid");
+        error_log("Activity registered {$attendancecount} minutes of attendance by user $userid");
         $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
         if ($type == COMPLETION_AND) {
             $result = $result && $value;

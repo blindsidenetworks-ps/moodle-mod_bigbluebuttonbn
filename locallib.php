@@ -2016,13 +2016,11 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return void
  */
 function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-    error_log(">>> bigbluebuttonbn_process_meeting_events");
     $meetingid = $jsonobj->{'meeting_id'};
     $recordid = $jsonobj->{'internal_meeting_id'};
     $attendees = $jsonobj->{'data'}->{'attendees'};
     foreach ($attendees as $attendee) {
         $userid = $attendee->{'ext_user_id'};
-        error_log("Enqueuing userid = $userid");
         $overrides['meetingid'] = $meetingid;
         $overrides['userid'] = $userid;
         $meta['recordid'] = $recordid;
@@ -2030,27 +2028,23 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
         // Stores the log.
         bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
         // Enqueue a task for processing the completion.
-        error_log("Enqueuing the completion");
         try {
             // Create the instance of completion_update_state task.
             $task = new \mod_bigbluebuttonbn\task\completion_update_state();
             // Set blocking if required (it probably isn't).
             // $task->set_blocking(false);
-            // Add 
+            // Add custom data.
             $data = array(
                 'bigbluebuttonbn' => $bigbluebuttonbn,
                 'userid' => $userid
             );
             $task->set_custom_data($data);
+            //$task->set_userid($userid);
             // Queue it.
             \core\task\manager::queue_adhoc_task($task);
         } catch (Exception $e) {
             error_log("Something went very wrong " . (string)$e);
         }
-
-        // Process the completion.
-        error_log("Processing the completion");
-        bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid);
     }
 }
 
@@ -2062,20 +2056,10 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
-    error_log(">>> bigbluebuttonbn_completion_update_state");
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
-    try {
-        $completion = new completion_info($course);
-        if ($completion->is_enabled($cm) && $bigbluebuttonbn->completionattendance && bigbluebuttonbn_get_completion_state($course, $cm, $userid, true)) {
-            error_log("Avtivity is completed. Attempt to register the completion.");
-            //$completion->update_state($cm, COMPLETION_COMPLETE, $userid);
-            $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
-            error_log("Attempt to register the completion is done.");
-        } else {
-            error_log("Avtivity is not completed.");
-        }
-    } catch (Exception $e) {
-        error_log("Something odd happened: {$e}");
+    $completion = new completion_info($course);
+    if ($completion->is_enabled($cm) && $bigbluebuttonbn->completionattendance && bigbluebuttonbn_get_completion_state($course, $cm, $userid, true)) {
+        $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
     }
 }
 
@@ -2364,22 +2348,16 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  */
 function bigbluebuttonbn_get_count_callback_event_log($recordid, $callbacktype = 'recording_ready') {
     global $DB;
-    error_log(">>> bigbluebuttonbn_get_count_callback_event_log (" . $callbacktype . ')');
     $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
     // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
     if ($callbacktype == 'recording_ready') {
-        error_log('recording_ready');
         $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
         $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%",
             $callbacktype, 'callback'));
-        error_log("count=" . (string)$count);
         return $count;
     }
-    error_log('NO recording_ready');
     $sql .= ' AND meta LIKE ?;';
-    error_log($sql);
     $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
-    error_log("count=" . (string)$count);
     return $count;
 }
 
