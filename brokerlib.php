@@ -627,7 +627,9 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
 
         // Pull the Bearer from the headers.
         if (!array_key_exists('Authorization', $headers)) {
-            header('HTTP/1.0 400 Bad Request. Authorization failed');
+            $msg = 'Authorization failed';
+            error_log($msg);
+            header('HTTP/1.0 400 Bad Request. ' . $msg);
             return;
         }
         $authorization = explode(" ", $headers['Authorization']);
@@ -640,10 +642,12 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
         $jsonstr = file_get_contents('php://input');
 
         // Convert JSON string to a JSON object.
+        error_log("JSON Object Received: $jsonstr");
         $jsonobj = json_decode($jsonstr);
     } catch (Exception $e) {
-        $error = 'Caught exception: '.$e->getMessage();
-        header('HTTP/1.0 400 Bad Request. '.$error);
+        $msg = 'Caught exception: ' . $e->getMessage();
+        error_log($msg);
+        header('HTTP/1.0 400 Bad Request. ' . $msg);
         return;
     }
 
@@ -651,7 +655,9 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
     $meetingidelements = explode('-', $meetingidelements[0]);
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-        header('HTTP/1.0 410 Gone. The activity may have been deleted');
+        $msg = 'The activity may have been deleted';
+        error_log($msg);
+        header('HTTP/1.0 410 Gone. ' . $msg);
         return;
     }
 
@@ -660,13 +666,17 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
     bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
-    if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
-        // Store the events.
-        bigbluebuttonbn_store_meeting_events($bigbluebuttonbn, $jsonobj);
-        header('HTTP/1.0 202 Accepted. Enqueued.');
+    //if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
+        // Process the events.
+        bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
+        $msg = 'Enqueued.';
+        error_log($msg);
+        header('HTTP/1.0 202 Accepted. ' . $msg);
         return;
-    }
-    header('HTTP/1.0 202 Accepted. Already processed.');
+    //}
+    $msg = 'Already processed.';
+    error_log($msg);
+    header('HTTP/1.0 202 Accepted. ' . $msg);
 }
 
 /**

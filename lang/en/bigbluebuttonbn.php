@@ -82,6 +82,8 @@ $string['completionattendancedesc'] = 'Student must attend the meeting and remai
 $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
+$string['completionupdatestate'] = "Complation update state";
+
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
 
