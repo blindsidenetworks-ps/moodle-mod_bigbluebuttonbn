@@ -179,13 +179,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform = $this->_form;
         // Elements for completion by Attendance.
+        $completiongroup = get_string('completionattendancegroup', 'bigbluebuttonbn');
+        $completionrule = get_string('completionattendance', 'bigbluebuttonbn');
         $group = [
-            $mform->createElement('checkbox', 'completionattendanceenabled', '', get_string('completionattendance', 'bigbluebuttonbn') . '&nbsp;'),
+            $mform->createElement('checkbox', 'completionattendanceenabled', '', $completionrule . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
             $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
         ];
         $mform->setType('completionattendance', PARAM_INT);
-        $mform->addGroup($group, 'completionattendancegroup', get_string('completionattendancegroup','bigbluebuttonbn'), [' '], false);
+        $mform->addGroup($group, 'completionattendancegroup', $completiongroup, [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
         $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
 
@@ -212,7 +214,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
-        // Turn off completion settings if the checkboxes aren't ticked
+        // Turn off completion settings if the checkboxes aren't ticked.
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
             if (empty($data->completionattendanceenabled) || !$autocompletion) {

@@ -2031,19 +2031,16 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
         try {
             // Create the instance of completion_update_state task.
             $task = new \mod_bigbluebuttonbn\task\completion_update_state();
-            // Set blocking if required (it probably isn't).
-            // $task->set_blocking(false);
             // Add custom data.
             $data = array(
                 'bigbluebuttonbn' => $bigbluebuttonbn,
                 'userid' => $userid
             );
             $task->set_custom_data($data);
-            //$task->set_userid($userid);
             // Queue it.
             \core\task\manager::queue_adhoc_task($task);
         } catch (Exception $e) {
-            error_log("Something went very wrong " . (string)$e);
+            mtrace("Error while enqueuing completion_uopdate_state task. " . (string)$e);
         }
     }
 }
@@ -2056,9 +2053,15 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
+    if (!$bigbluebuttonbn->completionattendance) {
+        return;
+    }
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
     $completion = new completion_info($course);
-    if ($completion->is_enabled($cm) && $bigbluebuttonbn->completionattendance && bigbluebuttonbn_get_completion_state($course, $cm, $userid, true)) {
+    if (!$completion->is_enabled($cm)) {
+        return;
+    }
+    if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, true)) {
         $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
     }
 }

@@ -133,11 +133,11 @@ function bigbluebuttonbn_supports($feature) {
  * in bigbluebuttonbn settings.
  *
  * @global object
- * @global object
  * @param object $course Course
  * @param object $cm Course-module
  * @param int $userid User ID
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ *
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison type)
  */
@@ -154,13 +154,11 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
     $result = $type;
 
     if ($bigbluebuttonbn->completionattendance) {
-        error_log("completionattendance enabled, check for user $userid");
         $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
         $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
         $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
         if (!$logs) {
             // As completion by attendance was required, the activity hasn't been completed.
-            error_log("NOT COMPLETED. No logs registered...");
             return false;
         }
         $attendancecount = 0;
@@ -169,7 +167,6 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
             $attendancecount += $summary->data->duration;
         }
         $attendancecount /= 60;
-        error_log("Activity registered {$attendancecount} minutes of attendance by user $userid");
         $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
         if ($type == COMPLETION_AND) {
             $result = $result && $value;
@@ -178,11 +175,6 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
         }
     }
 
-    if ($result) {
-        error_log("COMPLETED");
-    } else {
-        error_log("NOT COMPLETED");
-    }
     return $result;
 }
 
