@@ -2049,6 +2049,7 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
  * Helper function enqueues completion trigger.
  *
  * @param object $bigbluebuttonbn
+ * @param string $userid
  *
  * @return void
  */
@@ -2346,6 +2347,7 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  * Helper function to get how much callback events are logged.
  *
  * @param string $recordid
+ * @param string $callbacktype
  *
  * @return integer
  */

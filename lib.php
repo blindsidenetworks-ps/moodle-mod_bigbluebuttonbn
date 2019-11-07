@@ -132,7 +132,6 @@ function bigbluebuttonbn_supports($feature) {
  * Obtains the automatic completion state for this bigbluebuttonbn based on any conditions
  * in bigbluebuttonbn settings.
  *
- * @global object
  * @param object $course Course
  * @param object $cm Course-module
  * @param int $userid User ID

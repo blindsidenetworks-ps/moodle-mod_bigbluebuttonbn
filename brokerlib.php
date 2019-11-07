@@ -608,7 +608,11 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 /**
  * Helper for responding when storing live meeting events is requested.
  *
- * @param array $params
+ * The callback with a POST request includes:
+ *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
+ *  - Content Type: application/json
+ *  - Body: <A JSON Object>
+ *
  * @param object $bigbluebuttonbn
  *
  * @return void
@@ -616,19 +620,12 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        /** The callback with a POST request includes:
-         *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
-         *  - Content Type: application/json
-         *  - Body: <A JSON Object>
-         */
-
         // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
         $headers = getallheaders();
 
         // Pull the Bearer from the headers.
         if (!array_key_exists('Authorization', $headers)) {
             $msg = 'Authorization failed';
-            error_log($msg);
             header('HTTP/1.0 400 Bad Request. ' . $msg);
             return;
         }
@@ -645,7 +642,6 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
         $jsonobj = json_decode($jsonstr);
     } catch (Exception $e) {
         $msg = 'Caught exception: ' . $e->getMessage();
-        error_log($msg);
         header('HTTP/1.0 400 Bad Request. ' . $msg);
         return;
     }
@@ -655,7 +651,6 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $meetingidelements = explode('-', $meetingidelements[0]);
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
         $msg = 'The activity may have been deleted';
-        error_log($msg);
         header('HTTP/1.0 410 Gone. ' . $msg);
         return;
     }
@@ -665,16 +660,14 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
     bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
-    //if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
+    if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
         // Process the events.
         bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
         $msg = 'Enqueued.';
-        error_log($msg);
         header('HTTP/1.0 202 Accepted. ' . $msg);
         return;
-    //}
+    }
     $msg = 'Already processed.';
-    error_log($msg);
     header('HTTP/1.0 202 Accepted. ' . $msg);
 }
 
