@@ -3262,3 +3262,44 @@ function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
 
     return $activitystatus;
 }
+
+/**
+ * Helper for preparing metadata used while creating the meeting.
+ *
+ * @param  array    $bbbsession
+ * @return array
+ */
+function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
+    global $USER;
+    // Create standard metadata.
+    $metadata = [
+        'bbb-origin' => $bbbsession['origin'],
+        'bbb-origin-version' => $bbbsession['originVersion'],
+        'bbb-origin-server-name' => $bbbsession['originServerName'],
+        'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
+        'bbb-origin-tag' => $bbbsession['originTag'],
+        'bbb-context' => $bbbsession['course']->fullname,
+        'bbb-context-id' => $bbbsession['course']->id,
+        'bbb-context-name' => trim(html_to_text($bbbsession['course']->fullname, 0)),
+        'bbb-context-label' => trim(html_to_text($bbbsession['course']->shortname, 0)),
+        'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
+        'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
+        'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+    ];
+    // Special metadata for recording processing.
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
+        $metadata["bn-recording-status"] = json_encode(
+            array(
+                'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
+                'context' => $bbbsession['bigbluebuttonbnURL']
+              )
+          );
+    }
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
+        $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+    }
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
+    }
+    return $metadata;
+}

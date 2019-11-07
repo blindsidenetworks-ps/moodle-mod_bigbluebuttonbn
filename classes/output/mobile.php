@@ -78,10 +78,10 @@ class mobile {
         $bbbsession['coursename'] = $course->fullname;
         $bbbsession['cm'] = $cm;
         $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bbbsession_set($context, $bbbsession);
 
         // Check activity status.
-        $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
+        $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::get_activity_status($bbbsession);
         if ($activitystatus == 'not_started') {
             $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
@@ -163,8 +163,8 @@ class mobile {
 
             // The meeting doesnt exist in BBB server, must be created.
             $response = bigbluebuttonbn_get_create_meeting_array(
-                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_data($bbbsession),
-                \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
+                \mod_bigbluebuttonbn\locallib\mobileview::create_meeting_data($bbbsession),
+                \mod_bigbluebuttonbn\locallib\mobileview::create_meeting_metadata($bbbsession),
                 $bbbsession['presentation']['name'],
                 $bbbsession['presentation']['url']
             );
@@ -199,7 +199,7 @@ class mobile {
             bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         }
 
-        // It is part of 'bigbluebutton_bbb_view_join_meeting' in bbb_view.
+        // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
