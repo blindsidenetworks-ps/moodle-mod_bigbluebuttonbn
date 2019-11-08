@@ -145,12 +145,14 @@ switch (strtolower($action)) {
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Check the origin page.
-        $sql = "SELECT meta FROM {bigbluebuttonbn_logs}
-                  WHERE userid = ? AND log = 'Join'
-                  ORDER BY ID DESC LIMIT 1";
-        $params = array('userid' => $bbbsession['userID']);
-        $lastaccess = $DB->get_field_sql($sql, $params);
-        $lastaccess = json_decode($lastaccess);
+        $select = "userid = ? AND log = ?";
+        $params = array(
+                'userid' => $bbbsession['userID'],
+                'log' => BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
+            );
+        $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id', 'meta', 1);
+        $lastaccess = end($accesses);
+        $lastaccess = json_decode($lastaccess->meta);
         // If the user acceded from Timeline it should be redirected to the Dashboard.
         if (isset($lastaccess->origin) && $lastaccess->origin == BIGBLUEBUTTON_ORIGIN_TIMELINE) {
             redirect($CFG->wwwroot . '/my/');
