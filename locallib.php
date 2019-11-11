@@ -3299,7 +3299,7 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
         $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
     }
     if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
-        $metadata['bn-meeting-events-url'] = $bbbsession['meetingEventsURL'];
+        $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
     return $metadata;
 }
