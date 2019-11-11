@@ -566,6 +566,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
+    require_once(__DIR__.'/locallib.php');
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
         $bigbluebuttonbn->meetingid = 0;
