@@ -103,7 +103,8 @@ class notifier {
      * @return void
      */
     public static function notification_send($sender, $bigbluebuttonbn, $message = '') {
-        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
+        $coursemodinfo = \course_modinfo::instance($bigbluebuttonbn->course);
+        $course = $coursemodinfo->get_course($bigbluebuttonbn->course);
         // Complete message.
         $msg = (object) array();
         $msg->user_name = fullname($sender);
@@ -113,7 +114,7 @@ class notifier {
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         // Process the message sending.
-        foreach (self::users_to_notify($cm) as $user) {
+        foreach (self::users_to_notify($bigbluebuttonbn->course) as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);
             }
@@ -123,16 +124,15 @@ class notifier {
     /**
      * Define users to be notified.
      *
-     * @param object $cm
+     * @param object $courseid
      * @return array
      */
-    public static function users_to_notify($cm) {
-        $context = \context_module::instance($cm->id);
+    public static function users_to_notify($courseid) {
+        $context = \context_course::instance($courseid);
         $users = array();
         // See if there are any users in the lesson.
-        $users = get_enrolled_users($context);
-        $info = new \core_availability\info_module($cm);
-        $users = $info->filter_user_list($users);
+        list($sort, $params) = users_order_by_sql('u');
+        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         return $users;
     }
 }

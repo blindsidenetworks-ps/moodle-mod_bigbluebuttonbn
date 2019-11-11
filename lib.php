@@ -636,11 +636,7 @@ function bigbluebuttonbn_process_pre_save_common(&$bigbluebuttonbn) {
  *
  * @return void
  **/
-function bigbluebuttonbn_process_post_save($bigbluebuttonbn) {
-    global $DB;
-    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
-        return false;
-    }
+function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
