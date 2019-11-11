@@ -38,6 +38,7 @@ require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir.'/modinfolib.php');
 
 // JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
 if (!class_exists('\Firebase\JWT\JWT')) {
@@ -635,11 +636,7 @@ function bigbluebuttonbn_process_pre_save_common(&$bigbluebuttonbn) {
  *
  * @return void
  **/
-function bigbluebuttonbn_process_post_save($bigbluebuttonbn) {
-    global $DB;
-    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
-        return false;
-    }
+function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
