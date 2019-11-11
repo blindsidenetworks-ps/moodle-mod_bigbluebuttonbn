@@ -38,7 +38,6 @@ require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->libdir.'/modinfolib.php');
 
 // JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
 if (!class_exists('\Firebase\JWT\JWT')) {
