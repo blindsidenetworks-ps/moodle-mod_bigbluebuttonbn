@@ -190,6 +190,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addGroup($group, 'completionattendancegroup', $completiongroup, [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
         $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
+        $mform->disabledIf('completionattendanceenabled', 'completionview', 'notchecked');
 
         return ['completionattendancegroup'];
     }
