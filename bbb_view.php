@@ -150,7 +150,7 @@ switch (strtolower($action)) {
                 'userid' => $bbbsession['userID'],
                 'log' => BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
             );
-        $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id', 'meta', 1);
+        $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id ASC', 'id, meta', 1);
         $lastaccess = end($accesses);
         $lastaccess = json_decode($lastaccess->meta);
         // If the user acceded from Timeline it should be redirected to the Dashboard.
