@@ -84,6 +84,9 @@ M.mod_bigbluebuttonbn.modform = {
         // Competencies validation.
         this.showFieldset('id_competenciessection', showAll ||
                           this.isFeatureEnabled(profileType, 'competenciessection'));
+        // Completion validation.
+        this.showFormGroup('completionattendanceenabled', showAll ||
+                          this.isFeatureEnabled(profileType, 'completionattendance'));
     },
 
     isFeatureEnabled: function(profileType, feature) {
@@ -93,29 +96,44 @@ M.mod_bigbluebuttonbn.modform = {
 
     showFieldset: function(id, show) {
         // Show room settings validation.
-        var fieldset = Y.DOM.byId(id);
-        if (!fieldset) {
+        var node = Y.one('#' + id);
+        if (!node) {
             return;
         }
-        if (show) {
-            Y.DOM.setStyle(fieldset, 'display', 'block');
-            return;
-        }
-        Y.DOM.setStyle(fieldset, 'display', 'none');
-    },
-
-    showInput: function(id, show) {
-        // Show room settings validation.
-        var inputset = Y.DOM.byId(id);
-        if (!inputset) {
-            return;
-        }
-        var node = Y.one(inputset).ancestor('div').ancestor('div');
         if (show) {
             node.setStyle('display', 'block');
             return;
         }
         node.setStyle('display', 'none');
+    },
+
+    showInput: function(id, show) {
+        // Show room settings validation.
+        var node = Y.one('#' + id);
+        if (!node) {
+            return;
+        }
+        var ancestor = node.ancestor('div').ancestor('div');
+        if (show) {
+            ancestor.setStyle('display', 'block');
+            return;
+        }
+        ancestor.setStyle('display', 'none');
+    },
+
+    showFormGroup: function(id, show) {
+        // Show room settings validation.
+        var node = Y.one('input#id_' + id);
+        if (!node) {
+            return;
+        }
+        var ancestor = node.ancestor('div').ancestor('div');
+        if (show) {
+            ancestor.removeClass('hidden');
+            return;
+        }
+        ancestor.addClass('hidden');
+        node.set('checked', false);
     },
 
     participantSelectionSet: function() {
@@ -286,7 +304,6 @@ M.mod_bigbluebuttonbn.modform = {
                 this.bigbluebuttonbn.participantList[i].role = participantListRoleSelection.value;
             }
         }
-
         // Update in the form.
         this.participantListUpdate();
     },

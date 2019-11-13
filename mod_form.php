@@ -178,6 +178,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform = $this->_form;
+        if (!bigbluebuttonbn_is_bn_server() || !(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+            return [];
+        }
+
         // Elements for completion by Attendance.
         $completiongroup = get_string('completionattendancegroup', 'bigbluebuttonbn');
         $completionrule = get_string('completionattendance', 'bigbluebuttonbn');

@@ -2037,6 +2037,8 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
                 'userid' => $userid
             );
             $task->set_custom_data($data);
+            // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for everriding.
+            // $ task -> set_userid ( $ user -> id );.
             // Queue it.
             \core\task\manager::queue_adhoc_task($task);
         } catch (Exception $e) {
@@ -2062,7 +2064,7 @@ function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
     if (!$completion->is_enabled($cm)) {
         return;
     }
-    if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, true)) {
+    if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
         $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
     }
 }
@@ -2382,7 +2384,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
                   'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                       'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                       'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                      'clienttype')),
+                      'clienttype', 'completionattendance')),
         BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
                   'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
                   'features' => array('showrecordings', 'importrecordings'))

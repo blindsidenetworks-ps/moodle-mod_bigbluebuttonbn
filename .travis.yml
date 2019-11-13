@@ -12,8 +12,7 @@ addons:
 
 cache:
   directories:
-    - $HOME/.composer/cache
-    - $HOME/.npm
+    - $HOME
 
 php:
   - 7.0
@@ -82,5 +81,5 @@ script:
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
   #- moodle-plugin-ci mustache
-  - moodle-plugin-ci grunt
+  #- moodle-plugin-ci grunt
   - moodle-plugin-ci behat
