@@ -32,24 +32,17 @@ use \Firebase\JWT\JWT;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
-$params['action'] = optional_param('action', '', PARAM_TEXT);
-$params['callback'] = optional_param('callback', '', PARAM_TEXT);
-$params['id'] = optional_param('id', '', PARAM_TEXT);
-$params['idx'] = optional_param('idx', '', PARAM_TEXT);
-$params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
-$params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
-$params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
-$params['meta'] = optional_param('meta', '', PARAM_TEXT);
+$params = $_REQUEST;
 
-if (empty($params['action'])) {
+if (!isset($params['action']) || empty($params['action'])) {
     header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
     return;
 }
 
 // The endpoints for ajax requests are now implemented in bbb_ajax.php.
-// The endpoints for recording_ready and live_session_event callbacks must be moved to services (CONTRIB-7440).
+// The endpoints for recording_ready and meeting_events callbacks must be moved to services (CONTRIB-7440).
 // But in order to support the transition, requests other than the callbacks are redirected to bbb_ajax.php.
-if ($params['action'] != 'recording_ready' && $params['action'] != 'live_session_events') {
+if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_events') {
     $url = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?' . http_build_query($params, '', '&');
     header("Location: " . $url);
     exit;
@@ -61,10 +54,10 @@ if (!empty($error)) {
     return;
 }
 
-if ($params['bigbluebuttonbn']) {
-    $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
-    $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
-}
+$bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+$bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
+$context = context_course::instance($bigbluebuttonbn->course);
+$PAGE->set_context($context);
 
 try {
     $a = strtolower($params['action']);
@@ -72,8 +65,10 @@ try {
         bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
         return;
     }
-    if ($a == 'live_session_events') {
-        bigbluebuttonbn_broker_live_session_events($params, $bigbluebuttonbn);
+    if ($a == 'meeting_events') {
+        // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
+        // which is processed in the function using super globals.
+        bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');

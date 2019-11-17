@@ -119,8 +119,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     public function data_preprocessing(&$defaultvalues) {
+        parent::data_preprocessing($defaultvalues);
+
+        // Completion: tick by default if completion attendance settings is set to 1 or more.
+        $defaultvalues['completionattendanceenabled'] = 0;
+        if (!empty($defaultvalues['completionattendance'])) {
+            $defaultvalues['completionattendanceenabled'] = 1;
+        }
+        // Check if we are Editing an existing instance.
         if ($this->current->instance) {
-            // Editing existing instance - copy existing files into draft area.
+            // Pre-uploaded presentation: copy existing files into draft area.
             try {
                 $draftitemid = file_get_submitted_draft_itemid('presentation');
                 file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
@@ -130,6 +138,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             } catch (Exception $e) {
                 debugging('Presentation could not be loaded: '.$e->getMessage(), DEBUG_DEVELOPER);
                 return;
+            }
+            // Completion: tick if completion attendance settings is set to 1 or more.
+            $defaultvalues['completionattendanceenabled'] = 0;
+            if (!empty($this->current->completionattendance)) {
+                $defaultvalues['completionattendanceenabled'] = 1;
             }
         }
     }
@@ -156,6 +169,65 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         return $errors;
     }
+
+    /**
+     * Add elements for setting the custom completion rules.
+     *
+     * @category completion
+     * @return array List of added element names, or names of wrapping group elements.
+     */
+    public function add_completion_rules() {
+        $mform = $this->_form;
+        if (!bigbluebuttonbn_is_bn_server() || !(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+            return [];
+        }
+
+        // Elements for completion by Attendance.
+        $completiongroup = get_string('completionattendancegroup', 'bigbluebuttonbn');
+        $completionrule = get_string('completionattendance', 'bigbluebuttonbn');
+        $group = [
+            $mform->createElement('checkbox', 'completionattendanceenabled', '', $completionrule . '&nbsp;'),
+            $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
+            $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
+        ];
+        $mform->setType('completionattendance', PARAM_INT);
+        $mform->addGroup($group, 'completionattendancegroup', $completiongroup, [' '], false);
+        $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
+        $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
+        $mform->disabledIf('completionattendanceenabled', 'completionview', 'notchecked');
+
+        return ['completionattendancegroup'];
+    }
+
+    /**
+     * Called during validation to see whether some module-specific completion rules are selected.
+     *
+     * @param array $data Input data not yet validated.
+     * @return bool True if one or more rules is enabled, false if none are.
+     */
+    public function completion_rule_enabled($data) {
+        return (!empty($data['completionattendanceenabled']) && $data['completionattendance'] != 0);
+    }
+
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        // Turn off completion settings if the checkboxes aren't ticked.
+        if (!empty($data->completionunlocked)) {
+            $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
+            if (empty($data->completionattendanceenabled) || !$autocompletion) {
+                $data->completionattendance = 0;
+            }
+        }
+    }
+
 
     /**
      * Function for showing the block for selecting profiles.

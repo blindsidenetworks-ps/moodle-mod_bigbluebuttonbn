@@ -25,6 +25,7 @@
  */
 
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\task;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -2003,8 +2004,69 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
     $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
         ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
         get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-    $context = context_course::instance($bigbluebuttonbn->course);
     \mod_bigbluebuttonbn\locallib\notifier::notification_send($sender, $bigbluebuttonbn, $messagetext);
+}
+
+/**
+ * Helper function enqueues list of meeting events to be stored and processed as for completion.
+ *
+ * @param object $bigbluebuttonbn
+ * @param object $jsonobj
+ *
+ * @return void
+ */
+function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
+    $meetingid = $jsonobj->{'meeting_id'};
+    $recordid = $jsonobj->{'internal_meeting_id'};
+    $attendees = $jsonobj->{'data'}->{'attendees'};
+    foreach ($attendees as $attendee) {
+        $userid = $attendee->{'ext_user_id'};
+        $overrides['meetingid'] = $meetingid;
+        $overrides['userid'] = $userid;
+        $meta['recordid'] = $recordid;
+        $meta['data'] = $attendee;
+        // Stores the log.
+        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
+        // Enqueue a task for processing the completion.
+        try {
+            // Create the instance of completion_update_state task.
+            $task = new \mod_bigbluebuttonbn\task\completion_update_state();
+            // Add custom data.
+            $data = array(
+                'bigbluebuttonbn' => $bigbluebuttonbn,
+                'userid' => $userid
+            );
+            $task->set_custom_data($data);
+            // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for everriding.
+            // $ task -> set_userid ( $ user -> id );.
+            // Queue it.
+            \core\task\manager::queue_adhoc_task($task);
+        } catch (Exception $e) {
+            mtrace("Error while enqueuing completion_uopdate_state task. " . (string)$e);
+        }
+    }
+}
+
+/**
+ * Helper function enqueues completion trigger.
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $userid
+ *
+ * @return void
+ */
+function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
+    if (!$bigbluebuttonbn->completionattendance) {
+        return;
+    }
+    list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
+    $completion = new completion_info($course);
+    if (!$completion->is_enabled($cm)) {
+        return;
+    }
+    if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
+        $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
+    }
 }
 
 /**
@@ -2013,6 +2075,9 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return boolean
  */
 function bigbluebuttonbn_is_bn_server() {
+    if (\mod_bigbluebuttonbn\locallib\config::get('bn_server')) {
+        return true;
+    }
     $parsedurl = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
     if (!isset($parsedurl['host'])) {
         return false;
@@ -2284,13 +2349,23 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  * Helper function to get how much callback events are logged.
  *
  * @param string $recordid
+ * @param string $callbacktype
  *
  * @return integer
  */
-function bigbluebuttonbn_get_count_callback_event_log($recordid) {
+function bigbluebuttonbn_get_count_callback_event_log($recordid, $callbacktype = 'recording_ready') {
     global $DB;
     $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
-    return $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%{$recordid}%"));
+    // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
+    if ($callbacktype == 'recording_ready') {
+        $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
+        $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%",
+            $callbacktype, 'callback'));
+        return $count;
+    }
+    $sql .= ' AND meta LIKE ?;';
+    $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
+    return $count;
 }
 
 /**
@@ -2309,7 +2384,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
                   'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                       'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                       'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                      'clienttype')),
+                      'clienttype', 'completionattendance')),
         BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
                   'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
                   'features' => array('showrecordings', 'importrecordings'))
@@ -2788,16 +2863,16 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
  * @return void
  */
 function bigbluebuttonbn_settings_extended(&$renderer) {
-    // Configuration for extended BN capabilities.
-    if (!bigbluebuttonbn_is_bn_server()) {
+    // Configuration for 'notify users when recording ready' feature.
+    if (!(boolean)\mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
         return;
     }
-    // Configuration for 'notify users when recording ready' feature.
-    if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
-        $renderer->render_group_header('extended_capabilities');
-        // UI for 'notify users when recording ready' feature.
-        $renderer->render_group_element('recordingready_enabled',
-            $renderer->render_group_element_checkbox('recordingready_enabled', 0));
+    $renderer->render_group_header('extended_capabilities');
+    // UI for 'notify users when recording ready' feature.
+    $renderer->render_group_element('recordingready_enabled',
+        $renderer->render_group_element_checkbox('recordingready_enabled', 0));
+    // Configuration for extended BN capabilities.
+    if (bigbluebuttonbn_is_bn_server()) {
         // UI for 'register meeting events' feature.
         $renderer->render_group_element('meetingevents_enabled',
             $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
@@ -3188,4 +3263,45 @@ function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
     }
 
     return $activitystatus;
+}
+
+/**
+ * Helper for preparing metadata used while creating the meeting.
+ *
+ * @param  array    $bbbsession
+ * @return array
+ */
+function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
+    global $USER;
+    // Create standard metadata.
+    $metadata = [
+        'bbb-origin' => $bbbsession['origin'],
+        'bbb-origin-version' => $bbbsession['originVersion'],
+        'bbb-origin-server-name' => $bbbsession['originServerName'],
+        'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
+        'bbb-origin-tag' => $bbbsession['originTag'],
+        'bbb-context' => $bbbsession['course']->fullname,
+        'bbb-context-id' => $bbbsession['course']->id,
+        'bbb-context-name' => trim(html_to_text($bbbsession['course']->fullname, 0)),
+        'bbb-context-label' => trim(html_to_text($bbbsession['course']->shortname, 0)),
+        'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
+        'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
+        'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+    ];
+    // Special metadata for recording processing.
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
+        $metadata["bn-recording-status"] = json_encode(
+            array(
+                'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
+                'context' => $bbbsession['bigbluebuttonbnURL']
+              )
+          );
+    }
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
+        $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+    }
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
+    }
+    return $metadata;
 }

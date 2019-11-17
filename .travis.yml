@@ -2,73 +2,174 @@ language: php
 
 sudo: required
 
-#branches:
-#  only:
-#    - master
-
 addons:
   firefox: "47.0.1"
   postgresql: "9.5"
+
+services:
+  - mysql
+  - postgresql
 
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-
-services:
-  - mysql
-
 env:
   global:
     - COVERAGE=false
-  matrix:
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
-    - MOODLE_BRANCH=master DB=mysqli
-    - MOODLE_BRANCH=master DB=pgsql
 
-matrix:
-  exclude:
-    - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
-    - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
-    - php: 7.0
-      env: MOODLE_BRANCH=master DB=mysqli
-    - php: 7.0
-      env: MOODLE_BRANCH=master DB=pgsql
-    - php: 7.2
+jobs:
+  include:
+    - # MOODLE_32_STABLE with mysql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
       env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
-    - php: 7.2
+    - # MOODLE_32_STABLE with pgsql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
       env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
-    - php: 7.2
+    - # MOODLE_32_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli
+    - # MOODLE_32_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql
+
+    - # MOODLE_33_STABLE with mysql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
-    - php: 7.2
+    - # MOODLE_33_STABLE with pgsql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
       env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+    - # MOODLE_33_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli
+    - # MOODLE_33_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql
+
+    - # MOODLE_34_STABLE with mysql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    - # MOODLE_34_STABLE with pgsql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+    - # MOODLE_34_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    - # MOODLE_34_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+    - # MOODLE_34_STABLE with mysql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli
+    - # MOODLE_34_STABLE with pgsql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql
+
+    - # MOODLE_35_STABLE with mysql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - # MOODLE_35_STABLE with pgsql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    - # MOODLE_35_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - # MOODLE_35_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+    - # MOODLE_35_STABLE with mysql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - # MOODLE_35_STABLE with pgsql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+
+    - # MOODLE_36_STABLE with mysql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    - # MOODLE_36_STABLE with pgsql using php 7.0
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.0
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+    - # MOODLE_36_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    - # MOODLE_36_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+    - # MOODLE_36_STABLE with mysql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli
+    - # MOODLE_36_STABLE with pgsql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+
+    - # MOODLE_37_STABLE with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
+    - # MOODLE_37_STABLE with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
+    - # MOODLE_37_STABLE with mysql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
+    - # MOODLE_37_STABLE with pgsql using php 7.2
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.2
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql
+
+    - # master with mysql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=master DB=mysqli
+    - # master with pgsql using php 7.1
+      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
+      php: 7.1
+      env: MOODLE_BRANCH=master DB=pgsql
+    - # master with mysql using php 7.2
+      php: 7.2
+      env: MOODLE_BRANCH=master DB=mysqli
+    - # master with pgsql using php 7.2
+      php: 7.2
+      env: MOODLE_BRANCH=master DB=pgsql
 
 before_install:
   - phpenv config-rm xdebug.ini
+  - nvm install 8.9
+  - npm install
   - cd ../..
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - nvm install 8.9
-  - npm install
 
 install:
   - moodle-plugin-ci install
@@ -79,8 +180,9 @@ script:
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
-  - moodle-plugin-ci phpunit
   - moodle-plugin-ci savepoints
   #- moodle-plugin-ci mustache
-  - moodle-plugin-ci grunt
+  #- moodle-plugin-ci grunt
+  - moodle-plugin-ci phpdoc
+  - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat

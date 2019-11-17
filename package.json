@@ -1,0 +1,9 @@
+{
+  "name": "moodle-mod_bigbluebuttonbn",
+  "devDependencies": {
+    "grunt": "^1.0.4",
+    "grunt-contrib-less": "^2.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-load-gruntfile": "0.0.2"
+  }
+}

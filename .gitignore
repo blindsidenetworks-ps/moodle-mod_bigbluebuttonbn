@@ -7,6 +7,5 @@
 /output*
 /node_modules/
 
-
 /vendor/*
 !/vendor/firebase/
