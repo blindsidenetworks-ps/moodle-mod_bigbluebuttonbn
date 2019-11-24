@@ -35,7 +35,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class notifier {
+class notifier
+{
     /**
      * Starts the notification process.
      *
@@ -43,7 +44,8 @@ class notifier {
      * @param string $action
      * @return void
      */
-    public static function notification_process($bigbluebuttonbn, $action) {
+    public static function notification_process($bigbluebuttonbn, $action)
+    {
         global $USER;
         // Prepare message.
         $msg = (object) array();
@@ -61,7 +63,11 @@ class notifier {
         $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($USER);
         // Send notification to all users enrolled.
-        self::notification_send($USER, $bigbluebuttonbn, self::notification_msg_html($msg));
+        foreach (self::users_to_notify($bigbluebuttonbn->course) as $receiver) {
+            if ($receiver->id != $USER->id) {
+                self::notification_send($USER, $receiver, $bigbluebuttonbn);
+            }
+        }
     }
 
     /**
@@ -70,7 +76,8 @@ class notifier {
      * @param object $msg
      * @return string
      */
-    public static function notification_msg_html($msg) {
+    public static function notification_msg_html($msg)
+    {
         $messagetext = '<p>'.$msg->activity_type.' "'.$msg->activity_title.'" '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
         $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
@@ -91,6 +98,9 @@ class notifier {
         $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.
             get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>'."\n";
         $messagetext .= $msg->activity_owner.'</td></tr></tbody></table></p>'."\n";
+        $messagetext .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
+            $msg->user_name.'('.$msg->user_email.') ';
+        $messagetext .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         return $messagetext;
     }
 
@@ -98,11 +108,12 @@ class notifier {
      * Sends the message.
      *
      * @param object $sender
+     * @param object $receiver
      * @param object $bigbluebuttonbn
-     * @param string $message
      * @return void
      */
-    public static function notification_send($sender, $bigbluebuttonbn, $message = '') {
+    public static function notification_send($sender, $receiver, $bigbluebuttonbn)
+    {
         $coursemodinfo = \course_modinfo::instance($bigbluebuttonbn->course);
         $course = $coursemodinfo->get_course($bigbluebuttonbn->course);
         // Complete message.
@@ -110,15 +121,8 @@ class notifier {
         $msg->user_name = fullname($sender);
         $msg->user_email = $sender->email;
         $msg->course_name = $course->fullname;
-        $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
-            $msg->user_name.'('.$msg->user_email.') ';
-        $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-        // Process the message sending.
-        foreach (self::users_to_notify($bigbluebuttonbn->course) as $user) {
-            if ($user->id != $sender->id) {
-                message_post_message($sender, $user, $message, FORMAT_HTML);
-            }
-        }
+        // Send the message.
+        message_post_message($sender, $receiver, self::notification_msg_html($msg), FORMAT_HTML);
     }
 
     /**
@@ -127,7 +131,8 @@ class notifier {
      * @param object $courseid
      * @return array
      */
-    public static function users_to_notify($courseid) {
+    public static function users_to_notify($courseid)
+    {
         $context = \context_course::instance($courseid);
         $users = array();
         // See if there are any users in the lesson.
