@@ -2125,12 +2125,7 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)
  */
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn)
 {
-    $sender = get_admin();
-    // Prepare message.
-    $messagetext = '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
-        ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
-        get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
-    \mod_bigbluebuttonbn\locallib\notifier::send_all($sender, $bigbluebuttonbn, $messagetext);
+    \mod_bigbluebuttonbn\locallib\notifier::notify_recording_ready($bigbluebuttonbn);
 }
 
 /**
