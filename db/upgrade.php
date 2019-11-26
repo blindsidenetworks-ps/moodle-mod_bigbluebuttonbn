@@ -185,14 +185,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019042000, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2020101000) {
+    if ($oldversion < 2019101000) {
         // Add field for Completion with attendance.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionattendance',
             $fielddefinition);
         // Update db version tag.
-        upgrade_mod_savepoint(true, 2020101000, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2019101000, 'bigbluebuttonbn');
     }
     return true;
 }
