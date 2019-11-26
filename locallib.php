@@ -2056,9 +2056,6 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
-    if (!$bigbluebuttonbn->completionattendance) {
-        return;
-    }
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
     $completion = new completion_info($course);
     if (!$completion->is_enabled($cm)) {
@@ -2384,7 +2381,7 @@ function bigbluebuttonbn_get_instance_type_profiles() {
                   'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                       'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                       'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                      'clienttype', 'completionattendance')),
+                      'clienttype', 'completionattendance', 'completionengagement')),
         BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
                   'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
                   'features' => array('showrecordings', 'importrecordings'))
