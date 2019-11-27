@@ -1150,10 +1150,10 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
 /**
  * Adds module specific settings to the settings block
  *
- * @param settings_navigation $settings The settings navigation object
- * @param navigation_node $forumnode The node to add module settings to
+ * @param settings_navigation $settingsnav The settings navigation object
+ * @param navigation_node $nodenav The node to add module settings to
  */
-function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $bigbluebuttonbnnode) {
+function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
     global $PAGE, $CFG;
 
     $params = $PAGE->url->params();
@@ -1163,7 +1163,7 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
 
     if (isloggedin() && !isguestuser()) {
         $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $cm->instance;
-        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
+        $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
             $completionvalidate, navigation_node::TYPE_CONTAINER);
     }
 }
