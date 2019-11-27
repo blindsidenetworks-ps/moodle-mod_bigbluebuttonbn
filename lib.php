@@ -1162,8 +1162,8 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
     }
 
     if (isloggedin() && !isguestuser()) {
-        #$completionvalidate = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?action=completion_validate&bigbluebuttonbn=' . $cm->instance;
         $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $cm->instance;
-        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'), $completionvalidate, navigation_node::TYPE_CONTAINER);
+        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
+            $completionvalidate, navigation_node::TYPE_CONTAINER);
     }
 }
