@@ -166,7 +166,21 @@ M.mod_bigbluebuttonbn.broker = {
                 }
             }
         });
+    },
+
+    completionValidate: function(qs) {
+        this.datasource.sendRequest({
+            request: qs,
+            callback: {
+                success: function(e) {
+                    if (e.data.status) {
+                        return;
+                    }
+                }
+            }
+        });
     }
+
 };
 
 

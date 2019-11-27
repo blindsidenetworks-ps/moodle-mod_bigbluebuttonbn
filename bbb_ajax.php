@@ -121,6 +121,10 @@ try {
         echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
         return;
     }
+    if ($a == 'completion_validate') {
+        echo bigbluebuttonbn_broker_completion_validate($bbbsession, $params);
+        return;
+    }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
 } catch (Exception $e) {
     header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());

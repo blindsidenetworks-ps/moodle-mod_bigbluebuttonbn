@@ -1154,13 +1154,16 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
  * @param navigation_node $forumnode The node to add module settings to
  */
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $bigbluebuttonbnnode) {
-    global $USER, $PAGE, $CFG, $DB, $OUTPUT;
+    global $PAGE, $CFG;
 
-    if (empty($PAGE->cm->context)) {
-        $PAGE->cm->context = context_module::instance($PAGE->cm->instance);
+    $params = $PAGE->url->params();
+    if (!empty($params['id'])) {
+        $cm = get_coursemodule_from_id('bigbluebuttonbn', $params['id'], 0, false, MUST_EXIST);
     }
 
     if (isloggedin() && !isguestuser()) {
-        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'), $completionlink, navigation_node::TYPE_CONTAINER);
+        #$completionvalidate = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?action=completion_validate&bigbluebuttonbn=' . $cm->instance;
+        $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $cm->instance;
+        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'), $completionvalidate, navigation_node::TYPE_CONTAINER);
     }
 }

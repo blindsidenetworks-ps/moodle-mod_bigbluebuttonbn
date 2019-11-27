@@ -767,6 +767,10 @@ function bigbluebuttonbn_broker_required_parameters() {
     $params['meeting_events'] = [
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
     ];
+    $params['completion_validate'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
+    ];
     return $params;
 }
 
@@ -780,4 +784,16 @@ function bigbluebuttonbn_broker_required_parameters() {
  */
 function bigbluebuttonbn_broker_recording_is_imported($recordings, $recordingid) {
     return (isset($recordings[$recordingid]) && isset($recordings[$recordingid]['imported']));
+}
+
+/**
+ * Helper for performing validation of completion.
+ *
+ * @param array $bbbsession
+ * @param array $params
+ *
+ * @return string
+ */
+function bigbluebuttonbn_broker_completion_validate($bbbsession, $params) {
+    global $SESSION;
 }
