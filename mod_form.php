@@ -183,18 +183,19 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         // Elements for completion by Attendance.
-        $completiongroup = get_string('completionattendancegroup', 'bigbluebuttonbn');
-        $completionrule = get_string('completionattendance', 'bigbluebuttonbn');
-        $group = [
-            $mform->createElement('checkbox', 'completionattendanceenabled', '', $completionrule . '&nbsp;'),
+        $attendance['grouplabel'] = get_string('completionattendancegroup', 'bigbluebuttonbn');
+        $attendance['rulelabel'] = get_string('completionattendance', 'bigbluebuttonbn');
+        $attendance['group'] = [
+            $mform->createElement('checkbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
             $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
         ];
         $mform->setType('completionattendance', PARAM_INT);
-        $mform->addGroup($group, 'completionattendancegroup', $completiongroup, [' '], false);
+        $mform->addGroup($attendance['group'], 'completionattendancegroup', $attendance['grouplabel'], [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
-        $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
         $mform->disabledIf('completionattendanceenabled', 'completionview', 'notchecked');
+        $mform->disabledIf('completionattendance', 'completionview', 'notchecked');
+        $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
 
         return ['completionattendancegroup'];
     }
