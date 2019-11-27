@@ -83,6 +83,7 @@ $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
 $string['completionupdatestate'] = "Complation update state";
+$string['completionvalidatestate'] = "Validate completion";
 
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';

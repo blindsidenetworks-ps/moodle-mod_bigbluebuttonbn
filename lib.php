@@ -1146,3 +1146,21 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
     }
     return true;
 }
+
+/**
+ * Adds module specific settings to the settings block
+ *
+ * @param settings_navigation $settings The settings navigation object
+ * @param navigation_node $forumnode The node to add module settings to
+ */
+function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $bigbluebuttonbnnode) {
+    global $USER, $PAGE, $CFG, $DB, $OUTPUT;
+
+    if (empty($PAGE->cm->context)) {
+        $PAGE->cm->context = context_module::instance($PAGE->cm->instance);
+    }
+
+    if (isloggedin() && !isguestuser()) {
+        $bigbluebuttonbnnode->add(get_string('completionvalidatestate', 'bigbluebuttonbn'), $completionlink, navigation_node::TYPE_CONTAINER);
+    }
+}
