@@ -789,11 +789,17 @@ function bigbluebuttonbn_broker_recording_is_imported($recordings, $recordingid)
 /**
  * Helper for performing validation of completion.
  *
- * @param array $bbbsession
- * @param array $params
+ * @param object $bigbluebuttonbn
  *
- * @return string
+ * @return void
  */
-function bigbluebuttonbn_broker_completion_validate($bbbsession, $params) {
-    global $SESSION;
+function bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn) {
+    $context = \context_course::instance($bigbluebuttonbn->course);
+    // Get list with all the users enrolled in the course.
+    list($sort, $params) = users_order_by_sql('u');
+    $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
+    foreach ($users as $user) {
+        // Enqueue a task for processing the completion.
+        bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
+    }
 }
