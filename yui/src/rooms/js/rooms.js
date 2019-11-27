@@ -275,7 +275,7 @@ M.mod_bigbluebuttonbn.rooms = {
             return;
         }
         var qs = node.get('hash').substr(1);
-        node.on("click", function(e) {
+        node.on("click", function() {
             M.mod_bigbluebuttonbn.broker.completionValidate(qs);
         });
     }

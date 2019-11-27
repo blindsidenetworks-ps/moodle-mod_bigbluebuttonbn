@@ -122,7 +122,8 @@ try {
         return;
     }
     if ($a == 'completion_validate') {
-        echo bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn);
+        $completionvalidate = bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params);
+        echo $completionvalidate;
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');

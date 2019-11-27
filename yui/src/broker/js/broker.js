@@ -172,6 +172,8 @@ M.mod_bigbluebuttonbn.broker = {
             callback: {
                 success: function(e) {
                     if (e.data.status) {
+                        var message = M.util.get_string('completionvalidatestatetriggered', 'bigbluebuttonbn');
+                        M.mod_bigbluebuttonbn.helpers.alertError(message, 'info');
                         return;
                     }
                 }

@@ -84,6 +84,7 @@ $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minut
 
 $string['completionupdatestate'] = "Complation update state";
 $string['completionvalidatestate'] = "Validate completion";
+$string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
 
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';

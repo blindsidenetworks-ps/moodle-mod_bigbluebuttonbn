@@ -2068,15 +2068,14 @@ function bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
-    mtrace("Updating state for user $userid");
-    if (!$bigbluebuttonbn->completionattendance) {
-        mtrace("Completion by attendance not enabled");
-        return;
-    }
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
     $completion = new completion_info($course);
     if (!$completion->is_enabled($cm)) {
-        mtrace("Completion not enabled at all");
+        mtrace("Completion not enabled");
+        return;
+    }
+    if (!$bigbluebuttonbn->completionattendance) {
+        mtrace("Completion by attendance not enabled");
         return;
     }
     if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
