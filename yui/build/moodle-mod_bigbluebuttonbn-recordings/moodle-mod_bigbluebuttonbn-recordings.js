@@ -645,9 +645,12 @@ M.mod_bigbluebuttonbn.helpers = {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
 
-    alertError: function(message) {
+    alertError: function(message, title) {
+        if (typeof title == 'undefined') {
+            title = 'error';
+        }
         var alert = new M.core.alert({
-            title: M.util.get_string('error', 'moodle'),
+            title: M.util.get_string(title, 'moodle'),
             message: message
         });
         alert.show();

@@ -94,6 +94,7 @@ $string['completionengagementgroup_help'] = 'Active participation during the ses
 
 $string['completionupdatestate'] = "Completion update state";
 $string['completionvalidatestate'] = "Validate completion";
+$string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
 
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
