@@ -2028,22 +2028,34 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
         // Stores the log.
         bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
         // Enqueue a task for processing the completion.
-        try {
-            // Create the instance of completion_update_state task.
-            $task = new \mod_bigbluebuttonbn\task\completion_update_state();
-            // Add custom data.
-            $data = array(
-                'bigbluebuttonbn' => $bigbluebuttonbn,
-                'userid' => $userid
-            );
-            $task->set_custom_data($data);
-            // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for everriding.
-            // $ task -> set_userid ( $ user -> id );.
-            // Queue it.
-            \core\task\manager::queue_adhoc_task($task);
-        } catch (Exception $e) {
-            mtrace("Error while enqueuing completion_uopdate_state task. " . (string)$e);
-        }
+        bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
+    }
+}
+
+/**
+ * Helper function enqueues one user for being validated as for completion.
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $userid
+ *
+ * @return void
+ */
+function bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid) {
+    try {
+        // Create the instance of completion_update_state task.
+        $task = new \mod_bigbluebuttonbn\task\completion_update_state();
+        // Add custom data.
+        $data = array(
+            'bigbluebuttonbn' => $bigbluebuttonbn,
+            'userid' => $userid
+        );
+        $task->set_custom_data($data);
+        // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for overriding.
+        // $ task -> set_userid ( $ user -> id );.
+        // Enqueue it.
+        \core\task\manager::queue_adhoc_task($task);
+    } catch (Exception $e) {
+        mtrace("Error while enqueuing completion_update_state task. " . (string)$e);
     }
 }
 
@@ -2056,16 +2068,21 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
-    if (!$bigbluebuttonbn->completionattendance) {
-        return;
-    }
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
     $completion = new completion_info($course);
     if (!$completion->is_enabled($cm)) {
+        mtrace("Completion not enabled");
+        return;
+    }
+    if (!$bigbluebuttonbn->completionattendance) {
+        mtrace("Completion by attendance not enabled");
         return;
     }
     if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
+        mtrace("Completion succeeded for user $userid");
         $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
+    } else {
+        mtrace("Completion did not succeed for user $userid");
     }
 }
 

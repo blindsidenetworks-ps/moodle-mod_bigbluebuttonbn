@@ -767,6 +767,10 @@ function bigbluebuttonbn_broker_required_parameters() {
     $params['meeting_events'] = [
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
     ];
+    $params['completion_validate'] = [
+        'callback' => 'This request must include a javascript callback.',
+        'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
+    ];
     return $params;
 }
 
@@ -780,4 +784,26 @@ function bigbluebuttonbn_broker_required_parameters() {
  */
 function bigbluebuttonbn_broker_recording_is_imported($recordings, $recordingid) {
     return (isset($recordings[$recordingid]) && isset($recordings[$recordingid]['imported']));
+}
+
+/**
+ * Helper for performing validation of completion.
+ *
+ * @param object $bigbluebuttonbn
+ * @param array $params
+ *
+ * @return void
+ */
+function bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params) {
+    $context = \context_course::instance($bigbluebuttonbn->course);
+    // Get list with all the users enrolled in the course.
+    list($sort, $sqlparams) = users_order_by_sql('u');
+    $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
+    foreach ($users as $user) {
+        // Enqueue a task for processing the completion.
+        bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
+    }
+    $callbackresponse['status'] = 200;
+    $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
 }
