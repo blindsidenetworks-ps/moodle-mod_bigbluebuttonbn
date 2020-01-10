@@ -152,10 +152,11 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
     // Default return value.
     $result = $type;
 
+    $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
+    $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
+    $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
+
     if ($bigbluebuttonbn->completionattendance) {
-        $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
-        $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
-        $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
         if (!$logs) {
             // As completion by attendance was required, the activity hasn't been completed.
             return false;
@@ -167,6 +168,42 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
         }
         $attendancecount /= 60;
         $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+
+    if ($bigbluebuttonbn->completionengagementchats) {
+        if (!$logs) {
+            // As completion by engagement with chat was required, the activity hasn't been completed.
+            return false;
+        }
+        $engagementchatscount = 0;
+        foreach ($logs as $log) {
+            $summary = json_decode($log->meta);
+            $engagementchatscount += $summary->data->engagement->chats;
+        }
+        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatcount;
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+
+    if ($bigbluebuttonbn->completionengagementtalks) {
+        if (!$logs) {
+            // As completion by engagement with chat was required, the activity hasn't been completed.
+            return false;
+        }
+        $engagementtalkscount = 0;
+        foreach ($logs as $log) {
+            $summary = json_decode($log->meta);
+            $engagementtalkscount += $summary->data->engagement->talks;
+        }
+        $value = $bigbluebuttonbn->completionengagementtalks <= $engagementtalkscount;
         if ($type == COMPLETION_AND) {
             $result = $result && $value;
         } else {
@@ -620,6 +657,7 @@ function mod_bigbluebuttonbn_get_completion_active_rule_descriptions($cm) {
             case 'completionattendance':
                 if (!empty($val)) {
                     $descriptions[] = get_string('completionattendancedesc', 'bigbluebuttonbn', $val);
+                    $descriptions[] = get_string('completionengagementdesc', 'bigbluebuttonbn', $val);
                 }
                 break;
             default:

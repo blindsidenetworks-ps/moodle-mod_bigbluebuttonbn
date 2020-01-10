@@ -77,12 +77,22 @@ $string['privacy:metadata:bigbluebutton:userid'] = 'The userid of the user acces
 $string['privacy:metadata:bigbluebutton:fullname'] = 'The fullname of the user accessing the BigBlueButton server.';
 
 $string['completionattendance'] = 'Student must attend the meeting for:';
-$string['completionattendance_help'] = 'Attending the meeting for (n) minutes is required for completion';
 $string['completionattendancedesc'] = 'Student must attend the meeting and remain in the session for at least {$a} minute(s)';
 $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
-$string['completionupdatestate'] = "Complation update state";
+$string['completionengagementchats'] = 'Chat events';
+$string['completionengagementtalks'] = 'Talk events';
+$string['completionengagementtalktime'] = 'Talk time';
+$string['completionengagementraisehand'] = 'Raise hand events';
+$string['completionengagementpollvotes'] = 'Poll votes';
+$string['completionengagementemojis'] = 'Emojis';
+
+$string['completionengagementdesc'] = 'Student must engage in activities during the meeting';
+$string['completionengagementgroup'] = 'Require engagement';
+$string['completionengagementgroup_help'] = 'Active participation during the session is required for completion';
+
+$string['completionupdatestate'] = "Completion update state";
 $string['completionvalidatestate'] = "Validate completion";
 $string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
 

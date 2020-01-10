@@ -87,8 +87,11 @@ M.mod_bigbluebuttonbn.modform = {
         this.showFieldset('id_competenciessection', showAll ||
                           this.isFeatureEnabled(profileType, 'competenciessection'));
         // Completion validation.
-        this.showFormGroup('completionattendanceenabled', showAll ||
+        this.showFormGroup('completionattendancegroup', showAll ||
                           this.isFeatureEnabled(profileType, 'completionattendance'));
+        // Completion validation.
+        this.showFormGroup('completionengagementgroup', showAll ||
+                          this.isFeatureEnabled(profileType, 'completionengagement'));
     },
 
     isFeatureEnabled: function(profileType, feature) {
@@ -125,17 +128,15 @@ M.mod_bigbluebuttonbn.modform = {
 
     showFormGroup: function(id, show) {
         // Show room settings validation.
-        var node = Y.one('input#id_' + id);
+        var node = Y.one('#fgroup_id_' + id);
         if (!node) {
             return;
         }
-        var ancestor = node.ancestor('div').ancestor('div');
         if (show) {
-            ancestor.removeClass('hidden');
+            node.removeClass('hidden');
             return;
         }
-        ancestor.addClass('hidden');
-        node.set('checked', false);
+        node.addClass('hidden');
     },
 
     participantSelectionSet: function() {
