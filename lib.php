@@ -132,7 +132,6 @@ function bigbluebuttonbn_supports($feature) {
  * Obtains the automatic completion state for this bigbluebuttonbn based on any conditions
  * in bigbluebuttonbn settings.
  *
- * @param object $course Course
  * @param object $cm Course-module
  * @param int $userid User ID
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
@@ -140,7 +139,7 @@ function bigbluebuttonbn_supports($feature) {
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison type)
  */
-function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
+function bigbluebuttonbn_get_completion_state($cm, $userid, $type) {
     global $DB;
 
     // Get bigbluebuttonbn details.
@@ -185,7 +184,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
             $summary = json_decode($log->meta);
             $engagementchatscount += $summary->data->engagement->chats;
         }
-        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatcount;
+        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatscount;
         if ($type == COMPLETION_AND) {
             $result = $result && $value;
         } else {
@@ -195,7 +194,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
 
     if ($bigbluebuttonbn->completionengagementtalks) {
         if (!$logs) {
-            // As completion by engagement with chat was required, the activity hasn't been completed.
+            // As completion by engagement with talk was required, the activity hasn't been completed.
             return false;
         }
         $engagementtalkscount = 0;
