@@ -2078,7 +2078,7 @@ function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
         mtrace("Completion by attendance not enabled");
         return;
     }
-    if (bigbluebuttonbn_get_completion_state($cm, $userid, COMPLETION_AND)) {
+    if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
         mtrace("Completion succeeded for user $userid");
         $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
     } else {

@@ -132,6 +132,7 @@ function bigbluebuttonbn_supports($feature) {
  * Obtains the automatic completion state for this bigbluebuttonbn based on any conditions
  * in bigbluebuttonbn settings.
  *
+ * @param object $course Course
  * @param object $cm Course-module
  * @param int $userid User ID
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
@@ -139,11 +140,12 @@ function bigbluebuttonbn_supports($feature) {
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison type)
  */
-function bigbluebuttonbn_get_completion_state($cm, $userid, $type) {
+function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
     // Get bigbluebuttonbn details.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*',
+            MUST_EXIST);
     if (!$bigbluebuttonbn) {
         throw new Exception("Can't find bigbluebuttonbn {$cm->instance}");
     }
