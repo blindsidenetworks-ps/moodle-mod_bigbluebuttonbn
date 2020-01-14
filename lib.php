@@ -1191,11 +1191,17 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
  * @param navigation_node $nodenav The node to add module settings to
  */
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
-    global $PAGE;
-
-    if (isloggedin() && !isguestuser()) {
-        $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $PAGE->cm->instance;
-        $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
-            $completionvalidate, navigation_node::TYPE_CONTAINER);
+    global $PAGE, $USER;
+    // Don't add validate completion if the callback for meetingevents is NOT enabled.
+    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        return;
     }
+    // Don't add validate completion if user is not allowed to edit the activity.
+    $context = context_module::instance($PAGE->cm->id);
+    if (!has_capability('moodle/course:manageactivities', $context, $USER->id)) {
+        return;
+    }
+    $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $PAGE->cm->instance;
+    $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
+        $completionvalidate, navigation_node::TYPE_CONTAINER);
 }
