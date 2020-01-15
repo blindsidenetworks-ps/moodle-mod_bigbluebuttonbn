@@ -164,14 +164,6 @@ jobs:
       php: 7.2
       env: MOODLE_BRANCH=MOODLE_38_STABLE DB=pgsql
 
-    - # master with mysql using php 7.1
-      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
-      php: 7.1
-      env: MOODLE_BRANCH=master DB=mysqli
-    - # master with pgsql using php 7.1
-      if: repo = blindsidenetworks/moodle-mod_bigbluebuttonbn OR env(ALL) = true
-      php: 7.1
-      env: MOODLE_BRANCH=master DB=pgsql
     - # master with mysql using php 7.2
       php: 7.2
       env: MOODLE_BRANCH=master DB=mysqli

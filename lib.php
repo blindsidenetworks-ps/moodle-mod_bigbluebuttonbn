@@ -144,7 +144,8 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
     // Get bigbluebuttonbn details.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance));
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*',
+            MUST_EXIST);
     if (!$bigbluebuttonbn) {
         throw new Exception("Can't find bigbluebuttonbn {$cm->instance}");
     }
@@ -185,7 +186,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
             $summary = json_decode($log->meta);
             $engagementchatscount += $summary->data->engagement->chats;
         }
-        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatcount;
+        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatscount;
         if ($type == COMPLETION_AND) {
             $result = $result && $value;
         } else {
@@ -195,7 +196,7 @@ function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
 
     if ($bigbluebuttonbn->completionengagementtalks) {
         if (!$logs) {
-            // As completion by engagement with chat was required, the activity hasn't been completed.
+            // As completion by engagement with talk was required, the activity hasn't been completed.
             return false;
         }
         $engagementtalkscount = 0;
@@ -1192,16 +1193,17 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
  * @param navigation_node $nodenav The node to add module settings to
  */
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
-    global $PAGE, $CFG;
-
-    $params = $PAGE->url->params();
-    if (!empty($params['id'])) {
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $params['id'], 0, false, MUST_EXIST);
+    global $PAGE, $USER;
+    // Don't add validate completion if the callback for meetingevents is NOT enabled.
+    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        return;
     }
-
-    if (isloggedin() && !isguestuser()) {
-        $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $cm->instance;
-        $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
-            $completionvalidate, navigation_node::TYPE_CONTAINER);
+    // Don't add validate completion if user is not allowed to edit the activity.
+    $context = context_module::instance($PAGE->cm->id);
+    if (!has_capability('moodle/course:manageactivities', $context, $USER->id)) {
+        return;
     }
+    $completionvalidate = '#action=completion_validate&bigbluebuttonbn=' . $PAGE->cm->instance;
+    $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
+        $completionvalidate, navigation_node::TYPE_CONTAINER);
 }
