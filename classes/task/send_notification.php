@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
-use \mod_bigbluebuttonbn\locallib\notifier
+use \mod_bigbluebuttonbn\locallib\notifier;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,16 +46,14 @@ class send_notification extends adhoc_task
      *
      * @return string
      */
-    public function get_name()
-    {
+    public function get_name() {
         return get_string('sendnotification', 'mod_bigbluebuttonbn');
     }
 
     /**
      * Run bigbluebuttonbn cron.
      */
-    public function execute()
-    {
+    public function execute() {
         // Get the custom data.
         $data = $this->get_custom_data();
         mtrace("Task send_notification running for user {$data->userid}");

@@ -43,8 +43,7 @@ class notifier
      * @param object $msg
      * @return string
      */
-    public static function htmlmsg_instance_updated($msg)
-    {
+    public static function htmlmsg_instance_updated($msg) {
         $messagetext = '<p>'.$msg->activity_type.' "'.$msg->activity_title.'" '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
         $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
@@ -78,8 +77,7 @@ class notifier
      * @param string $action
      * @return void
      */
-    public static function notify_instance_updated($bigbluebuttonbn, $action)
-    {
+    public static function notify_instance_updated($bigbluebuttonbn, $action) {
         global $USER;
         $coursemodinfo = \course_modinfo::instance($bigbluebuttonbn->course);
         $course = $coursemodinfo->get_course($bigbluebuttonbn->course);
@@ -115,8 +113,7 @@ class notifier
      *
      * @return void
      */
-    public static function htmlmsg_recording_ready($bigbluebuttonbn)
-    {
+    public static function htmlmsg_recording_ready($bigbluebuttonbn) {
         return '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
             ' &quot;' . $bigbluebuttonbn->name . '&quot; '.
             get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
@@ -129,8 +126,7 @@ class notifier
      *
      * @return void
      */
-    public static function notify_recording_ready($bigbluebuttonbn)
-    {
+    public static function notify_recording_ready($bigbluebuttonbn) {
         $sender = get_admin();
         $htmlmsg = self::htmlmsg_recording_ready($bigbluebuttonbn);
         self::send_notifications($bigbluebuttonbn, $sender, $htmlmsg);
@@ -144,8 +140,7 @@ class notifier
      * @param string $htmlmsg
      * @return void
      */
-    public static function enqueue_notifications($bigbluebuttonbn, $sender, $htmlmsg)
-    {
+    public static function enqueue_notifications($bigbluebuttonbn, $sender, $htmlmsg) {
         foreach (self::receivers($bigbluebuttonbn->course) as $receiver) {
             if ($sender->id != $receiver->id) {
                 // Enqueue a task for sending a notification.
@@ -178,8 +173,7 @@ class notifier
      * @param object $htmlmsg
      * @return void
      */
-    public static function send_notification($sender, $receiver, $htmlmsg)
-    {
+    public static function send_notification($sender, $receiver, $htmlmsg) {
         // Send the message.
         message_post_message($sender, $receiver, $htmlmsg, FORMAT_HTML);
     }
@@ -190,8 +184,7 @@ class notifier
      * @param object $courseid
      * @return array
      */
-    public static function receivers($courseid)
-    {
+    public static function receivers($courseid) {
         $context = \context_course::instance($courseid);
         $users = array();
         // See if there are any users in the lesson.
