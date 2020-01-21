@@ -404,8 +404,10 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
     $items = bigbluebuttonbn_reset_course_items();
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
     foreach ($items as $item => $default) {
-        $mform->addElement('advcheckbox', "reset_bigbluebuttonbn_{$item}"
-            , get_string("reset{$item}", 'bigbluebuttonbn')
+        $mform->addElement(
+            'advcheckbox',
+            "reset_bigbluebuttonbn_{$item}",
+            get_string("reset{$item}", 'bigbluebuttonbn')
         );
         if ($item == 'logs' || $item == 'recordings') {
             $mform->addHelpButton("reset_bigbluebuttonbn_{$item}", "reset{$item}", 'bigbluebuttonbn');
@@ -781,7 +783,7 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     }
-    \mod_bigbluebuttonbn\locallib\notifier::notification_process($bigbluebuttonbn, $action);
+    \mod_bigbluebuttonbn\locallib\notifier::notify_instance_updated($bigbluebuttonbn, $action);
 }
 
 /**
@@ -841,7 +843,8 @@ function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
         \core_completion\api::update_completion_date_event(
             $bigbluebuttonbn->coursemodule,
             'bigbluebuttonbn',
-            $bigbluebuttonbn->id, $bigbluebuttonbn->completionexpected
+            $bigbluebuttonbn->id,
+            $bigbluebuttonbn->completionexpected
           );
     }
 }
@@ -864,8 +867,14 @@ function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
     // Save the file if it exists that is currently in the draft area.
     file_save_draft_area_files($bigbluebuttonbn->presentation, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
     // Get the file if it exists.
-    $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
-        'itemid, filepath, filename', false);
+    $files = $fs->get_area_files(
+        $context->id,
+        'mod_bigbluebuttonbn',
+        'presentation',
+        0,
+        'itemid, filepath, filename',
+        false
+    );
     // Check that there is a file to process.
     $filesrc = '';
     if (count($files) == 1) {
@@ -965,9 +974,11 @@ function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $
     // - Context is system, so we don't need to check the cmid in this case.
     // - The area is "presentationdefault_cache".
     if (count($args) > 1) {
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION,
+        $cache = cache::make_from_params(
+            cache_store::MODE_APPLICATION,
             'mod_bigbluebuttonbn',
-            'presentationdefault_cache');
+            'presentationdefault_cache'
+        );
 
         $noncekey = sha1($context->id);
         $presentationnonce = $cache->get($noncekey);
@@ -1113,8 +1124,10 @@ function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
  * @param \core_calendar\action_factory $factory
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $event,
-        \core_calendar\action_factory $factory) {
+function mod_bigbluebuttonbn_core_calendar_provide_event_action(
+    calendar_event $event,
+    \core_calendar\action_factory $factory
+) {
     global $CFG, $DB;
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
