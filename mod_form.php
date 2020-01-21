@@ -183,20 +183,38 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
 
         // Elements for completion by Attendance.
-        $completiongroup = get_string('completionattendancegroup', 'bigbluebuttonbn');
-        $completionrule = get_string('completionattendance', 'bigbluebuttonbn');
-        $group = [
-            $mform->createElement('checkbox', 'completionattendanceenabled', '', $completionrule . '&nbsp;'),
+        $attendance['grouplabel'] = get_string('completionattendancegroup', 'bigbluebuttonbn');
+        $attendance['rulelabel'] = get_string('completionattendance', 'bigbluebuttonbn');
+        $attendance['group'] = [
+            $mform->createElement('checkbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
             $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
         ];
         $mform->setType('completionattendance', PARAM_INT);
-        $mform->addGroup($group, 'completionattendancegroup', $completiongroup, [' '], false);
+        $mform->addGroup($attendance['group'], 'completionattendancegroup', $attendance['grouplabel'], [' '], false);
         $mform->addHelpButton('completionattendancegroup', 'completionattendancegroup', 'bigbluebuttonbn');
+        $mform->disabledIf('completionattendancegroup', 'completionview', 'notchecked');
         $mform->disabledIf('completionattendance', 'completionattendanceenabled', 'notchecked');
-        $mform->disabledIf('completionattendanceenabled', 'completionview', 'notchecked');
 
-        return ['completionattendancegroup'];
+        // Elements for completion by Engagement.
+        $engagement['grouplabel'] = get_string('completionengagementgroup', 'bigbluebuttonbn');
+        $engagement['chatlabel'] = get_string('completionengagementchats', 'bigbluebuttonbn');
+        $engagement['talklabel'] = get_string('completionengagementtalks', 'bigbluebuttonbn');
+        $engagement['raisehand'] = get_string('completionengagementraisehand', 'bigbluebuttonbn');
+        $engagement['pollvotes'] = get_string('completionengagementpollvotes', 'bigbluebuttonbn');
+        $engagement['emojis'] = get_string('completionengagementemojis', 'bigbluebuttonbn');
+        $engagement['group'] = [
+            $mform->createElement('checkbox', 'completionengagementchats', '', $engagement['chatlabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('checkbox', 'completionengagementtalks', '', $engagement['talklabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('checkbox', 'completionengagementraisehand', '', $engagement['raisehand'] . '&nbsp;&nbsp;'),
+            $mform->createElement('checkbox', 'completionengagementpollvotes', '', $engagement['pollvotes'] . '&nbsp;&nbsp;'),
+            $mform->createElement('checkbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
+        ];
+        $mform->addGroup($engagement['group'], 'completionengagementgroup', $engagement['grouplabel'], [' '], false);
+        $mform->addHelpButton('completionengagementgroup', 'completionengagementgroup', 'bigbluebuttonbn');
+        $mform->disabledIf('completionengagementgroup', 'completionview', 'notchecked');
+
+        return ['completionattendancegroup', 'completionengagementgroup'];
     }
 
     /**

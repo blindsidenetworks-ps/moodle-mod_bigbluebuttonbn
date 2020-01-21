@@ -35,6 +35,11 @@
         <FIELD NAME="clienttype" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="muteonstart" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionattendance" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of minutes in the meeting are required to mark an activity completed for a user."/>
+        <FIELD NAME="completionengagementchats" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if chat during the meeting is required to mark an activity completed for a user."/>
+        <FIELD NAME="completionengagementtalks" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if talking during the meeting is required to mark an activity completed for a user."/>
+        <FIELD NAME="completionengagementraisehand" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if raising hand during the meeting is required to mark an activity completed for a user."/>
+        <FIELD NAME="completionengagementpollvotes" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if poll voting during the meeting is required to mark an activity completed for a user."/>
+        <FIELD NAME="completionengagementemojis" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if the use of emojis during the meeting is required to mark an activity completed for a user."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

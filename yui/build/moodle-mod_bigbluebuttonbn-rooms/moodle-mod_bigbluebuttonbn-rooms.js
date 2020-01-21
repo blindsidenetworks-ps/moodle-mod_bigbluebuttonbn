@@ -47,6 +47,7 @@ M.mod_bigbluebuttonbn.rooms = {
             this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
         }
+        this.initCompletionValidate();
     },
 
     initRoom: function() {
@@ -268,6 +269,17 @@ M.mod_bigbluebuttonbn.rooms = {
             M.mod_bigbluebuttonbn.rooms.cleanRoom();
             M.mod_bigbluebuttonbn.rooms.updateRoom(true);
         }, 15000);
+    },
+
+    initCompletionValidate: function() {
+        var node = Y.one('a[href*=completion_validate]');
+        if (!node) {
+            return;
+        }
+        var qs = node.get('hash').substr(1);
+        node.on("click", function() {
+            M.mod_bigbluebuttonbn.broker.completionValidate(qs);
+        });
     }
 };
 

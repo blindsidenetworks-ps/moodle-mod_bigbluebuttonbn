@@ -166,7 +166,23 @@ M.mod_bigbluebuttonbn.broker = {
                 }
             }
         });
+    },
+
+    completionValidate: function(qs) {
+        this.datasource.sendRequest({
+            request: qs,
+            callback: {
+                success: function(e) {
+                    if (e.data.status) {
+                        var message = M.util.get_string('completionvalidatestatetriggered', 'bigbluebuttonbn');
+                        M.mod_bigbluebuttonbn.helpers.alertError(message, 'info');
+                        return;
+                    }
+                }
+            }
+        });
     }
+
 };
 
 
