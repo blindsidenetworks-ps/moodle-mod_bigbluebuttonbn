@@ -103,7 +103,7 @@ class notifier
         $msg->course_name = $course->fullname;
 
         // Send notification to all users enrolled.
-        self::send_notifications($bigbluebuttonbn, $sender, self::htmlmsg_instance_updated($msg));
+        self::enqueue_notifications($bigbluebuttonbn, $sender, self::htmlmsg_instance_updated($msg));
     }
 
     /**
@@ -127,9 +127,10 @@ class notifier
      * @return void
      */
     public static function notify_recording_ready($bigbluebuttonbn) {
+        // Instead of get_admin, the firs user enrolled with editing privileges may be used as the sender.
         $sender = get_admin();
         $htmlmsg = self::htmlmsg_recording_ready($bigbluebuttonbn);
-        self::send_notifications($bigbluebuttonbn, $sender, $htmlmsg);
+        self::enqueue_notifications($bigbluebuttonbn, $sender, $htmlmsg);
     }
 
     /**
@@ -154,12 +155,10 @@ class notifier
                         'htmlmsg' => $htmlmsg
                     );
                     $task->set_custom_data($data);
-                    // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for everriding.
-                    // $ task -> set_userid ( $ user -> id );.
-                    // Queue it.
+                    // Enqueue it.
                     \core\task\manager::queue_adhoc_task($task);
                 } catch (Exception $e) {
-                    mtrace("Error while enqueuing completion_uopdate_state task. " . (string)$e);
+                    mtrace("Error while enqueuing completion_uopdate_state task. " . (string) $e);
                 }
             }
         }

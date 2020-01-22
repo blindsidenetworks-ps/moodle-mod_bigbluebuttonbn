@@ -56,7 +56,7 @@ class send_notification extends adhoc_task
     public function execute() {
         // Get the custom data.
         $data = $this->get_custom_data();
-        mtrace("Task send_notification running for user {$data->userid}");
+        mtrace("Execute send_notification task: Sending notification to user {$data->receiver->id}");
         // Process the completion.
         \mod_bigbluebuttonbn\locallib\notifier::send_notification($data->sender, $data->receiver, $data->htmlmsg);
     }
