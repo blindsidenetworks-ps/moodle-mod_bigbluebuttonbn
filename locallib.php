@@ -24,6 +24,7 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\locallib;
 use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\task;
 

@@ -103,7 +103,7 @@ class notifier
         $msg->course_name = $course->fullname;
 
         // Send notification to all users enrolled.
-        self::send_notifications($bigbluebuttonbn, $sender, self::htmlmsg_instance_updated($msg));
+        self::enqueue_notifications($bigbluebuttonbn, $sender, self::htmlmsg_instance_updated($msg));
     }
 
     /**
@@ -129,7 +129,7 @@ class notifier
     public static function notify_recording_ready($bigbluebuttonbn) {
         $sender = get_admin();
         $htmlmsg = self::htmlmsg_recording_ready($bigbluebuttonbn);
-        self::send_notifications($bigbluebuttonbn, $sender, $htmlmsg);
+        self::enqueue_notifications($bigbluebuttonbn, $sender, $htmlmsg);
     }
 
     /**
