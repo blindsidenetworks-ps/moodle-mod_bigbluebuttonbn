@@ -1,4 +1,4 @@
-@mod @mod_bigbluebuttonbn @rr
+@mod @mod_bigbluebuttonbn @core_form
 Feature: bigbluebuttonbn instance
   In order to create a room activity with recordings
   As a user
@@ -41,3 +41,23 @@ Feature: bigbluebuttonbn instance
     And "#bigbluebuttonbn_view_message_box" "css_element" should not be visible
     And "#bigbluebuttonbn_view_action_button_box" "css_element" should not be visible
     And "#bigbluebuttonbn_recordings_table" "css_element" should be visible
+
+  @javascript
+  Scenario: Add an activity and check that required settings are available for the three
+    types of instance types
+    When I log in as "admin"
+    And I create a course with:
+      | Course full name | Test Course |
+      | Course short name | testcourse |
+    And I follow "Test Course"
+    And I turn editing mode on
+    And I add a "BigBlueButtonBN" to section "1"
+    And I wait until the page is ready
+    When  I select "Room/Activity with recordings" from the "Instance type" singleselect
+    Then I should see "Restrict access"
+    When  I select "Room/Activity only" from the "Instance type" singleselect
+    Then I wait until the page is ready
+    Then I should see "Restrict access"
+    When  I select "Recordings only" from the "Instance type" singleselect
+    Then I wait until the page is ready
+    Then I should see "Restrict access"

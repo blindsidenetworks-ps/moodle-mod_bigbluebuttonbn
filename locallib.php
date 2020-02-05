@@ -2453,10 +2453,10 @@ function bigbluebuttonbn_get_instance_type_profiles() {
             'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                 'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                 'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                'clienttype', 'completionattendance', 'completionengagement')),
+                'clienttype', 'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
         BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
             'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
-            'features' => array('showrecordings', 'importrecordings')),
+            'features' => array('showrecordings', 'importrecordings', 'availabilityconditionsheader')),
     );
     return $instanceprofiles;
 }
