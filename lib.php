@@ -30,7 +30,6 @@ global $CFG;
 
 require_once($CFG->dirroot.'/calendar/lib.php');
 require_once($CFG->dirroot.'/message/lib.php');
-require_once($CFG->dirroot.'/mod/lti/OAuth.php');
 require_once($CFG->dirroot.'/tag/lib.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
