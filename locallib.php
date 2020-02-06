@@ -1634,7 +1634,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     if (!bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
         return '';
     }
-    $text = get_string('view_recording_format_' . $playback['type'], 'bigbluebuttonbn');
+    $text = bigbluebuttonbn_get_recording_type_text($playback['type']);
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
         '&mid=' . $recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
@@ -1654,6 +1654,23 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         unset($linkattributes['data-href']);
     }
     return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
+}
+
+/**
+ * Helper function to handle yet unknown recording types
+ *
+ * @param string $playbacktype : for now presentation, video, statistics, capture, notes, podcast
+ *
+ * @return string the matching language string or a capitalised version of the provided string
+ */
+function bigbluebuttonbn_get_recording_type_text($playbacktype) {
+    // Check first if string exists, and if it does'nt just default to the capitalised version of the string.
+    $text = ucwords($playbacktype);
+    $typestringid = 'view_recording_format_' . $playbacktype;
+    if (get_string_manager()->string_exists($typestringid, 'bigbluebuttonbn')) {
+        $text = get_string($typestringid, 'bigbluebuttonbn');
+    }
+    return $text;
 }
 
 /**
