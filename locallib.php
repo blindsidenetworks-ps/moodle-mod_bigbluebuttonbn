@@ -231,11 +231,21 @@ function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
 /**
  * Helper function to fetch recordings from a BigBlueButton server.
  *
- * @param array $meetingidsarray   array with meeting ids in the form array("mid1","mid2","mid3")
+ * @param array $meetingidsarray array with meeting ids in the form array("mid1","mid2","mid3")
  *
- * @return associative array with recordings indexed by recordID, each recording is a non sequential associative array
+ * @return array (associative) with recordings indexed by recordID, each recording is a non sequential associative array
  */
 function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
+    if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)
+            || defined('BEHAT_SITE_RUNNING')
+            || defined('BEHAT_TEST')
+            || defined('BEHAT_UTIL')) {
+        // Just return the fake recording.
+        global $CFG;
+        require_once($CFG->libdir . '/testing/generator/lib.php');
+        require_once(__DIR__ . '/tests/generator/lib.php');
+        return mod_bigbluebuttonbn_generator::bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
+    }
     $recordings = array();
     // Execute a paginated getRecordings request.
     $pages = floor(count($meetingidsarray) / 25) + 1;
