@@ -50,6 +50,12 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  */
 class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
+    public function tearDown() {
+        parent::tearDown();
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->bigbluebuttonbn_clean_recordings_array_fetch();
+    }
+
     /**
      * Test for provider::get_metadata().
      */
@@ -105,7 +111,8 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         // Create a user which will make a submission.
         $user = $this->getDataGenerator()->create_user();
 
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user->id]);
 
         // Check the contexts supplied are correct.
         $contextlist = \mod_bigbluebuttonbn\privacy\provider::get_contexts_for_userid($user->id);
@@ -131,9 +138,12 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user2);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user1->id]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user1->id]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user2->id]);
 
         // Export all of the data for the context for user 1.
         $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
@@ -166,9 +176,12 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user1);
-        $this->create_bigbluebuttonbn_log($bigbluebuttonbn, $user2);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user1->id]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user1->id]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' =>  $user2->id]);
 
         // Export all of the data for the context for user 1.
         $cmcontext = context_module::instance($bigbluebuttonbn->cmid);
@@ -219,17 +232,17 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
         // Delete data for the first user.
         $context = \context_module::instance($e['instance']->cmid);
         $contextlist = new \core_privacy\local\request\approved_contextlist($e['users'][0], 'bigbluebuttonbn',
-            [$context->id]);
+                [$context->id]);
         \mod_bigbluebuttonbn\privacy\provider::delete_data_for_user($contextlist);
 
         // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
         $count = $DB->count_records('bigbluebuttonbn_logs',
-            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
+                ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
         $this->assertEquals(0, $count);
 
         // Check the logs for the other user is still there.
         $count = $DB->count_records('bigbluebuttonbn_logs',
-            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
+                ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
         $this->assertEquals(1, $count);
     }
 
@@ -256,12 +269,12 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         // After deletion the bigbluebuttonbn logs for the first user should have been deleted.
         $count = $DB->count_records('bigbluebuttonbn_logs',
-            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
+                ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
         $this->assertEquals(0, $count);
 
         // Check the logs for the other user is still there.
         $count = $DB->count_records('bigbluebuttonbn_logs',
-            ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
+                ['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
         $this->assertEquals(1, $count);
     }
 
@@ -278,30 +291,18 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
 
         // Create a bigbluebuttonbn instance.
         $e['instance'] = $this->getDataGenerator()->create_module('bigbluebuttonbn',
-            array('course' => $e['course']->id));
+                array('course' => $e['course']->id));
 
         // Create users that will use the bigbluebuttonbn instance.
         $e['users'][] = $this->getDataGenerator()->create_user();
         $e['users'][] = $this->getDataGenerator()->create_user();
 
         // Create the bigbluebuttonbn logs.
-        $this->create_bigbluebuttonbn_log($e['instance'], $e['users'][0]);
-        $this->create_bigbluebuttonbn_log($e['instance'], $e['users'][1]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][0]->id]);
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+                ->create_log(['bigbluebuttonbnid' => $e['instance']->id, 'userid' => $e['users'][1]->id]);
 
         return $e;
-    }
-
-    /**
-     * Mimicks the creation of an bigbluebuttonbn log.
-     *
-     * @param object $bigbluebuttonbn
-     * @param object $user
-     */
-    protected function create_bigbluebuttonbn_log($bigbluebuttonbn, $user) {
-        $overrides = [
-            'meetingid' => sha1($bigbluebuttonbn->meetingid) . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id,
-            'userid' => $user->id
-        ];
-        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides);
     }
 }
