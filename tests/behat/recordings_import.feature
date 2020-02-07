@@ -52,3 +52,10 @@ Feature: Manage and list recordings
     Then I follow "RecordingsOnly1"
     And I should see "Recording 1"
     And I should see "Recording 2"
+    Then I wait until the page is ready
+    Then I go to the courses management page
+    And I follow "Test Course 2"
+    Then I follow "View"
+    Then I follow "RecordingsOnly2"
+    And I should not see "Recording 1"
+    And I should not see "Recording 2"
