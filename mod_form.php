@@ -104,7 +104,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->add_action_buttons();
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-        $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context);
+        $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn);
         $jsvars['participantList'] = $participantlist;
         $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
         $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
