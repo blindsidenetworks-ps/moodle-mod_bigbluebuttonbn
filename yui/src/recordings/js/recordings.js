@@ -36,7 +36,7 @@ M.mod_bigbluebuttonbn.recordings = {
      */
     init: function(data) {
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + "&"
         });
         if (data.recordings_html === false &&
             (data.profile_features.indexOf('all') != -1 || data.profile_features.indexOf('showrecordings') != -1)) {
