@@ -218,6 +218,7 @@ class index implements renderable {
             $actions .= '<form name="form1" method="post" action="">'."\n";
             $actions .= '  <INPUT type="hidden" name="id" value="'.$course->id.'">'."\n";
             $actions .= '  <INPUT type="hidden" name="a" value="'.$bigbluebuttonbn->id.'">'."\n";
+            $actions .= '  <INPUT type="hidden" name="action" value="end">'."\n";
             if ($groupobj != null) {
                 $actions .= '  <INPUT type="hidden" name="g" value="'.$groupobj->id.'">'."\n";
             }
