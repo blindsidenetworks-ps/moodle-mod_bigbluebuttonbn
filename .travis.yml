@@ -2,9 +2,23 @@ language: php
 
 sudo: required
 
+# Slighly change config so we use chrome https://github.com/blackboard-open-source/moodle-plugin-ci/issues/70
+# The issue being that firefox and selenium driver don't work since travis defaulting to xenial
+# On one side because firefox 47.0.1 is not part of the distrib and also because it has to
+# be configured so we don't use marionette (https://docs.moodle.org/dev/Actual_Selenium_with_old_Firefox_47.0.1)
+# https://docs.moodle.org/dev/Acceptance_testing/Browsers/Working_combinations_of_OS%2BBrowser%2Bselenium
+
+# As a workaround we will use chrome stable and update the profile accordingly
+# This might be a problem for some tests, and we would recommend setting up the same
+# environment in development to test before pushing the code.
+
 addons:
-  firefox: "47.0.1"
+  chrome: stable
   postgresql: "9.5"
+  apt:
+    packages:
+      - openjdk-8-jre-headless
+      - chromium-chromedriver
 
 services:
   - mysql
@@ -17,6 +31,7 @@ cache:
 
 env:
   global:
+    - MUSTACHE_IGNORE_NAMES=broken.mustache
     - COVERAGE=false
 
 jobs:
@@ -194,4 +209,4 @@ script:
   #- moodle-plugin-ci grunt
   - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  - moodle-plugin-ci behat --profile chrome

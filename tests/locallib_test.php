@@ -37,6 +37,16 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @author    Laurent David (laurent@call-learning.fr)
  */
 class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
+    /**
+     * Clean the temporary mocked up recordings
+     *
+     * @throws coding_exception
+     */
+    public function tearDown() {
+        parent::tearDown();
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+            ->bigbluebuttonbn_clean_recordings_array_fetch();
+    }
 
     /**
      * Test for provider::get_metadata().
