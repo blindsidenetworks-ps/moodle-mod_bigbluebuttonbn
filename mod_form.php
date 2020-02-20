@@ -44,6 +44,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
+        $mform = &$this->_form;
+
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
@@ -53,23 +55,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         // Context.
         $bigbluebuttonbn = null;
-        $course = null;
-        $courseid = optional_param('course', 0, PARAM_INT);
-        if ($courseid) {
-            $course = get_course($courseid);
-        }
-        if (!$course) {
-            $cm = get_coursemodule_from_id('bigbluebuttonbn',
-                optional_param('update', 0, PARAM_INT), 0, false, MUST_EXIST);
-            $course = $DB->get_record('course', array('id' => $cm->course),
-                '*', MUST_EXIST);
-            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn',
-                array('id' => $cm->instance), '*', MUST_EXIST);
+        $course = get_course($this->current->course);
+        if ($this->current->id) {
+            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->current->id), '*', MUST_EXIST);
         }
         $context = context_course::instance($course->id);
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
-        $mform = &$this->_form;
+
         $jsvars = array();
         // Get only those that are allowed.
         $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context);
