@@ -26,17 +26,49 @@
 namespace mod_bigbluebuttonbn\privacy;
 
 use \core_privacy\local\metadata\collection;
-use \core_privacy\local\metadata\provider as metadataprovider;
 use \core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use \core_privacy\local\request\contextlist;
 use \core_privacy\local\request\helper;
 use \core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use \core_privacy\local\request\writer;
-use \core_privacy\local\request\plugin\provider as pluginprovider;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+
+/*
+ * This part is to be eliminated as soon as possible but allows the phpunit test to pass Ok on MOODLE_33 and below WHILST allowing
+ * also the privacy/tests/provider_test.php tests to pass
+ * (vendor/bin/phpunit --fail-on-risky --disallow-test-output -v privacy/tests/provider_test.php).
+ * Downside we add a new warning to the code checker. This is not ideal but will be ok until we stop supporting MOODLE_33 or we
+ * change the test in provider_test.php so to cater for classes which are implementing the right method but not necessarily
+ * inheriting from the new interface setup in MOODLE_34 (\core_privacy\local\request\core_userlist_provider).
+ * This is linked to CONTRIB-7983
+ */
+if (!interface_exists("\\core_privacy\\local\\request\\core_userlist_provider")) {
+    interface core_userlist_provider {
+        /**
+         * Get the list of users who have data within a context.
+         *
+         * @param   userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+         */
+        public static function get_users_in_context(userlist $userlist);
+
+        /**
+         * Delete multiple users within a single context.
+         *
+         * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+         */
+        public static function delete_data_for_users(approved_userlist $userlist);
+    }
+} else {
+    interface core_userlist_provider extends \core_privacy\local\request\core_userlist_provider {
+
+    }
+}
 
 /**
  * Privacy class for requesting user data.
@@ -46,7 +78,15 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class provider implements metadataprovider, pluginprovider {
+class provider implements
+    // This plugin has data.
+    \core_privacy\local\metadata\provider,
+
+    // This plugin currently implements the original plugin\provider interface.
+    \core_privacy\local\request\plugin\provider,
+
+    // This plugin is capable of determining which users have data within it.
+    core_userlist_provider {
 
     // This trait must be included.
     use \core_privacy\local\legacy_polyfill;
