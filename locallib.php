@@ -585,6 +585,8 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null,
  * @return object
  */
 function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
     $c = new curl();
     $c->setopt(array('SSL_VERIFYPEER' => true));
     if ($method == 'POST') {
@@ -2149,6 +2151,8 @@ function bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid) {
  * @return void
  */
 function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
+    global $CFG;
+    require_once($CFG->libdir.'/completionlib.php');
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
     $completion = new completion_info($course);
     if (!$completion->is_enabled($cm)) {
@@ -2576,6 +2580,8 @@ function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
  * @return string
  */
 function bigbluebuttonbn_format_activity_time($time) {
+    global $CFG;
+    require_once($CFG->dirroot.'/calendar/lib.php');
     $activitytime = '';
     if ($time) {
         $activitytime = calendar_day_representation($time) . ' ' .
