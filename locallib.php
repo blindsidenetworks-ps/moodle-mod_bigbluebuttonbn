@@ -671,15 +671,32 @@ function bigbluebuttonbn_get_users(context $context = null) {
  * Returns an array containing all the users in a context wrapped for html select element.
  *
  * @param context $context
- *
+ * @param null $bbactivity
  * @return array $users
+ * @throws coding_exception
+ * @throws moodle_exception
  */
-function bigbluebuttonbn_get_users_select(context $context = null) {
+function bigbluebuttonbn_get_users_select(context $context = null, $bbactivity = null) {
+    // CONTRIB-7972, check the group of current user and course group mode.
+    $groups = null;
     $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
-    foreach ($users as $key => $value) {
-        $users[$key] = array('id' => $value->id, 'name' => fullname($value));
+    if ($bbactivity) {
+        list($course, $cm) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
+        $groupmode = groups_get_activity_groupmode($cm);
+        if ($groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
+            global $USER;
+            $groups = groups_get_all_groups($course->id, $USER->id);
+            $users = [];
+            foreach ($groups as $g) {
+                $users += (array) get_enrolled_users($context, '', $g->id, 'u.*', null, 0, 0, true);
+            }
+        }
     }
-    return $users;
+    return array_map(
+            function($u) {
+                return array('id' => $u->id, 'name' => fullname($u));
+            },
+            $users);
 }
 
 /**
@@ -735,10 +752,10 @@ function bigbluebuttonbn_get_role($id) {
  * Returns an array to populate a list of participants used in mod_form.js.
  *
  * @param context $context
- *
+ * @param null|object $bbactivity
  * @return array $data
  */
-function bigbluebuttonbn_get_participant_data($context) {
+function bigbluebuttonbn_get_participant_data($context, $bbactivity = null) {
     $data = array(
         'all' => array(
             'name' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
@@ -751,7 +768,7 @@ function bigbluebuttonbn_get_participant_data($context) {
     );
     $data['user'] = array(
         'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
-        'children' => bigbluebuttonbn_get_users_select($context),
+        'children' => bigbluebuttonbn_get_users_select($context, $bbactivity),
     );
     return $data;
 }
@@ -1963,21 +1980,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
             $meetingid = $shortmeetingid[0];
         }
         // Check if the record belongs to a Visible Group type.
-        $sql = "SELECT bigbluebuttonbn.id, cm.id, cm.groupmode
-                 FROM {bigbluebuttonbn} bigbluebuttonbn
-                 JOIN {modules} m
-                   ON m.name = :bigbluebuttonbn
-                 JOIN {course_modules} cm
-                   ON cm.instance = bigbluebuttonbn.id
-                  AND cm.module = m.id
-                WHERE bigbluebuttonbn.meetingid = :meetingid";
-        $params = array('bigbluebuttonbn' => 'bigbluebuttonbn', 'meetingid' => $meetingid);
-
-        $groupmode = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
-
+        list($course, $cm) = get_course_and_cm_from_cmid($bbbsession['cm']->id);
+        $groupmode = groups_get_activity_groupmode($cm);
         $displayrow = true;
-        if ((isset($groupmode->groupmode) && (int) $groupmode->groupmode != VISIBLEGROUPS)
-            && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        if (($groupmode != VISIBLEGROUPS)
+                && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
             $groupid = explode('[', $recording['meetingID']);
             if (isset($groupid[1])) {
                 // It is a group recording and the user is not moderator/administrator. Recording should not be included by default.
