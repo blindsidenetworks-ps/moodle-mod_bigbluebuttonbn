@@ -649,26 +649,29 @@ function bigbluebuttonbn_get_users(context $context = null) {
 /**
  * Returns an array containing all the users in a context wrapped for html select element.
  *
- * @param context $context
+ * @param context_course $context
  * @param null $bbactivity
  * @return array $users
  * @throws coding_exception
  * @throws moodle_exception
  */
-function bigbluebuttonbn_get_users_select(context $context = null, $bbactivity = null) {
+function bigbluebuttonbn_get_users_select(context_course $context, $bbactivity = null) {
     // CONTRIB-7972, check the group of current user and course group mode.
     $groups = null;
     $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
+    $course = get_course($context->instanceid);
+    $groupmode = groups_get_course_groupmode($course);
     if ($bbactivity) {
-        list($course, $cm) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
+        list($bbcourse, $cm) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
         $groupmode = groups_get_activity_groupmode($cm);
-        if ($groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
-            global $USER;
-            $groups = groups_get_all_groups($course->id, $USER->id);
-            $users = [];
-            foreach ($groups as $g) {
-                $users += (array) get_enrolled_users($context, '', $g->id, 'u.*', null, 0, 0, true);
-            }
+
+    }
+    if ($groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
+        global $USER;
+        $groups = groups_get_all_groups($course->id, $USER->id);
+        $users = [];
+        foreach ($groups as $g) {
+            $users += (array) get_enrolled_users($context, '', $g->id, 'u.*', null, 0, 0, true);
         }
     }
     return array_map(
