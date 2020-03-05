@@ -564,6 +564,8 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null,
  * @return object
  */
 function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
     $c = new curl();
     $c->setopt(array('SSL_VERIFYPEER' => true));
     if ($method == 'POST') {
@@ -2423,6 +2425,8 @@ function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
  * @return string
  */
 function bigbluebuttonbn_format_activity_time($time) {
+    global $CFG;
+    require_once($CFG->dirroot.'/calendar/lib.php');
     $activitytime = '';
     if ($time) {
         $activitytime = calendar_day_representation($time).' '.
