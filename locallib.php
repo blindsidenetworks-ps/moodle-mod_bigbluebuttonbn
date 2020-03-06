@@ -1362,11 +1362,9 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     }
     $rowdata = new stdClass();
     // Set recording_types.
-    $rowdata->recording = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
-    // Set meeting name.
-    $rowdata->meeting = bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession);
+    $rowdata->playback = bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
     // Set activity name.
-    $rowdata->activity = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
+    $rowdata->recording = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
     $rowdata->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $bbbsession);
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
@@ -1863,12 +1861,10 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
 function bigbluebuttonbn_get_recording_columns($bbbsession) {
     $columns = array();
     // Initialize table headers.
-    $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_recording', 'bigbluebuttonbn'),
+    $columns[] = array('key' => 'playback', 'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
+        'width' => '125px', 'allowHTML' => true); // Note: here a strange bug noted whilst changing the columns, ref CONTRIB
+    $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
         'width' => '125px', 'allowHTML' => true);
-    $columns[] = array('key' => 'meeting', 'label' => get_string('view_recording_meeting', 'bigbluebuttonbn'),
-        'sortable' => true, 'width' => '175px', 'allowHTML' => true);
-    $columns[] = array('key' => 'activity', 'label' => get_string('view_recording_activity', 'bigbluebuttonbn'),
-        'sortable' => true, 'width' => '175px', 'allowHTML' => true);
     $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
         'sortable' => true, 'width' => '250px', 'allowHTML' => true);
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
@@ -1926,8 +1922,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     $table->data = array();
     // Initialize table headers.
     $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
-    $table->head[] = get_string('view_recording_meeting', 'bigbluebuttonbn');
-    $table->head[] = get_string('view_recording_recording', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_name', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
         $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
@@ -2007,9 +2002,8 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
     }
     $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
     $row->cells = array();
+    $row->cells[] = $texthead . $rowdata->playback . $texttail;
     $row->cells[] = $texthead . $rowdata->recording . $texttail;
-    $row->cells[] = $texthead . $rowdata->meeting . $texttail;;
-    $row->cells[] = $texthead . $rowdata->activity . $texttail;
     $row->cells[] = $texthead . $rowdata->description . $texttail;
     if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
         $row->cells[] = $rowdata->preview;

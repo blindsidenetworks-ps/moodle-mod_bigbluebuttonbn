@@ -116,7 +116,6 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $output .= bigbluebuttonbn_view_warning_general($bbbsession);
 
     // Renders the rest of the page.
-    $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     // Renders the completed description.
     $desc = file_rewrite_pluginfile_urls($bbbsession['meetingdescription'], 'pluginfile.php',
         $bbbsession['context']->id, 'mod_bigbluebuttonbn', 'intro', null);
