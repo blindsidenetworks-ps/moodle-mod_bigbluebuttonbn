@@ -2968,7 +2968,7 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
             $renderer->render_group_element_configmultiselect(
                 'participant_moderator_default',
                 array_keys($owner),
-                array_merge($owner, $roles)
+                $owner + $roles // CONTRIB-7966: don't use array_merge here so it does not reindex the array.
             )
         );
     }
