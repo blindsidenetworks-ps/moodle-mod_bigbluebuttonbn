@@ -87,3 +87,10 @@ Feature: Manage and list recordings
     Then I should see "Recording 1" in the "#bigbluebuttonbn_recordings_table table.yui3-datatable-table tbody.yui3-datatable-data tr td:nth-child(2)" "css_element"
     # Here we would need to test if there is no regression in the html by default view. This will have to be refactored
     # alongside with the view
+    Then I wait until the page is ready
+    Then I go to the courses management page
+    And I follow "Test Course 2"
+    Then I follow "View"
+    Then I follow "RecordingsOnly2"
+    And I should not see "Recording 1"
+    And I should not see "Recording 2"
