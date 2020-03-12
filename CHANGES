@@ -1,25 +1,7 @@
-Bug: Fix for issue with importing recordings on 3.7 (CONTRIB-7754).
-Bug: Fix for regression on recording ready notifications (CONTRIB-7740).
-Bug: Fix for instanceTypeProfiles array used by keys but NOT defined so (CONTRIB-7399).
-Bug: Fix for hard-coded strings in recordings table based on YUI datatables (CONTRIB-7518).
-Bug: Fix for Join session timeline button don't work (CONTRIB-7538).
-Bug: Fix for Index page does not show actions (CONTRIB-7579).
-Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
-Bug: Fix for implementation of resetting function (CONTRIB-7695).
-Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
-Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
-Bug: Fix for recording ready notifications not working (CONTRIB-7740).
-Bug: Fix for false positive sent to the logs (CONTRIB-7742).
-Bug: Fix for recording settings showing empty when no feature can be edited (CONTRIB-7701).
-Bug: Fix for notifications to be sent only to users allowed to see the activity (CONTRIB-7733).
-Enhancement: Playback recordings should be shown in a new tab (CONTRIB-7386).
-Enhancement: Limit instance type repertoire by capabilities (CONTRIB-7400).
-Enhancement: Media files in the description are now shown (CONTRIB-7440).
-Enhancement: Code cleanup and refactoring (CONTRIB-7625).
-New Feature: Being able to define a default presentation file for a Moodle site through settings (CONTRIB-6970).
-New Feature: Users being able to see recordings of only the rooms they have access to (CONTRIB-7225).
-New Feature: Add support for mobile application (CONTRIB-7227).
-New Feature: Add support for muteOnStart (CONTRIB-7519).
-New Feature: Add option for forcing all the sessions to be recorded (with no button) (CONTRIB-7520).
-New Feature: Add support for recordings of breakout rooms (CONTRIB-7521).
-New Feature: Recording list should give an option for searching recordings (CONTRIB-7522).
+Bug: Fix for issue wih Restrict Access setting on "Recording Only" and "Room/Activity Only" modes (CONTRIB-7960).
+Bug: Fix for issue wih HAndle missing language strings for new recording formats (CONTRIB-7962).
+Bug: Fix for issue wih hard-coded dependency on mod_lti (CONTRIB-7969).
+Bug: Fix for issue wih missing sesskey on ajax requests (CONTRIB-7971).
+Bug: Fix for issue wih participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
+Bug: Fix for issue wih recordings table doesn't respect forced group mode (CONTRIB-7973).
+Bug: Fix for issue wih fails core privacy provider testcase (CONTRIB-7983).
