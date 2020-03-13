@@ -1,3 +1,6 @@
+2.3.3 (2019042008)
+Bug: Fix for issue with instances not being saved on Moodle 3.5 and earlier (CONTRIB-8019).
+
 2.3.2 (2019042007)
 Bug: Fix for issue wih Restrict Access setting on "Recording Only" and "Room/Activity Only" modes (CONTRIB-7960).
 Bug: Fix for issue wih HAndle missing language strings for new recording formats (CONTRIB-7962).
