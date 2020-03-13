@@ -785,7 +785,8 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
-    global $DB;
+    global $CFG, $DB;
+    require_once($CFG->dirroot.'/calendar/lib.php');
     $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     // Delete the event from calendar when/if openingtime is NOT set.
