@@ -2110,7 +2110,7 @@ function bigbluebuttonbn_html2text($html, $len = 0) {
     $text = strip_tags($html);
     $text = str_replace('&nbsp;', ' ', $text);
     $textlen = strlen($text);
-    $text = substr($text, 0, $len);
+    $text = mb_substr($text, 0, $len);
     if ($textlen > $len) {
         $text .= '...';
     }
