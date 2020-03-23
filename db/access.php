@@ -84,9 +84,6 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_PREVENT,
-            'student' => CAP_PREVENT,
-            'guest' => CAP_PREVENT,
         ),
     ),
 
@@ -97,9 +94,6 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_PREVENT,
-            'student' => CAP_PREVENT,
-            'guest' => CAP_PREVENT,
         ),
     ),
 );
