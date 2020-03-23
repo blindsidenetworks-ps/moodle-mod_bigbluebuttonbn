@@ -53,7 +53,6 @@ Feature: Manage and list recordings
     And I should see "Recording 1"
     And I should see "Recording 2"
 
-
   @javascript
   Scenario: I check that I can import recordings into the Recording Only activity and that the list of
     recording is displays the right information (Recording Name as name and Description)
