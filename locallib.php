@@ -2109,7 +2109,7 @@ function bigbluebuttonbn_output_recording_table($bbbsession, $recordings, $tools
 function bigbluebuttonbn_html2text($html, $len = 0) {
     $text = strip_tags($html);
     $text = str_replace('&nbsp;', ' ', $text);
-    $textlen = strlen($text);
+    $textlen = mb_strlen($text);
     $text = mb_substr($text, 0, $len);
     if ($textlen > $len) {
         $text .= '...';
