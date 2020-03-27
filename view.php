@@ -118,17 +118,6 @@ if (!isset($serverVersion)) { // Server is not working.
     } else {
             print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
     }
-} else {
-    $xml = bigbluebuttonbn_wrap_xml_load_file(bigbluebuttonbn_getMeetingsURL($bbbsession['endpoint'], $bbbsession['shared_secret']));
-    if (!isset($xml) || !isset($xml->returncode) || $xml->returncode == 'FAILED') { // The shared secret is wrong
-        if ($bbbsession['administrator']) {
-                    print_error('view_error_unable_join', 'bigbluebuttonbn', $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
-        } else if ($bbbsession['moderator']) {
-                    print_error('view_error_unable_join_teacher', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
-        } else {
-                    print_error('view_error_unable_join_student', 'bigbluebuttonbn', $CFG->wwwroot . '/course/view.php?id=' . $bigbluebuttonbn->course);
-        }
-    }
 }
 
 // Mark viewed by user (if required).
