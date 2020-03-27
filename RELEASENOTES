@@ -1,3 +1,6 @@
+2.1.15 (2016051920)
+Bug: Fixed issue timeout on validation of BBB server while diplaying the activity in Moodle.
+
 2.1.14 (2016051919)
 Bug: Fixed issue participant list not considering rules based on Moodle roles when user had multiple.
 Bug: Fixed issue participant list not applying the default rule correctly.
