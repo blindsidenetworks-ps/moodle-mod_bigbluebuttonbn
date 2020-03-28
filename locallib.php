@@ -2771,7 +2771,7 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $renderer->render_group_element('participant_moderator_default',
             $renderer->render_group_element_configmultiselect('participant_moderator_default',
-                array_keys($owner), array_merge($owner, $roles))
+                array_keys($owner), $owner + $roles)
           );
     }
 }
