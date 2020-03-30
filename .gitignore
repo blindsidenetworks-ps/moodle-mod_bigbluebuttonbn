@@ -1,5 +1,6 @@
 /.buildpath
 /.project
+.DS_Store
 /.settings*
 /config.php
 /deploy*
