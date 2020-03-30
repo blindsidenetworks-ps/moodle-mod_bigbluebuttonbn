@@ -48,7 +48,7 @@ class bigbluebutton {
     public static function action_url($action = '', $data = array(), $metadata = array()) {
         $baseurl = self::sanitized_url() . $action . '?';
         $params = http_build_query($data, '', '&');
-        if($metadata){
+        if(!empty($metadata)){
             $metadataParams = array();
             foreach ($metadata as $key => $value) {
                 $metadataParams['meta_' . $key] = $value;
