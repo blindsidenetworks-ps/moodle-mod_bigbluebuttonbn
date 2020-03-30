@@ -49,11 +49,12 @@ class bigbluebutton {
         $baseurl = self::sanitized_url() . $action . '?';
         $params = '';
         foreach ($data as $key => $value) {
-            $params .= '&' . $key . '=' . urlencode($value);
+            $params .= $key . '=' . $value . '&';
         }
         foreach ($metadata as $key => $value) {
-            $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
+            $params .= 'meta_' . $key.'=' . $value . '&';
         }
+        $params = rtrim($params, "&");
         return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 
