@@ -3,7 +3,7 @@
 
 BigBlueButtonBN Activity Module for Moodle
 ==========================================
-BigBlueButton is an open source web conferencing system that enables universities and colleges to deliver a high-quality learning experience to remote students.  
+BigBlueButton is an open source web conferencing system that enables universities and colleges to deliver a high-quality learning experience to remote students.
 
 These instructions describe how to install the BigBlueButtonBN Activity Module for Moodle.  This module is developed and supported by Blindside Networks, the company that started the BigBlueButton project in 2007.
 
@@ -23,12 +23,13 @@ With the latest version of this plugin you can
 
 Note that on previous versions of Moodle you will need to use the specific version of this plugin.
 
-- For Moodle 1.9 use version 1.0.9 (2013071000).
-- For Moodle 2.0 to 2.5 use version 1.1.1 (2015062101)
-- For Moodle 2.6 use version 2.0.4 (2015080611).
-- For Moodle 2.7 to 3.4 use version 2.1.14 (2016051919).
-- For Moodle 3.0+ can use version 2.2-rc (2017101007).
-
+| Moodle Version    |  Branch      | Version              |
+|-------------------|--------------|----------------------|
+| Moodle 2.0 - 2.5  | v1.1-stable  | v1.1.1  (2015062101) |
+| Moodle 2.6        | v2.0-stable  | v2.0.4  (2015080611) |
+| Moodle 2.7 - 2.9  | v2.1-stable  | v2.1.15 (2016051920) |
+| Moodle 3.0 - 3.1  | v2.2-stable  | v2.2.12 (2017101020) |
+| Moodle 3.2 - 3.8  | v2.3-stable  | v2.3.3  (2019042008) |
 
 Prerequisites
 =============
