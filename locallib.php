@@ -1885,61 +1885,6 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
 }
 
 /**
- * Helper function builds the data used for headers by the recording table.
- *
- * @param array $bbbsession
- *
- * @return array
- */
-function bigbluebuttonbn_get_recording_columns($bbbsession) {
-    $columns = array();
-    // Initialize table headers.
-    $columns[] = array('key' => 'playback', 'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
-        'width' => '125px', 'allowHTML' => true); // Note: here a strange bug noted whilst changing the columns, ref CONTRIB
-    $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
-        'width' => '125px', 'allowHTML' => true);
-    $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
-        'sortable' => true, 'width' => '250px', 'allowHTML' => true);
-    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        $columns[] = array('key' => 'preview', 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
-            'width' => '250px', 'allowHTML' => true);
-    }
-    $columns[] = array('key' => 'date', 'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
-        'sortable' => true, 'width' => '225px', 'allowHTML' => true);
-    $columns[] = array('key' => 'duration', 'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
-        'width' => '50px');
-    if ($bbbsession['managerecordings']) {
-        $columns[] = array('key' => 'actionbar', 'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
-            'width' => '120px', 'allowHTML' => true);
-    }
-    return $columns;
-}
-
-/**
- * Helper function builds the data used by the recording table.
- *
- * @param array $bbbsession
- * @param array $recordings
- * @param array $tools
- *
- * @return array
- */
-function bigbluebuttonbn_get_recording_data($bbbsession, $recordings, $tools = ['protect', 'publish', 'delete']) {
-    $tabledata = array();
-    // Build table content.
-    if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
-        // There are recordings for this meeting.
-        foreach ($recordings as $recording) {
-            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-            if (!empty($rowdata)) {
-                array_push($tabledata, $rowdata);
-            }
-        }
-    }
-    return $tabledata;
-}
-
-/**
  * Helper function builds the recording table.
  *
  * @param array $bbbsession
@@ -2046,6 +1991,41 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
         $row->cells[] = $rowdata->actionbar;
     }
     return $row;
+}
+
+/**
+ * Get the basic data to display in the table view
+ *
+ * @param array $bbbsession the current session
+ * @param array $enabledfeatures feature enabled for this activity
+ * @return associative array containing the recordings indexed by recordID, each recording is also a
+ * non sequential associative array itself that corresponds to the actual recording in BBB
+ */
+function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures) {
+    $bigbluebuttonbnid = null;
+    if ($enabledfeatures['showroom']) {
+        $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+    }
+    // Get recordings.
+    $recordings = bigbluebuttonbn_get_recordings(
+        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
+        $bbbsession['bigbluebuttonbn']->recordings_deleted
+    );
+    if ($enabledfeatures['importrecordings']) {
+        // Get recording links.
+        $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+        $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
+            $bbbsession['course']->id, $bigbluebuttonbnid, true
+        );
+        /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
+         * recordings are not included. */
+        if ($bbbsession['bigbluebuttonbn']->recordings_imported) {
+            $recordings = $recordingsimported;
+        } else {
+            $recordings += $recordingsimported;
+        }
+    }
+    return $recordings;
 }
 
 /**

@@ -122,6 +122,12 @@ try {
         echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
         return;
     }
+    if ($a == 'recording_list_table') {
+        $PAGE->set_context(context_course::instance($PAGE->course->id));
+        $recordingdata = bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enabledfeatures);
+        echo $recordingdata;
+        return;
+    }
     if ($a == 'completion_validate') {
         $completionvalidate = bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params);
         echo $completionvalidate;
