@@ -347,6 +347,12 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['muteonstart']) {
         $data['muteOnStart'] = 'true';
     }
+
+    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('participant_student_only_listener')) {
+        $data['lockSettingsDisableCam'] = 'true';
+        $data['lockSettingsDisableMic'] = 'true';
+    }
+
     return $data;
 }
 

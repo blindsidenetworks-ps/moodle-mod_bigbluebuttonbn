@@ -184,6 +184,9 @@ $string['config_participant_description'] = 'These settings define the role by d
 $string['config_participant_moderator_default'] = 'Moderator by default';
 $string['config_participant_moderator_default_description'] = 'This rule is used by default when a new room is added.';
 
+$string['config_participant_student_only_listener'] = 'Only Moderators speak';
+$string['config_participant_student_only_listener_description'] = 'If checked, only moderators are allowed to enable camera and microphone';
+
 $string['config_userlimit'] = 'Configuration for "User limit" feature';
 $string['config_userlimit_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
 $string['config_userlimit_default'] = 'User limit enabled by default';
