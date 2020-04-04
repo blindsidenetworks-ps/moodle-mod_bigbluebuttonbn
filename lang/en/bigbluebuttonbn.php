@@ -99,6 +99,8 @@ $string['config_recording_hide_button_default'] = 'Hide recording button';
 $string['config_recording_hide_button_default_description'] = 'If checked the button for record will be hide';
 $string['config_recording_hide_button_editable'] = 'Hide recording button can be edited';
 $string['config_recording_hide_button_editable_description'] = 'If checked the interface includes an option for enable and disable the hide recording button feature.';
+$string['config_recording_validate_url'] = 'Validate URL';
+$string['config_recording_validate_url_description'] = 'If checked the playback URL will be validated before the user access it.';
 
 $string['config_recordings'] = 'Configuration for "Show recordings" feature';
 $string['config_recordings_description'] = 'These settings are feature specific';

@@ -93,6 +93,11 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * $CFG->bigbluebuttonbn['recording_icons_enabled'] = 1;
  */
 
+/* When the value is set to 1 (checked) the playback URLs will be validated
+ * before the user access it.
+ * $CFG->bigbluebuttonbn['recording_validate_url'] = 1;
+ */
+
 /*
  * 1.3. CONFIGURATION FOR "IMPORT RECORDINGS" FEATURE
  *

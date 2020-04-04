@@ -62,7 +62,8 @@ class validator {
                 !isset($CFG->bigbluebuttonbn['recording_all_from_start_default']) ||
                 !isset($CFG->bigbluebuttonbn['recording_all_from_start_editable']) ||
                 !isset($CFG->bigbluebuttonbn['recording_hide_button_default']) ||
-                !isset($CFG->bigbluebuttonbn['recording_hide_button_editable']) );
+                !isset($CFG->bigbluebuttonbn['recording_hide_button_editable']) ||
+                !isset($CFG->bigbluebuttonbn['recording_validate_url']) );
     }
 
     /**

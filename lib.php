@@ -601,6 +601,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->muteonstart)) {
         $bigbluebuttonbn->muteonstart = 0;
     }
+    if (!isset($bigbluebuttonbn->validate_recording_url)) {
+        $bigbluebuttonbn->validate_recording_url = 1;
+    }
 }
 
 /**
