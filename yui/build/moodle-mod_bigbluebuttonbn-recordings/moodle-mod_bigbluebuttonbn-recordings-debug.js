@@ -29,39 +29,50 @@ M.mod_bigbluebuttonbn.recordings = {
     locale: 'en',
     windowVideoPlay: null,
     table: null,
+    bbbid: 0,
 
     /**
      * Initialise recordings code.
      *
      * @method init
-     * @param {object} data
+     * @param {object} dataobj
      */
-    init: function(data) {
+    init: function(dataobj) {
+        this.bbbid = dataobj.bbbid;
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + "&"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + '&',
         });
-        if (data.recordings_html === false &&
-            (data.profile_features.indexOf('all') != -1 || data.profile_features.indexOf('showrecordings') != -1)) {
-            this.locale = data.locale;
-            this.datatable.columns = data.columns;
-            this.datatable.data = this.datatableInitFormatDates(data.data);
-            this.datatableInit();
-            var searchform = Y.one('#bigbluebuttonbn_recordings_searchform');
-            if (searchform) {
-                searchform.delegate('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    var value = null;
-                    if (e.target.get('id') == 'searchsubmit') {
-                        value = Y.one('#searchtext').get('value');
-                    } else {
-                        Y.one('#searchtext').set('value', '');
+        thisbbb = this;
+        this.datasource.sendRequest({
+            request: "id=" + this.bbbid + "&action=recording_list_table",
+            callback: {
+                success: function (data) {
+                    var bbinfo = data.data;
+                    if (bbinfo.recordings_html === false &&
+                        (bbinfo.profile_features.indexOf('all') != -1 || bbinfo.profile_features.indexOf('showrecordings') != -1)) {
+                        thisbbb.locale = bbinfo.locale;
+                        thisbbb.datatable.columns = bbinfo.data.columns;
+                        thisbbb.datatable.data = thisbbb.datatableInitFormatDates(bbinfo.data.data);
+                        thisbbb.datatableInit();
                     }
-
-                    this.filterByText(value);
-                }, 'input[type=submit]', this);
+                },
             }
+        });
+        var searchform = Y.one('#bigbluebuttonbn_recordings_searchform');
+        if (searchform) {
+            searchform.delegate('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var value = null;
+                if (e.target.get('id') == 'searchsubmit') {
+                    value = Y.one('#searchtext').get('value');
+                } else {
+                    Y.one('#searchtext').set('value', '');
+                }
+
+                this.filterByText(value);
+            }, 'input[type=submit]', this);
         }
         M.mod_bigbluebuttonbn.helpers.init();
     },
@@ -107,10 +118,10 @@ M.mod_bigbluebuttonbn.recordings = {
                 var tlist = this.table.data;
                 var rsearch = new RegExp('<span>.*?' + this.escapeRegex(searchvalue) + '.*?</span>', 'i');
                 var filterdata = tlist.filter({asList: true}, function(item) {
-                    var activity = item.get('activity');
+                    var name = item.get('recording');
                     var description = item.get('description');
                     return (
-                        (activity && rsearch.test(activity)) || (description && rsearch.test(description))
+                        (name && rsearch.test(name)) || (description && rsearch.test(description))
                     );
                 });
                 this.table.set('data', filterdata);
@@ -173,6 +184,22 @@ M.mod_bigbluebuttonbn.recordings = {
     recordingActionPerform: function(data) {
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOn(data);
         M.mod_bigbluebuttonbn.broker.recordingActionPerform(data);
+
+        thisbbb = this;
+        this.datasource.sendRequest({
+            request: "&id=" + this.bbbid + "&action=recording_list_table",
+            callback: {
+                success: function (data) {
+                    var bbinfo = data.data;
+                    if (bbinfo.recordings_html === false &&
+                        (bbinfo.profile_features.indexOf('all') != -1 || bbinfo.profile_features.indexOf('showrecordings') != -1)) {
+                        thisbbb.locale = bbinfo.locale;
+                        thisbbb.datatable.columns = bbinfo.data.columns;
+                        thisbbb.datatable.data = thisbbb.datatableInitFormatDates(bbinfo.data.data);
+                    }
+                }
+            }
+        });
     },
 
     recordingPublish: function(element) {

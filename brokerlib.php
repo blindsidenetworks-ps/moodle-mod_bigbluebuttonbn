@@ -794,6 +794,10 @@ function bigbluebuttonbn_broker_required_parameters() {
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
         'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
     ];
+    $params['recording_list_table'] = [
+        'id' => 'The Bigbluebutton activity id must be specified.',
+        'callback' => 'This request must include a javascript callback.',
+    ];
     $params['meeting_events'] = [
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
     ];
@@ -835,5 +839,67 @@ function bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params) {
     }
     $callbackresponse['status'] = 200;
     $callbackresponsedata = json_encode($callbackresponse);
+    return "{$params['callback']}({$callbackresponsedata});";
+}
+
+/**
+ * Helper function builds the data used by the recording table.
+ *
+ * @param array $bbbsession
+ * @param array $params
+ * @param array $enabledfeatures
+ *
+ * @return array
+ * @throws coding_exception
+ */
+function bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enabledfeatures) {
+    $tools = ['protect', 'publish', 'delete'];
+    $recordings = bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
+    $tabledata = array();
+    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+    $tabledata['activity'] = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    $tabledata['ping_interval'] = (int) \mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
+    $tabledata['locale'] = bigbluebuttonbn_get_localcode();
+    $tabledata['profile_features'] = $typeprofiles[0]['features'];
+    $tabledata['recordings_html'] = $bbbsession['bigbluebuttonbn']->recordings_html == '1';
+
+    $data = array();
+    // Build table content.
+    if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
+        // There are recordings for this meeting.
+        foreach ($recordings as $recording) {
+            $rowdata = bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
+            if (!empty($rowdata)) {
+                array_push($data, $rowdata);
+            }
+        }
+    }
+
+    $columns = array();
+    // Initialize table headers.
+    $columns[] = array('key' => 'playback', 'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
+        'width' => '125px', 'allowHTML' => true); // Note: here a strange bug noted whilst changing the columns, ref CONTRIB.
+    $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
+        'width' => '125px', 'allowHTML' => true);
+    $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '250px', 'allowHTML' => true);
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $columns[] = array('key' => 'preview', 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
+            'width' => '250px', 'allowHTML' => true);
+    }
+    $columns[] = array('key' => 'date', 'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    $columns[] = array('key' => 'duration', 'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
+        'width' => '50px');
+    if ($bbbsession['managerecordings']) {
+        $columns[] = array('key' => 'actionbar', 'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
+            'width' => '120px', 'allowHTML' => true);
+    }
+
+    $tabledata['data'] = array(
+        'columns' => $columns,
+        'data' => $data
+    );
+    $callbackresponsedata = json_encode($tabledata);
     return "{$params['callback']}({$callbackresponsedata});";
 }
