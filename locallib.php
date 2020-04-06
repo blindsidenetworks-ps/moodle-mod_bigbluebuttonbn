@@ -1546,10 +1546,11 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
+    global $CFG;
     $recordingpreview  = html_writer::start_tag('div', array('class' => 'container-fluid'));
     $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
     foreach ($playback['preview'] as $image) {
-        if (!bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
+        if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
             return '';
         }
         $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
@@ -1624,7 +1625,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         'data-target' => $playback['type'],
         'data-href' => $href,
       );
-    if (!bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
+    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
         $linkattributes['class'] = 'btn btn-sm btn-warning';
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
         unset($linkattributes['data-href']);
@@ -2611,6 +2612,8 @@ function bigbluebuttonbn_settings_showrecordings(&$renderer) {
             $renderer->render_group_element_checkbox('recordings_preview_editable', 0));
         $renderer->render_group_element('recordings_sortorder',
             $renderer->render_group_element_checkbox('recordings_sortorder', 0));
+        $renderer->render_group_element('recordings_validate_url',
+            $renderer->render_group_element_checkbox('recordings_validate_url', 1));
     }
 }
 

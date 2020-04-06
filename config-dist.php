@@ -276,6 +276,11 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * $CFG->bigbluebuttonbn['recordings_preview_editable'] = 0;
  */
 
+ /* When the value is set to 1 (checked) the playback URLs will be validated
+  * before the user access it.
+  * $CFG->bigbluebuttonbn['recordings_validate_url'] = 1;
+  */
+
 /*
  * 1.11. GENERAL CONFIGURATION FOR CLIENT TYPE SELECTION
  *
