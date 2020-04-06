@@ -188,7 +188,7 @@ jobs:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
+  - nvm install 8.9.4
   - npm install
   - cd ../..
   - composer selfupdate
