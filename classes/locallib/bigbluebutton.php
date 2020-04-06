@@ -47,13 +47,16 @@ class bigbluebutton {
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
         $baseurl = self::sanitized_url() . $action . '?';
-        $params = '';
-        foreach ($data as $key => $value) {
-            $params .= '&' . $key . '=' . urlencode($value);
-        }
-        foreach ($metadata as $key => $value) {
-            $params .= '&' . 'meta_' . $key.'=' . urlencode($value);
-        }
+        $metadata = array_combine(
+            array_map(
+                function($k) {
+                    return 'meta_' . $k;
+                }
+                , array_keys($metadata)
+            ),
+            $metadata
+        );
+        $params = http_build_query($data + $metadata, '', '&');
         return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 
