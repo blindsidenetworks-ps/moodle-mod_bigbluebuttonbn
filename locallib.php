@@ -250,10 +250,9 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
     // Execute a paginated getRecordings request.
     $pagecount = 25;
     $pages = floor(count($meetingidsarray) / $pagecount) + 1;
-
-    if(count($meetingidsarray) > 0 &&  count($meetingidsarray) % $pagecount == 0)
+    if(count($meetingidsarray) > 0 &&  count($meetingidsarray) % $pagecount == 0){
         $pages--;
-
+    }
     for ($page = 1; $page <= $pages; ++$page) {
         $mids = array_slice($meetingidsarray, ($page - 1) * $pagecount, $pagecount);
         $recordings += bigbluebuttonbn_get_recordings_array_fetch_page($mids);
