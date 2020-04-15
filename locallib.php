@@ -229,9 +229,13 @@ function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
 function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
     $recordings = array();
     // Execute a paginated getRecordings request.
-    $pages = floor(count($meetingidsarray) / 25) + 1;
+    $pagecount = 25;
+    $pages = floor(count($meetingidsarray) / $pagecount) + 1;
+    if (count($meetingidsarray) > 0 && count($meetingidsarray) % $pagecount == 0) {
+        $pages--;
+    }
     for ($page = 1; $page <= $pages; ++$page) {
-        $mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
+        $mids = array_slice($meetingidsarray, ($page - 1) * $pagecount, $pagecount);
         $recordings += bigbluebuttonbn_get_recordings_array_fetch_page($mids);
     }
     return $recordings;
@@ -2071,7 +2075,7 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     }
     $coursesforselect = [];
     foreach ($courses as $course) {
-        $coursesforselect[$course->id] = $course->fullname;
+        $coursesforselect[$course->id] = $course->fullname . " (" . $course->shortname . ")";
     }
     return $coursesforselect;
 }
