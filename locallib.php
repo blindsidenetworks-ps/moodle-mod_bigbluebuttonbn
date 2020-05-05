@@ -3027,6 +3027,216 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
 }
 
 /**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_locksettings(&$renderer) {
+    $renderer->render_group_header('locksettings');
+    // Configuration for various lock settings for meetings.
+    bigbluebuttonbn_settings_disablecam($renderer);
+    bigbluebuttonbn_settings_disablemic($renderer);
+    bigbluebuttonbn_settings_disableprivatechat($renderer);
+    bigbluebuttonbn_settings_disablepublicchat($renderer);
+    bigbluebuttonbn_settings_disablenote($renderer);
+    bigbluebuttonbn_settings_hideuserlist($renderer);
+    bigbluebuttonbn_settings_lockedlayout($renderer);
+    bigbluebuttonbn_settings_lockonjoin($renderer);
+    bigbluebuttonbn_settings_lockonjoinconfigurable($renderer);
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_disablecam(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_disablecam_shown()) {
+        $renderer->render_group_element(
+            'disablecam_default',
+            $renderer->render_group_element_checkbox('disablecam_default', 0)
+        );
+        $renderer->render_group_element(
+            'disablecam_editable',
+            $renderer->render_group_element_checkbox('disablecam_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_disablemic(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_disablemic_shown()) {
+        $renderer->render_group_element(
+            'disablemic_default',
+            $renderer->render_group_element_checkbox('disablemic_default', 0)
+        );
+        $renderer->render_group_element(
+            'disablecam_editable',
+            $renderer->render_group_element_checkbox('disablemic_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_disableprivatechat(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_disableprivatechat_shown()) {
+        $renderer->render_group_element(
+            'disableprivatechat_default',
+            $renderer->render_group_element_checkbox('disableprivatechat_default', 0)
+        );
+        $renderer->render_group_element(
+            'disableprivatechat_editable',
+            $renderer->render_group_element_checkbox('disableprivatechat_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_disablepublicchat(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_disablepublicchat_shown()) {
+        $renderer->render_group_element(
+            'disablepublicchat_default',
+            $renderer->render_group_element_checkbox('disablepublicchat_default', 0)
+        );
+        $renderer->render_group_element(
+            'disablepublicchat_editable',
+            $renderer->render_group_element_checkbox('disablepublicchat_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_disablenote(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_disablenote_shown()) {
+        $renderer->render_group_element(
+            'disablenote_default',
+            $renderer->render_group_element_checkbox('disablenote_default', 0)
+        );
+        $renderer->render_group_element(
+            'disablenote_editable',
+            $renderer->render_group_element_checkbox('disablenote_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_hideuserlist(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_hideuserlist_shown()) {
+        $renderer->render_group_element(
+            'hideuserlist_default',
+            $renderer->render_group_element_checkbox('hideuserlist_default', 0)
+        );
+        $renderer->render_group_element(
+            'hideuserlist_editable',
+            $renderer->render_group_element_checkbox('hideuserlist_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_lockedlayout(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockedlayout_shown()) {
+        $renderer->render_group_element(
+            'lockedlayout_default',
+            $renderer->render_group_element_checkbox('lockedlayout_default', 0)
+        );
+        $renderer->render_group_element(
+            'lockedlayout_editable',
+            $renderer->render_group_element_checkbox('lockedlayout_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_lockonjoin(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockonjoin_shown()) {
+        $renderer->render_group_element(
+            'lockonjoin_default',
+            $renderer->render_group_element_checkbox('lockonjoin_default', 0)
+        );
+        $renderer->render_group_element(
+            'lockonjoin_editable',
+            $renderer->render_group_element_checkbox('lockonjoin_editable', 1)
+        );
+    }
+}
+
+/**
+ * Helper function renders general settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_lockonjoinconfigurable(&$renderer) {
+    // Configuration for BigBlueButton.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockonjoinconfigurable_shown()) {
+        $renderer->render_group_element(
+            'lockonjoinconfigurable_default',
+            $renderer->render_group_element_checkbox('lockonjoinconfigurable_default', 0)
+        );
+        $renderer->render_group_element(
+            'lockonjoinconfigurable_editable',
+            $renderer->render_group_element_checkbox('lockonjoinconfigurable_editable', 1)
+        );
+    }
+}
+
+/**
  * Helper function renders extended settings if any of the features there is enabled.
  *
  * @param object $renderer
@@ -3357,6 +3567,16 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
     $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
     $bbbsession['muteonstart'] = $bbbsession['bigbluebuttonbn']->muteonstart;
+    // Lock settings.
+    $bbbsession['disablecam'] = $bbbsession['bigbluebuttonbn']->disablecam;
+    $bbbsession['disablemic'] = $bbbsession['bigbluebuttonbn']->disablemic;
+    $bbbsession['disableprivatechat'] = $bbbsession['bigbluebuttonbn']->disableprivatechat;
+    $bbbsession['disablepublicchat'] = $bbbsession['bigbluebuttonbn']->disablepublicchat;
+    $bbbsession['disablenote'] = $bbbsession['bigbluebuttonbn']->disablenote;
+    $bbbsession['hideuserlist'] = $bbbsession['bigbluebuttonbn']->hideuserlist;
+    $bbbsession['lockedlayout'] = $bbbsession['bigbluebuttonbn']->lockedlayout;
+    $bbbsession['lockonjoin'] = $bbbsession['bigbluebuttonbn']->lockonjoin;
+    $bbbsession['lockonjoinconfigurable'] = $bbbsession['bigbluebuttonbn']->lockonjoinconfigurable;
     // Additional info related to the course.
     $bbbsession['context'] = $context;
     // Metadata (origin).
