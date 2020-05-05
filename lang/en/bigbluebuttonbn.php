@@ -226,6 +226,54 @@ $string['config_muteonstart_default_description'] = 'If enabled the session will
 $string['config_muteonstart_editable'] = 'Mute on start can be edited';
 $string['config_muteonstart_editable_description'] = 'Mute on start by default can be edited when the instance is added or updated.';
 
+$string['config_locksettings'] = 'Configuration for locking settings';
+$string['config_locksettings_description'] = 'These setttings enable or disable options in the UI for locking settings, and also define default values for these options.';
+
+$string['config_disablecam_default'] = 'Disable cam enabled by default';
+$string['config_disablecam_default_description'] = 'If enabled the webcams will be disabled.';
+$string['config_disablecam_editable'] = 'Disable cam can be edited';
+$string['config_disablecam_editable_description'] = 'Disable cam by default can be edited when the instance is added or updated.';
+
+$string['config_disablemic_default'] = 'Disable mic enabled by default';
+$string['config_disablemic_default_description'] = 'If enabled the microphones will be disabled.';
+$string['config_disablemic_editable'] = 'Disable mic can be edited';
+$string['config_disablemic_editable_description'] = 'Disable mic by default can be edited when the instance is added or updated.';
+
+$string['config_disableprivatechat_default'] = 'Disable private chat enabled by default';
+$string['config_disableprivatechat_default_description'] = 'If enabled the private chat will be disabled.';
+$string['config_disableprivatechat_editable'] = 'Disable private chat can be edited';
+$string['config_disableprivatechat_editable_description'] = 'Disable private chat by default can be edited when the instance is added or updated.';
+
+$string['config_disablepublicchat_default'] = 'Disable public chat enabled by default';
+$string['config_disablepublicchat_default_description'] = 'If enabled the public chat will be disabled.';
+$string['config_disablepublicchat_editable'] = 'Disable public chat can be edited';
+$string['config_disablepublicchat_editable_description'] = 'Disable public chat by default can be edited when the instance is added or updated.';
+
+$string['config_disablenote_default'] = 'Disable shared notes enabled by default';
+$string['config_disablenote_default_description'] = 'If enabled the shared notes will be disabled.';
+$string['config_disablenote_editable'] = 'Disable shared notes can be edited';
+$string['config_disablenote_editable_description'] = 'Disable shared notes by default can be edited when the instance is added or updated.';
+
+$string['config_hideuserlist_default'] = 'Hide user list enabled by default';
+$string['config_hideuserlist_default_description'] = 'If enabled the session user list will be hidden.';
+$string['config_hideuserlist_editable'] = 'Hide user list can be edited';
+$string['config_hideuserlist_editable_description'] = 'Hide user list by default can be edited when the instance is added or updated.';
+
+$string['config_lockedlayout_default'] = 'Locked layout enabled by default';
+$string['config_lockedlayout_default_description'] = 'If enabled the session layout will be locked.';
+$string['config_lockedlayout_editable'] = 'Locked layout can be edited';
+$string['config_lockedlayout_editable_description'] = 'Locked layout by default can be edited when the instance is added or updated.';
+
+$string['config_lockonjoin_default'] = 'Ignore lock on join enabled by default';
+$string['config_lockonjoin_default_description'] = 'If enabled the lock settings will be ignored. Lock configuration must be enabled for this to apply.';
+$string['config_lockonjoin_editable'] = 'Ignore lock on join can be edited';
+$string['config_lockonjoin_editable_description'] = 'Ignore lock on join by default can be edited when the instance is added or updated.';
+
+$string['config_lockonjoinconfigurable_default'] = 'Lock configuration enabled by default';
+$string['config_lockonjoinconfigurable_default_description'] = 'If enabled the session lock settings can be enabled or disabled from the above control.';
+$string['config_lockonjoinconfigurable_editable'] = 'Lock configuration can be edited';
+$string['config_lockonjoinconfigurable_editable_description'] = 'Lock configuration by default can be edited when the instance is added or updated.';
+
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 
@@ -301,6 +349,17 @@ $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 $string['mod_form_field_recordallfromstart'] = 'Record all from start';
 $string['mod_form_field_recordhidebutton'] = 'Hide recording button';
 $string['mod_form_field_nosettings'] = 'No settings can be edited';
+$string['mod_form_field_disablecam'] = 'Disable webcams';
+$string['mod_form_field_disablemic'] = 'Disable microphones';
+$string['mod_form_field_disableprivatechat'] = 'Disable private chat';
+$string['mod_form_field_disablepublicchat'] = 'Hide user list';
+$string['mod_form_field_disablenote'] = 'Disable shared notes';
+$string['mod_form_field_hideuserlist'] = 'Hide user list';
+$string['mod_form_field_lockedlayout'] = 'Lock room layout';
+$string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
+$string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
+$string['mod_form_locksettings'] = 'Lock settings';
+
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
