@@ -3027,6 +3027,21 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
 }
 
 /**
+ * Helper function renders default messages settings.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_default_messages(&$renderer) {
+    $renderer->render_group_header('default_messages');
+    $renderer->render_group_element(
+        'welcome_default',
+        $renderer->render_group_element_textarea('welcome_default', '', PARAM_TEXT)
+    );
+}
+
+/**
  * Helper function renders extended settings if any of the features there is enabled.
  *
  * @param object $renderer

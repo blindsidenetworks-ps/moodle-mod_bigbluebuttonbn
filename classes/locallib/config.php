@@ -103,6 +103,7 @@ class config {
             'clienttype_editable' => true,
             'muteonstart_default' => false,
             'muteonstart_editable' => false,
+            'welcome_default' => '',
         );
     }
 
@@ -209,6 +210,7 @@ class config {
                'clienttype_default' => self::get('clienttype_default'),
                'muteonstart_editable' => self::get('muteonstart_editable'),
                'muteonstart_default' => self::get('muteonstart_default'),
+               'welcome_default' => self::get('welcome_default'),
           );
     }
 }
