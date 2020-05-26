@@ -121,6 +121,7 @@ class config {
             'lockonjoin_editable' => true,
             'lockonjoinconfigurable_default' => false,
             'lockonjoinconfigurable_editable' => true,
+            'welcome_default' => '',
         );
     }
 
@@ -227,7 +228,6 @@ class config {
                'clienttype_default' => self::get('clienttype_default'),
                'muteonstart_editable' => self::get('muteonstart_editable'),
                'muteonstart_default' => self::get('muteonstart_default'),
-
                'disablecam_editable' => self::get('disablecam_editable'),
                'disablecam_default' => self::get('disablecam_default'),
                'disablemic_editable' => self::get('disablemic_editable'),
@@ -246,7 +246,7 @@ class config {
                'lockonjoin_default' => self::get('lockonjoin_default'),
                'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
-
+               'welcome_default' => self::get('welcome_default'),
           );
     }
 }
