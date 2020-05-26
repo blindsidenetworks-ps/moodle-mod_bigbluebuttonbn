@@ -1,3 +1,4 @@
+function setUsernameCustom() { document.getElementById('join_button_input').setAttribute('onClick', document.getElementById('join_button_input').getAttribute('onClick').replace(/action=join&(usernamecustom=[^&]*&)?/, 'action=join&usernamecustom=' + document.getElementById('nameinputfield').value + '&')) }
 YUI.add('moodle-mod_bigbluebuttonbn-rooms', function (Y, NAME) {
 
 // This file is part of Moodle - http://moodle.org/
@@ -95,6 +96,7 @@ M.mod_bigbluebuttonbn.rooms = {
                             bnid: bnid
                         });
                     }
+                    setUsernameCustom();
                 }
             }
         });

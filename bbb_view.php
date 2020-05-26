@@ -29,6 +29,9 @@ require_once(dirname(__FILE__).'/locallib.php');
 global $SESSION;
 
 $action = required_param('action', PARAM_TEXT);
+//param to configure a custom username
+$usernamecustom = optional_param('usernamecustom', '', PARAM_TEXT);
+
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $href = optional_param('href', '', PARAM_TEXT);

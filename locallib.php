@@ -111,8 +111,13 @@ function bigbluebuttonbn_get_join_url(
     $userid = null,
     $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH
 ) {
+    //check if guest and entered a custom username
+    $username2=$username;
+    if(!empty($_GET['usernamecustom'])&&isguestuser($USER)){
+        $username2=$_GET['usernamecustom'];
+    }
     $data = ['meetingID' => $meetingid,
-        'fullName' => $username,
+        'fullName' => $username2,
         'password' => $pw,
         'logoutURL' => $logouturl,
     ];

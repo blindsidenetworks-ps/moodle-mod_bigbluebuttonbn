@@ -225,6 +225,15 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
     $output .= '<br><span id="status_bar"></span>';
     $output .= '<br><span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();
+    // Guest name input box.
+    if(isguestuser($USER)){
+        $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_guestnameinput_box');
+        $output .= '<br><span>Name eingeben:</span>';
+        //added script
+        $output .= '<script>function setUsernameCustom(){document.getElementById(\'join_button_input\').setAttribute(\'onClick\', document.getElementById(\'join_button_input\').getAttribute(\'onClick\').replace(/action=join&(usernamecustom=[^&]*&)?/,\'action=join&usernamecustom=\'+document.getElementById(\'nameinputfield\').value+\'&\'))}</script>';
+        $output .= '<br><span><input type="text" oninput="javascript:setUsernameCustom()" name="nameinputfield" id="nameinputfield" value="Gast"></span>';
+        $output .= $OUTPUT->box_end();
+    }
     // Action button box.
     $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
     $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>'."\n";

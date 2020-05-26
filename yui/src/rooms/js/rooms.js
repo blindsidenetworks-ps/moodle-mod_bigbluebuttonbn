@@ -1,3 +1,4 @@
+function setUsernameCustom() { document.getElementById('join_button_input').setAttribute('onClick', document.getElementById('join_button_input').getAttribute('onClick').replace(/action=join&(usernamecustom=[^&]*&)?/, 'action=join&usernamecustom=' + document.getElementById('nameinputfield').value + '&')) }
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -93,6 +94,7 @@ M.mod_bigbluebuttonbn.rooms = {
                             bnid: bnid
                         });
                     }
+                    setUsernameCustom();
                 }
             }
         });
