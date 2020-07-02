@@ -1338,7 +1338,7 @@ function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
  * @return array
  */
 function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
-    $configxml = bigbluebuttonbn_setConfigXML($meetingid, $configxml);
+    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
         debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
