@@ -2711,6 +2711,10 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             'recording_hide_button_editable',
             $renderer->render_group_element_checkbox('recording_hide_button_editable', 0)
         );
+        $renderer->render_group_element(
+            'recording_hide_button_activityonly',
+            $renderer->render_group_element_checkbox('recording_hide_button_activityonly', 0)
+        );
     }
 }
 
@@ -3547,6 +3551,13 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
     if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
         $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
+    }
+
+    // If the recording button should be hidden in activity only rooms, force recording off.
+    if ($CFG->bigbluebuttonbn_recording_hide_button_activityonly &&
+        $bbbsession['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_ROOM_ONLY) {
+        $bbbsession['record'] = "0";
+        $bbbsession['recordhidebutton'] = "1";
     }
 
     $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
