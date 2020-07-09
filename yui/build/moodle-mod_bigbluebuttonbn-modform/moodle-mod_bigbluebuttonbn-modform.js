@@ -334,7 +334,8 @@ M.mod_bigbluebuttonbn.modform = {
         option.text = text;
         option.value = value;
         select.add(option, option.length);
-    },
+    }
+
 };
 
 

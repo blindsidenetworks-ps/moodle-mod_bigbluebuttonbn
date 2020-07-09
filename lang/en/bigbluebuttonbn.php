@@ -400,7 +400,7 @@ $string['view_message_recordings_disabled'] = 'Recordings were disabled on this 
 $string['view_message_importrecordings_disabled'] = 'Feature for import recording links is disabled on this server.';
 
 $string['view_groups_selection_warning'] = 'There is a conference room for each group and you have access to more than one. Be sure to select the correct one.';
-$string['view_groups_nogroups_warning'] = 'The room was configured for using groups but the course does not have goups defined.';
+$string['view_groups_nogroups_warning'] = 'The room was configured for using groups but the course does not have groups defined.';
 $string['view_groups_notenrolled_warning'] = 'The room was configured for using groups but you are not enrolled in any of them.';
 $string['view_conference_action_join'] = 'Join session';
 $string['view_conference_action_end'] = 'End session';
