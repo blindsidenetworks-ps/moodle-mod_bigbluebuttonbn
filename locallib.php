@@ -248,9 +248,13 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
     }
     $recordings = array();
     // Execute a paginated getRecordings request.
-    $pages = floor(count($meetingidsarray) / 25) + 1;
+    $pagecount = 25;
+    $pages = floor(count($meetingidsarray) / $pagecount) + 1;
+    if (count($meetingidsarray) > 0 && count($meetingidsarray) % $pagecount == 0) {
+        $pages--;
+    }
     for ($page = 1; $page <= $pages; ++$page) {
-        $mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
+        $mids = array_slice($meetingidsarray, ($page - 1) * $pagecount, $pagecount);
         $recordings += bigbluebuttonbn_get_recordings_array_fetch_page($mids);
     }
     return $recordings;
@@ -708,14 +712,25 @@ function bigbluebuttonbn_get_users_select(context_course $context, $bbactivity =
  * Returns an array containing all the roles in a context.
  *
  * @param context $context
+ * @param bool $onlyviewableroles
  *
  * @return array $roles
  */
-function bigbluebuttonbn_get_roles(context $context = null) {
-    $roles = (array) role_get_names($context);
-    foreach ($roles as $key => $value) {
-        $roles[$key] = $value->localname;
+function bigbluebuttonbn_get_roles(context $context = null, bool $onlyviewableroles = true) {
+    global $CFG;
+
+    if ($onlyviewableroles == true && $CFG->branch >= 35) {
+        $roles = (array) get_viewable_roles($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = $value;
+        }
+    } else {
+        $roles = (array) role_get_names($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = $value->localname;
+        }
     }
+
     return $roles;
 }
 
@@ -723,14 +738,25 @@ function bigbluebuttonbn_get_roles(context $context = null) {
  * Returns an array containing all the roles in a context wrapped for html select element.
  *
  * @param context $context
+ * @param bool $onlyviewableroles
  *
  * @return array $users
  */
-function bigbluebuttonbn_get_roles_select(context $context = null) {
-    $roles = (array) role_get_names($context);
-    foreach ($roles as $key => $value) {
-        $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+function bigbluebuttonbn_get_roles_select(context $context = null, bool $onlyviewableroles = true) {
+    global $CFG;
+
+    if ($onlyviewableroles == true && $CFG->branch >= 35) {
+        $roles = (array) get_viewable_roles($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = array('id' => $key, 'name' => $value);
+        }
+    } else {
+        $roles = (array) role_get_names($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+        }
     }
+
     return $roles;
 }
 
@@ -769,8 +795,8 @@ function bigbluebuttonbn_get_participant_data($context, $bbactivity = null) {
     );
     $data['role'] = array(
         'name' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
-        'children' => bigbluebuttonbn_get_roles_select($context),
-    );
+        'children' => bigbluebuttonbn_get_roles_select($context, true)
+      );
     $data['user'] = array(
         'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
         'children' => bigbluebuttonbn_get_users_select($context, $bbactivity),
@@ -1134,7 +1160,7 @@ function bigbluebuttonbn_generate_nonce() {
  * @return string
  */
 function bigbluebuttonbn_random_password($length = 8, $unique = "") {
-    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^*()_-=+;:,.?';
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     do {
         $password = substr(str_shuffle($chars), 0, $length);
     } while ($unique == $password);
@@ -1363,7 +1389,7 @@ function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
  * @return array
  */
 function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
-    $configxml = bigbluebuttonbn_setConfigXML($meetingid, $configxml);
+    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
         debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
@@ -1595,10 +1621,11 @@ function bigbluebuttonbn_get_recording_data_row_preview($recording) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
-    $recordingpreview = html_writer::start_tag('div', array('class' => 'container-fluid'));
+    global $CFG;
+    $recordingpreview  = html_writer::start_tag('div', array('class' => 'container-fluid'));
     $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
     foreach ($playback['preview'] as $image) {
-        if (!bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
+        if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
             return '';
         }
         $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
@@ -1677,8 +1704,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         'data-action' => 'play',
         'data-target' => $playback['type'],
         'data-href' => $href,
-    );
-    if (!bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
+      );
+    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
         $linkattributes['class'] = 'btn btn-sm btn-warning';
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
         unset($linkattributes['data-href']);
@@ -1851,7 +1878,7 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
         $target .= '-' . $data['target'];
     }
     $id = 'recording-' . $target . '-' . $recording['recordID'];
-    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this);';
+    $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this); return false;';
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recording_icons_enabled')) {
         // With icon for $manageaction.
         $iconattributes = array('id' => $id, 'class' => 'iconsmall');
@@ -2181,7 +2208,7 @@ function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
     }
     $coursesforselect = [];
     foreach ($courses as $course) {
-        $coursesforselect[$course->id] = $course->fullname;
+        $coursesforselect[$course->id] = $course->fullname . " (" . $course->shortname . ")";
     }
     return $coursesforselect;
 }
@@ -2778,6 +2805,10 @@ function bigbluebuttonbn_settings_showrecordings(&$renderer) {
             'recordings_sortorder',
             $renderer->render_group_element_checkbox('recordings_sortorder', 0)
         );
+        $renderer->render_group_element(
+            'recordings_validate_url',
+            $renderer->render_group_element_checkbox('recordings_validate_url', 1)
+        );
     }
 }
 
@@ -2934,7 +2965,7 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
     if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_moderator_default_shown()) {
         $renderer->render_group_header('participant');
         // UI for 'participants' feature.
-        $roles = bigbluebuttonbn_get_roles();
+        $roles = bigbluebuttonbn_get_roles(null, false);
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $renderer->render_group_element(
             'participant_moderator_default',
