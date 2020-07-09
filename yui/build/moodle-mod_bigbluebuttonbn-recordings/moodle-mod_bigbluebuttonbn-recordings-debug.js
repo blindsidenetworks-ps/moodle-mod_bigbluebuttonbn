@@ -40,9 +40,9 @@ M.mod_bigbluebuttonbn.recordings = {
     init: function(dataobj) {
         this.bbbid = dataobj.bbbid;
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + '&',
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + '&'
         });
-        thisbbb = this;
+        var thisbbb = this;
         this.datasource.sendRequest({
             request: "id=" + this.bbbid + "&action=recording_list_table",
             callback: {
@@ -55,7 +55,7 @@ M.mod_bigbluebuttonbn.recordings = {
                         thisbbb.datatable.data = thisbbb.datatableInitFormatDates(bbinfo.data.data);
                         thisbbb.datatableInit();
                     }
-                },
+                }
             }
         });
         var searchform = Y.one('#bigbluebuttonbn_recordings_searchform');
@@ -185,7 +185,7 @@ M.mod_bigbluebuttonbn.recordings = {
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOn(data);
         M.mod_bigbluebuttonbn.broker.recordingActionPerform(data);
 
-        thisbbb = this;
+        var thisbbb = this;
         this.datasource.sendRequest({
             request: "&id=" + this.bbbid + "&action=recording_list_table",
             callback: {
@@ -451,6 +451,7 @@ M.mod_bigbluebuttonbn.recordings = {
         var node = nodeelement.ancestor('tr');
         return (node.getAttribute('data-imported') === 'true');
     }
+
 };
 // This file is part of Moodle - http://moodle.org/
 //
@@ -682,6 +683,7 @@ M.mod_bigbluebuttonbn.helpers = {
         });
         alert.show();
     }
+
 };
 
 
