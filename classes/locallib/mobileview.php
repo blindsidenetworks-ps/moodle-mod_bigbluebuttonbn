@@ -83,6 +83,13 @@ class mobileview {
             $session['recordhidebutton'] = $session['bigbluebuttonbn']->recordhidebutton;
         }
 
+        // If the recording button should be hidden in activity only rooms, force recording off.
+        if ($CFG->bigbluebuttonbn_recording_hide_button_activityonly &&
+            $session['bigbluebuttonbn']->type == BIGBLUEBUTTONBN_TYPE_ROOM_ONLY) {
+            $session['record'] = "0";
+            $session['recordhidebutton'] = "1";
+        }
+
         $session['welcome'] = $session['bigbluebuttonbn']->welcome;
         if (!isset($session['welcome']) || $session['welcome'] == '') {
             $session['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
