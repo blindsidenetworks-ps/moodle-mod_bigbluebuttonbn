@@ -40,6 +40,7 @@ $timeline = optional_param('timeline', 0, PARAM_INT);
 $index = optional_param('index', 0, PARAM_INT);
 $group = optional_param('group', -1, PARAM_INT);
 
+
 $bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
@@ -158,7 +159,7 @@ switch (strtolower($action)) {
         // See if the session is in progress.
         if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
             // Since the meeting is already running, we just join the session.
-            bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
+            bigbluebuttonbn_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
             break;
         }
         // If user is not administrator nor moderator (user is steudent) and waiting is required.
@@ -220,7 +221,7 @@ switch (strtolower($action)) {
         ]);
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
-        bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
+        bigbluebuttonbn_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
         break;
     case 'play':
         $href = bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype);
@@ -377,6 +378,9 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     }
     if ($bbbsession['lockonjoinconfigurable']) {
         $data['lockSettingsLockOnJoinConfigurable'] = 'true';
+    }
+    if ($bbbsession['bigbluebuttonbn']->moderatorapproval) {
+        $data['guestPolicy'] = 'ASK_MODERATOR';
     }
     return $data;
 }

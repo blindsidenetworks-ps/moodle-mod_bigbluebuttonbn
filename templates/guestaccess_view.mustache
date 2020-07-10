@@ -1,0 +1,69 @@
+<div class="bigbluebuttonbn-guestaccess-view">
+<div class="row shiftrow">
+    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
+    <div class="col-lg-6 col-md-6 col-sm-6">
+            <h4 class="text-left">{{# str }} guestlink_form_join_welcome,bigbluebuttonbn {{/ str }} </h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
+
+</div>
+<div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
+    <div class="col-lg-9 col-md-9 col-sm-9">
+        <h1 class="display-3 text-left mb-3 font-weight-400">{{name}}</h1>
+        <hr class="mt-2 float-left w-25">
+    </div>
+</div>
+<form action="guestlink.php" name="guestlinkform" accept-charset="UTF-8" method="get">
+{{#guestpassenabled}}
+<div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
+    <div class="col-lg-2 col-md-2 col-sm-2">
+    {{#guestpasserrormessage}}
+        <div class="warning">
+            {{# str }} guestlink_form_join_wrong_password,bigbluebuttonbn {{/ str }}
+        </div>
+    {{/guestpasserrormessage}}
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2">
+        <input type="text" class="form-control" name="guestpass" id="id_guestpass" value="" size="" placeholder="{{# str }} guestlink_form_guestpass_info,bigbluebuttonbn {{/ str }}" >
+    </div>
+    <div class="col-lg-5 col-md-5 col-sm-5"> </div>
+</div>
+{{/guestpassenabled}}
+<div class="row shiftrow">
+    <input type="hidden" name="gid" value="{{gid}}"/>
+    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
+    <div class="col-lg-2 col-md-2 col-sm-2">
+    {{#guestnameerrormessage}}
+        <div class="warning">
+            {{# str }} guestlink_form_join_no_username,bigbluebuttonbn {{/ str }}
+        </div>
+    {{/guestnameerrormessage}}
+    </div>    <div class="col-lg-2 col-md-2 col-sm-2">
+            <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
+    </div>
+    <div class="col-lg-5 col-md-5 col-sm-5"  style="padding-left:0px;">
+            <input type="submit" class="btn btn-primary inputbutton" name="joinbutton" id="id_joinbutton" value="{{# str }} guestlink_form_join_button,bigbluebuttonbn {{/ str }}">
+    </div>
+</div>
+</form>
+</div>
+{{^element.frozen}}
+{{#js}}
+var validateForm = function() {
+    var guestname = document.forms["guestlinkform"]["guestname"].value;
+    var guestpass = document.forms["guestlinkform"]["guestpass"];
+    if (guestname == "") {
+        alert("{{# str }} guestlink_form_noname_warning,bigbluebuttonbn {{/ str }}");
+        return false;
+    }
+    if(guestpass && !guestpass.value) {
+        alert("{{# str }} guestlink_form_noaccescode_warning,bigbluebuttonbn {{/ str }}");
+        return false;
+    }
+};
+
+document.getElementById("id_joinbutton").onclick = validateForm;
+{{/js}}
+{{/element.frozen}}

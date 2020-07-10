@@ -44,6 +44,7 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
             this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
+            this.initGuestLink();
         }
         this.initCompletionValidate();
     },
@@ -62,6 +63,68 @@ M.mod_bigbluebuttonbn.rooms = {
             return;
         }
         this.updateRoom();
+    },
+
+    initGuestLink: function() {
+        var context = this.bigbluebuttonbn.guestlink;
+        var datasource = this.datasource;
+        var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
+        window.require(['core/templates',], function(templates) {
+            templates.render('mod_bigbluebuttonbn/guestlink_view', context)
+                    .then(function(html, js) {
+                        templates.appendNodeContents('#guestlink_panel', html, js);
+                        /* guestlink things*/
+                        var btn = document.getElementById("guestlink-copy");
+                        btn.onclick = function () {
+                            var copyText = document.getElementById("guestlink");
+                            copyText.select();
+                            copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+                            document.execCommand("copy");
+                        };
+                        /* passwordthings */
+                        btn = document.getElementById("password-copy");
+                        btn.onclick = function () {
+                            var copyText = document.getElementById("password");
+                            if(copyText.value && !isNaN(copyText.value)) {
+                                copyText.select();
+                                copyText.setSelectionRange(0, 6); /*For mobile devices*/
+                                document.execCommand("copy");
+                            }
+                        };
+                        if(context.changepassenabled) {
+                            var setpass = function(del) {
+                                datasource.sendRequest({
+                                    request: 'action=set_guest_password&bigbluebuttonbn=' + bnid + '&delete=' + del,
+                                    callback: {
+                                        success: function(e) {
+                                            var input = document.getElementById("password");
+                                            var result = e.data;
+                                            if(result) {
+                                                input.value = ("000000" + result).slice(-6);
+                                            } else {
+                                                require(['core/str'], function(str) {
+                                                  str.get_string('view_guestlink_password_no_password_set',
+                                                      'bigbluebuttonbn').then(function(langString) {
+                                                      input.value = langString;
+                                                      return;
+                                                      }).catch(Notification.exception);
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            };
+                            btn = document.getElementById("password-delete");
+                            btn.addEventListener('click', function(){
+                                setpass(true);
+                            });
+                            btn = document.getElementById("password-random");
+                            btn.addEventListener('click', function(){
+                                setpass(false);
+                            });
+                        }
+                });
+        });
     },
 
     updateRoom: function(f) {

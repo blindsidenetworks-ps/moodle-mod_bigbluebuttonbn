@@ -40,6 +40,7 @@ $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 $params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
 $params['meta'] = optional_param('meta', '', PARAM_TEXT);
+$params['delete'] = optional_param('delete', false, PARAM_BOOL);
 
 require_login(null, true);
 require_sesskey();
@@ -134,6 +135,11 @@ try {
     if ($a == 'completion_validate') {
         $completionvalidate = bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params);
         echo $completionvalidate;
+        return;
+    }
+    if ($a == 'set_guest_password') {
+        $password = bigbluebuttonbn_broker_set_guest_password($bigbluebuttonbn, $params);
+        echo $password;
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');

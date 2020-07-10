@@ -1,0 +1,63 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_bigbluebuttonbn/import_view
+
+    This template renders the import recordings page.
+
+    Example context (json):
+    {
+        "url"     : "https:\/\/moodle.example.org.at\/mod\/bigbluebuttonbn\/guestlink.php?gid=cXBWfCxKVSgU",
+        "nopassword": false,
+        "password": 123456,
+        "changepassenabled":true,
+        "changepassdisabled": false,
+        "enabled" : true,
+    }
+}}
+<div class="mod_bigbluebuttonbn_guestlink_view">
+    {{#enabled}}
+    <div class="w-100">
+        <label for="guestlink" class="d-inline-block w-25"> {{# str }} view_guestlink_label, bigbluebuttonbn {{/ str }}</label>
+        <input type="text" id="guestlink" class="d-inline-block w-50 form-control" readonly value="{{url}}" size="50"/>
+        <a href="#" id="guestlink-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
+    </div>
+    {{#changepassenabled}}
+    <div class="w-100">
+        <label for="password" class="d-inline-block w-25"> {{# str }} view_guestlink_password_label, bigbluebuttonbn {{/ str }} </label>
+        {{#password}}
+            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{password}}" size="6"/>
+        {{/password}}
+        {{#nopassword}}
+            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{# str }} view_guestlink_password_no_password_set, bigbluebuttonbn {{/ str }}" size="6"/>
+        {{/nopassword}}
+        <a href="#" id="password-random" class="d-inline-block">{{#pix}} t/random, mod_bigbluebuttonbn {{/pix}}</a>
+        <a href="#" id="password-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
+        <a href="#" id="password-delete" class="d-inline-block">{{#pix}} t/trash, mod_bigbluebuttonbn {{/pix}}</a>
+
+    </div>
+    {{/changepassenabled}}
+    {{#changepassdisabled}}{{#password}}
+        <div class="w-100">
+            <label for="password" class="d-inline-block w-25"> {{# str }} view_guestlink_password_label, bigbluebuttonbn {{/ str }} </label>
+            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{password}}" size="6"/>
+            <a href="#" id="password-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
+
+        </div>
+    {{/password}}{{/changepassdisabled}}
+    {{/enabled}}
+</div>
