@@ -15,45 +15,14 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-
 services:
   - mysql
 
 env:
   global:
     - COVERAGE=false
-  matrix:
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
 
 matrix:
-  exclude:
-    - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
-    - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
-    - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
   include:
     - php: 5.4
       dist: trusty
@@ -61,6 +30,19 @@ matrix:
     - php: 5.4
       dist: trusty
       env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.5
+      dist: trusty
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
+    - php: 5.6
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+
     - php: 5.4
       dist: trusty
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
@@ -69,31 +51,125 @@ matrix:
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
     - php: 5.5
       dist: trusty
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      dist: trusty
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.5
-      dist: trusty
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
     - php: 5.5
       dist: trusty
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
     - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
-    - php: 5.6
-      env: MOODLE_BRANCH=MOODLE_30_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
-    - php: 5.6
+      dist: xenial
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=mysqli MOODLE_PLUGIN_CI=1
     - php: 5.6
+      dist: xenial
       env: MOODLE_BRANCH=MOODLE_31_STABLE DB=pgsql MOODLE_PLUGIN_CI=1
+
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_32_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_33_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_34_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.0
+      dist: xenial
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.1
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli MOODLE_PLUGIN_CI=2
+    - php: 7.2
+      dist: bionic
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=pgsql MOODLE_PLUGIN_CI=2
+
 
 before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^${MOODLE_PLUGIN_CI}
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - nvm install 8.9
+  - |
+    if [ ${MOODLE_BRANCH} == "MOODLE_35_STABLE" ] || [ ${MOODLE_BRANCH} == "MOODLE_37_STABLE" ]; then
+      nvm install 14.0.0
+    else
+      nvm install 8.9.4
+    fi
   - npm install
   ## Workaround for bypassing codechecker error due the use of BIGBLUEBUTTON_CFG
   - sudo sed -i "s/'MNET_REMOTE_CLIENT',/'MNET_REMOTE_CLIENT', 'BIGBLUEBUTTONBN_CFG',/g" "$(grep -rl MNET_REMOTE_CLIENT ./ci/vendor)"
