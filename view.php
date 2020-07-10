@@ -107,6 +107,7 @@ $activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id);
 
 // Output starts.
 echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($bigbluebuttonbn->name));
 
 bigbluebuttonbn_view_groups($bbbsession);
 

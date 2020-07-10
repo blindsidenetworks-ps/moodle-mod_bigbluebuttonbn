@@ -215,15 +215,40 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
         $closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn').': '.
             userdate($bbbsession['closingtime']);
     }
+    $guestlink = [];
+    if ($bbbsession['bigbluebuttonbn']->guestlinkenabled && \mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
+        $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bbbsession['bigbluebuttonbn']->id);
+        $context = context_module::instance($cm->id);
+        if (has_capability('mod/bigbluebuttonbn:guestlink_view', $context)) {
+            $guestlink['enabled'] = true;
+            $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
+                ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
+            $guestlink['url'] = $guestlinkurl->__toString();
+            if ($bbbsession['bigbluebuttonbn']->guestpass) {
+                $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestpass;
+            } else {
+                $guestlink['nopassword'] = true;
+            }
+            if (has_capability('mod/bigbluebuttonbn:guestlink_change_password', $context)) {
+                $guestlink['changepassenabled'] = true;
+            } else {
+                $guestlink['changepassdisabled'] = true;
+            }
+        }
+    } else {
+        $guestlink['enabled'] = false;
+    }
     $jsvars += array(
         'meetingid' => $bbbsession['meetingid'],
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
         'userlimit' => $bbbsession['userlimit'],
         'opening' => $openingtime,
         'closing' => $closingtime,
+        'guestlink' => $guestlink,
     );
     // Main box.
     $output  = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+    $output .= '<br><span id="guestlink_panel"></span>';
     $output .= '<br><span id="status_bar"></span>';
     $output .= '<br><span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();

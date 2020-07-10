@@ -72,6 +72,9 @@ class config {
             'recordingstatus_enabled' => false,
             'meetingevents_enabled' => false,
             'participant_moderator_default' => '0',
+            'participant_moderatorapproval' => '0',
+            'participant_guestlink_enabled' => '1',
+            'participant_guestlink_default' => '0',
             'scheduled_duration_enabled' => false,
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',
@@ -137,6 +140,15 @@ class config {
             return;
         }
         return $defaultvalues[$setting];
+    }
+
+    /**
+     * Validates if recording settings are enabled.
+     *
+     * @return boolean
+     */
+    public static function guestlinks_enabled() {
+        return (boolean)self::get('participant_guestlink');
     }
 
     /**

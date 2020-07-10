@@ -286,6 +286,28 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2019101005) {
+        // Add field for guestlinkenabled.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkenabled', $fielddefinition);
+        // Add field for guestlinkid.
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkid', $fielddefinition);
+        // Add field for guestpass.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestpass', $fielddefinition);
+        upgrade_mod_savepoint(true, 2019101005, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2019101006) {
+        // Add field for moderatorapproval.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'moderatorapproval', $fielddefinition);
+        upgrade_mod_savepoint(true, 2019101006, 'bigbluebuttonbn');
+    }
     return true;
 }
 

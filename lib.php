@@ -251,6 +251,8 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
     $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    // Get the guestlinkid column in the bigbluebuttonbn table.
+    $bigbluebuttonbn->guestlinkid = (string)$DB->get_field('bigbluebuttonbn', 'guestlinkid', array('id' => $bigbluebuttonbn->id));
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Get the meetingid column in the bigbluebuttonbn table.
@@ -698,6 +700,10 @@ function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         // As it is a new activity, assign passwords.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
+    }
+    if (!property_exists($bigbluebuttonbn, 'guestlinkid') ) {
+        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
     }
 }
 
@@ -1146,6 +1152,9 @@ function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array
 function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
         'mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
+        'mod_bigbluebuttonbn:t/copy' => 'fa-copy',
+        'mod_bigbluebuttonbn:t/random' => 'fa-repeat',
+        'mod_bigbluebuttonbn:t/trash' => 'fa-trash',
     ];
 }
 

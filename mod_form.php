@@ -94,6 +94,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_block_room($mform, $cfg);
         // Add block 'Lock'.
         $this->bigbluebuttonbn_mform_add_block_locksettings($mform, $cfg);
+        // Add block 'Guestlink'.
+        $this->bigbluebuttonbn_mform_add_block_guestlink($mform, $cfg);
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
@@ -381,7 +383,22 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['muteonstart_default']);
 
     }
-
+    /**
+     * Function for showing details of the guestlink settings for external users.
+     *
+     * @param object $mform
+     * @param array $cfg
+     * @return void
+     */
+    private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg) {
+        if (\mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
+                $mform->addElement('header', 'guestlink', get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
+                $mform->addElement('advcheckbox', 'guestlinkenabled',
+                        get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ');
+                $mform->addElement('advcheckbox', 'moderatorapproval',
+                        get_string('mod_form_field_moderatorapproval', 'bigbluebuttonbn'), ' ');
+        }
+    }
     /**
      * Function for showing details of the lock settings for the room.
      *

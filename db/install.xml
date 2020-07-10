@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/bigbluebuttonbn/db" VERSION="20200505" COMMENT="XMLDB file for Moodle mod/bigbluebuttonbn"
+<XMLDB PATH="mod/bigbluebuttonbn/db" VERSION="20200714" COMMENT="XMLDB file for Moodle mod/bigbluebuttonbn"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -49,6 +49,10 @@
         <FIELD NAME="completionengagementraisehand" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if raising hand during the meeting is required to mark an activity completed for a user."/>
         <FIELD NAME="completionengagementpollvotes" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if poll voting during the meeting is required to mark an activity completed for a user."/>
         <FIELD NAME="completionengagementemojis" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if the use of emojis during the meeting is required to mark an activity completed for a user."/>
+        <FIELD NAME="guestlinkenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="guestlinkid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="guestpass" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="moderatorapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

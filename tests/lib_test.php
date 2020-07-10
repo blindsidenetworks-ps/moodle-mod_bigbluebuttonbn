@@ -712,7 +712,12 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
 
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
         $this->resetAfterTest();
-        $this->assertEquals(array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'),
+        $this->assertEquals(
+                array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
+                      'mod_bigbluebuttonbn:t/copy' => 'fa-copy',
+                      'mod_bigbluebuttonbn:t/random' => 'fa-repeat',
+                      'mod_bigbluebuttonbn:t/trash' => 'fa-trash',
+                ),
                 mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 

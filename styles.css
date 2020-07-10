@@ -65,3 +65,12 @@
 .bbb_index_form {
     display: inline-block;
 }
+
+.bigbluebuttonbn-guestaccess-view .warning{
+    color: #a94442;
+}
+
+.bigbluebuttonbn-guestaccess-view .font-weight-400 {
+    font-weight: 400;
+}
+

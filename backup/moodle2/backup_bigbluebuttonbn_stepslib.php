@@ -54,7 +54,8 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
                             'recordings_html', 'recordings_deleted', 'recordings_imported', 'recordings_preview',
                             'clienttype', 'muteonstart', 'completionattendance',
                             'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
-                            'completionengagementpollvotes', 'completionengagementemojis'));
+                            'completionengagementpollvotes', 'completionengagementemojis',
+                            'guestlinkenabled', 'moderatorapproval'));
 
         $logs = new backup_nested_element('logs');
 

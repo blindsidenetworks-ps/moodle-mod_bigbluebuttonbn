@@ -96,4 +96,24 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         ),
     ),
+    // Ability to change the guestlink password.
+    'mod/bigbluebuttonbn:guestlink_change_password' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
+    // Ability to create and view guestlinks.
+    'mod/bigbluebuttonbn:guestlink_view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
 );

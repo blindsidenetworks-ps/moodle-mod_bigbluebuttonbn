@@ -33,6 +33,8 @@ $string['bbbrecordallfromstartwarning'] = 'This session is being recorded from s
 $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activity';
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:view'] = 'View a room/activity';
+$string['bigbluebuttonbn:guestlink_view'] = 'See the guest access link and it\'s access code of a bigbluebuttonbn room.';
+$string['bigbluebuttonbn:guestlink_change_password'] = 'Set/Change the access code for a guest access link.';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn:meeting'] = 'Create instances with live meeting capabilities';
 $string['bigbluebuttonbn:recording'] = 'Create instances with recording capabilities';
@@ -183,6 +185,9 @@ $string['config_presentation_default_description'] = 'This setting allow to sele
 
 $string['config_participant'] = 'Participant configuration';
 $string['config_participant_description'] = 'These settings define the role by default for participants in a conference.';
+$string['config_participant_guestlink'] = 'Allow guest access links';
+$string['config_participant_guestlink_description'] = 'Allow moderator to create a guest access link for external participants.';
+
 $string['config_participant_moderator_default'] = 'Moderator by default';
 $string['config_participant_moderator_default_description'] = 'This rule is used by default when a new room is added.';
 
@@ -305,6 +310,7 @@ $string['index_heading'] = 'BigBlueButton Rooms';
 $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'View for recording';
+$string['mod_form_block_guestlink'] = 'External guest link';
 $string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_presentation_default'] = 'Presentation default content';
 $string['mod_form_block_participants'] = 'Role assigned during live session';
@@ -344,6 +350,7 @@ $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
 $string['mod_form_field_instanceprofiles'] = 'Instance type';
 $string['mod_form_field_instanceprofiles_help'] = 'Select the type for this BigBlueButton instance.';
+$string['mod_form_field_moderatorapproval'] = 'Moderator must approve guests';
 $string['mod_form_field_muteonstart'] = 'Mute on start';
 $string['mod_form_field_notification'] = 'Notify this change to users enrolled';
 $string['mod_form_field_notification_help'] = 'Send a notification to all users enrolled to let them know that this activity has been added or updated';
@@ -370,6 +377,20 @@ $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
 
+
+$string['mod_form_field_guestlinkenabled'] = 'Create guest access link for external participants.';
+
+$string['guestlink_form_guestpass_info'] = 'Enter the room\'s access code';
+$string['guestlink_form_guestname_info'] = 'Enter your name!';
+$string['guestlink_form_join_button'] = 'Start';
+$string['guestlink_form_join_welcome'] = 'You have been invited to join!';
+$string['guestlink_form_join_wrong_password'] = 'Wrong access code!';
+$string['guestlink_form_join_no_username'] = 'Please enter your name!';
+$string['guestlink_form_join_waiting'] = 'The meeting has not (yet) started. You will automatically join, once it started.';
+$string['guestlink_form_noname_warning'] = 'Please enter a name!';
+$string['guestlink_form_noaccescode_warning'] = 'Please enter the valid acces code for this conference.';
+$string['guestlink_form_guestlink_disabled'] = 'The administrator has not enabled this feature.';
+$string['guestlink_form_guestlink_disabled_instance'] = 'The guest access link for this room has been disabled.';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
@@ -429,6 +450,9 @@ $string['view_recording_format_screenshare'] = 'Screenshare';
 $string['view_recording_format_statistics'] = 'Statistics';
 $string['view_recording_format_video'] = 'Video';
 $string['view_recording_format_errror_unreachable'] = 'The URL for this recording format is unreachable.';
+$string['view_guestlink_label'] = 'Invite Participants:';
+$string['view_guestlink_password_label'] = 'Access Code:';
+$string['view_guestlink_password_no_password_set'] = 'Generate an optional room access code.';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
