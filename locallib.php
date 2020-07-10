@@ -2777,8 +2777,10 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
         $roles = bigbluebuttonbn_get_roles(null, false);
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $renderer->render_group_element('participant_moderator_default',
-            $renderer->render_group_element_configmultiselect('participant_moderator_default',
-                array_keys($owner), $owner + $roles)
+            $renderer->render_group_element_configmultiselect(
+                'participant_moderator_default',
+                array_keys($owner),
+                $owner + $roles) // CONTRIB-7966: don't use array_merge here so it does not reindex the array.
           );
     }
 }
