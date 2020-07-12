@@ -597,8 +597,10 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     $str .= '  </div>'."\n";
     $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).
         '</div>'."\n";
-    $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
-      .'</div>'."\n";
+    if (!empty($bigbluebuttonbn->closingtime)) {
+        $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
+                .'</div>'."\n";
+    }
     $str .= '</div>'."\n";
     return $str;
 }
