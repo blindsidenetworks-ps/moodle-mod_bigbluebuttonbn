@@ -163,7 +163,7 @@ jobs:
 before_install:
   - phpenv config-rm xdebug.ini
   - |
-    if [ $MOODLE_BRANCH == "MOODLE_32_STABLE" ]; then
+    if [ $MOODLE_BRANCH == "MOODLE_32_STABLE" ] || [ $MOODLE_BRANCH == "MOODLE_33_STABLE" ]  || [ $MOODLE_BRANCH == "MOODLE_34_STABLE" ] || [ $MOODLE_BRANCH == "MOODLE_36_STABLE" ]; then
       nvm install 8.9.4
     else
       nvm install 14.0.0
