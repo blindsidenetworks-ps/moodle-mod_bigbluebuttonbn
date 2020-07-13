@@ -40,4 +40,5 @@ M.mod_bigbluebuttonbn.imports = {
 };
 
 
+
 }, '@VERSION@', {"requires": ["base", "node"]});

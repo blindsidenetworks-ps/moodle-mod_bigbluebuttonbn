@@ -281,6 +281,7 @@ M.mod_bigbluebuttonbn.rooms = {
             M.mod_bigbluebuttonbn.broker.completionValidate(qs);
         });
     }
+
 };
 
 
