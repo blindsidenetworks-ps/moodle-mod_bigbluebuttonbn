@@ -3066,14 +3066,12 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
         'recordingready_enabled',
         $renderer->render_group_element_checkbox('recordingready_enabled', 0)
     );
-    // Configuration for extended BN capabilities.
-    if (bigbluebuttonbn_is_bn_server()) {
-        // UI for 'register meeting events' feature.
-        $renderer->render_group_element(
-            'meetingevents_enabled',
-            $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
-        );
-    }
+    // UI for 'register meeting events' feature.
+    $renderer->render_group_element(
+        'meetingevents_enabled',
+        $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
+    );
+    // Configuration for extended BN capabilities should go here.
 }
 
 /**

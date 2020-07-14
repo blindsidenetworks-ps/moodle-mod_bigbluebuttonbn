@@ -66,6 +66,7 @@ try {
         return;
     }
     if ($a == 'meeting_events') {
+        error_log("so far so good");
         // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
         // which is processed in the function using super globals.
         bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn);

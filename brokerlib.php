@@ -645,6 +645,8 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
  * @return void
  */
 function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
+    error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    error_log(json_encode($bigbluebuttonbn));
     // Decodes the received JWT string.
     try {
         // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
@@ -677,11 +679,13 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     }
 
     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
+    error_log(json_encode($jsonobj));
     $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
     $meetingidelements = explode('-', $meetingidelements[0]);
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
         $msg = 'The activity may have been deleted';
         header('HTTP/1.0 410 Gone. ' . $msg);
+        error_log($msg);
         return;
     }
 
