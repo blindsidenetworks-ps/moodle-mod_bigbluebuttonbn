@@ -2099,8 +2099,8 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return void
  */
 function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-    $meetingid = $jsonobj->{'meeting_id'};
-    $recordid = $jsonobj->{'internal_meeting_id'};
+    $meetingid = $jsonobj->{'ext_meeting_id'};
+    $recordid = $jsonobj->{'meeting_id'};
     $attendees = $jsonobj->{'data'}->{'attendees'};
     foreach ($attendees as $attendee) {
         $userid = $attendee->{'ext_user_id'};
@@ -3066,14 +3066,12 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
         'recordingready_enabled',
         $renderer->render_group_element_checkbox('recordingready_enabled', 0)
     );
-    // Configuration for extended BN capabilities.
-    if (bigbluebuttonbn_is_bn_server()) {
-        // UI for 'register meeting events' feature.
-        $renderer->render_group_element(
-            'meetingevents_enabled',
-            $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
-        );
-    }
+    // UI for 'register meeting events' feature.
+    $renderer->render_group_element(
+        'meetingevents_enabled',
+        $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
+    );
+    // Configuration for extended BN capabilities should go here.
 }
 
 /**

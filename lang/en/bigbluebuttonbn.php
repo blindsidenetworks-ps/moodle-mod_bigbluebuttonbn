@@ -213,8 +213,8 @@ $string['config_uidelegation_enabled'] = 'UI delegation is enabled';
 $string['config_uidelegation_enabled_description'] = 'These settings enable or disable the UI delegation to the BigBlueButton server.';
 $string['config_recordingready_enabled'] = 'Notifications when recording ready enabled';
 $string['config_recordingready_enabled_description'] = 'Notifications when recording ready feature is enabled.';
-$string['config_meetingevents_enabled'] = 'Register meeting events';
-$string['config_meetingevents_enabled_description'] = 'Register meeting events feature is enabled.';
+$string['config_meetingevents_enabled'] = 'Register live events';
+$string['config_meetingevents_enabled_description'] = 'Enable the plugin for accepting and processing live events after the session ends. (It must be enabled for "Activity completion" and will only work if the BigBlueButton server is capable of processing post_events scripts)';
 
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
 $string['config_warning_bigbluebuttonbn_cfg_deprecated'] = 'BigBlueButtonBN is making use of config.php with a global variable that has been deprecated. Please convert the file as it will not be supported in future versions';

@@ -171,7 +171,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform = $this->_form;
-        if (!bigbluebuttonbn_is_bn_server() || !(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
             return [];
         }
 
