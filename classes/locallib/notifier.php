@@ -111,7 +111,7 @@ class notifier {
         $msg->user_email = $sender->email;
         $msg->course_name = $course->fullname;
         $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
-            $msg->user_name.'('.$msg->user_email.') ';
+            $msg->user_name.' ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         // Process the message sending.
         foreach (self::users_to_notify($bigbluebuttonbn->course) as $user) {
