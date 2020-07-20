@@ -130,9 +130,8 @@ class notifier {
     public static function users_to_notify($courseid) {
         $context = \context_course::instance($courseid);
         $users = array();
-        // See if there are any users in the lesson.
-        list($sort, $params) = users_order_by_sql('u');
-        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
+        // Potential users should be active users only.
+        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', null, 0, 0, true);
         return $users;
     }
 }
