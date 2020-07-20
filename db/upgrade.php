@@ -187,9 +187,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     }
     if ($oldversion < 2019042009) {
         // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid', ['courseid']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log', ['log']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow', ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
+            ['courseid']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log',
+            ['log']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
+            ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019042009, 'bigbluebuttonbn');
     }
@@ -271,10 +274,11 @@ function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew
  * @param   object    $dbman
  * @param   string    $tablename
  * @param   string    $indexname
- * @param   string    $indextype
  * @param   array     $indexfields
+ * @param   string    $indextype
  */
-function xmldb_bigbluebuttonbn_index_table($dbman, $tablename, $indexname, $indexfields, $indextype = XMLDB_INDEX_NOTUNIQUE) {
+function xmldb_bigbluebuttonbn_index_table($dbman, $tablename, $indexname, $indexfields,
+        $indextype = XMLDB_INDEX_NOTUNIQUE) {
     $table = new xmldb_table($tablename);
     if (!$dbman->table_exists($table)) {
         return;

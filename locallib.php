@@ -1649,7 +1649,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         'data-target' => $playback['type'],
         'data-href' => $href,
       );
-    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
+    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server()
+            && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
         $linkattributes['class'] = 'btn btn-sm btn-warning';
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
         unset($linkattributes['data-href']);
@@ -1862,7 +1863,7 @@ function bigbluebuttonbn_get_recording_columns($bbbsession) {
     $columns = array();
     // Initialize table headers.
     $columns[] = array('key' => 'playback', 'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
-        'width' => '125px', 'allowHTML' => true); // Note: here a strange bug noted whilst changing the columns, ref CONTRIB
+        'width' => '125px', 'allowHTML' => true); // Note: here a strange bug noted whilst changing the columns, ref CONTRIB.
     $columns[] = array('key' => 'recording', 'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
         'width' => '125px', 'allowHTML' => true);
     $columns[] = array('key' => 'description', 'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
