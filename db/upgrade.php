@@ -185,6 +185,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019042000, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2019042009) {
+        // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
+            ['courseid']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log',
+            ['log']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
+            ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2019042009, 'bigbluebuttonbn');
+    }
     return true;
 }
 
@@ -255,4 +266,26 @@ function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew
     if ($dbman->table_exists($table)) {
         $dbman->rename_table($table, $tablenamenew, true, true);
     }
+}
+
+/**
+ * Generic helper function for adding index to a table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablename
+ * @param   string    $indexname
+ * @param   array     $indexfields
+ * @param   string    $indextype
+ */
+function xmldb_bigbluebuttonbn_index_table($dbman, $tablename, $indexname, $indexfields,
+        $indextype = XMLDB_INDEX_NOTUNIQUE) {
+    $table = new xmldb_table($tablename);
+    if (!$dbman->table_exists($table)) {
+        return;
+    }
+    $index = new xmldb_index($indexname, $indextype, $indexfields);
+    if ($dbman->index_exists($table, $index)) {
+        $dbman->drop_index($table, $index);
+    }
+    $dbman->add_index($table, $index, true, true);
 }
