@@ -2034,6 +2034,10 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
     if (isset($recording['imported'])) {
         return true;
     }
+    // Administrators and moderators are always allowed.
+    if ($bbbsession['administrator'] || $bbbsession['moderator']) {
+        return true;
+    }
     // When groups are enabled, exclude those to which the user doesn't have access to.
     if (isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
         return false;
