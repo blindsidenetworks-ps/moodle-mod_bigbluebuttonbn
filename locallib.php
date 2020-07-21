@@ -2068,6 +2068,9 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return boolean
  */
 function bigbluebuttonbn_is_bn_server() {
+    if (\mod_bigbluebuttonbn\locallib\config::get('bn_server')) {
+        return true;
+    }
     $parsedurl = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
     if (!isset($parsedurl['host'])) {
         return false;
@@ -2849,19 +2852,18 @@ function bigbluebuttonbn_settings_muteonstart(&$renderer) {
  * @return void
  */
 function bigbluebuttonbn_settings_extended(&$renderer) {
-    // Configuration for extended BN capabilities.
-    if (!bigbluebuttonbn_is_bn_server()) {
-        return;
-    }
     // Configuration for 'notify users when recording ready' feature.
     if ((boolean)\mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
         $renderer->render_group_header('extended_capabilities');
         // UI for 'notify users when recording ready' feature.
         $renderer->render_group_element('recordingready_enabled',
             $renderer->render_group_element_checkbox('recordingready_enabled', 0));
-        // UI for 'register meeting events' feature.
-        $renderer->render_group_element('meetingevents_enabled',
-            $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
+        // Configuration for extended BN capabilities.
+        if (bigbluebuttonbn_is_bn_server()) {
+            // UI for 'register meeting events' feature.
+            $renderer->render_group_element('meetingevents_enabled',
+                $renderer->render_group_element_checkbox('meetingevents_enabled', 0));
+        }
     }
 }
 
