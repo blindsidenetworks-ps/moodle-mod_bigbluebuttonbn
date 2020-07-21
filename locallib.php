@@ -2064,6 +2064,9 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return boolean
  */
 function bigbluebuttonbn_is_bn_server() {
+    if (\mod_bigbluebuttonbn\locallib\config::get('bn_server')) {
+        return true;
+    }
     $parsedurl = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
     if (!isset($parsedurl['host'])) {
         return false;
