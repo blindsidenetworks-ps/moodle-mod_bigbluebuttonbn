@@ -8,4 +8,5 @@ Bug: Fix for issue with performance on view (CONTRIB-8157).
 Bug: Fix for issue with BBB incorrectly distributes moderator rights to student-role (CONTRIB-7627).
 Bug: Fix for issue with meeting name is not required in the recording list (CONTRIB-7703).
 Bug: Fix for issue with imported recordings shows all the "Imported recordings" in the course (CONTRIB-7961).
+Bug: Fix for issue with option 'Session can be recorded' not shown for 'Room/Activity only' (CONTRIB-8174).
 Enhancement: Added option for turn off sending notifications when recording ready feature. (CONTRIB-8026).
