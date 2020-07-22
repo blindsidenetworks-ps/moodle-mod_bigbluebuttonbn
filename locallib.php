@@ -142,13 +142,13 @@ function bigbluebuttonbn_get_join_url(
 function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $pname = null, $purl = null) {
     $createmeetingurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('create', $data, $metadata);
     $method = 'GET';
-    $data = null;
+    $payload = null;
     if (!is_null($pname) && !is_null($purl)) {
         $method = 'POST';
-        $data = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" .
-            $purl . "' /></module></modules>";
+        $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".
+            $purl."' /></module></modules>";
     }
-    $xml = bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $data);
+    $xml = bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
     if ($xml) {
         $response = array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
         if ($xml->meetingID) {
@@ -3358,12 +3358,10 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
         $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
     }
-
     $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
     if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
         $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
     }
-
     $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
     if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
         $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
