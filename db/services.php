@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die;
 
 $functions = array(
-
     'mod_bigbluebuttonbn_view_bigbluebuttonbn' => array(
         'classname'     => 'mod_bigbluebuttonbn_external',
         'methodname'    => 'view_bigbluebuttonbn',
@@ -41,6 +40,14 @@ $functions = array(
         'methodname'    => 'get_bigbluebuttonbns_by_courses',
         'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided
                             all bigbluebuttonbns that the user can view will be returned.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'mod_bigbluebuttonbn_can_join' => array(
+        'classname'     => 'mod_bigbluebuttonbn_external',
+        'methodname'    => 'can_join',
+        'description'   => 'Returns information if the current user can join or not.',
         'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),

@@ -43,5 +43,7 @@
                         <p><% not_started.ends_at %></p>
                     </ion-item>
                 <%/not_started%>
+        <span core-site-plugins-call-ws-on-load
+              name="mod_bigbluebuttonbn_can_join" [params]="{cmid: <% cmid %>}" (onSuccess)="onCanJoinReturns($event)"></span>
     </ion-list>
 </div>
