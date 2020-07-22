@@ -63,7 +63,7 @@ class mobile {
             return(self::mobile_print_error($error));
         }
 
-        $bbbsession = bigbluebutton::build_bb_session_fromviewinstance($viewinstance);
+        $bbbsession = bigbluebutton::build_bbb_session_fromviewinstance($viewinstance);
 
         // Create variables for easy access.
         $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];

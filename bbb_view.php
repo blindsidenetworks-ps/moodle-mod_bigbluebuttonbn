@@ -76,7 +76,7 @@ if ($timeline || $index) {
         exit;
     }
 
-    $bbbsession = mod_bigbluebuttonbn\locallib\bigbluebutton::build_bb_session($cm, $course, $bigbluebuttonbn);
+    $bbbsession = mod_bigbluebuttonbn\locallib\bigbluebutton::build_bbb_session($cm, $course, $bigbluebuttonbn);
 
     // Check status and set extra values.
     $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);

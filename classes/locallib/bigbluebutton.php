@@ -112,11 +112,11 @@ class bigbluebutton {
      * @throws \require_login_exception
      * @throws \required_capability_exception
      */
-    public static function build_bb_session_fromviewinstance($viewinstance) {
+    public static function build_bbb_session_fromviewinstance($viewinstance) {
         $cm = $viewinstance['cm'];
         $course = $viewinstance['course'];
         $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-        return self::build_bb_session($cm, $course, $bigbluebuttonbn);
+        return self::build_bbb_session($cm, $course, $bigbluebuttonbn);
     }
 
     /**
@@ -132,7 +132,7 @@ class bigbluebutton {
      * @throws \require_login_exception
      * @throws \required_capability_exception
      */
-    public static function build_bb_session($cm, $course, $bigbluebuttonbn) {
+    public static function build_bbb_session($cm, $course, $bigbluebuttonbn) {
         global $CFG;
         $context = context_module::instance($cm->id);
         require_login($course->id, false, $cm, true, true);
@@ -265,7 +265,7 @@ class bigbluebutton {
 
         $viewinstance = bigbluebuttonbn_view_validator($cmid, null);
         if ($viewinstance) {
-            $bbbsession = self::build_bb_session_fromviewinstance($viewinstance);
+            $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
             if ($bbbsession) {
                 require_once($CFG->dirroot . "/mod/bigbluebuttonbn/brokerlib.php");
                 $info = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
