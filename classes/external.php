@@ -202,4 +202,53 @@ class mod_bigbluebuttonbn_external extends external_api {
             )
         );
     }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.0
+     */
+    public static function can_join_parameters() {
+        return new external_function_parameters(
+            array(
+                'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED)
+            )
+        );
+    }
+
+    /**
+     * This will check if current user can join the session from this module
+     * @param int $cmid
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function can_join($cmid) {
+        global $SESSION, $CFG;
+        require_once($CFG->dirroot . "/mod/bigbluebuttonbn/locallib.php");
+
+        $params = self::validate_parameters(self::can_join_parameters(),
+            array(
+                'cmid' => $cmid
+            ));
+        $canjoin = \mod_bigbluebuttonbn\locallib\bigbluebutton::can_join_meeting($cmid);
+        $canjoin['cmid'] = $cmid;
+        return $canjoin;
+    }
+
+    /**
+     * Return value for can join function
+     *
+     * @return external_single_structure
+     * @since Moodle 3.3
+     */
+    public static function can_join_returns() {
+        return new external_single_structure(
+            array(
+                'can_join' => new external_value(PARAM_BOOL, 'Can join session'),
+                'message' => new external_value(PARAM_RAW, 'Message if we cannot join', VALUE_OPTIONAL),
+                'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED)
+            )
+        );
+    }
 }
