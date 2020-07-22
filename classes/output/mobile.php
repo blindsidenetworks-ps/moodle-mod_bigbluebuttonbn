@@ -28,7 +28,8 @@ namespace mod_bigbluebuttonbn\output;
 defined('MOODLE_INTERNAL') || die();
 
 use context_module;
-use mod_bigbluebuttonbn_external;
+use mod_bigbluebuttonbn\locallib\bigbluebutton;
+
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 require_once($CFG->dirroot . '/lib/grouplib.php');
 
@@ -53,7 +54,7 @@ class mobile {
      */
     public static function mobile_course_view($args) {
 
-        global $OUTPUT, $SESSION, $CFG;
+        global $OUTPUT, $SESSION;
 
         $args = (object) $args;
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
@@ -62,23 +63,14 @@ class mobile {
             return(self::mobile_print_error($error));
         }
 
-        $cm = $viewinstance['cm'];
-        $course = $viewinstance['course'];
+        $bbbsession = bigbluebutton::build_bbb_session_fromviewinstance($viewinstance);
+
+        // Create variables for easy access.
         $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-        $context = context_module::instance($cm->id);
-
-        require_login($course->id, false , $cm, true, true);
-        require_capability('mod/bigbluebuttonbn:join', $context);
-
-        // Add view event.
-        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
-
-        // Create array bbbsession with configuration for BBB server.
-        $bbbsession['course'] = $course;
-        $bbbsession['coursename'] = $course->fullname;
-        $bbbsession['cm'] = $cm;
-        $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-        $bbbsession = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+        $serverversion = $bbbsession['serverversion'];
+        $cm = $bbbsession['cm'];
+        $course = $bbbsession['course'];
+        $context = $bbbsession['context'];
 
         // Check activity status.
         $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::bigbluebuttonbn_view_get_activity_status($bbbsession);
@@ -111,8 +103,6 @@ class mobile {
         }
 
         // Check if the BBB server is working.
-        $serverversion = bigbluebuttonbn_get_server_version();
-        $bbbsession['serverversion'] = (string) $serverversion;
         if (is_null($serverversion)) {
 
             if ($bbbsession['administrator']) {
@@ -137,25 +127,17 @@ class mobile {
             return(self::mobile_print_error($error));
         }
 
-        // Operation URLs.
-        $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
-        $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$args->cmid .
-            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
-            'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
-            '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $args->cmid .
-            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-
         // Initialize session variable used across views.
         $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 
         // Logic of bbb_view for join to session.
         // If user is not administrator nor moderator (user is student) and waiting is required.
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+            $canjoin = \mod_bigbluebuttonbn\locallib\bigbluebutton::can_join_meeting($args->cmid);
+            if (!$canjoin['can_join']) {
+                $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+                return (self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+            }
         }
 
         // See if the BBB session is already in progress.
@@ -225,7 +207,7 @@ class mobile {
             'msjgroup' => $msjgroup,
             'urltojoin' => $urltojoin,
             'cmid' => $cm->id,
-            'courseid' => $args->courseid
+            'courseid' => $course->id
         );
 
         // We want to show a notification when user excedded 45 seconds without click button.
@@ -284,7 +266,7 @@ class mobile {
      */
     protected static function mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted = array()) {
 
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
             'cmid' => $cm->id,
@@ -299,7 +281,7 @@ class mobile {
                     'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_notification', $data),
                 ),
             ),
-            'javascript' => '',
+            'javascript' => file_get_contents($CFG->dirroot . '/mod/bigbluebuttonbn/mobile.notification.js'),
             'otherdata' => '',
             'files' => ''
         );

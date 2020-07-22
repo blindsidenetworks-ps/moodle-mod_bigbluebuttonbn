@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn\locallib;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
@@ -35,91 +35,6 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobileview {
-
-    /**
-     * Return standard array with configurations required for BBB server.
-     * @param context $context
-     * @param array $session
-     * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     */
-    public static function bigbluebuttonbn_view_bbbsession_set($context, &$session) {
-
-        global $CFG, $USER;
-
-        $session['username'] = fullname($USER);
-        $session['userID'] = $USER->id;
-        $session['administrator'] = is_siteadmin($session['userID']);
-        $participantlist = bigbluebuttonbn_get_participant_list($session['bigbluebuttonbn'], $context);
-        $session['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
-        $session['managerecordings'] = ($session['administrator']
-            || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-        $session['importrecordings'] = ($session['managerecordings']);
-        $session['modPW'] = $session['bigbluebuttonbn']->moderatorpass;
-        $session['viewerPW'] = $session['bigbluebuttonbn']->viewerpass;
-        $session['meetingid'] = $session['bigbluebuttonbn']->meetingid.'-'.$session['course']->id.'-'.
-            $session['bigbluebuttonbn']->id;
-        $session['meetingname'] = $session['bigbluebuttonbn']->name;
-        $session['meetingdescription'] = $session['bigbluebuttonbn']->intro;
-        $session['userlimit'] = intval((int)\mod_bigbluebuttonbn\locallib\config::get('userlimit_default'));
-        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('userlimit_editable')) {
-            $session['userlimit'] = intval($session['bigbluebuttonbn']->userlimit);
-        }
-        $session['voicebridge'] = $session['bigbluebuttonbn']->voicebridge;
-        if ($session['bigbluebuttonbn']->voicebridge > 0) {
-            $session['voicebridge'] = 70000 + $session['bigbluebuttonbn']->voicebridge;
-        }
-        $session['wait'] = $session['bigbluebuttonbn']->wait;
-        $session['record'] = $session['bigbluebuttonbn']->record;
-
-        $session['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
-        if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
-            $session['recordallfromstart'] = $session['bigbluebuttonbn']->recordallfromstart;
-        }
-
-        $session['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
-        if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
-            $session['recordhidebutton'] = $session['bigbluebuttonbn']->recordhidebutton;
-        }
-
-        $session['welcome'] = $session['bigbluebuttonbn']->welcome;
-        if (!isset($session['welcome']) || $session['welcome'] == '') {
-            $session['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
-        }
-        if ($session['bigbluebuttonbn']->record) {
-            // Check if is enable record all from start.
-            if ($session['recordallfromstart']) {
-                $session['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
-                        'bigbluebuttonbn');
-            } else {
-                $session['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
-            }
-        }
-        $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
-        $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
-        $session['muteonstart'] = $session['bigbluebuttonbn']->muteonstart;
-        $session['context'] = $context;
-        $session['origin'] = 'Moodle';
-        $session['originVersion'] = $CFG->release;
-        $parsedurl = parse_url($CFG->wwwroot);
-        $session['originServerName'] = $parsedurl['host'];
-        $session['originServerUrl'] = $CFG->wwwroot;
-        $session['originServerCommonName'] = '';
-        $session['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $session['bnserver'] = bigbluebuttonbn_is_bn_server();
-        $session['clienttype'] = \mod_bigbluebuttonbn\locallib\config::get('clienttype_default');
-
-        if (\mod_bigbluebuttonbn\locallib\config::get('clienttype_editable')) {
-            $session['clienttype'] = $session['bigbluebuttonbn']->clienttype;
-        }
-
-        if (!\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
-            $session['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
-        }
-
-        return($session);
-    }
 
     /**
      * Build url for join to session.
