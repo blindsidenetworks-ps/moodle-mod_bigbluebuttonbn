@@ -9,6 +9,7 @@ Bug: Fix for issue with BBB incorrectly distributes moderator rights to student-
 Bug: Fix for issue with meeting name is not required in the recording list (CONTRIB-7703).
 Bug: Fix for issue with imported recordings shows all the "Imported recordings" in the course (CONTRIB-7961).
 Bug: Fix for issue with option 'Session can be recorded' not shown for 'Room/Activity only' (CONTRIB-8174).
+Bug: Fix for issue with "wait for moderator" not allowing join meetings from mobile app (CONTRIB-8162).
 Enhancement: Added option for turn off sending notifications when recording ready feature. (CONTRIB-8026).
 
 2.3.3 (2019042008)
