@@ -179,7 +179,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $attendance['grouplabel'] = get_string('completionattendancegroup', 'bigbluebuttonbn');
         $attendance['rulelabel'] = get_string('completionattendance', 'bigbluebuttonbn');
         $attendance['group'] = [
-            $mform->createElement('checkbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
             $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
         ];
@@ -197,11 +197,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $engagement['pollvotes'] = get_string('completionengagementpollvotes', 'bigbluebuttonbn');
         $engagement['emojis'] = get_string('completionengagementemojis', 'bigbluebuttonbn');
         $engagement['group'] = [
-            $mform->createElement('checkbox', 'completionengagementchats', '', $engagement['chatlabel'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementtalks', '', $engagement['talklabel'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementraisehand', '', $engagement['raisehand'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementpollvotes', '', $engagement['pollvotes'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementchats', '', $engagement['chatlabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementtalks', '', $engagement['talklabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementraisehand', '', $engagement['raisehand'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementpollvotes', '', $engagement['pollvotes'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
         ];
         $mform->addGroup($engagement['group'], 'completionengagementgroup', $engagement['grouplabel'], [' '], false);
         $mform->addHelpButton('completionengagementgroup', 'completionengagementgroup', 'bigbluebuttonbn');
