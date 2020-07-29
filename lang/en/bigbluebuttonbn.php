@@ -151,6 +151,8 @@ $string['config_recordings_sortorder'] = 'Order the recordings in ascending orde
 $string['config_recordings_sortorder_description'] = 'By default recordings are displayed in descending order. When checked they will be sorted in ascending order.';
 $string['config_recordings_validate_url'] = 'Validate URL';
 $string['config_recordings_validate_url_description'] = 'If checked the playback URL will be validated before the user access it.';
+$string['config_recordings_proxy_playback'] = 'Proxy Recording Playback';
+$string['config_recordings_proxy_playback_description'] = 'If checked, when viewing any recordings they will be proxied through Moodle';
 
 $string['config_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_importrecordings_description'] = 'These settings are feature specific';

@@ -211,6 +211,7 @@ class config {
                'recordings_preview_default' => self::get('recordings_preview_default'),
                'recordings_preview_editable' => self::get('recordings_preview_editable'),
                'recordings_validate_url' => self::get('recordings_validate_url'),
+               'recordings_proxy_playback' => self::get('recordings_proxy_playback'),
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),

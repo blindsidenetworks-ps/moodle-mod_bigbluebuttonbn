@@ -267,10 +267,10 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
  *
  * @return array
  */
-function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
+function bigbluebuttonbn_get_recordings_array_fetch_page($mids, $rids = []) {
     $recordings = array();
     // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
+    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids), 'recordID' => implode(',', $rids)]);
     $xml = bigbluebuttonbn_wrap_xml_load_file($url);
     if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
         // If there were meetings already created.
@@ -1606,10 +1606,18 @@ function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
         if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
             return '';
         }
+
+        if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
+            $parseUrl = parse_url($image['url']);
+            $url = "./proxy_presentation.php{$parseUrl['path']}";
+        } else {
+            $url = $image['url'];
+        }
+
         $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
         $recordingpreview .= html_writer::empty_tag(
             'img',
-            array('src' => trim($image['url']) . '?' . time(), 'class' => 'recording-thumbnail pull-left')
+            array('src' => trim($url) . '?' . time(), 'class' => 'recording-thumbnail pull-left')
         );
         $recordingpreview .= html_writer::end_tag('div');
     }
@@ -2790,6 +2798,10 @@ function bigbluebuttonbn_settings_showrecordings(&$renderer) {
         $renderer->render_group_element(
             'recordings_validate_url',
             $renderer->render_group_element_checkbox('recordings_validate_url', 1)
+        );
+        $renderer->render_group_element(
+            'recordings_proxy_playback',
+            $renderer->render_group_element_checkbox('recordings_proxy_playback', 0)
         );
     }
 }
