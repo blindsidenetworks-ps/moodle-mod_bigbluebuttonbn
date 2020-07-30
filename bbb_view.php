@@ -237,8 +237,18 @@ switch (strtolower($action)) {
         // Internal logger: Instert a record with the playback played.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
+
+        if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
+            $parseUrl = parse_url($href);
+            $path = $parseUrl['path'];
+            $query = $parseUrl['query'];
+            $location = "./proxy_presentation.php{$path}?{$query}";
+        } else {
+            $location = urldecode($href);
+        }
+
         // Execute the redirect.
-        header('Location: '.urldecode($href));
+        header("Location: $location");
         break;
     default:
         bigbluebuttonbn_bbb_view_close_window();
