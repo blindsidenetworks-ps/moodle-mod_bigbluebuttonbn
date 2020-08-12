@@ -54,6 +54,12 @@ if (isset($pathparts[1]) && $pathparts[1] === 'presentation' && isset($pathparts
     }
 
     $bbbinstanceid = $meetingidparts[2];
+
+    // MeetingID can sometimes have [xxx] at the end. Needs sanitisation.
+    if (strpos($bbbinstanceid, '[') !== false) {
+        $bbbinstanceid = substr($bbbinstanceid, 0, strpos($bbbinstanceid, '['));
+    }
+
     $viewinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($bbbinstanceid);
     require_login($viewinstance['course'], true, $viewinstance['cm']);
 } else {
