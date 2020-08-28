@@ -597,8 +597,10 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     $str .= '  </div>'."\n";
     $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).
         '</div>'."\n";
-    $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
-      .'</div>'."\n";
+    if (!empty($bigbluebuttonbn->closingtime)) {
+        $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
+                .'</div>'."\n";
+    }
     $str .= '</div>'."\n";
     return $str;
 }
@@ -836,7 +838,8 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
     $event->type = CALENDAR_EVENT_TYPE_ACTION;
     $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
-    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule, false);
+    $event->format      = FORMAT_HTML;
     $event->courseid = $bigbluebuttonbn->course;
     $event->groupid = 0;
     $event->userid = 0;

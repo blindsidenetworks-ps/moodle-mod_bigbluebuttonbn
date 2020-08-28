@@ -25,6 +25,9 @@
 
 namespace mod_bigbluebuttonbn\locallib;
 
+use html_writer;
+use mod_bigbluebuttonbn\plugin;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -44,10 +47,10 @@ class notifier
      * @return string
      */
     public static function htmlmsg_instance_updated($msg) {
-        $messagetext = '<p>'.$msg->activity_type.' "'.$msg->activity_title.'" '.
+        $messagetext = '<p>'.get_string('pluginname', 'bigbluebuttonbn').
+            ' <b>'.$msg->activity_url.'</b> '.
             get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
-        $messagetext .= '<p><b>'.$msg->activity_title.'</b> '.
-            get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
+        $messagetext .= '<p>'.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
         $messagetext .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>'."\n";
         $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
             get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>'."\n";
@@ -65,7 +68,7 @@ class notifier
             get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>'."\n";
         $messagetext .= $msg->activity_owner.'</td></tr></tbody></table></p>'."\n";
         $messagetext .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
-            $msg->user_name.'('.$msg->user_email.') ';
+            $msg->user_name.' ';
         $messagetext .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
         return $messagetext;
     }
@@ -86,13 +89,16 @@ class notifier
         $msg = (object) array();
         // Build the message_body.
         $msg->action = $action;
-        $msg->activity_type = '';
-        $msg->activity_title = $bigbluebuttonbn->name;
+        $msg->activity_url = html_writer::link(
+            plugin::necurl('/mod/bigbluebuttonbn/view.php', ['id' => $bigbluebuttonbn->coursemodule]),
+            format_string($bigbluebuttonbn->name)
+        );
+        $msg->activity_title = format_string($bigbluebuttonbn->name);
         // Add the meeting details to the message_body.
         $msg->action = ucfirst($action);
         $msg->activity_description = '';
         if (!empty($bigbluebuttonbn->intro)) {
-            $msg->activity_description = trim($bigbluebuttonbn->intro);
+            $msg->activity_description = format_string(trim($bigbluebuttonbn->intro));
         }
         $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
         $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
@@ -186,9 +192,8 @@ class notifier
     public static function receivers($courseid) {
         $context = \context_course::instance($courseid);
         $users = array();
-        // See if there are any users in the lesson.
-        list($sort, $params) = users_order_by_sql('u');
-        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
+        // Potential users should be active users only.
+        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', null, 0, 0, true);
         return $users;
     }
 }

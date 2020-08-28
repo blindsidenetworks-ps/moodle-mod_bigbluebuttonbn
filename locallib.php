@@ -142,13 +142,13 @@ function bigbluebuttonbn_get_join_url(
 function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $pname = null, $purl = null) {
     $createmeetingurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('create', $data, $metadata);
     $method = 'GET';
-    $data = null;
+    $payload = null;
     if (!is_null($pname) && !is_null($purl)) {
         $method = 'POST';
-        $data = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" .
-            $purl . "' /></module></modules>";
+        $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='".
+            $purl."' /></module></modules>";
     }
-    $xml = bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $data);
+    $xml = bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
     if ($xml) {
         $response = array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
         if ($xml->meetingID) {
@@ -712,14 +712,25 @@ function bigbluebuttonbn_get_users_select(context_course $context, $bbactivity =
  * Returns an array containing all the roles in a context.
  *
  * @param context $context
+ * @param bool $onlyviewableroles
  *
  * @return array $roles
  */
-function bigbluebuttonbn_get_roles(context $context = null) {
-    $roles = (array) role_get_names($context);
-    foreach ($roles as $key => $value) {
-        $roles[$key] = $value->localname;
+function bigbluebuttonbn_get_roles(context $context = null, bool $onlyviewableroles = true) {
+    global $CFG;
+
+    if ($onlyviewableroles == true && $CFG->branch >= 35) {
+        $roles = (array) get_viewable_roles($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = $value;
+        }
+    } else {
+        $roles = (array) role_get_names($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = $value->localname;
+        }
     }
+
     return $roles;
 }
 
@@ -727,14 +738,25 @@ function bigbluebuttonbn_get_roles(context $context = null) {
  * Returns an array containing all the roles in a context wrapped for html select element.
  *
  * @param context $context
+ * @param bool $onlyviewableroles
  *
  * @return array $users
  */
-function bigbluebuttonbn_get_roles_select(context $context = null) {
-    $roles = (array) role_get_names($context);
-    foreach ($roles as $key => $value) {
-        $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+function bigbluebuttonbn_get_roles_select(context $context = null, bool $onlyviewableroles = true) {
+    global $CFG;
+
+    if ($onlyviewableroles == true && $CFG->branch >= 35) {
+        $roles = (array) get_viewable_roles($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = array('id' => $key, 'name' => $value);
+        }
+    } else {
+        $roles = (array) role_get_names($context);
+        foreach ($roles as $key => $value) {
+            $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
+        }
     }
+
     return $roles;
 }
 
@@ -773,8 +795,8 @@ function bigbluebuttonbn_get_participant_data($context, $bbactivity = null) {
     );
     $data['role'] = array(
         'name' => get_string('mod_form_field_participant_list_type_role', 'bigbluebuttonbn'),
-        'children' => bigbluebuttonbn_get_roles_select($context),
-    );
+        'children' => bigbluebuttonbn_get_roles_select($context, true)
+      );
     $data['user'] = array(
         'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
         'children' => bigbluebuttonbn_get_users_select($context, $bbactivity),
@@ -1367,7 +1389,7 @@ function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
  * @return array
  */
 function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
-    $configxml = bigbluebuttonbn_setConfigXML($meetingid, $configxml);
+    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
         debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
@@ -1691,7 +1713,8 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         'data-target' => $playback['type'],
         'data-href' => $href,
       );
-    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server() && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
+    if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server()
+            && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
         $linkattributes['class'] = 'btn btn-sm btn-warning';
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
         unset($linkattributes['data-href']);
@@ -2058,6 +2081,10 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
     if (isset($recording['imported'])) {
         return true;
     }
+    // Administrators and moderators are always allowed.
+    if ($bbbsession['administrator'] || $bbbsession['moderator']) {
+        return true;
+    }
     // When groups are enabled, exclude those to which the user doesn't have access to.
     if (isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
         return false;
@@ -2085,8 +2112,8 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return void
  */
 function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-    $meetingid = $jsonobj->{'meeting_id'};
-    $recordid = $jsonobj->{'internal_meeting_id'};
+    $meetingid = $jsonobj->{'ext_meeting_id'};
+    $recordid = $jsonobj->{'meeting_id'};
     $attendees = $jsonobj->{'data'}->{'attendees'};
     foreach ($attendees as $attendee) {
         $userid = $attendee->{'ext_user_id'};
@@ -2959,7 +2986,7 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
     if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_moderator_default_shown()) {
         $renderer->render_group_header('participant');
         // UI for 'participants' feature.
-        $roles = bigbluebuttonbn_get_roles();
+        $roles = bigbluebuttonbn_get_roles(null, false);
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
         $renderer->render_group_element(
             'participant_moderator_default',
@@ -3270,14 +3297,12 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
         'recordingready_enabled',
         $renderer->render_group_element_checkbox('recordingready_enabled', 0)
     );
-    // Configuration for extended BN capabilities.
-    if (bigbluebuttonbn_is_bn_server()) {
-        // UI for 'register meeting events' feature.
-        $renderer->render_group_element(
-            'meetingevents_enabled',
-            $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
-        );
-    }
+    // UI for 'register meeting events' feature.
+    $renderer->render_group_element(
+        'meetingevents_enabled',
+        $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
+    );
+    // Configuration for extended BN capabilities should go here.
 }
 
 /**
@@ -3559,7 +3584,6 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
         $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
     }
-
     $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
     if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
         $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;

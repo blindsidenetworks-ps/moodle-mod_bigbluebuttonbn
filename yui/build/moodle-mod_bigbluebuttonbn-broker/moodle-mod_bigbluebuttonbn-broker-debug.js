@@ -186,6 +186,7 @@ M.mod_bigbluebuttonbn.broker = {
 };
 
 
+
 }, '@VERSION@', {
     "requires": [
         "base",

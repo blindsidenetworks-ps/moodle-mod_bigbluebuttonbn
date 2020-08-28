@@ -57,7 +57,7 @@ M.mod_bigbluebuttonbn.modform = {
         this.showFieldset('id_room', showAll ||
                           this.isFeatureEnabled(profileType, 'showroom'));
         this.showInput('id_record', showAll ||
-                       this.isFeatureEnabled(profileType, 'showrecordings'));
+                       this.isFeatureEnabled(profileType, 'showroom'));
         // Show recordings settings validation.
         this.showFieldset('id_recordings', showAll ||
                           this.isFeatureEnabled(profileType, 'showrecordings'));
@@ -332,5 +332,6 @@ M.mod_bigbluebuttonbn.modform = {
         option.text = text;
         option.value = value;
         select.add(option, option.length);
-    },
+    }
+
 };
