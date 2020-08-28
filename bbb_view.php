@@ -58,13 +58,6 @@ if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
 }
 
 if ($timeline || $index) {
-    // If the user come from timeline or index page, the $bbbsession should be created or overriden here.
-    $bbbsession['course'] = $course;
-    $bbbsession['coursename'] = $course->fullname;
-    $bbbsession['cm'] = $cm;
-    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-    bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
-
     // Validates if the BigBlueButton server is working.
     $serverversion = bigbluebuttonbn_get_server_version();
     if (is_null($serverversion)) {
@@ -82,18 +75,8 @@ if ($timeline || $index) {
             $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
         exit;
     }
-    $bbbsession['serverversion'] = (string) $serverversion;
 
-    // Operation URLs.
-    $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
-    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
-        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-    $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
-        'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-    $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
-        '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-    $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
-        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession = mod_bigbluebuttonbn\locallib\bigbluebutton::build_bbb_session($cm, $course, $bigbluebuttonbn);
 
     // Check status and set extra values.
     $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);

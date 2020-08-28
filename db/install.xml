@@ -68,6 +68,15 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+      <INDEXES>
+        <INDEX NAME="log" UNIQUE="false" FIELDS="log"/>
+      </INDEXES>
+      <INDEXES>
+        <INDEX NAME="logrow" UNIQUE="false" FIELDS="courseid, bigbluebuttonbnid, userid, log"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

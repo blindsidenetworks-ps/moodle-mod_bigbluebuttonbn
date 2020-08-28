@@ -476,6 +476,15 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * capability is enabled, meaning that once a recording is processed by BigBlueButton
  * a message containing the events from the live session will be sent to Moodle.
  * These avents are added to the logging system and used for reports
+ *
+ * This setting is required for Activity Completion, but it will work only if the
+ * BigBlueButton server is enabled to process events though the script post_process_analytics.rb.
+ *
+ * By default, the fueature only works if the session is recorded, but in order to make it
+ * work for every session, the property keepEvents must be st to true in BigBlueButton.
+ * Edit the file /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties and set
+ *     keepEvents=true
+ *
  * $CFG->bigbluebuttonbn['meetingevents_enabled'] = 0;
  */
 
