@@ -185,17 +185,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019042000, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2019042009) {
-        // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
-            ['courseid']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log',
-            ['log']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
-            ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
-        // Update db version tag.
-        upgrade_mod_savepoint(true, 2019042009, 'bigbluebuttonbn');
-    }
     if ($oldversion < 2019101001) {
         // Add field for Completion with attendance.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
@@ -229,6 +218,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2019101002) {
+        // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
+            ['courseid']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log',
+            ['log']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
+            ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
+        // Update db version tag.
+        upgrade_mod_savepoint(true, 2019101002, 'bigbluebuttonbn');
     }
     return true;
 }
