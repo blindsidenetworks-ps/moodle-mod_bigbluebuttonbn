@@ -892,8 +892,14 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bigbluebuttonbn->id);
         $presentationnonce = $cache->get($noncekey);
-        $noncevalue = $presentationnonce['value'];
-        $noncecounter = $presentationnonce['counter'];
+        if (!empty($presentationnonce)) {
+            $noncevalue = $presentationnonce['value'];
+            $noncecounter = $presentationnonce['counter'];
+        } else {
+            $noncevalue = null;
+            $noncecounter = 0;
+        }
+
         if ($args['0'] != $noncevalue) {
             return;
         }

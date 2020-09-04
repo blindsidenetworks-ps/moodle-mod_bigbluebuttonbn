@@ -1192,7 +1192,7 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $updatecache = false) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
     $now = time();
-    if (!$updatecache && isset($result) && $now < ($result['creation_time'] + $cachettl)) {
+    if (!$updatecache && !empty($result) && $now < ($result['creation_time'] + $cachettl)) {
         // Use the value in the cache.
         return (array) json_decode($result['meeting_info']);
     }
