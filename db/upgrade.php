@@ -216,10 +216,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementemojis',
             $fielddefinition);
-        // Update db version tag.
-        upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
-    }
-    if ($oldversion < 2019101002) {
         // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
             ['courseid']);
@@ -228,7 +224,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
             ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
         // Update db version tag.
-        upgrade_mod_savepoint(true, 2019101002, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
     }
     return true;
 }
