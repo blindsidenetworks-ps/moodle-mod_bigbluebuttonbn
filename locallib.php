@@ -701,15 +701,11 @@ function bigbluebuttonbn_get_users_select(context_course $context, $bbactivity =
             $users += (array) get_enrolled_users($context, '', $g->id, 'u.*', null, 0, 0, true);
         }
     }
-    $userselect = array_map(
-        function($u) {
-            return array('id' => $u->id, 'name' => fullname($u));
-        },
-        $users);
-    usort($userselect, function($u1, $u2) {
-        return strcmp($u1["name"], $u2["name"]);
-    });
-    return $userselect;
+    return array_map(
+            function($u) {
+                return array('id' => $u->id, 'name' => fullname($u));
+            },
+            $users);
 }
 
 /**
@@ -760,9 +756,7 @@ function bigbluebuttonbn_get_roles_select(context $context = null, bool $onlyvie
             $roles[$key] = array('id' => $value->id, 'name' => $value->localname);
         }
     }
-    usort($roles, function($r1, $r2) {
-        return strcmp($r1["name"], $r2["name"]);
-    });
+
     return $roles;
 }
 
