@@ -228,4 +228,5 @@ M.mod_bigbluebuttonbn.helpers = {
         });
         alert.show();
     }
+
 };

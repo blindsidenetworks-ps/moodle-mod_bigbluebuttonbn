@@ -88,7 +88,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
+        $this->bigbluebuttonbn_mform_add_block_user_role_mapping($mform, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add block 'client Type'.
@@ -173,7 +173,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform = $this->_form;
-        if (!bigbluebuttonbn_is_bn_server() || !(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
             return [];
         }
 
@@ -181,7 +181,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $attendance['grouplabel'] = get_string('completionattendancegroup', 'bigbluebuttonbn');
         $attendance['rulelabel'] = get_string('completionattendance', 'bigbluebuttonbn');
         $attendance['group'] = [
-            $mform->createElement('checkbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionattendanceenabled', '', $attendance['rulelabel'] . '&nbsp;'),
             $mform->createElement('text', 'completionattendance', '', ['size' => 3]),
             $mform->createElement('static', 'completionattendanceunit', ' ', get_string('minutes', 'bigbluebuttonbn'))
         ];
@@ -199,11 +199,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $engagement['pollvotes'] = get_string('completionengagementpollvotes', 'bigbluebuttonbn');
         $engagement['emojis'] = get_string('completionengagementemojis', 'bigbluebuttonbn');
         $engagement['group'] = [
-            $mform->createElement('checkbox', 'completionengagementchats', '', $engagement['chatlabel'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementtalks', '', $engagement['talklabel'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementraisehand', '', $engagement['raisehand'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementpollvotes', '', $engagement['pollvotes'] . '&nbsp;&nbsp;'),
-            $mform->createElement('checkbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementchats', '', $engagement['chatlabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementtalks', '', $engagement['talklabel'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementraisehand', '', $engagement['raisehand'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementpollvotes', '', $engagement['pollvotes'] . '&nbsp;&nbsp;'),
+            $mform->createElement('advcheckbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
         ];
         $mform->addGroup($engagement['group'], 'completionengagementgroup', $engagement['grouplabel'], [' '], false);
         $mform->addHelpButton('completionengagementgroup', 'completionengagementgroup', 'bigbluebuttonbn');
@@ -571,7 +571,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $participantlist) {
+    private function bigbluebuttonbn_mform_add_block_user_role_mapping(&$mform, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');

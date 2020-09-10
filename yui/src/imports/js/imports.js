@@ -36,3 +36,4 @@ M.mod_bigbluebuttonbn.imports = {
     }
 
 };
+
