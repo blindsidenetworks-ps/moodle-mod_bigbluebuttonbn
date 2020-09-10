@@ -103,6 +103,24 @@ class config {
             'clienttype_editable' => true,
             'muteonstart_default' => false,
             'muteonstart_editable' => false,
+            'disablecam_default' => false,
+            'disablecam_editable' => true,
+            'disablemic_default' => false,
+            'disablemic_editable' => true,
+            'disableprivatechat_default' => false,
+            'disableprivatechat_editable' => true,
+            'disablepublicchat_default' => false,
+            'disablepublicchat_editable' => true,
+            'disablenote_default' => false,
+            'disablenote_editable' => true,
+            'hideuserlist_default' => false,
+            'hideuserlist_editable' => true,
+            'lockedlayout_default' => false,
+            'lockedlayout_editable' => true,
+            'lockonjoin_default' => false,
+            'lockonjoin_editable' => true,
+            'lockonjoinconfigurable_default' => false,
+            'lockonjoinconfigurable_editable' => true,
         );
     }
 
@@ -209,6 +227,26 @@ class config {
                'clienttype_default' => self::get('clienttype_default'),
                'muteonstart_editable' => self::get('muteonstart_editable'),
                'muteonstart_default' => self::get('muteonstart_default'),
+
+               'disablecam_editable' => self::get('disablecam_editable'),
+               'disablecam_default' => self::get('disablecam_default'),
+               'disablemic_editable' => self::get('disablemic_editable'),
+               'disablemic_default' => self::get('disablemic_default'),
+               'disableprivatechat_editable' => self::get('disableprivatechat_editable'),
+               'disableprivatechat_default' => self::get('disableprivatechat_default'),
+               'disablepublicchat_editable' => self::get('disablepublicchat_editable'),
+               'disablepublicchat_default' => self::get('disablepublicchat_default'),
+               'disablenote_editable' => self::get('disablenote_editable'),
+               'disablenote_default' => self::get('disablenote_default'),
+               'hideuserlist_editable' => self::get('hideuserlist_editable'),
+               'hideuserlist_default' => self::get('hideuserlist_default'),
+               'lockedlayout_editable' => self::get('lockedlayout_editable'),
+               'lockedlayout_default' => self::get('lockedlayout_default'),
+               'lockonjoin_editable' => self::get('lockonjoin_editable'),
+               'lockonjoin_default' => self::get('lockonjoin_default'),
+               'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
+               'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
+
           );
     }
 }
