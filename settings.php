@@ -58,4 +58,6 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_locksettings($renderer);
     // Renders settings for extended capabilities.
     bigbluebuttonbn_settings_extended($renderer);
+    // Renders settings for experimental features.
+    bigbluebuttonbn_settings_experimental($renderer);
 }

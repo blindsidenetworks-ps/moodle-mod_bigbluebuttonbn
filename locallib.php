@@ -3267,7 +3267,7 @@ function bigbluebuttonbn_settings_lockonjoinconfigurable(&$renderer) {
  * @return void
  */
 function bigbluebuttonbn_settings_extended(&$renderer) {
-    // Configuration for 'notify users when recording ready' feature.
+    // Configuration for extended capabilities.
     if (!(boolean) \mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
         return;
     }
@@ -3277,12 +3277,24 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
         'recordingready_enabled',
         $renderer->render_group_element_checkbox('recordingready_enabled', 0)
     );
+    // Configuration for extended BN capabilities should go here.
+}
+
+/**
+ * Helper function renders experimental settings if any of the features there is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_experimental(&$renderer) {
+    // Configuration for experimental features should go here.
+    $renderer->render_group_header('experimental_features');
     // UI for 'register meeting events' feature.
     $renderer->render_group_element(
         'meetingevents_enabled',
         $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
     );
-    // Configuration for extended BN capabilities should go here.
 }
 
 /**

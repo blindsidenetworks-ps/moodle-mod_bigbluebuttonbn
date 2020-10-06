@@ -274,6 +274,9 @@ $string['config_lockonjoinconfigurable_default_description'] = 'If enabled the s
 $string['config_lockonjoinconfigurable_editable'] = 'Lock configuration can be edited';
 $string['config_lockonjoinconfigurable_editable_description'] = 'Lock configuration by default can be edited when the instance is added or updated.';
 
+$string['config_experimental_features'] = 'Configuration for experimental features';
+$string['config_experimental_features_description'] = 'Configuration for experimental features.';
+
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 
