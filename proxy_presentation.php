@@ -81,7 +81,7 @@ $curl->setopt([
     'CURLOPT_CERTINFO'          => 1,
     'CURLOPT_SSL_VERIFYPEER'    => true,
     'CURLOPT_HEADERFUNCTION'    => function ($curl, $header) use ($jstobereplaced) {
-        if (!$jstobereplaced || substr($header, 0, 14) !== "Content-Length") {
+        if (!$jstobereplaced ||  stripos($header, 'content-length') === false) {
             header($header);
         }
         return strlen($header);
