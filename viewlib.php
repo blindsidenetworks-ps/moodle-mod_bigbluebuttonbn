@@ -25,6 +25,8 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+use mod_bigbluebuttonbn\locallib\config;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -92,9 +94,9 @@ function bigbluebuttonbn_view_message_box(&$bbbsession, $message, $type = 'warni
 /**
  * Displays the general view.
  *
- * @param array $bbbsession
- * @param string $activity
- * @return void
+ * @param $bbbsession
+ * @param $activity
+ * @throws coding_exception
  */
 function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     global $OUTPUT, $PAGE;
@@ -123,9 +125,15 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $output .= $OUTPUT->heading($desc, 5);
 
     if ($enabledfeatures['showroom']) {
-        $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
-            'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
+        if (bigbluebuttonbn_get_selected_server() === null) {
+            $output = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_select_server_box');
+            $output .= $OUTPUT->notification(get_string('no_server_selected', 'bigbluebuttonbn'), \core\output\notification::NOTIFY_WARNING);
+            $output .= $OUTPUT->box_end();
+        } else {
+            $output .= bigbluebuttonbn_view_render_room($bbbsession, $activity, $jsvars);
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
+                'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
+        }
     }
     // Show recordings should only be enabled if recordings are also enabled in session.
     if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
@@ -337,7 +345,13 @@ function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
     if (!is_siteadmin($bbbsession['userID'])) {
         return '';
     }
-    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+    if (\mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server !== null) {
+        $serverurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server->get('url');
+    } else {
+        $serverurl = \mod_bigbluebuttonbn\locallib\config::get('server_url');
+    }
+
+    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != $serverurl) {
         return '';
     }
     return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');

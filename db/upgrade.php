@@ -286,6 +286,101 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2020102900) {
+        // Define table bigbluebuttonbn_servers to be created.
+        $table = new xmldb_table('bigbluebuttonbn_servers');
+
+        // Adding fields to table bigbluebuttonbn_servers.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('url', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('secret', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('weight', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('enabled', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+
+        // Adding keys to table bigbluebuttonbn_servers.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Adding indexes to table bigbluebuttonbn_servers.
+        $table->add_index('enabled', XMLDB_INDEX_NOTUNIQUE, ['enabled']);
+
+        // Conditionally launch create table for bigbluebuttonbn_servers.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2020102900, 'bigbluebuttonbn');
+
+    }
+
+    if ($oldversion < 2020102901) {
+        // Define table bigbluebuttonbn_bn_server to be created.
+        $table = new xmldb_table('bigbluebuttonbn_bn_server');
+
+        // Adding fields to table bigbluebuttonbn_bn_server.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('bnid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('serverid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table bigbluebuttonbn_bn_server.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Adding indexes to table bigbluebuttonbn_bn_server.
+        $table->add_index('bnid', XMLDB_INDEX_NOTUNIQUE, ['bnid']);
+
+        // Conditionally launch create table for bigbluebuttonbn_bn_server.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2020102901, 'bigbluebuttonbn');
+    }
+
+    if ($oldversion < 2020102902) {
+        $table = new xmldb_table('bigbluebuttonbn_servers');
+        $field = new xmldb_field('participants', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0);
+        if ($dbman->field_exists($table, $field) == false) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('bigbluebuttonbn_bn_server');
+        $field = new xmldb_field('participants', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0);
+        if ($dbman->field_exists($table, $field) == false) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('ended', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0);
+        if ($dbman->field_exists($table, $field) == false) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020102902, 'bigbluebuttonbn');
+    }
+
+    if ($oldversion < 2020102903) {
+        $table = new xmldb_table('bigbluebuttonbn_history');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('bnid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('serverid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('bnserverid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('starttime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('endtime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('bnserverid_userid', XMLDB_INDEX_NOTUNIQUE, ['bnserverid', 'userid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2020102903, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 

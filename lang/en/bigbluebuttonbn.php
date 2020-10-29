@@ -569,3 +569,20 @@ $string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
 
 $string['view_mobile_message_reload_page_creation_time_meeting'] = 'You exceeded the 45 seconds in this page, please reload the page to join correctly to the meeting.';
 $string['view_mobile_message_groups_not_supported'] = 'This instance is enable to work with groups but the mobile app has not support for this. Please open in desktop if you want to use the group support.';
+
+
+$string['settings'] = 'Settings';
+$string['admin_external_page_bbbservers'] = 'BigBlueButton Servers';
+$string['addbbbserver'] = 'Add server';
+$string['server_name'] = 'Name';
+$string['server_url'] = 'Url';
+$string['server_secret'] = 'Secret';
+$string['server_weight'] = 'Weight';
+$string['server_enabled'] = 'Enabled';
+$string['server_new'] = 'New server';
+$string['server_edit'] = 'Edit server';
+$string['server_weight_greater_zero'] = 'Weight must be greater than 0';
+$string['server_confirm_delete'] = 'Are you sure you want to remove the server named : {$a->name}?';
+$string['select_server'] = 'Select server';
+$string['no_server_selected'] = 'No server selected by your teacher. Refresh page later.';
+$string['bbb_task'] = 'Execute BBB process';

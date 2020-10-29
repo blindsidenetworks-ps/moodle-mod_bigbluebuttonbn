@@ -59,6 +59,7 @@ if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
     $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 }
 
+bigbluebuttonbn_load_selected_server($bigbluebuttonbn->id);
 if ($timeline || $index) {
     // Validates if the BigBlueButton server is working.
     $serverversion = bigbluebuttonbn_get_server_version();
@@ -133,6 +134,17 @@ switch (strtolower($action)) {
         }
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_left'], $bigbluebuttonbn);
+        // Update history
+        global $DB, $USER;
+        $server = \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server;
+        $server_id = $server->get('id');
+        $bn = $bigbluebuttonbn;
+        $bn_server = $DB->get_record_sql("SELECT * FROM {bigbluebuttonbn_bn_server} WHERE serverid = $server_id AND bnid = $bn->id AND ended = 0");
+        $history = $DB->get_record_sql("SELECT * FROM {bigbluebuttonbn_history} WHERE bnserverid = :bnserverid AND userid = :userid ORDER BY starttime DESC LIMIT 1", ['bnserverid' => $bn_server->id, 'userid' => $USER->id]);
+        if (!empty($history)) {
+            $history->endtime = time();
+            $DB->update_record('bigbluebuttonbn_history', $history);
+        }
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Check the origin page.
@@ -437,6 +449,20 @@ function bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $o
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],
         ($bbbsession['administrator'] || $bbbsession['moderator']));
+    // Add to history
+    global $DB, $USER;
+    $server = \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server;
+    $server_id = $server->get('id');
+    $bn = $bigbluebuttonbn;
+    $bn_server = $DB->get_record_sql("SELECT * FROM {bigbluebuttonbn_bn_server} WHERE serverid = $server_id AND bnid = $bn->id AND ended = 0");
+    $history = new stdClass();
+    $history->bnid = $bn->id;
+    $history->serverid = $server_id;
+    $history->bnserverid = $bn_server->id;
+    $history->userid = $USER->id;
+    $history->starttime = time();
+    $history->endtime = time();
+    $DB->insert_record('bigbluebuttonbn_history', $history);
     // Execute the redirect.
     header('Location: '.$joinurl);
 }

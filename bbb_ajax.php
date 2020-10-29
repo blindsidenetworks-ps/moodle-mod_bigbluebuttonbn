@@ -56,6 +56,7 @@ if (!empty($error)) {
 }
 
 if ($params['bigbluebuttonbn']) {
+    bigbluebuttonbn_load_selected_server($params['bigbluebuttonbn']);
     $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
     $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
