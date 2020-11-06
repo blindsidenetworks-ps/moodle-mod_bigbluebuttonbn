@@ -322,7 +322,7 @@ $string['mod_form_field_voicebridge_notunique_error'] = 'Not a unique value. Thi
 $string['mod_form_field_wait'] = 'Wait for moderator';
 $string['mod_form_field_wait_help'] = 'Viewers must wait until a moderator enters the session before they can do so';
 $string['mod_form_field_welcome'] = 'Welcome message';
-$string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like <b>...</b> or <i></i> ';
+$string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like &lt;b>...&lt;/b>, &lt;br />, &lt;u>&lt;/u> or &lt;i>&lt;/i> ';
 $string['mod_form_field_welcome_default'] = '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>For help on using BigBlueButton see these (short)  <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the phone icon (top center). <b>Please use a headset to avoid causing background noise for others.</b>';
 $string['mod_form_field_participant_add'] = 'Add assignation';
 $string['mod_form_field_participant_list'] = 'Assignation list';
