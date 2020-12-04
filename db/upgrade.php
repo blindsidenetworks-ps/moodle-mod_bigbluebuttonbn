@@ -280,6 +280,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2020050502, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2020050503) {
+        // Add access policy field.
+        $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => 'lockonjoinconfigurable');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'accesspolicy',
+            $fielddefinition);
+        upgrade_mod_savepoint(true, 2020050503, 'bigbluebuttonbn');
+    }
     return true;
 }
 

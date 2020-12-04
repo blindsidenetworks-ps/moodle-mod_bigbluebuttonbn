@@ -2949,6 +2949,29 @@ function bigbluebuttonbn_settings_userlimit(&$renderer) {
 }
 
 /**
+ * Helper function renders access modal settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_accessmodal(&$renderer) {
+    // Configuration for "accessmodal" feature.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_accessmodal_shown()) {
+        $renderer->render_group_header('accessmodal');
+
+        $renderer->render_group_element(
+            'accessmodal_default',
+            $renderer->render_group_element_editor('accessmodal_default', '', PARAM_RAW)
+        );
+        $renderer->render_group_element(
+            'accessmodal_editable',
+            $renderer->render_group_element_checkbox('accessmodal_editable', 0)
+        );
+    }
+}
+
+/**
  * Helper function renders duration settings if the feature is enabled.
  *
  * @param object $renderer

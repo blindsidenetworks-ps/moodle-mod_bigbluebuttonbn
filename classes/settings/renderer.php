@@ -203,4 +203,12 @@ class renderer {
         $this->settings->add($filemanager);
         return $filemanager;
     }
+
+    public function render_group_element_editor($name, $default = null, $type = PARAM_RAW) {
+        $item = new \admin_setting_confightmleditor('bigbluebuttonbn_' . $name,
+                get_string('config_' . $name, 'bigbluebuttonbn'),
+                get_string('config_' . $name . '_description', 'bigbluebuttonbn'),
+                $default, $type);
+        return $item;
+    }
 }

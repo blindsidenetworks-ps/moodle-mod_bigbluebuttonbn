@@ -699,6 +699,10 @@ function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
     }
+
+    // Get the correct access policy data.
+    $accesspolicy = $bigbluebuttonbn->accessmodaltext;
+    $bigbluebuttonbn->accesspolicy = is_array($accesspolicy) ? $accesspolicy['text'] : $accesspolicy;
 }
 
 /**

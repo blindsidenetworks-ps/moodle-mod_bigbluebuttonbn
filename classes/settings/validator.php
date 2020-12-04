@@ -140,6 +140,17 @@ class validator {
     }
 
     /**
+     * Validate if user limit section will be shown.
+     *
+     * @return boolean
+    */
+    public static function section_accessmodal_shown() {
+        global $CFG;
+        return (!isset($CFG->bigbluebuttonbn['accessmodal_default']) ||
+                !isset($CFG->bigbluebuttonbn['accessmodal_editable']));
+    }
+
+    /**
      * Validate if scheduled duration section will be shown.
      *
      * @return boolean
