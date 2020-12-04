@@ -42,7 +42,7 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
      *
      * @throws coding_exception
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
             ->bigbluebuttonbn_clean_recordings_array_fetch();
