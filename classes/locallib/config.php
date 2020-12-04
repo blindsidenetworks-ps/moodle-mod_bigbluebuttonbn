@@ -122,6 +122,8 @@ class config {
             'lockonjoin_editable' => true,
             'lockonjoinconfigurable_default' => false,
             'lockonjoinconfigurable_editable' => true,
+            'accessmodal_editable' => true,
+            'accessmodal_default' => '',
         );
     }
 
@@ -225,6 +227,8 @@ class config {
                'general_warning_button_text' => self::get('general_warning_button_text'),
                'general_warning_button_href' => self::get('general_warning_button_href'),
                'general_warning_button_class' => self::get('general_warning_button_class'),
+               'accessmodal_editable' => self::get('accessmodal_editable'),
+               'accessmodal_default' => self::get('accessmodal_default'),
                'clienttype_enabled' => self::get('clienttype_enabled'),
                'clienttype_editable' => self::get('clienttype_editable'),
                'clienttype_default' => self::get('clienttype_default'),

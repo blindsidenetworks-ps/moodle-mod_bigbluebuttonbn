@@ -197,6 +197,13 @@ $string['config_userlimit_default_description'] = 'The number of users allowed i
 $string['config_userlimit_editable'] = 'User limit feature can be edited';
 $string['config_userlimit_editable_description'] = 'User limit value by default can be edited when the room or conference is added or updated.';
 
+$string['config_accessmodal'] = 'Configuration for "Access policy" feature';
+$string['config_accessmodal_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
+$string['config_accessmodal_default'] = 'Default access policy content';
+$string['config_accessmodal_default_description'] = 'The content to be displayed to users when attempting to access a BigBlueButton room from a Moodle activity.';
+$string['config_accessmodal_editable'] = 'Access policy content can be edited';
+$string['config_accessmodal_editable_description'] = 'Access policy content can be edited when the room or conference is added or updated.';
+
 $string['config_scheduled'] = 'Configuration for "Scheduled sessions"';
 $string['config_scheduled_description'] = 'These settings define some of the behaviour by default for scheduled sessions.';
 $string['config_scheduled_duration_enabled'] = 'Calculate duration enabled';
@@ -304,6 +311,7 @@ $string['mod_form_block_presentation_default'] = 'Presentation default content';
 $string['mod_form_block_participants'] = 'Participants';
 $string['mod_form_block_schedule'] = 'Schedule for session';
 $string['mod_form_block_record'] = 'Record settings';
+$string['mod_form_block_accessmodal'] = 'Access policy';
 $string['mod_form_field_openingtime'] = 'Join open';
 $string['mod_form_field_closingtime'] = 'Join closed';
 $string['mod_form_field_intro'] = 'Description';
@@ -363,7 +371,7 @@ $string['mod_form_field_lockedlayout'] = 'Lock room layout';
 $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
-
+$string['mod_form_field_accessmodal'] = 'Access policy content';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';

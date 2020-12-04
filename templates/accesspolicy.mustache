@@ -1,0 +1,34 @@
+<!-- Modal -->
+<div class="modal fade" id="policymodal" data-hash={{hash}} tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="accesspolicytitle">Access policy</h5>
+            </div>
+            <div class="modal-body">
+                {{{body}}}
+            </div>
+            <div class="modal-footer">
+                <a id="policymodalaccept" type="button" class="btn btn-secondary" href={{forward}}>Accept</a>
+                <a class="btn btn-primary" data-dismiss="modal">Decline</a>
+            </div>
+        </div>
+    </div>
+</div>
+{{#js}}
+require(['jquery', 'core/sessionstorage'], function($, Storage) {
+    var hash = $('#policymodal').data('hash');
+
+    $('#policymodalaccept').on('click', (e) => {
+        Storage.set('mod_bigbluebutton_policyaccepted' + hash, 'true');
+    });
+
+    // If the storage key for accepting the policy is set,
+    $('#policymodal').on('show.bs.modal', (e) => {
+        if (Storage.get('mod_bigbluebutton_policyaccepted' + hash) === 'true') {
+            e.preventDefault();
+            window.location.href = "{{{forward}}}";
+        }
+    });
+});
+{{/js}}

@@ -50,6 +50,7 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_preupload($renderer);
     bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
     bigbluebuttonbn_settings_userlimit($renderer);
+    bigbluebuttonbn_settings_accessmodal($renderer);
     bigbluebuttonbn_settings_duration($renderer);
     bigbluebuttonbn_settings_participants($renderer);
     bigbluebuttonbn_settings_notifications($renderer);

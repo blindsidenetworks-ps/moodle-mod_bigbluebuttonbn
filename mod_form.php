@@ -91,6 +91,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
+        // Add block accessmodal
+        $this->bigbluebuttonbn_mform_add_block_accessmodal($mform, $cfg, $bigbluebuttonbn);
         // Add block 'client Type'.
         $this->bigbluebuttonbn_mform_add_block_clienttype($mform, $cfg);
         // Add standard elements, common to all modules.
@@ -139,6 +141,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if (!empty($this->current->completionattendance)) {
                 $defaultvalues['completionattendanceenabled'] = 1;
             }
+            // Accesspolicy: Fill correct data from stored string.
+            $defaultvalues['accessmodaltext'] = $defaultvalues['accesspolicy'];
         }
     }
 
@@ -661,6 +665,31 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('date_time_selector', 'closingtime',
             get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
         $mform->setDefault('closingtime', 0);
+    }
+
+    private function bigbluebuttonbn_mform_add_block_accessmodal(&$mform, &$cfg, &$bigbluebuttonbn) {
+        global $PAGE;
+
+        if ($cfg['accessmodal_editable']) {
+            $mform->addElement('header', 'accessmodal', get_string('mod_form_block_accessmodal', 'bigbluebuttonbn'));
+
+            $textfieldoptions = [
+                'trusttext' => false,
+                'subdirs' => false,
+                'maxfiles' => -1,
+                'maxbytes' => 1,
+                'context' => $PAGE->context,
+                'enable_filemanagement' => false
+            ];
+            $mform->addElement('editor', 'accessmodaltext', get_string('mod_form_field_accessmodal', 'bigbluebuttonbn'), null, $textfieldoptions);
+            $mform->setType('accessmodaltext', PARAM_RAW);
+            // Hack alert! Formatting is not stored, so transformation must be done.
+            $value = empty($bigbluebuttonbn->accesspolicy) ? $cfg['accessmodal_default'] : $bigbluebuttonbn->accesspolicy;
+            $mform->getElement('accessmodaltext')->setValue(['text' => $value]);
+        } else  {
+            $mform->addElement('hidden', 'accessmodaltext', $cfg['accessmodal_default']);
+            $mform->setType('accessmodaltext', PARAM_RAW);
+        }
     }
 
     /**

@@ -228,6 +228,15 @@ class bigbluebutton {
         $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
         $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
         $session['muteonstart'] = $session['bigbluebuttonbn']->muteonstart;
+        $session['disablecam'] = $session['bigbluebuttonbn']->disablecam;
+        $session['disablemic'] = $session['bigbluebuttonbn']->disablemic;
+        $session['disableprivatechat'] = $session['bigbluebuttonbn']->disableprivatechat;
+        $session['disablepublicchat'] = $session['bigbluebuttonbn']->disablepublicchat;
+        $session['disablenote'] = $session['bigbluebuttonbn']->disablenote;
+        $session['hideuserlist'] = $session['bigbluebuttonbn']->hideuserlist;
+        $session['lockedlayout'] = $session['bigbluebuttonbn']->lockedlayout;
+        $session['lockonjoin'] = $session['bigbluebuttonbn']->lockonjoin;
+        $session['lockonjoinconfigurable'] = $session['bigbluebuttonbn']->lockonjoinconfigurable;
         $session['context'] = $context;
         $session['origin'] = 'Moodle';
         $session['originVersion'] = $CFG->release;

@@ -202,7 +202,7 @@ function bigbluebuttonbn_view_warning_shown($bbbsession) {
  * @return string
  */
 function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
-    global $OUTPUT;
+    global $CFG, $OUTPUT, $SESSION;
     // JavaScript variables for room.
     $openingtime = '';
     if ($bbbsession['openingtime']) {
@@ -214,6 +214,7 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
         $closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn').': '.
             userdate($bbbsession['closingtime']);
     }
+
     $jsvars += array(
         'meetingid' => $bbbsession['meetingid'],
         'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
@@ -226,6 +227,31 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
     $output .= '<br><span id="status_bar"></span>';
     $output .= '<br><span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();
+
+    // Setup access policy modal window.
+    // If global editing is disabled, it is always the global version.
+    if ((int) $CFG->bigbluebuttonbn_accessmodal_editable) {
+        $policytext = format_text($bbbsession['bigbluebuttonbn']->accesspolicy ?? '');
+        // If empty here, try the default policy.
+        if (empty(strip_tags($policytext))) {
+            $policytext = format_text($CFG->bigbluebuttonbn_accessmodal_default ?? '');
+        }
+    } else {
+        $policytext = format_text($CFG->bigbluebuttonbn_accessmodal_default ?? '');
+    }
+
+    // Check if there is any content with HTML stripped.
+    if (!empty(strip_tags($policytext))) {
+        $modal = $OUTPUT->render_from_template('mod_bigbluebuttonbn/accesspolicy', [
+            'body' => $policytext,
+            'forward' => $bbbsession['joinURL'],
+            'hash' => md5($policytext)
+        ]);
+        $output .= $modal;
+        // Add the JS var to setup the modal from JS.
+        $jsvars['accesspolicy'] = true;
+    }
+
     // Action button box.
     $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
     $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>'."\n";

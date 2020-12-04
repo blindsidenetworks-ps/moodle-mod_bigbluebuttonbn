@@ -183,7 +183,11 @@ M.mod_bigbluebuttonbn.rooms = {
         Y.DOM.setAttribute(joinButtonInput, 'type', 'button');
         Y.DOM.setAttribute(joinButtonInput, 'value', status.join_button_text);
         Y.DOM.setAttribute(joinButtonInput, 'class', 'btn btn-primary');
-        var inputHtml = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
+        if (this.bigbluebuttonbn.accesspolicy) {
+            var inputHtml = '$("#policymodal").modal("show");';
+        } else {
+            var inputHtml = 'M.mod_bigbluebuttonbn.rooms.join(\'' + status.join_url + '\');';
+        }
         Y.DOM.setAttribute(joinButtonInput, 'onclick', inputHtml);
         if (!status.can_join) {
             // Disable join button.
