@@ -245,7 +245,8 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
         $modal = $OUTPUT->render_from_template('mod_bigbluebuttonbn/accesspolicy', [
             'body' => $policytext,
             'forward' => $bbbsession['joinURL'],
-            'hash' => md5($policytext)
+            'hash' => md5($policytext),
+            'alert' => get_string('accesspolicyalert', 'mod_bigbluebuttonbn')
         ]);
         $output .= $modal;
         // Add the JS var to setup the modal from JS.

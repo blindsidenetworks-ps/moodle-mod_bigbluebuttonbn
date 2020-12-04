@@ -41,6 +41,7 @@ $string['indicator:cognitivedepth'] = 'BigBlueButtonBN cognitive';
 $string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a BigBlueButtonBN activity.';
 $string['indicator:socialbreadth'] = 'BigBlueButtonBN social';
 $string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in a BigBlueButtonBN activity.';
+$string['accesspolicyalert'] = 'You have not accepted the activity access policy. You must read and accept the policy to access this activity.';
 $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.

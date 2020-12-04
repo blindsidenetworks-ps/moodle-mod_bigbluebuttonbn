@@ -10,7 +10,7 @@
             </div>
             <div class="modal-footer">
                 <a id="policymodalaccept" type="button" class="btn btn-secondary" href={{forward}}>Accept</a>
-                <a class="btn btn-primary" data-dismiss="modal">Decline</a>
+                <a id="policymodaldecline" type="button" class="btn btn-primary" data-dismiss="modal">Decline</a>
             </div>
         </div>
     </div>
@@ -29,6 +29,11 @@ require(['jquery', 'core/sessionstorage'], function($, Storage) {
             e.preventDefault();
             window.location.href = "{{{forward}}}";
         }
+    });
+
+    // If the policy is declined, throw an alert.
+    $('#policymodaldecline').on('click', () => {
+        alert('{{alert}}');
     });
 });
 {{/js}}
