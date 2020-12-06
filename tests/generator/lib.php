@@ -59,6 +59,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 "timecreated" => $now,
                 "timemodified" => $now,
                 "presentation" => null,
+                "accessmodaltext" => '',
         );
         $record = (array) $record;
         foreach ($defaults as $key => $value) {
