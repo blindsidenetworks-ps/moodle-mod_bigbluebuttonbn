@@ -90,6 +90,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->setAdminUser();
         $bbactivitycm = get_coursemodule_from_instance('bigbluebuttonbn', $bbactivity->id);
         list($cm, $context, $module, $data, $cw) = get_moduleinfo_data($bbactivitycm, $course);
+        $data->accessmodaltext = '';
         $this->setUser($USER);
         return $data;
     }
@@ -779,5 +780,3 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertCount(0, $node->get_children_key_list());
     }
 }
-
-
