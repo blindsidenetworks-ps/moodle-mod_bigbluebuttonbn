@@ -166,12 +166,12 @@ before_install:
     if [ $MOODLE_BRANCH == "MOODLE_32_STABLE" ] || [ $MOODLE_BRANCH == "MOODLE_33_STABLE" ]  || [ $MOODLE_BRANCH == "MOODLE_34_STABLE" ] || [ $MOODLE_BRANCH == "MOODLE_36_STABLE" ]; then
       nvm install 8.9.4
     else
-      nvm install 14.0.0
+      nvm install 14.15.0
     fi
   - npm install
   - cd ../..
-  - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - composer self-update 1.10.12
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci:v2 ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
@@ -186,11 +186,11 @@ script:
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci phpdoc
   - moodle-plugin-ci behat --profile chrome
-  - |
-    # Grunt fails since version 3.8
-    # https://moodle.org/mod/forum/discuss.php?d=389744
-    if [ $MOODLE_BRANCH != "master" && $MOODLE_BRANCH != "MOODLE_38_STABLE" && $MOODLE_BRANCH != "MOODLE_39_STABLE"]; then
-      moodle-plugin-ci grunt
-    fi
+  # - |
+  #   # Grunt fails since version 3.8
+  #   # https://moodle.org/mod/forum/discuss.php?d=389744
+  #   if [ $MOODLE_BRANCH != "master" && $MOODLE_BRANCH != "MOODLE_38_STABLE" && $MOODLE_BRANCH != "MOODLE_39_STABLE"]; then
+  #     moodle-plugin-ci grunt
+  #   fi
   # - moodle-plugin-ci mustache # Not working
   # - moodle-plugin-ci phpunit # Not working
