@@ -23,6 +23,8 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+define('READ_ONLY_SESSION', true);
+
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/locallib.php');
 require_once(__DIR__.'/brokerlib.php');
