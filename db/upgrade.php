@@ -278,6 +278,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101002, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2019101004) {
+        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
+            ['userid', 'log']);
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 
