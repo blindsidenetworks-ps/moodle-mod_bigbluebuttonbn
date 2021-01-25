@@ -53,39 +53,38 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             return;
         }
-        // Context.
         $bigbluebuttonbn = null;
-        $course = get_course($this->current->course);
         if ($this->current->id) {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->current->id), '*', MUST_EXIST);
         }
-        $context = context_course::instance($course->id);
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
 
         $jsvars = array();
+
         // Get only those that are allowed.
-        $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context);
-        $createrecording = has_capability('mod/bigbluebuttonbn:recording', $context);
+        $course = get_course($this->current->course);
+        $context = context_course::instance($course->id);
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-            $createroom, $createrecording);
-        $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
+                has_capability('mod/bigbluebuttonbn:meeting', $context), 
+                has_capability('mod/bigbluebuttonbn:recording', $context)
+            );
         // If none is allowed, fail and return.
         if (empty($jsvars['instanceTypeProfiles'])) {
             // Also check module context for those that are allowed
             $context_m = context_module::instance($this->_cm->id);
-            $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context_m);
-            $createrecording = has_capability('mod/bigbluebuttonbn:recording', $context_m);
             $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-                $createroom, $createrecording);
-            $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
-            // If none is allowed, fail and return.
+                    has_capability('mod/bigbluebuttonbn:meeting', $context_m),
+                    has_capability('mod/bigbluebuttonbn:recording', $context_m)
+                );
+            // If still none is allowed, fail and return.
             if (empty($jsvars['instanceTypeProfiles'])) { 
-                    print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
-                        $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+                print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
+                    $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
                 return;
             }
         }
+        $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
         $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instanceTypeProfiles']);
         // Data for participant selection.
         $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
