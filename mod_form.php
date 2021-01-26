@@ -66,19 +66,19 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $course = get_course($this->current->course);
         $context = context_course::instance($course->id);
         $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-                has_capability('mod/bigbluebuttonbn:meeting', $context), 
+                has_capability('mod/bigbluebuttonbn:meeting', $context),
                 has_capability('mod/bigbluebuttonbn:recording', $context)
             );
         // If none is allowed, fail and return.
         if (empty($jsvars['instanceTypeProfiles'])) {
             // Also check module context for those that are allowed
-            $context_m = context_module::instance($this->_cm->id);
+            $contextm = context_module::instance($this->_cm->id);
             $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-                    has_capability('mod/bigbluebuttonbn:meeting', $context_m),
-                    has_capability('mod/bigbluebuttonbn:recording', $context_m)
+                    has_capability('mod/bigbluebuttonbn:meeting', $contextm),
+                    has_capability('mod/bigbluebuttonbn:recording', $contextm)
                 );
             // If still none is allowed, fail and return.
-            if (empty($jsvars['instanceTypeProfiles'])) { 
+            if (empty($jsvars['instanceTypeProfiles'])) {
                 print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
                 return;
