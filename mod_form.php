@@ -294,7 +294,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $field = ['type' => 'textarea', 'name' => 'welcome', 'data_type' => PARAM_CLEANHTML,
             'description_key' => 'mod_form_field_welcome'];
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], '', ['wrap' => 'virtual', 'rows' => 5, 'cols' => '60']);
+            $field['description_key'], $cfg['welcome_default'], ['wrap' => 'virtual', 'rows' => 5, 'cols' => '60']);
         $field = ['type' => 'hidden', 'name' => 'voicebridge', 'data_type' => PARAM_INT,
             'description_key' => null];
         if ($cfg['voicebridge_editable']) {

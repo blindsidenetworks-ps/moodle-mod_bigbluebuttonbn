@@ -56,6 +56,7 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_clienttype($renderer);
     bigbluebuttonbn_settings_muteonstart($renderer);
     bigbluebuttonbn_settings_locksettings($renderer);
+    bigbluebuttonbn_settings_default_messages($renderer);
     // Renders settings for extended capabilities.
     bigbluebuttonbn_settings_extended($renderer);
     // Renders settings for experimental features.
