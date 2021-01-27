@@ -1,3 +1,12 @@
+2.4-beta2 (2019101004)
+Bug: Patch for adding timestamp to join.
+Bug: Fix for issue after bug fixed on BBB post_events script (CONTRIB-7457).
+Bug: Fix for check capabilities also in module context (CONTRIB-8371 & GITHUB-315).
+Bug: Fix for preventing bugged displays on recordings (GITHUB-321).
+Enhancement: Update to external.php.
+Enhancement: Add default welcome message to settings (CONTRIB-7845).
+
+2.4-beta1 (2019101003)
 Bug: Fix for issue with search on updated recordings only works if page is refreshed (CONTRIB-7700).
 Bug: Fix for end session action not always working (CONTRIB-7895).
 Bug: Fix for message sending triggered by recordng ready callback hangs (CONTRIB-7905).
