@@ -1,3 +1,6 @@
+2.2.13 (2017101021)
+Bug: Fix for issue with users joining meetings with static URLs.
+
 2.2.12 (2017101020)
 Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
 Bug: Fix for implementation of resetting function (CONTRIB-7695).
