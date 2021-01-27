@@ -99,6 +99,7 @@ const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
  * @param string $configtoken
  * @param string $userid
  * @param string $clienttype
+ * @param string $createtime
  *
  * @return string
  */
