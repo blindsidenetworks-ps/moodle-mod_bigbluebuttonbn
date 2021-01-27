@@ -101,7 +101,7 @@ const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
  * @return string
  */
 function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $configtoken = null,
-        $userid = null, $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH) {
+        $userid = null, $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH, $createtime = null) {
     $data = ['meetingID' => $meetingid,
               'fullName' => $username,
               'password' => $pw,
@@ -116,6 +116,9 @@ function bigbluebuttonbn_get_join_url($meetingid, $username, $pw, $logouturl, $c
     }
     if (!is_null($userid)) {
         $data['userID'] = $userid;
+    }
+    if (!is_null($createtime)) {
+        $data['createTime'] = $createtime;
     }
     return \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('join', $data);
 }

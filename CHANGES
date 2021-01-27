@@ -1,3 +1,6 @@
+2.3.5 (2019042010)
+Bug: Fix for issue with users joining meetings with static URLs.
+
 2.3.4 (2019042009)
 Bug: Fix for issue with wrong role ids in Website Administration (CONTRIB-8047).
 Bug: Fix for issue with notification when activity is updated not respecting enrolment status (CONTRIB-8046).
