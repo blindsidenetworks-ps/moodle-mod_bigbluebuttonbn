@@ -1,3 +1,6 @@
+2.3.6 (2019042011)
+Bug: Fix for issue with users joining meetings with static URLs on mobile devices.
+
 2.3.5 (2019042010)
 Bug: Fix for issue with users joining meetings with static URLs.
 

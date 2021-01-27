@@ -1,3 +1,6 @@
+2.3.6 (2019042011)
+Bug: Fix for issue with users joining meetings with static URLs on mobile devices.
+
 2.3.5 (2019042010)
 Bug: Fix for issue with users joining meetings with static URLs.
 
@@ -70,6 +73,15 @@ New Feature: Add support for muteOnStart (CONTRIB-7519).
 New Feature: Add option for forcing all the sessions to be recorded (with no button) (CONTRIB-7520).
 New Feature: Add support for recordings of breakout rooms (CONTRIB-7521).
 New Feature: Recording list should give an option for searching recordings (CONTRIB-7522).
+
+2.2.13 (2017101021)
+Bug: Fix for issue with users joining meetings with static URLs.
+
+2.2.12 (2017101020)
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
 
 2.2.11 (2017101019)
 Bug: Fix for participation rules for users applied as rules for roles (CONTRIB-7627).
