@@ -83,7 +83,7 @@ Feature: Manage and list recordings
     And I should see "Name" in the "table > thead > tr" "css_element"
     # This should be refactored with the right classes for the table element
     # We use javascript here to create the table so we don't get the same structure.
-    Then I should see "Recording 1" in the "#bigbluebuttonbn_recordings_table table.yui3-datatable-table tbody.yui3-datatable-data tr td:nth-child(2)" "css_element"
+    Then I should see "Recording 1" in the "#bigbluebuttonbn_recordings_table table.yui3-datatable-table tbody.yui3-datatable-data tr" "css_element"
     # Here we would need to test if there is no regression in the html by default view. This will have to be refactored
     # alongside with the view
     Then I wait until the page is ready
