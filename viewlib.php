@@ -106,7 +106,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     }
     $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
     $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
-    $pinginterval = (int)\mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
+    $pinginterval = (int)\mod_bigbluebuttonbn\local\config::get('waitformoderator_ping_interval') * 1000;
     // JavaScript for locales.
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
     // JavaScript variables.
@@ -185,7 +185,7 @@ function bigbluebuttonbn_view_warning_shown($bbbsession) {
     if (is_siteadmin($bbbsession['userID'])) {
         return true;
     }
-    $generalwarningroles = explode(',', \mod_bigbluebuttonbn\locallib\config::get('general_warning_roles'));
+    $generalwarningroles = explode(',', \mod_bigbluebuttonbn\local\config::get('general_warning_roles'));
     $userroles = bigbluebuttonbn_get_user_roles($bbbsession['context'], $bbbsession['userID']);
     foreach ($userroles as $userrole) {
         if (in_array($userrole->shortname, $generalwarningroles)) {
@@ -339,7 +339,7 @@ function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
     if (!is_siteadmin($bbbsession['userID'])) {
         return '';
     }
-    if (bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+    if (bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\local\config::get('server_url')) {
         return '';
     }
     return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
@@ -357,10 +357,10 @@ function bigbluebuttonbn_view_warning_general(&$bbbsession) {
         return '';
     }
     return bigbluebuttonbn_render_warning(
-        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_message'),
-        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_box_type'),
-        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_href'),
-        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_text'),
-        (string)\mod_bigbluebuttonbn\locallib\config::get('general_warning_button_class')
+        (string)\mod_bigbluebuttonbn\local\config::get('general_warning_message'),
+        (string)\mod_bigbluebuttonbn\local\config::get('general_warning_box_type'),
+        (string)\mod_bigbluebuttonbn\local\config::get('general_warning_button_href'),
+        (string)\mod_bigbluebuttonbn\local\config::get('general_warning_button_text'),
+        (string)\mod_bigbluebuttonbn\local\config::get('general_warning_button_class')
     );
 }

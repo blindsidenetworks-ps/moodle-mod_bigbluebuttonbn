@@ -23,12 +23,12 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\local\bbb_constants;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**

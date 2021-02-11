@@ -181,7 +181,7 @@ class instance {
         if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
             $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
         }
-        \mod_bigbluebuttonbn\locallib\notifier::notify_instance_updated($bigbluebuttonbn, $action);
+        \mod_bigbluebuttonbn\local\notifier::notify_instance_updated($bigbluebuttonbn, $action);
     }
 
     /**

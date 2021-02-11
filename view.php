@@ -55,7 +55,7 @@ $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 // In locallib.
-mod_bigbluebuttonbn\locallib\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
+mod_bigbluebuttonbn\local\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
 
 // Validates if the BigBlueButton server is working.
 $serverversion = bigbluebuttonbn_get_server_version();  // In locallib.

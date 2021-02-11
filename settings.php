@@ -36,7 +36,7 @@ if ($hassiteconfig) {
     // Renders general settings.
     bigbluebuttonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.
-    if (\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+    if (\mod_bigbluebuttonbn\local\config::recordings_enabled()) {
         // Renders settings for record feature.
         bigbluebuttonbn_settings_record($renderer);
         // Renders settings for import recordings.

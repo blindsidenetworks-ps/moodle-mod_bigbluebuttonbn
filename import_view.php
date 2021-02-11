@@ -47,7 +47,7 @@ if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
     print_error('view_error_invalid_session', plugin::COMPONENT);
 }
 
-if (!(boolean)\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
+if (!(boolean)\mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
     print_error('view_message_importrecordings_disabled', plugin::COMPONENT);
 }
 

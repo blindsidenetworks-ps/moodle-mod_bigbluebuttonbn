@@ -120,7 +120,7 @@ class reset {
     public static function bigbluebuttonbn_reset_course_items() {
         $items = array("events" => 0, "tags" => 0, "logs" => 0);
         // Include recordings only if enabled.
-        if ((boolean) \mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        if ((boolean) \mod_bigbluebuttonbn\local\config::recordings_enabled()) {
             $items["recordings"] = 0;
         }
         return $items;

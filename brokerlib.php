@@ -558,7 +558,7 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     try {
         $decodedparameters = \Firebase\JWT\JWT::decode(
             $params['signed_parameters'],
-            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
+            \mod_bigbluebuttonbn\local\config::get('shared_secret'),
             array('HS256')
         );
     } catch (Exception $e) {
@@ -665,7 +665,7 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
         // Verify the authenticity of the request.
         $token = \Firebase\JWT\JWT::decode(
             $authorization[1],
-            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
+            \mod_bigbluebuttonbn\local\config::get('shared_secret'),
             array('HS512')
         );
 
@@ -861,7 +861,7 @@ function bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enable
     $tabledata = array();
     $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
     $tabledata['activity'] = bigbluebuttonbn_view_get_activity_status($bbbsession);
-    $tabledata['ping_interval'] = (int) \mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
+    $tabledata['ping_interval'] = (int) \mod_bigbluebuttonbn\local\config::get('waitformoderator_ping_interval') * 1000;
     $tabledata['locale'] = bigbluebuttonbn_get_localcode();
     $tabledata['profile_features'] = $typeprofiles[0]['features'];
     $tabledata['recordings_html'] = $bbbsession['bigbluebuttonbn']->recordings_html == '1';

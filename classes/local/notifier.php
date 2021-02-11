@@ -23,13 +23,13 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
 
 use html_writer;
 use mod_bigbluebuttonbn\plugin;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
@@ -117,7 +117,7 @@ class notifier
      *
      * @param object $bigbluebuttonbn
      *
-     * @return void
+     * @return string
      */
     public static function htmlmsg_recording_ready($bigbluebuttonbn) {
         return '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').

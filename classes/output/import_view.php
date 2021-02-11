@@ -86,7 +86,7 @@ class import_view implements renderable, templatable {
             }
             $recordings = bigbluebuttonbn_get_allrecordings(
                 $selected, $bigbluebuttonbnid, false,
-                (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled')
+                (boolean)\mod_bigbluebuttonbn\local\config::get('importrecordings_from_deleted_enabled')
             );
             // Exclude the ones that are already imported.
             if (!empty($recordings)) {
