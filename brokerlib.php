@@ -25,6 +25,9 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\helpers\logs;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -587,7 +590,8 @@ function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
         $overrides = array('meetingid' => $decodedparameters->meeting_id);
         $meta['recordid'] = $decodedparameters->record_id;
         $meta['callback'] = 'recording_ready';
-        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
+        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
+            json_encode($meta));
         header('HTTP/1.0 202 Accepted');
     } catch (Exception $e) {
         $error = 'Caught exception: '.$e->getMessage();
@@ -619,7 +623,7 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
     $importrecordings[$params['id']]['imported'] = true;
     $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
     $meta = '{"recording":'.json_encode($importrecordings[$params['id']]).'}';
-    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
+    logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides, $meta);
     // Moodle event logger: Create an event for recording imported.
     if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
         bigbluebuttonbn_event_log(
@@ -689,7 +693,7 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
     $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
-    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
+    logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
     if (bigbluebuttonbn_get_count_callback_event_log($meta['recordid'], 'meeting_events') == 1) {
         // Process the events.
         bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);

@@ -61,7 +61,6 @@ class mod_bigbluebuttonbn_external extends external_api {
      */
     public static function view_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB, $CFG;
-        require_once($CFG->dirroot . "/mod/bigbluebuttonbn/lib.php");
 
         $params = self::validate_parameters(self::view_bigbluebuttonbn_parameters(),
                                             array(

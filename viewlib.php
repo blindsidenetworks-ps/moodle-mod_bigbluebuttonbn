@@ -25,6 +25,8 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bbb_constants;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -337,7 +339,7 @@ function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
     if (!is_siteadmin($bbbsession['userID'])) {
         return '';
     }
-    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+    if (bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
         return '';
     }
     return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');

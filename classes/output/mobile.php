@@ -27,7 +27,7 @@ namespace mod_bigbluebuttonbn\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-use context_module;
+use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\locallib\bigbluebutton;
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -178,7 +178,8 @@ class mobile {
             // Insert a record that meeting was created.
             $overrides = array('meetingid' => $bbbsession['meetingid']);
             $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
-            bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
+            \mod_bigbluebuttonbn\output\bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'],
+                bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         }
 
         // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.

@@ -23,6 +23,9 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\helpers\logs;
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -131,7 +134,7 @@ switch (strtolower($action)) {
         $select = "userid = ? AND log = ?";
         $params = array(
                 'userid' => $bbbsession['userID'],
-                'log' => BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
+                'log' => bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
             );
         $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id ASC', 'id, meta', 1);
         $lastaccess = end($accesses);
@@ -208,7 +211,8 @@ switch (strtolower($action)) {
         // Internal logger: Insert a record with the meeting created.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
         $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
-        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
+        logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides,
+            $meta);
         // Since the meeting is already running, we just join the session.
         bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
         break;
@@ -219,7 +223,7 @@ switch (strtolower($action)) {
             ['other' => $rid]);
         // Internal logger: Instert a record with the playback played.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
-        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
+        logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         // Execute the redirect.
         header('Location: '.urldecode($href));
         break;
@@ -425,7 +429,7 @@ function bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $o
     // Internal logger: Instert a record with the meeting created.
     $overrides = array('meetingid' => $bbbsession['meetingid']);
     $meta = '{"origin":'.$origin.'}';
-    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
+    logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],
         ($bbbsession['administrator'] || $bbbsession['moderator']));

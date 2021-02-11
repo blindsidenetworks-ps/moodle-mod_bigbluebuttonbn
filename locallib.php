@@ -24,15 +24,13 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\locallib;
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\plugin;
-use mod_bigbluebuttonbn\task;
 
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
-
-require_once(__DIR__ . '/lib.php');
 
 /** @var BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
 const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
@@ -2119,7 +2117,7 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
         $meta['recordid'] = $recordid;
         $meta['data'] = $attendee;
         // Stores the log.
-        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
+        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
         // Enqueue a task for processing the completion.
         bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
     }
@@ -2312,7 +2310,7 @@ function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid
  * @return string containing the sql used for getting the target bigbluebuttonbn instances
  */
 function bigbluebuttonbn_get_recordings_deleted_sql_select($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
-    $sql = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_DELETE . "' AND meta like '%has_recordings%' AND meta like '%true%'";
+    $sql = "log = '" . bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_DELETE . "' AND meta like '%has_recordings%' AND meta like '%true%'";
     if (empty($courseid)) {
         $courseid = 0;
     }
@@ -2336,7 +2334,7 @@ function bigbluebuttonbn_get_recordings_deleted_sql_select($courseid = 0, $bigbl
  * @return string containing the sql used for getting the target bigbluebuttonbn instances
  */
 function bigbluebuttonbn_get_recordings_imported_sql_select($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
-    $sql = "log = '" . BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
+    $sql = "log = '" . bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
     if (empty($courseid)) {
         $courseid = 0;
     }
@@ -2409,7 +2407,7 @@ function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null
     // Include only Create events and exclude those with record not true.
     $sql .= ' AND log = ? AND meta LIKE ? AND meta LIKE ?';
     // Execute select for loading records based on existent bigbluebuttonbns.
-    $records = $DB->get_records_sql_menu($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
+    $records = $DB->get_records_sql_menu($sql, array(bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
     // Get actual recordings.
     return bigbluebuttonbn_get_recordings_array(array_keys($records));
 }
@@ -2443,7 +2441,7 @@ function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings,
 function bigbluebuttonbn_count_recording_imported_instances($recordid) {
     global $DB;
     $sql = 'SELECT COUNT(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
-    return $DB->count_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordid}%"));
+    return $DB->count_records_sql($sql, array(bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%', "%{$recordid}%"));
 }
 
 /**
@@ -2456,7 +2454,7 @@ function bigbluebuttonbn_count_recording_imported_instances($recordid) {
 function bigbluebuttonbn_get_recording_imported_instances($recordid) {
     global $DB;
     $sql = 'SELECT * FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
-    $recordingsimported = $DB->get_records_sql($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%',
+    $recordingsimported = $DB->get_records_sql($sql, array(bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, '%recordID%',
         "%{$recordid}%"));
     return $recordingsimported;
 }
@@ -2475,12 +2473,12 @@ function bigbluebuttonbn_get_count_callback_event_log($recordid, $callbacktype =
     // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
     if ($callbacktype == 'recording_ready') {
         $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
-        $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%",
+        $count = $DB->count_records_sql($sql, array(bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%",
             $callbacktype, 'callback'));
         return $count;
     }
     $sql .= ' AND meta LIKE ?;';
-    $count = $DB->count_records_sql($sql, array(BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
+    $count = $DB->count_records_sql($sql, array(bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
     return $count;
 }
 
@@ -2689,11 +2687,11 @@ function bigbluebuttonbn_settings_general(&$renderer) {
         $renderer->render_group_header('general');
         $renderer->render_group_element(
             'server_url',
-            $renderer->render_group_element_text('server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL)
+            $renderer->render_group_element_text('server_url', bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL)
         );
         $renderer->render_group_element(
             'shared_secret',
-            $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
+            $renderer->render_group_element_text('shared_secret', bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
         );
     }
 }

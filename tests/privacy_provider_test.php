@@ -38,8 +38,6 @@ if (!class_exists("\\core_privacy\\tests\\provider_testcase", true)) {
     die();
 }
 
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
-
 /**
  * Privacy provider tests class.
  *
