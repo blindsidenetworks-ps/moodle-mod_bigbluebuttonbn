@@ -28,15 +28,6 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-// JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
-if (!class_exists('\Firebase\JWT\JWT')) {
-    if (file_exists($CFG->libdir.'/php-jwt/src/JWT.php')) {
-        require_once($CFG->libdir.'/php-jwt/src/JWT.php');
-    } else {
-        require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
-    }
-}
-
 // Do not declare new $CFG variables if unit tests are running
 // as it can cause "unexpected new $CFG->xxx value" warnings.
 if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
