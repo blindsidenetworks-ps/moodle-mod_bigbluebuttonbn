@@ -27,8 +27,6 @@ namespace mod_bigbluebuttonbn\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
-
 /**
  * The mod_bigbluebuttonbn class for event name definition.
  *

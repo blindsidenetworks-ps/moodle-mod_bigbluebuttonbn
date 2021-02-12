@@ -25,17 +25,18 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/locallib.php');
-require_once(__DIR__.'/viewlib.php');
 
 $id = required_param('id', PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 
-$viewinstance = bigbluebuttonbn_view_validator($id, $bn); // In locallib.
+$viewinstance = view::bigbluebuttonbn_view_validator($id, $bn); // In locallib.
 if (!$viewinstance) {
     print_error('view_error_url_missing_parameters', plugin::COMPONENT);
 }
@@ -47,7 +48,7 @@ $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
 require_login($course, true, $cm);
 
 // In locallib.
-bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
+logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
 // Additional info related to the course.
 $bbbsession['course'] = $course;
@@ -58,7 +59,7 @@ $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 mod_bigbluebuttonbn\local\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
 
 // Validates if the BigBlueButton server is working.
-$serverversion = bigbluebuttonbn_get_server_version();  // In locallib.
+$serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();  // In locallib.
 if ($serverversion === null) {
     $errmsg = 'view_error_unable_join_student';
     $errurl = '/course/view.php';
@@ -103,14 +104,14 @@ if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], 
     exit;
 }
 
-$activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id);
+$activitystatus = bigbluebutton::bigbluebuttonbn_view_session_config($bbbsession, $id);
 
 // Output starts.
 echo $OUTPUT->header();
 
-bigbluebuttonbn_view_groups($bbbsession);
+view::view_groups($bbbsession);
 
-bigbluebuttonbn_view_render($bbbsession, $activitystatus);
+view::view_render($bbbsession, $activitystatus);
 
 // Output finishes.
 echo $OUTPUT->footer();

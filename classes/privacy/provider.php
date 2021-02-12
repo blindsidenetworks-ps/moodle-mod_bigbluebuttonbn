@@ -37,7 +37,6 @@ use \core_privacy\local\request\writer;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Privacy class for requesting user data.

@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class logs_testcase extends \bbb_simple_testcase {
+class logs_test extends \bbb_simple_test {
     /**
      * Test delete instance logs
      *

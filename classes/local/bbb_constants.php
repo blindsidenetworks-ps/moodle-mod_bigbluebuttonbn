@@ -57,4 +57,28 @@ class bbb_constants {
     public const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
     /** @var string BIGBLUEBUTTON_LOG_EVENT_SUMMARY defines the bigbluebuttonbn Summary event */
     public const BIGBLUEBUTTON_LOG_EVENT_SUMMARY = 'Summary';
+    /** @var bool BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
+    public const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
+    /** @var int BIGBLUEBUTTONBN_TYPE_ALL integer set to 0 defines an instance type that inclueds room and recordings */
+    public const BIGBLUEBUTTONBN_TYPE_ALL = 0;
+    /** @var int BIGBLUEBUTTONBN_TYPE_ROOM_ONLY integer set to 1 defines an instance type that inclueds only room */
+    public const BIGBLUEBUTTONBN_TYPE_ROOM_ONLY = 1;
+    /** @var int BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY integer set to 2 defines an instance type that inclueds only recordings */
+    public const BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY = 2;
+    /** @var int BIGBLUEBUTTONBN_ROLE_VIEWER string defines the bigbluebutton viewer role */
+    public const BIGBLUEBUTTONBN_ROLE_VIEWER = 'viewer';
+    /** @var string BIGBLUEBUTTONBN_ROLE_MODERATOR string defines the bigbluebutton moderator role */
+    public const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
+    /** @var string  BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
+    public const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
+    /** @var int BIGBLUEBUTTON_CLIENTTYPE_FLASH integer that defines the bigbluebuttonbn default web client based on Adobe FLASH */
+    public const BIGBLUEBUTTON_CLIENTTYPE_FLASH = 0;
+    /** @var int BIGBLUEBUTTON_CLIENTTYPE_HTML5 integer that defines the bigbluebuttonbn default web client based on HTML5 */
+    public const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
+    /** @var int BIGBLUEBUTTON_ORIGIN_BASE integer set to 0 defines that the user acceded the session from activity page */
+    public const BIGBLUEBUTTON_ORIGIN_BASE = 0;
+    /** @var int BIGBLUEBUTTON_ORIGIN_TIMELINE integer set to 1 defines that the user acceded the session from Timeline */
+    public const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
+    /** @var int BIGBLUEBUTTON_ORIGIN_INDEX integer set to 2 defines that the user acceded the session from Index */
+    public const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
 }

@@ -28,7 +28,6 @@ use mod_bigbluebuttonbn\output\import_view;
 use mod_bigbluebuttonbn\output\renderer;
 
 require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/locallib.php');
 
 $bn = required_param('bn', PARAM_INT);
 $tc = optional_param('tc', 0, PARAM_INT);

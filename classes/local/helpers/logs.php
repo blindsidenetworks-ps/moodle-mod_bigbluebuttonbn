@@ -22,6 +22,7 @@
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 namespace mod_bigbluebuttonbn\local\helpers;
+use context_module;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use stdClass;
 
@@ -83,5 +84,68 @@ class logs {
             array($bigbluebuttonbn->id, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, "{\"record\":true}"));
         $meta = "{\"has_recordings\":" . empty($logs) ? "true" : "false" . "}";
         static::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_DELETE, [], $meta);
+    }
+
+    /**
+     * Helper function to get how much callback events are logged.
+     *
+     * @param string $recordid
+     * @param string $callbacktype
+     *
+     * @return integer
+     */
+    public static function bigbluebuttonbn_get_count_callback_event_log($recordid, $callbacktype = 'recording_ready') {
+        global $DB;
+        $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
+        // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
+        if ($callbacktype == 'recording_ready') {
+            $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
+            $count =
+                $DB->count_records_sql($sql, array(bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%",
+                    $callbacktype, 'callback'));
+            return $count;
+        }
+        $sql .= ' AND meta LIKE ?;';
+        $count = $DB->count_records_sql($sql,
+            array(bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
+        return $count;
+    }
+
+    /**
+     * Helper register a bigbluebuttonbn event.
+     *
+     * @param string $type
+     * @param object $bigbluebuttonbn
+     * @param array $options [timecreated, userid, other]
+     *
+     * @return void
+     */
+    public static function bigbluebuttonbn_event_log($type, $bigbluebuttonbn, $options = []) {
+        global $DB;
+        if (!in_array($type, \mod_bigbluebuttonbn\event\events::$events)) {
+            // No log will be created.
+            return;
+        }
+        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        $params = array('context' => $context, 'objectid' => $bigbluebuttonbn->id);
+        if (array_key_exists('timecreated', $options)) {
+            $params['timecreated'] = $options['timecreated'];
+        }
+        if (array_key_exists('userid', $options)) {
+            $params['userid'] = $options['userid'];
+        }
+        if (array_key_exists('other', $options)) {
+            $params['other'] = $options['other'];
+        }
+        $event = call_user_func_array(
+            '\mod_bigbluebuttonbn\event\\' . $type . '::create',
+            array($params)
+        );
+        $event->add_record_snapshot('course_modules', $cm);
+        $event->add_record_snapshot('course', $course);
+        $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
+        $event->trigger();
     }
 }

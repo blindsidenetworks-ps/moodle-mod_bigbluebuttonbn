@@ -23,6 +23,8 @@
  * @author    Laurent David (laurent@call-learning.fr)
  */
 namespace mod_bigbluebuttonbn\local\helpers;
+use mod_bigbluebuttonbn\local\bbb_constants;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -36,7 +38,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class instance_testcase extends \bbb_simple_testcase {
+class instance_test extends \bbb_simple_test {
 
     /**
      * Presave test
@@ -96,11 +98,10 @@ class instance_testcase extends \bbb_simple_testcase {
      */
     public function test_bigbluebuttonbn_process_pre_save_common() {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-            $this->create_instance(null, ['type' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
+            $this->create_instance(null, ['type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         $bbformdata->groupmode = '1';
@@ -116,11 +117,10 @@ class instance_testcase extends \bbb_simple_testcase {
      */
     public function test_bigbluebuttonbn_process_post_save() {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-            $this->create_instance(null, ['type' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
+            $this->create_instance(null, ['type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         // Enrol users in a course so he will receive the message.
@@ -146,11 +146,10 @@ class instance_testcase extends \bbb_simple_testcase {
      */
     public function test_bigbluebuttonbn_process_post_save_notification() {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-            $this->create_instance(null, ['type' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
+            $this->create_instance(null, ['type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->add = "1";
         $messagesink = $this->redirectMessages();
