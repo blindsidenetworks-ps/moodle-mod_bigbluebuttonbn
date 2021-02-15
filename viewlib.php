@@ -116,6 +116,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $output .= bigbluebuttonbn_view_warning_general($bbbsession);
 
     // Renders the rest of the page.
+    $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     // Renders the completed description.
     $desc = file_rewrite_pluginfile_urls($bbbsession['meetingdescription'], 'pluginfile.php',
         $bbbsession['context']->id, 'mod_bigbluebuttonbn', 'intro', null);
@@ -126,7 +127,8 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
-    if ($enabledfeatures['showrecordings']) {
+    // Show recordings should only be enabled if recordings are also enabled in session.
+    if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
         $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
         $output .= html_writer::end_tag('div');

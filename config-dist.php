@@ -328,6 +328,129 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
+ * 1.12. CONFIGURATION FOR LOCKING SETTINGS
+ *
+ * These features are locking API options added in BBB v2.2. When the session is created,
+ * it will be created with these parameters.
+ **/
+
+/*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have user webcams disabled.
+ * default.
+ * $CFG->bigbluebuttonbn['disablecam_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the disable webcam
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['disablecam_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have user microphones disabled.
+ * default.
+ * $CFG->bigbluebuttonbn['disablemic_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the disable microphone
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['disablemic_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have private chat disabled.
+ * default.
+ * $CFG->bigbluebuttonbn['disableprivatechat_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the private chat
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['disableprivatechat_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have public chat disabled.
+ * default.
+ * $CFG->bigbluebuttonbn['disablepublicchat_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the disable public chat
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['disablepublicchat_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have shared notes disabled.
+ * default.
+ * $CFG->bigbluebuttonbn['disablenote_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the disable shared notes
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['disablenote_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have the user list hidden.
+ * default.
+ * $CFG->bigbluebuttonbn['hideuserlist_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the hidden user list
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['hideuserlist_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will have a locked layout.
+ * default.
+ * $CFG->bigbluebuttonbn['lockedlayout_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the locked layout
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['lockedlayout_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the bigbluebuttonbn rooms or
+ * activities will ignore the locking settings.
+ * default.
+ * $CFG->bigbluebuttonbn['lockonjoin_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the ignore locking
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['lockonjoin_editable'] = 0;
+ */
+
+ /*
+ * When the value is set to 1 (checked) the capability to ignore
+ * locking settings is enabled.
+ * $CFG->bigbluebuttonbn['lockonjoinconfigurable_default'] = 0;
+ */
+/*
+ * When the value is set to 1 (checked) the ignore locking
+ * capability can be enabled/disabled by the user creating or editing
+ * the room or activity.
+ * $CFG->bigbluebuttonbn['lockonjoinconfigurable_editable'] = 0;
+ */
+
+/*
  *  2. CONFIGURATION FOR FEATURES OFFERED BY BN SERVERS
  ** ------------------------------------------------------------------ **
  **/
@@ -353,6 +476,15 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * capability is enabled, meaning that once a recording is processed by BigBlueButton
  * a message containing the events from the live session will be sent to Moodle.
  * These avents are added to the logging system and used for reports
+ *
+ * This setting is required for Activity Completion, but it will work only if the
+ * BigBlueButton server is enabled to process events though the script post_process_analytics.rb.
+ *
+ * By default, the fueature only works if the session is recorded, but in order to make it
+ * work for every session, the property keepEvents must be st to true in BigBlueButton.
+ * Edit the file /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties and set
+ *     keepEvents=true
+ *
  * $CFG->bigbluebuttonbn['meetingevents_enabled'] = 0;
  */
 

@@ -182,3 +182,4 @@ M.mod_bigbluebuttonbn.broker = {
     }
 
 };
+

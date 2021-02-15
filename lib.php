@@ -37,21 +37,25 @@ if (!class_exists('\Firebase\JWT\JWT')) {
     }
 }
 
-if (!isset($CFG->bigbluebuttonbn)) {
-    $CFG->bigbluebuttonbn = array();
-}
+// Do not declare new $CFG variables if unit tests are running
+// as it can cause "unexpected new $CFG->xxx value" warnings.
+if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+    if (!isset($CFG->bigbluebuttonbn)) {
+        $CFG->bigbluebuttonbn = array();
+    }
 
-if (file_exists(dirname(__FILE__).'/config.php')) {
-    require_once(dirname(__FILE__).'/config.php');
-}
+    if (file_exists(dirname(__FILE__).'/config.php')) {
+        require_once(dirname(__FILE__).'/config.php');
+    }
 
-/*
- * DURATIONCOMPENSATION: Feature removed by configuration
- */
-$CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
-/*
- * Remove this block when restored
- */
+    /*
+     * DURATIONCOMPENSATION: Feature removed by configuration
+     */
+    $CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
+    /*
+     * Remove this block when restored
+     */
+}
 
 /** @var BIGBLUEBUTTONBN_DEFAULT_SERVER_URL string of default bigbluebutton server url */
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
@@ -593,8 +597,10 @@ function bigbluebuttonbn_print_overview_element($bigbluebuttonbn, $now) {
     $str .= '  </div>'."\n";
     $str .= '  <div class="info">'.get_string($start, 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->openingtime).
         '</div>'."\n";
-    $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
-      .'</div>'."\n";
+    if (!empty($bigbluebuttonbn->closingtime)) {
+        $str .= '  <div class="info">'.get_string('ends_at', 'bigbluebuttonbn').': '.userdate($bigbluebuttonbn->closingtime)
+                .'</div>'."\n";
+    }
     $str .= '</div>'."\n";
     return $str;
 }
@@ -730,6 +736,33 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->muteonstart)) {
         $bigbluebuttonbn->muteonstart = 0;
     }
+    if (!isset($bigbluebuttonbn->disablecam)) {
+        $bigbluebuttonbn->disablecam = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablemic)) {
+        $bigbluebuttonbn->disablemic = 0;
+    }
+    if (!isset($bigbluebuttonbn->disableprivatechat)) {
+        $bigbluebuttonbn->disableprivatechat = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablepublicchat)) {
+        $bigbluebuttonbn->disablepublicchat = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablenote)) {
+        $bigbluebuttonbn->disablenote = 0;
+    }
+    if (!isset($bigbluebuttonbn->hideuserlist)) {
+        $bigbluebuttonbn->hideuserlist = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockedlayout)) {
+        $bigbluebuttonbn->lockedlayout = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockonjoin)) {
+        $bigbluebuttonbn->lockonjoin = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockonjoinconfigurable)) {
+        $bigbluebuttonbn->lockonjoinconfigurable = 0;
+    }
     if (!isset($bigbluebuttonbn->recordings_validate_url)) {
         $bigbluebuttonbn->recordings_validate_url = 1;
     }
@@ -805,7 +838,8 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
     $event->type = CALENDAR_EVENT_TYPE_ACTION;
     $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
-    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
+    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule, false);
+    $event->format      = FORMAT_HTML;
     $event->courseid = $bigbluebuttonbn->course;
     $event->groupid = 0;
     $event->userid = 0;
@@ -1023,8 +1057,14 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bigbluebuttonbn->id);
         $presentationnonce = $cache->get($noncekey);
-        $noncevalue = $presentationnonce['value'];
-        $noncecounter = $presentationnonce['counter'];
+        if (!empty($presentationnonce)) {
+            $noncevalue = $presentationnonce['value'];
+            $noncecounter = $presentationnonce['counter'];
+        } else {
+            $noncevalue = null;
+            $noncecounter = 0;
+        }
+
         if ($args['0'] != $noncevalue) {
             return;
         }

@@ -690,15 +690,14 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
     bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
-    if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'internal_meeting_id'}, 'meeting_events') == 1) {
+    if (bigbluebuttonbn_get_count_callback_event_log($meta['recordid'], 'meeting_events') == 1) {
         // Process the events.
         bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
-        $msg = 'Enqueued.';
-        header('HTTP/1.0 202 Accepted. ' . $msg);
+        header('HTTP/1.0 200 Accepted. Enqueued.');
         return;
     }
-    $msg = 'Already processed.';
-    header('HTTP/1.0 202 Accepted. ' . $msg);
+
+    header('HTTP/1.0 202 Accepted. Already processed.');
 }
 
 /**
