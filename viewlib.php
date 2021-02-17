@@ -261,8 +261,14 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     );
     // If there are meetings with recordings load the data to the table.
     if ($bbbsession['bigbluebuttonbn']->recordings_html) {
+        $recordings_html = '';
+        if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording') 
+            && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
+            $recordings_html .= bigbluebuttonbn_output_recording_opencast($bbbsession['course']->id);
+        }
+        $recordings_html .= bigbluebuttonbn_output_recording_table($bbbsession, $recordings)."\n";
         // Render a plain html table.
-        return bigbluebuttonbn_output_recording_table($bbbsession, $recordings)."\n";
+        return $recordings_html;
     }
     // JavaScript variables for recordings with YUI.
     $jsvars += array(

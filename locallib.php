@@ -2244,7 +2244,19 @@ function bigbluebuttonbn_output_recording_table($bbbsession, $recordings, $tools
     // Render the table.
     return html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_recordings_table'));
 }
-
+/**
+ * Helper function renders recording link for opencast.
+ *
+ * @param string $courseid
+ * 
+ * @return array
+ */
+function bigbluebuttonbn_output_recording_opencast($courseid) {
+    $opencast_url = new \moodle_url('/blocks/opencast/index.php', array('courseid'=>$courseid));
+    return html_writer::div(html_writer::tag('button', get_string('view_message_oc_recordings', 'bigbluebuttonbn'), 
+                                array('class' => 'btn btn-primary', 'onclick' => "window.location='{$opencast_url}';")),
+                                 '', array('id' => 'bigbluebuttonbn_recordings_opencast', 'class' => 'py-3'));
+}
 /**
  * Helper function to convert an html string to plain text.
  *
@@ -2717,6 +2729,12 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             'recording_editable',
             $renderer->render_group_element_checkbox('recording_editable', 1)
         );
+        if (bigbluebuttonbn_check_opencast()) {
+            $renderer->render_group_element(
+                'oc_recording',
+                $renderer->render_group_element_checkbox('oc_recording', 0)
+            );
+        }
         $renderer->render_group_element(
             'recording_icons_enabled',
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1)
@@ -3660,5 +3678,36 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
+    // Special metadata for Opencast recordings
+    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording') 
+        && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
+        $metadata['opencast-dc-isPartOf'] = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
+    }
     return $metadata;
+}
+
+/**
+ * Helper for checking/retreiving seriesid Opencast plugin.
+ *
+ * @param  string    $courseid
+ * @return boolean|string
+ */
+function bigbluebuttonbn_check_opencast($courseid = null) {
+    $block_plugins = core_plugin_manager::instance()->get_plugins_of_type('block');
+    if (in_array('opencast', array_keys($block_plugins))) {
+        $opencast = \block_opencast\local\apibridge::get_instance();
+        if (!$opencast) {
+            return false;
+        }
+        if ($courseid) {
+            $seriesid = $opencast->get_stored_seriesid($courseid);
+            $ocseriesid = $opencast->get_course_series($courseid);
+            if (!$seriesid || ($seriesid && !$ocseriesid)) {
+                return flase;
+            }
+            return $seriesid;
+        }
+        return true;
+    }
+    return false;
 }

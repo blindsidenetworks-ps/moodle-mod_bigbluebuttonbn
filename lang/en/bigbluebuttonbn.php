@@ -111,6 +111,8 @@ $string['config_shared_secret_description'] = 'The security salt of your BigBlue
 $string['config_recording'] = 'Configuration for "Record meeting" feature';
 $string['config_recording_description'] = 'These settings are feature specific';
 $string['config_recording_default'] = 'Recording feature enabled by default';
+$string['config_oc_recording'] = 'Opencast can be used for Recording';
+$string['config_oc_recording_description'] = 'When enabled, BBB will use Opencast server for recordings. The course must use Opencast Videos Plugin (block_opencast) and have a valid Seires ID. If not, BBB uses its defaults.';
 $string['config_recording_default_description'] = 'If enabled the sessions created in BigBlueButton will have recording capabilities.';
 $string['config_recording_editable'] = 'Recording feature can be edited';
 $string['config_recording_editable_description'] = 'If checked the interface includes an option for enable and disable the recording feature.';
@@ -366,6 +368,7 @@ $string['mod_form_field_lockedlayout'] = 'Lock room layout';
 $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
+$string['mod_form_field_record_oc'] = $string['mod_form_field_record'] . ' (Opencast)';
 
 
 $string['starts_at'] = 'Starts';
@@ -429,6 +432,7 @@ $string['view_recording_format_errror_unreachable'] = 'The URL for this recordin
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
+$string['view_message_oc_recordings'] = 'List of Recordings on Opencast';
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 
