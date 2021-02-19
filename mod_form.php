@@ -58,7 +58,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->current->id), '*', MUST_EXIST);
         }
         // UI configuration options.
-        $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
+        $cfg = \mod_bigbluebuttonbn\local\config::get_options();
 
         $jsvars = array();
 
@@ -182,7 +182,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform = $this->_form;
-        if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        if (!(boolean)\mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
             return [];
         }
 
@@ -259,7 +259,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
-        if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        if ((boolean)\mod_bigbluebuttonbn\local\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
                 bigbluebuttonbn_get_instance_profiles_array($profiles),
                 array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));

@@ -28,7 +28,7 @@ namespace mod_bigbluebuttonbn\output;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\locallib\bigbluebutton;
+use mod_bigbluebuttonbn\local\bigbluebutton;
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 require_once($CFG->dirroot . '/lib/grouplib.php');
@@ -73,7 +73,7 @@ class mobile {
         $context = $bbbsession['context'];
 
         // Check activity status.
-        $activitystatus = \mod_bigbluebuttonbn\locallib\mobileview::get_activity_status($bbbsession);
+        $activitystatus = \mod_bigbluebuttonbn\local\mobileview::get_activity_status($bbbsession);
         if ($activitystatus == 'not_started') {
             $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
@@ -133,7 +133,7 @@ class mobile {
         // Logic of bbb_view for join to session.
         // If user is not administrator nor moderator (user is student) and waiting is required.
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            $canjoin = \mod_bigbluebuttonbn\locallib\bigbluebutton::can_join_meeting($args->cmid);
+            $canjoin = \mod_bigbluebuttonbn\local\bigbluebutton::can_join_meeting($args->cmid);
             if (!$canjoin['can_join']) {
                 $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
                 return (self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
@@ -145,8 +145,8 @@ class mobile {
 
             // The meeting doesnt exist in BBB server, must be created.
             $response = bigbluebuttonbn_get_create_meeting_array(
-                \mod_bigbluebuttonbn\locallib\mobileview::create_meeting_data($bbbsession),
-                \mod_bigbluebuttonbn\locallib\mobileview::create_meeting_metadata($bbbsession),
+                \mod_bigbluebuttonbn\local\mobileview::create_meeting_data($bbbsession),
+                \mod_bigbluebuttonbn\local\mobileview::create_meeting_metadata($bbbsession),
                 $bbbsession['presentation']['name'],
                 $bbbsession['presentation']['url']
             );
@@ -193,7 +193,7 @@ class mobile {
 
         // Build final url to BBB.
         $bbbsession['createtime'] = $meetinginfo['createTime'];
-        $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
+        $urltojoin = \mod_bigbluebuttonbn\local\mobileview::build_url_join_session($bbbsession);
 
         // Check groups access and show message.
         $msjgroup = array();

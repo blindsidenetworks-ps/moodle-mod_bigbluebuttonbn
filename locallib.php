@@ -129,7 +129,7 @@ function bigbluebuttonbn_get_join_url(
     if (!is_null($createtime)) {
         $data['createTime'] = $createtime;
     }
-    return \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('join', $data);
+    return \mod_bigbluebuttonbn\local\bigbluebutton::action_url('join', $data);
 }
 
 /**
@@ -143,7 +143,7 @@ function bigbluebuttonbn_get_join_url(
  * @return array
  */
 function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $pname = null, $purl = null) {
-    $createmeetingurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('create', $data, $metadata);
+    $createmeetingurl = \mod_bigbluebuttonbn\local\bigbluebutton::action_url('create', $data, $metadata);
     $method = 'GET';
     $payload = null;
     if (!is_null($pname) && !is_null($purl)) {
@@ -172,7 +172,7 @@ function bigbluebuttonbn_get_create_meeting_array($data, $metadata = array(), $p
  */
 function bigbluebuttonbn_get_meeting_info_array($meetingid) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
+        \mod_bigbluebuttonbn\local\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
     );
     if ($xml && $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
         // Meeting info was returned.
@@ -273,7 +273,7 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
 function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
     $recordings = array();
     // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
+    $url = \mod_bigbluebuttonbn\local\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
     $xml = bigbluebuttonbn_wrap_xml_load_file($url);
     if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
         // If there were meetings already created.
@@ -284,7 +284,7 @@ function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
             // Check if there is childs.
             if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
                 foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url(
+                    $url = \mod_bigbluebuttonbn\local\bigbluebutton::action_url(
                         'getRecordings',
                         ['recordID' => implode(',', (array) $breakoutroom)]
                     );
@@ -356,7 +356,7 @@ function bigbluebuttonbn_get_recordings_imported_array($courseid = 0, $bigbluebu
  */
 function bigbluebuttonbn_get_default_config_xml() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getDefaultConfigXML')
+        \mod_bigbluebuttonbn\local\bigbluebutton::action_url('getDefaultConfigXML')
     );
     return $xml;
 }
@@ -460,7 +460,7 @@ function bigbluebuttonbn_delete_recordings($recordids) {
     $ids = explode(',', $recordids);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(
-            \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('deleteRecordings', ['recordID' => $id])
+            \mod_bigbluebuttonbn\local\bigbluebutton::action_url('deleteRecordings', ['recordID' => $id])
         );
         if ($xml && $xml->returncode != 'SUCCESS') {
             return false;
@@ -479,7 +479,7 @@ function bigbluebuttonbn_publish_recordings($recordids, $publish = 'true') {
     $ids = explode(',', $recordids);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(
-            \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('publishRecordings', ['recordID' => $id, 'publish' => $publish])
+            \mod_bigbluebuttonbn\local\bigbluebutton::action_url('publishRecordings', ['recordID' => $id, 'publish' => $publish])
         );
         if ($xml && $xml->returncode != 'SUCCESS') {
             return false;
@@ -498,7 +498,7 @@ function bigbluebuttonbn_update_recordings($recordids, $params) {
     $ids = explode(',', $recordids);
     foreach ($ids as $id) {
         $xml = bigbluebuttonbn_wrap_xml_load_file(
-            \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('updateRecordings', ['recordID' => $id] + (array) $params)
+            \mod_bigbluebuttonbn\local\bigbluebutton::action_url('updateRecordings', ['recordID' => $id] + (array) $params)
         );
         if ($xml && $xml->returncode != 'SUCCESS') {
             return false;
@@ -515,7 +515,7 @@ function bigbluebuttonbn_update_recordings($recordids, $params) {
  */
 function bigbluebuttonbn_end_meeting($meetingid, $modpw) {
     $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
+        \mod_bigbluebuttonbn\local\bigbluebutton::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
     );
     if ($xml) {
         // If the xml packet returned failure it displays the message to the user.
@@ -532,7 +532,7 @@ function bigbluebuttonbn_end_meeting($meetingid, $modpw) {
  */
 function bigbluebuttonbn_get_server_version() {
     $xml = bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url()
+        \mod_bigbluebuttonbn\local\bigbluebutton::action_url()
     );
     if ($xml && $xml->returncode == 'SUCCESS') {
         return $xml->version;
@@ -847,7 +847,7 @@ function bigbluebuttonbn_get_participant_list_default($context, $ownerid = null)
         'selectionid' => 'all',
         'role' => BIGBLUEBUTTONBN_ROLE_VIEWER,
     );
-    $defaultrules = explode(',', \mod_bigbluebuttonbn\locallib\config::get('participant_moderator_default'));
+    $defaultrules = explode(',', \mod_bigbluebuttonbn\local\config::get('participant_moderator_default'));
     foreach ($defaultrules as $defaultrule) {
         if ($defaultrule == '0') {
             if (!empty($ownerid) && is_enrolled($context, $ownerid)) {
@@ -1035,7 +1035,7 @@ function bigbluebuttonbn_get_duration($closingtime) {
     $now = time();
     if ($closingtime > 0 && $now < $closingtime) {
         $duration = ceil(($closingtime - $now) / 60);
-        $compensationtime = intval((int) \mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_compensation'));
+        $compensationtime = intval((int) \mod_bigbluebuttonbn\local\config::get('scheduled_duration_compensation'));
         $duration = intval($duration) + $compensationtime;
     }
     return $duration;
@@ -1237,7 +1237,7 @@ function bigbluebuttonbn_participant_joined($meetingid, $ismoderator) {
  * @return array
  */
 function bigbluebuttonbn_get_meeting_info($meetingid, $updatecache = false) {
-    $cachettl = (int) \mod_bigbluebuttonbn\locallib\config::get('waitformoderator_cache_ttl');
+    $cachettl = (int) \mod_bigbluebuttonbn\local\config::get('waitformoderator_cache_ttl');
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $result = $cache->get($meetingid);
     $now = time();
@@ -1247,7 +1247,7 @@ function bigbluebuttonbn_get_meeting_info($meetingid, $updatecache = false) {
     }
     // Ping again and refresh the cache.
     $meetinginfo = (array) bigbluebuttonbn_wrap_xml_load_file(
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
+        \mod_bigbluebuttonbn\local\bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
     );
     $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
     return $meetinginfo;
@@ -1357,7 +1357,7 @@ function bigbluebuttonbn_protect_recording_imported($id, $protect = true) {
  * @return object
  */
 function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
-    $urldefaultconfig = \mod_bigbluebuttonbn\locallib\config::get('server_url') . 'api/setConfigXML?';
+    $urldefaultconfig = \mod_bigbluebuttonbn\local\config::get('server_url') . 'api/setConfigXML?';
     $configxmlparams = bigbluebuttonbn_set_config_xml_params($meetingid, $configxml);
     $xml = bigbluebuttonbn_wrap_xml_load_file(
         $urldefaultconfig,
@@ -1378,7 +1378,7 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
  */
 function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
-    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
+    $sharedsecret = \mod_bigbluebuttonbn\local\config::get('shared_secret');
     $configxmlparams = $params . '&checksum=' . sha1('setConfigXML' . $params . $sharedsecret);
     return $configxmlparams;
 }
@@ -1743,7 +1743,7 @@ function bigbluebuttonbn_get_recording_type_text($playbacktype) {
  */
 function bigbluebuttonbn_is_valid_resource($url) {
     $urlhost = parse_url($url, PHP_URL_HOST);
-    $serverurlhost = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'), PHP_URL_HOST);
+    $serverurlhost = parse_url(\mod_bigbluebuttonbn\local\config::get('server_url'), PHP_URL_HOST);
     // Skip validation when the recording URL host is the same as the configured BBB server.
     if ($urlhost == $serverurlhost) {
         return true;
@@ -1883,7 +1883,7 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     }
     $id = 'recording-' . $target . '-' . $recording['recordID'];
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this); return false;';
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recording_icons_enabled')) {
+    if ((boolean) \mod_bigbluebuttonbn\local\config::get('recording_icons_enabled')) {
         // With icon for $manageaction.
         $iconattributes = array('id' => $id, 'class' => 'iconsmall');
         $linkattributes = array(
@@ -2095,7 +2095,7 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
  * @return void
  */
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
-    \mod_bigbluebuttonbn\locallib\notifier::notify_recording_ready($bigbluebuttonbn);
+    \mod_bigbluebuttonbn\local\notifier::notify_recording_ready($bigbluebuttonbn);
 }
 
 /**
@@ -2181,10 +2181,10 @@ function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
  * @return boolean
  */
 function bigbluebuttonbn_is_bn_server() {
-    if (\mod_bigbluebuttonbn\locallib\config::get('bn_server')) {
+    if (\mod_bigbluebuttonbn\local\config::get('bn_server')) {
         return true;
     }
-    $parsedurl = parse_url(\mod_bigbluebuttonbn\locallib\config::get('server_url'));
+    $parsedurl = parse_url(\mod_bigbluebuttonbn\local\config::get('server_url'));
     if (!isset($parsedurl['host'])) {
         return false;
     }
@@ -2523,16 +2523,16 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
     $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
     // Evaluates if recordings are enabled for the Moodle site.
     $enabledfeatures['showrecordings'] = false;
-    if (\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+    if (\mod_bigbluebuttonbn\local\config::recordings_enabled()) {
         $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
     }
     $enabledfeatures['importrecordings'] = false;
-    if (\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
+    if (\mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
         $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
     }
     // Evaluates if clienttype is enabled for the Moodle site.
     $enabledfeatures['clienttype'] = false;
-    if (\mod_bigbluebuttonbn\locallib\config::clienttype_enabled()) {
+    if (\mod_bigbluebuttonbn\local\config::clienttype_enabled()) {
         $enabledfeatures['clienttype'] = (in_array('all', $features) || in_array('clienttype', $features));
     }
     return $enabledfeatures;
@@ -3016,7 +3016,7 @@ function bigbluebuttonbn_settings_clienttype(&$renderer) {
             $renderer->render_group_element_checkbox('clienttype_editable', 0)
         );
         // Web Client default.
-        $default = intval((int) \mod_bigbluebuttonbn\locallib\config::get('clienttype_default'));
+        $default = intval((int) \mod_bigbluebuttonbn\local\config::get('clienttype_default'));
         $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
             BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
         $renderer->render_group_element(
@@ -3547,7 +3547,7 @@ function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
  * @return boolean
  */
 function bigbluebuttonbn_has_html5_client() {
-    $checkurl = \mod_bigbluebuttonbn\locallib\bigbluebutton::root() . "html5client/check";
+    $checkurl = \mod_bigbluebuttonbn\local\bigbluebutton::root() . "html5client/check";
     $curlinfo = bigbluebuttonbn_wrap_xml_load_file_curl_request($checkurl, 'HEAD');
     return (isset($curlinfo['http_code']) && $curlinfo['http_code'] == 200);
 }
@@ -3644,7 +3644,7 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
         'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
     ];
     // Special metadata for recording processing.
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
+    if ((boolean) \mod_bigbluebuttonbn\local\config::get('recordingstatus_enabled')) {
         $metadata["bn-recording-status"] = json_encode(
             array(
                 'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
@@ -3652,10 +3652,10 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
             )
         );
     }
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
+    if ((boolean) \mod_bigbluebuttonbn\local\config::get('recordingready_enabled')) {
         $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
     }
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+    if ((boolean) \mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
     return $metadata;

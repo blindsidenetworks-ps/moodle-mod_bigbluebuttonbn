@@ -79,7 +79,7 @@ if ($timeline || $index) {
         exit;
     }
 
-    $bbbsession = mod_bigbluebuttonbn\locallib\bigbluebutton::build_bbb_session($cm, $course, $bigbluebuttonbn);
+    $bbbsession = mod_bigbluebuttonbn\local\bigbluebutton::build_bbb_session($cm, $course, $bigbluebuttonbn);
 
     // Check status and set extra values.
     $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
@@ -372,7 +372,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
  * @return string
  */
 function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
+    if ((boolean)\mod_bigbluebuttonbn\local\config::recordings_enabled() && $record) {
         return 'true';
     }
     return 'false';
@@ -385,7 +385,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
  * @return integer
  */
 function bigbluebuttonbn_bbb_view_create_meeting_data_duration($closingtime) {
-    if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
+    if ((boolean)\mod_bigbluebuttonbn\local\config::get('scheduled_duration_enabled')) {
         return bigbluebuttonbn_get_duration($closingtime);
     }
     return 0;

@@ -23,7 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
 
 use context_module;
 

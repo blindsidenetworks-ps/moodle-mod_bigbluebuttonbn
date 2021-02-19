@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -139,7 +139,7 @@ class mobileview {
      * @return string
      */
     public static function create_meeting_data_record($record) {
-        if ((boolean)\mod_bigbluebuttonbn\locallib\config::recordings_enabled() && $record) {
+        if ((boolean)\mod_bigbluebuttonbn\local\config::recordings_enabled() && $record) {
             return 'true';
         }
         return 'false';
@@ -152,7 +152,7 @@ class mobileview {
      * @return integer
      */
     public static function create_meeting_data_duration($closingtime) {
-        if ((boolean)\mod_bigbluebuttonbn\locallib\config::get('scheduled_duration_enabled')) {
+        if ((boolean)\mod_bigbluebuttonbn\local\config::get('scheduled_duration_enabled')) {
             return bigbluebuttonbn_get_duration($closingtime);
         }
         return 0;

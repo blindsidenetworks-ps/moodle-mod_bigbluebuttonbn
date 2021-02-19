@@ -587,7 +587,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
     global $PAGE, $USER;
     // Don't add validate completion if the callback for meetingevents is NOT enabled.
-    if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+    if (!(boolean)\mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
         return;
     }
     // Don't add validate completion if user is not allowed to edit the activity.
