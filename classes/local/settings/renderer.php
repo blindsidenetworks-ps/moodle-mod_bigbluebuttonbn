@@ -23,11 +23,9 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\settings;
+namespace mod_bigbluebuttonbn\local\settings;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 require_once($CFG->libdir.'/adminlib.php');
 
 /**

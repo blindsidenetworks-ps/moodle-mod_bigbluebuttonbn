@@ -23,11 +23,14 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\broker;
+use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\view;
+
 define('AJAX_SCRIPT', true);
 
 require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/locallib.php');
-require_once(__DIR__.'/brokerlib.php');
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
@@ -48,14 +51,14 @@ if (empty($params['action'])) {
     return;
 }
 
-$error = bigbluebuttonbn_broker_validate_parameters($params);
+$error = broker::validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
     return;
 }
 
 if ($params['bigbluebuttonbn']) {
-    $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+    $bbbbrokerinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
     $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
     $context = context_module::instance($cm->id);
@@ -83,55 +86,55 @@ if (isset($bbbsession['bigbluebuttonbn']->type)) {
     $type = $bbbsession['bigbluebuttonbn']->type;
 }
 
-$typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
-$enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
+$typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
+$enabledfeatures = config::bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
 try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
     if ($a == 'meeting_info') {
-        $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
+        $meetinginfo = broker::meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
         echo $meetinginfo;
         return;
     }
     if ($a == 'meeting_end') {
-        $meetingend = bigbluebuttonbn_broker_meeting_end($bbbsession, $params);
+        $meetingend = broker::meeting_end($bbbsession, $params);
         echo $meetingend;
         return;
     }
     if ($a == 'recording_play') {
-        $recordingplay = bigbluebuttonbn_broker_recording_play($params);
+        $recordingplay = broker::recording_play($params);
         echo $recordingplay;
         return;
     }
     if ($a == 'recording_links') {
-        $recordinglinks = bigbluebuttonbn_broker_recording_links($bbbsession, $params);
+        $recordinglinks = broker::recording_links($bbbsession, $params);
         echo $recordinglinks;
         return;
     }
     if ($a == 'recording_info') {
-        $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabledfeatures['showroom']);
+        $recordinginfo = broker::recording_info($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordinginfo;
         return;
     }
     if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
         $a == 'recording_delete' || $a == 'recording_edit' ||
         $a == 'recording_protect' || $a == 'recording_unprotect') {
-        $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $enabledfeatures['showroom']);
+        $recordingaction = broker::recording_action($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingaction;
         return;
     }
     if ($a == 'recording_import') {
-        echo bigbluebuttonbn_broker_recording_import($bbbsession, $params);
+        echo broker::recording_import($bbbsession, $params);
         return;
     }
     if ($a == 'recording_list_table') {
         $PAGE->set_context(context_course::instance($PAGE->course->id));
-        $recordingdata = bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enabledfeatures);
+        $recordingdata = broker::get_recording_data($bbbsession, $params, $enabledfeatures);
         echo $recordingdata;
         return;
     }
     if ($a == 'completion_validate') {
-        $completionvalidate = bigbluebuttonbn_broker_completion_validate($bigbluebuttonbn, $params);
+        $completionvalidate = broker::completion_validate($bigbluebuttonbn, $params);
         echo $completionvalidate;
         return;
     }

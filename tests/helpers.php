@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class bbb_simple_testcase extends advanced_testcase {
+class bbb_simple_test extends advanced_testcase {
     /**
      * @var testing_data_generator|null $generator
      */
@@ -91,6 +91,16 @@ class bbb_simple_testcase extends advanced_testcase {
     }
 
     /**
+     * Clean the temporary mocked up recordings
+     *
+     * @throws coding_exception
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
+            ->bigbluebuttonbn_clean_recordings_array_fetch();
+    }
+    /**
      * Setup
      *
      * Enable completion and create a course
@@ -101,5 +111,56 @@ class bbb_simple_testcase extends advanced_testcase {
         set_config('enablecompletion', true); // Enable completion for all tests.
         $this->generator = $this->getDataGenerator();
         $this->course = $this->generator->create_course(['enablecompletion' => 1]);
+    }
+
+    /**
+     * Generate a course, several students and several groups
+     *
+     * @param object $courserecord
+     * @param int $numstudents
+     * @param int $numteachers
+     * @param int $groupsnum
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    protected function setup_course_students_teachers($courserecord, $numstudents, $numteachers, $groupsnum) {
+        global $DB;
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course($courserecord);
+        $groups = [];
+        for ($i = 0; $i < $groupsnum; $i++) {
+            $groups[] = $generator->create_group(array('courseid' => $course->id));
+        }
+        $group1 = $generator->create_group(array('courseid' => $course->id));
+        $group2 = $generator->create_group(array('courseid' => $course->id));
+
+        $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
+
+        $students = [];
+        for ($i = 0; $i < $numstudents; $i++) {
+            $student = $generator->create_user();
+            $generator->enrol_user($student->id, $course->id, $roleids['student']);
+            $groupid = $groups[$i % $groupsnum]->id;
+            groups_add_member($groupid, $student->id);
+            $students[] = $student;
+        }
+
+        $teachers = [];
+        for ($i = 0; $i < $numteachers; $i++) {
+            $teacher = $generator->create_user();
+            $generator->enrol_user($teacher->id, $course->id, $roleids['teacher']);
+            $groupid = $groups[$i % $groupsnum]->id;
+            groups_add_member($groupid, $teacher->id);
+            $teachers[] = $teacher;
+        }
+        $bbactivity = $generator->create_module(
+            'bigbluebuttonbn',
+            array('course' => $course->id),
+            ['visible' => true]);
+
+        get_fast_modinfo(0, 0, true);
+        return array($course, $groups, $students, $teachers, $bbactivity, $roleids);
     }
 }

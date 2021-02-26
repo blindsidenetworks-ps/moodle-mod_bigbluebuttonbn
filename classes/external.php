@@ -225,8 +225,6 @@ class mod_bigbluebuttonbn_external extends external_api {
      */
     public static function can_join($cmid) {
         global $SESSION, $CFG;
-        require_once($CFG->dirroot . "/mod/bigbluebuttonbn/locallib.php");
-
         $params = self::validate_parameters(self::can_join_parameters(),
             array(
                 'cmid' => $cmid

@@ -25,11 +25,19 @@
 
 namespace mod_bigbluebuttonbn\local;
 
+use completion_info;
 use context_module;
+use curl;
+use Exception;
+use mod_bigbluebuttonbn\local\helpers\files;
+use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\plugin;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Wrapper for executing http requests on a BigBlueButton server.
@@ -139,7 +147,7 @@ class bigbluebutton {
         require_capability('mod/bigbluebuttonbn:join', $context);
 
         // Add view event.
-        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
+        logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
         // Create array bbbsession with configuration for BBB server.
         $bbbsession['course'] = $course;
@@ -148,7 +156,7 @@ class bigbluebutton {
         $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
         self::view_bbbsession_set($context, $bbbsession);
 
-        $serverversion = bigbluebuttonbn_get_server_version();
+        $serverversion = self::bigbluebuttonbn_get_server_version();
         $bbbsession['serverversion'] = (string) $serverversion;
 
         // Operation URLs.
@@ -180,8 +188,9 @@ class bigbluebutton {
         $bbbsession['username'] = fullname($USER);
         $bbbsession['userID'] = $USER->id;
         $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
-        $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
-        $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
+        $participantlist =
+            roles::bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
+        $bbbsession['moderator'] = roles::bigbluebuttonbn_is_moderator($context, $participantlist);
         $bbbsession['managerecordings'] = ($bbbsession['administrator']
             || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
         $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
@@ -245,14 +254,14 @@ class bigbluebutton {
         $bbbsession['originServerUrl'] = $CFG->wwwroot;
         $bbbsession['originServerCommonName'] = '';
         $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
+        $bbbsession['bnserver'] = plugin::bigbluebuttonbn_is_bn_server();
         // Setting for clienttype, assign flash if not enabled, or default if not editable.
         $bbbsession['clienttype'] = config::get('clienttype_default');
         if (config::get('clienttype_editable')) {
             $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
         }
         if (!config::clienttype_enabled()) {
-            $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+            $bbbsession['clienttype'] = bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH;
         }
     }
 
@@ -271,12 +280,11 @@ class bigbluebutton {
         global $CFG;
         $canjoin = array('can_join' => false, 'message' => '');
 
-        $viewinstance = bigbluebuttonbn_view_validator($cmid, null);
+        $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
         if ($viewinstance) {
             $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
             if ($bbbsession) {
-                require_once($CFG->dirroot . "/mod/bigbluebuttonbn/brokerlib.php");
-                $info = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
+                $info = meeting::bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
                 $running = false;
                 if ($info['returncode'] == 'SUCCESS') {
                     $running = ($info['running'] === 'true');
@@ -285,9 +293,474 @@ class bigbluebutton {
                 if (isset($info['participantCount'])) {
                     $participantcount = $info['participantCount'];
                 }
-                $canjoin = bigbluebuttonbn_broker_meeting_info_can_join($bbbsession, $running, $participantcount);
+                $canjoin = broker::meeting_info_can_join($bbbsession, $running,
+                    $participantcount);
             }
         }
         return $canjoin;
+    }
+
+    /**
+     * Builds and retunrs a url for joining a bigbluebutton meeting.
+     *
+     * @param string $meetingid
+     * @param string $username
+     * @param string $pw
+     * @param string $logouturl
+     * @param string $configtoken
+     * @param string $userid
+     * @param string $clienttype
+     * @param string $createtime
+     *
+     * @return string
+     */
+    public static function bigbluebuttonbn_get_join_url(
+        $meetingid,
+        $username,
+        $pw,
+        $logouturl,
+        $configtoken = null,
+        $userid = null,
+        $clienttype = bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH,
+        $createtime = null
+    ) {
+        $data = ['meetingID' => $meetingid,
+            'fullName' => $username,
+            'password' => $pw,
+            'logoutURL' => $logouturl,
+        ];
+        // Choose between Adobe Flash or HTML5 Client.
+        if ($clienttype == bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_HTML5) {
+            $data['joinViaHtml5'] = 'true';
+        }
+        if (!is_null($configtoken)) {
+            $data['configToken'] = $configtoken;
+        }
+        if (!is_null($userid)) {
+            $data['userID'] = $userid;
+        }
+        if (!is_null($createtime)) {
+            $data['createTime'] = $createtime;
+        }
+        return static::action_url('join', $data);
+    }
+
+    /**
+     * Perform api request on BBB.
+     *
+     * @return string
+     */
+    public static function bigbluebuttonbn_get_server_version() {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url()
+        );
+        if ($xml && $xml->returncode == 'SUCCESS') {
+            return $xml->version;
+        }
+        return null;
+    }
+
+    /**
+     * Perform api request on BBB and wraps the response in an XML object
+     *
+     * @param string $url
+     * @param string $method
+     * @param string $data
+     * @param string $contenttype
+     *
+     * @return object
+     */
+    public static function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+        if (extension_loaded('curl')) {
+            $response =
+                self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
+            if (!$response) {
+                debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
+                return null;
+            }
+            $previous = libxml_use_internal_errors(true);
+            try {
+                $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+                return $xml;
+            } catch (Exception $e) {
+                libxml_use_internal_errors($previous);
+                $error = 'Caught exception: ' . $e->getMessage();
+                debugging($error, DEBUG_DEVELOPER);
+                return null;
+            }
+        }
+        // Alternative request non CURL based.
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+            return $response;
+        } catch (Exception $e) {
+            $error = 'Caught exception: ' . $e->getMessage();
+            debugging($error, DEBUG_DEVELOPER);
+            libxml_use_internal_errors($previous);
+            return null;
+        }
+    }
+
+    /**
+     * Perform api request on BBB using CURL and wraps the response in an XML object
+     *
+     * @param string $url
+     * @param string $method
+     * @param string $data
+     * @param string $contenttype
+     *
+     * @return object
+     */
+    public static function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null,
+        $contenttype = 'text/xml') {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $c = new curl();
+        $c->setopt(array('SSL_VERIFYPEER' => true));
+        if ($method == 'POST') {
+            if (is_null($data) || is_array($data)) {
+                return $c->post($url);
+            }
+            $options = array();
+            $options['CURLOPT_HTTPHEADER'] = array(
+                'Content-Type: ' . $contenttype,
+                'Content-Length: ' . strlen($data),
+                'Content-Language: en-US',
+            );
+
+            return $c->post($url, $data, $options);
+        }
+        if ($method == 'HEAD') {
+            $c->head($url, array('followlocation' => true, 'timeout' => 1));
+            return $c->get_info();
+        }
+        return $c->get($url);
+    }
+
+    /**
+     * Helper function to retrive the default config.xml file.
+     *
+     * @return string
+     */
+    public static function bigbluebuttonbn_get_default_config_xml() {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('getDefaultConfigXML')
+        );
+        return $xml;
+    }
+
+    /**
+     * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
+     *
+     * @return boolean
+     */
+    public static function bigbluebuttonbn_has_html5_client() {
+        $checkurl = self::root() . "html5client/check";
+        $curlinfo = self::bigbluebuttonbn_wrap_xml_load_file_curl_request($checkurl, 'HEAD');
+        return (isset($curlinfo['http_code']) && $curlinfo['http_code'] == 200);
+    }
+
+    /**
+     * Helper for getting the owner userid of a bigbluebuttonbn instance.
+     *
+     * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+     *
+     * @return integer ownerid (a valid user id or null if not registered/found)
+     */
+    public static function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
+        global $DB;
+        $filters = array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => 'Add');
+        $ownerid = (integer) $DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
+        return $ownerid;
+    }
+
+    /**
+     * Helper evaluates if a voicebridge number is unique.
+     *
+     * @param integer $instance
+     * @param integer $voicebridge
+     *
+     * @return string
+     */
+    public static function bigbluebuttonbn_voicebridge_unique($instance, $voicebridge) {
+        global $DB;
+        if ($voicebridge == 0) {
+            return true;
+        }
+        $select = 'voicebridge = ' . $voicebridge;
+        if ($instance != 0) {
+            $select .= ' AND id <>' . $instance;
+        }
+        if (!$DB->get_records_select('bigbluebuttonbn', $select)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Helper estimate a duration for the meeting based on the closingtime.
+     *
+     * @param integer $closingtime
+     *
+     * @return integer
+     */
+    public static function bigbluebuttonbn_get_duration($closingtime) {
+        $duration = 0;
+        $now = time();
+        if ($closingtime > 0 && $now < $closingtime) {
+            $duration = ceil(($closingtime - $now) / 60);
+            $compensationtime = intval((int) \mod_bigbluebuttonbn\local\config::get('scheduled_duration_compensation'));
+            $duration = intval($duration) + $compensationtime;
+        }
+        return $duration;
+    }
+
+    /**
+     * Helper function validates a remote resource.
+     *
+     * @param string $url
+     *
+     * @return boolean
+     */
+    public static function bigbluebuttonbn_is_valid_resource($url) {
+        $urlhost = parse_url($url, PHP_URL_HOST);
+        $serverurlhost = parse_url(\mod_bigbluebuttonbn\local\config::get('server_url'), PHP_URL_HOST);
+        // Skip validation when the recording URL host is the same as the configured BBB server.
+        if ($urlhost == $serverurlhost) {
+            return true;
+        }
+        // Skip validation when the recording URL was already validated.
+        $validatedurls = plugin::bigbluebuttonbn_cache_get('recordings_cache', 'validated_urls', array());
+        if (array_key_exists($urlhost, $validatedurls)) {
+            return $validatedurls[$urlhost];
+        }
+        // Validate the recording URL.
+        $validatedurls[$urlhost] = true;
+        $curlinfo = self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
+        if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
+            $error = "Resources hosted by " . $urlhost . " are unreachable. Server responded with code " . $curlinfo['http_code'];
+            debugging($error, DEBUG_DEVELOPER);
+            $validatedurls[$urlhost] = false;
+        }
+        plugin::bigbluebuttonbn_cache_set('recordings_cache', 'validated_urls', $validatedurls);
+        return $validatedurls[$urlhost];
+    }
+
+    /**
+     * Helper function enqueues one user for being validated as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param string $userid
+     *
+     * @return void
+     */
+    public static function bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid) {
+        try {
+            // Create the instance of completion_update_state task.
+            $task = new \mod_bigbluebuttonbn\task\completion_update_state();
+            // Add custom data.
+            $data = array(
+                'bigbluebuttonbn' => $bigbluebuttonbn,
+                'userid' => $userid,
+            );
+            $task->set_custom_data($data);
+            // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for overriding.
+            // $ task -> set_userid ( $ user -> id );.
+            // Enqueue it.
+            \core\task\manager::queue_adhoc_task($task);
+        } catch (Exception $e) {
+            mtrace("Error while enqueuing completion_update_state task. " . (string) $e);
+        }
+    }
+
+    /**
+     * Helper function enqueues completion trigger.
+     *
+     * @param object $bigbluebuttonbn
+     * @param string $userid
+     *
+     * @return void
+     */
+    public static function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
+        global $CFG;
+        require_once($CFG->libdir . '/completionlib.php');
+        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
+        $completion = new completion_info($course);
+        if (!$completion->is_enabled($cm)) {
+            mtrace("Completion not enabled");
+            return;
+        }
+        if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
+            mtrace("Completion succeeded for user $userid");
+            $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
+        } else {
+            mtrace("Completion did not succeed for user $userid");
+        }
+    }
+
+    /**
+     * Helper function returns an array with the profiles (with features per profile) for the different types
+     * of bigbluebuttonbn instances.
+     *
+     * @return array
+     */
+    public static function bigbluebuttonbn_get_instance_type_profiles() {
+        $instanceprofiles = array(
+            bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
+                'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+                'features' => array('all')),
+            bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY,
+                'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
+                    'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
+                    'clienttype', 'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
+            bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
+                'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
+                'features' => array('showrecordings', 'importrecordings', 'availabilityconditionsheader')),
+        );
+        return $instanceprofiles;
+    }
+
+    /**
+     * Helper function returns an array with the profiles (with features per profile) for the different types
+     * of bigbluebuttonbn instances that the user is allowed to create.
+     *
+     * @param boolean $room
+     * @param boolean $recording
+     *
+     * @return array
+     */
+    public static function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recording) {
+        $profiles = self::bigbluebuttonbn_get_instance_type_profiles();
+        if (!$room) {
+            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]);
+            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL]);
+        }
+        if (!$recording) {
+            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
+            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL]);
+        }
+        return $profiles;
+    }
+
+    /**
+     * Helper function returns an array with the profiles (with features per profile) for the different types
+     * of bigbluebuttonbn instances.
+     *
+     * @param array $profiles
+     *
+     * @return array
+     */
+    public static function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
+        $profilesarray = array();
+        foreach ($profiles as $key => $profile) {
+            $profilesarray[$profile['id']] = $profile['name'];
+        }
+        return $profilesarray;
+    }
+
+    /**
+     * Helper for evaluating if scheduled activity is avaiable.
+     *
+     * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+     *
+     * @return array                       status (room available or not and possible warnings)
+     */
+    public static function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
+        $open = true;
+        $closed = false;
+        $warnings = array();
+
+        $timenow = time();
+        $timeopen = $bigbluebuttonbn->openingtime;
+        $timeclose = $bigbluebuttonbn->closingtime;
+        if (!empty($timeopen) && $timeopen > $timenow) {
+            $open = false;
+        }
+        if (!empty($timeclose) && $timenow > $timeclose) {
+            $closed = true;
+        }
+
+        if (!$open || $closed) {
+            if (!$open) {
+                $warnings['notopenyet'] = userdate($timeopen);
+            }
+            if ($closed) {
+                $warnings['expired'] = userdate($timeclose);
+            }
+            return array(false, $warnings);
+        }
+
+        return array(true, $warnings);
+    }
+
+    /**
+     * Return the status of an activity [open|not_started|ended].
+     *
+     * @param array $bbbsession
+     * @return string
+     */
+    public static function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
+        $now = time();
+        if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
+            // The activity has not been opened.
+            return 'not_started';
+        }
+        if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
+            // The activity has been closed.
+            return 'ended';
+        }
+        // The activity is open.
+        return 'open';
+    }
+
+    /**
+     * Set session URLs.
+     *
+     * @param array $bbbsession
+     * @param int $id
+     * @return string
+     */
+    public static function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
+        // Operation URLs.
+        $bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
+            '/mod/bigbluebuttonbn/view.php',
+            ['id' => $bbbsession['cm']->id]
+        );
+        $bbbsession['logoutURL'] = plugin::necurl(
+            '/mod/bigbluebuttonbn/bbb_view.php',
+            ['action' => 'logout', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
+        );
+        $bbbsession['recordingReadyURL'] = plugin::necurl(
+            '/mod/bigbluebuttonbn/bbb_broker.php',
+            ['action' => 'recording_ready', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
+        );
+        $bbbsession['meetingEventsURL'] = plugin::necurl(
+            '/mod/bigbluebuttonbn/bbb_broker.php',
+            ['action' => 'meeting_events', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
+        );
+        $bbbsession['joinURL'] = plugin::necurl(
+            '/mod/bigbluebuttonbn/bbb_view.php',
+            ['action' => 'join', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
+        );
+
+        // Check status and set extra values.
+        $activitystatus = self::bigbluebuttonbn_view_get_activity_status($bbbsession); // In locallib.
+        if ($activitystatus == 'ended') {
+            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
+                $bbbsession['context'],
+                $bbbsession['bigbluebuttonbn']->presentation
+            );
+        } else if ($activitystatus == 'open') {
+            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
+                $bbbsession['context'],
+                $bbbsession['bigbluebuttonbn']->presentation,
+                $bbbsession['bigbluebuttonbn']->id
+            );
+        }
+
+        return $activitystatus;
     }
 }

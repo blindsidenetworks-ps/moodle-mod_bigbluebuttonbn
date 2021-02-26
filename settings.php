@@ -24,41 +24,41 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\settings\settings;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once(__DIR__.'/locallib.php');
-
 if ($hassiteconfig) {
     // Configuration for BigBlueButton.
-    $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
+    $renderer = new \mod_bigbluebuttonbn\local\settings\renderer($settings);
     // Renders general settings.
-    bigbluebuttonbn_settings_general($renderer);
+    settings::bigbluebuttonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.
     if (\mod_bigbluebuttonbn\local\config::recordings_enabled()) {
         // Renders settings for record feature.
-        bigbluebuttonbn_settings_record($renderer);
+        settings::bigbluebuttonbn_settings_record($renderer);
         // Renders settings for import recordings.
-        bigbluebuttonbn_settings_importrecordings($renderer);
+        settings::bigbluebuttonbn_settings_importrecordings($renderer);
         // Renders settings for showing recordings.
-        bigbluebuttonbn_settings_showrecordings($renderer);
+        settings::bigbluebuttonbn_settings_showrecordings($renderer);
     }
     // Renders settings for meetings.
-    bigbluebuttonbn_settings_waitmoderator($renderer);
-    bigbluebuttonbn_settings_voicebridge($renderer);
-    bigbluebuttonbn_settings_preupload($renderer);
-    bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
-    bigbluebuttonbn_settings_userlimit($renderer);
-    bigbluebuttonbn_settings_duration($renderer);
-    bigbluebuttonbn_settings_participants($renderer);
-    bigbluebuttonbn_settings_notifications($renderer);
-    bigbluebuttonbn_settings_clienttype($renderer);
-    bigbluebuttonbn_settings_muteonstart($renderer);
-    bigbluebuttonbn_settings_locksettings($renderer);
-    bigbluebuttonbn_settings_default_messages($renderer);
+    settings::bigbluebuttonbn_settings_waitmoderator($renderer);
+    settings::bigbluebuttonbn_settings_voicebridge($renderer);
+    settings::bigbluebuttonbn_settings_preupload($renderer);
+    settings::bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
+    settings::bigbluebuttonbn_settings_userlimit($renderer);
+    settings::bigbluebuttonbn_settings_duration($renderer);
+    settings::bigbluebuttonbn_settings_participants($renderer);
+    settings::bigbluebuttonbn_settings_notifications($renderer);
+    settings::bigbluebuttonbn_settings_clienttype($renderer);
+    settings::bigbluebuttonbn_settings_muteonstart($renderer);
+    settings::bigbluebuttonbn_settings_locksettings($renderer);
+    settings::bigbluebuttonbn_settings_default_messages($renderer);
     // Renders settings for extended capabilities.
-    bigbluebuttonbn_settings_extended($renderer);
+    settings::bigbluebuttonbn_settings_extended($renderer);
     // Renders settings for experimental features.
-    bigbluebuttonbn_settings_experimental($renderer);
+    settings::bigbluebuttonbn_settings_experimental($renderer);
 }

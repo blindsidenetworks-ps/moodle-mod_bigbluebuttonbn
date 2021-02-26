@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class mod_bigbluebuttonbn_lib_testcase extends \bbb_simple_testcase {
+class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
 
     public function test_bigbluebuttonbn_supports() {
         $this->resetAfterTest();
@@ -285,7 +285,7 @@ class mod_bigbluebuttonbn_lib_testcase extends \bbb_simple_testcase {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
         // Standard use case, the meeting start and we want add an action event to join the meeting.
-        $event = $this->create_action_event($this->course, $bbactivity, BIGBLUEBUTTON_EVENT_MEETING_START);
+        $event = $this->create_action_event($this->course, $bbactivity, bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START);
         $factory = new \core_calendar\action_factory();
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertEquals("Join session", $actionevent->get_name());
@@ -297,7 +297,7 @@ class mod_bigbluebuttonbn_lib_testcase extends \bbb_simple_testcase {
         $bbactivity->closingtime = time() - 1000;
         $bbactivity->openingtime = time() - 2000;
         $DB->update_record('bigbluebuttonbn', $bbactivity);
-        $event = $this->create_action_event($this->course, $bbactivity, BIGBLUEBUTTON_EVENT_MEETING_START);
+        $event = $this->create_action_event($this->course, $bbactivity, bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START);
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertNull($actionevent);
     }

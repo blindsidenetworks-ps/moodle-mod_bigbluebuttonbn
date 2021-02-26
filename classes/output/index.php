@@ -26,16 +26,16 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use renderable;
+use coding_exception;
 use html_table;
 use html_writer;
-use stdClass;
-use coding_exception;
+use mod_bigbluebuttonbn\helpers\roles;
+use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\plugin;
+use renderable;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Class index
@@ -84,8 +84,9 @@ class index implements renderable {
             if ($bigbluebuttonbn->visible) {
                 $cm = get_coursemodule_from_id('bigbluebuttonbn', $bigbluebuttonbn->coursemodule, 0, false, MUST_EXIST);
                 // User roles.
-                $participantlist = bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $PAGE->context);
-                $moderator = bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
+                $participantlist =
+                    roles::bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $PAGE->context);
+                $moderator = roles::bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
                 $administrator = is_siteadmin();
                 $canmoderate = ($administrator || $moderator);
                 // Add a the data for the bigbluebuttonbn instance.
@@ -123,7 +124,7 @@ class index implements renderable {
             $urlparams['group'] = $groupobj->id;
             $groupname = $groupobj->name;
         }
-        $meetinginfo = bigbluebuttonbn_get_meeting_info_array($meetingid);
+        $meetinginfo = meeting::bigbluebuttonbn_get_meeting_info_array($meetingid);
         if (empty($meetinginfo)) {
             // The server was unreachable.
             print_error('index_error_unable_display', plugin::COMPONENT);

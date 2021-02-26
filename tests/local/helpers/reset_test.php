@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class reset_testcase extends \bbb_simple_testcase {
+class reset_test extends \bbb_simple_test {
 
     /**
      * Reset course item test

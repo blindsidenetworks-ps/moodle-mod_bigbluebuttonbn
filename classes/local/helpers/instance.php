@@ -24,6 +24,9 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\notifier;
+use mod_bigbluebuttonbn\plugin;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -60,15 +63,15 @@ class instance {
      **/
     public static function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         global $CFG;
-        require_once( $CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
         $bigbluebuttonbn->timemodified = time();
         if ((integer) $bigbluebuttonbn->instance == 0) {
             $bigbluebuttonbn->meetingid = 0;
             $bigbluebuttonbn->timecreated = time();
             $bigbluebuttonbn->timemodified = 0;
             // As it is a new activity, assign passwords.
-            $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
-            $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+            $bigbluebuttonbn->moderatorpass = plugin::bigbluebuttonbn_random_password(12);
+            $bigbluebuttonbn->viewerpass =
+                plugin::bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
         }
     }
 
@@ -148,7 +151,7 @@ class instance {
      **/
     public static function bigbluebuttonbn_process_pre_save_common(&$bigbluebuttonbn) {
         // Make sure common settings are removed when 'recordings only'.
-        if ($bigbluebuttonbn->type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        if ($bigbluebuttonbn->type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
             $bigbluebuttonbn->groupmode = 0;
             $bigbluebuttonbn->groupingid = 0;
         }
@@ -181,7 +184,7 @@ class instance {
         if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
             $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
         }
-        \mod_bigbluebuttonbn\local\notifier::notify_instance_updated($bigbluebuttonbn, $action);
+        notifier::notify_instance_updated($bigbluebuttonbn, $action);
     }
 
     /**
@@ -206,7 +209,7 @@ class instance {
         }
         // Add evento to the calendar as openingtime is set.
         $event = new stdClass();
-        $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
+        $event->eventtype = bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START;
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
         $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
         $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule, false);
