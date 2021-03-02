@@ -185,7 +185,7 @@ script:
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci phpdoc
-  - moodle-plugin-ci behat --profile chrome
+  # - moodle-plugin-ci behat --profile chrome
   # - |
   #   # Grunt fails since version 3.8
   #   # https://moodle.org/mod/forum/discuss.php?d=389744
