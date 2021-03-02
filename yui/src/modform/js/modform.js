@@ -335,6 +335,34 @@ M.mod_bigbluebuttonbn.modform = {
         option.text = text;
         option.value = value;
         select.add(option, option.length);
-    }
+    },
 
+    serverParticipantCount: function (Y) {
+        var fitem_id_total_connected_users = Y.one('#fitem_id_total_connected_users');
+        var chkShowTotalUsers = Y.one('#chkShowTotalUsers');
+        fitem_id_total_connected_users.removeClass('d-none');
+        Y.DOM.setAttribute(chkShowTotalUsers, 'onchange', 'M.mod_bigbluebuttonbn.bigbluebuttonbn_show_server_connected_users(this);');
+    },
+
+    showConnectedUsers: function(checkbox) {
+        var totalUsers = Y.one('#totalUsers');
+        if(checkbox.checked == true){
+            Y.DOM.setAttribute(checkbox, 'disabled', true);
+            M.mod_bigbluebuttonbn.datasource_init(Y);
+            this.datasource.sendRequest({
+                request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
+                callback : {
+                    success : function(e) {
+                        //e.data.info
+                        checkbox.removeAttribute('disabled');
+                        var realParticipantCount = e.data.info.participantCount;
+                        realParticipantCount = realParticipantCount == undefined? 0 : realParticipantCount;
+                        totalUsers.set('value', realParticipantCount);
+                    }
+                }
+            });
+        } else {
+            totalUsers.set('value', '?');
+        }
+    }
 };

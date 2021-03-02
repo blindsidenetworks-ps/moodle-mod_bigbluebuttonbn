@@ -45,9 +45,10 @@ class bigbluebutton {
      * @param string $action
      * @param array  $data
      * @param array  $metadata
+     * @param string  $server
      * @return string
      */
-    public static function action_url($action = '', $data = array(), $metadata = array()) {
+    public static function action_url($action = '', $data = array(), $metadata = array(), $server = null) {
         $baseurl = self::sanitized_url() . $action . '?';
         $metadata = array_combine(
             array_map(
@@ -59,7 +60,8 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
+        $sharedsecret = \mod_bigbluebuttonbn\locallib\config::getSharedSecret($server);
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . $sharedsecret);
     }
 
     /**

@@ -300,6 +300,7 @@ $string['index_heading_users'] = 'Users';
 $string['index_heading_viewer'] = 'Viewers';
 $string['index_heading'] = 'BigBlueButton Rooms';
 $string['mod_form_block_general'] = 'General settings';
+$string['mod_form_field_server'] = 'Server';
 $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'View for recording';
 $string['mod_form_block_presentation'] = 'Presentation content';

@@ -89,6 +89,15 @@ const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
 /** @var BIGBLUEBUTTON_ORIGIN_INDEX integer set to 2 defines that the user acceded the session from Index */
 const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
 
+function bigbluebuttonbn_get_servers($cluster) {
+    $dataCluster = [];
+    foreach ($cluster as $key => $clusterData) {
+        $dataCluster[$key] = $key;
+    }
+
+    return $dataCluster;
+}
+
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
  *
@@ -1358,9 +1367,9 @@ function bigbluebuttonbn_protect_recording_imported($id, $protect = true) {
  *
  * @return object
  */
-function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
+function bigbluebuttonbn_set_config_xml($meetingid, $configxml, $server = null) {
     $urldefaultconfig = \mod_bigbluebuttonbn\locallib\config::get('server_url') . 'api/setConfigXML?';
-    $configxmlparams = bigbluebuttonbn_set_config_xml_params($meetingid, $configxml);
+    $configxmlparams = bigbluebuttonbn_set_config_xml_params($meetingid, $configxml, $server);
     $xml = bigbluebuttonbn_wrap_xml_load_file(
         $urldefaultconfig,
         'POST',
@@ -1375,12 +1384,13 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
  *
  * @param string $meetingid
  * @param string $configxml
+ * @param string $server
  *
  * @return string
  */
-function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
+function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml, $server = null) {
     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
-    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
+    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::getSharedSecret($server);
     $configxmlparams = $params . '&checksum=' . sha1('setConfigXML' . $params . $sharedsecret);
     return $configxmlparams;
 }
@@ -1390,11 +1400,12 @@ function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
  *
  * @param string $meetingid
  * @param string $configxml
+ * @param string $server
  *
  * @return array
  */
-function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
-    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml);
+function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml, $server = null) {
+    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml, $server);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
         debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);

@@ -277,6 +277,34 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_general(&$mform, $cfg) {
         global $CFG;
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
+
+        if (\mod_bigbluebuttonbn\locallib\config::defaultvalue('cluster_enabled')) {
+            $servers = bigbluebuttonbn_get_servers($CFG->bigbluebuttonbn['cluster']);
+            if (!empty($servers)) {
+                $mform->addElement('select', 'server', get_string('mod_form_field_server', 'bigbluebuttonbn'), $servers);
+                $mform->setDefault('server', '');
+            }
+        }
+
+        $connectedUsersBlock = '<div id="fitem_id_total_connected_users" class="form-group row  fitem d-none">'.
+            '<div class="col-md-3">'.
+            '<span class="float-sm-right text-nowrap">'.
+            '</span>'.
+            '<label class="col-form-label d-inline " for="id_total_connected_users">'.
+            'Connected Users'.
+            '</label>'.
+            '</div>'.
+            '<div class="col-md-9 form-inline felement" data-fieldtype="text">'.
+            '<input type="text" class="form-control text-center" name="total_connected_users" id="totalUsers" value="?" size="6" readonly="readonly">'.
+            '<div class="form-control-feedback invalid-feedback" id="id_error_total_connected_users">'.
+            '</div>'.
+            '<input type="checkbox" name="show_total_connected_users" class="form-check-input ml-2" id="chkShowTotalUsers" value="1" size="">'.
+
+            '</label>'.
+            '</div>'.
+            '</div>';
+        $mform->addElement('html', $connectedUsersBlock);
+
         $mform->addElement('text', 'name', get_string('mod_form_field_name', 'bigbluebuttonbn'),
             'maxlength="64" size="32"');
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);

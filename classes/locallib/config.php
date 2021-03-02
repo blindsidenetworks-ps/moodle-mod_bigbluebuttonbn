@@ -54,7 +54,9 @@ class config {
      * @return array
      */
     public static function defaultvalues() {
+        global $CFG;
         return array(
+            'cluster_enabled' => isset($CFG->bigbluebuttonbn['cluster']),
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
             'voicebridge_editable' => false,
@@ -248,5 +250,24 @@ class config {
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
           );
+    }
+
+    public static function getServerUrl($server)
+    {
+        global $CFG;
+
+        return $CFG->bigbluebuttonbn['cluster'][$server]->server_url;
+    }
+
+    public static function getSharedSecret($server)
+    {
+        global $CFG;
+        if (self::defaultvalue('cluster_enabled')) {
+            if (!empty($server) && !empty($CFG->bigbluebuttonbn['cluster'][$server])) {
+                return trim($CFG->bigbluebuttonbn['cluster'][$server]->shared_secret);
+            }
+        }
+
+        return trim(self::get('shared_secret'));
     }
 }

@@ -47,7 +47,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
-                            'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
+                            'server', 'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
                             'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
                             'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
                             'timemodified', 'presentation', 'participants', 'userlimit',
