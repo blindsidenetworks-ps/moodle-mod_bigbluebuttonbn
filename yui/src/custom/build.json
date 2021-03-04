@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_bigbluebuttonbn-custom",
+    "builds": {
+        "moodle-mod_bigbluebuttonbn-custom": {
+            "jsfiles": [
+                "custom.js"
+            ]
+        }
+    }
+}
