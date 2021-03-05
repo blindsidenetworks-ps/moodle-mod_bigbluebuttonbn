@@ -63,7 +63,7 @@ $string['resetrecordings_help'] = 'Deleting the recordings will make them inacce
 
 $string['search:activity'] = 'BigBlueButtonBN - activity information';
 $string['search:tags'] = 'BigBlueButtonBN - tags information';
-
+$string['settings'] = 'BigBlueButtonBN settings';
 $string['privacy:metadata:bigbluebuttonbn'] = 'Stores the configuration for the room or activity that defines the features and general behaviour of the BigBlueButton session.';
 $string['privacy:metadata:bigbluebuttonbn:participants'] = 'A list of rules that define the role users will in the live meeting. A user ID may be stored as permissions can be granted per role or user.';
 $string['privacy:metadata:bigbluebuttonbn_logs'] = 'Stores events triggered when using the plugin.';
