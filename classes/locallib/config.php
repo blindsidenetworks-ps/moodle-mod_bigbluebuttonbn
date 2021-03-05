@@ -251,23 +251,4 @@ class config {
                'welcome_default' => self::get('welcome_default'),
           );
     }
-
-    public static function getServerUrl($server)
-    {
-        global $CFG;
-
-        return $CFG->bigbluebuttonbn['cluster'][$server]->server_url;
-    }
-
-    public static function getSharedSecret($server)
-    {
-        global $CFG;
-        if (self::defaultvalue('cluster_enabled')) {
-            if (!empty($server) && !empty($CFG->bigbluebuttonbn['cluster'][$server])) {
-                return trim($CFG->bigbluebuttonbn['cluster'][$server]->shared_secret);
-            }
-        }
-
-        return trim(self::get('shared_secret'));
-    }
 }

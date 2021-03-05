@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-global $CFG;
+global $CFG, $PAGE;
 
 require_once(__DIR__.'/locallib.php');
 
@@ -61,4 +61,7 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_extended($renderer);
     // Renders settings for experimental features.
     bigbluebuttonbn_settings_experimental($renderer);
+
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-custom',
+        'M.mod_bigbluebuttonbn.custom.cluster', []);
 }

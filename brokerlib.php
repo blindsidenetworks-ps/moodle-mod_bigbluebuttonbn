@@ -547,16 +547,15 @@ function bigbluebuttonbn_broker_recording_action_edit($params, $recordings) {
  *
  * @param array $params
  * @param object $bigbluebuttonbn
- * @param string $server
  *
  * @return void
  */
-function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn, $server = null) {
+function bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         $decodedparameters = \Firebase\JWT\JWT::decode(
             $params['signed_parameters'],
-            \mod_bigbluebuttonbn\locallib\config::getSharedSecret($server),
+            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
             array('HS256')
         );
     } catch (Exception $e) {
@@ -642,11 +641,10 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
  *  - Body: <A JSON Object>
  *
  * @param object $bigbluebuttonbn
- * @param string $server
  *
  * @return void
  */
-function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn, $server = null) {
+function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
         // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
@@ -663,7 +661,7 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn, $server = null)
         // Verify the authenticity of the request.
         $token = \Firebase\JWT\JWT::decode(
             $authorization[1],
-            \mod_bigbluebuttonbn\locallib\config::getSharedSecret($server),
+            \mod_bigbluebuttonbn\locallib\config::get('shared_secret'),
             array('HS512')
         );
 

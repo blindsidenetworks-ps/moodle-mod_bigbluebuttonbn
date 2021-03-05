@@ -89,6 +89,7 @@ const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
 /** @var BIGBLUEBUTTON_ORIGIN_INDEX integer set to 2 defines that the user acceded the session from Index */
 const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
 
+
 function bigbluebuttonbn_get_servers($cluster) {
     $dataCluster = [];
     foreach ($cluster as $key => $clusterData) {
@@ -1364,12 +1365,13 @@ function bigbluebuttonbn_protect_recording_imported($id, $protect = true) {
  *
  * @param string $meetingid
  * @param string $configxml
+ * @param string $server
  *
  * @return object
  */
-function bigbluebuttonbn_set_config_xml($meetingid, $configxml, $server = null) {
+function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
     $urldefaultconfig = \mod_bigbluebuttonbn\locallib\config::get('server_url') . 'api/setConfigXML?';
-    $configxmlparams = bigbluebuttonbn_set_config_xml_params($meetingid, $configxml, $server);
+    $configxmlparams = bigbluebuttonbn_set_config_xml_params($meetingid, $configxml);
     $xml = bigbluebuttonbn_wrap_xml_load_file(
         $urldefaultconfig,
         'POST',
@@ -1388,9 +1390,9 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml, $server = null) 
  *
  * @return string
  */
-function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml, $server = null) {
+function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
-    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::getSharedSecret($server);
+    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
     $configxmlparams = $params . '&checksum=' . sha1('setConfigXML' . $params . $sharedsecret);
     return $configxmlparams;
 }
@@ -1400,12 +1402,11 @@ function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml, $server =
  *
  * @param string $meetingid
  * @param string $configxml
- * @param string $server
  *
  * @return array
  */
-function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml, $server = null) {
-    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml, $server);
+function bigbluebuttonbn_set_config_xml_array($meetingid, $configxml) {
+    $configxml = bigbluebuttonbn_set_config_xml($meetingid, $configxml);
     $configxmlarray = (array) $configxml;
     if ($configxmlarray['returncode'] != 'SUCCESS') {
         debugging('BigBlueButton was not able to set the custom config.xml file', DEBUG_DEVELOPER);
@@ -2705,6 +2706,10 @@ function bigbluebuttonbn_settings_general(&$renderer) {
         $renderer->render_group_element(
             'shared_secret',
             $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
+        );
+        $renderer->render_group_element(
+            'enable_cluster',
+            $renderer->render_group_element_checkbox('enable_cluster', 0)
         );
     }
 }
