@@ -88,6 +88,9 @@ M.mod_bigbluebuttonbn.custom = {
             myInput.setAttribute("placeholder", placehoilder[i]);
             myInput.setAttribute("name", nameInput[i]);
             myInput.setAttribute("class", "form-control");
+            if(i === 0){
+                myInput.setAttribute("onkeypress", "return M.mod_bigbluebuttonbn.custom.validationAN(event);");
+            }
             myTd.appendChild(myInput);
             myTd.appendChild(myInput);
             myTr.appendChild(myTd);
@@ -114,5 +117,16 @@ M.mod_bigbluebuttonbn.custom = {
     deleteRow: function (rowIdDelete) {
         let row = rowIdDelete.parentNode.parentNode;
         row.parentNode.removeChild(row);
+    },
+
+    validationAN: function (e) {
+        var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var key = String.fromCharCode(
+            !e.charCode ? e.which : e.charCode
+        );
+        if (!regex.test(key)) {
+            e.preventDefault();
+            return false;
+        }
     },
 };
