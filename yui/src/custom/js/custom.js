@@ -1,6 +1,7 @@
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.custom = {
     bigbluebuttonbn: {},
+    lastIndex: 0,
 
     init: function (bigbluebuttonbn) {
         this.bigbluebuttonbn = bigbluebuttonbn;
@@ -15,12 +16,27 @@ M.mod_bigbluebuttonbn.custom = {
             "onclick",
             "M.mod_bigbluebuttonbn.custom.addServer()"
         );
+
+        let servers = JSON.parse(this.bigbluebuttonbn.cluster);
+        if (servers) {
+            console.log(servers)
+            let that = this;
+            Object.keys(servers).forEach(function(server, index) {
+                let serverName = server;
+                let serverUrl = servers[server].server_url;
+                let serverSharedSecret = servers[server].shared_secret;
+                that.addServer(index, serverName, serverUrl, serverSharedSecret);
+            });
+        }
+
+        // default row
+        this.addServer();
     },
 
     table: `<div class="container mb-5" id="cluster_table">
                             <div class="row clearfix">
                                 <div class="col-md-12 table-responsive">
-                                    <table class="table table-bordered table-hover table-sortable" id="tab_logic">
+                                    <table class="table table-bordered table-hover table-sortable">
                                         <thead>
                                             <tr >
                                                 <th class="text-center">Server Name</th>
@@ -29,26 +45,12 @@ M.mod_bigbluebuttonbn.custom = {
                                                 <th class="text-center" style="border-top: 1px solid #ffffff; border-right: 1px solid #ffffff;"></th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr data-index="1">
-                                                <td data-name="server_name">
-                                                    <input type="text" name="bigbluebuttonbn_cluster[1][server_name]"  placeholder="Server Name" class="form-control"/>
-                                                </td>
-                                                <td data-name="server_url">
-                                                    <input type="text" name="bigbluebuttonbn_cluster[1][server_url]" placeholder="Server Url" class="form-control"/>
-                                                </td>
-                                                <td data-name="shared_secret">
-                                                    <input type="text" name="bigbluebuttonbn_cluster[1][shared_secret]" placeholder="Shared Secret" class="form-control"/>
-                                                </td>
-                                                <td data-name="del">
-                                                    <button class='btn btn-danger row-remove' value="Delete" onclick="M.mod_bigbluebuttonbn.custom.deleteRow(this)" type="button"><span>×</span></button>
-                                                </td>
-                                            </tr>
+                                        <tbody id="cluster-tbody">
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <a id="add_server" class="btn btn-primary text-white float-right">Add Server</a>
+                            <a id="add_server" class="btn btn-primary text-white float-right" style="cursor: pointer;">Add Server</a>
                         </div>`,
 
     showCluster: function (ele) {
@@ -67,36 +69,37 @@ M.mod_bigbluebuttonbn.custom = {
         Y.one('#cluster_table').hide();
     },
 
-    addServer: function () {
-
-        let parentTable = document.getElementById("tab_logic").getElementsByTagName('tbody')[0];
+    addServer: function (index = this.lastIndex, serverName = '', serverUrl = '', serverSharedSecret = '') {
+        let tbody = document.getElementById("cluster-tbody");
         let myTd, myInput, myspan;
         let myTr = document.createElement("tr");
         let placehoilder = ["Server Name", "Server Ulr", "Shared Secret"];
-        let nameInput = ["server_name", "server_url", "shared_secret"];
+        let nameInput = [
+            "bigbluebuttonbn_cluster[" + index + "][server_name]",
+            "bigbluebuttonbn_cluster[" + index + "][server_url]",
+            "bigbluebuttonbn_cluster[" + index + "][shared_secret]"
+        ];
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < nameInput.length; i++) {
             myTd = document.createElement("td");
             myInput = document.createElement("input");
             myInput.setAttribute("type", "text");
+            myInput.setAttribute("value", i === 0 ? serverName : i === 1 ? serverUrl : i === 2 ? serverSharedSecret : '');
             myInput.setAttribute("placeholder", placehoilder[i]);
             myInput.setAttribute("name", nameInput[i]);
             myInput.setAttribute("class", "form-control");
-            myTd.setAttribute("data-name",nameInput[i]);
             myTd.appendChild(myInput);
             myTd.appendChild(myInput);
             myTr.appendChild(myTd);
-            if (i == 2) {
+            if (i === 2) {
                 myTd = document.createElement("td");
-                myTd.setAttribute("data-name","del");
                 myspan = document.createElement("span");
                 myspan.textContent = "×";
-                mybutton = document.createElement("button");
+                let mybutton = document.createElement("button");
                 mybutton.setAttribute("class", "btn btn-danger row-remove");
                 mybutton.setAttribute("value","delete");
                 mybutton.setAttribute("onclick","M.mod_bigbluebuttonbn.custom.deleteRow(this)");
                 mybutton.setAttribute("type", "button");
-                mybutton.setAttribute("id","");
                 mybutton.appendChild(myspan);
                 myTd.appendChild(mybutton);
                 myTr.appendChild(myTd);
@@ -104,7 +107,8 @@ M.mod_bigbluebuttonbn.custom = {
             }
         }
 
-        parentTable.appendChild(myTr);
+        tbody.appendChild(myTr);
+        this.lastIndex = index + 1;
     },
 
     deleteRow: function (rowIdDelete) {
