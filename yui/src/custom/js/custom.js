@@ -1,6 +1,9 @@
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.custom = {
-    cluster: function () {
+    bigbluebuttonbn: {},
+
+    init: function (bigbluebuttonbn) {
+        this.bigbluebuttonbn = bigbluebuttonbn;
         let mainParent = Y.one("#admin-bigbluebuttonbn_enable_cluster");
         let ele = document.getElementById('id_s__bigbluebuttonbn_enable_cluster');
         Y.DOM.setAttribute(ele, 'onchange', 'M.mod_bigbluebuttonbn.custom.showCluster(this);');
@@ -23,13 +26,27 @@ M.mod_bigbluebuttonbn.custom = {
                                         <tbody>
                                             <tr data-index="0">
                                                 <td data-name="server_name">
-                                                    <input type="text" name="server_name"  placeholder="Server Name" class="form-control"/>
+                                                    <input type="text" name="bigbluebuttonbn_cluster[0][server_name]"  placeholder="Server Name" class="form-control"/>
                                                 </td>
                                                 <td data-name="server_url">
-                                                    <input type="text" name="server_url" placeholder="Server Url" class="form-control"/>
+                                                    <input type="text" name="bigbluebuttonbn_cluster[0][server_url]" placeholder="Server Url" class="form-control"/>
                                                 </td>
                                                 <td data-name="shared_secret">
-                                                    <input type="text" name="shared_secret" placeholder="Shared Secret" class="form-control"/>
+                                                    <input type="text" name="bigbluebuttonbn_cluster[0][shared_secret]" placeholder="Shared Secret" class="form-control"/>
+                                                </td>
+                                                <td data-name="del">
+                                                    <a class='btn btn-danger row-remove'><span>×</span></a>
+                                                </td>
+                                            </tr>
+                                            <tr data-index="1">
+                                                <td data-name="server_name">
+                                                    <input type="text" name="bigbluebuttonbn_cluster[1][server_name]"  placeholder="Server Name" class="form-control"/>
+                                                </td>
+                                                <td data-name="server_url">
+                                                    <input type="text" name="bigbluebuttonbn_cluster[1][server_url]" placeholder="Server Url" class="form-control"/>
+                                                </td>
+                                                <td data-name="shared_secret">
+                                                    <input type="text" name="bigbluebuttonbn_cluster[1][shared_secret]" placeholder="Shared Secret" class="form-control"/>
                                                 </td>
                                                 <td data-name="del">
                                                     <a class='btn btn-danger row-remove'><span>×</span></a>
