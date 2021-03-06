@@ -20,6 +20,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.modform = {
 
+    datasource: null,
     bigbluebuttonbn: {},
     strings: {},
 
@@ -30,6 +31,9 @@ M.mod_bigbluebuttonbn.modform = {
      * @param {object} bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
+        this.datasource = new Y.DataSource.Get({
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + "&"
+        });
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.strings = {
             as: M.util.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
@@ -39,6 +43,7 @@ M.mod_bigbluebuttonbn.modform = {
         };
         this.updateInstanceTypeProfile();
         this.participantListInit();
+        this.serverParticipantCount();
     },
 
     updateInstanceTypeProfile: function() {
@@ -337,27 +342,25 @@ M.mod_bigbluebuttonbn.modform = {
         select.add(option, option.length);
     },
 
-    serverParticipantCount: function (Y) {
-        var fitem_id_total_connected_users = Y.one('#fitem_id_total_connected_users');
+    serverParticipantCount: function () {
         var chkShowTotalUsers = Y.one('#chkShowTotalUsers');
-        fitem_id_total_connected_users.removeClass('d-none');
-        Y.DOM.setAttribute(chkShowTotalUsers, 'onchange', 'M.mod_bigbluebuttonbn.bigbluebuttonbn_show_server_connected_users(this);');
+        Y.DOM.setAttribute(chkShowTotalUsers, 'onchange', 'M.mod_bigbluebuttonbn.modform.showConnectedUsers(this);');
     },
 
     showConnectedUsers: function(checkbox) {
         var totalUsers = Y.one('#totalUsers');
         if(checkbox.checked == true){
             Y.DOM.setAttribute(checkbox, 'disabled', true);
-            M.mod_bigbluebuttonbn.datasource_init(Y);
             this.datasource.sendRequest({
-                request : 'action=meeting_info&id=' + bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + bigbluebuttonbn.bigbluebuttonbnid,
-                callback : {
-                    success : function(e) {
+                request: 'action=meeting_info&id=' + this.bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid,
+                callback: {
+                    success: function(e) {
                         //e.data.info
                         checkbox.removeAttribute('disabled');
-                        var realParticipantCount = e.data.info.participantCount;
-                        realParticipantCount = realParticipantCount == undefined? 0 : realParticipantCount;
-                        totalUsers.set('value', realParticipantCount);
+                        let participantCount = e.data.info.participantCount;
+                        if (participantCount || participantCount === 0) {
+                            totalUsers.set('value', participantCount);
+                        }
                     }
                 }
             });

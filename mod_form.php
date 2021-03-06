@@ -43,8 +43,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $OUTPUT, $PAGE, $SESSION;
         $mform = &$this->_form;
+        $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebuttonbn_get_server_version();
@@ -112,6 +113,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['participantList'] = $participantlist;
         $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
         $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+        $jsvars['meetingid'] = $bbbsession['meetingid'];
+        $jsvars['bigbluebuttonbnid'] = $bbbsession['bigbluebuttonbn']->id;
+
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
     }
