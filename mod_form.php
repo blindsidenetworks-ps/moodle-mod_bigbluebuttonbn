@@ -291,7 +291,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
         }
 
-        $connectedUsersBlock = '<div id="fitem_id_total_connected_users" class="form-group row  fitem d-none">'.
+        $connectedUsersBlock = '<div id="fitem_id_total_connected_users" class="form-group row fitem">'.
             '<div class="col-md-3">'.
             '<span class="float-sm-right text-nowrap">'.
             '</span>'.
