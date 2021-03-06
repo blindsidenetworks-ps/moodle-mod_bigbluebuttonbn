@@ -241,6 +241,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
+
+        if (\mod_bigbluebuttonbn\locallib\config::clusterEnabled() && isset($data->server) && !empty($data->server)) {
+            \mod_bigbluebuttonbn\locallib\config::setCurrentServer($data->server);
+        }
+
         // Turn off completion settings if the checkboxes aren't ticked.
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
@@ -278,8 +283,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         global $CFG;
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
 
-        if (\mod_bigbluebuttonbn\locallib\config::defaultvalue('cluster_enabled')) {
-            $servers = bigbluebuttonbn_get_servers($CFG->bigbluebuttonbn['cluster']);
+        if (\mod_bigbluebuttonbn\locallib\config::clusterEnabled()) {
+            $servers = \mod_bigbluebuttonbn\locallib\config::getServers();
             if (!empty($servers)) {
                 $mform->addElement('select', 'server', get_string('mod_form_field_server', 'bigbluebuttonbn'), $servers);
                 $mform->setDefault('server', '');

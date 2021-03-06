@@ -1,0 +1,19 @@
+YUI.add("moodle-mod_bigbluebuttonbn-custom",function(n,e){M.mod_bigbluebuttonbn=M.mod_bigbluebuttonbn||{},M.mod_bigbluebuttonbn.custom={bigbluebuttonbn:{},lastIndex:0,init:function(e){this.bigbluebuttonbn=e;let t=n.one("#admin-bigbluebuttonbn_enable_cluster");e=document.getElementById("id_s__bigbluebuttonbn_enable_cluster");n.DOM.setAttribute(e,"onchange","M.mod_bigbluebuttonbn.custom.showCluster(this);"),t.insert(this.table,"after"),this.showCluster(e);e=document.getElementById("add_server");n.DOM.setAttribute(e,"onclick","M.mod_bigbluebuttonbn.custom.addServer()");var b,l=JSON.parse(this.bigbluebuttonbn.cluster);l&&(console.log(l),b=this,Object.keys(l).forEach(function(e,t){var n=l[e].server_url,r=l[e].shared_secret;b.addServer(t,e,n,r)})),this.addServer()},table:`<div class="container mb-5" id="cluster_table">
+                            <div class="row clearfix">
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover table-sortable">
+                                        <thead>
+                                            <tr >
+                                                <th class="text-center">Server Name</th>
+                                                <th class="text-center">Server Url</th>
+                                                <th class="text-center">Shared Secret</th>
+                                                <th class="text-center" style="border-top: 1px solid #ffffff; border-right: 1px solid #ffffff;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cluster-tbody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <a id="add_server" class="btn btn-primary text-white float-right" style="cursor: pointer;">Add Server</a>
+                        </div>`,showCluster:function(e){e.checked?this.enableCluster():this.disableCluster()},enableCluster:function(){n.one("#admin-bigbluebuttonbn_server_url").hide(),n.one("#admin-bigbluebuttonbn_shared_secret").hide(),n.one("#cluster_table").show()},disableCluster:function(){n.one("#admin-bigbluebuttonbn_server_url").show(),n.one("#admin-bigbluebuttonbn_shared_secret").show(),n.one("#cluster_table").hide()},addServer:function(e=this.lastIndex,t="",n="",r=""){let b=document.getElementById("cluster-tbody"),l,o,s,d=document.createElement("tr");var u=["Server Name","Server Ulr","Shared Secret"],i=["bigbluebuttonbn_cluster["+e+"][server_name]","bigbluebuttonbn_cluster["+e+"][server_url]","bigbluebuttonbn_cluster["+e+"][shared_secret]"];for(let e=0;e<i.length;e++)if(l=document.createElement("td"),o=document.createElement("input"),o.setAttribute("type","text"),o.setAttribute("value",0===e?t:1===e?n:2===e?r:""),o.setAttribute("placeholder",u[e]),o.setAttribute("name",i[e]),o.setAttribute("class","form-control"),0===e&&o.setAttribute("onkeypress","return M.mod_bigbluebuttonbn.custom.validationAN(event);"),l.appendChild(o),l.appendChild(o),d.appendChild(l),2===e){l=document.createElement("td"),s=document.createElement("span"),s.textContent="×";let e=document.createElement("button");e.setAttribute("class","btn btn-danger row-remove"),e.setAttribute("value","delete"),e.setAttribute("onclick","M.mod_bigbluebuttonbn.custom.deleteRow(this)"),e.setAttribute("type","button"),e.appendChild(s),l.appendChild(e),d.appendChild(l),d.appendChild(l)}b.appendChild(d),this.lastIndex=e+1},deleteRow:function(e){let t=e.parentNode.parentNode;t.parentNode.removeChild(t)},validationAN:function(e){var t=new RegExp("^[a-zA-Z0-9]+$"),n=String.fromCharCode(e.charCode||e.which);if(!t.test(n))return e.preventDefault(),!1}}},"@VERSION@",{requires:["base","node"]});

@@ -54,9 +54,7 @@ class config {
      * @return array
      */
     public static function defaultvalues() {
-        global $CFG;
         return array(
-            'cluster_enabled' => isset($CFG->bigbluebuttonbn['cluster']),
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
             'voicebridge_editable' => false,
@@ -149,6 +147,22 @@ class config {
      */
     public static function get($setting) {
         global $CFG;
+
+        // if cluster is enable and server config is not empty
+        if (self::clusterEnabled()) {
+            if (!empty($CFG->{'bigbluebuttonbn_server'}) && !empty($CFG->{'bigbluebuttonbn_server'})) {
+                $cluster = self::getCluster();
+                if (!empty($cluster)) {
+                    $serverName = $CFG->{'bigbluebuttonbn_server'};
+                    if (isset($cluster->$serverName)) {
+                        if (isset($cluster->$serverName->$setting) && !empty($cluster->$serverName->$setting)) {
+                            return $cluster->$serverName->$setting;
+                        }
+                    }
+                }
+            }
+        }
+
         if (isset($CFG->bigbluebuttonbn[$setting])) {
             return (string)$CFG->bigbluebuttonbn[$setting];
         }
@@ -156,6 +170,52 @@ class config {
             return (string)$CFG->{'bigbluebuttonbn_'.$setting};
         }
         return self::defaultvalue($setting);
+    }
+
+    public static function getCluster() {
+        global $CFG;
+        if (isset($CFG->{'bigbluebuttonbn_cluster'})) {
+            return json_decode($CFG->{'bigbluebuttonbn_cluster'});
+        }
+
+        return null;
+    }
+
+    public static function clusterEnabled() {
+        global $CFG;
+        return (isset($CFG->{'bigbluebuttonbn_enable_cluster'}) && !empty($CFG->{'bigbluebuttonbn_enable_cluster'}));
+    }
+
+    public static function getServers() {
+        $servers = [];
+        $cluster = self::getCluster();
+        foreach ($cluster as $key => $clusterData) {
+            $servers[$key] = $key;
+        }
+
+        return $servers;
+    }
+
+    public static function setCurrentServer($serverName) {
+        set_config('bigbluebuttonbn_server', $serverName, '');
+
+        $cluster = self::getCluster();
+        if (!empty($cluster)) {
+            foreach ($cluster as $key => $clusterData) {
+                if ($serverName === $key) {
+                    self::setCurrentServerUrl($cluster->$serverName->server_url);
+                    self::setCurrentServerSharedSecret($cluster->$serverName->shared_secret);
+                }
+            }
+        }
+    }
+
+    public static function setCurrentServerUrl($serverUrl) {
+        set_config('bigbluebuttonbn_server_url', $serverUrl, '');
+    }
+
+    public static function setCurrentServerSharedSecret($serverSharedSecret) {
+        set_config('bigbluebuttonbn_shared_secret', $serverSharedSecret, '');
     }
 
     /**

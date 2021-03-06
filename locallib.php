@@ -89,16 +89,6 @@ const BIGBLUEBUTTON_ORIGIN_TIMELINE = 1;
 /** @var BIGBLUEBUTTON_ORIGIN_INDEX integer set to 2 defines that the user acceded the session from Index */
 const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
 
-
-function bigbluebuttonbn_get_servers($cluster) {
-    $dataCluster = [];
-    foreach ($cluster as $key => $clusterData) {
-        $dataCluster[$key] = $key;
-    }
-
-    return $dataCluster;
-}
-
 /**
  * Builds and retunrs a url for joining a bigbluebutton meeting.
  *

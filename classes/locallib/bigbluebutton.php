@@ -59,8 +59,7 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . $sharedsecret);
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 
     /**
