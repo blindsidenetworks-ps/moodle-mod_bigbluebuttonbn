@@ -14,7 +14,7 @@ M.mod_bigbluebuttonbn.custom = {
         Y.DOM.setAttribute(
             addServer,
             "onclick",
-            "M.mod_bigbluebuttonbn.custom.addServer()"
+            "M.mod_bigbluebuttonbn.custom.add()"
         );
 
         let servers = JSON.parse(this.bigbluebuttonbn.cluster);
@@ -36,7 +36,7 @@ M.mod_bigbluebuttonbn.custom = {
     table: `<div class="container mb-5" id="cluster_table">
                             <div class="row clearfix">
                                 <div class="col-md-12 table-responsive">
-                                    <table class="table table-bordered table-hover table-sortable">
+                                    <table id = "clusterTable" class="table table-bordered table-hover table-sortable">
                                         <thead>
                                             <tr >
                                                 <th class="text-center">Server Name</th>
@@ -129,4 +129,48 @@ M.mod_bigbluebuttonbn.custom = {
             return false;
         }
     },
+    add: function () {
+
+        if (this.validationInput() == true) {
+            this.addServer();
+        }
+    },
+    validationInput: function () {
+        let targetTable = document.getElementById('clusterTable');
+        let targetTableRows = targetTable.rows;
+        let tableHeaders = targetTableRows[0];
+        let ok = true;
+
+        for (let i = 1; i < targetTableRows.length; i++) {
+            for (let j = 0; j < targetTableRows[i].cells.length - 1; j++) {
+                let currColumn = tableHeaders.cells[j].innerHTML;
+                let currData = targetTableRows[i].cells[j];
+                let currDataInput = currData.querySelector('input');
+                if (currDataInput.value == null || currDataInput.value == "") {
+                    currDataInput.focus();
+                    ok = false;
+                    break;
+                }
+                if(currColumn == "Server Url"){
+                    if(!this.validURL(currDataInput.value)){
+                        alert("URL is bad");
+                        currDataInput.focus();
+                        ok=false;
+                        break;
+                    }
+                }
+            }
+        }
+        return ok;
+    },
+    validURL: function (str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+          '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+          '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+          '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+          '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+      }
+
 };
