@@ -728,6 +728,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $event->courseid = $course->id;
         $event->instance = $bbbactivity->id;
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
+        $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
         $event->eventtype = $eventtype;
         $event->timestart = time();
 
