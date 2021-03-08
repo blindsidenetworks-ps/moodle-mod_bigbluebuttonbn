@@ -345,6 +345,9 @@ M.mod_bigbluebuttonbn.modform = {
     serverParticipantCount: function () {
         var chkShowTotalUsers = Y.one('#chkShowTotalUsers');
         Y.DOM.setAttribute(chkShowTotalUsers, 'onchange', 'M.mod_bigbluebuttonbn.modform.showConnectedUsers(this);');
+        if (!this.bigbluebuttonbn.meetingid || !this.bigbluebuttonbn.bigbluebuttonbnid) {
+            Y.one('#fitem_id_total_connected_users').hide();
+        }
     },
 
     showConnectedUsers: function(checkbox) {
