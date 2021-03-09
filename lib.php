@@ -1180,7 +1180,8 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Get if the user can join.
     list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
     // Get if the time has already passed.
-    $haspassed = $bigbluebuttonbn->openingtime < time();
+    $time = time();
+    $haspassed = ($bigbluebuttonbn->openingtime < $time && $bigbluebuttonbn->closingtime > $time);
 
     // Check if the room is closed and the user has already joined this session or played the record.
     if ($haspassed && !$roomavailable && $usercomplete) {
