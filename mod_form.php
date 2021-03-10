@@ -43,8 +43,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $OUTPUT, $PAGE, $SESSION;
         $mform = &$this->_form;
+        $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
 
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebuttonbn_get_server_version();
@@ -112,6 +113,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars['participantList'] = $participantlist;
         $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
         $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+        $jsvars['meetingid'] = $bbbsession['meetingid'];
+        $jsvars['bigbluebuttonbnid'] = $bbbsession['bigbluebuttonbn']->id;
+
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
     }
@@ -241,6 +245,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
+
+        if (\mod_bigbluebuttonbn\locallib\config::clusterEnabled() && isset($data->server) && !empty($data->server)) {
+            \mod_bigbluebuttonbn\locallib\config::setCurrentServer($data->server);
+        }
+
         // Turn off completion settings if the checkboxes aren't ticked.
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
@@ -277,6 +286,34 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_general(&$mform, $cfg) {
         global $CFG;
         $mform->addElement('header', 'general', get_string('mod_form_block_general', 'bigbluebuttonbn'));
+
+        if (\mod_bigbluebuttonbn\locallib\config::clusterEnabled()) {
+            $servers = \mod_bigbluebuttonbn\locallib\config::getServers();
+            if (!empty($servers)) {
+                $mform->addElement('select', 'server', get_string('mod_form_field_server', 'bigbluebuttonbn'), $servers);
+                $mform->setDefault('server', '');
+            }
+        }
+
+        $connectedUsersBlock = '<div id="fitem_id_total_connected_users" class="form-group row fitem">'.
+            '<div class="col-md-3">'.
+            '<span class="float-sm-right text-nowrap">'.
+            '</span>'.
+            '<label class="col-form-label d-inline " for="id_total_connected_users">'.
+            'Connected Users'.
+            '</label>'.
+            '</div>'.
+            '<div class="col-md-9 form-inline felement" data-fieldtype="text">'.
+            '<input type="text" class="form-control text-center" name="total_connected_users" id="totalUsers" value="?" size="6" readonly="readonly">'.
+            '<div class="form-control-feedback invalid-feedback" id="id_error_total_connected_users">'.
+            '</div>'.
+            '<input type="checkbox" name="show_total_connected_users" class="form-check-input ml-2" id="chkShowTotalUsers" value="1" size="">'.
+
+            '</label>'.
+            '</div>'.
+            '</div>';
+        $mform->addElement('html', $connectedUsersBlock);
+
         $mform->addElement('text', 'name', get_string('mod_form_field_name', 'bigbluebuttonbn'),
             'maxlength="64" size="32"');
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);

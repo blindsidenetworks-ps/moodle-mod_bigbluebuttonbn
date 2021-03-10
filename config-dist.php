@@ -51,6 +51,21 @@ global $CFG;
  ** ------------------------------------------------------------------ **
  **/
 
+$CFG->bigbluebuttonbn_cluster = [
+    'Server 1' => (object)[
+        'server_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
+        'shared_secret' => '8cd8ef52e8e101574e400365b55e11a6'
+    ],
+    'Server 2' => (object)[
+        'server_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
+        'shared_secret' => '8cd8ef52e8e101574e400365b55e11a6'
+    ],
+    'Server 3' => (object)[
+        'server_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
+        'shared_secret' => '8cd8ef52e8e101574e400365b55e11a6'
+    ],
+];
+
 /*
  * 1.1. BIGBLUEBUTTON SERVER CONFIGURATION
  *
@@ -61,8 +76,8 @@ global $CFG;
  * Networks that you can use for testing.
  **/
 
-$CFG->bigbluebuttonbn['server_url'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-$CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
+/*$CFG->bigbluebuttonbn['server_url'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+$CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';*/
 
 /*
  * 1.2. CONFIGURATION FOR "RECORDING" FEATURE

@@ -1355,6 +1355,7 @@ function bigbluebuttonbn_protect_recording_imported($id, $protect = true) {
  *
  * @param string $meetingid
  * @param string $configxml
+ * @param string $server
  *
  * @return object
  */
@@ -1375,6 +1376,7 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
  *
  * @param string $meetingid
  * @param string $configxml
+ * @param string $server
  *
  * @return string
  */
@@ -2694,6 +2696,10 @@ function bigbluebuttonbn_settings_general(&$renderer) {
         $renderer->render_group_element(
             'shared_secret',
             $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
+        );
+        $renderer->render_group_element(
+            'enable_cluster',
+            $renderer->render_group_element_checkbox('enable_cluster', 0)
         );
     }
 }

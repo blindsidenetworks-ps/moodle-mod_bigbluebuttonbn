@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-global $CFG;
+global $CFG, $PAGE;
 
 require_once(__DIR__.'/locallib.php');
 
@@ -61,4 +61,43 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_extended($renderer);
     // Renders settings for experimental features.
     bigbluebuttonbn_settings_experimental($renderer);
+
+    $clusterArrayName = 'bigbluebuttonbn_cluster';
+
+    if (isset($_POST['s__bigbluebuttonbn_enable_cluster'])) {
+        unset($_POST['s__bigbluebuttonbn_server_url']);
+        unset($_POST['s__bigbluebuttonbn_shared_secret']);
+
+        $flag = (int)$_POST['s__bigbluebuttonbn_enable_cluster'];
+        $bigbluebuttonbnCluster = $_POST[$clusterArrayName];
+
+        if ($flag === 1) {
+            $cluster = [];
+            foreach ($bigbluebuttonbnCluster as $serverConfig) {
+                $serverName = trim($serverConfig['server_name']);
+                $serverUrl = trim($serverConfig['server_url']);
+                $serverSharedSecret = trim($serverConfig['shared_secret']);
+
+                if (!empty($serverName) && !empty($serverUrl) && !empty($serverSharedSecret)) {
+                    // set current bbb server, first time
+                    if (get_config('', 'bigbluebuttonbn_server') === false) {
+                        \mod_bigbluebuttonbn\locallib\config::setCurrentServer($serverName);
+                        \mod_bigbluebuttonbn\locallib\config::setCurrentServerUrl($serverUrl);
+                        \mod_bigbluebuttonbn\locallib\config::setCurrentServerSharedSecret($serverSharedSecret);
+                    }
+
+                    $cluster[$serverName] = [
+                        'server_url' => $serverUrl,
+                        'shared_secret' => $serverSharedSecret
+                    ];
+                }
+            }
+
+            // rewrite cluster config
+            set_config($clusterArrayName, json_encode($cluster), '');
+        }
+    }
+
+    $jsvars['cluster'] = get_config('', $clusterArrayName);
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-custom', 'M.mod_bigbluebuttonbn.custom.init', [$jsvars]);
 }

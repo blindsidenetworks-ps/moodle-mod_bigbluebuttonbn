@@ -22,6 +22,7 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
 M.mod_bigbluebuttonbn.modform = {
 
+    datasource: null,
     bigbluebuttonbn: {},
     strings: {},
 
@@ -32,6 +33,9 @@ M.mod_bigbluebuttonbn.modform = {
      * @param {object} bigbluebuttonbn
      */
     init: function(bigbluebuttonbn) {
+        this.datasource = new Y.DataSource.Get({
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + "&"
+        });
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.strings = {
             as: M.util.get_string('mod_form_field_participant_list_text_as', 'bigbluebuttonbn'),
@@ -41,6 +45,7 @@ M.mod_bigbluebuttonbn.modform = {
         };
         this.updateInstanceTypeProfile();
         this.participantListInit();
+        this.serverParticipantCount();
     },
 
     updateInstanceTypeProfile: function() {
@@ -337,9 +342,38 @@ M.mod_bigbluebuttonbn.modform = {
         option.text = text;
         option.value = value;
         select.add(option, option.length);
-    }
+    },
 
+    serverParticipantCount: function () {
+        var chkShowTotalUsers = Y.one('#chkShowTotalUsers');
+        Y.DOM.setAttribute(chkShowTotalUsers, 'onchange', 'M.mod_bigbluebuttonbn.modform.showConnectedUsers(this);');
+        if (!this.bigbluebuttonbn.meetingid || !this.bigbluebuttonbn.bigbluebuttonbnid) {
+            Y.one('#fitem_id_total_connected_users').hide();
+        }
+    },
+
+    showConnectedUsers: function(checkbox) {
+        var totalUsers = Y.one('#totalUsers');
+        if(checkbox.checked == true){
+            Y.DOM.setAttribute(checkbox, 'disabled', true);
+            this.datasource.sendRequest({
+                request: 'action=meeting_info&id=' + this.bigbluebuttonbn.meetingid + '&bigbluebuttonbn=' + this.bigbluebuttonbn.bigbluebuttonbnid,
+                callback: {
+                    success: function(e) {
+                        //e.data.info
+                        checkbox.removeAttribute('disabled');
+                        let participantCount = e.data.info.participantCount;
+                        if (participantCount || participantCount === 0) {
+                            totalUsers.set('value', participantCount);
+                        }
+                    }
+                }
+            });
+        } else {
+            totalUsers.set('value', '?');
+        }
+    }
 };
 
 
-}, '@VERSION@', {"requires": ["base", "node"]});
+}, '@VERSION@', {"requires": ["base", "node", "datasource-get"]});
