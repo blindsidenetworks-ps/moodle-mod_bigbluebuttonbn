@@ -2729,6 +2729,7 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             'recording_editable',
             $renderer->render_group_element_checkbox('recording_editable', 1)
         );
+        //if opencast plugin is installed
         if (bigbluebuttonbn_check_opencast()) {
             $renderer->render_group_element(
                 'oc_recording',
@@ -3678,7 +3679,7 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
-    // Special metadata for Opencast recordings
+    // Special metadata for Opencast recordings (passing opencast seriesid of the course as opencast-dc-isPartOf as metadata)
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording') 
         && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
         $metadata['opencast-dc-isPartOf'] = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
@@ -3687,27 +3688,32 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
 }
 
 /**
- * Helper for checking/retreiving seriesid Opencast plugin.
+ * Helper for checking/retreiving seriesid from opencast_block plugin.
  *
  * @param  string    $courseid
  * @return boolean|string
  */
 function bigbluebuttonbn_check_opencast($courseid = null) {
     $block_plugins = core_plugin_manager::instance()->get_plugins_of_type('block');
+    //if opencast_block is installed
     if (in_array('opencast', array_keys($block_plugins))) {
+        //getting the current instance of opencast
         $opencast = \block_opencast\local\apibridge::get_instance();
+        //if opencast is not configured!
         if (!$opencast) {
             return false;
         }
+        //if the courseid is required (check if the course has the opencsat series)
         if ($courseid) {
-            $seriesid = $opencast->get_stored_seriesid($courseid);
-            $ocseriesid = $opencast->get_course_series($courseid);
-            if (!$seriesid || ($seriesid && !$ocseriesid)) {
-                return flase;
+            //trying to get course seriesid, create if is not set before!
+            try {
+                return $opencast->ensure_course_series_exists($courseid);
+            } catch (Exception $e) {
+                return false;
             }
-            return $seriesid;
         }
         return true;
     }
+    //if opencast_block is not installed
     return false;
 }
