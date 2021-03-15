@@ -25,18 +25,15 @@
 
 namespace mod_bigbluebuttonbn\output;
 
+use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\plugin;
 use renderable;
 use renderer_base;
-use templatable;
-use html_table;
-use html_writer;
 use stdClass;
-use coding_exception;
-use mod_bigbluebuttonbn\plugin;
+use templatable;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Class import_view
@@ -59,7 +56,7 @@ class import_view implements renderable, templatable {
     public function __construct($course, $bigbluebuttonbn, $tc) {
         global $SESSION, $PAGE;
         $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-        $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
+        $options = \mod_bigbluebuttonbn\local\helpers\roles::bigbluebuttonbn_import_get_courses_for_select($bbbsession);
         $selected = isset($options[$tc]) ? $tc : '';
         $this->context['backactionurl'] = plugin::necurl('/mod/bigbluebuttonbn/view.php');
         $this->context['cmid'] = $PAGE->cm->id;
@@ -84,13 +81,13 @@ class import_view implements renderable, templatable {
             if ($course->id == $selected) {
                 $bigbluebuttonbnid = $bigbluebuttonbn->id;
             }
-            $recordings = bigbluebuttonbn_get_allrecordings(
+            $recordings = recording::bigbluebuttonbn_get_allrecordings(
                 $selected, $bigbluebuttonbnid, false,
-                (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled')
+                (boolean) \mod_bigbluebuttonbn\local\config::get('importrecordings_from_deleted_enabled')
             );
             // Exclude the ones that are already imported.
             if (!empty($recordings)) {
-                $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported(
+                $recordings = recording::bigbluebuttonbn_unset_existent_recordings_already_imported(
                     $recordings, $course->id, $bigbluebuttonbn->id
                 );
             }
@@ -99,10 +96,11 @@ class import_view implements renderable, templatable {
             // Proceed with rendering.
             if (!empty($recordings)) {
                 $this->context['recordings'] = true;
-                $this->context['recordingtable'] = bigbluebuttonbn_output_recording_table($bbbsession, $recordings, ['import']);
+                $this->context['recordingtable'] =
+                    recording::bigbluebuttonbn_output_recording_table($bbbsession, $recordings, ['import']);
             }
             // JavaScript for locales.
-            $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+            $PAGE->requires->strings_for_js(array_keys(view::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
             // Require JavaScript modules.
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-imports', 'M.mod_bigbluebuttonbn.imports.init',
                 array(array('bn' => $bigbluebuttonbn->id, 'tc' => $selected)));

@@ -23,12 +23,11 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
-
+defined('MOODLE_INTERNAL') || die;
 require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/locallib.php');
-require_once(__DIR__.'/brokerlib.php');
 
-use \Firebase\JWT\JWT;
+use mod_bigbluebuttonbn\local\broker;
+use mod_bigbluebuttonbn\local\view;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
@@ -48,13 +47,13 @@ if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_even
     exit;
 }
 
-$error = bigbluebuttonbn_broker_validate_parameters($params);
+$error = broker::validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);
     return;
 }
 
-$bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+$bbbbrokerinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
 $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
 $context = context_course::instance($bigbluebuttonbn->course);
 $PAGE->set_context($context);
@@ -62,13 +61,13 @@ $PAGE->set_context($context);
 try {
     $a = strtolower($params['action']);
     if ($a == 'recording_ready') {
-        bigbluebuttonbn_broker_recording_ready($params, $bigbluebuttonbn);
+        broker::recording_ready($params, $bigbluebuttonbn);
         return;
     }
     if ($a == 'meeting_events') {
         // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
         // which is processed in the function using super globals.
-        bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn);
+        broker::meeting_events($bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');

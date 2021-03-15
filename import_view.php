@@ -28,7 +28,6 @@ use mod_bigbluebuttonbn\output\import_view;
 use mod_bigbluebuttonbn\output\renderer;
 
 require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/locallib.php');
 
 $bn = required_param('bn', PARAM_INT);
 $tc = optional_param('tc', 0, PARAM_INT);
@@ -47,7 +46,7 @@ if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
     print_error('view_error_invalid_session', plugin::COMPONENT);
 }
 
-if (!(boolean)\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
+if (!(boolean)\mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
     print_error('view_message_importrecordings_disabled', plugin::COMPONENT);
 }
 

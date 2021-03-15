@@ -23,11 +23,12 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
+
+use mod_bigbluebuttonbn\local\bbb_constants;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+global $CFG;
 
 /**
  * Handles the global configuration based on config.php.
@@ -55,8 +56,8 @@ class config {
      */
     public static function defaultvalues() {
         return array(
-            'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
-            'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+            'server_url' => (string) bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
+            'shared_secret' => (string) bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
             'voicebridge_editable' => false,
             'importrecordings_enabled' => false,
             'importrecordings_from_deleted_enabled' => false,
@@ -134,7 +135,7 @@ class config {
     public static function defaultvalue($setting) {
         $defaultvalues = self::defaultvalues();
         if (!array_key_exists($setting, $defaultvalues)) {
-            return;
+            return null;
         }
         return $defaultvalues[$setting];
     }
@@ -248,5 +249,37 @@ class config {
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
           );
+    }
+
+    /**
+     * Helper function returns an array with enabled features for an specific profile type.
+     *
+     * @param array $typeprofiles
+     * @param string $type
+     *
+     * @return array
+     */
+    public static function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
+        $enabledfeatures = array();
+        $features = $typeprofiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL]['features'];
+        if (!is_null($type) && key_exists($type, $typeprofiles)) {
+            $features = $typeprofiles[$type]['features'];
+        }
+        $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
+        // Evaluates if recordings are enabled for the Moodle site.
+        $enabledfeatures['showrecordings'] = false;
+        if (self::recordings_enabled()) {
+            $enabledfeatures['showrecordings'] = (in_array('all', $features) || in_array('showrecordings', $features));
+        }
+        $enabledfeatures['importrecordings'] = false;
+        if (self::importrecordings_enabled()) {
+            $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
+        }
+        // Evaluates if clienttype is enabled for the Moodle site.
+        $enabledfeatures['clienttype'] = false;
+        if (self::clienttype_enabled()) {
+            $enabledfeatures['clienttype'] = (in_array('all', $features) || in_array('clienttype', $features));
+        }
+        return $enabledfeatures;
     }
 }

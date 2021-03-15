@@ -23,14 +23,13 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\locallib;
+namespace mod_bigbluebuttonbn\local;
 
 use html_writer;
 use mod_bigbluebuttonbn\plugin;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
+global $CFG;
 
 /**
  * Helper class for sending notifications.
@@ -100,8 +99,8 @@ class notifier
         if (!empty($bigbluebuttonbn->intro)) {
             $msg->activity_description = format_string(trim($bigbluebuttonbn->intro));
         }
-        $msg->activity_openingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
-        $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
+        $msg->activity_openingtime = view::bigbluebuttonbn_format_activity_time($bigbluebuttonbn->openingtime);
+        $msg->activity_closingtime = view::bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($sender);
 
         $msg->user_name = fullname($sender);
@@ -117,7 +116,7 @@ class notifier
      *
      * @param object $bigbluebuttonbn
      *
-     * @return void
+     * @return string
      */
     public static function htmlmsg_recording_ready($bigbluebuttonbn) {
         return '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn').
