@@ -554,8 +554,11 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Set flag haspassed if closingtime has already passed only if it is defined.
     $haspassed = ($bigbluebuttonbn->closingtime) && $bigbluebuttonbn->closingtime < $time;
 
-    // Check haspassed flag.
-    if ($haspassed) {
+    // Set flag hasstarted if startingtime has already passed or not defined.
+    $hasstarted = $bigbluebuttonbn->openingtime < $time;
+
+    // Return null if it has passed or not started.
+    if ($haspassed || !$hasstarted) {
         return null;
     }
 
@@ -566,11 +569,8 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Get if the user can join.
     list($usercanjoin) = meeting::bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
 
-    // Set flag hasstarted if startingtime has already passed or not defined.
-    $hasstarted = $bigbluebuttonbn->openingtime < $time;
-
     // Check if the room is closed and the user has already joined this session or played the record.
-    if ($hasstarted && !$roomavailable && $usercomplete) {
+    if (!$roomavailable && $usercomplete) {
         return null;
     }
 
