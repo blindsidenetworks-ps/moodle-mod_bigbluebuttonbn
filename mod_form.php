@@ -71,7 +71,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             );
         // If none is allowed, fail and return.
         if (empty($jsvars['instanceTypeProfiles'])) {
-            // Also check module context for those that are allowed
+            // Also check module context for those that are allowed.
             $contextm = context_module::instance($this->_cm->id);
             $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
                     has_capability('mod/bigbluebuttonbn:meeting', $contextm),
