@@ -129,16 +129,53 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     }
     if ($enabledfeatures['showrecordings']) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
-        $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
+        $output .= "<i class='icon fa fa-spinner fa-spin' aria-hidden='true'></i> Loading Recordings ...";
         $output .= html_writer::end_tag('div');
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
-            'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
+        $output .= html_writer::start_tag('script', array('language' => 'javascript'));
+        $id = $bbbsession['cm']->id;
+        $js = "jQuery(document).ready(function(){"
+                . "jQuery.get('recordings.php?id=$id', function(data) { "
+                . "jQuery('#bigbluebuttonbn_view_recordings').html(data);"
+                . "Y.use('moodle-mod_bigbluebuttonbn-recordings',function() {M.mod_bigbluebuttonbn.recordings.init({'bbbid': '" . $bbbsession['bigbluebuttonbn']->id . "'})});"
+                . "});"
+                . "})";
+        $output .= html_writer::end_tag('script');
+        $PAGE->requires->js_amd_inline($js);
     } else if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
         $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
         $output .= bigbluebuttonbn_render_warning($recordingsdisabled, 'danger');
     }
     echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
     $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
+}
+
+/**
+ * Displays the recordings view.
+ *
+ * @param array $bbbsession
+ * @param string $activity
+ * @return void
+ */
+function bigbluebuttonbn_view_render_recordings_ajax(&$bbbsession, $activity) {
+    global $OUTPUT, $PAGE;
+    $type = null;
+    if (isset($bbbsession['bigbluebuttonbn']->type)) {
+        $type = $bbbsession['bigbluebuttonbn']->type;
+    }
+    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+    $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
+    $pinginterval = (int)\mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
+    // JavaScript for locales.
+    $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+    // JavaScript variables.
+    $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
+        'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
+    $output  = '';
+
+    $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
+    echo $output.html_writer::empty_tag('br').html_writer::empty_tag('br').html_writer::empty_tag('br');
+    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
+            'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
 }
 
 /**
