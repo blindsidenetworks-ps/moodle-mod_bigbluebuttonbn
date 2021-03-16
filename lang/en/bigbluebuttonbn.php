@@ -103,11 +103,14 @@ $string['minutes'] = 'minutes';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
-$string['config_server_url'] = 'BigBlueButton Server URL';
+$string['config_server_url'] = 'Primary BigBlueButton Server URL';
 $string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
-$string['config_shared_secret'] = 'BigBlueButton Shared Secret';
-$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
-
+$string['config_shared_secret'] = 'Primary BigBlueButton Shared Secret';
+$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server. (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_secondary_server_url'] = 'Secondary BigBlueButton Server URL';
+$string['config_secondary_server_url_description'] = 'This URL wil be used for fetching recordings. (Leave blank if the same as the primary server URL.)';
+$string['config_secondary_shared_secret'] = 'Secondary BigBlueButton Shared Secret';
+$string['config_secondary_shared_secret_description'] = 'Shared secret of your secondary BigBlueButton. (Leave blank if same as the primary server shared secret.)';
 $string['config_recording'] = 'Configuration for "Record meeting" feature';
 $string['config_recording_description'] = 'These settings are feature specific';
 $string['config_recording_default'] = 'Recording feature enabled by default';
