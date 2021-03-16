@@ -611,3 +611,18 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
     $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
         $completionvalidate, navigation_node::TYPE_CONTAINER);
 }
+
+/**
+ * In place editable for the recording table
+ *
+ * @param string $itemtype
+ * @param string $itemid
+ * @param mixed $newvalue
+ * @return mixed
+ */
+function bigbluebuttonbn_inplace_editable($itemtype, $itemid, $newvalue) {
+    $editableclass = \mod_bigbluebuttonbn\output\recording_editable::get_editable_class($itemtype);
+    if ($editableclass) {
+        return $editableclass::update($itemid, $newvalue);
+    }
+}

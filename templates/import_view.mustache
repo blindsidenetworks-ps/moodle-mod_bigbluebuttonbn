@@ -21,44 +21,42 @@
 
     Example context (json):
     {
-        "backactionurl": "http://localhost/foo",
-        "cmid": 3,
-        "hascontent": true,
-        "selectoptions": [
-          {"selected": true, "value": 1, "label": "First choice"},
-          {"value": 2, "label": "Second choice"}
-        ],
-        "recordings": true,
-        "recordingtable": "<table></table>"
+        'bbbid' : 3
+        'has_records': true,
+        'search_input' : {... search input data ...}
+        'back_button' : {... back button input button data ...}
     }
 }}
 
 <div class="mod_bigbluebuttonbn_import_view">
-    <h4>{{#str}} view_recording_button_import, mod_bigbluebuttonbn {{/str}}</h4>
-    {{^hascontent}}
-        <div>{{#str}} view_error_import_no_courses, mod_bigbluebuttonbn {{/str}}</div>
-    {{/hascontent}}
-    {{#hascontent}}
+    <div class="d-flex flex-row">
         <div>
-            <select id="menuimport_recording_links_select"
-                    class="select custom-select menuimport_recording_links_select"
-                    name="import_recording_links_select">
-                {{#selectoptions}}
-                    <option {{#selected}}selected="selected"{{/selected}} value="{{value}}">{{label}}</option>
-                {{/selectoptions}}
-            </select>
-            {{#recordings}}
-                <span id="import_recording_links_table"></span>
-                {{{recordingtable}}}
-            {{/recordings}}
-            {{^recordings}}
-                <div>{{#str}} view_error_import_no_recordings, mod_bigbluebuttonbn {{/str}}</div>
-            {{/recordings}}
-            <br>
+            <span class="p-1">{{#str}}view_recording_list_course, mod_bigbluebuttonbn{{/str}}</span>
+            {{#course_select}}
+                {{>core/single_select}}
+            {{/course_select}}
         </div>
-    {{/hascontent}}
-    <form id="goback-button" action="{{backactionurl}}" method="get">
-        <input type="hidden" name="id" value="{{cmid}}">
-        <input type="submit" class="btn btn-secondary" value="{{#str}} view_recording_button_return, mod_bigbluebuttonbn {{/str}}">
-    </form>
+        <div>
+            {{#bbb_select}}
+                <span class="p-1">{{#str}}view_recording_activity, mod_bigbluebuttonbn{{/str}}</span>
+                {{>core/single_select}}
+            {{/bbb_select}}
+        </div>
+    </div>
+    {{#has_selected_course}}
+        {{< mod_bigbluebuttonbn/recordings_table}}
+            {{$title}}{{#str}} view_recording_button_import, mod_bigbluebuttonbn {{/str}}{{/title}}
+            {{$tools}}import{{/tools}}
+            {{$removeimportedid}}{{bbboriginid}}{{/removeimportedid}}
+            {{$otherattributes}}data-bboriginid="{{bbboriginid}}"{{/otherattributes}}
+        {{/mod_bigbluebuttonbn/recordings_table}}
+    {{/has_selected_course}}
+    {{^has_selected_course}}
+        <span class="text-warning">{{#str}} view_recording_select_course, mod_bigbluebuttonbn {{/str}}</span>
+    {{/has_selected_course}}
+    <div class="mt-3">
+        {{#back_button}}
+            {{>core/single_button}}
+        {{/back_button}}
+    </div>
 </div>

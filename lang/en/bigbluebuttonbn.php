@@ -427,6 +427,8 @@ $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
+$string['view_recording_select_course'] = 'Select a course first in the drop down menu';
+
 
 $string['view_message_session_started_at'] = 'This session started at';
 $string['view_message_session_running_for'] = 'This session has been running for';

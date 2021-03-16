@@ -91,16 +91,6 @@ $enabledfeatures = config::bigbluebuttonbn_get_enabled_features($typeprofiles, $
 try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
-    if ($a == 'meeting_info') {
-        $meetinginfo = broker::meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
-        echo $meetinginfo;
-        return;
-    }
-    if ($a == 'meeting_end') {
-        $meetingend = broker::meeting_end($bbbsession, $params);
-        echo $meetingend;
-        return;
-    }
     if ($a == 'recording_play') {
         $recordingplay = broker::recording_play($params);
         echo $recordingplay;
@@ -121,21 +111,6 @@ try {
         $a == 'recording_protect' || $a == 'recording_unprotect') {
         $recordingaction = broker::recording_action($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingaction;
-        return;
-    }
-    if ($a == 'recording_import') {
-        echo broker::recording_import($bbbsession, $params);
-        return;
-    }
-    if ($a == 'recording_list_table') {
-        $PAGE->set_context(context_course::instance($PAGE->course->id));
-        $recordingdata = broker::get_recording_data($bbbsession, $params, $enabledfeatures);
-        echo $recordingdata;
-        return;
-    }
-    if ($a == 'completion_validate') {
-        $completionvalidate = broker::completion_validate($bigbluebuttonbn, $params);
-        echo $completionvalidate;
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');

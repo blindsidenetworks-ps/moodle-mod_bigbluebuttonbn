@@ -282,7 +282,7 @@ function bigbluebuttonbn_bbb_view_playback_href_lookup($playbacks, $type) {
 function bigbluebuttonbn_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
     echo $OUTPUT->header();
-    $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms', 'M.mod_bigbluebuttonbn.rooms.windowClose');
+    $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
     echo $OUTPUT->footer();
 }
 

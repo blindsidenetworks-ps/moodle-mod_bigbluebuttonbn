@@ -1,0 +1,106 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_bigbluebuttonbn/recording_table
+
+    This template renders the mobile page.
+
+    Example context (json):
+    {
+       'statusclosed': true,
+       'statusclosed': false,
+       'opening': "...",
+       'closing': "...",
+    }
+}}
+
+<div id="bbb-room-view" class="box py-3 generalbox boxaligncenter" data-bbb-id="{{bigbluebuttonbnid}}"
+     data-meeting-id="{{meetingid}}">
+    <span id="status_bar">
+        <span class="status-message">{{statusmessage}}</span>
+        <span class="conf-opening-time">
+            {{#openingtime}}<span class="conf-opening">{{.}}</span>{{/openingtime}}
+            {{#closingtime}}<span class="conf-opening">{{.}}</span>{{/closingtime}}
+        </span>
+        {{#statusrunning}}
+            <div>
+            <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn{{/str}}</span>
+                <strong>{{#userdate}} {{startedat}}, {{#str}} strftimetime, core_langconfig{{/str}} {{/userdate}}</strong>
+            <span>{{#moderatorplural}}{{#str}}view_message_moderators, mod_bigbluebuttonbn{{/str}}{{/moderatorplural}}
+                {{^moderatorplural}}{{#str}}view_message_moderator, mod_bigbluebuttonbn{{/str}}{{/moderatorplural}}
+                <strong>{{moderatorcount}}</strong>
+            </span>
+            <span>
+                {{#viewerplural}}{{#str}}view_message_viewers, mod_bigbluebuttonbn{{/str}}{{/viewerplural}}
+                {{^viewerplural}}{{#str}}view_message_viewer, mod_bigbluebuttonbn{{/str}}{{/viewerplural}}
+                <strong>{{participantcount}}</strong>
+            </span>
+        </div>
+        {{/statusrunning}}
+    </span>
+    <span id="control_panel">
+
+    </span>
+    <div id="room_view_control_panel" data-bbb-id="{{bigbluebuttonbnid}}">
+        {{#starttime}}
+            <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn, {{startTime}}{{/str}}</span>
+        {{/starttime}}
+        {{#attendees}}
+            {{^participants}}
+                <span>{{#str}}view_message_session_no_users, mod_bigbluebuttonbn{{/str}}</span>
+            {{/participants}}
+            {{^onemoderators}}
+                <span>{{#str}}view_message_moderators, mod_bigbluebuttonbn{{/str}}</span>
+            {{/onemoderators}}
+            {{#onemoderators}}
+                <span>{{#str}}view_message_moderator, mod_bigbluebuttonbn{{/str}}</span>
+            {{/onemoderators}}
+            {{#isrunning}}
+                <span></span>
+            {{/isrunning}}
+            <span>{{.}}</span>
+        {{/attendees}}
+        {{#presentation}}
+            <div class="presentation">
+                <h4>view_section_title_presentation,mod_bigbluebuttonbn</h4>
+                {{#pix}}{{iconname}},{{icondesc}}{{/pix}}
+                <a href="{{url}}" class="btn btn-secondary" title="{{name}}">{{name}}</a>
+            </div>
+        {{/presentation}}
+    </div>
+    <div id="bigbluebuttonbn_view_action_button_box" class="box py-3 generalbox boxaligncenter">
+        <div id="room_view_action_buttons">
+            <input id="join_button_input"
+                   type="button"
+                   value="{{#str}}view_conference_action_join, mod_bigbluebuttonbn{{/str}}"
+                   data-bbb-id="{{bigbluebuttonbnid}}"
+                   data-cm-id="{{cmid}}"
+                   class="btn btn-primary bbb-btn-action  {{^canjoin}}d-none{{/canjoin}}">
+            <input id="end_button_input"
+                   type="button"
+                   data-bbb-id="{{bigbluebuttonbnid}}"
+                   data-meeting-id="{{meetingid}}"
+                   value="{{#str}}view_conference_action_end, mod_bigbluebuttonbn{{/str}}"
+                   class="btn btn-secondary bbb-btn-action  {{#statusopen}}d-none{{/statusopen}}">
+        </div>
+    </div>
+</div>
+{{#js}}
+    require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
+    rooms.initActions(); // Register action on all buttons.
+    });
+{{/js}}

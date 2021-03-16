@@ -30,7 +30,7 @@ use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
 
-require(__DIR__.'/../../config.php');
+require(__DIR__ . '/../../config.php');
 
 $id = required_param('id', PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
@@ -85,8 +85,7 @@ $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
-/** @var core_renderer $OUTPUT */
-$OUTPUT;
+/* @var core_renderer $OUTPUT */
 
 // Validate if the user is in a role allowed to join.
 if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {
@@ -104,20 +103,19 @@ if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], 
     exit;
 }
 
-$activitystatus = bigbluebutton::bigbluebuttonbn_view_session_config($bbbsession, $id);
-
 // Output starts.
 echo $OUTPUT->header();
 
 view::view_groups($bbbsession);
 
-view::view_render($bbbsession, $activitystatus);
+view::view_render($bbbsession);
 
 // Output finishes.
 echo $OUTPUT->footer();
 
 // Shows version as a comment.
-echo '<!-- '.$bbbsession['originTag'].' -->'."\n";
+echo '<!-- ' . $bbbsession['originTag'] . ' -->' . "\n";
 
 // Initialize session variable used across views.
+// TODO: Get rid of this ASAP !
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
