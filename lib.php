@@ -938,7 +938,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
     // Finally send the file.
-    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+    send_stored_file($file, 0, 0, $forcedownload, $options); // Download MUST be forced - security!
 }
 
 /**

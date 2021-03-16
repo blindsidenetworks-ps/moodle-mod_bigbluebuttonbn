@@ -71,7 +71,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             );
         // If none is allowed, fail and return.
         if (empty($jsvars['instanceTypeProfiles'])) {
-            // Also check module context for those that are allowed
+            // Also check module context for those that are allowed.
             $contextm = context_module::instance($this->_cm->id);
             $jsvars['instanceTypeProfiles'] = bigbluebuttonbn_get_instance_type_profiles_create_allowed(
                     has_capability('mod/bigbluebuttonbn:meeting', $contextm),
@@ -640,9 +640,9 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['type'] = 'select';
             $field['data_type'] = PARAM_TEXT;
             $field['description_key'] = 'mod_form_field_block_clienttype';
-             $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
+            $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
                              BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
-             $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
+            $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
             $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
                                     $field['description_key'], $cfg['clienttype_default'], $choices);
             return;
