@@ -7,7 +7,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: 'ubuntu-16.04'
+    runs-on: 'ubuntu-18.04'
     strategy:
       fail-fast: false
       matrix:
@@ -59,7 +59,7 @@ jobs:
       - name: Deploy moodle-plugin-ci
         run: |
           composer self-update 1.10.12
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^2
+          composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
           # Add dirs to $PATH
           export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
