@@ -2,9 +2,8 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI
-#on: [push, pull_request]
-on: [pull_request]
+name: Moodle plugin CI for Moodle 3.4
+on: [push, pull_request]
 
 jobs:
   test:
@@ -13,11 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '7.4'
-            moodle-branch: 'master'
-            database: 'pgsql'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_311_STABLE'
+          - php: '7.2'
+            moodle-branch: 'MOODLE_34_STABLE'
             database: 'mariadb'
 
     services:
@@ -107,10 +103,10 @@ jobs:
       #   if: ${{ always() }}
       #   run: moodle-plugin-ci grunt
 
-      - name: phpunit
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpunit
+      # - name: phpunit
+      #   if: ${{ always() }}
+      #   run: moodle-plugin-ci phpunit
 
-      - name: behat
-        if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome
+      # - name: behat
+      #   if: ${{ always() }}
+      #   run: moodle-plugin-ci behat --profile chrome
