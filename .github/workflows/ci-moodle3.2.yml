@@ -2,7 +2,7 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI for Moodle 3.3
+name: Moodle plugin CI for Moodle 3.2
 on: [push, pull_request]
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           - php: '7.1'
-            moodle-branch: 'MOODLE_33_STABLE'
+            moodle-branch: 'MOODLE_32_STABLE'
             database: 'mariadb'
 
     services:
@@ -61,7 +61,6 @@ jobs:
           composer self-update 1.10.12
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^2
           # Add dirs to $PATH
-          export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
           # PHPUnit depends on en_AU.UTF-8 locale
