@@ -2,7 +2,7 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI for Moodle 3.10
+name: Moodle plugin CI for Moodle 3.4
 on: [pull_request]
 
 jobs:
@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '7.3'
-            moodle-branch: 'MOODLE_310_STABLE'
+          - php: '7.2'
+            moodle-branch: 'MOODLE_34_STABLE'
             database: 'mariadb'
 
     services:
@@ -107,6 +107,6 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit
 
-      - name: behat
-        if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome
+      # - name: behat
+      #   if: ${{ always() }}
+      #   run: moodle-plugin-ci behat --profile chrome

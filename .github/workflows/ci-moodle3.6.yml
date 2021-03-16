@@ -2,7 +2,7 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI
+name: Moodle plugin CI for Moodle 3.6
 on: [pull_request]
 
 jobs:
@@ -103,9 +103,9 @@ jobs:
       #   if: ${{ always() }}
       #   run: moodle-plugin-ci grunt
 
-      # - name: phpunit
-      #   if: ${{ always() }}
-      #   run: moodle-plugin-ci phpunit
+      - name: phpunit
+        if: ${{ always() }}
+        run: moodle-plugin-ci phpunit
 
       - name: behat
         if: ${{ always() }}
