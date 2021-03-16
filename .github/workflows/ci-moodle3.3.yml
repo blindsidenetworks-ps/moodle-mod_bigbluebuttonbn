@@ -48,7 +48,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '8.17.0'
+          node-version: '8.9.4'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -58,8 +58,10 @@ jobs:
 
       - name: Deploy moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+          composer self-update 1.10.12
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^2
           # Add dirs to $PATH
+          export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
           # PHPUnit depends on en_AU.UTF-8 locale
