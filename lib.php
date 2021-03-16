@@ -1167,11 +1167,21 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+    $time = time();
+
     // Get mod info.
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
     // Get bigbluebuttonbn activity.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
+
+    // Set flag haspassed if closingtime has already passed only if it is defined.
+    $haspassed = ($bigbluebuttonbn->closingtime) && $bigbluebuttonbn->closingtime < $time;
+
+    // Check haspassed flag.
+    if ($haspassed) {
+        return null;
+    }
 
     // Get if the user has joined in live session or viewed the recorded.
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
@@ -1179,16 +1189,17 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
     // Get if the user can join.
     list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
-    // Get if the time has already passed.
-    $haspassed = $bigbluebuttonbn->openingtime < time();
+
+    // Set flag hasstarted if startingtime has already passed or not defined.
+    $hasstarted = $bigbluebuttonbn->openingtime < $time;
 
     // Check if the room is closed and the user has already joined this session or played the record.
-    if ($haspassed && !$roomavailable && $usercomplete) {
+    if ($hasstarted && !$roomavailable && $usercomplete) {
         return null;
     }
 
     // Check if the user can join this session.
-    $actionable = ($roomavailable && $usercanjoin) || $haspassed;
+    $actionable = ($roomavailable && $usercanjoin);
 
     // Action data.
     $string = get_string('view_room', 'bigbluebuttonbn');
