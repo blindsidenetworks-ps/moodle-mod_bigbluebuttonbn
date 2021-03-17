@@ -191,6 +191,7 @@ class mobile {
         }
 
         // Build final url to BBB.
+        $bbbsession['createtime'] = $meetinginfo['createTime'];
         $urltojoin = \mod_bigbluebuttonbn\locallib\mobileview::build_url_join_session($bbbsession);
 
         // Check groups access and show message.

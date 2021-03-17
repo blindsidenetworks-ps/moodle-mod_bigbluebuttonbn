@@ -174,8 +174,8 @@ M.mod_bigbluebuttonbn.modform = {
                 this.participantRemoveFromMemory(selectionTypeValue, selectionValue);
                 continue;
             }
-            // Add it to the form.
-            this.participantAddToForm(selectionTypeValue, selectionValue, selectionRole);
+            // Add it to the form, but don't add the delete button if it is the first item.
+            this.participantAddToForm(selectionTypeValue, selectionValue, selectionRole, (i > 0));
         }
         // Update in the form.
         this.participantListUpdate();
@@ -239,7 +239,7 @@ M.mod_bigbluebuttonbn.modform = {
         // Add it to memory.
         this.participantAddToMemory(selectionType.value, selection.value);
         // Add it to the form.
-        this.participantAddToForm(selectionType.value, selection.value, 'viewer');
+        this.participantAddToForm(selectionType.value, selection.value, 'viewer', true);
         // Update in the form.
         this.participantListUpdate();
     },
@@ -252,7 +252,7 @@ M.mod_bigbluebuttonbn.modform = {
         });
     },
 
-    participantAddToForm: function(selectionTypeValue, selectionValue, selectionRole) {
+    participantAddToForm: function(selectionTypeValue, selectionValue, selectionRole, canDelete) {
         var listTable, innerHTML, selectedHtml, removeHtml, removeClass, bbbRoles, i, row, cell0, cell1, cell2, cell3;
         listTable = document.getElementById('participant_list_table');
         row = listTable.insertRow(listTable.rows.length);
@@ -290,9 +290,12 @@ M.mod_bigbluebuttonbn.modform = {
             removeHtml = this.bigbluebuttonbn.pixIconDelete;
             removeClass = "btn btn-link";
         }
-        innerHTML = '<a class="' + removeClass + '" onclick="M.mod_bigbluebuttonbn.modform.participantRemove(\'';
-        innerHTML += selectionTypeValue + '\', \'' + selectionValue;
-        innerHTML += '\'); return 0;" title="' + this.strings.remove + '">' + removeHtml + '</a>';
+        innerHTML = "";
+        if (canDelete) {
+            innerHTML = '<a class="' + removeClass + '" onclick="M.mod_bigbluebuttonbn.modform.participantRemove(\'';
+            innerHTML += selectionTypeValue + '\', \'' + selectionValue;
+            innerHTML += '\'); return 0;" title="' + this.strings.remove + '">' + removeHtml + '</a>';
+        }
         cell3.innerHTML = innerHTML;
     },
 

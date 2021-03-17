@@ -56,7 +56,7 @@ class mod_bigbluebuttonbn_recordings_testcase extends advanced_testcase {
         'BBACTIVITY3' => ['courseindex' => 1, 'type' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'nbrecordings' => 3],
     ];
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $maxcourseindexindex = array_reduce(
@@ -93,7 +93,7 @@ class mod_bigbluebuttonbn_recordings_testcase extends advanced_testcase {
      *
      * @throws coding_exception
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
             ->bigbluebuttonbn_clean_recordings_array_fetch();

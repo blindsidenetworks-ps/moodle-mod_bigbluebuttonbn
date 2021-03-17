@@ -228,6 +228,61 @@ $string['config_muteonstart_default'] = 'Mute on start enabled by default';
 $string['config_muteonstart_default_description'] = 'If enabled the session will be muted on start.';
 $string['config_muteonstart_editable'] = 'Mute on start can be edited';
 $string['config_muteonstart_editable_description'] = 'Mute on start by default can be edited when the instance is added or updated.';
+$string['config_welcome_default'] = 'Default welcome message';
+$string['config_welcome_default_description'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like <b>...</b> or <i></i> ';
+$string['config_default_messages'] = 'Default messages';
+$string['config_default_messages_description'] = 'Set message defaults for activities';
+
+$string['config_locksettings'] = 'Configuration for locking settings';
+$string['config_locksettings_description'] = 'These setttings enable or disable options in the UI for locking settings, and also define default values for these options.';
+
+$string['config_disablecam_default'] = 'Disable cam enabled by default';
+$string['config_disablecam_default_description'] = 'If enabled the webcams will be disabled.';
+$string['config_disablecam_editable'] = 'Disable cam can be edited';
+$string['config_disablecam_editable_description'] = 'Disable cam by default can be edited when the instance is added or updated.';
+
+$string['config_disablemic_default'] = 'Disable mic enabled by default';
+$string['config_disablemic_default_description'] = 'If enabled the microphones will be disabled.';
+$string['config_disablemic_editable'] = 'Disable mic can be edited';
+$string['config_disablemic_editable_description'] = 'Disable mic by default can be edited when the instance is added or updated.';
+
+$string['config_disableprivatechat_default'] = 'Disable private chat enabled by default';
+$string['config_disableprivatechat_default_description'] = 'If enabled the private chat will be disabled.';
+$string['config_disableprivatechat_editable'] = 'Disable private chat can be edited';
+$string['config_disableprivatechat_editable_description'] = 'Disable private chat by default can be edited when the instance is added or updated.';
+
+$string['config_disablepublicchat_default'] = 'Disable public chat enabled by default';
+$string['config_disablepublicchat_default_description'] = 'If enabled the public chat will be disabled.';
+$string['config_disablepublicchat_editable'] = 'Disable public chat can be edited';
+$string['config_disablepublicchat_editable_description'] = 'Disable public chat by default can be edited when the instance is added or updated.';
+
+$string['config_disablenote_default'] = 'Disable shared notes enabled by default';
+$string['config_disablenote_default_description'] = 'If enabled the shared notes will be disabled.';
+$string['config_disablenote_editable'] = 'Disable shared notes can be edited';
+$string['config_disablenote_editable_description'] = 'Disable shared notes by default can be edited when the instance is added or updated.';
+
+$string['config_hideuserlist_default'] = 'Hide user list enabled by default';
+$string['config_hideuserlist_default_description'] = 'If enabled the session user list will be hidden.';
+$string['config_hideuserlist_editable'] = 'Hide user list can be edited';
+$string['config_hideuserlist_editable_description'] = 'Hide user list by default can be edited when the instance is added or updated.';
+
+$string['config_lockedlayout_default'] = 'Locked layout enabled by default';
+$string['config_lockedlayout_default_description'] = 'If enabled the session layout will be locked.';
+$string['config_lockedlayout_editable'] = 'Locked layout can be edited';
+$string['config_lockedlayout_editable_description'] = 'Locked layout by default can be edited when the instance is added or updated.';
+
+$string['config_lockonjoin_default'] = 'Ignore lock on join enabled by default';
+$string['config_lockonjoin_default_description'] = 'If enabled the lock settings will be ignored. Lock configuration must be enabled for this to apply.';
+$string['config_lockonjoin_editable'] = 'Ignore lock on join can be edited';
+$string['config_lockonjoin_editable_description'] = 'Ignore lock on join by default can be edited when the instance is added or updated.';
+
+$string['config_lockonjoinconfigurable_default'] = 'Lock configuration enabled by default';
+$string['config_lockonjoinconfigurable_default_description'] = 'If enabled the session lock settings can be enabled or disabled from the above control.';
+$string['config_lockonjoinconfigurable_editable'] = 'Lock configuration can be edited';
+$string['config_lockonjoinconfigurable_editable_description'] = 'Lock configuration by default can be edited when the instance is added or updated.';
+
+$string['config_experimental_features'] = 'Configuration for experimental features';
+$string['config_experimental_features_description'] = 'Configuration for experimental features.';
 
 $string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
@@ -252,7 +307,7 @@ $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'View for recording';
 $string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_presentation_default'] = 'Presentation default content';
-$string['mod_form_block_participants'] = 'Participants';
+$string['mod_form_block_participants'] = 'Role assigned during live session';
 $string['mod_form_block_schedule'] = 'Schedule for session';
 $string['mod_form_block_record'] = 'Record settings';
 $string['mod_form_field_openingtime'] = 'Join open';
@@ -274,15 +329,15 @@ $string['mod_form_field_voicebridge_notunique_error'] = 'Not a unique value. Thi
 $string['mod_form_field_wait'] = 'Wait for moderator';
 $string['mod_form_field_wait_help'] = 'Viewers must wait until a moderator enters the session before they can do so';
 $string['mod_form_field_welcome'] = 'Welcome message';
-$string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like <b>...</b> or <i></i> ';
+$string['mod_form_field_welcome_help'] = 'Replaces the default message setted up for the BigBlueButton server. The message can includes keywords  (%%CONFNAME%%, %%DIALNUM%%, %%CONFNUM%%) which will be substituted automatically, and also html tags like &lt;b>...&lt;/b>, &lt;br />, &lt;u>&lt;/u> or &lt;i>&lt;/i> ';
 $string['mod_form_field_welcome_default'] = '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>For help on using BigBlueButton see these (short)  <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the phone icon (top center). <b>Please use a headset to avoid causing background noise for others.</b>';
-$string['mod_form_field_participant_add'] = 'Add participant';
-$string['mod_form_field_participant_list'] = 'Participant list';
+$string['mod_form_field_participant_add'] = 'Add assignation';
+$string['mod_form_field_participant_list'] = 'Assignation list';
 $string['mod_form_field_participant_list_type_all'] = 'All users enrolled';
 $string['mod_form_field_participant_list_type_role'] = 'Role';
 $string['mod_form_field_participant_list_type_user'] = 'User';
 $string['mod_form_field_participant_list_type_owner'] = 'Owner';
-$string['mod_form_field_participant_list_text_as'] = 'as';
+$string['mod_form_field_participant_list_text_as'] = 'joins session as';
 $string['mod_form_field_participant_list_action_add'] = 'Add';
 $string['mod_form_field_participant_list_action_remove'] = 'Remove';
 $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
@@ -304,6 +359,17 @@ $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 $string['mod_form_field_recordallfromstart'] = 'Record all from start';
 $string['mod_form_field_recordhidebutton'] = 'Hide recording button';
 $string['mod_form_field_nosettings'] = 'No settings can be edited';
+$string['mod_form_field_disablecam'] = 'Disable webcams';
+$string['mod_form_field_disablemic'] = 'Disable microphones';
+$string['mod_form_field_disableprivatechat'] = 'Disable private chat';
+$string['mod_form_field_disablepublicchat'] = 'Disable public chat';
+$string['mod_form_field_disablenote'] = 'Disable shared notes';
+$string['mod_form_field_hideuserlist'] = 'Hide user list';
+$string['mod_form_field_lockedlayout'] = 'Lock room layout';
+$string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
+$string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
+$string['mod_form_locksettings'] = 'Lock settings';
+
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';

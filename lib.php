@@ -736,6 +736,33 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->muteonstart)) {
         $bigbluebuttonbn->muteonstart = 0;
     }
+    if (!isset($bigbluebuttonbn->disablecam)) {
+        $bigbluebuttonbn->disablecam = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablemic)) {
+        $bigbluebuttonbn->disablemic = 0;
+    }
+    if (!isset($bigbluebuttonbn->disableprivatechat)) {
+        $bigbluebuttonbn->disableprivatechat = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablepublicchat)) {
+        $bigbluebuttonbn->disablepublicchat = 0;
+    }
+    if (!isset($bigbluebuttonbn->disablenote)) {
+        $bigbluebuttonbn->disablenote = 0;
+    }
+    if (!isset($bigbluebuttonbn->hideuserlist)) {
+        $bigbluebuttonbn->hideuserlist = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockedlayout)) {
+        $bigbluebuttonbn->lockedlayout = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockonjoin)) {
+        $bigbluebuttonbn->lockonjoin = 0;
+    }
+    if (!isset($bigbluebuttonbn->lockonjoinconfigurable)) {
+        $bigbluebuttonbn->lockonjoinconfigurable = 0;
+    }
     if (!isset($bigbluebuttonbn->recordings_validate_url)) {
         $bigbluebuttonbn->recordings_validate_url = 1;
     }
@@ -911,7 +938,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
     // Finally send the file.
-    send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+    send_stored_file($file, 0, 0, $forcedownload, $options); // Download MUST be forced - security!
 }
 
 /**
@@ -1030,8 +1057,14 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bigbluebuttonbn->id);
         $presentationnonce = $cache->get($noncekey);
-        $noncevalue = $presentationnonce['value'];
-        $noncecounter = $presentationnonce['counter'];
+        if (!empty($presentationnonce)) {
+            $noncevalue = $presentationnonce['value'];
+            $noncecounter = $presentationnonce['counter'];
+        } else {
+            $noncevalue = null;
+            $noncecounter = 0;
+        }
+
         if ($args['0'] != $noncevalue) {
             return;
         }
@@ -1134,11 +1167,24 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+    $time = time();
+
     // Get mod info.
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
     // Get bigbluebuttonbn activity.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
+
+    // Set flag haspassed if closingtime has already passed only if it is defined.
+    $haspassed = ($bigbluebuttonbn->closingtime) && $bigbluebuttonbn->closingtime < $time;
+
+    // Set flag hasstarted if startingtime has already passed or not defined.
+    $hasstarted = $bigbluebuttonbn->openingtime < $time;
+
+    // Return null if it has passed or not started.
+    if ($haspassed || !$hasstarted) {
+        return null;
+    }
 
     // Get if the user has joined in live session or viewed the recorded.
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
@@ -1146,16 +1192,14 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
     // Get if the user can join.
     list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
-    // Get if the time has already passed.
-    $haspassed = $bigbluebuttonbn->openingtime < time();
 
     // Check if the room is closed and the user has already joined this session or played the record.
-    if ($haspassed && !$roomavailable && $usercomplete) {
+    if (!$roomavailable && $usercomplete) {
         return null;
     }
 
     // Check if the user can join this session.
-    $actionable = ($roomavailable && $usercanjoin) || $haspassed;
+    $actionable = ($roomavailable && $usercanjoin);
 
     // Action data.
     $string = get_string('view_room', 'bigbluebuttonbn');

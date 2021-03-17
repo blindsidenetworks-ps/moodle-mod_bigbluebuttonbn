@@ -59,7 +59,7 @@ class mod_bigbluebuttonbn_privacy_provider_testcase extends \core_privacy\tests\
      *
      * @throws coding_exception
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->bigbluebuttonbn_clean_recordings_array_fetch();
     }

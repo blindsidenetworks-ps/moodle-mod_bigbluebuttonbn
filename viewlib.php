@@ -127,7 +127,8 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
-    if ($enabledfeatures['showrecordings']) {
+    // Show recordings should only be enabled if recordings are also enabled in session.
+    if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
         $output .= "<i class='icon fa fa-spinner fa-spin' aria-hidden='true'></i> Loading Recordings ...";
         $output .= html_writer::end_tag('div');

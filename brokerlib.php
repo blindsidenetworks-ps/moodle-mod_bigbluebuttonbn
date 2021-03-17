@@ -677,7 +677,7 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     }
 
     // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
-    $meetingidelements = explode('[', $jsonobj->{'ext_meeting_id'});
+    $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
     $meetingidelements = explode('-', $meetingidelements[0]);
     if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
         $msg = 'The activity may have been deleted';
@@ -686,18 +686,18 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     }
 
     // We make sure events are processed only once.
-    $overrides = array('meetingid' => $jsonobj->{'ext_meeting_id'});
-    $meta['recordid'] = $jsonobj->{'meeting_id'};
+    $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
+    $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
     bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
-    // Set the header by default.
-    $header = 'HTTP/1.0 202 Accepted. Already processed.';
-    if (bigbluebuttonbn_get_count_callback_event_log($jsonobj->{'meeting_id'}, 'meeting_events') == 1) {
+    if (bigbluebuttonbn_get_count_callback_event_log($meta['recordid'], 'meeting_events') == 1) {
         // Process the events.
         bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
-        $header = 'HTTP/1.0 202 Accepted. Enqueued.';
+        header('HTTP/1.0 200 Accepted. Enqueued.');
+        return;
     }
-    header($header);
+
+    header('HTTP/1.0 202 Accepted. Already processed.');
 }
 
 /**

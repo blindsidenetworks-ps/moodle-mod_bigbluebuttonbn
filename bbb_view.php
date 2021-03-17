@@ -330,6 +330,34 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['muteonstart']) {
         $data['muteOnStart'] = 'true';
     }
+    // Lock settings.
+    if ($bbbsession['disablecam']) {
+        $data['lockSettingsDisableCam'] = 'true';
+    }
+    if ($bbbsession['disablemic']) {
+        $data['lockSettingsDisableMic'] = 'true';
+    }
+    if ($bbbsession['disableprivatechat']) {
+        $data['lockSettingsDisablePrivateChat'] = 'true';
+    }
+    if ($bbbsession['disablepublicchat']) {
+        $data['lockSettingsDisablePublicChat'] = 'true';
+    }
+    if ($bbbsession['disablenote']) {
+        $data['lockSettingsDisableNote'] = 'true';
+    }
+    if ($bbbsession['hideuserlist']) {
+        $data['lockSettingsHideUserList'] = 'true';
+    }
+    if ($bbbsession['lockedlayout']) {
+        $data['lockSettingsLockedLayout'] = 'true';
+    }
+    if ($bbbsession['lockonjoin']) {
+        $data['lockSettingsLockOnJoin'] = 'false';
+    }
+    if ($bbbsession['lockonjoinconfigurable']) {
+        $data['lockSettingsLockOnJoinConfigurable'] = 'true';
+    }
     return $data;
 }
 
@@ -389,8 +417,9 @@ function bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $o
     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
         $password = $bbbsession['modPW'];
     }
+    $bbbsession['createtime'] = $meetinginfo['createTime'];
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
-        $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype']);
+        $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'], $bbbsession['createtime']);
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.
