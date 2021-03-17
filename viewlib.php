@@ -262,7 +262,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     // If there are meetings with recordings load the data to the table.
     if ($bbbsession['bigbluebuttonbn']->recordings_html) {
         $recordingshtml = '';
-        // if opencast recoding config is set and checks if opencast is available for the current course
+        // If opencast recoding config is set and checks if opencast is available for the current course.
         if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording')
             && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
             $recordingshtml .= bigbluebuttonbn_output_recording_opencast($bbbsession['course']->id);

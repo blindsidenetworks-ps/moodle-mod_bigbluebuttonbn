@@ -338,7 +338,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ($cfg['recording_editable']) {
             $field['type'] = 'checkbox';
             $field['description_key'] = 'mod_form_field_record';
-            // try to check the opencast config and make sure that opencast is available for this course
+            // Try to check the opencast config and make sure that opencast is available for this course.
             if ($cfg['oc_recording'] && bigbluebuttonbn_check_opencast(get_course($this->current->course)->id)) {
                 $field['description_key'] = 'mod_form_field_record_oc';
             }
