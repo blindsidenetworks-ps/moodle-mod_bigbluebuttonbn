@@ -25,15 +25,18 @@
 namespace mod_bigbluebuttonbn\local\settings;
 
 use admin_category;
+use admin_setting;
 use admin_setting_configcheckbox;
 use admin_setting_configmultiselect;
 use admin_setting_configselect;
+use admin_setting_configstoredfile;
 use admin_setting_configtext;
 use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
 use lang_string;
 use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
 defined('MOODLE_INTERNAL') || die();
@@ -48,7 +51,7 @@ defined('MOODLE_INTERNAL') || die();
 class settings {
 
     /**
-     * @var \admin_setting shared value
+     * @var admin_setting shared value
      */
     private $admin;
 
@@ -67,25 +70,32 @@ class settings {
     /**
      * settings constructor.
      *
-     * @param \admin_setting $admin
+     * @param admin_category $admin
      * @param object  $module
-     * @param string $section
+     * @param string $section for the plugin setting (main setting page)
      */
-    public function __construct(&$admin, $module, &$section) {
+    public function __construct(&$admin, $module, $section) {
         $this->moduleenabled = $module->is_enabled() === true;
         $this->admin = $admin;
-        $modbigbluebuttobnfolder = new admin_category($section,
+
+        $bbbcategorysection = $section.'cat';
+        $modbigbluebuttobnfolder = new admin_category($bbbcategorysection,
             new lang_string('pluginname', 'mod_bigbluebuttonbn'),
             $module->is_enabled() === false);
+
         $admin->add('modsettings', $modbigbluebuttobnfolder);
-        $this->section = $section;
+
+        $mainsettings = $this->bigbluebuttonbn_settings_general($section);
+        $admin->add($bbbcategorysection, $mainsettings);
+
+        $this->section = $bbbcategorysection;
 
     }
 
     /**
      * Add the setting and lock it conditionally
      * @param string $name
-     * @param \admin_setting $item
+     * @param admin_setting $item
      * @param admin_settingpage $settings
      */
     protected function add_conditional_element($name, $item, &$settings) {
@@ -107,8 +117,8 @@ class settings {
      *
      * @throws \coding_exception
      */
-    public function bigbluebuttonbn_settings_general() {
-        $settingsgeneral = new admin_settingpage('general', get_string('config_general', 'bigbluebuttonbn'),
+    public function bigbluebuttonbn_settings_general($sectioname) {
+        $settingsgeneral = new admin_settingpage($sectioname, get_string('config_general', 'bigbluebuttonbn'),
             'moodle/site:config', !((boolean) validator::section_general_shown()) && ($this->moduleenabled));
         if ($this->admin->fulltree) {
             // Configuration for BigBlueButton.
@@ -150,7 +160,7 @@ class settings {
                 $settingsgeneral
             );
         }
-        $this->admin->add($this->section, $settingsgeneral);
+        return $settingsgeneral;
     }
 
     /**
@@ -284,7 +294,7 @@ class settings {
     public function bigbluebuttonbn_settings_showrecordings() {
         // Configuration for 'show recordings' feature.
         $showrecordingsettings = new admin_settingpage('showrecordings',
-            get_string('config_importrecordings', 'bigbluebuttonbn'),
+            get_string('config_recordings', 'bigbluebuttonbn'),
             'moodle/site:config', !((boolean) validator::section_show_recordings_shown()) && ($this->moduleenabled));
         if ($this->admin->fulltree) {
             $item = new admin_setting_heading('bigbluebuttonbn_config_recordings',
@@ -485,7 +495,6 @@ class settings {
             && ($this->moduleenabled));
         if ($this->admin->fulltree) {
             // This feature only works if curl is installed (but it is as now required by Moodle). The checks have been removed.
-            $preuploaddescripion = get_string('config_preuploadpresentation_description', 'bigbluebuttonbn');
             $item = new admin_setting_heading('bigbluebuttonbn_config_preuploadpresentation',
                 '',
                 get_string('config_preuploadpresentation_description', 'bigbluebuttonbn'));
@@ -508,7 +517,7 @@ class settings {
             $filemanageroptions['maxfiles'] = 1;
             $filemanageroptions['mainfile'] = true;
 
-            $filemanager = new \admin_setting_configstoredfile('mod_bigbluebuttonbn/presentationdefault',
+            $filemanager = new admin_setting_configstoredfile('mod_bigbluebuttonbn/presentationdefault',
                 get_string('config_presentation_default', 'bigbluebuttonbn'),
                 get_string('config_presentation_default_description', 'bigbluebuttonbn'),
                 'presentationdefault',
@@ -697,7 +706,7 @@ class settings {
                 $clienttypesettings
             );
             // Web Client default.
-            $default = intval((int) \mod_bigbluebuttonbn\local\config::get('clienttype_default'));
+            $default = intval((int) config::get('clienttype_default'));
             $choices = array(bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash',
                 'bigbluebuttonbn'),
                 bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
@@ -1134,7 +1143,7 @@ class settings {
     public function bigbluebuttonbn_settings_experimental() {
         // Configuration for experimental features should go here.
         $experimentalfeaturessetting = new admin_settingpage('experimentalfeatures',
-            get_string('config_extended_capabilities', 'bigbluebuttonbn'),
+            get_string('config_experimental_features', 'bigbluebuttonbn'),
             'moodle/site:config', !((boolean) validator::section_settings_extended_shown())
             && ($this->moduleenabled));
         if ($this->admin->fulltree) {

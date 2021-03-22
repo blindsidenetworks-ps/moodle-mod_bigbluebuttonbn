@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 $bbbsettings = new settings($ADMIN, $module, $section);
-$bbbsettings->bigbluebuttonbn_settings_general();
 
 // Evaluates if recordings are enabled for the Moodle site.
 
@@ -60,5 +59,5 @@ $bbbsettings->bigbluebuttonbn_settings_extended();
 // Renders settings for experimental features.
 $bbbsettings->bigbluebuttonbn_settings_experimental();
 
-// Tell core we already added the settings structure.
 $settings = null;
+
