@@ -681,49 +681,6 @@ class settings {
     }
 
     /**
-     * Helper function renders client type settings if the feature is enabled.
-     *
-     * @return void
-     */
-    public function bigbluebuttonbn_settings_clienttype() {
-        // Configuration for "clienttype" feature.
-        $clienttypesettings = new admin_settingpage('clienttype',
-            get_string('config_clienttype', 'bigbluebuttonbn'),
-            'moodle/site:config', !((boolean) validator::section_clienttype_shown())
-            && ($this->moduleenabled));
-        if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_clienttype',
-                '',
-                get_string('config_clienttype_description', 'bigbluebuttonbn'));
-            $clienttypesettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_clienttype_editable',
-                get_string('config_clienttype_editable', 'bigbluebuttonbn'),
-                get_string('config_clienttype_editable_description', 'bigbluebuttonbn'),
-                0);
-            $this->add_conditional_element(
-                'clienttype_editable',
-                $item,
-                $clienttypesettings
-            );
-            // Web Client default.
-            $default = intval((int) config::get('clienttype_default'));
-            $choices = array(bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash',
-                'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
-            $item = new admin_setting_configselect('bigbluebuttonbn_clienttype_default',
-                get_string('config_clienttype_default', 'bigbluebuttonbn'),
-                get_string('config_clienttype_default_description', 'bigbluebuttonbn'),
-                $default, $choices);
-            $this->add_conditional_element(
-                'clienttype_default',
-                $item,
-                $clienttypesettings
-            );
-        }
-        $this->admin->add($this->section, $clienttypesettings);
-    }
-
-    /**
      * Helper function renders general settings if the feature is enabled.
      *
      *

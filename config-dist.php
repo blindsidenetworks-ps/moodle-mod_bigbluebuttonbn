@@ -284,26 +284,11 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
 /*
  * 1.11. GENERAL CONFIGURATION FOR CLIENT TYPE SELECTION
  *
+ * This feature has been phased out because BBB only offers support for the HTML5 client.
+ * For deployments that are stuck in an old version, the adjustment can be done in BBB itslef.
+ *
  **/
 
-/*
- * When the value is set to 1 (checked) the 'clienttype' capability is enabled,
- * meaning that the administrator may be able to choose the default web client type
- * and wheter it can be editable in each room through the plugin configuration
- * $CFG->bigbluebuttonbn['clienttype_enabled'] = 0;
- */
-
-/*
- * The WebClient selected by default is Flash (value = 0)
- * [flash=0|html5=1]
- * $CFG->bigbluebuttonbn['clienttype_default'] = 0;
- */
-
-/*
- * When the value is set to 1 (checked) the WebClient can be chosen by
- * the user creating or editing the resource.
- * $CFG->bigbluebuttonbn['clienttype_editable'] = 0;
- */
 
 /*
  * 1.12. CONFIGURATION FOR "MUTE ON START" FEATURE

@@ -51,7 +51,6 @@ $bbbsettings->bigbluebuttonbn_settings_userlimit();
 $bbbsettings->bigbluebuttonbn_settings_duration();
 $bbbsettings->bigbluebuttonbn_settings_participants();
 $bbbsettings->bigbluebuttonbn_settings_notifications();
-$bbbsettings->bigbluebuttonbn_settings_clienttype();
 $bbbsettings->bigbluebuttonbn_settings_muteonstart();
 $bbbsettings->bigbluebuttonbn_settings_locksettings();
 // Renders settings for extended capabilities.
