@@ -255,14 +255,6 @@ class bigbluebutton {
         $bbbsession['originServerCommonName'] = '';
         $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
         $bbbsession['bnserver'] = plugin::bigbluebuttonbn_is_bn_server();
-        // Setting for clienttype, assign flash if not enabled, or default if not editable.
-        $bbbsession['clienttype'] = config::get('clienttype_default');
-        if (config::get('clienttype_editable')) {
-            $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
-        }
-        if (!config::clienttype_enabled()) {
-            $bbbsession['clienttype'] = bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH;
-        }
     }
 
     /**
@@ -309,7 +301,6 @@ class bigbluebutton {
      * @param string $logouturl
      * @param string $configtoken
      * @param string $userid
-     * @param string $clienttype
      * @param string $createtime
      *
      * @return string
@@ -321,7 +312,6 @@ class bigbluebutton {
         $logouturl,
         $configtoken = null,
         $userid = null,
-        $clienttype = bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_FLASH,
         $createtime = null
     ) {
         $data = ['meetingID' => $meetingid,
@@ -329,10 +319,6 @@ class bigbluebutton {
             'password' => $pw,
             'logoutURL' => $logouturl,
         ];
-        // Choose between Adobe Flash or HTML5 Client.
-        if ($clienttype == bbb_constants::BIGBLUEBUTTON_CLIENTTYPE_HTML5) {
-            $data['joinViaHtml5'] = 'true';
-        }
         if (!is_null($configtoken)) {
             $data['configToken'] = $configtoken;
         }
@@ -615,7 +601,7 @@ class bigbluebutton {
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                     'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                     'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                    'clienttype', 'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
+                    'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
             bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
                 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
                 'features' => array('showrecordings', 'importrecordings', 'availabilityconditionsheader')),

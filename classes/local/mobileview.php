@@ -49,8 +49,7 @@ class mobileview {
             $password = $bbbsession['modPW'];
         }
         $joinurl = bigbluebutton::bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
-            $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'],
-            $bbbsession['createtime']);
+            $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['createtime']);
 
         return($joinurl);
     }

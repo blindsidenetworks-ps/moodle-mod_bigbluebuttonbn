@@ -99,9 +99,6 @@ class config {
             'general_warning_button_text' => '',
             'general_warning_button_href' => '',
             'general_warning_button_class' => '',
-            'clienttype_enabled' => false,
-            'clienttype_default' => '0',
-            'clienttype_editable' => true,
             'muteonstart_default' => false,
             'muteonstart_editable' => false,
             'disablecam_default' => false,
@@ -176,15 +173,6 @@ class config {
     }
 
     /**
-     * Validates if clienttype settings are enabled.
-     *
-     * @return boolean
-     */
-    public static function clienttype_enabled() {
-        return (boolean)self::get('clienttype_enabled');
-    }
-
-    /**
      * Wraps current settings in an array.
      *
      * @return array
@@ -224,9 +212,6 @@ class config {
                'general_warning_button_text' => self::get('general_warning_button_text'),
                'general_warning_button_href' => self::get('general_warning_button_href'),
                'general_warning_button_class' => self::get('general_warning_button_class'),
-               'clienttype_enabled' => self::get('clienttype_enabled'),
-               'clienttype_editable' => self::get('clienttype_editable'),
-               'clienttype_default' => self::get('clienttype_default'),
                'muteonstart_editable' => self::get('muteonstart_editable'),
                'muteonstart_default' => self::get('muteonstart_default'),
                'disablecam_editable' => self::get('disablecam_editable'),
@@ -274,11 +259,6 @@ class config {
         $enabledfeatures['importrecordings'] = false;
         if (self::importrecordings_enabled()) {
             $enabledfeatures['importrecordings'] = (in_array('all', $features) || in_array('importrecordings', $features));
-        }
-        // Evaluates if clienttype is enabled for the Moodle site.
-        $enabledfeatures['clienttype'] = false;
-        if (self::clienttype_enabled()) {
-            $enabledfeatures['clienttype'] = (in_array('all', $features) || in_array('clienttype', $features));
         }
         return $enabledfeatures;
     }

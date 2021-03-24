@@ -71,10 +71,6 @@ class bbb_constants {
     public const BIGBLUEBUTTONBN_ROLE_MODERATOR = 'moderator';
     /** @var string  BIGBLUEBUTTON_EVENT_MEETING_START string defines the bigbluebuttonbn meeting_start event */
     public const BIGBLUEBUTTON_EVENT_MEETING_START = 'meeting_start';
-    /** @var int BIGBLUEBUTTON_CLIENTTYPE_FLASH integer that defines the bigbluebuttonbn default web client based on Adobe FLASH */
-    public const BIGBLUEBUTTON_CLIENTTYPE_FLASH = 0;
-    /** @var int BIGBLUEBUTTON_CLIENTTYPE_HTML5 integer that defines the bigbluebuttonbn default web client based on HTML5 */
-    public const BIGBLUEBUTTON_CLIENTTYPE_HTML5 = 1;
     /** @var int BIGBLUEBUTTON_ORIGIN_BASE integer set to 0 defines that the user acceded the session from activity page */
     public const BIGBLUEBUTTON_ORIGIN_BASE = 0;
     /** @var int BIGBLUEBUTTON_ORIGIN_TIMELINE integer set to 1 defines that the user acceded the session from Timeline */
