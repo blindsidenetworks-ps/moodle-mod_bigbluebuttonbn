@@ -1705,10 +1705,11 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     $linkattributes = array(
         'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
         'class' => 'btn btn-sm btn-default',
-        'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
+        'onclick' => '',
         'data-action' => 'play',
         'data-target' => $playback['type'],
-        'data-href' => $href,
+        'data-href' => '',
+        'target' => '_blank',
       );
     if ($CFG->bigbluebuttonbn_recordings_validate_url && !bigbluebuttonbn_is_bn_server()
             && !bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
@@ -1716,7 +1717,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
         $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
         unset($linkattributes['data-href']);
     }
-    return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
+    return $OUTPUT->action_link($playback['url'], $text, null, $linkattributes) . '&#32;';
 }
 
 /**
