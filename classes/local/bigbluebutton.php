@@ -485,24 +485,6 @@ class bigbluebutton {
     }
 
     /**
-     * Helper estimate a duration for the meeting based on the closingtime.
-     *
-     * @param integer $closingtime
-     *
-     * @return integer
-     */
-    public static function bigbluebuttonbn_get_duration($closingtime) {
-        $duration = 0;
-        $now = time();
-        if ($closingtime > 0 && $now < $closingtime) {
-            $duration = ceil(($closingtime - $now) / 60);
-            $compensationtime = intval((int) \mod_bigbluebuttonbn\local\config::get('scheduled_duration_compensation'));
-            $duration = intval($duration) + $compensationtime;
-        }
-        return $duration;
-    }
-
-    /**
      * Helper function validates a remote resource.
      *
      * @param string $url

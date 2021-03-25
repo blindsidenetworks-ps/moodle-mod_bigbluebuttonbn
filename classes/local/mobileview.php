@@ -107,17 +107,6 @@ class mobileview {
             }
         }
         $data['welcome'] = trim($bbbsession['welcome']);
-        // Set the duration for the meeting.
-        $durationtime = self::create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
-        if ($durationtime > 0) {
-            $data['duration'] = $durationtime;
-            $data['welcome'] .= '<br><br>';
-            $data['welcome'] .= str_replace(
-                '%duration%',
-                (string) $durationtime,
-                get_string('bbbdurationwarning', 'bigbluebuttonbn')
-            );
-        }
         $voicebridge = intval($bbbsession['voicebridge']);
         if ($voicebridge > 0 && $voicebridge < 79999) {
             $data['voiceBridge'] = $voicebridge;
@@ -143,18 +132,5 @@ class mobileview {
             return 'true';
         }
         return 'false';
-    }
-
-    /**
-     * Helper for returning the duration expected for the meeting.
-     *
-     * @param  string    $closingtime
-     * @return integer
-     */
-    public static function create_meeting_data_duration($closingtime) {
-        if ((boolean) config::get('scheduled_duration_enabled')) {
-            return bigbluebutton::bigbluebuttonbn_get_duration($closingtime);
-        }
-        return 0;
     }
 }

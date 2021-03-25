@@ -570,54 +570,6 @@ class settings {
     }
 
     /**
-     * Helper function renders duration settings if the feature is enabled.
-     *
-     *
-     * @return void
-     */
-    public function bigbluebuttonbn_settings_duration() {
-        // Configuration for "scheduled duration" feature.
-        $scheduledsettings = new admin_settingpage('scheduled',
-            get_string('config_scheduled', 'bigbluebuttonbn'),
-            'moodle/site:config', !((boolean) validator::section_scheduled_duration_shown())
-            && ($this->moduleenabled));
-        if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_scheduled',
-                '',
-                get_string('config_scheduled_description', 'bigbluebuttonbn'));
-            $scheduledsettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_scheduled_duration_enabled',
-                get_string('config_scheduled_duration_enabled', 'bigbluebuttonbn'),
-                get_string('config_scheduled_duration_enabled_description', 'bigbluebuttonbn'),
-                1);
-            $this->add_conditional_element(
-                'scheduled_duration_enabled',
-                $item,
-                $scheduledsettings
-            );
-            $item = new admin_setting_configtext('bigbluebuttonbn_scheduled_duration_compensation',
-                get_string('config_scheduled_duration_compensation', 'bigbluebuttonbn'),
-                get_string('config_scheduled_duration_compensation_description', 'bigbluebuttonbn'),
-                10, PARAM_INT);
-            $this->add_conditional_element(
-                'scheduled_duration_compensation',
-                $item,
-                $scheduledsettings
-            );
-            $item = new admin_setting_configtext('bigbluebuttonbn_scheduled_pre_opening',
-                get_string('config_scheduled_pre_opening', 'bigbluebuttonbn'),
-                get_string('config_scheduled_pre_opening_description', 'bigbluebuttonbn'),
-                10, PARAM_INT);
-            $this->add_conditional_element(
-                'scheduled_pre_opening',
-                $item,
-                $scheduledsettings
-            );
-        }
-        $this->admin->add($this->section, $scheduledsettings);
-    }
-
-    /**
      * Helper function renders participant settings if the feature is enabled.
      *
      *
