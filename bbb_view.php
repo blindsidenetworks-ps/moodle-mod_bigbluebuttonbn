@@ -319,17 +319,6 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     }
 
     $data['welcome'] = trim($bbbsession['welcome']);
-    // Set the duration for the meeting.
-    $durationtime = bigbluebuttonbn_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
-    if ($durationtime > 0) {
-        $data['duration'] = $durationtime;
-        $data['welcome'] .= '<br><br>';
-        $data['welcome'] .= str_replace(
-            '%duration%',
-            (string) $durationtime,
-            get_string('bbbdurationwarning', 'bigbluebuttonbn')
-          );
-    }
     $voicebridge = intval($bbbsession['voicebridge']);
     if ($voicebridge > 0 && $voicebridge < 79999) {
         $data['voiceBridge'] = $voicebridge;
@@ -383,19 +372,6 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
         return 'true';
     }
     return 'false';
-}
-
-/**
- * Helper for returning the duration expected for the meeting.
- *
- * @param  string    $closingtime
- * @return integer
- */
-function bigbluebuttonbn_bbb_view_create_meeting_data_duration($closingtime) {
-    if ((boolean)\mod_bigbluebuttonbn\local\config::get('scheduled_duration_enabled')) {
-        return bigbluebutton::bigbluebuttonbn_get_duration($closingtime);
-    }
-    return 0;
 }
 
 /**

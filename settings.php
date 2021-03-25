@@ -48,7 +48,6 @@ $bbbsettings->bigbluebuttonbn_settings_waitmoderator();
 $bbbsettings->bigbluebuttonbn_settings_voicebridge();
 $bbbsettings->bigbluebuttonbn_settings_preupload();
 $bbbsettings->bigbluebuttonbn_settings_userlimit();
-$bbbsettings->bigbluebuttonbn_settings_duration();
 $bbbsettings->bigbluebuttonbn_settings_participants();
 $bbbsettings->bigbluebuttonbn_settings_notifications();
 $bbbsettings->bigbluebuttonbn_settings_muteonstart();

@@ -140,16 +140,6 @@ class validator {
     }
 
     /**
-     * Validate if scheduled duration section will be shown.
-     *
-     * @return boolean
-     */
-    public static function section_scheduled_duration_shown() {
-        global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['scheduled_duration_enabled']));
-    }
-
-    /**
      * Validate if moderator default section will be shown.
      *
      * @return boolean

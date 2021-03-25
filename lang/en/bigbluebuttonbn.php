@@ -195,10 +195,6 @@ $string['config_userlimit_editable_description'] = 'User limit value by default 
 
 $string['config_scheduled'] = 'Configuration for "Scheduled sessions"';
 $string['config_scheduled_description'] = 'These settings define some of the behaviour by default for scheduled sessions.';
-$string['config_scheduled_duration_enabled'] = 'Calculate duration enabled';
-$string['config_scheduled_duration_enabled_description'] = 'The duration of an scheduled session is calculated based on the opening and closing times.';
-$string['config_scheduled_duration_compensation'] = 'Compensatory time (minutes)';
-$string['config_scheduled_duration_compensation_description'] = 'Minutes added to the scheduled closing when calculating the duration.';
 $string['config_scheduled_pre_opening'] = 'Accessible before opening time (minutes)';
 $string['config_scheduled_pre_opening_description'] = 'The time in minutes for the session to be acceessible before the schedules opening time is due.';
 
