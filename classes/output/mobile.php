@@ -290,7 +290,7 @@ class mobile {
                     'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_notification', $data),
                 ),
             ),
-            'javascript' => file_get_contents($CFG->dirroot . '/mod/bigbluebuttonbn/mobile.notification.js'),
+            'javascript' => file_get_contents($CFG->dirroot . '/mod/bigbluebuttonbn/mobileapp/mobile.notification.js'),
             'otherdata' => '',
             'files' => ''
         );
