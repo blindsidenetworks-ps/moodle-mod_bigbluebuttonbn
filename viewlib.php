@@ -71,6 +71,42 @@ function bigbluebuttonbn_view_groups(&$bbbsession) {
 }
 
 /**
+ * Modify session according to the group information.
+ *
+ * @param array $bbbsession
+ * @return void
+ */
+function bigbluebuttonbn_build_groups_session(&$bbbsession) {
+    global $CFG;
+    // Find out current group mode.
+    $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+    if ($groupmode == NOGROUPS) {
+        // No groups mode.
+        return;
+    }
+    // Separate or visible group mode.
+    $groups = groups_get_activity_allowed_groups($bbbsession['cm']);
+    if (empty($groups)) {
+        // No groups in this course.
+        return;
+    }
+    $bbbsession['group'] = groups_get_activity_group($bbbsession['cm'], true);
+    $groupname = get_string('allparticipants');
+    if ($bbbsession['group'] != 0) {
+        $groupname = groups_get_group_name($bbbsession['group']);
+    }
+    // Assign group default values.
+    $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
+    $bbbsession['meetingname'] .= ' ('.$groupname.')';
+    if (count($groups) == 0) {
+        // Only the All participants group exists.
+        return;
+    }
+    $context = context_module::instance($bbbsession['cm']->id);
+    $urltoroot = $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$bbbsession['cm']->id;
+}
+
+/**
  * Displays the view for messages.
  *
  * @param array $bbbsession
@@ -134,8 +170,9 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('script', array('language' => 'javascript'));
         $id = $bbbsession['cm']->id;
+        $group = $bbbsession['group'];
         $js = "jQuery(document).ready(function(){"
-                . "jQuery.get('recordings.php?id=$id', function(data) { "
+                . "jQuery.get('recordings.php?id=$id&group=$group', function(data) { "
                 . "jQuery('#bigbluebuttonbn_view_recordings').html(data);"
                 . "Y.use('moodle-mod_bigbluebuttonbn-recordings',function() {M.mod_bigbluebuttonbn.recordings.init({'bbbid': '" . $bbbsession['bigbluebuttonbn']->id . "'})});"
                 . "});"
@@ -170,7 +207,14 @@ function bigbluebuttonbn_view_render_recordings_ajax(&$bbbsession, $activity) {
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
     // JavaScript variables.
     $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
-        'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
+        'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features'],
+        'meetingid' => $bbbsession['meetingid'],
+        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
+        'userlimit' => $bbbsession['userlimit'],
+        'opening' => $openingtime,
+        'closing' => $closingtime,
+    );
+
     $output  = '';
 
     $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);

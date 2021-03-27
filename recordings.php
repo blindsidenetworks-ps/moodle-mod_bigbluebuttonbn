@@ -108,6 +108,8 @@ $activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id);
 // Output starts.
 //echo $OUTPUT->header();
 
+bigbluebuttonbn_build_groups_session($bbbsession);
+
 bigbluebuttonbn_view_render_recordings_ajax($bbbsession, $activitystatus);
 
 // Output finishes.
