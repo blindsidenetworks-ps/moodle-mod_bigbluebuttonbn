@@ -170,7 +170,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('script', array('language' => 'javascript'));
         $id = $bbbsession['cm']->id;
-        $group = $bbbsession['group'];
+        $group = isset($bbbsession['group']) ? $bbbsession['group'] : 0;
         $js = "jQuery(document).ready(function(){"
                 . "jQuery.get('recordings.php?id=$id&group=$group', function(data) { "
                 . "jQuery('#bigbluebuttonbn_view_recordings').html(data);"

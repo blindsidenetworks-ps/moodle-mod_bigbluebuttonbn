@@ -65,9 +65,9 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        $resultUrl = $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret($secondary));
+        $result_url = $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret($secondary));
 
-        return $resultUrl;
+        return $result_url;
     }
 
     /**
@@ -76,7 +76,7 @@ class bigbluebutton {
      * @return string
      */
     public static function sanitized_url($secondary = false) {
-        $pfx=$secondary? 'secondary_' : '';
+        $pfx = $secondary ? 'secondary_' : '';
         $serverurl = trim(config::get($pfx . 'server_url'));
         if (empty($serverurl)) {
             $serverurl = trim(config::get('server_url'));
@@ -96,7 +96,7 @@ class bigbluebutton {
      * @return string
      */
     public static function sanitized_secret($secondary = false) {
-        $pfx=$secondary? 'secondary_' : '';
+        $pfx = $secondary ? 'secondary_' : '';
         $sharedsecret = trim(config::get($pfx . 'shared_secret'));
         if (empty($sharedsecret)) {
             $sharedsecret = trim(config::get('shared_secret'));
@@ -110,7 +110,7 @@ class bigbluebutton {
      * @return string
      */
     public static function root($secondary = false) {
-        $pfx=$secondary? 'secondary_' : '';
+        $pfx = $secondary ? 'secondary_' : '';
         $pserverurl = parse_url(trim(config::get($pfx . 'server_url')));
         $pserverurlport = "";
         if (isset($pserverurl['port'])) {
