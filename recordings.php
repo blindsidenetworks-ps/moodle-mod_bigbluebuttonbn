@@ -78,11 +78,7 @@ $bbbsession['serverversion'] = (string) $serverversion;
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-// Print the page header.
-//$PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
-//$PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
-//$PAGE->set_heading($course->fullname);
 
 /** @var core_renderer $OUTPUT */
 $OUTPUT;
@@ -105,15 +101,9 @@ if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], 
 
 $activitystatus = bigbluebuttonbn_view_session_config($bbbsession, $id);
 
-// Output starts.
-//echo $OUTPUT->header();
-
 bigbluebuttonbn_build_groups_session($bbbsession);
 
 bigbluebuttonbn_view_render_recordings_ajax($bbbsession, $activitystatus);
-
-// Output finishes.
-//echo $OUTPUT->footer();
 
 // Shows version as a comment.
 echo '<!-- '.$bbbsession['originTag'].' -->'."\n";

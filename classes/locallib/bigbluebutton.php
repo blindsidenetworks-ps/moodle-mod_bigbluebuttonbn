@@ -65,9 +65,9 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        $result_url = $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret($secondary));
+        $resulturl = $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret($secondary));
 
-        return $result_url;
+        return $resulturl;
     }
 
     /**
