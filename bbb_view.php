@@ -222,9 +222,9 @@ switch (strtolower($action)) {
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
 
         if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
-            $parseUrl = parse_url($href);
-            $path = $parseUrl['path'];
-            $query = $parseUrl['query'];
+            $parseurl = parse_url($href);
+            $path = $parseurl['path'];
+            $query = $parseurl['query'];
             $location = "./proxy_presentation.php{$path}?{$query}";
         } else {
             $location = urldecode($href);

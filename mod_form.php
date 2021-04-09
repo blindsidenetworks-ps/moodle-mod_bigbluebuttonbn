@@ -695,7 +695,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             // Hack alert! Formatting is not stored, so transformation must be done.
             $value = empty($bigbluebuttonbn->accesspolicy) ? $cfg['accessmodal_default'] : $bigbluebuttonbn->accesspolicy;
             $mform->getElement('accessmodaltext')->setValue(['text' => $value]);
-        } else  {
+        } else {
             $mform->addElement('hidden', 'accessmodaltext', $cfg['accessmodal_default']);
             $mform->setType('accessmodaltext', PARAM_RAW);
         }

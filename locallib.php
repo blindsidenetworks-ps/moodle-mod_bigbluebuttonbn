@@ -1635,8 +1635,8 @@ function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
         }
 
         if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
-            $parseUrl = parse_url($image['url']);
-            $url = "./proxy_presentation.php{$parseUrl['path']}";
+            $parseurl = parse_url($image['url']);
+            $url = "./proxy_presentation.php{$parseurl['path']}";
         } else {
             $url = $image['url'];
         }
