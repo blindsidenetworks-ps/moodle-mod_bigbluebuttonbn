@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/bigbluebuttonbn/db" VERSION="20201201" COMMENT="XMLDB file for Moodle mod/bigbluebuttonbn"
+<XMLDB PATH="mod/bigbluebuttonbn/db" VERSION="20200505" COMMENT="XMLDB file for Moodle mod/bigbluebuttonbn"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -73,6 +73,7 @@
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
         <INDEX NAME="log" UNIQUE="false" FIELDS="log"/>
         <INDEX NAME="logrow" UNIQUE="false" FIELDS="courseid, bigbluebuttonbnid, userid, log"/>
+        <INDEX NAME="userlog" UNIQUE="false" FIELDS="userid, log"/>
       </INDEXES>
     </TABLE>
   </TABLES>

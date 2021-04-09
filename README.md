@@ -23,13 +23,14 @@ With the latest version of this plugin you can
 
 Note that on previous versions of Moodle you will need to use the specific version of this plugin.
 
-| Moodle Version    |  Branch      | Version              |
-|-------------------|--------------|----------------------|
-| Moodle 2.0 - 2.5  | v1.1-stable  | v1.1.1  (2015062101) |
-| Moodle 2.6        | v2.0-stable  | v2.0.4  (2015080611) |
-| Moodle 2.7 - 2.9  | v2.1-stable  | v2.1.15 (2016051920) |
-| Moodle 3.0 - 3.1  | v2.2-stable  | v2.2.12 (2017101020) |
-| Moodle 3.2 - 3.8  | v2.3-stable  | v2.3.3  (2019042008) |
+| Moodle Version    |  Branch      | Version                 |
+|-------------------|--------------|-------------------------|
+| Moodle 2.0 - 2.5  | v1.1-stable  | v1.1.1  (2015062101)    |
+| Moodle 2.6        | v2.0-stable  | v2.0.4  (2015080611)    |
+| Moodle 2.7 - 2.9  | v2.1-stable  | v2.1.15 (2016051920)    |
+| Moodle 3.0 - 3.1  | v2.2-stable  | v2.2.12 (2017101020)    |
+| Moodle 3.2 - 3.9  | v2.3-stable  | v2.3.4  (2019042009)    |
+| Moodle 3.4 - 3.9  | v2.4-beta    | v2.4-beta1 (2019101003) |
 
 Prerequisites
 =============
@@ -57,7 +58,7 @@ https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn/
 contains the latest source. We recommend to download the latest snapshot from the Moodle Plugin Directory.
 
 
-Note: You may want to install the RecordingsBN activity module to access recordings as well.
+Note: Since version 2.2 the use of the RecordingsBN activity module to access recordings is no longer needed. But when running an older version, it is requiered in order to gain access to the recordings.
 
 
 Contact Us
@@ -65,6 +66,3 @@ Contact Us
 If you have feedback, enhancement requests, or would like commercial support for hosting, integrating, customizing, branding, or scaling BigBlueButton, contact us at
 
 http://blindsidenetworks.com/
-
-Regards,... Fred Dixon
-ffdixon [at] blindsidenetworks [dt] com

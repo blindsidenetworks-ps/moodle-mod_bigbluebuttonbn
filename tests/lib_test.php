@@ -95,7 +95,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         return $data;
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
         parent::setUp();
         set_config('enablecompletion', true); // Enable completion for all tests.

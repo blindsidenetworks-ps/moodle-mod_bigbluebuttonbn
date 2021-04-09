@@ -427,8 +427,9 @@ function bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $o
     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
         $password = $bbbsession['modPW'];
     }
+    $bbbsession['createtime'] = $meetinginfo['createTime'];
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
-        $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype']);
+        $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'], $bbbsession['createtime']);
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.
