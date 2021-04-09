@@ -1,3 +1,79 @@
+2.4-rc.1 (2019101005)
+Bug: Patch for issue with Calendar/Event (CONTRIB-8454).
+
+2.4-beta.2 (2019101004)
+Bug: Patch for adding timestamp to join.
+Bug: Fix for issue after bug fixed on BBB post_events script (CONTRIB-7457).
+Bug: Fix for check capabilities also in module context (CONTRIB-8371 & GITHUB-315).
+Bug: Fix for preventing bugged displays on recordings (GITHUB-321).
+Enhancement: Update to external.php.
+Enhancement: Add default welcome message to settings (CONTRIB-7845).
+
+2.4-beta.1 (2019101003)
+Bug: Fix for issue with search on updated recordings only works if page is refreshed (CONTRIB-7700).
+Bug: Fix for end session action not always working (CONTRIB-7895).
+Bug: Fix for message sending triggered by recordng ready callback hangs (CONTRIB-7905).
+Bug: Fix for issue with mod_bigbluebuttonbn\privacy\provider::get_contexts_for_userid (CONTRIB-7915).
+Bug: Fix for participation report is not correctly implemented (CONTRIB-7951).
+Bug: Fix for "Recordings Only" instances have the feature [Restrict Access] disabled (CONTRIB-7960).
+Bug: Fix for missing strings for the new recording formats (CONTRIB-7962).
+Bug: Fix for "Moderator by default" setting does not recognise custom roles (CONTRIB-7966).
+Bug: Fix for BBB hard-coded dependency on mod_lti (CONTRIB-7969).
+Bug: Fix for possible CSRF vulnerability in BBB ajax intermediate script (CONTRIB-7971).
+Bug: Fix for BBB add participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
+Bug: Fix for error while creating or updating a BBB activity (CONTRIB-8019).
+Bug: Fix for '&' breaks the password when randomly assigned (CONTRIB-8049).
+Bug: Fix for validation of recording links fails some times (CONTRIB-8051).
+Bug: Fix for problem of List Table Pagination (CONTRIB-8053).
+Bug: Fix for improve performance on view (CONTRIB-8157).
+Enhancement: Add a way to reprocess completion validation (CONTRIB-7917).
+Enhancement: Completion by engagement should include configurable metrics (CONTRIB-7919).
+Enhancement: BBB should only include core libraries as required (CONTRIB-7970).
+Enhancement: Notification should contain link to BBB (CONTRIB-8029).
+Enhancement: Corrected problem of Import List Same Course Names (CONTRIB-8052).
+Enhancement: Recording parameters in activity form (CONTRIB-8116).
+Enhancement: Change the UI for Participants to User/Role Mapping (CONTRIB-8164).
+New Feature: Completion should be based on events captured from the live session (CONTRIB-7457).
+New Feature: Completion should be extended for supporting engagement (CONTRIB-7908).
+New Feature: Configure meeting room from the plugin (CONTRIB-8239).
+
+2.3.6 (2019042011)
+Bug: Fix for issue with users joining meetings with static URLs on mobile devices.
+
+2.3.5 (2019042010)
+Bug: Fix for issue with users joining meetings with static URLs.
+
+2.3.4 (2019042009)
+Bug: Fix for issue with regression BBB incorrectly distributes moderator rights to student-role (CONTRIB-7627).
+Bug: Fix for issue with regression meeting name is not required in the recording list (CONTRIB-7703).
+Bug: Fix for issue with imported recordings shows all the "Imported recordings" in the course (CONTRIB-7961).
+Bug: Fix for issue with administrator and manager-role cannot see recordings when groups are used (CONTRIB-8038).
+Bug: Fix for issue with BigBlueButton notifications include the sender email-address (CONTRIB-8042).
+Bug: Fix for issue with notification when activity is updated not respecting enrolment status (CONTRIB-8046).
+Bug: Fix for issue with wrong role ids in Website Administration (CONTRIB-8047).
+Bug: Fix for issue with performance on view (CONTRIB-8157).
+Bug: Fix for issue with closingtime shown on the Dashboard if it isn't set in the activity instance (CONTRIB-8158).
+Bug: Fix for issue with "wait for moderator" not allowing join meetings from mobile app (CONTRIB-8162).
+Bug: Fix for issue with option 'Session can be recorded' not shown for 'Room/Activity only' (CONTRIB-8174).
+Enhancement: Added option for turn off sending notifications when recording ready feature. (CONTRIB-8026).
+
+2.3.3 (2019042008)
+Bug: Fix for issue with instances not being saved on Moodle 3.5 and earlier (CONTRIB-8019).
+
+2.3.2 (2019042007)
+Bug: Fix for issue with Restrict Access setting on "Recording Only" and "Room/Activity Only" modes (CONTRIB-7960).
+Bug: Fix for issue with HAndle missing language strings for new recording formats (CONTRIB-7962).
+Bug: Fix for issue with hard-coded dependency on mod_lti (CONTRIB-7969).
+Bug: Fix for issue with missing sesskey on ajax requests (CONTRIB-7971).
+Bug: Fix for issue with participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
+Bug: Fix for issue with recordings table doesn't respect forced group mode (CONTRIB-7973).
+Bug: Fix for issue with fails core privacy provider testcase (CONTRIB-7983).
+
+2.3.1 (2019042006)
+Bug: Fix for issue with notifications on creation (CONTRIB-7874).
+Bug: Fix for issue with unit test failure on v2.2 stable (CONTRIB-7875).
+Bug: Fix for issue with DML when using Oracle or MSSQL (CONTRIB-7894).
+
 2.3 (2019042005)
 Tag: Bumped version and release tags and updated maturity to stable.
 
@@ -36,6 +112,15 @@ New Feature: Add support for muteOnStart (CONTRIB-7519).
 New Feature: Add option for forcing all the sessions to be recorded (with no button) (CONTRIB-7520).
 New Feature: Add support for recordings of breakout rooms (CONTRIB-7521).
 New Feature: Recording list should give an option for searching recordings (CONTRIB-7522).
+
+2.2.13 (2017101021)
+Bug: Fix for issue with users joining meetings with static URLs.
+
+2.2.12 (2017101020)
+Bug: Fix for issue with JWT library clashing in Moodle 3.7 (CONTRIB-7716).
+Bug: Fix for implementation of resetting function (CONTRIB-7695).
+Bug: Fix for for issue with delete instances with recycle bin disabled (CONTRIB-7660).
+Bug: Fix for hard-coded string in room.js and old reference to RecordingsBN (GIT-130).
 
 2.2.11 (2017101019)
 Bug: Fix for participation rules for users applied as rules for roles (CONTRIB-7627).

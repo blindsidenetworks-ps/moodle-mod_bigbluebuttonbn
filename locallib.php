@@ -99,6 +99,7 @@ const BIGBLUEBUTTON_ORIGIN_INDEX = 2;
  * @param string $configtoken
  * @param string $userid
  * @param string $clienttype
+ * @param string $createtime
  *
  * @return string
  */
@@ -109,7 +110,8 @@ function bigbluebuttonbn_get_join_url(
     $logouturl,
     $configtoken = null,
     $userid = null,
-    $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH
+    $clienttype = BIGBLUEBUTTON_CLIENTTYPE_FLASH,
+    $createtime = null
 ) {
     $data = ['meetingID' => $meetingid,
         'fullName' => $username,
@@ -125,6 +127,9 @@ function bigbluebuttonbn_get_join_url(
     }
     if (!is_null($userid)) {
         $data['userID'] = $userid;
+    }
+    if (!is_null($createtime)) {
+        $data['createTime'] = $createtime;
     }
     return \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('join', $data);
 }
@@ -1630,8 +1635,8 @@ function bigbluebuttonbn_get_recording_data_row_preview_images($playback) {
         }
 
         if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
-            $parseUrl = parse_url($image['url']);
-            $url = "./proxy_presentation.php{$parseUrl['path']}";
+            $parseurl = parse_url($image['url']);
+            $url = "./proxy_presentation.php{$parseurl['path']}";
         } else {
             $url = $image['url'];
         }
@@ -2112,8 +2117,8 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return void
  */
 function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-    $meetingid = $jsonobj->{'ext_meeting_id'};
-    $recordid = $jsonobj->{'meeting_id'};
+    $meetingid = $jsonobj->{'meeting_id'};
+    $recordid = $jsonobj->{'internal_meeting_id'};
     $attendees = $jsonobj->{'data'}->{'attendees'};
     foreach ($attendees as $attendee) {
         $userid = $attendee->{'ext_user_id'};
@@ -2170,10 +2175,6 @@ function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
     $completion = new completion_info($course);
     if (!$completion->is_enabled($cm)) {
         mtrace("Completion not enabled");
-        return;
-    }
-    if (!$bigbluebuttonbn->completionattendance) {
-        mtrace("Completion by attendance not enabled");
         return;
     }
     if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
@@ -3303,6 +3304,21 @@ function bigbluebuttonbn_settings_lockonjoinconfigurable(&$renderer) {
 }
 
 /**
+ * Helper function renders default messages settings.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_default_messages(&$renderer) {
+    $renderer->render_group_header('default_messages');
+    $renderer->render_group_element(
+        'welcome_default',
+        $renderer->render_group_element_textarea('welcome_default', '', PARAM_TEXT)
+    );
+}
+
+/**
  * Helper function renders extended settings if any of the features there is enabled.
  *
  * @param object $renderer
@@ -3310,7 +3326,7 @@ function bigbluebuttonbn_settings_lockonjoinconfigurable(&$renderer) {
  * @return void
  */
 function bigbluebuttonbn_settings_extended(&$renderer) {
-    // Configuration for 'notify users when recording ready' feature.
+    // Configuration for extended capabilities.
     if (!(boolean) \mod_bigbluebuttonbn\settings\validator::section_settings_extended_shown()) {
         return;
     }
@@ -3320,12 +3336,24 @@ function bigbluebuttonbn_settings_extended(&$renderer) {
         'recordingready_enabled',
         $renderer->render_group_element_checkbox('recordingready_enabled', 0)
     );
+    // Configuration for extended BN capabilities should go here.
+}
+
+/**
+ * Helper function renders experimental settings if any of the features there is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_experimental(&$renderer) {
+    // Configuration for experimental features should go here.
+    $renderer->render_group_header('experimental_features');
     // UI for 'register meeting events' feature.
     $renderer->render_group_element(
         'meetingevents_enabled',
         $renderer->render_group_element_checkbox('meetingevents_enabled', 0)
     );
-    // Configuration for extended BN capabilities should go here.
 }
 
 /**

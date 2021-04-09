@@ -216,8 +216,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementemojis',
             $fielddefinition);
+        // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'courseid',
+            ['courseid']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'log',
+            ['log']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'logrow',
+            ['courseid', 'bigbluebuttonbnid', 'userid', 'log']);
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2019101004) {
+        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
+            ['userid', 'log']);
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
     if ($oldversion < 2020050500) {
 
@@ -288,6 +302,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         upgrade_mod_savepoint(true, 2020050503, 'bigbluebuttonbn');
     }
+
     return true;
 }
 

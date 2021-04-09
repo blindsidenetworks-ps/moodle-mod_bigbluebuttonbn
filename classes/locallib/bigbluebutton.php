@@ -169,91 +169,90 @@ class bigbluebutton {
      * Build standard array with configurations required for BBB server.
      *
      * @param \context $context
-     * @param array $session
+     * @param array $bbbsession
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function view_bbbsession_set($context, &$session) {
+    public static function view_bbbsession_set($context, &$bbbsession) {
 
         global $CFG, $USER;
 
-        $session['username'] = fullname($USER);
-        $session['userID'] = $USER->id;
-        $session['administrator'] = is_siteadmin($session['userID']);
-        $participantlist = bigbluebuttonbn_get_participant_list($session['bigbluebuttonbn'], $context);
-        $session['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
-        $session['managerecordings'] = ($session['administrator']
+        $bbbsession['username'] = fullname($USER);
+        $bbbsession['userID'] = $USER->id;
+        $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
+        $participantlist = bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
+        $bbbsession['moderator'] = bigbluebuttonbn_is_moderator($context, $participantlist);
+        $bbbsession['managerecordings'] = ($bbbsession['administrator']
             || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-        $session['importrecordings'] = ($session['managerecordings']);
-        $session['modPW'] = $session['bigbluebuttonbn']->moderatorpass;
-        $session['viewerPW'] = $session['bigbluebuttonbn']->viewerpass;
-        $session['meetingid'] = $session['bigbluebuttonbn']->meetingid.'-'.$session['course']->id.'-'.
-            $session['bigbluebuttonbn']->id;
-        $session['meetingname'] = $session['bigbluebuttonbn']->name;
-        $session['meetingdescription'] = $session['bigbluebuttonbn']->intro;
-        $session['userlimit'] = intval((int) config::get('userlimit_default'));
+        $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
+        $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
+        $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
+        $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
+            $bbbsession['bigbluebuttonbn']->id;
+        $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
+        $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
+        $bbbsession['userlimit'] = intval((int) config::get('userlimit_default'));
         if ((boolean) config::get('userlimit_editable')) {
-            $session['userlimit'] = intval($session['bigbluebuttonbn']->userlimit);
+            $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
         }
-        $session['voicebridge'] = $session['bigbluebuttonbn']->voicebridge;
-        if ($session['bigbluebuttonbn']->voicebridge > 0) {
-            $session['voicebridge'] = 70000 + $session['bigbluebuttonbn']->voicebridge;
+        $bbbsession['voicebridge'] = $bbbsession['bigbluebuttonbn']->voicebridge;
+        if ($bbbsession['bigbluebuttonbn']->voicebridge > 0) {
+            $bbbsession['voicebridge'] = 70000 + $bbbsession['bigbluebuttonbn']->voicebridge;
         }
-        $session['wait'] = $session['bigbluebuttonbn']->wait;
-        $session['record'] = $session['bigbluebuttonbn']->record;
-
-        $session['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
+        $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
+        $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
+        $bbbsession['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
         if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
-            $session['recordallfromstart'] = $session['bigbluebuttonbn']->recordallfromstart;
+            $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
         }
-
-        $session['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
+        $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
         if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
-            $session['recordhidebutton'] = $session['bigbluebuttonbn']->recordhidebutton;
+            $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
         }
-
-        $session['welcome'] = $session['bigbluebuttonbn']->welcome;
-        if (!isset($session['welcome']) || $session['welcome'] == '') {
-            $session['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
+        $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
+        if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
+            $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
         }
-        if ($session['bigbluebuttonbn']->record) {
+        if ($bbbsession['bigbluebuttonbn']->record) {
             // Check if is enable record all from start.
-            if ($session['recordallfromstart']) {
-                $session['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
+            if ($bbbsession['recordallfromstart']) {
+                $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
                         'bigbluebuttonbn');
             } else {
-                $session['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
+                $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
             }
         }
-        $session['openingtime'] = $session['bigbluebuttonbn']->openingtime;
-        $session['closingtime'] = $session['bigbluebuttonbn']->closingtime;
-        $session['muteonstart'] = $session['bigbluebuttonbn']->muteonstart;
-        $session['disablecam'] = $session['bigbluebuttonbn']->disablecam;
-        $session['disablemic'] = $session['bigbluebuttonbn']->disablemic;
-        $session['disableprivatechat'] = $session['bigbluebuttonbn']->disableprivatechat;
-        $session['disablepublicchat'] = $session['bigbluebuttonbn']->disablepublicchat;
-        $session['disablenote'] = $session['bigbluebuttonbn']->disablenote;
-        $session['hideuserlist'] = $session['bigbluebuttonbn']->hideuserlist;
-        $session['lockedlayout'] = $session['bigbluebuttonbn']->lockedlayout;
-        $session['lockonjoin'] = $session['bigbluebuttonbn']->lockonjoin;
-        $session['lockonjoinconfigurable'] = $session['bigbluebuttonbn']->lockonjoinconfigurable;
-        $session['context'] = $context;
-        $session['origin'] = 'Moodle';
-        $session['originVersion'] = $CFG->release;
+        $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
+        $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
+        $bbbsession['muteonstart'] = $bbbsession['bigbluebuttonbn']->muteonstart;
+        // Lock settings.
+        $bbbsession['disablecam'] = $bbbsession['bigbluebuttonbn']->disablecam;
+        $bbbsession['disablemic'] = $bbbsession['bigbluebuttonbn']->disablemic;
+        $bbbsession['disableprivatechat'] = $bbbsession['bigbluebuttonbn']->disableprivatechat;
+        $bbbsession['disablepublicchat'] = $bbbsession['bigbluebuttonbn']->disablepublicchat;
+        $bbbsession['disablenote'] = $bbbsession['bigbluebuttonbn']->disablenote;
+        $bbbsession['hideuserlist'] = $bbbsession['bigbluebuttonbn']->hideuserlist;
+        $bbbsession['lockedlayout'] = $bbbsession['bigbluebuttonbn']->lockedlayout;
+        $bbbsession['lockonjoin'] = $bbbsession['bigbluebuttonbn']->lockonjoin;
+        $bbbsession['lockonjoinconfigurable'] = $bbbsession['bigbluebuttonbn']->lockonjoinconfigurable;
+        // Additional info related to the course.
+        $bbbsession['context'] = $context;
+        // Metadata (origin).
+        $bbbsession['origin'] = 'Moodle';
+        $bbbsession['originVersion'] = $CFG->release;
         $parsedurl = parse_url($CFG->wwwroot);
-        $session['originServerName'] = $parsedurl['host'];
-        $session['originServerUrl'] = $CFG->wwwroot;
-        $session['originServerCommonName'] = '';
-        $session['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $session['bnserver'] = bigbluebuttonbn_is_bn_server();
-        $session['clienttype'] = config::get('clienttype_default');
-
+        $bbbsession['originServerName'] = $parsedurl['host'];
+        $bbbsession['originServerUrl'] = $CFG->wwwroot;
+        $bbbsession['originServerCommonName'] = '';
+        $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
+        $bbbsession['bnserver'] = bigbluebuttonbn_is_bn_server();
+        // Setting for clienttype, assign flash if not enabled, or default if not editable.
+        $bbbsession['clienttype'] = config::get('clienttype_default');
         if (config::get('clienttype_editable')) {
-            $session['clienttype'] = $session['bigbluebuttonbn']->clienttype;
+            $bbbsession['clienttype'] = $bbbsession['bigbluebuttonbn']->clienttype;
         }
-
         if (!config::clienttype_enabled()) {
-            $session['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
+            $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
         }
     }
 
