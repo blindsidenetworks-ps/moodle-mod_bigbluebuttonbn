@@ -310,7 +310,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         upgrade_mod_savepoint(true, 2020050504, 'bigbluebuttonbn');
     }
-
     if ($oldversion < 2019101005) {
         // Add field for guestlinkenabled.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
