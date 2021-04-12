@@ -226,13 +226,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2019101004) {
-        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
-            ['userid', 'log']);
-        // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
-    }
     if ($oldversion < 2020050500) {
 
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
@@ -301,6 +294,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'accesspolicy',
             $fielddefinition);
         upgrade_mod_savepoint(true, 2020050503, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2020050504) {
+        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
+            ['userid', 'log']);
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
     return true;
