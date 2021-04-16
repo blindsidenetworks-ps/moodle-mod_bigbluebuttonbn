@@ -1270,3 +1270,23 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
     $nodenav->add(get_string('completionvalidatestate', 'bigbluebuttonbn'),
         $completionvalidate, navigation_node::TYPE_CONTAINER);
 }
+
+/**
+ * Helper function to convert BBB's sent datetime format into a timestamp which can be converted to any format.
+ *
+ * @param string $datetime the format passed from BBB servers which is usually in this example format "2021-04-15 12:47:41 +1000"
+ * @return int unix timestamp of the datetime provided
+ */
+function bigbluebuttonbn_datetime_to_timestamp($datetime) {
+    return strtotime(
+        str_replace(
+            " ",
+            "T",
+            str_replace(
+                " +",
+                "+",
+                $datetime
+            )
+        )
+    );
+}
