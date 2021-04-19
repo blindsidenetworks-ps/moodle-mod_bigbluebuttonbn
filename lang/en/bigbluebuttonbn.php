@@ -192,6 +192,8 @@ $string['config_participant'] = 'Participant configuration';
 $string['config_participant_description'] = 'These settings define the role by default for participants in a conference.';
 $string['config_participant_guestlink'] = 'Allow guest access links';
 $string['config_participant_guestlink_description'] = 'Allow moderator to create a guest access link for external participants.';
+$string['config_participant_guest_requires_moderator_approval'] = 'Moderator must approve guests';
+$string['config_participant_guest_requires_moderator_approval_description'] = 'Moderators must always approve guests. Enabling this will lock and hide the option from the activity setting';
 
 $string['config_participant_moderator_default'] = 'Moderator by default';
 $string['config_participant_moderator_default_description'] = 'This rule is used by default when a new room is added.';

@@ -387,12 +387,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return void
      */
     private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg) {
-        if (\mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
-                $mform->addElement('header', 'guestlink', get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
-                $mform->addElement('advcheckbox', 'guestlinkenabled',
-                        get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ');
+        if ($cfg['participant_guestlink']) {
+            $mform->addElement('header', 'guestlink', get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
+            $mform->addElement('advcheckbox', 'guestlinkenabled',
+                    get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ');
+
+            // If site-level moderatorapproval is required, do not include this element (as it should be automatically applied)
+            if (!$cfg['participant_guest_requires_moderator_approval']) {
                 $mform->addElement('advcheckbox', 'moderatorapproval',
                         get_string('mod_form_field_moderatorapproval', 'bigbluebuttonbn'), ' ');
+            }
         }
     }
     /**

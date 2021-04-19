@@ -379,7 +379,11 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['lockonjoinconfigurable']) {
         $data['lockSettingsLockOnJoinConfigurable'] = 'true';
     }
-    if ($bbbsession['bigbluebuttonbn']->moderatorapproval) {
+    // Check global mod settings first, otherwise check activity instance settings
+    if (
+        \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_moderator_approval')
+        || $bbbsession['bigbluebuttonbn']->moderatorapproval
+    ) {
         $data['guestPolicy'] = 'ASK_MODERATOR';
     }
     return $data;

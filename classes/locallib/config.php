@@ -146,7 +146,7 @@ class config {
     }
 
     /**
-     * Validates if recording settings are enabled.
+     * Validates if guestlink settings are enabled.
      *
      * @return boolean
      */
@@ -266,6 +266,8 @@ class config {
                'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
+               'participant_guestlink' => self::get('participant_guestlink'),
+               'participant_guest_requires_moderator_approval' => self::get('participant_guest_requires_moderator_approval'),
           );
     }
 }
