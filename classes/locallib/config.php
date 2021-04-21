@@ -128,6 +128,8 @@ class config {
             'accessmodal_editable' => true,
             'accessmodal_default' => '',
             'welcome_default' => '',
+            'participant_guestlink' => '',
+            'participant_guest_requires_moderator_approval' => false,
         );
     }
 
