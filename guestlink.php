@@ -63,7 +63,33 @@ if (!$valid) {
     ];
 
     echo $OUTPUT->header();
+
+    // Setup access policy modal window
+    // If global editing is disabled, it is always the global version.
+    // Note: Duplicate block @ mod/bigbluebuttonbn/viewlib.php:258
+    if ((int) $CFG->bigbluebuttonbn_accessmodal_editable) {
+        $policytext = format_text($bbbsession['bigbluebuttonbn']->accesspolicy ?? '');
+        // If empty here, try the default policy.
+        if (empty(strip_tags($policytext))) {
+            $policytext = format_text($CFG->bigbluebuttonbn_accessmodal_default ?? '');
+        }
+    } else {
+        $policytext = format_text($CFG->bigbluebuttonbn_accessmodal_default ?? '');
+    }
+
+    // Check if there is any content with HTML stripped.
+    if (!empty(strip_tags($policytext))) {
+        echo $OUTPUT->render_from_template('mod_bigbluebuttonbn/accesspolicy', [
+            'body' => $policytext,
+            'forward' => null,
+            'hash' => md5($policytext),
+            'alert' => get_string('accesspolicyalert', 'mod_bigbluebuttonbn')
+        ]);
+        // Add the JS var to setup the modal from JS.
+        $context['accesspolicy'] = true;
+    }
     echo $OUTPUT->render_from_template('mod_bigbluebuttonbn/guestaccess_view', $context);
+
     echo $OUTPUT->footer();
 } else {
     list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');

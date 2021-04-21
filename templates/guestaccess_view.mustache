@@ -2,10 +2,9 @@
 <div class="row shiftrow">
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
-            <h4 class="text-left">{{# str }} guestlink_form_join_welcome,bigbluebuttonbn {{/ str }} </h4>
+        <h4 class="text-left">{{# str }} guestlink_form_join_welcome,bigbluebuttonbn {{/ str }} </h4>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-
 </div>
 <div class="row">
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
@@ -35,16 +34,17 @@
     <input type="hidden" name="gid" value="{{gid}}"/>
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
     <div class="col-lg-2 col-md-2 col-sm-2">
-    {{#guestnameerrormessage}}
-        <div class="warning">
-            {{# str }} guestlink_form_join_no_username,bigbluebuttonbn {{/ str }}
-        </div>
-    {{/guestnameerrormessage}}
-    </div>    <div class="col-lg-2 col-md-2 col-sm-2">
-            <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
+        {{#guestnameerrormessage}}
+            <div class="warning">
+                {{# str }} guestlink_form_join_no_username,bigbluebuttonbn {{/ str }}
+            </div>
+        {{/guestnameerrormessage}}
     </div>
-    <div class="col-lg-5 col-md-5 col-sm-5"  style="padding-left:0px;">
-            <input type="submit" class="btn btn-primary inputbutton" name="joinbutton" id="id_joinbutton" value="{{# str }} guestlink_form_join_button,bigbluebuttonbn {{/ str }}">
+    <div class="col-lg-2 col-md-2 col-sm-2">
+        <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
+    </div>
+    <div class="col-lg-5 col-md-5 col-sm-5" style="padding-left:0px;">
+        <input type="submit" class="btn btn-primary inputbutton" name="joinbutton" id="id_joinbutton" value="{{# str }} guestlink_form_join_button,bigbluebuttonbn {{/ str }}">
     </div>
 </div>
 </form>
@@ -63,7 +63,18 @@ var validateForm = function() {
         return false;
     }
 };
-
 document.getElementById("id_joinbutton").onclick = validateForm;
+
+{{#accesspolicy}}
+let showAccessPolicy = () => {
+    $("#policymodal").data("callback", function() {
+        document.forms["guestlinkform"].submit()
+    });
+    $("#policymodal").modal("show");
+    return false
+}
+document.forms["guestlinkform"].onsubmit = showAccessPolicy
+{{/accesspolicy}}
+
 {{/js}}
 {{/element.frozen}}

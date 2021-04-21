@@ -19,15 +19,30 @@
 require(['jquery', 'core/sessionstorage'], function($, Storage) {
     var hash = $('#policymodal').data('hash');
 
+    let handlePolicyAcceptedCallback = () => {
+
+        // If a destination/forward is set, redirect to the intended URL
+        let destination = "{{{forward}}}";
+        if (destination) {
+            window.location.href = destination;
+        }
+        // Otherwise execute the callback set if one exists on the policy modal
+        else {
+            $('#policymodal').data('callback')?.()
+        }
+    }
+
     $('#policymodalaccept').on('click', (e) => {
         Storage.set('mod_bigbluebutton_policyaccepted' + hash, 'true');
+        e.preventDefault();
+        handlePolicyAcceptedCallback();
     });
 
     // If the storage key for accepting the policy is set,
     $('#policymodal').on('show.bs.modal', (e) => {
         if (Storage.get('mod_bigbluebutton_policyaccepted' + hash) === 'true') {
             e.preventDefault();
-            window.location.href = "{{{forward}}}";
+            handlePolicyAcceptedCallback();
         }
     });
 
