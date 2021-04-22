@@ -1299,3 +1299,57 @@ function bigbluebuttonbn_datetime_to_timestamp($datetime) {
         )
     );
 }
+
+/**
+ * Helper for performing a setting a new password
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $password
+ *
+ * @return void
+ */
+function bigbluebuttonbn_set_guest_password($bigbluebuttonbn, $password) {
+    global $DB;
+    if (!bigbluebuttonbn_has_capability($bigbluebuttonbn->id, 'mod/bigbluebuttonbn:guestlink_change_password')) {
+        return;
+    }
+    $DB->set_field('bigbluebuttonbn', 'guestpass', $password, ['id' => $bigbluebuttonbn->id]);
+}
+
+/**
+ * Helper for performing a setting an expires at timestamp for guest access.
+ * Note: Uses the same capability checks as changing the password.
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $expiresat
+ *
+ * @return void
+ */
+function bigbluebuttonbn_set_guest_access_expiry($bigbluebuttonbn, $expiresat) {
+    global $DB;
+    if (!bigbluebuttonbn_has_capability($bigbluebuttonbn->id, 'mod/bigbluebuttonbn:guestlink_change_password')) {
+        return;
+    }
+    $DB->set_field('bigbluebuttonbn', 'guestlinkexpiresat', $expiresat, ['id' => $bigbluebuttonbn->id]);
+}
+
+/**
+ * Helper for checking module capability.
+ *
+ * Note: Full capability string is used to allow easy search and replace if required
+ *
+ * @param object $bigbluebuttonbnid
+ * @param string $capability
+ *
+ * @return bool
+ */
+function bigbluebuttonbn_has_capability($bigbluebuttonbnid, $capability) {
+    if (!$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbnid)) {
+        return false;
+    }
+    $context = context_module::instance($cm->id);
+    if (!has_capability($capability, $context)) {
+        return false;
+    }
+    return true;
+}

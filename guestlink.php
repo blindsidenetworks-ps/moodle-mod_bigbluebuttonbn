@@ -46,7 +46,11 @@ $bigbluebuttonbn = bigbluebuttonbn_get_bigbluebuttonbn_by_guestlinkid($gid);
 if (!$bigbluebuttonbn->guestlinkenabled) {
     echo get_string('guestlink_form_guestlink_disabled_instance', 'bigbluebuttonbn');
     die();
+} else if ($bigbluebuttonbn->guestlinkexpiresat != 0 && $bigbluebuttonbn->guestlinkexpiresat < time()) {
+    echo get_string('guestlink_form_guestlink_access_expired', 'bigbluebuttonbn');
+    die;
 }
+
 $valid = ($guestname && ($bigbluebuttonbn->guestpass == $guestpass || !$bigbluebuttonbn->guestpass));
 
 if (!$valid) {

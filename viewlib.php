@@ -248,7 +248,30 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
     );
     // Main box.
     $output  = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
-    $output .= '<br><span id="guestlink_panel"></span>';
+
+    if (!empty($guestlink['enabled'])) {
+        $actionurl = new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]);
+        $mform = new \mod_bigbluebuttonbn\form\guestlink_access_form($actionurl, [
+            'guestlinkurl' => $guestlink['url'],
+            'guestlinkpassword' => $guestlink['password'] ?? '',
+            'guestlinkchangepassenabled' => $guestlink['changepassenabled'],
+            'guestlinkexpiresat' => $bbbsession['bigbluebuttonbn']->guestlinkexpiresat ?? null,
+        ]);
+        if ($fromform = $mform->get_data()) {
+            // Access-Code / Password handling: If no password set, clear it. If password is provided, set it.
+            $password = !empty(trim($fromform->password)) ? $fromform->password : null;
+            bigbluebuttonbn_set_guest_password($bbbsession['bigbluebuttonbn'], $password);
+
+            // Access Time / Guest-link Expires At handling.
+            bigbluebuttonbn_set_guest_access_expiry($bbbsession['bigbluebuttonbn'], $fromform->guestlinkexpiresat);
+
+            $output .= $mform->render();
+        } else {
+            // Adds the form to the display.
+            $output .= $mform->render();
+        }
+    }
+
     $output .= '<br><span id="status_bar"></span>';
     $output .= '<br><span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();

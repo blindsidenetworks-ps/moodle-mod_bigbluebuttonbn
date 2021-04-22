@@ -811,7 +811,7 @@ function bigbluebuttonbn_broker_required_parameters() {
         'callback' => 'This request must include a javascript callback.',
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
     ];
-    $params['set_guest_password'] = [
+    $params['generate_guest_password'] = [
         'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
         'callback' => 'This request must include a javascript callback.',
     ];
@@ -917,21 +917,16 @@ function bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enable
 }
 
 /**
- * Helper for performing a guest password change
+ * Helper for generating a guest access code or password
  *
  * @param object $bigbluebuttonbn
  * @param array $params
  *
  * @return void
  */
-function bigbluebuttonbn_broker_set_guest_password($bigbluebuttonbn, $params) {
+function bigbluebuttonbn_broker_generate_guest_password($bigbluebuttonbn, $params) {
     global $DB;
-    require_once('locallib.php');
-    if (!$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id)) {
-        return;
-    }
-    $context = context_module::instance($cm->id);
-    if (!has_capability('mod/bigbluebuttonbn:guestlink_change_password', $context)) {
+    if (!bigbluebuttonbn_has_capability($bigbluebuttonbn->id, 'mod/bigbluebuttonbn:guestlink_change_password')) {
         return;
     }
     if ($params['delete']) {
@@ -943,3 +938,4 @@ function bigbluebuttonbn_broker_set_guest_password($bigbluebuttonbn, $params) {
     $callbackresponsedata = json_encode($password);
     return "{$params['callback']}({$callbackresponsedata})";
 }
+

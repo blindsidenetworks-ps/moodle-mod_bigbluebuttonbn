@@ -137,8 +137,8 @@ try {
         echo $completionvalidate;
         return;
     }
-    if ($a == 'set_guest_password') {
-        $password = bigbluebuttonbn_broker_set_guest_password($bigbluebuttonbn, $params);
+    if ($a == 'generate_guest_password') {
+        $password = bigbluebuttonbn_broker_generate_guest_password($bigbluebuttonbn, $params);
         echo $password;
         return;
     }

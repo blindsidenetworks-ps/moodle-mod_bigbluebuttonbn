@@ -438,8 +438,12 @@ $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
 $string['mod_form_field_accessmodal'] = 'Access policy content';
-
 $string['mod_form_field_guestlinkenabled'] = 'Create guest access link for external participants.';
+
+$string['mod_guestlink_access_form_generate'] = 'Generate';
+$string['mod_guestlink_access_form_update_time'] = 'Update Time';
+$string['mod_guestlink_access_form_copy'] = 'Copy';
+$string['mod_guestlink_access_form_clear'] = 'Clear';
 
 $string['guestlink_form_guestpass_info'] = 'Enter the room\'s access code';
 $string['guestlink_form_guestname_info'] = 'Enter your name!';
@@ -452,6 +456,7 @@ $string['guestlink_form_noname_warning'] = 'Please enter a name!';
 $string['guestlink_form_noaccescode_warning'] = 'Please enter the valid acces code for this conference.';
 $string['guestlink_form_guestlink_disabled'] = 'The administrator has not enabled this feature.';
 $string['guestlink_form_guestlink_disabled_instance'] = 'The guest access link for this room has been disabled.';
+$string['guestlink_form_guestlink_access_expired'] = 'The guest access link for this room has expired.';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
@@ -511,9 +516,11 @@ $string['view_recording_format_screenshare'] = 'Screenshare';
 $string['view_recording_format_statistics'] = 'Statistics';
 $string['view_recording_format_video'] = 'Video';
 $string['view_recording_format_errror_unreachable'] = 'The URL for this recording format is unreachable.';
-$string['view_guestlink_label'] = 'Invite Participants:';
-$string['view_guestlink_password_label'] = 'Access Code:';
+$string['view_guestlink_label'] = 'Guest Access URL';
+$string['view_guestlink_password_label'] = 'Access Code';
+$string['view_guestlink_expires_at_label'] = 'Guest Access Available Until';
 $string['view_guestlink_password_no_password_set'] = 'Generate an optional room access code.';
+$string['view_guestlink_save_settings'] = 'Update Guest Access Settings';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_section_title_analytics'] = 'Analytics';
