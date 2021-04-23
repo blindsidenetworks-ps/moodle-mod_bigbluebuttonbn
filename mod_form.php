@@ -67,29 +67,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $jsvars = array();
 
         // Get only those that are allowed.
+        // TODO: check as here it seems more logical to get this through: $this->_course.
         $course = get_course($this->current->course);
         $context = context_course::instance($course->id);
-        $jsvars['instanceTypeProfiles'] = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-            has_capability('mod/bigbluebuttonbn:meeting', $context),
-            has_capability('mod/bigbluebuttonbn:recording', $context)
-        );
-        // If none is allowed, fail and return.
-        if (empty($jsvars['instanceTypeProfiles'])) {
-            // Also check module context for those that are allowed.
-            $contextm = context_module::instance($this->_cm->id);
-            $jsvars['instanceTypeProfiles'] = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
-                has_capability('mod/bigbluebuttonbn:meeting', $contextm),
-                has_capability('mod/bigbluebuttonbn:recording', $contextm)
-            );
-            // If still none is allowed, fail and return.
-            if (empty($jsvars['instanceTypeProfiles'])) {
-                print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
-                    $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
-                return;
-            }
-        }
-        $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
-        $this->bigbluebuttonbn_mform_add_block_profiles($mform, $jsvars['instanceTypeProfiles']);
+
+        $instancetyperofiles = $this->get_instance_type_profiles();
+        $this->bigbluebuttonbn_mform_add_block_profiles($mform, $instancetyperofiles);
         // Data for participant selection.
         $participantlist = roles::bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
         // Add block 'General'.
@@ -110,12 +93,46 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->add_action_buttons();
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(view::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-        $jsvars['participantData'] = roles::bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn);
-        $jsvars['participantList'] = $participantlist;
-        $jsvars['iconsEnabled'] = (boolean) $cfg['recording_icons_enabled'];
-        $jsvars['pixIconDelete'] = (string) $OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
-            'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
+        $jsvars['instanceTypeDefault'] = array_keys($instancetyperofiles)[0];
+        // Now add the instance type profiles to the form as a html hidden field.
+        $mform->addElement('html', html_writer::div('', 'd-none', [
+            'data-profile-types' => json_encode($instancetyperofiles),
+            'data-participant-data' => json_encode(roles::bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn)),
+        ]));
+        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/modform',
+            'init', array($jsvars));
+    }
+
+    /**
+     * Get instance type profile.
+     *
+     * @return array|array[]
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    protected function get_instance_type_profiles() {
+        // Add profile data here instead of passing it by parameters.
+        $context = context_course::instance($this->_course->id);
+        $instancetyperofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+            has_capability('mod/bigbluebuttonbn:meeting', $context),
+            has_capability('mod/bigbluebuttonbn:recording', $context)
+        );
+        // If none is allowed, fail and return.
+        if (empty($instancetyperofiles)) {
+            global $CFG;
+            // Also check module context for those that are allowed.
+            $contextm = context_module::instance($this->_cm->id);
+            $instancetyperofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+                has_capability('mod/bigbluebuttonbn:meeting', $contextm),
+                has_capability('mod/bigbluebuttonbn:recording', $contextm)
+            );
+            // If still none is allowed, fail and return.
+            if (empty($instancetyperofiles)) {
+                throw new moodle_exception('general_error_not_allowed_to_create_instances', 'bigbluebuttonbn',
+                    $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+            }
+        }
+        return $instancetyperofiles;
     }
 
     /**
@@ -262,8 +279,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
         if ((boolean) \mod_bigbluebuttonbn\local\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
-                bigbluebutton::bigbluebuttonbn_get_instance_profiles_array($profiles),
-                array('onchange' => 'M.mod_bigbluebuttonbn.modform.updateInstanceTypeProfile(this);'));
+                bigbluebutton::bigbluebuttonbn_get_instance_profiles_array($profiles));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
     }
@@ -578,45 +594,38 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for setting participant roles.
      *
      * @param object $mform
-     * @param string $participantlist
+     * @param array $participantlist
      * @return void
      */
     private function bigbluebuttonbn_mform_add_block_user_role_mapping(&$mform, $participantlist) {
+        global $OUTPUT;
         $participantselection = roles::bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');
         $mform->addElement('hidden', 'participants', json_encode($participantlist));
         $mform->setType('participants', PARAM_TEXT);
-        // Render elements for participant selection.
-        $htmlselectiontype = html_writer::select($participantselection['type_options'],
-            'bigbluebuttonbn_participant_selection_type', $participantselection['type_selected'], array(),
-            array('id' => 'bigbluebuttonbn_participant_selection_type',
-                'onchange' => 'M.mod_bigbluebuttonbn.modform.participantSelectionSet(); return 0;'));
-        $htmlselectionoptions = html_writer::select($participantselection['options'], 'bigbluebuttonbn_participant_selection',
-            $participantselection['selected'], array(),
-            array('id' => 'bigbluebuttonbn_participant_selection', 'disabled' => 'disabled'));
-        $htmlselectioninput = html_writer::tag('input', '', array('id' => 'id_addselectionid',
-            'type' => 'button', 'class' => 'btn btn-secondary',
-            'value' => get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
-            'onclick' => 'M.mod_bigbluebuttonbn.modform.participantAdd(); return 0;'
-        ));
-        $htmladdparticipant = html_writer::tag('div',
-            $htmlselectiontype . '&nbsp;&nbsp;' . $htmlselectionoptions . '&nbsp;&nbsp;' . $htmlselectioninput, null);
-        $mform->addElement('html', "\n\n");
-        $mform->addElement('static', 'static_add_participant',
-            get_string('mod_form_field_participant_add', 'bigbluebuttonbn'), $htmladdparticipant);
-        $mform->addElement('html', "\n\n");
-        // Declare the table.
-        $htmltable = new html_table();
-        $htmltable->align = array('left', 'left', 'left', 'left');
-        $htmltable->id = 'participant_list_table';
-        $htmltable->data = array(array());
-        // Render elements for participant list.
-        $htmlparticipantlist = html_writer::table($htmltable);
-        $mform->addElement('html', "\n\n");
+        $selectiontype = new single_select(new moodle_url(qualified_me()),
+            'bigbluebuttonbn_participant_selection_type',
+            $participantselection['type_options'],
+            $participantselection['type_selected']);
+        $selectionparticipants = new single_select(new moodle_url(qualified_me()),
+            'bigbluebuttonbn_participant_selection',
+            $participantselection['options'],
+            $participantselection['selected']);
+        $action = new single_button(new moodle_url(qualified_me()),
+            get_string('mod_form_field_participant_list_action_add', 'bigbluebuttonbn'),
+            'post',
+            false,
+            ['name' => 'bigbluebuttonbn_participant_selection_add']
+        );
+        $pformcontext = [
+            'selectionType' => $selectiontype->export_for_template($OUTPUT),
+            'selectionParticipant' => $selectionparticipants->export_for_template($OUTPUT),
+            'action' => $action->export_for_template($OUTPUT),
+        ];
+        $html = $OUTPUT->render_from_template('mod_bigbluebuttonbn/participant_form', $pformcontext);
         $mform->addElement('static', 'static_participant_list',
-            get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
-        $mform->addElement('html', "\n\n");
+            get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $html);
     }
 
     /**

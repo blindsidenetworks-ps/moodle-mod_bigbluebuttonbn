@@ -15,38 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer.
+ * Renderer for recording name in place editable.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
 
 namespace mod_bigbluebuttonbn\output;
 
-use html_writer;
-use html_table;
-use plugin_renderer_base;
-
-defined('MOODLE_INTERNAL') || die();
+use mod_bigbluebuttonbn\local\helpers\recording;
 
 /**
- * Class renderer
+ * Renderer for recording name in place editable.
+ *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
-class renderer extends plugin_renderer_base {
-
+class recording_name_editable extends recording_editable {
     /**
-     * Renderer for index.
-     * @param  index $indexobj
+     * Get the value to display
+     *
+     * @param array $recording
+     * @param array $bbbsession
      * @return string
      */
-    protected function render_index(index $indexobj) {
-        return html_writer::table($indexobj->table);
+    public function get_recording_value($recording, $bbbsession) {
+        return recording::bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     }
 
+    /**
+     *  Get the type of editable
+     */
+    protected static function get_type() {
+        return 'meta_bbb-recording-name';
+    }
 }

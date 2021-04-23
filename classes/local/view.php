@@ -26,8 +26,12 @@
 namespace mod_bigbluebuttonbn\local;
 
 use context_module;
+use core_renderer;
 use html_writer;
+use mod_bigbluebuttonbn\external\meeting_info;
+use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\output\recordings_session;
 use mod_bigbluebuttonbn\plugin;
 use pix_icon;
 
@@ -116,7 +120,7 @@ class view {
      * @param string $activity
      * @return void
      */
-    public static function view_render(&$bbbsession, $activity) {
+    public static function view_render(&$bbbsession) {
         global $OUTPUT, $PAGE;
         $type = null;
         if (isset($bbbsession['bigbluebuttonbn']->type)) {
@@ -128,8 +132,6 @@ class view {
         // JavaScript for locales.
         $PAGE->requires->strings_for_js(array_keys(self::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
         // JavaScript variables.
-        $jsvars = array('activity' => $activity, 'ping_interval' => $pinginterval,
-            'locale' => plugin::bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
         $output = '';
         // Renders warning messages when configured.
         $output .= self::view_warning_default_server($bbbsession);
@@ -143,54 +145,26 @@ class view {
         $output .= $OUTPUT->heading($desc, 5);
 
         if ($enabledfeatures['showroom']) {
-            $output .= self::view_render_room($bbbsession, $activity, $jsvars);
-            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
-                'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
+            $output .= self::view_render_room($bbbsession);
+            $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'init', array(array(
+                'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id
+            )));
         }
         // Show recordings should only be enabled if recordings are also enabled in session.
         if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
-            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
-            $output .= self::view_render_recording_section($bbbsession, $type,
-                $enabledfeatures, $jsvars);
-            $output .= html_writer::end_tag('div');
-            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
-                'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
+
+            $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
+            $recordingsection = new recordings_session($bbbsession, $type, $enabledfeatures);
+
+            $output .= $renderer->render($recordingsection);
+
         } else if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
             $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
             $output .= self::bigbluebuttonbn_render_warning($recordingsdisabled, 'danger');
         }
-        echo $output . html_writer::empty_tag('br') . html_writer::empty_tag('br') . html_writer::empty_tag('br');
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init', array($jsvars));
-    }
+        echo $output . html_writer::empty_tag('br') . html_writer::empty_tag('br')
+            . html_writer::empty_tag('br');
 
-    /**
-     * Renders the view for recordings.
-     *
-     * @param array $bbbsession
-     * @param integer $type
-     * @param array $enabledfeatures
-     * @param array $jsvars
-     * @return string
-     */
-    public static function view_render_recording_section(&$bbbsession, $type, $enabledfeatures, &$jsvars) {
-        if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY) {
-            return '';
-        }
-        $output = '';
-        if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
-            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_header'));
-            $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
-            $output .= html_writer::end_tag('div');
-        }
-        if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
-            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_content'));
-            $output .= self::view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
-            $output .= html_writer::end_tag('div');
-            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
-            $output .= self::view_render_imported($bbbsession, $enabledfeatures);
-            $output .= html_writer::end_tag('div');
-        }
-        return $output;
     }
 
     /**
@@ -205,7 +179,8 @@ class view {
             return true;
         }
         $generalwarningroles = explode(',', config::get('general_warning_roles'));
-        $userroles = \mod_bigbluebuttonbn\local\helpers\roles::bigbluebuttonbn_get_user_roles($bbbsession['context'], $bbbsession['userID']);
+        $userroles =
+            \mod_bigbluebuttonbn\local\helpers\roles::bigbluebuttonbn_get_user_roles($bbbsession['context'], $bbbsession['userID']);
         foreach ($userroles as $userrole) {
             if (in_array($userrole->shortname, $generalwarningroles)) {
                 return true;
@@ -222,84 +197,13 @@ class view {
      * @param array $jsvars
      *
      * @return string
+     * @throws \moodle_exception
      */
-    public static function view_render_room(&$bbbsession, $activity, &$jsvars) {
+    public static function view_render_room(&$bbbsession) {
         global $OUTPUT;
-        // JavaScript variables for room.
-        $openingtime = '';
-        if ($bbbsession['openingtime']) {
-            $openingtime = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' .
-                userdate($bbbsession['openingtime']);
-        }
-        $closingtime = '';
-        if ($bbbsession['closingtime']) {
-            $closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' .
-                userdate($bbbsession['closingtime']);
-        }
-        $jsvars += array(
-            'meetingid' => $bbbsession['meetingid'],
-            'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-            'userlimit' => $bbbsession['userlimit'],
-            'opening' => $openingtime,
-            'closing' => $closingtime,
-        );
-        // Main box.
-        $output = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
-        $output .= '<br><span id="status_bar"></span>';
-        $output .= '<br><span id="control_panel"></span>';
-        $output .= $OUTPUT->box_end();
-        // Action button box.
-        $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-        $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>' . "\n";
-        $output .= $OUTPUT->box_end();
-        if ($activity == 'ended') {
-            $output .= self::view_ended($bbbsession);
-        }
-        return $output;
-    }
-
-    /**
-     * Renders the view for recordings.
-     *
-     * @param array $bbbsession
-     * @param array $enabledfeatures
-     * @param array $jsvars
-     *
-     * @return string
-     */
-    public static function view_render_recordings(&$bbbsession, $enabledfeatures, &$jsvars) {
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
-
-        if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
-            // There are no recordings to be shown.
-            return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
-                array('id' => 'bigbluebuttonbn_recordings_table'));
-        }
-        // There are recordings for this meeting.
-        // JavaScript variables for recordings.
-        $jsvars += array(
-            'recordings_html' => $bbbsession['bigbluebuttonbn']->recordings_html == '1',
-        );
-        // If there are meetings with recordings load the data to the table.
-        if ($bbbsession['bigbluebuttonbn']->recordings_html) {
-            // Render a plain html table.
-            return recording::bigbluebuttonbn_output_recording_table($bbbsession, $recordings) . "\n";
-        }
-        // JavaScript variables for recordings with YUI.
-        $jsvars += array(
-            'bbbid' => $bbbsession['bigbluebuttonbn']->id,
-        );
-        // Render a YUI table.
-        $reset = get_string('reset');
-        $search = get_string('search');
-        $output = "<form id='bigbluebuttonbn_recordings_searchform'>
-                 <input id='searchtext' type='text'>
-                 <input id='searchsubmit' type='submit' value='{$search}'>
-                 <input id='searchreset' type='submit' value='{$reset}'>
-               </form>";
-        $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
-
-        return $output;
+        $context = meeting_info::get_meeting_info($bbbsession, false);
+        /* @var core_renderer $OUTPUT */
+        return $OUTPUT->render_from_template('mod_bigbluebuttonbn/room_view', $context);
     }
 
     /**
@@ -315,36 +219,15 @@ class view {
         if (!$enabledfeatures['importrecordings'] || !$bbbsession['importrecordings']) {
             return '';
         }
-        $button = html_writer::tag('input', '',
-            array('type' => 'button',
-                'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
-                'class' => 'btn btn-secondary',
-                'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' .
-                    $bbbsession['bigbluebuttonbn']->id . '\''));
+        $button = html_writer::tag('input', '', [
+            'type' => 'button',
+            'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
+            'class' => 'btn btn-secondary',
+        ]);
         $output = html_writer::empty_tag('br');
         $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
         $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
         return $output;
-    }
-
-    /**
-     * Renders the content for ended meeting.
-     *
-     * @param array $bbbsession
-     *
-     * @return string
-     */
-    public static function view_ended(&$bbbsession) {
-        global $OUTPUT;
-        if (!is_null($bbbsession['presentation']['url'])) {
-            $attributes = array('title' => $bbbsession['presentation']['name']);
-            $icon = new pix_icon($bbbsession['presentation']['icon'], $bbbsession['presentation']['mimetype_description']);
-            return '<h4>' . get_string('view_section_title_presentation', 'bigbluebuttonbn') . '</h4>' .
-                $OUTPUT->action_icon($bbbsession['presentation']['url'], $icon, null, array(), false) .
-                $OUTPUT->action_link($bbbsession['presentation']['url'],
-                    $bbbsession['presentation']['name'], null, $attributes) . '<br><br>';
-        }
-        return '';
     }
 
     /**
@@ -463,7 +346,7 @@ class view {
     /**
      * Helper function returns array with the instance settings used in views based on bigbluebuttonbnid.
      *
-     * @param object $bigbluebuttonbnid
+     * @param int $bigbluebuttonbnid
      *
      * @return array
      */
@@ -532,7 +415,7 @@ class view {
      * @return string
      */
     public static function bigbluebuttonbn_actionbar_render_button($recording, $data) {
-        global $OUTPUT;
+        global $PAGE;
         if (empty($data)) {
             return '';
         }
@@ -541,14 +424,13 @@ class view {
             $target .= '-' . $data['target'];
         }
         $id = 'recording-' . $target . '-' . $recording['recordID'];
-        $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this); return false;';
         if ((boolean) config::get('recording_icons_enabled')) {
             // With icon for $manageaction.
             $iconattributes = array('id' => $id, 'class' => 'iconsmall');
             $linkattributes = array(
                 'id' => $id,
-                'onclick' => $onclick,
                 'data-action' => $data['action'],
+                'data-require-confirmation' => !empty($data['requireconfirmation']),
             );
             if (!isset($recording['imported'])) {
                 $linkattributes['data-links'] = recording::bigbluebuttonbn_count_recording_imported_instances(
@@ -558,7 +440,6 @@ class view {
             if (isset($data['disabled'])) {
                 $iconattributes['class'] .= ' fa-' . $data['disabled'];
                 $linkattributes['class'] = 'disabled';
-                unset($linkattributes['onclick']);
             }
             $icon = new pix_icon(
                 'i/' . $data['tag'],
@@ -566,12 +447,11 @@ class view {
                 'moodle',
                 $iconattributes
             );
-            return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
+            return $PAGE->get_renderer('core')->action_icon('#', $icon, null, $linkattributes, false);
         }
         // With text for $manageaction.
-        $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger',
-            'onclick' => $onclick);
-        return $OUTPUT->action_link('#', get_string($data['action']), null, $linkattributes);
+        $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger');
+        return $PAGE->get_renderer('core')->action_link('#', get_string($data['action']), null, $linkattributes);
     }
 
     /**

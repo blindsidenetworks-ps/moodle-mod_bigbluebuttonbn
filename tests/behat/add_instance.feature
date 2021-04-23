@@ -17,10 +17,12 @@ Feature: bigbluebuttonbn instance
       | Virtual classroom name | RoomRecordings |
     Then I should see "RoomRecordings"
     When I follow "RoomRecordings"
+    And I wait until the page is ready
     Then I should see "RoomRecordings"
-    And "#bigbluebuttonbn_view_message_box" "css_element" should be visible
-    And "#bigbluebuttonbn_view_action_button_box" "css_element" should be visible
-    And "#bigbluebuttonbn_recordings_table" "css_element" should be visible
+    And I should see "This conference room is ready. You can join the session now."
+    # The button text is somewhat not considered as "visible".
+    And "#join_button_input" "css_element" should be visible
+    And I should see "Recordings"
     When I follow "testcourse"
     And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
       | Instance type | Room/Activity only |
@@ -28,9 +30,10 @@ Feature: bigbluebuttonbn instance
     Then I should see "RoomOnly"
     When I follow "RoomOnly"
     Then I should see "RoomOnly"
-    And "#bigbluebuttonbn_view_message_box" "css_element" should be visible
-    And "#bigbluebuttonbn_view_action_button_box" "css_element" should be visible
-    And "#bigbluebuttonbn_recordings_table" "css_element" should not be visible
+    And I wait until the page is ready
+    And I should see "This conference room is ready. You can join the session now."
+    And "#join_button_input" "css_element" should be visible
+    And I should see "Recordings"
     When I follow "testcourse"
     And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
       | Instance type | Recordings only |
@@ -38,9 +41,10 @@ Feature: bigbluebuttonbn instance
     Then I should see "RecordingsOnly"
     When I follow "RecordingsOnly"
     Then I should see "RecordingsOnly"
-    And "#bigbluebuttonbn_view_message_box" "css_element" should not be visible
-    And "#bigbluebuttonbn_view_action_button_box" "css_element" should not be visible
-    And "#bigbluebuttonbn_recordings_table" "css_element" should be visible
+    And I wait until the page is ready
+    And I should not see "This conference room is ready. You can join the session now."
+    And "#join_button_input" "css_element" should not be visible
+    And I should see "Recordings"
 
   @javascript
   Scenario: Add an activity and check that required settings are available for the three

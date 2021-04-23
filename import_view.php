@@ -23,41 +23,42 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\output\import_view;
 use mod_bigbluebuttonbn\output\renderer;
 
-require(__DIR__.'/../../config.php');
+require(__DIR__ . '/../../config.php');
+global $DB, $PAGE, $OUTPUT;
+$originbn = required_param('originbn', PARAM_INT);
+$frombn = optional_param('frombn', 0, PARAM_INT);
+$courseidscope = optional_param('courseidscope', 0, PARAM_INT);
 
-$bn = required_param('bn', PARAM_INT);
-$tc = optional_param('tc', 0, PARAM_INT);
-
-if (!$bn) {
+if (!$originbn) {
     print_error('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
-$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $bn], '*', MUST_EXIST);
-$course = $DB->get_record('course', ['id' => $bigbluebuttonbn->course], '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-
+list('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn) =
+    view::bigbluebuttonbn_view_instance_bigbluebuttonbn($originbn);
 require_login($course, true, $cm);
 
+// TODO: check if this is still necessary.
 if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
     print_error('view_error_invalid_session', plugin::COMPONENT);
 }
 
-if (!(boolean)\mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
+if (!(boolean) \mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
     print_error('view_message_importrecordings_disabled', plugin::COMPONENT);
 }
 
 // Print the page header.
-$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', ['id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id]);
+$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', ['originbn' => $bigbluebuttonbn->id]);
 $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
 // View widget must be initialized here in order to properly load javascript.
-$view = new import_view($course, $bigbluebuttonbn, $tc);
+$view = new import_view($originbn, $frombn, $courseidscope);
 
 /** @var renderer $renderer */
 $renderer = $PAGE->get_renderer(plugin::COMPONENT);
