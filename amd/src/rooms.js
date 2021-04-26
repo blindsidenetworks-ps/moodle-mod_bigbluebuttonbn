@@ -39,11 +39,20 @@ export const initActions = () => {
                 const id = element.id;
                 const bbbid = element.dataset.bbbId;
                 if (id === 'join_button_input') {
+                    let group = 0;
                     const cmid = element.dataset.cmId;
                     let joinURL = new URL(Config.wwwroot + '/mod/bigbluebuttonbn/bbb_view.php');
+                    const groupSelectors = document.querySelectorAll('.groupselector select[name="group"]');
+                    if (groupSelectors.length) {
+                        const selected = groupSelectors[0];
+                        group = selected[selected.selectedIndex].value;
+                    }
                     joinURL.searchParams.append('action', 'join');
                     joinURL.searchParams.append('id', cmid);
                     joinURL.searchParams.append('bn', bbbid);
+                    if (group) {
+                        joinURL.searchParams.append('group', group);
+                    }
                     join(joinURL.toString());
                 }
                 if (id === 'end_button_input') {
