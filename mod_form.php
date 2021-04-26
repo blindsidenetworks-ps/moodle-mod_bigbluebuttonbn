@@ -95,7 +95,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Lock'.
         $this->bigbluebuttonbn_mform_add_block_locksettings($mform, $cfg);
         // Add block 'Guestlink'.
-        $this->bigbluebuttonbn_mform_add_block_guestlink($mform, $cfg);
+        $this->bigbluebuttonbn_mform_add_block_guestlink($mform, $cfg, $context);
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
@@ -178,6 +178,21 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
         }
         return $errors;
+    }
+
+    public function get_data() {
+        $data = parent::get_data();
+        $course = get_course($this->current->course);
+        $context = context_course::instance($course->id);
+
+        // Remove guestlinkenabled setting if the user does not have permissions to configure guestlink access.
+        if (
+            isset($data->guestlinkenabled)
+            && !has_capability('mod/bigbluebuttonbn:guestlink_configure_access', $context)
+        ) {
+            unset($data->guestlinkenabled);
+        }
+        return $data;
     }
 
     /**
@@ -386,11 +401,15 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @param array $cfg
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg) {
+    private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg, $context) {
         if ($cfg['participant_guestlink']) {
             $mform->addElement('header', 'guestlink', get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
+            $checkboxattributes = [];
+            if (!(has_capability('mod/bigbluebuttonbn:guestlink_configure_access', $context))) {
+                $checkboxattributes['disabled'] = true;
+            }
             $mform->addElement('advcheckbox', 'guestlinkenabled',
-                    get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ');
+                    get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ', $checkboxattributes);
 
             // If site-level moderatorapproval is required, do not include this element (as it should be automatically applied)
             if (!$cfg['participant_guest_requires_moderator_approval']) {

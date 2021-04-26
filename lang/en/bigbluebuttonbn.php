@@ -35,6 +35,7 @@ $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:view'] = 'View a room/activity';
 $string['bigbluebuttonbn:guestlink_view'] = 'See the guest access link and it\'s access code of a bigbluebuttonbn room.';
 $string['bigbluebuttonbn:guestlink_change_password'] = 'Set/Change the access code for a guest access link.';
+$string['bigbluebuttonbn:guestlink_configure_access'] = 'Able to turn on/off access to guest links.';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn:meeting'] = 'Create instances with live meeting capabilities';
 $string['bigbluebuttonbn:recording'] = 'Create instances with recording capabilities';
