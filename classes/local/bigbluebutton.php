@@ -26,6 +26,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use completion_info;
+use context_course;
 use context_module;
 use curl;
 use Exception;
@@ -733,5 +734,34 @@ class bigbluebutton {
         }
 
         return $activitystatus;
+    }
+
+    /**
+     * Check if a user has access to a given group.
+     *
+     * @param $groupid
+     * @param $user
+     * @param $course
+     * @return bool
+     * @throws \coding_exception
+     */
+    public static function user_can_access_groups($groupid, $user, $course, $cm) {
+        $groupmode = groups_get_activity_groupmode($cm);
+        $context = context_course::instance($course->id);
+        $aag = has_capability('moodle/site:accessallgroups', $context, $user);
+        if ($aag) {
+            return true;
+        }
+        if ($groupmode == VISIBLEGROUPS or $aag) {
+            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
+        } else {
+            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
+        }
+        foreach ($allowedgroups as $g) {
+            if ($g->id == $groupid) {
+                return true;
+            }
+        }
+        return false;
     }
 }
