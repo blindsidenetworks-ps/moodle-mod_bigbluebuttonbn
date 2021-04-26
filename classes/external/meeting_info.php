@@ -100,7 +100,6 @@ class meeting_info extends external_api {
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
-        require_capability('mod/bigbluebuttonbn:managerecordings', $context);
         // Fetch the session, features, and profile.
         [
             'bbbsession' => $bbbsession,
