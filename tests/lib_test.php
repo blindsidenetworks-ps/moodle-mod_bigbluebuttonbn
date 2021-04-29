@@ -94,6 +94,21 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         return $data;
     }
 
+    /**
+     * Workaround for bypassing strinct enforcement of rule for get_completion_state in unittest .
+     *
+     * @param object $course Course
+     * @param object $cm Course-module
+     * @param int $userid User ID
+     * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+     *
+     * @return bool True if completed, false if not. (If no conditions, then return
+     *   value depends on comparison type)
+     */
+    public function get_completion_state($course, $cm, $userid, $type): bool {
+        return bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type);
+    }
+
     public function setUp(): void {
         global $CFG;
         parent::setUp();
@@ -114,7 +129,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $user = $this->generator->create_user();
         $this->setUser($user);
-        $result = bigbluebuttonbn_get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
+        $result = $this->get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
         $this->assertEquals(COMPLETION_AND, $result);
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
@@ -126,7 +141,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $meta = '{"origin":0, "data": {"duration": 120, "engagement": {"chats": 2, "talks":2} }}';
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
-        $result = bigbluebuttonbn_get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
+        $result = $this->get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
         $this->assertEquals(COMPLETION_AND, $result);
     }
 
@@ -176,7 +191,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
-        $this->assertRegExp('/.* has joined the session for 2 times/', $result);
+        $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
     }
 
     public function test_bigbluebuttonbn_user_complete() {
@@ -254,7 +269,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $data->course = $bbactivity->course;
         $results = bigbluebuttonbn_reset_userdata($data);
         $this->assertEquals(array(
-                'component' => 'BigBlueButtonBN',
+                'component' => 'BigBlueButton',
                 'item' => 'Deleted tags',
                 'error' => false,
         ), $results[0]);
@@ -264,7 +279,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $result = bigbluebuttonbn_reset_getstatus('events');
         $this->assertEquals(array(
-                'component' => 'BigBlueButtonBN',
+                'component' => 'BigBlueButton',
                 'item' => 'Deleted events',
                 'error' => false,
         ), $result);
@@ -356,7 +371,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
 
         $htmlarray = [];
         bigbluebuttonbn_print_overview([$this->course->id => $this->course], $htmlarray);
-        $this->assertRegExp("/BigBlueButtonBN (1|2)/", $htmlarray[$this->course->id]['bigbluebuttonbn']);
+        $this->assertMatchesRegularExpression("/BigBlueButton (1|2)/", $htmlarray[$this->course->id]['bigbluebuttonbn']);
     }
 
     public function test_bigbluebuttonbn_print_overview_element() {
@@ -367,7 +382,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $cmrecord = (object) array_merge((array) $bbactivity, (array) $bbactivitycm->get_course_module_record());
         $cmrecord->coursemodule = $bbactivity->id;
         $str = bigbluebuttonbn_print_overview_element($cmrecord, time());
-        $this->assertRegExp("/bigbluebuttonbn overview/", $str);
+        $this->assertMatchesRegularExpression("/bigbluebuttonbn overview/", $str);
     }
 
     public function test_bigbluebuttonbn_get_coursemodule_info() {
