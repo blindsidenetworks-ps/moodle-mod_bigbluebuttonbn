@@ -8,5 +8,5 @@ Feature: Installation succeeds
     When I log in as "admin"
     And I navigate to "Plugins > Plugins overview" in site administration
     Then the following should exist in the "plugins-control-panel" table:
-        |BigBlueButtonBN|
-        |mod_bigbluebutton|
+        |BigBlueButton|
+        |mod_bigbluebuttonbn|
