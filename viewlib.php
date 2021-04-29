@@ -169,6 +169,22 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
         $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
         $output .= html_writer::end_tag('div');
     }
+    // Repeating the above conditions to show Opencast Recordings, when Opencast series id is available in the current course and
+    // bigbluebuttonbn_oc_show_recording config is enabled.
+    $seriesid = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
+    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_show_recording') && !empty($seriesid)) {
+        if ($type == BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
+            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_opencast_recordings_header', 'class' => 'mt-3'));
+            $output .= html_writer::tag('h4', get_string('view_section_title_opencast_recordings', 'bigbluebuttonbn'));
+            $output .= html_writer::end_tag('div');
+        }
+        if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
+            $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_opencast_recordings_content'));
+            $output .= bigbluebuttonbn_view_render_opencast_recordings($bbbsession, $seriesid);
+            $output .= html_writer::end_tag('div');
+        }
+    }
+    
     return $output;
 }
 
@@ -261,15 +277,8 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     );
     // If there are meetings with recordings load the data to the table.
     if ($bbbsession['bigbluebuttonbn']->recordings_html) {
-        $recordingshtml = '';
-        // If opencast recoding config is set and checks if opencast is available for the current course.
-        if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording')
-            && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
-            $recordingshtml .= bigbluebuttonbn_output_recording_opencast($bbbsession['course']->id);
-        }
-        $recordingshtml .= bigbluebuttonbn_output_recording_table($bbbsession, $recordings)."\n";
         // Render a plain html table.
-        return $recordingshtml;
+        return bigbluebuttonbn_output_recording_table($bbbsession, $recordings)."\n";
     }
     // JavaScript variables for recordings with YUI.
     $jsvars += array(
@@ -286,6 +295,27 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
 
     return $output;
+}
+
+/**
+ * Renders the view for Opencast recordings.
+ *
+ * @param array $bbbsession
+ * @param string $seriesid
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_render_opencast_recordings($bbbsession, $seriesid) {
+    $ocrecordings = bigbluebutton_get_opencast_recordings_for_table_view($bbbsession, $seriesid);
+
+    if (empty($ocrecordings)) {
+        // There are no Opencast recordings to be shown.
+        return html_writer::div(get_string('view_message_opencast_norecordings', 'bigbluebuttonbn'), '',
+            array('id' => 'bigbluebuttonbn_opencast_recordings_table'));
+    }
+    
+    // Render a plain html table.
+    return bigbluebuttonbn_output_opencast_recording_table($bbbsession, $ocrecordings);
 }
 
 /**

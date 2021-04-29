@@ -340,7 +340,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'] = 'mod_form_field_record';
             // Try to check the opencast config and make sure that opencast is available for this course.
             if ($cfg['oc_recording'] && bigbluebuttonbn_check_opencast(get_course($this->current->course)->id)) {
-                $field['description_key'] = 'mod_form_field_record_oc';
+                $field['description_key'] = 'mod_form_field_opencast_record';
             }
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],

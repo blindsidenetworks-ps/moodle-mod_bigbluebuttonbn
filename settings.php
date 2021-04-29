@@ -43,6 +43,8 @@ if ($hassiteconfig) {
         bigbluebuttonbn_settings_importrecordings($renderer);
         // Renders settings for showing recordings.
         bigbluebuttonbn_settings_showrecordings($renderer);
+        // Renders settings for Opencast integration.
+        bigbluebuttonbn_settings_opencastintegration($renderer);
     }
     // Renders settings for meetings.
     bigbluebuttonbn_settings_waitmoderator($renderer);

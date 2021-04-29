@@ -2246,18 +2246,370 @@ function bigbluebuttonbn_output_recording_table($bbbsession, $recordings, $tools
 }
 
 /**
- * Helper function renders recording link for opencast.
+ * Helper function renders Opencast recording table.
  *
- * @param string $courseid
+ * @param array $bbbsession
+ * @param array $ocrecordings
  *
  * @return array
  */
-function bigbluebuttonbn_output_recording_opencast($courseid) {
-    $opencasturl = new \moodle_url('/blocks/opencast/index.php', array('courseid' => $courseid));
-    return html_writer::div(html_writer::tag('button', get_string('view_message_oc_recordings', 'bigbluebuttonbn'),
-                                array('class' => 'btn btn-primary', 'onclick' => "window.location='{$opencasturl}';")),
-                                 '', array('id' => 'bigbluebuttonbn_recordings_opencast', 'class' => 'py-3'));
+function bigbluebuttonbn_output_opencast_recording_table($bbbsession, $ocrecordings) {
+    // Get the Opencast recording table.
+    $table = bigbluebuttonbn_get_opencast_recording_table($bbbsession, $ocrecordings);
+    
+    if (!isset($table) || !isset($table->data)) {
+        // Render a table with "No Opencast recordings".
+        return html_writer::div(
+            get_string('view_message_opencast_norecordings', 'bigbluebuttonbn'),
+            '',
+            array('id' => 'bigbluebuttonbn_opencast_recordings_table')
+        );
+    }
+    // Render the table.
+    return html_writer::div(html_writer::table($table), '', array('id' => 'bigbluebuttonbn_opencast_recordings_table'));
 }
+
+/**
+ * Helper function builds the Opencast recording table.
+ *
+ * @param array $bbbsession
+ * @param array $ocrecordings
+ *
+ * @return object
+ */
+function bigbluebuttonbn_get_opencast_recording_table($bbbsession, $ocrecordings) {
+    // Declare the table.
+    $table = new html_table();
+    $table->data = array();
+    // Initialize table headers.
+    $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_name', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
+    }
+    $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
+    $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
+    $table->size = array('', '', '', '', '', '');
+    if ($bbbsession['managerecordings']) {
+        $table->head[] = get_string('view_recording_actionbar', 'bigbluebuttonbn');
+        $table->align[] = 'left';
+        $table->size[] = (count($tools) * 40) . 'px';
+    }
+    // Get the groups of the user.
+    $usergroups = groups_get_all_groups($bbbsession['course']->id, $bbbsession['userID']);
+
+    // Build table content.
+    foreach ($ocrecordings as $ocrecording) {
+        // Check if the record belongs to a Visible Group type.
+        list($course, $cm) = get_course_and_cm_from_cmid($bbbsession['cm']->id);
+        $groupmode = groups_get_activity_groupmode($cm);
+        $displayrow = true;
+        if (($groupmode != VISIBLEGROUPS)
+                && !$bbbsession['administrator'] && !$bbbsession['moderator']) {
+            $groupid = explode('[', $bbbsession['meetingid']);
+            if (isset($groupid[1])) {
+                // It is a group recording and the user is not moderator/administrator. Recording should not be included by default.
+                $displayrow = false;
+                $groupid = explode(']', $groupid[1]);
+                if (isset($groupid[0])) {
+                    foreach ($usergroups as $usergroup) {
+                        if ($usergroup->id == $groupid[0]) {
+                            // Include recording if the user is in the same group.
+                            $displayrow = true;
+                        }
+                    }
+                }
+            }
+        }
+        if ($displayrow) {
+            $rowdata = bigbluebuttonbn_get_opencast_recording_data_row($bbbsession, $ocrecording);
+            if (!empty($rowdata)) {
+                $row = bigbluebuttonbn_get_opencast_recording_table_row($bbbsession, $ocrecording, $rowdata);
+                array_push($table->data, $row);
+            }
+        }
+    }
+    return $table;
+}
+
+/**
+ * Helper function builds a row for the data used by the Opencast recording table.
+ *
+ * @param array $bbbsession
+ * @param array $ocrecording
+ *
+ * @return array
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row($bbbsession, $ocrecording) {
+    $rowdata = new stdClass();
+    // Set recording playback url.
+    $rowdata->playback = bigbluebuttonbn_get_opencast_recording_data_row_playback($ocrecording, $bbbsession);
+    // Set recording name from title if exists, otherwise shows "Opencast Video".
+    $rowdata->name = isset($ocrecording['title']) ? $ocrecording['title'] : get_string('view_recording_list_opencast', 'bigbluebuttonbn');
+    // Set recording description.
+    $rowdata->description = isset($ocrecording['description']) ? $ocrecording['description'] : '';
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        // Set recording_preview.
+        $rowdata->preview = bigbluebuttonbn_get_opencast_recording_data_row_preview($ocrecording);
+    }
+    // Set formatted date.
+    $rowdata->date_formatted = bigbluebuttonbn_get_opencast_recording_data_row_date_formatted($ocrecording);
+    // Set formatted duration.
+    $rowdata->duration_formatted = bigbluebuttonbn_get_opencast_recording_data_row_duration($ocrecording['duration']);
+    // Set actionbar, if user is allowed to manage recordings.
+    if ($bbbsession['managerecordings']) {
+        $rowdata->actionbar = bigbluebuttonbn_get_opencast_recording_data_row_actionbar($ocrecording, $bbbsession);
+    }
+    return $rowdata;
+}
+
+/**
+ * Helper function renders the link used for Opencast recording playback in row for the data used by the recording table.
+ * To display the video, it is important for a video in Opencast to be published with engage-player, also it is required to
+ * have filter_opencast plugin installed and configured. 
+ * The link redirects user to oc_view.php to authentificate the user via LTI and show the video in Opencast. 
+ *
+ * @param array $ocrecording
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_playback($ocrecording, $bbbsession) {
+    global $CFG, $OUTPUT;
+    $text = get_string('view_recording_list_opencast', 'bigbluebuttonbn');
+    $href = '#';
+    // Check if the publication status has engage-player
+    if (isset($ocrecording['publication_status']) && in_array('engage-player', $ocrecording['publication_status'])) {
+        // Check if filter_opencast is configured
+        $consumerkey = get_config('filter_opencast', 'consumerkey');
+        $consumersecret = get_config('filter_opencast', 'consumersecret');
+        // In order to make LTI auth both consumerkey and consumersecret are required.
+        if (!empty($consumerkey) && !empty($consumersecret)) {
+            $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/oc_player.php?identifier=' . $ocrecording['identifier'] .
+            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+        }
+    }
+
+    $linkattributes = array(
+        'id' => 'opencast-player-redirect-' . $ocrecording['identifier'],
+        'class' => 'btn btn-sm btn-default',
+        'target' => '_blank'
+      );
+    if ($href == '#' || empty($href)) {
+        $linkattributes['class'] = 'btn btn-sm btn-warning';
+        $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+    }
+    return $OUTPUT->action_link($href, $text, null, $linkattributes) . '&#32;';
+}
+
+/**
+ * Helper function builds Opencast recording preview used in row for the data used by the recording table.
+ *
+ * @param array $ocrecording
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_preview($ocrecording) {
+    $options = array('id' => 'preview-' . $ocrecording['identifier']);
+    $recordingpreview = html_writer::start_tag('div', $options);
+    $imageurl = '';
+    // Getting preview image from mediapackage attachments.
+    if (isset($ocrecording['mediapackage']['attachments']['attachment'])) {
+        foreach ($ocrecording['mediapackage']['attachments']['attachment'] as $attachment) {
+            // Looking for image only.
+            if (isset($attachment['mimetype']) && strpos($attachment['mimetype'], 'image') !== FALSE) {
+                // Looking for the url of the preview image.
+                if (empty($imageurl) && isset($attachment['type']) && isset($attachment['url'])) {
+                    // There are several type of attachments which are different in size.
+                    // More suitable sizes are of these types, respectively.
+                    $suitabletypes = array('search', 'feed');
+                    foreach ($suitabletypes as $type) {
+                        if (strpos($attachment['type'], $type) !== FALSE) {
+                            $imageurl = $attachment['url'];
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!empty($imageurl)) {
+                break;
+            }
+        }
+        if (!empty($imageurl)) {
+            $recordingpreview .= bigbluebuttonbn_get_opencast_recording_data_row_preview_images($imageurl);
+        }
+    }
+   
+    $recordingpreview .= html_writer::end_tag('div');
+    return $recordingpreview;
+}
+
+/**
+ * Helper function format Opencast recording date used in row for the data used by the recording table.
+ *
+ * @param array $ocrecording
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_date_formatted($ocrecording) {
+    global $USER;
+    $starttime_str = !empty($ocrecording['start']) ? $ocrecording['start'] : $ocrecording['created'];
+    $starttime = strtotime($starttime_str);
+    // Set formatted date.
+    $dateformat = get_string('strftimerecentfull', 'langconfig') . ' %Z';
+    return userdate($starttime, $dateformat, usertimezone($USER->timezone));
+}
+
+/**
+ * Helper function converts Opencast recording duration used in row for the data used by the recording table.
+ *
+ * @param array $duration
+ *
+ * @return integer
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_duration($duration) {
+    if ($duration) {
+        // Convert the duration (in miliseconds) into Hours:Minutes:Seconds format
+        return gmdate('H:i:s', $duration / 1000);
+    }
+    return 0;
+}
+
+/**
+ * Helper function builds Opencast recording actionbar used in row for the data used by the recording table.
+ *
+ * @param array $ocrecording
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_actionbar($ocrecording, $bbbsession) {
+    global $OUTPUT;
+    if (empty($ocrecording['identifier']) || empty($bbbsession['course'])) {
+        return '';
+    }
+    $actionbar = '';
+    $linkattributes = array(
+        'target' => '_blank',
+        'class' => 'btn btn-xs btn-danger'
+    );
+    // Creating moodle url, to redirect to Opencast update metadata (Edit) page.
+    $opencastediturl = new \moodle_url('/blocks/opencast/updatemetadata.php',
+            array('video_identifier' => $ocrecording['identifier'], 'courseid' => $bbbsession['course']->id));
+    $linkattributes['id'] = 'opencast-edit-episode-' . $ocrecording['identifier'];
+    // Generating Action Link for Opencast update metadata (Edit).
+    $actionbar .= $OUTPUT->action_link($opencastediturl, get_string('edit'), null, $linkattributes) . '&#32;';
+    
+    // Creating moodle url, to redirect to Opencast delete event (Delete) page.
+    $opencastdeleteurl = new \moodle_url('/blocks/opencast/deleteevent.php',
+            array('identifier' => $ocrecording['identifier'], 'courseid' => $bbbsession['course']->id));
+    $linkattributes['id'] = 'opencast-delete-episode-' . $ocrecording['identifier'];
+    // Generating Action Link for Opencast delete event (Delete).
+    $actionbar .= $OUTPUT->action_link($opencastdeleteurl, get_string('delete'), null, $linkattributes) . '&#32;';
+    $head = html_writer::start_tag('div', array(
+        'id' => 'recording-actionbar-' . $ocrecording['identifier'],
+        'data-recordingid' => $ocrecording['identifier'],
+        'data-meetingid' => $bbbsession['meetingid']));
+    $tail = html_writer::end_tag('div');
+    return $head . $actionbar . $tail;
+}
+
+/**
+ * Helper function builds the Opencast recording table row and insert into table.
+ *
+ * @param array $bbbsession
+ * @param object $ocrecording
+ * @param object $rowdata
+ *
+ * @return object
+ */
+function bigbluebuttonbn_get_opencast_recording_table_row($bbbsession, $ocrecording, $rowdata) {
+    $row = new html_table_row();
+    $row->id = 'recording-tr-' . $ocrecording['identifier'];
+    $rowdata->date_formatted = str_replace(' ', '&nbsp;', $rowdata->date_formatted);
+    $row->cells = array();
+    $row->cells[] = $rowdata->playback;
+    $row->cells[] = $rowdata->name;
+    $row->cells[] = $rowdata->description;
+    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        $row->cells[] = $rowdata->preview;
+    }
+    $row->cells[] = $rowdata->date_formatted;
+    $row->cells[] = $rowdata->duration_formatted;
+    if ($bbbsession['managerecordings']) {
+        $row->cells[] = $rowdata->actionbar;
+    }
+    return $row;
+}
+
+/**
+ * Helper function builds element with actual images used in Opencast recording preview row based on a selected playback.
+ *
+ * @param string $imageurl
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_opencast_recording_data_row_preview_images($imageurl) {
+    global $CFG;
+    $recordingpreview  = html_writer::start_tag('div', array('class' => 'container-fluid'));
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
+    $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
+    $recordingpreview .= html_writer::empty_tag(
+        'img',
+        array('src' => trim($imageurl) . '?' . time(), 'class' => 'recording-thumbnail pull-left')
+    );
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
+    $recordingpreview .= html_writer::tag(
+        'div',
+        get_string('view_recording_preview_help', 'bigbluebuttonbn'),
+        array('class' => 'text-center text-muted small')
+    );
+    $recordingpreview .= html_writer::end_tag('div');
+    $recordingpreview .= html_writer::end_tag('div');
+    return $recordingpreview;
+}
+
+/**
+ * Helper function to get BBB recordings from the Opencast video avaialble in the course.
+ * It uses block_opencast for getting all videos for the course and match them with meeting id.
+ * It uses tool_opencast for making an api call to get mediapackage of vidoes.
+ *
+ * @param object $bbbsession
+ * @param string $seriesid
+ *
+ */
+function bigbluebutton_get_opencast_recordings_for_table_view($bbbsession, $seriesid) {
+    $bbbocvideos = array();
+    // Initializing the api from tool_opencast plugin.
+    $api = new \tool_opencast\local\api();
+    // Getting an instance of apibridge from block_opencast plugin.
+    $opencast = \block_opencast\local\apibridge::get_instance();
+    // Getting the course videos from block_opencast plugin.
+    $ocvideos = $opencast->get_course_videos($bbbsession['course']->id);
+    if ($ocvideos->videos && !empty($ocvideos->videos)) {
+        foreach ($ocvideos->videos as $ocvideo) {
+            // Check subjects of opencast video contains $bbbsession['meetingid'].
+            if (in_array($bbbsession['meetingid'], $ocvideo->subjects)) {
+                // Converting $ocvideo object to array.
+                $ocvideoarray = json_decode(json_encode($ocvideo), true);
+                // Get mediapackage json using api call.
+                $url = '/search/episode.json?id=' . $ocvideo->identifier;
+                $search_result = json_decode($api->oc_get($url), true);
+                if ($api->get_http_code() == 200 && isset($search_result['search-results']['result']['mediapackage'])) {
+                    // Add mediapackage to array if exists.
+                    $ocvideoarray['mediapackage'] = $search_result['search-results']['result']['mediapackage'];
+                }
+                $bbbocvideos[] = $ocvideoarray;
+            }
+        }
+    }
+    return $bbbocvideos;
+}
+
 /**
  * Helper function to convert an html string to plain text.
  *
@@ -2730,13 +3082,6 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             'recording_editable',
             $renderer->render_group_element_checkbox('recording_editable', 1)
         );
-        // If opencast plugin is installed.
-        if (bigbluebuttonbn_check_opencast()) {
-            $renderer->render_group_element(
-                'oc_recording',
-                $renderer->render_group_element_checkbox('oc_recording', 0)
-            );
-        }
         $renderer->render_group_element(
             'recording_icons_enabled',
             $renderer->render_group_element_checkbox('recording_icons_enabled', 1)
@@ -3681,24 +4026,28 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
     // Special metadata for Opencast recordings (passing opencast seriesid of the course as opencast-dc-isPartOf as metadata).
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording')
-        && bigbluebuttonbn_check_opencast($bbbsession['course']->id)) {
-        $metadata['opencast-dc-isPartOf'] = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
+    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording')) {
+        $ocseriesid = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
+        if ($ocseriesid != false) {
+            $metadata['opencast-dc-isPartOf'] = $ocseriesid;
+            $metadata['opencast-dc-subject'] = $bbbsession['meetingid'];
+        }
     }
     return $metadata;
 }
 
 /**
- * Helper for checking/retreiving seriesid from opencast_block plugin.
+ * Helper function which checks if the Opencast plugin (block_opencast) is installed. The function is called from several places throughout mod_bigbluebuttonbn where Opencast functionality can enhance the BBB meeting recording functionality as soon as the Opencast plugin is present.
+ * If called with a course ID as parameter, the function will not only check if the Opencast plugin is installed. It will also ensure that an Opencast series exists for the given course and will return the Opencast series ID instead of a boolean. In this case, the block does not necessarily be placed in the course.
  *
  * @param  string    $courseid
  * @return boolean|string
  */
 function bigbluebuttonbn_check_opencast($courseid = null) {
     $blockplugins = core_plugin_manager::instance()->get_plugins_of_type('block');
-    // If opencast_block is installed.
+    // If block_opencast is installed.
     if (in_array('opencast', array_keys($blockplugins))) {
-        // Getting the current instance of opencast.
+        // Getting an instance of the block_opencast API bridge.
         $opencast = \block_opencast\local\apibridge::get_instance();
         // If opencast is not configured!
         if (!$opencast) {
@@ -3708,13 +4057,42 @@ function bigbluebuttonbn_check_opencast($courseid = null) {
         if ($courseid) {
             // Trying to get course seriesid, create if is not set before!
             try {
-                return $opencast->ensure_course_series_exists($courseid);
+                $series = $opencast->ensure_course_series_exists($courseid);
+                if (is_object($series) && $series->identifier) {
+                    $seriesid = $series->identifier;
+                } else {
+                    $seriesid = $series;
+                }
+                return $seriesid;
             } catch (Exception $e) {
                 return false;
             }
         }
         return true;
     }
-    // If opencast_block is not installed
+    // If block_opencast is not installed
     return false;
+}
+
+/**
+ * Helper function renders Opencast integration settings if block_opencast is installed.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_opencastintegration(&$renderer) {
+    // Configuration for 'Opencast integration' feature when Opencast plugins are installed.
+    if ((boolean) bigbluebuttonbn_check_opencast()) {
+        $renderer->render_group_header('opencast');
+        $renderer->render_group_element(
+            'oc_recording',
+            $renderer->render_group_element_checkbox('oc_recording', 0)
+        );
+        $renderer->render_group_element(
+            'oc_show_recording',
+            $renderer->render_group_element_checkbox('oc_show_recording', 0)
+        );
+    }
+    
 }
