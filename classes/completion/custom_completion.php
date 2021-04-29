@@ -42,6 +42,8 @@ defined('MOODLE_INTERNAL') || die();
 class custom_completion extends activity_custom_completion {
 
     /**
+     * Get current state
+     *
      * @param string $rule
      * @return int
      * @throws \dml_exception

@@ -95,19 +95,10 @@ class meeting_info extends external_api {
         [
             'bbbsession' => $bbbsession,
             'context' => $context,
-            'enabledfeatures' => $enabledfeatures,
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
-
-        // Validate that the user has access to this activity and to manage recordings.
-        self::validate_context($context);
-        // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context
         ] = instance::get_session_from_id($bigbluebuttonbnid);
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
-        return static::get_meeting_info($bbbsession, $updatecache);
+        return static::get_meeting_info($bbbsession, $updatecache, $meetingid);
     }
 
     /**
@@ -115,11 +106,13 @@ class meeting_info extends external_api {
      *
      * @param array $bbbsession
      * @param bool $updatecache
+     * @param null $meetingidoverride override for the meeting id
      * @return array
      * @throws \coding_exception
      */
     public static function get_meeting_info($bbbsession,
-        bool $updatecache = false) {
+        bool $updatecache = false,
+        $meetingidoverride = null) {
         global $USER;
         $bbbinfo = new \stdClass();
         if ($bbbsession['openingtime']) {
@@ -130,7 +123,9 @@ class meeting_info extends external_api {
             $bbbinfo->closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' .
                 userdate($bbbsession['closingtime']);
         }
-        $info = meeting::bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], $updatecache);
+
+        $meetingid = $meetingidoverride ? $meetingidoverride : $bbbsession['meetingid'];
+        $info = meeting::bigbluebuttonbn_get_meeting_info($meetingid, $updatecache);
         $running = false;
         if ($info['returncode'] == 'SUCCESS') {
             $running = ($info['running'] === 'true');
@@ -165,7 +160,7 @@ class meeting_info extends external_api {
         } else {
             $bbbinfo->statusmessage = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
         }
-        $bbbinfo->meetingid = $bbbsession['meetingid'];
+        $bbbinfo->meetingid = $meetingid;
         $bbbinfo->bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         $bbbinfo->cmid = $bbbsession['cm']->id;
         $bbbinfo->userlimit = $bbbsession['userlimit'];
@@ -176,6 +171,9 @@ class meeting_info extends external_api {
             'name' => $bbbsession['presentation']['name'],
         ] : [];
         $bbbinfo->presentation = $presentation;
+        if (!empty($bbbsession['group'])) {
+            $bbbinfo->group = $bbbsession['group'];
+        }
         return (array) $bbbinfo;
     }
 
