@@ -91,7 +91,7 @@ class recording {
     public static function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
         // TODO: We will need to completely rewrite this by
         // Having a recording singleton which instantiation would depend on the condition here or
-        // overriding the higher level function (bigbluebuttonbn_get_recordings_array)
+        // overriding the higher level function (bigbluebuttonbn_get_recordings_array).
 
         if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)
             || defined('BEHAT_SITE_RUNNING')

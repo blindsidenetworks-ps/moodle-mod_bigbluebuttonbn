@@ -76,93 +76,6 @@ function bigbluebuttonbn_supports($feature) {
 }
 
 /**
- * Obtains the automatic completion state for this bigbluebuttonbn based on any conditions
- * in bigbluebuttonbn settings.
- *
- * @param object $course Course
- * @param object $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- *
- * @return bool True if completed, false if not. (If no conditions, then return
- *   value depends on comparison type)
- */
-function bigbluebuttonbn_get_completion_state($course, $cm, $userid, $type) {
-    global $DB;
-
-    // Get bigbluebuttonbn details.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*',
-            MUST_EXIST);
-    if (!$bigbluebuttonbn) {
-        throw new Exception("Can't find bigbluebuttonbn {$cm->instance}");
-    }
-
-    // Default return value.
-    $result = $type;
-
-    $sql  = "SELECT * FROM {bigbluebuttonbn_logs} ";
-    $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
-    $logs = $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $userid, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
-
-    if ($bigbluebuttonbn->completionattendance) {
-        if (!$logs) {
-            // As completion by attendance was required, the activity hasn't been completed.
-            return false;
-        }
-        $attendancecount = 0;
-        foreach ($logs as $log) {
-            $summary = json_decode($log->meta);
-            $attendancecount += $summary->data->duration;
-        }
-        $attendancecount /= 60;
-        $value = $bigbluebuttonbn->completionattendance <= $attendancecount;
-        if ($type == COMPLETION_AND) {
-            $result = $result && $value;
-        } else {
-            $result = $result || $value;
-        }
-    }
-
-    if ($bigbluebuttonbn->completionengagementchats) {
-        if (!$logs) {
-            // As completion by engagement with chat was required, the activity hasn't been completed.
-            return false;
-        }
-        $engagementchatscount = 0;
-        foreach ($logs as $log) {
-            $summary = json_decode($log->meta);
-            $engagementchatscount += $summary->data->engagement->chats;
-        }
-        $value = $bigbluebuttonbn->completionengagementchats <= $engagementchatscount;
-        if ($type == COMPLETION_AND) {
-            $result = $result && $value;
-        } else {
-            $result = $result || $value;
-        }
-    }
-
-    if ($bigbluebuttonbn->completionengagementtalks) {
-        if (!$logs) {
-            // As completion by engagement with talk was required, the activity hasn't been completed.
-            return false;
-        }
-        $engagementtalkscount = 0;
-        foreach ($logs as $log) {
-            $summary = json_decode($log->meta);
-            $engagementtalkscount += $summary->data->engagement->talks;
-        }
-        $value = $bigbluebuttonbn->completionengagementtalks <= $engagementtalkscount;
-        if ($type == COMPLETION_AND) {
-            $result = $result && $value;
-        } else {
-            $result = $result || $value;
-        }
-    }
-
-    return $result;
-}
-
-/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -420,35 +333,6 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 }
 
 /**
- * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
- *
- * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
- * @return array $descriptions the array of descriptions for the custom rules.
- */
-function mod_bigbluebuttonbn_get_completion_active_rule_descriptions($cm) {
-    // Values will be present in cm_info, and we assume these are up to date.
-    if (empty($cm->customdata['customcompletionrules'])
-        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
-        return [];
-    }
-
-    $descriptions = [];
-    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
-        switch ($key) {
-            case 'completionattendance':
-                if (!empty($val)) {
-                    $descriptions[] = get_string('completionattendancedesc', 'bigbluebuttonbn', $val);
-                    $descriptions[] = get_string('completionengagementdesc', 'bigbluebuttonbn', $val);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    return $descriptions;
-}
-
-/**
  * Serves the bigbluebuttonbn attachments. Implements needed access control ;-).
  *
  * @category files
@@ -472,7 +356,7 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
     // Finally send the file.
-    return send_stored_file($file, 0, 0, $forcedownload, $options); // download MUST be forced - security!
+    return send_stored_file($file, 0, 0, $forcedownload, $options); // Download MUST be forced - security!
 }
 
 /**

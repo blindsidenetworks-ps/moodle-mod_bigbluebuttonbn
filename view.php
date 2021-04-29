@@ -38,7 +38,7 @@ $group = optional_param('group', 0, PARAM_INT);
 
 $viewinstance = view::bigbluebuttonbn_view_validator($id, $bn); // In locallib.
 if (!$viewinstance) {
-    print_error('view_error_url_missing_parameters', plugin::COMPONENT);
+    throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
 $cm = $viewinstance['cm'];
@@ -71,7 +71,7 @@ if ($serverversion === null) {
     } else if ($bbbsession['moderator']) {
         $errmsg = 'view_error_unable_join_teacher';
     }
-    print_error($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
+    throw new moodle_exception($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
 }
 $bbbsession['serverversion'] = (string) $serverversion;
 
@@ -84,8 +84,6 @@ $PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
 $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
-
-/* @var core_renderer $OUTPUT */
 
 // Validate if the user is in a role allowed to join.
 if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {

@@ -29,6 +29,7 @@ use core\output\inplace_editable;
 use lang_string;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
+use moodle_exception;
 
 /**
  * Renderer for recording in place editable.
@@ -54,7 +55,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
             format_string($this->get_recording_value($recording, $bbbsession)
                 , true, array('context' => \context_module::instance($bbbsession['cm']->id)));
 
-        // Hack here: the ID is the recordID and the meeting ID
+        // Hack here: the ID is the recordID and the meeting ID.
         parent::__construct('mod_bigbluebuttonbn', static::get_type(),
             $recording['recordID'] . ',' . $recording['meetingID'], $editable,
             $displayvalue, $displayvalue);
@@ -70,7 +71,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
     protected static function check_capability($bbbsession) {
         global $USER;
         if (!can_access_course($bbbsession['course'], $USER)) {
-            print_error('noaccess', 'mod_bigbluebuttonbn');
+            throw new moodle_exception('noaccess', 'mod_bigbluebuttonbn');
         }
         if (!$bbbsession['managerecordings']) {
             return false;
@@ -92,7 +93,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @param array $bbbsession
      * @return mixed
      */
-    public abstract function get_recording_value($recording, $bbbsession);
+    abstract public function get_recording_value($recording, $bbbsession);
 
     /**
      * Get all necessary info from itemid

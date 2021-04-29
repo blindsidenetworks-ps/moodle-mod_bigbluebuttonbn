@@ -29,6 +29,7 @@ use completion_info;
 use context_module;
 use curl;
 use Exception;
+use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
@@ -559,7 +560,9 @@ class bigbluebutton {
             mtrace("Completion not enabled");
             return;
         }
-        if (bigbluebuttonbn_get_completion_state($course, $cm, $userid, COMPLETION_AND)) {
+
+        $bbbcompletion = new custom_completion($cm, $userid);
+        if ($bbbcompletion->get_overall_completion_state()) {
             mtrace("Completion succeeded for user $userid");
             $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
         } else {

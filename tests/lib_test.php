@@ -23,6 +23,7 @@
  * @author    Laurent David (laurent@call-learning.fr)
  */
 
+use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\helpers\logs;
 
@@ -40,7 +41,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
+class lib_test extends \bbb_simple_test {
 
     public function test_bigbluebuttonbn_supports() {
         $this->resetAfterTest();
@@ -54,20 +55,28 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $user = $this->generator->create_user();
         $this->setUser($user);
-        $result = bigbluebuttonbn_get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
-        $this->assertEquals(COMPLETION_AND, $result);
+        $completion = new custom_completion($bbactivitycm, $user->id);
+        $result = $completion->get_overall_completion_state();
+        // No custom rules so complete.
+        $this->assertEquals(COMPLETION_COMPLETE, $result);
 
+        // Now with a custom rule.
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-                $this->create_instance(null, ['completionattendance' => 1, 'completionengagementchats' => 1,
-                        'completionengagementtalks' => 1]);
-
+            $this->create_instance(null);
+        $bbactivitycm->override_customdata('customcompletionrules', [
+            'completionengagementchats' => '1',
+            'completionattendance' => '1'
+        ]);
+        $completion = new custom_completion($bbactivitycm, $user->id);
+        $result = $completion->get_overall_completion_state();
+        $this->assertEquals(COMPLETION_INCOMPLETE, $result);
         // Add a couple of fake logs.
         $overrides = array('meetingid' => $bbactivity->meetingid);
         $meta = '{"origin":0, "data": {"duration": 120, "engagement": {"chats": 2, "talks":2} }}';
         logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
         logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
-        $result = bigbluebuttonbn_get_completion_state($this->course, $bbactivitycm, $user->id, COMPLETION_AND);
-        $this->assertEquals(COMPLETION_AND, $result);
+        $result = $completion->get_overall_completion_state();
+        $this->assertEquals(COMPLETION_COMPLETE, $result);
     }
 
     public function test_bigbluebuttonbn_add_instance() {
@@ -107,7 +116,7 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
         logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
         logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
-        $this->assertRegExp('/.* has joined the session for 2 times/', $result);
+        $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
     }
 
     public function test_bigbluebuttonbn_user_complete() {
@@ -156,10 +165,10 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
         $this->resetAfterTest();
         $results = bigbluebuttonbn_reset_course_form_defaults($this->course);
         $this->assertEquals(array(
-                'reset_bigbluebuttonbn_events' => 0,
-                'reset_bigbluebuttonbn_tags' => 0,
-                'reset_bigbluebuttonbn_logs' => 0,
-                'reset_bigbluebuttonbn_recordings' => 0,
+            'reset_bigbluebuttonbn_events' => 0,
+            'reset_bigbluebuttonbn_tags' => 0,
+            'reset_bigbluebuttonbn_logs' => 0,
+            'reset_bigbluebuttonbn_recordings' => 0,
         ), $results);
     }
 
@@ -174,9 +183,9 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
         $data->course = $bbactivity->course;
         $results = bigbluebuttonbn_reset_userdata($data);
         $this->assertEquals(array(
-                'component' => 'BigBlueButtonBN',
-                'item' => 'Deleted tags',
-                'error' => false,
+            'component' => 'BigBlueButtonBN',
+            'item' => 'Deleted tags',
+            'error' => false,
         ), $results[0]);
     }
 
@@ -189,55 +198,63 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
 
     public function test_mod_bigbluebuttonbn_get_completion_active_rule_descriptions() {
         $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
         // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
         // Inspired from the same test in forum.
         list($bbactivitycontext, $cm1, $bbactivity) = $this->create_instance($this->course,
-                ['completion' => '2', 'completionsubmit' => '1']);
+            ['completion' => '2', 'completionattendance' => '1']);
         list($bbactivitycontext, $cm2, $bbactivity) = $this->create_instance($this->course,
-                ['completion' => '2', 'completionsubmit' => '0']);
+            ['completion' => '2', 'completionattendance' => '0']);
 
         // Data for the stdClass input type.
         // This type of input would occur when checking the default completion rules for an activity type, where we don't have
         // any access to cm_info, rather the input is a stdClass containing completion and customdata attributes, just like cm_info.
         $moddefaults = (object) [
-                'customdata' => [
-                        'customcompletionrules' => [
-                                'completionsubmit' => '1',
-                        ],
+            'customdata' => [
+                'customcompletionrules' => [
+                    'completionsubmit' => '1',
                 ],
-                'completion' => 2,
+            ],
+            'completion' => 2,
         ];
 
-        $activeruledescriptions = [get_string('completionsubmit', 'assign')];
+        $completioncm1 = new custom_completion($cm1, $user->id);
         // TODO: check the return value here as there might be an issue with the function compared to the forum for example.
-        /*
-          $this->assertEquals(mod_bigbluebuttonbn_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
-          $this->assertEquals(mod_bigbluebuttonbn_get_completion_active_rule_descriptions($moddefaults), $activeruledescriptions);
-        */
-
-        $this->assertEquals(mod_bigbluebuttonbn_get_completion_active_rule_descriptions($cm2), []);
-        $this->assertEquals(mod_bigbluebuttonbn_get_completion_active_rule_descriptions(new stdClass()), []);
-
+        $this->assertEquals(
+            [
+                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
+                    0),
+                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
+                    0),
+                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
+                    1),
+            ],
+            $completioncm1->get_custom_rule_descriptions());
+        $completioncm2 = new custom_completion($cm2, $user->id);
+        $this->assertEquals(
+            [
+                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
+                    0),
+                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
+                    0),
+                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
+                    0),
+            ], $completioncm2->get_custom_rule_descriptions());
     }
 
     public function test_bigbluebuttonbn_pluginfile() {
         $this->resetAfterTest();
         $this->markTestSkipped(
-                'For now this test on send file and it should be mocked to avoid the real API CALL.'
+            'For now this test on send file and it should be mocked to avoid the real API CALL.'
         );
-
-        /*
-            $mediafilepath = bigbluebuttonbn_pluginfile($this->course, $bbactivitycm, context_module::instance($bbactivitycm->id),
-               'presentation', ['bbfile.pptx'], false, ['preview'=>true, 'dontdie'=>true]);
-               $this->assertEquals('/bbfile.pptx', $mediafilepath);
-        */
     }
 
     public function test_bigbluebuttonbn_view() {
         $this->resetAfterTest();
         $this->setAdminUser();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance([],
-                array('completion' => 2, 'completionview' => 1));
+            array('completion' => 2, 'completionview' => 1));
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -267,15 +284,16 @@ class mod_bigbluebuttonbn_lib_test extends \bbb_simple_test {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $result = bigbluebuttonbn_check_updates_since($bbactivitycm, 0);
         $this->assertEquals(
-                '{"configuration":{"updated":false},"contentfiles":{"updated":false},"introfiles":{"updated":false},"completion":{"updated":false}}',
-                json_encode($result)
+            '{"configuration":{"updated":false},"contentfiles":{"updated":false},"introfiles":' .
+            '{"updated":false},"completion":{"updated":false}}',
+            json_encode($result)
         );
     }
 
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
         $this->resetAfterTest();
         $this->assertEquals(array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'),
-                mod_bigbluebuttonbn_get_fontawesome_icon_map());
+            mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 
     public function test_mod_bigbluebuttonbn_core_calendar_provide_event_action() {

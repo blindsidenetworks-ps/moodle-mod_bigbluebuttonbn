@@ -75,7 +75,6 @@ class recording_test extends advanced_testcase {
             $this->courses[] = $this->getDataGenerator()->create_course();
         }
         $bbngenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-        /* @var $bbngenerator mod_bigbluebuttonbn_generator */
         foreach (static::BB_ACTIVITIES as $aname => $activity) {
             $bbactivity = $bbngenerator->create_instance(
                 [
