@@ -117,8 +117,9 @@ class view {
      * Displays the general view.
      *
      * @param array $bbbsession
-     * @param string $activity
      * @return void
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public static function view_render(&$bbbsession) {
         global $OUTPUT, $PAGE;
@@ -193,8 +194,6 @@ class view {
      * Renders the view for room.
      *
      * @param array $bbbsession
-     * @param string $activity
-     * @param array $jsvars
      *
      * @return string
      * @throws \moodle_exception
@@ -202,7 +201,6 @@ class view {
     public static function view_render_room(&$bbbsession) {
         global $OUTPUT;
         $context = meeting_info::get_meeting_info($bbbsession, false);
-        /* @var core_renderer $OUTPUT */
         return $OUTPUT->render_from_template('mod_bigbluebuttonbn/room_view', $context);
     }
 
@@ -213,6 +211,7 @@ class view {
      * @param array $enabledfeatures
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function view_render_imported($bbbsession, $enabledfeatures) {
         global $CFG;

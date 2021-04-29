@@ -51,7 +51,7 @@ $group = optional_param('group', -1, PARAM_INT);
 
 $bbbviewinstance = view::bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
-    print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
+    throw new moodle_exception('view_error_url_missing_parameters', 'bigbluebuttonbn');
 }
 
 $cm = $bbbviewinstance['cm'];
@@ -71,16 +71,16 @@ if ($timeline || $index) {
     $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
     if (is_null($serverversion)) {
         if ($bbbsession['administrator']) {
-            print_error('view_error_unable_join', 'bigbluebuttonbn',
+            throw new moodle_exception('view_error_unable_join', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             exit;
         }
         if ($bbbsession['moderator']) {
-            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+            throw new moodle_exception('view_error_unable_join_teacher', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
             exit;
         }
-        print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+        throw new moodle_exception('view_error_unable_join_student', 'bigbluebuttonbn',
             $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
         exit;
     }
@@ -155,7 +155,7 @@ switch (strtolower($action)) {
         break;
     case 'join':
         if (is_null($bbbsession)) {
-            print_error('view_error_unable_join', 'bigbluebuttonbn');
+            throw new moodle_exception('view_error_unable_join', 'bigbluebuttonbn');
             break;
         }
         // Check the origin page.
@@ -186,31 +186,31 @@ switch (strtolower($action)) {
         if (empty($response)) {
             // The server is unreachable.
             if ($bbbsession['administrator']) {
-                print_error('view_error_unable_join', 'bigbluebuttonbn',
+                throw new moodle_exception('view_error_unable_join', 'bigbluebuttonbn',
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
                 break;
             }
             if ($bbbsession['moderator']) {
-                print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                throw new moodle_exception('view_error_unable_join_teacher', 'bigbluebuttonbn',
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
                 break;
             }
-            print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+            throw new moodle_exception('view_error_unable_join_student', 'bigbluebuttonbn',
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             break;
         }
         if ($response['returncode'] == 'FAILED') {
             // The meeting was not created.
             if (!$printerrorkey) {
-                print_error($response['message'], 'bigbluebuttonbn');
+                throw new moodle_exception($response['message'], 'bigbluebuttonbn');
                 break;
             }
             $printerrorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
-            print_error($printerrorkey, 'bigbluebuttonbn');
+            throw new moodle_exception($printerrorkey, 'bigbluebuttonbn');
             break;
         }
         if ($response['hasBeenForciblyEnded'] == 'true') {
-            print_error(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
+            throw new moodle_exception(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
             break;
         }
         // Moodle event logger: Create an event for meeting created.
@@ -435,7 +435,7 @@ function bigbluebuttonbn_bbb_view_errors($serrors, $id) {
         $msgerrors .= html_writer::tag('p', $error->{'message'}, array('class' => 'alert alert-danger'))."\n";
     }
     echo $OUTPUT->header();
-    print_error('view_error_bigbluebutton', 'bigbluebuttonbn',
+    throw new moodle_exception('view_error_bigbluebutton', 'bigbluebuttonbn',
         $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id, $msgerrors, $serrors);
     echo $OUTPUT->footer();
 }

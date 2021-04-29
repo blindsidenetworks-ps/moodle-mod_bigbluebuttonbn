@@ -82,7 +82,9 @@ $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
 $string['completionengagementchats'] = 'Chat events';
+$string['completionengagementchatsdesc'] = '{$a} Chat events';
 $string['completionengagementtalks'] = 'Talk events';
+$string['completionengagementtalksdesc'] = '{$a} Talk events';
 $string['completionengagementtalktime'] = 'Talk time';
 $string['completionengagementraisehand'] = 'Raise hand events';
 $string['completionengagementpollvotes'] = 'Poll votes';

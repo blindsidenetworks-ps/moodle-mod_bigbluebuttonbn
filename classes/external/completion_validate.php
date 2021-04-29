@@ -61,7 +61,6 @@ class completion_validate extends external_api {
      * Mark activity as complete
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param string $meetingid
      * @return array (empty array for now)
      * @throws \coding_exception
      * @throws \dml_exception

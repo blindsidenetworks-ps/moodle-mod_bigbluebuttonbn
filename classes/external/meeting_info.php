@@ -67,13 +67,14 @@ class meeting_info extends external_api {
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param string $meetingid
+     * @param bool $updatecache
      * @return array (empty array for now)
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      * @throws \required_capability_exception
-     * @throws \restricted_context_exception
      * @throws moodle_exception
+     * @throws restricted_context_exception
      */
     public static function execute(
         int $bigbluebuttonbnid,
@@ -110,6 +111,14 @@ class meeting_info extends external_api {
         return static::get_meeting_info($bbbsession, $updatecache);
     }
 
+    /**
+     * Get meeting information
+     *
+     * @param array $bbbsession
+     * @param bool $updatecache
+     * @return array
+     * @throws \coding_exception
+     */
     public static function get_meeting_info($bbbsession,
         bool $updatecache = false) {
         global $USER;

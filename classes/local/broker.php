@@ -469,6 +469,7 @@ class broker {
      * @param array $recordings
      *
      * @return array
+     * @throws \dml_exception
      */
     public static function recording_action_protect($params, $recordings) {
         global $DB;
@@ -603,7 +604,9 @@ class broker {
                 return;
             }
             // We make sure messages are sent only once.
-            if (\mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log($decodedparameters->record_id) == 0) {
+            if (
+                \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
+                    $decodedparameters->record_id) == 0) {
                 recording::bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
             }
             $overrides = array('meetingid' => $decodedparameters->meeting_id);

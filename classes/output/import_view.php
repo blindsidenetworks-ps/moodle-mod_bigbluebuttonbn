@@ -108,7 +108,7 @@ class import_view implements renderable, templatable {
         }
         $context['has_recordings'] = $hasrecordings;
 
-        // Now the selects
+        // Now the selects.
         if ($this->courseidscope) {
             $bbbrecords = $DB->get_records('bigbluebuttonbn', array('course' => $this->courseidscope));
             $selectrecords = [];

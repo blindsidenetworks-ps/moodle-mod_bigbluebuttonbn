@@ -115,6 +115,9 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
+     * @param string $sectioname
+     *
+     * @return admin_settingpage
      * @throws \coding_exception
      */
     public function bigbluebuttonbn_settings_general($sectioname) {

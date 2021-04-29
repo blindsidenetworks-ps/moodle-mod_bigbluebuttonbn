@@ -235,7 +235,7 @@ class get_recordings extends external_api {
                     'key' => new external_value(PARAM_ALPHA),
                     'label' => new external_value(PARAM_TEXT),
                     'width' => new external_value(PARAM_ALPHANUMEXT),
-                    // See https://datatables.net/reference/option/columns.type
+                    // See https://datatables.net/reference/option/columns.type .
                     'type' => new external_value(PARAM_ALPHANUMEXT, 'Column type', VALUE_OPTIONAL),
                     'sortable' => new external_value(PARAM_BOOL, 'Whether this column is sortable', VALUE_OPTIONAL, false),
                     'allowHTML' => new external_value(PARAM_BOOL, 'Whether this column contains HTML', VALUE_OPTIONAL, false),
