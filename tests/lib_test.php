@@ -191,7 +191,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
         bigbluebuttonbn_log($bbactivity, BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
-        $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
+        if ( (new mod_bigbluebuttonbn\locallib\config)->get_moodle_version_major() >= '2021052500' ) {
+            $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
+        } else {
+            $this->assertRegExp('/.* has joined the session for 2 times/', $result);
+        }
     }
 
     public function test_bigbluebuttonbn_user_complete() {
@@ -371,7 +375,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
 
         $htmlarray = [];
         bigbluebuttonbn_print_overview([$this->course->id => $this->course], $htmlarray);
-        $this->assertMatchesRegularExpression("/BigBlueButton (1|2)/", $htmlarray[$this->course->id]['bigbluebuttonbn']);
+        if ( (new mod_bigbluebuttonbn\locallib\config)->get_moodle_version_major() >= '2021052500' ) {
+            $this->assertMatchesRegularExpression("/BigBlueButton (1|2)/", $htmlarray[$this->course->id]['bigbluebuttonbn']);
+        } else {
+            $this->assertRegExp("/BigBlueButton (1|2)/", $htmlarray[$this->course->id]['bigbluebuttonbn']);
+        }
     }
 
     public function test_bigbluebuttonbn_print_overview_element() {
@@ -382,7 +390,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $cmrecord = (object) array_merge((array) $bbactivity, (array) $bbactivitycm->get_course_module_record());
         $cmrecord->coursemodule = $bbactivity->id;
         $str = bigbluebuttonbn_print_overview_element($cmrecord, time());
-        $this->assertMatchesRegularExpression("/bigbluebuttonbn overview/", $str);
+        if ( (new mod_bigbluebuttonbn\locallib\config)->get_moodle_version_major() >= '2021052500' ) {
+            $this->assertMatchesRegularExpression("/bigbluebuttonbn overview/", $str);
+        } else {
+            $this->assertRegExp("/bigbluebuttonbn overview/", $str);
+        }
     }
 
     public function test_bigbluebuttonbn_get_coursemodule_info() {
