@@ -2,8 +2,8 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI for Moodle 3.2
-on: [pull_request]
+name: Moodle plugin CI for Moodle 3.11
+on: [push, pull_request]
 
 jobs:
   test:
@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '7.1'
-            moodle-branch: 'MOODLE_32_STABLE'
+          - php: '7.3'
+            moodle-branch: 'MOODLE_311_STABLE'
             database: 'mariadb'
 
     services:
@@ -48,7 +48,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '8.9.4'
+          node-version: '14.15.0'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -58,8 +58,7 @@ jobs:
 
       - name: Deploy moodle-plugin-ci
         run: |
-          composer self-update 1.10.12
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^2
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
           # Add dirs to $PATH
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
@@ -108,6 +107,6 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit
 
-      # - name: behat
-      #   if: ${{ always() }}
-      #   run: moodle-plugin-ci behat --profile chrome
+      - name: behat
+        if: ${{ always() }}
+        run: moodle-plugin-ci behat --profile chrome

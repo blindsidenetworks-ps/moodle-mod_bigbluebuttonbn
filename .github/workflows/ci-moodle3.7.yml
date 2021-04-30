@@ -3,7 +3,7 @@
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
 name: Moodle plugin CI for Moodle 3.7
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   test:

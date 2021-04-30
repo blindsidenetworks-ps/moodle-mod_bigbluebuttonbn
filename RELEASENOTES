@@ -1,3 +1,7 @@
+2.4-rc.2 (2019101006)
+Bug: Patch for issue with Groups (CONTRIB-8471).
+Enhancement: Re-brand BigBlueButtonBN to BigBlueButton (CONTRIB-8521)
+
 2.4-rc.1 (2019101005)
 Bug: Patch for issue with Calendar/Event (CONTRIB-8454).
 
@@ -33,8 +37,8 @@ Enhancement: Notification should contain link to BBB (CONTRIB-8029).
 Enhancement: Corrected problem of Import List Same Course Names (CONTRIB-8052).
 Enhancement: Recording parameters in activity form (CONTRIB-8116).
 Enhancement: Change the UI for Participants to User/Role Mapping (CONTRIB-8164).
-New Feature: Completion should be based on events captured from the live session (CONTRIB-7457).
-New Feature: Completion should be extended for supporting engagement (CONTRIB-7908).
+New Feature: -Experimental- Completion should be based on events captured from the live session (CONTRIB-7457).
+New Feature: -Experimental- Completion should be extended for supporting engagement (CONTRIB-7908).
 New Feature: Configure meeting room from the plugin (CONTRIB-8239).
 
 2.3.6 (2019042011)
