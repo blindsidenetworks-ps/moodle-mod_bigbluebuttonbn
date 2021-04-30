@@ -460,3 +460,4 @@ function bigbluebuttonbn_bbb_view_errors($serrors, $id) {
         $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id, $msgerrors, $serrors);
     echo $OUTPUT->footer();
 }
+
