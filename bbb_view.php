@@ -23,6 +23,8 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\locallib\bigbluebutton;
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
@@ -90,15 +92,21 @@ if ($timeline || $index) {
 
     // Check group.
     if ($group >= 0) {
-        $bbbsession['group'] = $group;
-        $groupname = get_string('allparticipants');
-        if ($bbbsession['group'] != 0) {
-            $groupname = groups_get_group_name($bbbsession['group']);
-        }
+        global $USER;
+        // CONTRIB-8471: prevent user from accessing the activity if not member of the group.
+        if (bigbluebutton::user_can_access_groups($group, $USER, $course, $cm)) {
+            $bbbsession['group'] = $group;
+            $groupname = get_string('allparticipants');
+            if ($bbbsession['group'] != 0) {
+                $groupname = groups_get_group_name($bbbsession['group']);
+            }
 
-        // Assign group default values.
-        $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
-        $bbbsession['meetingname'] .= ' ('.$groupname.')';
+            // Assign group default values.
+            $bbbsession['meetingid'] .= '[' . $bbbsession['group'] . ']';
+            $bbbsession['meetingname'] .= ' (' . $groupname . ')';
+        } else {
+            print_error('invalidaccess');
+        }
     }
 
     // Initialize session variable used across views.
