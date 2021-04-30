@@ -38,15 +38,6 @@ if (!isset($params['action']) || empty($params['action'])) {
     return;
 }
 
-// The endpoints for ajax requests are now implemented in bbb_ajax.php.
-// The endpoints for recording_ready and meeting_events callbacks must be moved to services (CONTRIB-7440).
-// But in order to support the transition, requests other than the callbacks are redirected to bbb_ajax.php.
-if ($params['action'] != 'recording_ready' && $params['action'] != 'meeting_events') {
-    $url = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_ajax.php?' . http_build_query($params, '', '&');
-    header("Location: " . $url);
-    exit;
-}
-
 $error = broker::validate_parameters($params);
 if (!empty($error)) {
     header('HTTP/1.0 400 Bad Request. '.$error);

@@ -96,23 +96,6 @@ try {
         echo $recordingplay;
         return;
     }
-    if ($a == 'recording_links') {
-        $recordinglinks = broker::recording_links($bbbsession, $params);
-        echo $recordinglinks;
-        return;
-    }
-    if ($a == 'recording_info') {
-        $recordinginfo = broker::recording_info($bbbsession, $params, $enabledfeatures['showroom']);
-        echo $recordinginfo;
-        return;
-    }
-    if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
-        $a == 'recording_delete' || $a == 'recording_edit' ||
-        $a == 'recording_protect' || $a == 'recording_unprotect') {
-        $recordingaction = broker::recording_action($bbbsession, $params, $enabledfeatures['showroom']);
-        echo $recordingaction;
-        return;
-    }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
 } catch (Exception $e) {
     header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());
