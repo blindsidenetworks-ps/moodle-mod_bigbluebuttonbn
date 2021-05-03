@@ -3115,7 +3115,14 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
             'participant_guestlink',
             $renderer->render_group_element_checkbox('participant_guestlink', 0)
         );
-        // Option for locking (and hiding) the settings for moderator approval on a global level
+
+        // Option for enforcing access codes be required all the time when guestinks are enabled.
+        $renderer->render_group_element(
+            'participant_guest_requires_access_code',
+            $renderer->render_group_element_checkbox('participant_guest_requires_access_code', 0)
+        );
+
+        // Option for locking (and hiding) the settings for moderator approval on a global level.
         $renderer->render_group_element(
             'participant_guest_requires_moderator_approval',
             $renderer->render_group_element_checkbox('participant_guest_requires_moderator_approval', 0)

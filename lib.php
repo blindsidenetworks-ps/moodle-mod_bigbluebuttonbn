@@ -251,8 +251,6 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
     $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
-    // Get the guestlinkid column in the bigbluebuttonbn table.
-    $bigbluebuttonbn->guestlinkid = (string)$DB->get_field('bigbluebuttonbn', 'guestlinkid', array('id' => $bigbluebuttonbn->id));
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Get the meetingid column in the bigbluebuttonbn table.
@@ -691,6 +689,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
+    global $DB;
     require_once(__DIR__.'/locallib.php');
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
@@ -703,7 +702,9 @@ function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
     }
     if (!property_exists($bigbluebuttonbn, 'guestlinkid') ) {
-        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
+        // Get the guestlinkid column in the bigbluebuttonbn table, and use it if it's not empty, otherwise generate an id.
+        $guestlinkid = (string)$DB->get_field('bigbluebuttonbn', 'guestlinkid', array('id' => $bigbluebuttonbn->instance));
+        $bigbluebuttonbn->guestlinkid = $guestlinkid ?: bigbluebuttonbn_random_password(12);
     }
 
     // Get the correct access policy data.
@@ -1353,3 +1354,14 @@ function bigbluebuttonbn_has_capability($bigbluebuttonbnid, $capability) {
     }
     return true;
 }
+
+
+/**
+ * Helper for generating access codes for BBB
+ *
+ * @return string
+ */
+function bigbluebuttonbn_generate_access_code() {
+    return rand(1, 999999);
+}
+

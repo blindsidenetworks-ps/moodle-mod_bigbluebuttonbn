@@ -110,14 +110,18 @@ M.mod_bigbluebuttonbn.rooms = {
                 });
             };
             btn = document.getElementById("id_password_clear");
-            btn.addEventListener('click', function(){
-                var input = document.getElementById("id_password");
-                input.value = null;
-            });
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    var input = document.getElementById("id_password");
+                    input.value = null;
+                });
+            }
             btn = document.getElementById("id_password_change");
-            btn.addEventListener('click', function(){
-                setpass(false);
-            });
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    setpass(false);
+                });
+            }
         }
     },
 

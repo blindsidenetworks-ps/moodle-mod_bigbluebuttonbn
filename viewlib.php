@@ -224,9 +224,11 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
             $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
                 ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
             $guestlink['url'] = $guestlinkurl->__toString();
-            if ($bbbsession['bigbluebuttonbn']->guestpass) {
+            $hasguestpass = !empty($bbbsession['bigbluebuttonbn']->guestpass);
+            $accesscoderequired = \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_access_code');
+            if ($hasguestpass) { // If there is a guestpass/access-code/password set for this session.
                 $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestpass;
-            } else {
+            } else { // No password/access code is required.
                 $guestlink['nopassword'] = true;
             }
             if (has_capability('mod/bigbluebuttonbn:guestlink_change_password', $context)) {
@@ -256,6 +258,7 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
             'guestlinkpassword' => $guestlink['password'] ?? '',
             'guestlinkchangepassenabled' => $guestlink['changepassenabled'],
             'guestlinkexpiresat' => $bbbsession['bigbluebuttonbn']->guestlinkexpiresat ?? null,
+            'guestlinkaccesscoderequired' => $accesscoderequired ?? false,
         ]);
         if ($fromform = $mform->get_data()) {
             // Access-Code / Password handling: If no password set, clear it. If password is provided, set it.

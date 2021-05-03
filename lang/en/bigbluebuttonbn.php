@@ -193,6 +193,8 @@ $string['config_participant'] = 'Participant configuration';
 $string['config_participant_description'] = 'These settings define the role by default for participants in a conference.';
 $string['config_participant_guestlink'] = 'Allow guest access links';
 $string['config_participant_guestlink_description'] = 'Allow moderator to create a guest access link for external participants.';
+$string['config_participant_guest_requires_access_code'] = 'Guests need to provide access code';
+$string['config_participant_guest_requires_access_code_description'] = 'Ensure guests always require an access code for entry, generating one if not already set';
 $string['config_participant_guest_requires_moderator_approval'] = 'Moderator must approve guests';
 $string['config_participant_guest_requires_moderator_approval_description'] = 'Moderators must always approve guests. Enabling this will lock and hide the option from the activity setting';
 
@@ -444,6 +446,7 @@ $string['mod_guestlink_access_form_generate'] = 'Generate';
 $string['mod_guestlink_access_form_update_time'] = 'Update Time';
 $string['mod_guestlink_access_form_copy'] = 'Copy';
 $string['mod_guestlink_access_form_clear'] = 'Clear';
+$string['mod_guestlink_access_form_accesscoderequired'] = 'An access code is required';
 
 $string['guestlink_form_guestpass_info'] = 'Enter the room\'s access code';
 $string['guestlink_form_guestname_info'] = 'Enter your name!';

@@ -192,6 +192,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         ) {
             unset($data->guestlinkenabled);
         }
+
+        // If guestlink is enabled, and site-level settings require a mandatory access code be set, generate one and store it.
+        if (
+            !empty($data->guestlinkenabled)
+            && \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_access_code')
+        ) {
+            $data->guestpass = bigbluebuttonbn_generate_access_code();
+        }
         return $data;
     }
 

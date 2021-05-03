@@ -932,7 +932,7 @@ function bigbluebuttonbn_broker_generate_guest_password($bigbluebuttonbn, $param
     if ($params['delete']) {
         $password = null;
     } else {
-        $password = rand(1, 999999);
+        $password = bigbluebuttonbn_generate_access_code();
     }
     $DB->set_field('bigbluebuttonbn', 'guestpass', $password, ['id' => $bigbluebuttonbn->id]);
     $callbackresponsedata = json_encode($password);
