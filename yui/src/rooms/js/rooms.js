@@ -72,22 +72,26 @@ M.mod_bigbluebuttonbn.rooms = {
 
         /* guestlink things*/
         var btn = document.getElementById("id_guestlinkurl_copy");
-        btn.onclick = function () {
-            var copyText = document.getElementById("id_guestlinkurl");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-            document.execCommand("copy");
-        };
+        if (btn) {
+            btn.onclick = function () {
+                var copyText = document.getElementById("id_guestlinkurl");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+                document.execCommand("copy");
+            };
+        }
         /* passwordthings */
         btn = document.getElementById("id_password_copy");
-        btn.onclick = function () {
-            var copyText = document.getElementById("id_password");
-            if(copyText.value && !isNaN(copyText.value)) {
-                copyText.select();
-                copyText.setSelectionRange(0, 6); /*For mobile devices*/
-                document.execCommand("copy");
-            }
-        };
+        if (btn) {
+            btn.onclick = function () {
+                var copyText = document.getElementById("id_password");
+                if(copyText.value && !isNaN(copyText.value)) {
+                    copyText.select();
+                    copyText.setSelectionRange(0, 6); /*For mobile devices*/
+                    document.execCommand("copy");
+                }
+            };
+        }
         if(context.changepassenabled) {
             var setpass = function(del) {
                 datasource.sendRequest({
