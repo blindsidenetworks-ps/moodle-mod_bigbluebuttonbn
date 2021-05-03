@@ -15,7 +15,7 @@ Feature: Test the complete sequence of operational steps for an activity module
       | Course short name | testcourse |
     And I follow "Test Course"
     And I turn editing mode on
-    And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
+    And I add a "BigBlueButton" to section "1" and I fill the form with:
       | Virtual classroom name | TestActivity |
     Then I should see "TestActivity"
     When I backup "Test Course" course using this options:

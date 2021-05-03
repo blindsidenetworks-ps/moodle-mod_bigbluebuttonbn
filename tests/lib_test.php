@@ -183,7 +183,7 @@ class lib_test extends \bbb_simple_test {
         $data->course = $bbactivity->course;
         $results = bigbluebuttonbn_reset_userdata($data);
         $this->assertEquals(array(
-            'component' => 'BigBlueButtonBN',
+            'component' => 'BigBlueButton',
             'item' => 'Deleted tags',
             'error' => false,
         ), $results[0]);
