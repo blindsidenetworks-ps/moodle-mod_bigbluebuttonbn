@@ -2,19 +2,16 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: Moodle plugin CI
-on: [push, pull_request]
+name: Moodle plugin CI for Moodle 3.11
+on: [pull_request]
 
 jobs:
   test:
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - php: '7.4'
-            moodle-branch: 'master'
-            database: 'pgsql'
           - php: '7.4'
             moodle-branch: 'MOODLE_311_STABLE'
             database: 'mariadb'
