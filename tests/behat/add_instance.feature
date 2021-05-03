@@ -12,7 +12,7 @@ Feature: bigbluebuttonbn instance
       | Course short name | testcourse |
     And I follow "Test Course"
     And I turn editing mode on
-    And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
+    And I add a "BigBlueButton" to section "1" and I fill the form with:
       | Instance type | Room/Activity with recordings |
       | Virtual classroom name | RoomRecordings |
     Then I should see "RoomRecordings"
@@ -24,7 +24,7 @@ Feature: bigbluebuttonbn instance
     And "#join_button_input" "css_element" should be visible
     And I should see "Recordings"
     When I follow "testcourse"
-    And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
+    And I add a "BigBlueButton" to section "1" and I fill the form with:
       | Instance type | Room/Activity only |
       | Virtual classroom name | RoomOnly  |
     Then I should see "RoomOnly"
@@ -35,7 +35,7 @@ Feature: bigbluebuttonbn instance
     And "#join_button_input" "css_element" should be visible
     And I should see "Recordings"
     When I follow "testcourse"
-    And I add a "BigBlueButtonBN" to section "1" and I fill the form with:
+    And I add a "BigBlueButton" to section "1" and I fill the form with:
       | Instance type | Recordings only |
       | Virtual classroom name | RecordingsOnly |
     Then I should see "RecordingsOnly"
@@ -55,7 +55,7 @@ Feature: bigbluebuttonbn instance
       | Course short name | testcourse |
     And I follow "Test Course"
     And I turn editing mode on
-    And I add a "BigBlueButtonBN" to section "1"
+    And I add a "BigBlueButton" to section "1"
     And I wait until the page is ready
     When  I select "Room/Activity with recordings" from the "Instance type" singleselect
     Then I should see "Restrict access"

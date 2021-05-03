@@ -62,7 +62,7 @@ class reset_test extends \bbb_simple_test {
         $this->resetAfterTest();
         $result = reset::bigbluebuttonbn_reset_getstatus('events');
         $this->assertEquals(array(
-                'component' => 'BigBlueButtonBN',
+                'component' => 'BigBlueButton',
                 'item' => 'Deleted events',
                 'error' => false,
         ), $result);
