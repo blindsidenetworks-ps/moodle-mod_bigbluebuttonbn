@@ -14,39 +14,37 @@
     </div>
 </div>
 <form action="guestlink.php" name="guestlinkform" accept-charset="UTF-8" method="get">
-{{#guestpassenabled}}
-<div class="row">
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-    {{#guestpasserrormessage}}
-        <div class="warning">
-            {{# str }} guestlink_form_join_wrong_password,bigbluebuttonbn {{/ str }}
-        </div>
-    {{/guestpasserrormessage}}
-    </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-        <input type="text" class="form-control" name="guestpass" id="id_guestpass" value="" size="" placeholder="{{# str }} guestlink_form_guestpass_info,bigbluebuttonbn {{/ str }}" >
-    </div>
-    <div class="col-lg-5 col-md-5 col-sm-5"> </div>
-</div>
-{{/guestpassenabled}}
 <div class="row shiftrow">
     <input type="hidden" name="gid" value="{{gid}}"/>
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
+    <div class="col-lg-3 col-md-2 col-sm-2">
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6">
+        <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
         {{#guestnameerrormessage}}
             <div class="warning">
                 {{# str }} guestlink_form_join_no_username,bigbluebuttonbn {{/ str }}
             </div>
         {{/guestnameerrormessage}}
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-        <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
+    <div class="col-lg-5 col-md-5 col-sm-5"> </div></div>
+{{#guestpassenabled}}
+<div class="row">
+    <div class="col-lg-3 col-md-2 col-sm-2">
     </div>
-    <div class="col-lg-5 col-md-5 col-sm-5" style="padding-left:0px;">
+    <div class="col-lg-4 col-md-4 col-sm-6">
+        <input type="text" class="form-control" name="guestpass" id="id_guestpass" value="" size="" placeholder="{{# str }} guestlink_form_guestpass_info,bigbluebuttonbn {{/ str }}" >
+        {{#guestpasserrormessage}}
+            <div class="warning">
+                {{# str }} guestlink_form_join_wrong_password,bigbluebuttonbn {{/ str }}
+            </div>
+        {{/guestpasserrormessage}}
+    </div>
+    <div class="col-lg-3 col-md-5 col-sm-4">
         <input type="submit" class="btn btn-primary inputbutton" name="joinbutton" id="id_joinbutton" value="{{# str }} guestlink_form_join_button,bigbluebuttonbn {{/ str }}">
     </div>
+
 </div>
+{{/guestpassenabled}}
 </form>
 </div>
 {{^element.frozen}}

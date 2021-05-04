@@ -456,7 +456,7 @@ $string['mod_guestlink_access_form_accesscoderequired'] = 'An access code is req
 $string['mod_guestlink_access_form_guestlinkexpiresat_required'] = 'An end datetime must be specified';
 $string['mod_guestlink_access_form_guestlinkexpiresat_maximum_duration_reached'] = 'The datetime specified needs to be before the maximum valid period';
 
-$string['guestlink_form_guestpass_info'] = 'Enter the room\'s access code';
+$string['guestlink_form_guestpass_info'] = "Enter the room's access code";
 $string['guestlink_form_guestname_info'] = 'Enter your name!';
 $string['guestlink_form_join_button'] = 'Start';
 $string['guestlink_form_join_welcome'] = 'You have been invited to join!';

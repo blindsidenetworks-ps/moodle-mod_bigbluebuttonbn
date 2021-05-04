@@ -30,7 +30,7 @@ require_once(__DIR__ . '/locallib.php');
 global $PAGE, $OUTPUT;
 
 $gid = required_param('gid', PARAM_ALPHANUM); // This is required.
-$guestname = optional_param('guestname', '', PARAM_TEXT);
+$guestname = optional_param('guestname', null, PARAM_TEXT);
 $guestpass = optional_param('guestpass', '', PARAM_TEXT);
 $PAGE->set_url(new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
         ['gid' => $gid, 'guestname' => $guestname, 'guestpass' => $guestpass]));
@@ -58,6 +58,10 @@ if (!$valid) {
     $guestnameerrormessage = false;
     if ($guestpass && $bigbluebuttonbn->guestpass != $guestpass) {
         $guestpasserrormessage = true;
+    }
+    // Ensure initial load does not display guestname error message and only when submitted with no name.
+    if (isset($guestname) && !$guestname) {
+        $guestnameerrormessage = true;
     }
     $context = ['name' => $bigbluebuttonbn->name, 'gid' => $gid,
         'guestpassenabled' => $bigbluebuttonbn->guestpass,
