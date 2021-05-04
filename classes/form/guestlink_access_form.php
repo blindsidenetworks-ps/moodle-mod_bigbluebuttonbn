@@ -83,17 +83,62 @@ class guestlink_access_form extends \moodleform {
 
         // Expires At.
         $defaultdateoptions = [
-           'optional' => true
+            // Based on whether or not is set the guestlinkexpiry is set to a required field (defaults to optional).
+           'optional' => !$this->_customdata['guestlinkexpiresatrequired']
         ];
+
         $mform->addElement('date_time_selector', 'guestlinkexpiresat', get_string('view_guestlink_expires_at_label', 'bigbluebuttonbn'), $defaultdateoptions);
         $mform->setType('guestlinkexpiresat', PARAM_RAW);
 
         $this->add_action_buttons($cancel = false, get_string('view_guestlink_save_settings', 'bigbluebuttonbn'));
 
+        $expiresat = $this->_customdata['guestlinkexpiresat'] ?? null;
+        if (
+            is_null($expiresat)
+            && $this->_customdata['guestlinkdefaultduration']
+        ) {
+            $expiresat = time() + $this->_customdata['guestlinkdefaultduration'];
+        }
         $this->set_data([
-            'guestlinkexpiresat' => $this->_customdata['guestlinkexpiresat'] ?? null
+            'guestlinkexpiresat' => $expiresat
         ]);
 
+    }
+
+    /**
+     * Validation of submitted data
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // If access duration must be limited (must expire at some point), but the user provided no date.
+        if ($this->_customdata['guestlinkexpiresatrequired'] && empty($data['guestlinkexpiresat'])) {
+            $errors['guestlinkexpiresat'] = get_string('mod_guestlink_access_form_guestlinkexpiresatrequired', 'bigbluebuttonbn');
+        }
+
+        // If the user provided a date AFTER the maximum intended duration of the guestlink (from now).
+        $maximumdatetime = (time() + $this->_customdata['guestlinkmaximumduration']);
+        if (
+            // Maximum has been set.
+            $this->_customdata['guestlinkmaximumduration']
+            // Expires at datetime is set.
+            && !empty($data['guestlinkexpiresat'])
+            // Check if the provided date is set AFTER the intended maximum based on now + maximum.
+            && $data['guestlinkexpiresat'] > $maximumdatetime
+        ) {
+            $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
+            $formattedmaxdate = userdate($maximumdatetime, $dateformat);
+            $errors['guestlinkexpiresat'] = (
+                get_string('mod_guestlink_access_form_guestlinkexpiresat_maximum_duration_reached', 'bigbluebuttonbn') .
+                " (".$formattedmaxdate.")"
+            );
+        }
+
+        return $errors;
     }
 
 }

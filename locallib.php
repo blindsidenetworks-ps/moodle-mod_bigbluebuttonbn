@@ -3122,6 +3122,34 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
             $renderer->render_group_element_checkbox('participant_guest_requires_access_code', 0)
         );
 
+        // Guest link should expire / have a limited duration set [true/false].
+        $renderer->render_group_element(
+            'participant_guestlink_requires_access_duration',
+            $renderer->render_group_element_checkbox('participant_guestlink_requires_access_duration', 0)
+        );
+
+        // Default duration from now.
+        $setting = new \admin_setting_configduration('bigbluebuttonbn/config_participant_guestlink_access_duration_expiry_default',
+            get_string('config_participant_guestlink_access_duration_expiry_default', 'bigbluebuttonbn'),
+            get_string('config_participant_guestlink_access_duration_expiry_default_description', 'bigbluebuttonbn'),
+            0);
+        $renderer->render_group_element(
+            'participant_guestlink_access_duration_expiry_default',
+            $setting
+        );
+
+        // Max duration that can be set.
+        $setting = new \admin_setting_configduration('bigbluebuttonbn/config_participant_guestlink_access_duration_maximum',
+            get_string('config_participant_guestlink_access_duration_maximum', 'bigbluebuttonbn'),
+            get_string('config_participant_guestlink_access_duration_maximum_description', 'bigbluebuttonbn'),
+            0);
+        $renderer->render_group_element(
+            'participant_guestlink_access_duration_maximum',
+            $setting
+        );
+
+        // Default min duration value  (to allow for an easy way to enable and set the access duration / guestlinkexpiryat)
+        // Default max duration value (e.g. to prevent users from setting a duration too far into the future - unlimited access).
         // Option for locking (and hiding) the settings for moderator approval on a global level.
         $renderer->render_group_element(
             'participant_guest_requires_moderator_approval',

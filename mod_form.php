@@ -200,6 +200,16 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         ) {
             $data->guestpass = bigbluebuttonbn_generate_access_code();
         }
+
+        // Apply the default duration of guestlink access if it is set.
+        $defaultexpiryduration = get_config('bigbluebuttonbn', 'config_participant_guestlink_access_duration_expiry_default');
+        if (
+            isset($data)
+            && $defaultexpiryduration
+            && empty($this->current->guestlinkexpiresat)
+        ) {
+            $data->guestlinkexpiresat = time() + $defaultexpiryduration;
+        }
         return $data;
     }
 
@@ -419,7 +429,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('advcheckbox', 'guestlinkenabled',
                     get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ', $checkboxattributes);
 
-            // If site-level moderatorapproval is required, do not include this element (as it should be automatically applied)
+            // If site-level moderatorapproval is required, do not include this element (as it should be automatically applied).
             if (!$cfg['participant_guest_requires_moderator_approval']) {
                 $mform->addElement('advcheckbox', 'moderatorapproval',
                         get_string('mod_form_field_moderatorapproval', 'bigbluebuttonbn'), ' ');

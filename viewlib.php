@@ -253,12 +253,17 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
 
     if (!empty($guestlink['enabled'])) {
         $actionurl = new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]);
+
+        $guestlinkexpiresatrequired = \mod_bigbluebuttonbn\locallib\config::get('participant_guestlink_requires_access_duration');
         $mform = new \mod_bigbluebuttonbn\form\guestlink_access_form($actionurl, [
             'guestlinkurl' => $guestlink['url'],
             'guestlinkpassword' => $guestlink['password'] ?? '',
             'guestlinkchangepassenabled' => $guestlink['changepassenabled'],
             'guestlinkexpiresat' => $bbbsession['bigbluebuttonbn']->guestlinkexpiresat ?? null,
+            'guestlinkexpiresatrequired' => $guestlinkexpiresatrequired,
             'guestlinkaccesscoderequired' => $accesscoderequired ?? false,
+            'guestlinkdefaultduration' => get_config('bigbluebuttonbn', 'config_participant_guestlink_access_duration_expiry_default'),
+            'guestlinkmaximumduration' => get_config('bigbluebuttonbn', 'config_participant_guestlink_access_duration_maximum'),
         ]);
         if ($fromform = $mform->get_data()) {
             // Access-Code / Password handling: If no password set, clear it. If password is provided, set it.

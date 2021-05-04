@@ -339,6 +339,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkexpiresat', $fielddefinition);
         upgrade_mod_savepoint(true, 2020050506, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2020050510) {
+        // Update guestlinkexpiresat to nullable.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkexpiresat', $fielddefinition);
+        upgrade_mod_savepoint(true, 2020050510, 'bigbluebuttonbn');
+    }
     return true;
 }
 
