@@ -52,6 +52,11 @@ export const initActions = () => {
                     joinURL.searchParams.append('bn', bbbid);
                     if (group) {
                         joinURL.searchParams.append('group', group);
+                    } else {
+                        const groupId = element.dataset.groupId;
+                        if (groupId) {
+                            joinURL.searchParams.append('group', group);
+                        }
                     }
                     join(joinURL.toString());
                 }

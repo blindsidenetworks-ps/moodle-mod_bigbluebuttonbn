@@ -739,9 +739,10 @@ class bigbluebutton {
     /**
      * Check if a user has access to a given group.
      *
-     * @param $groupid
-     * @param $user
-     * @param $course
+     * @param int $groupid
+     * @param object $user
+     * @param object $course
+     * @param \cm_info $cm
      * @return bool
      * @throws \coding_exception
      */
