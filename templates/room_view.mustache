@@ -91,12 +91,14 @@
                    data-cm-id="{{cmid}}"
                    {{#group}}data-group-id="{{group}}"{{/group}}
                    class="btn btn-primary bbb-btn-action  {{^canjoin}}d-none{{/canjoin}}">
+            {{#ismoderator}}
             <input id="end_button_input"
                    type="button"
                    data-bbb-id="{{bigbluebuttonbnid}}"
                    data-meeting-id="{{meetingid}}"
                    value="{{#str}}view_conference_action_end, mod_bigbluebuttonbn{{/str}}"
                    class="btn btn-secondary bbb-btn-action  {{#statusopen}}d-none{{/statusopen}}">
+            {{/ismoderator}}
         </div>
     </div>
 </div>
