@@ -25,6 +25,7 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+use mod_bigbluebuttonbn\external\meeting_info;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -473,6 +474,28 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 
     return $factory->create_instance($string, $url, 1, $actionable);
 }
+
+/**
+ * Is the event visible?
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $event) {
+    global $DB;
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+    // Create array bbbsession with configuration for BBB server.
+    $bbbsession['course'] = $cm->get_course();
+    $bbbsession['coursename'] = $cm->get_course()->fullname;
+    $bbbsession['cm'] = $cm;
+    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+    $context = context_module::instance($cm->id);
+    mod_bigbluebuttonbn\local\bigbluebutton::view_bbbsession_set($context, $bbbsession);
+    $activitystatus = mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($bbbsession);
+    return $activitystatus != 'ended';
+}
+
 
 /**
  * Adds module specific settings to the settings block
