@@ -227,7 +227,7 @@ class get_recordings extends external_api {
         return new external_single_structure([
             'status' => new external_value(PARAM_BOOL, 'Whether the fetch was successful'),
             'tabledata' => new external_single_structure([
-                'activity' => new external_value(PARAM_ALPHA),
+                'activity' => new external_value(PARAM_ALPHANUMEXT),
                 'ping_interval' => new external_value(PARAM_INT),
                 'locale' => new external_value(PARAM_TEXT),
                 'profile_features' => new external_multiple_structure(new external_value(PARAM_TEXT)),
