@@ -24,7 +24,7 @@
  */
 
 namespace mod_bigbluebuttonbn\search;
-use core_tag\output\tag;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -105,7 +105,7 @@ class tags extends \core_search\base_activity {
             return false;
         }
 
-        // Prepare associative array with data from DB.
+        // Prepare array with data from DB.
         $doc = \core_search\document_factory::instance($record->id, $this->componentname, $this->areaname);
         $doc->set('title', content_to_text($record->name, false));
         $doc->set('content', $tagsstring);

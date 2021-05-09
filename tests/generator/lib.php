@@ -24,10 +24,12 @@
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\helpers\logs;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
 
 /**
  * bigbluebuttonbn module data generator
@@ -172,7 +174,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 'meetingid' => $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id,
         ];
         $record = array_merge($default, $record);
-        bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $record);
+        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $record);
     }
 
     /**

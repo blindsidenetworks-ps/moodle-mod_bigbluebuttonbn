@@ -1,8 +1,0 @@
-{
-    "moodle-mod_bigbluebuttonbn-modform": {
-        "requires": [
-            "base",
-            "node"
-        ]
-    }
-}

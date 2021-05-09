@@ -28,8 +28,6 @@ use core\task\adhoc_task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
-
 /**
  * Class containing the scheduled task for lti module.
  *
@@ -56,6 +54,6 @@ class completion_update_state extends adhoc_task {
         $data = $this->get_custom_data();
         mtrace("Task completion_update_state running for user {$data->userid}");
         // Process the completion.
-        bigbluebuttonbn_completion_update_state($data->bigbluebuttonbn, $data->userid);
+        \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_completion_update_state($data->bigbluebuttonbn, $data->userid);
     }
 }
