@@ -58,6 +58,10 @@ export const initActions = () => {
                             joinURL.searchParams.append('group', group);
                         }
                     }
+                    const inputfield = document.querySelector('#nameinputfield');
+                    if (inputfield  !== null){
+                        joinURL.searchParams.append('usernamecustom', inputfield.value);
+                    }
                     join(joinURL.toString());
                 }
                 if (id === 'end_button_input') {
@@ -121,7 +125,6 @@ const updateRoom = (updatecache) => {
  */
 const join = (joinUrl) => {
     autoUpdateRoom();
-    joinURL.searchParams.append('usernamecustom', document.getElementById('nameinputfield').value);
     window.open(joinUrl);
 };
 

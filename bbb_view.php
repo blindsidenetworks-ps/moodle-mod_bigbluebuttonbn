@@ -38,8 +38,6 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 global $SESSION;
 
 $action = required_param('action', PARAM_TEXT);
-//param to configure a custom username
-$usernamecustom = optional_param('usernamecustom', '', PARAM_TEXT);
 
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
@@ -51,6 +49,8 @@ $errors = optional_param('errors', '', PARAM_TEXT);
 $timeline = optional_param('timeline', 0, PARAM_INT);
 $index = optional_param('index', 0, PARAM_INT);
 $group = optional_param('group', -1, PARAM_INT);
+//param to configure a custom username
+$usernamecustom = optional_param('usernamecustom', '', PARAM_TEXT);
 
 $bbbviewinstance = view::bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
