@@ -147,6 +147,7 @@ class meeting_info extends external_api {
         $participantlist = roles::bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
         $isadmin = is_siteadmin($USER->id);
         $ismoderator = roles::bigbluebuttonbn_is_moderator($context, $participantlist, $USER->id);
+        $bbbinfo->isguestuser = isguestuser($USER);
         // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
         if ($running) {
             $bbbinfo->statusmessage = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
@@ -202,6 +203,7 @@ class meeting_info extends external_api {
                 'moderatorplural' => new external_value(PARAM_BOOL, 'Several moderators ?', VALUE_OPTIONAL),
                 'participantplural' => new external_value(PARAM_BOOL, 'Several participants ?', VALUE_OPTIONAL),
                 'canjoin' => new external_value(PARAM_BOOL, 'Can join'),
+                'isguestuser' => new external_value(PARAM_BOOL, 'Guest User', VALUE_OPTIONAL),
                 'presentation' => new \external_multiple_structure(
                     new external_single_structure(
                         [

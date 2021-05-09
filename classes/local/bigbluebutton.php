@@ -316,8 +316,12 @@ class bigbluebutton {
         $userid = null,
         $createtime = null
     ) {
+        $username2=$username;
+        if(!empty($_GET['usernamecustom'])&&isguestuser($USER)){
+            $username2=$_GET['usernamecustom'];
+        }
         $data = ['meetingID' => $meetingid,
-            'fullName' => $username,
+            'fullName' => $username2,
             'password' => $pw,
             'logoutURL' => $logouturl,
         ];

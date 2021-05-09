@@ -55,6 +55,17 @@
     <span id="control_panel">
 
     </span>
+    {{#isguestuser}}
+    <div id="bigbluebuttonbn_view_guestnameinput_box" class="box py-3 generalbox boxaligncenter">
+    <br>
+    <span>Name eingeben:</span>
+    <script>function setUsernameCustom(){document.getElementById('join_button_input').setAttribute('onClick', document.getElementById('join_button_input').getAttribute('onClick').replace(/action=join&(usernamecustom=[^&]*&)?/,'action=join&usernamecustom='+document.getElementById('nameinputfield').value+'&'))}</script>
+    <br>
+    <span>
+    <input type="text" oninput="javascript:setUsernameCustom()" name="nameinputfield" id="nameinputfield" value="Gast">
+    </span>
+    </div>
+    {{/isguestuser}}
     <div id="room_view_control_panel" data-bbb-id="{{bigbluebuttonbnid}}">
         {{#starttime}}
             <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn, {{startTime}}{{/str}}</span>
