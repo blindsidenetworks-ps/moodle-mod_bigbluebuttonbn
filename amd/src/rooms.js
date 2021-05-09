@@ -121,6 +121,7 @@ const updateRoom = (updatecache) => {
  */
 const join = (joinUrl) => {
     autoUpdateRoom();
+    joinURL.searchParams.append('usernamecustom', document.getElementById('nameinputfield').value);
     window.open(joinUrl);
 };
 
