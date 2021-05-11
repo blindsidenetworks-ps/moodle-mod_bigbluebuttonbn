@@ -680,6 +680,7 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
 
         bigbluebuttonbn_view($bbactivity, $this->course, $bbactivitycm, context_module::instance($bbactivitycm->id));
+        $this->resetDebugging();
 
         $events = $sink->get_events();
         $this->assertCount(3, $events);
