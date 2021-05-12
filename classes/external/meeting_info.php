@@ -174,6 +174,7 @@ class meeting_info extends external_api {
         if (!empty($bbbsession['group'])) {
             $bbbinfo->group = $bbbsession['group'];
         }
+        $bbbinfo->ismoderator = $ismoderator;
         return (array) $bbbinfo;
     }
 
@@ -202,6 +203,7 @@ class meeting_info extends external_api {
                 'moderatorplural' => new external_value(PARAM_BOOL, 'Several moderators ?', VALUE_OPTIONAL),
                 'participantplural' => new external_value(PARAM_BOOL, 'Several participants ?', VALUE_OPTIONAL),
                 'canjoin' => new external_value(PARAM_BOOL, 'Can join'),
+                'ismoderator' => new external_value(PARAM_BOOL, 'Is moderator'),
                 'presentation' => new \external_multiple_structure(
                     new external_single_structure(
                         [
