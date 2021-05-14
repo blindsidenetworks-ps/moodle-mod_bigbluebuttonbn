@@ -113,8 +113,8 @@ $string['config_recording_description'] = 'These settings are feature specific';
 $string['config_recording_default'] = 'Recording feature enabled by default';
 $string['config_opencast'] = 'Configuration for "Opencast integration" feature';
 $string['config_opencast_description'] = 'These settings control the integration of BBB meeting recordings and Opencast';
-$string['config_oc_recording'] = 'Opencast can be used for Recording';
-$string['config_oc_recording_description'] = 'When enabled, the Opencast series ID of the Moodle Course is sent to BBB as metadata, in order for BBB to integrate with Opencast Server.';
+$string['config_oc_recording'] = 'Send Opencast series ID to BBB';
+$string['config_oc_recording_description'] = 'If this setting is enabled, Moodle will send the Opencast series ID of the course to BBB alongside the BBB metadata whenever a new BBB meeting is initiated. If there is not an Opencast series ID for the course yet, a new series will be created on-the-fly. This way, Opencast can be used to process BBB recordings and to publish them in the course\'s series.';
 $string['config_oc_show_recording'] = 'Show Opencast recordings';
 $string['config_oc_show_recording_description'] = 'If enabled the recording table will also include the Opencast recordings.';
 $string['config_recording_default_description'] = 'If enabled the sessions created in BigBlueButton will have recording capabilities.';
@@ -372,8 +372,6 @@ $string['mod_form_field_lockedlayout'] = 'Lock room layout';
 $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
-$string['mod_form_field_opencast_record'] = 'Session can be recorded in Opencast';
-
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
@@ -440,7 +438,6 @@ $string['view_section_title_recordings'] = 'Recordings';
 $string['view_section_title_opencast_recordings'] = 'Opencast Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
 $string['view_message_opencast_norecordings'] = 'There are no Opencast recording to show.';
-$string['view_message_oc_recordings'] = 'List of Recordings on Opencast';
 $string['view_message_finished'] = 'This activity is over.';
 $string['view_message_notavailableyet'] = 'This session is not yet available.';
 

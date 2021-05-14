@@ -4025,7 +4025,8 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
     }
-    // Special metadata for Opencast recordings (passing opencast seriesid of the course as opencast-dc-isPartOf as metadata).
+    // If block_opencast is installed and the option to send the Opencast series ID to BBB is enabled,
+    // pass the Opencast series ID of the course as opencast-dc-isPartOf within the BBB metadata.
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('oc_recording')) {
         $ocseriesid = bigbluebuttonbn_check_opencast($bbbsession['course']->id);
         if ($ocseriesid != false) {
@@ -4049,13 +4050,14 @@ function bigbluebuttonbn_check_opencast($courseid = null) {
     if (in_array('opencast', array_keys($blockplugins))) {
         // Getting an instance of the block_opencast API bridge.
         $opencast = \block_opencast\local\apibridge::get_instance();
-        // If opencast is not configured!
+        // If the block_opencast API bridge is not configured.
         if (!$opencast) {
             return false;
         }
-        // If the courseid is required (check if the course has the opencsat series).
-        if ($courseid) {
-            // Trying to get course seriesid, create if is not set before!
+        // If a courseid is given, we will return the Opencast series ID for the course.
+        if (is_numeric($courseid) && $courseid > 0) {
+            // Get and return the Opencast series ID for the given course. Let Opencast create a new series if there isn't a series yet for this course.
+            // If an exception occurs during this process, return false as the Opencast integration is not usable at the moment which is the same as if the Opencast plugin would not be installed at all.
             try {
                 $series = $opencast->ensure_course_series_exists($courseid);
                 if (is_object($series) && $series->identifier) {
@@ -4068,9 +4070,10 @@ function bigbluebuttonbn_check_opencast($courseid = null) {
                 return false;
             }
         }
+        // The block_opencast plugin is installed.
         return true;
     }
-    // If block_opencast is not installed
+    // If block_opencast plugin is NOT installed.
     return false;
 }
 
@@ -4083,6 +4086,7 @@ function bigbluebuttonbn_check_opencast($courseid = null) {
  */
 function bigbluebuttonbn_settings_opencastintegration(&$renderer) {
     // Configuration for 'Opencast integration' feature when Opencast plugins are installed.
+    // If block_opencast is installed.
     if ((boolean) bigbluebuttonbn_check_opencast()) {
         $renderer->render_group_header('opencast');
         $renderer->render_group_element(
