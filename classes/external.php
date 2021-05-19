@@ -61,7 +61,6 @@ class mod_bigbluebuttonbn_external extends external_api {
      */
     public static function view_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB, $CFG;
-        require_once($CFG->dirroot . "/mod/bigbluebuttonbn/lib.php");
 
         $params = self::validate_parameters(self::view_bigbluebuttonbn_parameters(),
                                             array(
@@ -226,13 +225,11 @@ class mod_bigbluebuttonbn_external extends external_api {
      */
     public static function can_join($cmid) {
         global $SESSION, $CFG;
-        require_once($CFG->dirroot . "/mod/bigbluebuttonbn/locallib.php");
-
         $params = self::validate_parameters(self::can_join_parameters(),
             array(
                 'cmid' => $cmid
             ));
-        $canjoin = \mod_bigbluebuttonbn\locallib\bigbluebutton::can_join_meeting($cmid);
+        $canjoin = \mod_bigbluebuttonbn\local\bigbluebutton::can_join_meeting($cmid);
         $canjoin['cmid'] = $cmid;
         return $canjoin;
     }
