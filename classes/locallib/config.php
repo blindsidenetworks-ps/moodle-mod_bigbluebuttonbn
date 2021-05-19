@@ -72,6 +72,9 @@ class config {
             'recordingstatus_enabled' => false,
             'meetingevents_enabled' => false,
             'participant_moderator_default' => '0',
+            'participant_moderatorapproval' => '0',
+            'participant_guestlink_enabled' => '1',
+            'participant_guestlink_default' => '0',
             'scheduled_duration_enabled' => false,
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',
@@ -125,6 +128,8 @@ class config {
             'accessmodal_editable' => true,
             'accessmodal_default' => '',
             'welcome_default' => '',
+            'participant_guestlink' => '',
+            'participant_guest_requires_moderator_approval' => false,
         );
     }
 
@@ -140,6 +145,15 @@ class config {
             return;
         }
         return $defaultvalues[$setting];
+    }
+
+    /**
+     * Validates if guestlink settings are enabled.
+     *
+     * @return boolean
+     */
+    public static function guestlinks_enabled() {
+        return (boolean)self::get('participant_guestlink');
     }
 
     /**
@@ -254,6 +268,8 @@ class config {
                'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
+               'participant_guestlink' => self::get('participant_guestlink'),
+               'participant_guest_requires_moderator_approval' => self::get('participant_guest_requires_moderator_approval'),
           );
     }
 }

@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/mod/bigbluebuttonbn/locallib.php');
+
 /**
  * Define all the restore steps that will be used by the restore_url_activity_task.
  *
@@ -59,6 +61,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
         $data = (object) $data;
         $data->course = $this->get_courseid();
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        $data->guestlinkid = bigbluebuttonbn_random_password(12);
         // Insert the bigbluebuttonbn record.
         $newitemid = $DB->insert_record('bigbluebuttonbn', $data);
         // Immediately after inserting "activity" record, call this.

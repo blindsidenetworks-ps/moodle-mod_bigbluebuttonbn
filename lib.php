@@ -689,6 +689,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
+    global $DB;
     require_once(__DIR__.'/locallib.php');
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
@@ -698,6 +699,12 @@ function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         // As it is a new activity, assign passwords.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
+    }
+    if (!property_exists($bigbluebuttonbn, 'guestlinkid') ) {
+        // Get the guestlinkid column in the bigbluebuttonbn table, and use it if it's not empty, otherwise generate an id.
+        $guestlinkid = (string)$DB->get_field('bigbluebuttonbn', 'guestlinkid', array('id' => $bigbluebuttonbn->instance));
+        $bigbluebuttonbn->guestlinkid = $guestlinkid ?: bigbluebuttonbn_random_password(12);
     }
 
     // Get the correct access policy data.
@@ -1150,6 +1157,9 @@ function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array
 function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
     return [
         'mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
+        'mod_bigbluebuttonbn:t/copy' => 'fa-copy',
+        'mod_bigbluebuttonbn:t/random' => 'fa-repeat',
+        'mod_bigbluebuttonbn:t/trash' => 'fa-trash',
     ];
 }
 
@@ -1290,3 +1300,68 @@ function bigbluebuttonbn_datetime_to_timestamp($datetime) {
         )
     );
 }
+
+/**
+ * Helper for performing a setting a new password
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $password
+ *
+ * @return void
+ */
+function bigbluebuttonbn_set_guest_password($bigbluebuttonbn, $password) {
+    global $DB;
+    if (!bigbluebuttonbn_has_capability($bigbluebuttonbn->id, 'mod/bigbluebuttonbn:guestlink_change_password')) {
+        return;
+    }
+    $DB->set_field('bigbluebuttonbn', 'guestpass', $password, ['id' => $bigbluebuttonbn->id]);
+}
+
+/**
+ * Helper for performing a setting an expires at timestamp for guest access.
+ * Note: Uses the same capability checks as changing the password.
+ *
+ * @param object $bigbluebuttonbn
+ * @param string $expiresat
+ *
+ * @return void
+ */
+function bigbluebuttonbn_set_guest_access_expiry($bigbluebuttonbn, $expiresat) {
+    global $DB;
+    if (!bigbluebuttonbn_has_capability($bigbluebuttonbn->id, 'mod/bigbluebuttonbn:guestlink_change_password')) {
+        return;
+    }
+    $DB->set_field('bigbluebuttonbn', 'guestlinkexpiresat', $expiresat, ['id' => $bigbluebuttonbn->id]);
+}
+
+/**
+ * Helper for checking module capability.
+ *
+ * Note: Full capability string is used to allow easy search and replace if required
+ *
+ * @param object $bigbluebuttonbnid
+ * @param string $capability
+ *
+ * @return bool
+ */
+function bigbluebuttonbn_has_capability($bigbluebuttonbnid, $capability) {
+    if (!$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbnid)) {
+        return false;
+    }
+    $context = context_module::instance($cm->id);
+    if (!has_capability($capability, $context)) {
+        return false;
+    }
+    return true;
+}
+
+
+/**
+ * Helper for generating access codes for BBB
+ *
+ * @return string
+ */
+function bigbluebuttonbn_generate_access_code() {
+    return rand(1, 999999);
+}
+

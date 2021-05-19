@@ -46,6 +46,7 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
             this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
+            this.initGuestLink();
         }
         this.initCompletionValidate();
     },
@@ -64,6 +65,64 @@ M.mod_bigbluebuttonbn.rooms = {
             return;
         }
         this.updateRoom();
+    },
+
+    initGuestLink: function() {
+        var context = this.bigbluebuttonbn.guestlink;
+        var datasource = this.datasource;
+        var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
+
+        /* guestlink things*/
+        var btn = document.getElementById("id_guestlinkurl_copy");
+        if (btn) {
+            btn.onclick = function () {
+                var copyText = document.getElementById("id_guestlinkurl");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+                document.execCommand("copy");
+            };
+        }
+        /* passwordthings */
+        btn = document.getElementById("id_password_copy");
+        if (btn) {
+            btn.onclick = function () {
+                var copyText = document.getElementById("id_password");
+                if(copyText.value && !isNaN(copyText.value)) {
+                    copyText.select();
+                    copyText.setSelectionRange(0, 6); /*For mobile devices*/
+                    document.execCommand("copy");
+                }
+            };
+        }
+        if(context.changepassenabled) {
+            var setpass = function(del) {
+                datasource.sendRequest({
+                    request: 'action=generate_guest_password&bigbluebuttonbn=' + bnid + '&delete=' + del,
+                    callback: {
+                        success: function(e) {
+                            var input = document.getElementById("id_password");
+                            var result = e.data;
+                            if(result) {
+                                input.value = ("000000" + result).slice(-6);
+                            }
+                        }
+                    }
+                });
+            };
+            btn = document.getElementById("id_password_clear");
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    var input = document.getElementById("id_password");
+                    input.value = null;
+                });
+            }
+            btn = document.getElementById("id_password_change");
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    setpass(false);
+                });
+            }
+        }
     },
 
     updateRoom: function(f) {
