@@ -33,6 +33,8 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 require_once(__DIR__ . '/lib.php');
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
+require_once($CFG->dirroot . '/lib/oauthlib.php');
 
 /** @var BIGBLUEBUTTONBN_UPDATE_CACHE boolean set to true indicates that cache has to be updated */
 const BIGBLUEBUTTONBN_UPDATE_CACHE = true;
@@ -2380,13 +2382,11 @@ function bigbluebuttonbn_get_opencast_recording_data_row_playback($ocrecording, 
     global $CFG, $OUTPUT;
     $text = get_string('view_recording_list_opencast', 'bigbluebuttonbn');
     $href = '#';
-    // Check if the publication status has engage-player
+    // Check if the publication status has engage-player.
     if (isset($ocrecording['publication_status']) && in_array('engage-player', $ocrecording['publication_status'])) {
-        // Check if filter_opencast is configured
-        $consumerkey = get_config('filter_opencast', 'consumerkey');
-        $consumersecret = get_config('filter_opencast', 'consumersecret');
-        // In order to make LTI auth both consumerkey and consumersecret are required.
-        if (!empty($consumerkey) && !empty($consumersecret)) {
+        // If filter_opencast is installed and configured,
+        // also if the LTI form handler JavaScript file in block_opencast is available to use in order to submit the LTI form.
+        if ((boolean) bigbluebuttonbn_check_opencast_filter() && file_exists("$CFG->dirroot/blocks/opencast/amd/src/block_lti_form_handler.js")) {
             $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/oc_player.php?identifier=' . $ocrecording['identifier'] .
             '&bn=' . $bbbsession['bigbluebuttonbn']->id;
         }
@@ -2398,8 +2398,9 @@ function bigbluebuttonbn_get_opencast_recording_data_row_playback($ocrecording, 
         'target' => '_blank'
       );
     if ($href == '#' || empty($href)) {
+        unset($linkattributes['target']);
         $linkattributes['class'] = 'btn btn-sm btn-warning';
-        $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
+        $linkattributes['title'] = get_string('view_recording_format_error_opencast_unreachable', 'bigbluebuttonbn');
     }
     return $OUTPUT->action_link($href, $text, null, $linkattributes) . '&#32;';
 }
@@ -2574,7 +2575,7 @@ function bigbluebuttonbn_get_opencast_recording_data_row_preview_images($imageur
 }
 
 /**
- * Helper function to get BBB recordings from the Opencast video avaialble in the course.
+ * Helper function to get BBB recordings from the Opencast video available in the course.
  * It uses block_opencast for getting all videos for the course and match them with meeting id.
  * It uses tool_opencast for making an api call to get mediapackage of vidoes.
  *
@@ -2590,7 +2591,7 @@ function bigbluebutton_get_opencast_recordings_for_table_view($bbbsession, $seri
     $opencast = \block_opencast\local\apibridge::get_instance();
     // Getting the course videos from block_opencast plugin.
     $ocvideos = $opencast->get_course_videos($bbbsession['course']->id);
-    if ($ocvideos->videos && !empty($ocvideos->videos)) {
+    if ($ocvideos->error == 0) {
         foreach ($ocvideos->videos as $ocvideo) {
             // Check subjects of opencast video contains $bbbsession['meetingid'].
             if (in_array($bbbsession['meetingid'], $ocvideo->subjects)) {
@@ -4085,6 +4086,7 @@ function bigbluebuttonbn_check_opencast($courseid = null) {
  * @return void
  */
 function bigbluebuttonbn_settings_opencastintegration(&$renderer) {
+    global $CFG;
     // Configuration for 'Opencast integration' feature when Opencast plugins are installed.
     // If block_opencast is installed.
     if ((boolean) bigbluebuttonbn_check_opencast()) {
@@ -4098,5 +4100,130 @@ function bigbluebuttonbn_settings_opencastintegration(&$renderer) {
             $renderer->render_group_element_checkbox('oc_show_recording', 0)
         );
     }
-    
 }
+
+/**
+ * Helper function which checks if the Opencast Filter plugin (filter_opencast) is installed and configured.
+ * This function is used to display the BBB recordings on Opencast, which uses LTI to handle the authentication.
+ * 
+ * @return boolean|array
+ */
+function bigbluebuttonbn_check_opencast_filter() {
+    $filterplugins = core_plugin_manager::instance()->get_plugins_of_type('filter');
+    // If filter_opencast is installed.
+    if (in_array('opencast', array_keys($filterplugins))) {
+        // In order to display the videos through LTI consumerkey and consumersecret must be configured in filter_opencast.
+        $consumerkey = get_config('filter_opencast', 'consumerkey');
+        $consumersecret = get_config('filter_opencast', 'consumersecret');
+
+        // Engageurl in filter_opencast plugin is the endpoint from which the Opencast player will be called.
+        $engageurl = get_config('filter_opencast', 'engageurl');
+        if (empty($engageurl)) {
+            // If it is not set in filter_opencast, the main apiurl setting of tool_opencast plugin will be used.
+            $engageurl = get_config('tool_opencast', 'apiurl');
+        }
+
+        if (strpos($engageurl, 'http') !== 0) {
+            $engageurl = 'http://' . $engageurl;
+        }
+
+        // A player url helps to predefine the endpoint to call the Opencast player directly.
+        $playerurl = get_config('filter_opencast', 'playerurl');
+        if (empty($playerurl)) {
+            // If it is not configured, /play/ endpoint will make Opencast to decide based on its internal configuration.
+            $playerurl = '/play/';
+        } else {
+            // If it is configured, then "id" query string is needed in any case.
+            $playerurl .= '?id=';
+        }
+
+        // Make sure the player url is correct.
+        $playerurl = '/' . ltrim($playerurl, '/');
+
+        // Make lti url.
+        $ltiendpoint = rtrim($engageurl, '/') . '/lti';
+
+        if (!empty($consumerkey) && !empty($consumersecret) && !empty($playerurl) && !empty($ltiendpoint)) {
+            // If filter_opencast plugin is configured.
+            return array(
+                'consumerkey' => $consumerkey,
+                'consumersecret' => $consumersecret,
+                'engageurl' => $engageurl,
+                'playerurl' => $playerurl,
+                'ltiendpoint' => $ltiendpoint
+            );
+        } else {
+            // If filter_opencast plugin is NOT configured.
+            return false;
+        }
+    }
+    // If filter_opencast plugin is NOT installed.
+    return false;
+}
+
+/**
+ * Create necessary lti parameters.
+ * @param array $opencastfilterconfig the array of customized configuration from bigbluebuttonbn_check_opencast_filter function.
+ *
+ * @return array lti parameters
+ * @throws dml_exception
+ * @throws moodle_exception
+ */
+function bigbluebuttonbn_create_lti_parameters_opencast($opencastfilterconfig) {
+    global $CFG, $COURSE, $USER;
+
+    $endpoint = $opencastfilterconfig['ltiendpoint'];
+    $consumerkey = $opencastfilterconfig['consumerkey'];
+    $consumersecret = $opencastfilterconfig['consumersecret'];
+    $customtool = $opencastfilterconfig['playerurl'];
+
+    $helper = new oauth_helper(array('oauth_consumer_key'    => $consumerkey,
+                                    'oauth_consumer_secret' => $consumersecret));
+
+    // Set all necessary parameters.
+    $params = array();
+    $params['oauth_version'] = '1.0';
+    $params['oauth_nonce'] = $helper->get_nonce();
+    $params['oauth_timestamp'] = $helper->get_timestamp();
+    $params['oauth_consumer_key'] = $consumerkey;
+
+    $params['context_id'] = $COURSE->id;
+    $params['context_label'] = trim($COURSE->shortname);
+    $params['context_title'] = trim($COURSE->fullname);
+    $params['resource_link_id'] = 'o' . random_int(1000, 9999) . '-' . random_int(1000, 9999);
+    $params['resource_link_title'] = 'Opencast';
+    $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
+    $params['launch_presentation_locale'] = current_language();
+    $params['ext_lms'] = 'moodle-2';
+    $params['tool_consumer_info_product_family_code'] = 'moodle';
+    $params['tool_consumer_info_version'] = strval($CFG->version);
+    $params['oauth_callback'] = 'about:blank';
+    $params['lti_version'] = 'LTI-1p0';
+    $params['lti_message_type'] = 'basic-lti-launch-request';
+    $urlparts = parse_url($CFG->wwwroot);
+    $params['tool_consumer_instance_guid'] = $urlparts['host'];
+    $params['custom_tool'] = $customtool;
+
+    // User data.
+    $params['user_id'] = $USER->id;
+    $params['lis_person_name_given'] = $USER->firstname;
+    $params['lis_person_name_family'] = $USER->lastname;
+    $params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
+    $params['ext_user_username'] = $USER->username;
+    $params['lis_person_contact_email_primary'] = $USER->email;
+    $params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
+
+    if (!empty($CFG->mod_lti_institution_name)) {
+        $params['tool_consumer_instance_name'] = trim(html_to_text($CFG->mod_lti_institution_name, 0));
+    } else {
+        $params['tool_consumer_instance_name'] = get_site()->shortname;
+    }
+
+    $params['launch_presentation_document_target'] = 'iframe';
+    $params['oauth_signature_method'] = 'HMAC-SHA1';
+    $signedparams = lti_sign_parameters($params, $endpoint, "POST", $consumerkey, $consumersecret);
+    $params['oauth_signature'] = $signedparams['oauth_signature'];
+
+    return $params;
+}
+

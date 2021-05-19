@@ -388,6 +388,7 @@ $string['view_error_create'] = 'The BigBlueButton server responded with an error
 $string['view_error_max_concurrent'] = 'Number of concurrent meetings allowed has been reached.';
 $string['view_error_userlimit_reached'] = 'The number of users allowed in a meeting has been reached.';
 $string['view_error_url_missing_parameters'] = 'There are parameters missing in this URL';
+$string['view_error_missing_filter_opencast_config'] = 'Unable to get valid Opencast configuration in order to display the recording.';
 $string['view_error_import_no_courses'] = 'No courses to look up for recordings';
 $string['view_error_import_no_recordings'] = 'No recordings in this course for importing';
 $string['view_error_invalid_session'] = 'The session is expired. Go back to the activity main page.';
