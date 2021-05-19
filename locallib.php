@@ -1431,6 +1431,8 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     $rowdata->date = bigbluebuttonbn_get_recording_data_row_date($recording);
     // Set formatted date.
     $rowdata->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($rowdata->date);
+    // Set analytics link.
+    $rowdata->analytics = bigbluebuttonbn_get_recording_data_row_analytics($bbbsession, $recording);
     // Set formatted duration.
     $rowdata->duration_formatted = $rowdata->duration = bigbluebuttonbn_get_recording_data_row_duration($recording);
     // Set actionbar, if user is allowed to manage recordings.
@@ -1540,6 +1542,30 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
         'data-meetingid' => $recording['meetingID']));
     $tail = html_writer::end_tag('div');
     return $head . $actionbar . $tail;
+}
+
+/**
+ * Helper function builds link to the analytics page for the specific recording/session
+ *
+ * @param array $recording
+ * @param array $tools
+ *
+ * @return string
+ */
+function bigbluebuttonbn_get_recording_data_row_analytics($bbbsession, $recording) {
+    global $OUTPUT;
+    $url = new moodle_url('/mod/bigbluebuttonbn/analytics.php', [
+        'id' => $recording['recordID'],
+        'bn' => $bbbsession['bigbluebuttonbn']->id
+    ]);
+    $pixicon = $OUTPUT->pix_icon('i/report', get_string('view_recording_show_analytics', 'bigbluebuttonbn'));
+    $analytics = html_writer::tag('a', $pixicon, ['href' => $url]);
+    $head = html_writer::start_tag('div', array(
+        'id' => 'recording-actionbar-' . $recording['recordID'],
+        'data-recordingid' => $recording['recordID'],
+        'data-meetingid' => $recording['meetingID']));
+    $tail = html_writer::end_tag('div');
+    return $head . $analytics . $tail;
 }
 
 /**
@@ -1947,6 +1973,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
     }
     $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
+    $table->head[] = get_string('view_recording_analytics', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     $table->size = array('', '', '', '', '', '');
@@ -2027,6 +2054,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
         $row->cells[] = $rowdata->preview;
     }
     $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
+    $row->cells[] = $texthead . $rowdata->analytics . $texttail;
     $row->cells[] = $rowdata->duration_formatted;
     if ($bbbsession['managerecordings']) {
         $row->cells[] = $rowdata->actionbar;
@@ -2043,6 +2071,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
  * non sequential associative array itself that corresponds to the actual recording in BBB
  */
 function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures) {
+    global $DB;
     $bigbluebuttonbnid = null;
     if ($enabledfeatures['showroom']) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
@@ -2052,6 +2081,39 @@ function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatur
         $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
         $bbbsession['bigbluebuttonbn']->recordings_deleted
     );
+
+    // Get statistic entries, that might not have a recording available
+    // Prepare select for loading records with stats based on bigbluebuttonbns_logs.
+    $sql = 'SELECT DISTINCT recordid, meetingid, bigbluebuttonbnid, meta
+              FROM {bigbluebuttonbn_logs}
+             WHERE meetingid = ?
+                   AND log = ?
+                   AND userid is null
+                   AND recordid is not null
+                   AND meta is not null';
+    $meetingcreatedevents = $DB->get_records_sql($sql, [
+        $bbbsession['meetingid'],
+        BIGBLUEBUTTON_LOG_EVENT_SUMMARY,
+    ]);
+
+    $meetingcreatedevents = convert_to_array($meetingcreatedevents);
+    foreach ($meetingcreatedevents as $recordid => &$meetingcreatedevent) {
+
+        // Push onto recordings array of items if the item does not exist yet,
+        // othewise it should just use the recordings array results.
+        if (!isset($recordings[$recordid])) {
+            $meta = json_decode($meetingcreatedevent['meta']);
+            $meetingcreatedevent['meetingID'] = $meetingcreatedevent['meetingid'];
+            $meetingcreatedevent['recordID'] = $meetingcreatedevent['recordid'];
+            $meetingcreatedevent['startTime'] = bigbluebuttonbn_datetime_to_timestamp($meta->start).'000'; // JS timestamp.
+            $meetingcreatedevent['meetingName'] = $meta->meetingname;
+            $meetingcreatedevent['playbacks'] = [];
+            $meetingcreatedevent['published'] = false;
+            $recordings[$recordid] = $meetingcreatedevent;
+        }
+
+    }
+
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
@@ -2117,12 +2179,23 @@ function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
  * @return void
  */
 function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-    $meetingid = $jsonobj->{'meeting_id'};
-    $recordid = $jsonobj->{'internal_meeting_id'};
-    $attendees = $jsonobj->{'data'}->{'attendees'};
+    // Set default values.
+    $moderatorcount = 0;
+    $viewercount = 0;
+    // Process Attendee Data.
+    $meetingid = $jsonobj->meeting_id;
+    $recordid = $jsonobj->internal_meeting_id;
+    $attendees = $jsonobj->data->attendees;
     foreach ($attendees as $attendee) {
-        $userid = $attendee->{'ext_user_id'};
+
+        if ($attendee->moderator == true) {
+            $moderatorcount++;
+        } else {
+            $viewercount++;
+        }
+        $userid = $attendee->ext_user_id;
         $overrides['meetingid'] = $meetingid;
+        $overrides['recordid'] = $recordid;
         $overrides['userid'] = $userid;
         $meta['recordid'] = $recordid;
         $meta['data'] = $attendee;
@@ -2131,6 +2204,28 @@ function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
         // Enqueue a task for processing the completion.
         bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
     }
+    // Process Overall Meeting Data.
+    $overrides = [
+        'recordid' => $recordid,
+        'meetingid' => $meetingid,
+        'userid' => null // Non user specific events are not linked to a user.
+    ];
+    $data = $jsonobj->data;
+    $meta = [
+        // General.
+        'start' => $data->start,
+        'meetingname' => $data->metadata->meeting_name,
+        'finish' => $data->finish,
+        'duration' => $data->duration,
+        // Counts.
+        'moderators' => $moderatorcount,
+        'viewers' => $viewercount,
+        // Misc.
+        'files' => $data->files,
+        'polls' => $data->polls
+    ];
+    // Stores overall meeting summary information.
+    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, json_encode($meta));
 }
 
 /**

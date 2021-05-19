@@ -206,8 +206,18 @@ switch (strtolower($action)) {
         // Moodle event logger: Create an event for meeting created.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
         // Internal logger: Insert a record with the meeting created.
-        $overrides = array('meetingid' => $bbbsession['meetingid']);
-        $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        $overrides = [
+            'meetingid' => $bbbsession['meetingid'],
+            'recordid' => $meetinginfo['internalMeetingID']
+        ];
+        $meta = json_encode([
+            'record' => ($bbbsession['record'] ? 'true' : 'false'),
+            'recordid' => $meetinginfo['internalMeetingID'],
+            'createtime' => $meetinginfo['createTime'],
+            'starttime' => $meetinginfo['startTime'],
+            'meetingname' => $meetinginfo['meetingName'],
+        ]);
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
         bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
@@ -431,10 +441,15 @@ function bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $o
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'], $bbbsession['createtime']);
     // Moodle event logger: Create an event for meeting joined.
-    bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
+    bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn, [
+        'other' => \core_useragent::get_user_agent_string()
+    ]);
     // Internal logger: Instert a record with the meeting created.
     $overrides = array('meetingid' => $bbbsession['meetingid']);
-    $meta = '{"origin":'.$origin.'}';
+    $meta = json_encode([
+        'origin' => $origin,
+        'useragent' => \core_useragent::get_user_agent_string(),
+    ]);
     bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],

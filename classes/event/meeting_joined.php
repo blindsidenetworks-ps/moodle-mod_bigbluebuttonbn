@@ -45,7 +45,7 @@ class meeting_joined extends base
         parent::init($crud, $edulevel);
         $this->description = "The user with id '##userid' has joined a bigbluebutton meeting for ".
             "the bigbluebuttonbn activity with id '##objectid' for the course id ".
-            "'##courseid'.";
+            "'##courseid'. having user agent ##other";
     }
 
     /**

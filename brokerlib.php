@@ -647,8 +647,12 @@ function bigbluebuttonbn_broker_recording_import($bbbsession, $params) {
 function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     // Decodes the received JWT string.
     try {
-        // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
-        $headers = getallheaders();
+        // Get the HTTP headers - Apache webserver.
+        if (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+        } else { // Nginx webserver.
+            $headers = $_SERVER;
+        }
 
         // Pull the Bearer from the headers.
         if (!array_key_exists('Authorization', $headers)) {
@@ -686,7 +690,10 @@ function bigbluebuttonbn_broker_meeting_events($bigbluebuttonbn) {
     }
 
     // We make sure events are processed only once.
-    $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
+    $overrides = [
+        'meetingid' => $jsonobj->{'meeting_id'},
+        'recordid' => $jsonobj->{'internal_meeting_id'} ?? null,
+    ];
     $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
     $meta['callback'] = 'meeting_events';
     bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides, json_encode($meta));
@@ -887,6 +894,8 @@ function bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enable
             'width' => '250px', 'allowHTML' => true);
     }
     $columns[] = array('key' => 'date', 'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
+        'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    $columns[] = array('key' => 'analytics', 'label' => get_string('view_recording_analytics', 'bigbluebuttonbn'),
         'sortable' => true, 'width' => '225px', 'allowHTML' => true);
     $columns[] = array('key' => 'duration', 'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
         'width' => '50px');

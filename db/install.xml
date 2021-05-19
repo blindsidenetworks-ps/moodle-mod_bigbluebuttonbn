@@ -63,6 +63,7 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="meetingid" TYPE="char" LENGTH="256" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="recordid" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="log" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="meta" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>

@@ -302,6 +302,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         upgrade_mod_savepoint(true, 2020050503, 'bigbluebuttonbn');
     }
+    if ($oldversion < 2020050504) {
+        // Add field recordid to bigbluebuttonbn_logs table.
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => 'lockonjoinconfigurable');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_logs', 'recordid',
+            $fielddefinition);
+        upgrade_mod_savepoint(true, 2020050504, 'bigbluebuttonbn');
+    }
 
     return true;
 }
