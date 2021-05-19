@@ -175,7 +175,7 @@ switch (strtolower($action)) {
             bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
             break;
         }
-        // If user is not administrator nor moderator (user is steudent) and waiting is required.
+        // If user is not administrator nor moderator (user is student) and waiting is required.
         if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
             header('Location: '.$bbbsession['logoutURL']);
             break;
