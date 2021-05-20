@@ -132,7 +132,7 @@ class meeting_info extends external_api {
         }
         $activitystatus = bigbluebutton::bigbluebuttonbn_view_session_config($bbbsession, $bbbsession['bigbluebuttonbn']->id);
         $bbbinfo->statusrunning = $running;
-        $bbbinfo->statusclosed = ($activitystatus == 'closed');
+        $bbbinfo->statusclosed = ($activitystatus == 'ended');
         if (!$running) {
             $bbbinfo->statusopen = ($activitystatus == 'open');
         }
@@ -164,12 +164,15 @@ class meeting_info extends external_api {
         $bbbinfo->bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         $bbbinfo->cmid = $bbbsession['cm']->id;
         $bbbinfo->userlimit = $bbbsession['userlimit'];
-        $presentation = $bbbsession['presentation']['url'] ? [
-            'url' => $bbbsession['presentation']['url'],
-            'iconname' => $bbbsession['presentation']['icon'],
-            'icondesc' => $bbbsession['presentation']['mimetype_description'],
-            'name' => $bbbsession['presentation']['name'],
-        ] : [];
+        $presentation = [];
+        if (!empty($bbbsession['presentation']) && !empty($bbbsession['presentation']['url'])) {
+            $presentation = [
+                'url' => $bbbsession['presentation']['url'],
+                'iconname' => $bbbsession['presentation']['icon'],
+                'icondesc' => $bbbsession['presentation']['mimetype_description'],
+                'name' => $bbbsession['presentation']['name'],
+            ];
+        }
         $bbbinfo->presentation = $presentation;
         if (!empty($bbbsession['group'])) {
             $bbbinfo->group = $bbbsession['group'];
