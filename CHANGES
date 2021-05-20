@@ -1,3 +1,6 @@
+2.4.1 (2019101008)
+Hot-fix: Patch for issue with Completion caused blocks view to crash (CONTRIB-8551).
+
 2.4 (2019101007)
 Bug: Patch for issue with Groups (CONTRIB-8471).
 Bug: Patch for issue with Calendar/Event (CONTRIB-8454).

@@ -1,3 +1,6 @@
+2.4.1 (2019101008)
+Hot-fix: Patch for issue with Completion caused blocks view to crash (CONTRIB-8551).
+
 2.4 (2019101007)
 2.4-rc.2 (2019101006)
 Bug: Patch for issue with Groups (CONTRIB-8471).
