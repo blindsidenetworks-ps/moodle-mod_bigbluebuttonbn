@@ -1191,7 +1191,13 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Get if the room is available.
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
     // Get if the user can join.
-    list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    // /CONTRIB-8419 : Here we will check first  if the meeting info was stored in the cache already or not.
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+    $usercanjoin = false;
+    $mid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id;
+    if ($cache->get($mid)) {
+        list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    }
 
     // Check if the room is closed and the user has already joined this session or played the record.
     if (!$roomavailable && $usercomplete) {
