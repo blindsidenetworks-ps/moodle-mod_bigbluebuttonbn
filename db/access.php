@@ -126,4 +126,13 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'mod/bigbluebuttonbn:addinstance',
     ),
+    // Ability to see the recordings analytics report.
+    'mod/bigbluebuttonbn:recording_analytics' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/site:config'
+    )
 );

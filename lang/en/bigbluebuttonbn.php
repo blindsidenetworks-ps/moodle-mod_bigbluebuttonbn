@@ -101,6 +101,7 @@ $string['completionvalidatestate'] = "Validate completion";
 $string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
 
 $string['sendnotification'] = "Send notification";
+$string['fetchmetaforrecordings'] = "Fetch metadata for recordings";
 
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
@@ -699,6 +700,30 @@ $string['view_analytics_number_of_students_speaking'] = '# of Students Speaking'
 $string['view_analytics_number_of_students_messaging'] = '# of Students Messaging';
 $string['view_analytics_number_of_students_using_emojis'] = '# of Students Using Emojis';
 $string['view_analytics_number_of_students_raising_hands'] = '# of Students Raising Hands';
+
+$string['view_analytics_heading_recordings'] = 'BBB Recording Analytics';
+$string['view_analytics_total_recordings'] = 'Total Recordings';
+$string['view_analytics_total_storage_used'] = 'Total Storage Used';
+$string['view_analytics_total_playback_duration'] = 'Total Playback Duration';
+$string['view_analytics_total_processing_time'] = 'Total Processing Time';
+$string['view_analytics_average_queue_time'] = 'Average Queue Time';
+$string['view_analytics_average_processing_time'] = 'Average Processing Time';
+$string['view_analytics_processing_speed'] = 'Processing Speed Estimate'; // Calculated by (filesize / duration) ~= bytes per second.
+
+$string['view_analytics_recorded'] = 'Recorded';
+$string['view_analytics_recorded_status_unknown'] = 'Unknown';
+$string['view_analytics_recordingprocessingtime'] = 'Rec. Processing Time';
+$string['view_analytics_createtime'] = 'Meeting Created At';
+$string['view_analytics_starttime'] = 'Meeting Started At';
+$string['view_analytics_endtime'] = 'Meeting Ended At';
+$string['view_analytics_playbackduration'] = 'Playback Duration';
+$string['view_analytics_duration'] = 'Meeting Duration';
+$string['view_analytics_processingtime'] = 'Processing Started At';
+$string['view_analytics_processingduration'] = 'Processing Duration';
+$string['view_analytics_lastchecked'] = 'Meta Last Checked';
+$string['view_analytics_filesize'] = 'Filesize';
+$string['view_analytics_queuestarttime'] = 'Queued At';
+$string['view_analytics_queueduration'] = 'Queue Duration';
 
 $string['strftimetime24seconds'] = '%H:%M:%S';
 $string['strftimetime12seconds'] = '%I:%M:%S %p';

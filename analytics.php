@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Page to grant external users access to a BBB session
+ * Views analytics on the particular BBB session/meeting
  *
  * @package    mod_bigbluebuttonbn
  * @copyright  Kevin Pham <kevinpham@catalyst-au.net>
@@ -85,6 +85,10 @@ $meetingsummary = $DB->get_record('bigbluebuttonbn_logs', [
     'recordid' => $id,
     'log' => BIGBLUEBUTTON_LOG_EVENT_SUMMARY
 ]);
+$meetingcreationinfo = $DB->get_record('bigbluebuttonbn_logs', [
+    'recordid' => $id,
+    'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE
+]);
 $output = "";
 
 // Prepare attendee data for Attention Box.
@@ -98,7 +102,7 @@ if (isset($meetingsummary->meta)) {
     $meetingsummary->meta = json_decode($meetingsummary->meta);
 }
 
-if (!$download) {
+if (!$download && !empty($attendees)) {
     $tables = "";
     if (isset($meetingsummary->meta)) {
         $output .= $OUTPUT->heading($meetingsummary->meta->meetingname, 3);
@@ -130,6 +134,49 @@ if (!$download) {
                 \html_writer::tag('div', $meetingsummary->meta->viewers, $htmlparams),
             ]
         ];
+
+        // Recording info.
+        if (!empty($meetingcreationinfo)) {
+            $meta = json_decode($meetingcreationinfo->meta);
+
+            // Recorded: Is this session recorded?
+            if ($meta->record === 'false' || (isset($meta->recorded) && $meta->recorded === false)) {
+                $recordedresult = get_string('no');
+            } else if (!empty($meta->recordinglastmodified)) {
+                $recordedresult = get_string('yes');
+                $recorded = true;
+            } else {
+                $recordedresult = get_string('view_analytics_recorded_status_unknown', 'bigbluebuttonbn');
+            }
+            $data[] = [
+                get_string('view_analytics_recorded', 'bigbluebuttonbn'),
+                \html_writer::tag('div', $recordedresult, ['class' => 'text-center'])
+            ];
+
+            // Processing Time - If recorded (confirmed), how long did it take?
+            if (!empty($recorded)) {
+                if (isset($meta->recordingprocessingtime)) {
+                    $recordingprocessingtimeinseconds = $meta->recordingprocessingtime / 1000;
+                    $recordingprocessingtime = userdate(
+                        $recordingprocessingtimeinseconds,
+                        get_string('strftimetime24seconds', 'bigbluebuttonbn'),
+                        'UTC'
+                    );
+                    $recordingprocessingtimetitle = format_time($recordingprocessingtimeinseconds);
+                } else {
+                    $recordingprocessingtime = get_string('view_analytics_recorded_status_unknown', 'bigbluebuttonbn');
+                }
+                $data[] = [
+                    get_string('view_analytics_recordingprocessingtime', 'bigbluebuttonbn'),
+                    \html_writer::tag('div', $recordingprocessingtime, [
+                        'class' => 'text-right',
+                        'title' => $recordingprocessingtimetitle ?? ''
+                    ])
+                ];
+            }
+
+        }
+
         $overviewtable->data = $data;
         $overviewtablehtml = html_writer::table($overviewtable);
         $tables .= $overviewtablehtml;
@@ -156,8 +203,6 @@ if (!$download) {
             return $acc;
         }, $attentiontotals);
     }
-
-    // echo"<pre>";print_r($attentiontotals);die;
 
     // Attention Box.
     $attentiontable = new html_table();

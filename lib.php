@@ -1365,3 +1365,84 @@ function bigbluebuttonbn_generate_access_code() {
     return rand(1, 999999);
 }
 
+/**
+ * Fetch the meta data for this particular recording by providing the BBB internal meeting id
+ *
+ * Note: Sometimes referred to in the plugin code as recordid.
+ *
+ * @param     array|string
+ * @return    array containing a list of recordids to their last modified timestamps
+ * @author     Kevin Pham <kevinpham@catalyst-au.net>
+ * @copyright  Catalyst IT, 2021
+ */
+function bigbluebuttonbn_get_recordings_meta($recordids) {
+    $recordids = (array)$recordids; // Cast the provided param to an array to always handle it in array format.
+
+    // Grab the BBB server url.
+    $bbbserverurl = \mod_bigbluebuttonbn\locallib\config::get('server_url');
+    list($bbbserverbase) = explode('/bigbluebutton/', $bbbserverurl);
+
+    // Fetch and set lastmodified for this recording.
+    $metas = []; // To determine the time it took to process a recording (e.g. endprocessingat - meetingendat).
+    $lastmodified = []; // To determine the time it took to process a recording (e.g. endprocessingat - meetingendat).
+
+    // Handles the specific record's timestamp and adds it to the lastmodified timestamp array (recordid => lastmodified).
+    $headerfunctionhandler = function($recordid) use (&$metas) {
+        // This is the function that will be passed to curl's CURLOPT_HEADERFUNCTION.
+        return function($ch, $header) use (&$metas, $recordid) {
+            // Handle last modified.
+            if (strpos($header, 'last-modified: ') !== false) {
+                $timestr = substr($header, strlen('last-modified: ')); // Using just the date portion of the header.
+                $metas[$recordid]['lastmodified'] = strtotime($timestr) * 1000; // Needs to be stored in milliseconds.
+            }
+            // Handle content-length === filesize.
+            if (strpos($header, 'content-length: ') !== false) {
+                $filesize = (int)substr($header, strlen('content-length: ')); // Using just the date portion of the header.
+                $metas[$recordid]['filesize'] = $filesize; // Stored as bytes.
+            }
+            return strlen($header);
+        };
+    };
+
+    $count   = count($recordids);
+    $handles = [];
+    $results = [];
+    $main    = curl_multi_init();
+    foreach ($recordids as $i => $recordid) {
+        $url = "$bbbserverbase/presentation/$recordid/video/webcams.webm";
+        $handles[$i] = curl_init($url);
+        curl_setopt($handles[$i], CURLOPT_URL, $url);
+        curl_setopt($handles[$i], CURLOPT_NOBODY, true);
+        curl_setopt($handles[$i], CURLOPT_FAILONERROR, true);
+        curl_setopt($handles[$i], CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($handles[$i], CURLOPT_TIMEOUT, 5);
+        curl_setopt($handles[$i], CURLOPT_HEADERFUNCTION, $headerfunctionhandler($recordid));
+        curl_multi_add_handle($main, $handles[$i]);
+    }
+    $running = 0;
+    do {
+        curl_multi_exec($main, $running);
+    } while ($running > 0);
+    for ($i = 0; $i < $count; $i++) {
+        curl_multi_remove_handle($main, $handles[$i]);
+    }
+    curl_multi_close($main);
+
+    // Add on meeting duration and filesize.
+    foreach ($recordids as $i => $recordid) {
+        $url = "$bbbserverbase/presentation/$recordid/metadata.xml";
+        $xml = bigbluebuttonbn_wrap_xml_load_file($url);
+        if (!empty($xml)) {
+            $playback = $xml->playback;
+            $metas[$recordid]['playbackduration'] = (int)$playback->duration;
+            $metas[$recordid]['processingduration'] = (int)$playback->processing_time;
+
+            // NOTE: The filesize here is not the filesize of the video you get
+            // when downloaded. Leaving this here as a reference.
+            // $metas[$recordid]['filesize'] = (int)$playback->size; // filesize stated in the metadata.
+
+        }
+    }
+
+    return $metas;
+}
