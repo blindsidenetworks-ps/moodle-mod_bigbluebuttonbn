@@ -235,7 +235,7 @@ switch (strtolower($action)) {
         if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
             $parseurl = parse_url($href);
             $path = $parseurl['path'];
-            $query = $parseurl['query'];
+            $query = $parseurl['query'] ?? '';
             $location = "./proxy_presentation.php{$path}?{$query}";
         } else {
             $location = urldecode($href);
