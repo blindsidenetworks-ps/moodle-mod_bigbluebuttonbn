@@ -33,13 +33,19 @@ if (empty($relativepath)) {
     exit();
 }
 
+define('RECORD_ID_REGEX', '/[a-f0-9]{40}-[0-9]{13}/');
 
 // If path is of format /presentation/{recording-id}/xxxx we need to check
 // user has access to the recording in question. Urls of this format contain
 // sensitive media.
 $pathparts = explode('/', $relativepath);
-if (isset($pathparts[1]) && $pathparts[1] === 'presentation' && isset($pathparts[2])) {
+if (isset($pathparts[1]) && $pathparts[1] === 'presentation' && isset($pathparts[2])) { // Legacy handling.
     $recordingid = $pathparts[2];
+} else if (preg_match(RECORD_ID_REGEX, $relativepath, $matches) && !empty($matches)) { // BBB 2.3+ handling.
+    $recordingid = reset($matches);
+}
+
+if (!empty($recordingid)) {
     $recordings = bigbluebuttonbn_get_recordings_array_fetch_page([], [$recordingid]);
 
     if (!isset($recordings[$recordingid])) {
@@ -68,7 +74,7 @@ if (isset($pathparts[1]) && $pathparts[1] === 'presentation' && isset($pathparts
 
 // One JS asset contains a non relative route we need to rewrite
 // to be relative in order to work with the proxy. We also filter out the
-// Content-Length Header in this case to avoid truncation
+// Content-Length Header in this case to avoid truncation.
 $jstobereplaced = $relativepath === '/playback/presentation/2.0/lib/writing.js';
 
 $curl = new curl();
@@ -86,12 +92,39 @@ $curl->setopt([
         }
         return strlen($header);
     },
-    'CURLOPT_WRITEFUNCTION'     => function ($curl, $body) use ($jstobereplaced) {
-        // Even if we modify the body, we need to return the original length
+    'CURLOPT_WRITEFUNCTION'     => function ($curl, $body) use ($jstobereplaced, $relativepath) {
+        // Even if we modify the body, we need to return the original length.
         $originalbodylength = strlen($body);
 
         if ($jstobereplaced) {
             $body = str_replace("let url = '/presentation/'", "let url = '../../../presentation/'", $body);
+        }
+
+        // HACK: Version 2.3+ replaces to ensure it routes all assets and subsequent calls through the proxy appropriately.
+        if (strpos($relativepath, '2.0') === false) {
+            // Due to it referencing other resources non-relatively, which was
+            // implied for a non-proxied playback, it would not go through the
+            // proxy and instead attempt to use a resource at which doesn't
+            // exist in moodle-land.
+            $proxybase = explode($relativepath, $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'])[0];
+            // Replace absolute paths with relative paths, and add <base> to
+            // ensure that's the base path used for all relative calls (rather
+            // than doing many more str_replaces).
+            $body = str_replace('src="/', 'src="', $body);
+            $body = str_replace('href="/', 'href="', $body);
+            $body = str_replace('<head>', '<head><base href="http://'.$proxybase.'/">', $body);
+            // This one was added as it seemed like it was being used to
+            // reference the base URL of the web app. As this going through the
+            // proxy, it would need to have this file as the prefix for the URL
+            // instead.
+            $body = str_replace(
+                '/playback/presentation/',
+                '/mod/bigbluebuttonbn/proxy_presentation.php/playback/presentation/',
+                $body
+            );
+            // This was being set at the base prefix for all resource requests
+            // such as meeting notes, video, cursor (mainly the XML includes).
+            $body = str_replace('"/presentation"', '"/mod/bigbluebuttonbn/proxy_presentation.php/presentation"', $body);
         }
 
         echo $body;
