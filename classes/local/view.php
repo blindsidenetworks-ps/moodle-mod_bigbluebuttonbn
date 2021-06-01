@@ -32,6 +32,7 @@ use mod_bigbluebuttonbn\external\meeting_info;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\output\recordings_session;
+use mod_bigbluebuttonbn\output\opencast_recordings_session;
 use mod_bigbluebuttonbn\plugin;
 use pix_icon;
 
@@ -158,6 +159,11 @@ class view {
             $recordingsection = new recordings_session($bbbsession, $type, $enabledfeatures);
 
             $output .= $renderer->render($recordingsection);
+
+            if (config::get('opencast_show_recording')) {
+                $opencastrecordingsection = new opencast_recordings_session($bbbsession, $type, $enabledfeatures);
+                $output .= $renderer->render($opencastrecordingsection);
+            }
 
         } else if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
             $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');

@@ -95,3 +95,31 @@ export const meetingInfo = args => fetchMany([
         args,
     }
 ])[0];
+
+/**
+ * Request for Opencast recording
+ *
+ * @param   {Number} bigbluebuttonbnid The instance ID
+ * @param   {String} tools the set of tools to display
+ * @returns {Promise}
+ */
+
+ const getOpencastListTableRequest = (bigbluebuttonbnid, tools)  => {
+    return {
+        methodname: 'mod_bigbluebutton_opencast_recording_list_table',
+        args: {
+            bigbluebuttonbnid,
+            tools
+        }
+    };
+};
+
+/**
+ * Fetch the list of Opencast recordings from the server.
+ *
+ * @param   {Number} bigbluebuttonbnid The instance ID
+ * @param   {String} tools the set of tools to display
+ * @returns {Promise}
+ */
+ export const fetchOpencastRecordings = (bigbluebuttonbnid, tools) =>
+    fetchMany([getOpencastListTableRequest(bigbluebuttonbnid, tools)])[0];

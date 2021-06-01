@@ -23,22 +23,30 @@
  * @author    2021 Farbod Zamani Boroujeni - ELAN e.V.
  */
 
-global $PAGE, $OUTPUT;
+use mod_bigbluebuttonbn\local\helpers\opencast;
+use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\plugin;
+use context_module;
+use moodle_url;
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
+global $PAGE, $OUTPUT, $CFG;
+
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
+require_once($CFG->dirroot . '/lib/oauthlib.php');
 
 $identifier = required_param('identifier', PARAM_TEXT);
 $bn = optional_param('bn', 0, PARAM_INT);
 
-$bbbviewinstance = bigbluebuttonbn_view_validator(null, $bn);
+$bbbviewinstance = view::bigbluebuttonbn_view_validator(null, $bn);
 if (!$bbbviewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
 
 // Get configs from filter_opencast
-$opencastfilterconfig = bigbluebuttonbn_check_opencast_filter();
+$opencastfilterconfig = opencast::bigbluebuttonbn_check_opencast_filter();
 if (!$opencastfilterconfig) {
     print_error(get_string('view_error_missing_filter_opencast_config', 'bigbluebuttonbn'));
 }
@@ -64,7 +72,7 @@ $PAGE->set_heading($course->fullname);
 $opencastfilterconfig['playerurl'] .= $identifier;
 
 // Create LTI parameters.
-$params = bigbluebuttonbn_create_lti_parameters_opencast($opencastfilterconfig);
+$params = opencast::bigbluebuttonbn_create_lti_parameters_opencast($opencastfilterconfig);
 
 // Using block_opencast renderer in order to use render_lti_form function.
 $opencastrenderer = $PAGE->get_renderer('block_opencast');
@@ -78,4 +86,3 @@ echo $opencastrenderer->render_lti_form($opencastfilterconfig['ltiendpoint'], $p
 // Use block_opencast LTI form handler javascript to submit the lti form.
 $PAGE->requires->js_call_amd('block_opencast/block_lti_form_handler', 'init');
 echo $OUTPUT->footer();
-

@@ -110,6 +110,12 @@ $string['config_server_url_description'] = 'The URL of your BigBlueButton server
 $string['config_shared_secret'] = 'BigBlueButton Shared Secret';
 $string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 
+$string['config_opencast'] = 'Configuration for "Opencast integration" feature';
+$string['config_opencast_description'] = 'These settings control the integration of BBB meeting recordings and Opencast';
+$string['config_opencast_recording'] = 'Send Opencast series ID to BBB';
+$string['config_opencast_recording_description'] = 'If this setting is enabled, Moodle will send the Opencast series ID of the course to BBB alongside the BBB metadata whenever a new BBB meeting is initiated. If there is not an Opencast series ID for the course yet, a new series will be created on-the-fly. This way, Opencast can be used to process BBB recordings and to publish them in the course\'s series.';
+$string['config_opencast_show_recording'] = 'Show Opencast recordings';
+$string['config_opencast_show_recording_description'] = 'If enabled the recording table will also include the Opencast recordings.';
 $string['config_recording'] = 'Configuration for "Record meeting" feature';
 $string['config_recording_description'] = 'These settings are feature specific';
 $string['config_recording_default'] = 'Recording feature enabled by default';
