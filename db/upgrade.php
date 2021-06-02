@@ -317,17 +317,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         upgrade_mod_savepoint(true, 2020050503, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2020050504) {
-        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
-            ['userid', 'log']);
-        // Add field recordid to bigbluebuttonbn_logs table.
-        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
-            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => 'lockonjoinconfigurable');
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_logs', 'recordid',
-            $fielddefinition);
-        upgrade_mod_savepoint(true, 2020050504, 'bigbluebuttonbn');
-    }
     if ($oldversion < 2020050506) {
         // Add field for guestlinkexpiresat.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
@@ -341,6 +330,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkexpiresat', $fielddefinition);
         upgrade_mod_savepoint(true, 2020050510, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2020050513) {
+        // Add index to bigbluebuttonbn_logs (Leftover for CONTRIB-8157).
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_logs', 'userlog',
+            ['userid', 'log']);
+        // Add field recordid to bigbluebuttonbn_logs table.
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => 'lockonjoinconfigurable');
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_logs', 'recordid',
+            $fielddefinition);
+        upgrade_mod_savepoint(true, 2020050513, 'bigbluebuttonbn');
     }
     return true;
 }
