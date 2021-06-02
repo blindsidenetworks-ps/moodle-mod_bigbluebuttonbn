@@ -63,3 +63,8 @@ if ($hassiteconfig) {
     // Renders settings for experimental features.
     bigbluebuttonbn_settings_experimental($renderer);
 }
+
+// Adds the recordings analytics report to the /admin/search.php#linkreports page.
+$ADMIN->add('reports', new admin_externalpage('bigbluebuttonbnrecordingsanalyticsreport',
+    get_string('view_analytics_heading_recordings', 'bigbluebuttonbn'),
+    "$CFG->wwwroot/mod/bigbluebuttonbn/analytics-recordings.php"));

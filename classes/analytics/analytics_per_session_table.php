@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn\analytics;
+
 /**
  * Analytics Table
  *
@@ -22,9 +24,6 @@
  * @copyright 2021 onwards Catalyst IT Ltd
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_bigbluebuttonbn\analytics;
-
 class analytics_per_session_table extends \table_sql {
 
     public function __construct($uniqueid, \moodle_url $url, $perpage = 100) {
