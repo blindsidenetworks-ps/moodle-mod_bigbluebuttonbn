@@ -3275,7 +3275,7 @@ function bigbluebuttonbn_settings_default_messages(&$renderer) {
     $renderer->render_group_header('default_messages');
     $renderer->render_group_element(
         'welcome_default',
-        $renderer->render_group_element_textarea('welcome_default', '', PARAM_TEXT)
+        $renderer->render_group_element_textarea('welcome_default', '', PARAM_RAW)
     );
 }
 
