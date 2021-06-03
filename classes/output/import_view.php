@@ -36,10 +36,11 @@ use mod_bigbluebuttonbn\plugin;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/bigbluebuttonbn/locallib.php');
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * Class import_view
+ *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -52,6 +53,7 @@ class import_view implements renderable, templatable {
 
     /**
      * import_view constructor.
+     *
      * @param stdClass $course
      * @param stdClass $bigbluebuttonbn
      * @param int $tc
@@ -86,7 +88,7 @@ class import_view implements renderable, templatable {
             }
             $recordings = bigbluebuttonbn_get_allrecordings(
                 $selected, $bigbluebuttonbnid, false,
-                (boolean)\mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled')
+                (boolean) \mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled')
             );
             // Exclude the ones that are already imported.
             if (!empty($recordings)) {
@@ -109,13 +111,15 @@ class import_view implements renderable, templatable {
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init',
                 array());
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings', 'M.mod_bigbluebuttonbn.recordings.init',
-                array('recordings_html' => true));
+                array(array('hide_table' => true, 'bbbid' => $bigbluebuttonbn->id))
+            );
         }
     }
 
     /**
      * Defer to template.
-     * @param  renderer_base $output
+     *
+     * @param renderer_base $output
      * @return array
      */
     public function export_for_template(renderer_base $output) {

@@ -38,6 +38,7 @@ M.mod_bigbluebuttonbn.recordings = {
      * @param {object} dataobj
      */
     init: function(dataobj) {
+        var hidetable = (dataobj && dataobj.hide_table && dataobj.hide_table === true);
         this.bbbid = dataobj.bbbid;
         this.datasource = new Y.DataSource.Get({
             source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?sesskey=" + M.cfg.sesskey + '&'
@@ -48,7 +49,7 @@ M.mod_bigbluebuttonbn.recordings = {
             callback: {
                 success: function (data) {
                     var bbinfo = data.data;
-                    if (bbinfo.recordings_html === false &&
+                    if (!hidetable && bbinfo.recordings_html === false &&
                         (bbinfo.profile_features.indexOf('all') != -1 || bbinfo.profile_features.indexOf('showrecordings') != -1)) {
                         thisbbb.locale = bbinfo.locale;
                         thisbbb.datatable.columns = bbinfo.data.columns;
