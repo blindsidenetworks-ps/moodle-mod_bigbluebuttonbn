@@ -1221,6 +1221,27 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 }
 
 /**
+ * Is the event visible?
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $event) {
+    global $DB;
+    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
+    // Create array bbbsession with configuration for BBB server.
+    $bbbsession['course'] = $cm->get_course();
+    $bbbsession['coursename'] = $cm->get_course()->fullname;
+    $bbbsession['cm'] = $cm;
+    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+    $context = context_module::instance($cm->id);
+    mod_bigbluebuttonbn\locallib\bigbluebutton::view_bbbsession_set($context, $bbbsession);
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    return $activitystatus != 'ended';
+}
+
+/**
  * Register a bigbluebuttonbn event
  *
  * @param object $bigbluebuttonbn
