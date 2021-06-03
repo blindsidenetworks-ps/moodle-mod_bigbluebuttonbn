@@ -379,12 +379,16 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['lockonjoinconfigurable']) {
         $data['lockSettingsLockOnJoinConfigurable'] = 'true';
     }
-    // Check global mod settings first, otherwise check activity instance settings
+    // Check global mod settings first, otherwise check activity instance settings.
     if (
         \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_moderator_approval')
         || $bbbsession['bigbluebuttonbn']->moderatorapproval
     ) {
         $data['guestPolicy'] = 'ASK_MODERATOR';
+    }
+    // Ensure meeting events are stored such that the BBB server can push meeting events back once it ends.
+    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
+        $data['meetingKeepEvents'] = 'true'; // Option added as per PR #11681.
     }
     return $data;
 }
