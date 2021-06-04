@@ -112,7 +112,7 @@ $curl->setopt([
             // than doing many more str_replaces).
             $body = str_replace('src="/', 'src="', $body);
             $body = str_replace('href="/', 'href="', $body);
-            $body = str_replace('<head>', '<head><base href="http://'.$proxybase.'/">', $body);
+            $body = str_replace('<head>', '<head><base href="//'.$proxybase.'/">', $body);
             // This one was added as it seemed like it was being used to
             // reference the base URL of the web app. As this going through the
             // proxy, it would need to have this file as the prefix for the URL
