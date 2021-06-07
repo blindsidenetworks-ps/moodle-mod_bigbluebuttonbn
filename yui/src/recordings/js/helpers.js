@@ -230,3 +230,4 @@ M.mod_bigbluebuttonbn.helpers = {
     }
 
 };
+

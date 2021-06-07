@@ -285,6 +285,7 @@ M.mod_bigbluebuttonbn.rooms = {
 };
 
 
+
 }, '@VERSION@', {
     "requires": [
         "base",

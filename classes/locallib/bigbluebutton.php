@@ -298,6 +298,7 @@ class bigbluebutton {
      * @param $groupid
      * @param $user
      * @param $course
+     * @param $cm
      * @return bool
      * @throws \coding_exception
      */
