@@ -452,3 +452,4 @@ M.mod_bigbluebuttonbn.recordings = {
     }
 
 };
+

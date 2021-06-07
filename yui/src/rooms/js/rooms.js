@@ -281,3 +281,4 @@ M.mod_bigbluebuttonbn.rooms = {
     }
 
 };
+

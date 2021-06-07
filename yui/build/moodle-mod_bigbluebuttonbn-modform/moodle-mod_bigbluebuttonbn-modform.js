@@ -342,4 +342,5 @@ M.mod_bigbluebuttonbn.modform = {
 };
 
 
+
 }, '@VERSION@', {"requires": ["base", "node"]});

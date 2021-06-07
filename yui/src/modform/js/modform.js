@@ -338,3 +338,4 @@ M.mod_bigbluebuttonbn.modform = {
     }
 
 };
+
