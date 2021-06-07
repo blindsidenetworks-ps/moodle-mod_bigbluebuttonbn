@@ -1175,33 +1175,23 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Get bigbluebuttonbn activity.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
 
-    // Set flag haspassed if closingtime has already passed only if it is defined.
-    $haspassed = ($bigbluebuttonbn->closingtime) && $bigbluebuttonbn->closingtime < $time;
-
-    // Set flag hasstarted if startingtime has already passed or not defined.
-    $hasstarted = $bigbluebuttonbn->openingtime < $time;
-
-    // Return null if it has passed or not started.
-    if ($haspassed || !$hasstarted) {
-        return null;
-    }
-
     // Get if the user has joined in live session or viewed the recorded.
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
     // Get if the room is available.
     list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
-    // Get if the user can join.
+
+    // Check if the room is closed and the user has already joined this session or played the record.
+    if (!$roomavailable && $usercomplete) {
+        return null;
+    }
+    // Get if the user can join. Push it further down the line so we have a chance to exit before
+    // even doing this check.
     // /CONTRIB-8419 : Here we will check first  if the meeting info was stored in the cache already or not.
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
     $usercanjoin = false;
     $mid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id;
     if ($cache->get($mid)) {
         list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
-    }
-
-    // Check if the room is closed and the user has already joined this session or played the record.
-    if (!$roomavailable && $usercomplete) {
-        return null;
     }
 
     // Check if the user can join this session.
