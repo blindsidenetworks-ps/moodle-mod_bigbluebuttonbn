@@ -185,6 +185,8 @@ class bigbluebutton {
         $bbbsession['managerecordings'] = ($bbbsession['administrator']
             || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
         $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
+        $bbbsession['meetinganalytics'] = ($bbbsession['administrator'] ||
+            has_capability('mod/bigbluebuttonbn:meetinganalytics', $context));
         $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
         $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
         $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.

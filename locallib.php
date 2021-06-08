@@ -1434,7 +1434,9 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     // Set formatted date.
     $rowdata->date_formatted = bigbluebuttonbn_get_recording_data_row_date_formatted($rowdata->date);
     // Set analytics link.
-    $rowdata->analytics = bigbluebuttonbn_get_recording_data_row_analytics($bbbsession, $recording);
+    if ($bbbsession['meetinganalytics']) {
+        $rowdata->analytics = bigbluebuttonbn_get_recording_data_row_analytics($bbbsession, $recording);
+    }
     // Set formatted duration.
     $rowdata->duration_formatted = $rowdata->duration = bigbluebuttonbn_get_recording_data_row_duration($recording);
     // Set actionbar, if user is allowed to manage recordings.
@@ -1975,7 +1977,9 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
         $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
     }
     $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
-    $table->head[] = get_string('view_recording_analytics', 'bigbluebuttonbn');
+    if ($bbbsession['meetinganalytics']) {
+        $table->head[] = get_string('view_recording_analytics', 'bigbluebuttonbn');
+    }
     $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
     $table->size = array('', '', '', '', '', '');
@@ -2056,7 +2060,9 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
         $row->cells[] = $rowdata->preview;
     }
     $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
-    $row->cells[] = $texthead . $rowdata->analytics . $texttail;
+    if ($bbbsession['meetinganalytics']) {
+        $row->cells[] = $texthead . $rowdata->analytics . $texttail;
+    }
     $row->cells[] = $rowdata->duration_formatted;
     if ($bbbsession['managerecordings']) {
         $row->cells[] = $rowdata->actionbar;
@@ -3758,6 +3764,8 @@ function bigbluebuttonbn_view_bbbsession_set($context, &$bbbsession) {
     $bbbsession['managerecordings'] = ($bbbsession['administrator']
         || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
     $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
+    $bbbsession['meetinganalytics'] = ($bbbsession['administrator'] ||
+        has_capability('mod/bigbluebuttonbn:meetinganalytics', $context));
     // Server data.
     $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
     $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;

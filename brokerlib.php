@@ -899,8 +899,10 @@ function bigbluebuttonbn_broker_get_recording_data($bbbsession, $params, $enable
     }
     $columns[] = array('key' => 'date', 'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
         'sortable' => true, 'width' => '225px', 'allowHTML' => true);
-    $columns[] = array('key' => 'analytics', 'label' => get_string('view_recording_analytics', 'bigbluebuttonbn'),
-        'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    if ($bbbsession['meetinganalytics']) {
+        $columns[] = array('key' => 'analytics', 'label' => get_string('view_recording_analytics', 'bigbluebuttonbn'),
+            'sortable' => true, 'width' => '225px', 'allowHTML' => true);
+    }
     $columns[] = array('key' => 'duration', 'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
         'width' => '50px');
     if ($bbbsession['managerecordings']) {

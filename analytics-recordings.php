@@ -53,11 +53,11 @@ if (!empty($bn)) {
 } else {
     // Checks for the site admin report.
     require_login();
-    require_capability('mod/bigbluebuttonbn:recording_analytics', context_system::instance());
     $title = get_string('view_analytics_heading_recordings', 'bigbluebuttonbn');
     $heading = get_string('bigbluebuttonbn', 'bigbluebuttonbn');
     admin_externalpage_setup('bigbluebuttonbnrecordingsanalyticsreport', '', null, '', array('pagelayout' => 'report'));
 }
+require_capability('mod/bigbluebuttonbn:recordinganalytics', context_system::instance());
 
 // Print the page header.
 $pageurl = new moodle_url('/mod/bigbluebuttonbn/analytics-recordings.php', ['bn' => $bn]);
