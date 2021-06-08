@@ -126,8 +126,18 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'mod/bigbluebuttonbn:addinstance',
     ),
+    // Ability to see the (meeting) analytics report.
+    'mod/bigbluebuttonbn:meetinganalytics' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'mod/bigbluebuttonbn:addinstance'
+    ),
     // Ability to see the recordings analytics report.
-    'mod/bigbluebuttonbn:recording_analytics' => array(
+    'mod/bigbluebuttonbn:recordinganalytics' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(

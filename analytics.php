@@ -49,7 +49,7 @@ require_login($course, true, $cm);
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/bigbluebuttonbn/lib.php');
 
-$context = context_system::instance();
+require_capability('mod/bigbluebuttonbn:meetinganalytics', context_module::instance($cm->id));
 
 // Print the page header.
 $pageurl = new moodle_url('/mod/bigbluebuttonbn/analytics.php', ['id' => $id, 'bn' => $bn]);
