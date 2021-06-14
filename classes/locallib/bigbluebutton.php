@@ -212,7 +212,11 @@ class bigbluebutton {
         }
         $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
         if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-            $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
+            // CONTRIB-8573: default to the config and if empty, then the default string.
+            $bbbsession['welcome'] = config::get('welcome_default');
+            if (!$bbbsession['welcome']) {
+                $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
+            }
         }
         if ($bbbsession['bigbluebuttonbn']->record) {
             // Check if is enable record all from start.
