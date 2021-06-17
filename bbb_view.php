@@ -234,7 +234,16 @@ switch (strtolower($action)) {
 
         if ((bool)\mod_bigbluebuttonbn\locallib\config::get('recordings_proxy_playback')) {
             $parseurl = parse_url($href);
-            $path = $parseurl['path'];
+
+            // Handle path restructuring for use with the proxy/redirects.
+            if (basename($parseurl['path']) === 'playback.html') {
+                // Keep urls e.g. playback.html?meetingId=1234 as-is for legacy BBB.
+                $path = $parseurl['path'];
+            } else {
+                // Make sure path ends in '/' e.g. playback/presentation/2.3/1234-123 for 2.3 and above.
+                $path = rtrim($parseurl['path']) . '/';
+            }
+
             $query = $parseurl['query'] ?? '';
             $location = "./proxy_presentation.php{$path}?{$query}";
         } else {
