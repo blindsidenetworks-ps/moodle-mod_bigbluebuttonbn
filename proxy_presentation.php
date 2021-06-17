@@ -101,7 +101,7 @@ $curl->setopt([
         }
 
         // HACK: Version 2.3+ replaces to ensure it routes all assets and subsequent calls through the proxy appropriately.
-        if (strpos($relativepath, '2.0') === false) {
+        if (strpos($relativepath, '2.0') === false && strpos($relativepath, '/capture/') === false) {
             // Due to it referencing other resources non-relatively, which was
             // implied for a non-proxied playback, it would not go through the
             // proxy and instead attempt to use a resource at which doesn't
