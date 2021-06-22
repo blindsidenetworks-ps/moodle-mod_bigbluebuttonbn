@@ -2205,7 +2205,7 @@ function bigbluebuttonbn_is_bn_server() {
  * @return array
  */
 function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
-    if ($bbbsession['administrator'] || has_capability('moodle/course:view')) {
+    if ($bbbsession['administrator'] || has_capability('moodle/course:view', $bbbsession['context'])) {
         $courses = get_courses('all', 'c.fullname ASC');
         // It includes the name of the site as a course (category 0), so remove the first one.
         unset($courses['1']);
