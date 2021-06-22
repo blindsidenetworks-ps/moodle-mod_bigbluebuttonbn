@@ -34,15 +34,17 @@
 <div>
     <core-course-module-description description="<% bigbluebuttonbn.intro %>" component="mod_bigbluebuttonbn" componentId="<% cmid %>"></core-course-module-description>
     <ion-list>
-        <ion-item text-wrap>
-            <% message %>
+        <ion-item class="ion-text-wrap" text-wrap>
+            <ion-label><% message %></ion-label>
         </ion-item>
-                <%#not_started%>
-                    <ion-item text-wrap>
-                        <p><% not_started.starts_at %></p>
-                        <p><% not_started.ends_at %></p>
-                    </ion-item>
-                <%/not_started%>
+        <%#not_started%>
+            <ion-item class="ion-text-wrap" text-wrap>
+                <ion-label>
+                    <p><% not_started.starts_at %></p>
+                    <p><% not_started.ends_at %></p>
+                </ion-label>
+            </ion-item>
+        <%/not_started%>
         <span core-site-plugins-call-ws-on-load
               name="mod_bigbluebuttonbn_can_join" [params]="{cmid: <% cmid %>}" (onSuccess)="onCanJoinReturns($event)"></span>
     </ion-list>
