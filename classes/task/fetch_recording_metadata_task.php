@@ -54,6 +54,23 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
         require_once(__DIR__.'/../../locallib.php');
         global $CFG, $DB;
 
+        // Updates older records to have recordid set on the log record and not
+        // just the meta, for all older records without this set already.
+        $sql = "SELECT id, meta
+                  FROM {bigbluebuttonbn_logs}
+                 WHERE recordid IS NULL
+                   AND log = :log
+                   AND ".$DB->sql_like('meta', ':recordid');
+        $createlogswithnorecordid = $DB->get_records_sql($sql, [
+            'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE,
+            'recordid' => '%"recordid":"%', // Recordid exists.
+        ]);
+        foreach ($createlogswithnorecordid as $logentry) {
+            $meta = json_decode($logentry->meta);
+            $DB->update_record('bigbluebuttonbn_logs', ['id' => $logentry->id, 'recordid' => $meta->recordid], $bulk = true);
+        }
+
+        // Fetch and process any recordids - most recent first.
         $sql = "SELECT recordid, id, *
                   FROM {bigbluebuttonbn_logs}
                  WHERE recordid IS NOT NULL
@@ -63,6 +80,7 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
                    AND (
                        ".$DB->sql_like('meta', ':recordinglastmodified', false, false, $notlike = true)."
                        OR ".$DB->sql_like('meta', ':endtime', false, false, $notlike = true).")
+                 ORDER BY :order
                  LIMIT :limit
                    ";
         $meetingswithnorecordingmeta = $DB->get_records_sql($sql, [
@@ -71,8 +89,10 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
             'recordedfalse' => '%"recorded":false%', // Recording did not happen (set after meeting ended).
             'recordinglastmodified' => '%recordinglastmodified%',
             'endtime' => '%endtime%',
+            'order' => 'id desc', // Process the most recent entries first.
             'limit' => DEFAULT_PROCESSING_LIMIT
         ]);
+
         // Filter out all the meetings that have been recently checked, so we can.
         $relevantmeetings = [];
         foreach ($meetingswithnorecordingmeta as $recordid => $meeting) {

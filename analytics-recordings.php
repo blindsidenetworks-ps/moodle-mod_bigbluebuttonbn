@@ -67,7 +67,7 @@ $PAGE->set_cacheable(false);
 $PAGE->set_heading($heading);
 
 $table = new \mod_bigbluebuttonbn\analytics\analytics_for_recordings_table('bigbluebuttonbn_recordings_metrics_table', $PAGE->url);
-$table->is_downloading($download);
+$table->is_downloading($download, 'bigbluebuttonbn-recordinganalytics-' . time());
 
 if (!$download) {
     // Only print headers if not asked to download data.
@@ -90,17 +90,17 @@ if (!empty($bn) && !empty($bigbluebuttonbn->id)) {
 $table->set_sql('id, meta, userid', "{bigbluebuttonbn_logs}", $wheresql, $params);
 $table->define_baseurl($pageurl);
 
-// Add cloned table modifying the query for past week instead.
-$pastweektable = clone $table;
-$wheresqlwithweekconstraint = $wheresql;
+// Add cloned table modifying the query for Past Month instead.
+$pastmonthtable = clone $table;
+$wheresqlwithmonthconstraint = $wheresql;
 $wheresql .= " AND timecreated > :timecreated";
-$params['timecreated'] = time() - WEEKSECS;
-$pastweektable->set_sql('id, meta, userid', "{bigbluebuttonbn_logs}", $wheresql, $params);
-$pastweektable->setup();
-$pastweektable->query_db(0); // No limit, fetch all rows.
-$pastweektable->pageable(false);
-$pastweektable->close_recordset();
-$pastweekmeetingcreateevents = $pastweektable->rawdata;
+$params['timecreated'] = time() - (30 * DAYSECS); // Currently set to 1 calendar month.
+$pastmonthtable->set_sql('id, meta, userid, timecreated', "{bigbluebuttonbn_logs}", $wheresql, $params);
+$pastmonthtable->setup();
+$pastmonthtable->query_db(0); // No limit, fetch all rows.
+$pastmonthtable->pageable(false);
+$pastmonthtable->close_recordset();
+$pastmonthmeetingcreateevents = $pastmonthtable->rawdata;
 
 $output = "";
 
@@ -131,6 +131,12 @@ if (!$download && !empty($meetingcreateevents)) {
             }, 0);
         };
 
+        // Count all valid events.
+        $totaleventswithrecordings = array_reduce($events, function($acc, $event){
+            $data = json_decode($event->meta);
+            $acc += isset($data->recordinglastmodified) ? 1 : 0;
+            return $acc;
+        }, 0);
         $processingdurationtotalinseconds = $sumkeyfunc('processingduration') / 1000;
         $filesizetotal = $sumkeyfunc('filesize');
         $overviewtable = new html_table();
@@ -138,7 +144,7 @@ if (!$download && !empty($meetingcreateevents)) {
         $overviewtable->attributes['class'] = 'w-auto admintable generaltable mr-4 table-bordered';
         $htmlparams = ['class' => 'text-center'];
         $data = [
-            [get_string('view_analytics_total_recordings', 'bigbluebuttonbn'), count($events)],
+            [get_string('view_analytics_total_recordings', 'bigbluebuttonbn'), $totaleventswithrecordings],
             [get_string('view_analytics_total_storage_used', 'bigbluebuttonbn'), display_size($filesizetotal)],
             [
                 get_string('view_analytics_total_playback_duration', 'bigbluebuttonbn'),
@@ -146,19 +152,24 @@ if (!$download && !empty($meetingcreateevents)) {
             ],
             [
                 get_string('view_analytics_total_processing_time', 'bigbluebuttonbn'),
-                userdate($processingdurationtotalinseconds, get_string('strftimetime24seconds', 'bigbluebuttonbn'), 'UTC')
+                userdate(
+                    $processingdurationtotalinseconds,
+                    get_string('strftimetime24seconds', 'bigbluebuttonbn'),
+                    'UTC')
             ],
             [
                 get_string('view_analytics_average_queue_time', 'bigbluebuttonbn'),
-                userdate($sumkeyfunc('queuetime') / 1000, get_string('strftimetime24seconds', 'bigbluebuttonbn'), 'UTC')
+                userdate(
+                    empty($totaleventswithrecordings) ? 0 : ($sumkeyfunc('queueduration') / 1000 / $totaleventswithrecordings),
+                    get_string('strftimetime24seconds', 'bigbluebuttonbn'),
+                    'UTC')
             ],
             [
                 get_string('view_analytics_average_processing_time', 'bigbluebuttonbn'),
                 userdate(
-                    $processingdurationtotalinseconds / count($events),
+                    empty($totaleventswithrecordings) ? 0 : ($processingdurationtotalinseconds / $totaleventswithrecordings),
                     get_string('strftimetime24seconds', 'bigbluebuttonbn'),
-                    'UTC'
-                )
+                    'UTC' )
             ],
             [
                 get_string('view_analytics_processing_speed', 'bigbluebuttonbn'),
@@ -175,10 +186,10 @@ if (!$download && !empty($meetingcreateevents)) {
         get_string('view_analytics_heading_overview', 'bigbluebuttonbn'),
         $meetingcreateevents);
 
-    // Generate and return the HTML for the Past Week Section.
+    // Generate and return the HTML for the Past Month Section.
     $tables .= $createoverviewtable(
-        "Past week",
-        $pastweekmeetingcreateevents);
+        get_string('view_analytics_heading_past_month', 'bigbluebuttonbn'),
+        $pastmonthmeetingcreateevents);
 
     // Add all tables to the output.
     $output .= '<div class="d-flex align-items-start">'.$tables.'</div>';
