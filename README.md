@@ -49,6 +49,11 @@ For information on how to setup your own BigBlueButton server see
 
 http://bigbluebutton.org/
 
+3. An additional change to the BigBlueButton server code is required for *meeting analytics* to work. The following code should perform the change required on a standard install:
+```sh
+sed -i /usr/local/bigbluebutton/core/scripts/post_events/post_events_analytics_callback.rb -e "s/analytics-callback-url/events-callback-url/"
+```
+
 Obtaining the source
 ====================
 This GitHub repository at

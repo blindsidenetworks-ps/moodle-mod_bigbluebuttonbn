@@ -3955,6 +3955,7 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
     }
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {
         $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
+        $metadata['events-callback-url'] = $bbbsession['meetingEventsURL'];
     }
     return $metadata;
 }

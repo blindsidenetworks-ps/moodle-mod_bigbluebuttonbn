@@ -135,6 +135,8 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 'meta_bbb-context' => 'Test course: BBB',
                 'meta_analytics-callback-url' => $CFG->wwwroot .
                         '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting_events&bigbluebuttonbn=' . $bbactivity->id,
+                'meta_events-callback-url' => $CFG->wwwroot .
+                        '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting_events&bigbluebuttonbn=' . $bbactivity->id,
                 'meta_bbb-origin-tag' => 'moodle-mod_bigbluebuttonbn (2019101001)',
                 'meta_bbb-origin-version' => '3.7.4+ (Build: 20200117)',
                 'meta_bbb-recording-description' => '',
