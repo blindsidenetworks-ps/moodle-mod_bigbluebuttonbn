@@ -71,7 +71,7 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
         }
 
         // Fetch and process any recordids - most recent first.
-        $sql = "SELECT recordid, id, *
+        $sql = "SELECT recordid, id, {bigbluebuttonbn_logs}.*
                   FROM {bigbluebuttonbn_logs}
                  WHERE recordid IS NOT NULL
                    AND log = :log
@@ -80,9 +80,7 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
                    AND (
                        ".$DB->sql_like('meta', ':recordinglastmodified', false, false, $notlike = true)."
                        OR ".$DB->sql_like('meta', ':endtime', false, false, $notlike = true).")
-                 ORDER BY :order
-                 LIMIT :limit
-                   ";
+                 ORDER BY :order";
         $meetingswithnorecordingmeta = $DB->get_records_sql($sql, [
             'log' => BIGBLUEBUTTONBN_LOG_EVENT_CREATE,
             'recordtrue' => '%"record":"true"%', // Recording is enabled.
@@ -90,8 +88,7 @@ class fetch_recording_metadata_task extends \core\task\scheduled_task {
             'recordinglastmodified' => '%recordinglastmodified%',
             'endtime' => '%endtime%',
             'order' => 'id desc', // Process the most recent entries first.
-            'limit' => DEFAULT_PROCESSING_LIMIT
-        ]);
+        ], 0, DEFAULT_PROCESSING_LIMIT);
 
         // Filter out all the meetings that have been recently checked, so we can.
         $relevantmeetings = [];
