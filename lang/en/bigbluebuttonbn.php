@@ -175,8 +175,8 @@ $string['config_voicebridge_editable_description'] = 'Conference voice bridge nu
 
 $string['config_preuploadpresentation'] = 'Configuration for "Pre-upload presentation" feature';
 $string['config_preuploadpresentation_description'] = 'These settings enable or disable options in the UI and also define default values for these options. The feature works only if the Moodle server is accessible to BigBlueButton..';
-$string['config_preuploadpresentation_enabled'] = 'Pre-uploading presentation enabled';
-$string['config_preuploadpresentation_enabled_description'] = 'Preupload presentation feature is enabled in the UI when the room or conference is added or updated.';
+$string['config_preuploadpresentation_editable'] = 'Pre-uploading presentation editable';
+$string['config_preuploadpresentation_editable_description'] = 'Preupload presentation feature is editable in the UI when the room or conference is added or updated.';
 
 $string['config_presentation_default'] = 'Default file for "Pre-upload presentation" feature';
 $string['config_presentation_default_description'] = 'This setting allow to select a file to use as default in all BBB instances if "Pre-upload presentation" is enabled.';

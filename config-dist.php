@@ -175,7 +175,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  * Moodle file repository and vinculate it to the BigBlueButtonBN room or
  * activity in one step. This file will be pulled by the BigBluebutton server
  * when the meeting session is accessed for the first time.
- * $CFG->bigbluebuttonbn['preuploadpresentation_enabled'] = 1;
+ * $CFG->bigbluebuttonbn['preuploadpresentation_editable'] = 1;
  */
 
 /*
