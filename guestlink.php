@@ -31,33 +31,33 @@ global $PAGE, $OUTPUT;
 
 $gid = required_param('gid', PARAM_ALPHANUM); // This is required.
 $guestname = optional_param('guestname', '', PARAM_TEXT);
-$guestpass = optional_param('guestpass', '', PARAM_TEXT);
+$guestlinkpass = optional_param('guestlinkpass', '', PARAM_TEXT);
 $PAGE->set_url(new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
-        ['gid' => $gid, 'guestname' => $guestname, 'guestpass' => $guestpass]));
+        ['gid' => $gid, 'guestname' => $guestname, 'guestlinkpass' => $guestlinkpass]));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 
-if (!\mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
+if (!\mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
     echo get_string('guestlink_form_guestlink_disabled', 'bigbluebuttonbn');
     die();
 }
 
 $bigbluebuttonbn = bigbluebuttonbn_get_bigbluebuttonbn_by_guestlinkid($gid);
-if (!$bigbluebuttonbn->guestlinkenabled) {
+if (!$bigbluebuttonbn->guestlink) {
     echo get_string('guestlink_form_guestlink_disabled_instance', 'bigbluebuttonbn');
     die();
 }
-$valid = ($guestname && ($bigbluebuttonbn->guestpass == $guestpass || !$bigbluebuttonbn->guestpass));
+$valid = ($guestname && ($bigbluebuttonbn->guestlinkpass == $guestlinkpass || !$bigbluebuttonbn->guestlinkpass));
 
 if (!$valid) {
-    $guestpasserrormessage = false;
+    $guestlinkpasserrormessage = false;
     $guestnameerrormessage = false;
-    if ($guestpass && $bigbluebuttonbn->guestpass != $guestpass) {
-        $guestpasserrormessage = true;
+    if ($guestlinkpass && $bigbluebuttonbn->guestlinkpass != $guestlinkpass) {
+        $guestlinkpasserrormessage = true;
     }
     $context = ['name' => $bigbluebuttonbn->name, 'gid' => $gid,
-        'guestpassenabled' => $bigbluebuttonbn->guestpass,
-        'guestpasserrormessage' => $guestpasserrormessage,
+        'guestlinkpassenabled' => $bigbluebuttonbn->guestlinkpass,
+        'guestlinkpasserrormessage' => $guestlinkpasserrormessage,
         'guestnameerrormessage' => $guestnameerrormessage,
         'guestname' => $guestname,
     ];

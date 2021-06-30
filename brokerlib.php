@@ -930,7 +930,7 @@ function bigbluebuttonbn_broker_set_guest_password($bigbluebuttonbn, $params) {
     } else {
         $password = rand(1, 999999);
     }
-    $DB->set_field('bigbluebuttonbn', 'guestpass', $password, ['id' => $bigbluebuttonbn->id]);
+    $DB->set_field('bigbluebuttonbn', 'guestlinkpass', $password, ['id' => $bigbluebuttonbn->id]);
     $callbackresponsedata = json_encode($password);
     return "{$params['callback']}({$callbackresponsedata})";
 }

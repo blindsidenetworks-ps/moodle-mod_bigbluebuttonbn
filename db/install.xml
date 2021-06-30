@@ -49,10 +49,10 @@
         <FIELD NAME="completionengagementraisehand" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if raising hand during the meeting is required to mark an activity completed for a user."/>
         <FIELD NAME="completionengagementpollvotes" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if poll voting during the meeting is required to mark an activity completed for a user."/>
         <FIELD NAME="completionengagementemojis" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if the use of emojis during the meeting is required to mark an activity completed for a user."/>
-        <FIELD NAME="guestlinkenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="guestlink" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="guestlinkid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="guestpass" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="moderatorapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="guestlinkpass" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="guestlinkmoderatorapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -15,22 +15,22 @@
     </div>
 </div>
 <form action="guestlink.php" name="guestlinkform" accept-charset="UTF-8" method="get">
-{{#guestpassenabled}}
+{{#guestlinkpassenabled}}
 <div class="row">
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
     <div class="col-lg-2 col-md-2 col-sm-2">
-    {{#guestpasserrormessage}}
+    {{#guestlinkpasserrormessage}}
         <div class="warning">
             {{# str }} guestlink_form_join_wrong_password,bigbluebuttonbn {{/ str }}
         </div>
-    {{/guestpasserrormessage}}
+    {{/guestlinkpasserrormessage}}
     </div>
     <div class="col-lg-2 col-md-2 col-sm-2">
-        <input type="text" class="form-control" name="guestpass" id="id_guestpass" value="" size="" placeholder="{{# str }} guestlink_form_guestpass_info,bigbluebuttonbn {{/ str }}" >
+        <input type="text" class="form-control" name="guestlinkpass" id="id_guestlinkpass" value="" size="" placeholder="{{# str }} guestlink_form_guestlinkpass_info,bigbluebuttonbn {{/ str }}" >
     </div>
     <div class="col-lg-5 col-md-5 col-sm-5"> </div>
 </div>
-{{/guestpassenabled}}
+{{/guestlinkpassenabled}}
 <div class="row shiftrow">
     <input type="hidden" name="gid" value="{{gid}}"/>
     <div class="col-lg-3 col-md-3 col-sm-3"> </div>
@@ -53,12 +53,12 @@
 {{#js}}
 var validateForm = function() {
     var guestname = document.forms["guestlinkform"]["guestname"].value;
-    var guestpass = document.forms["guestlinkform"]["guestpass"];
+    var guestlinkpass = document.forms["guestlinkform"]["guestlinkpass"];
     if (guestname == "") {
         alert("{{# str }} guestlink_form_noname_warning,bigbluebuttonbn {{/ str }}");
         return false;
     }
-    if(guestpass && !guestpass.value) {
+    if(guestlinkpass && !guestlinkpass.value) {
         alert("{{# str }} guestlink_form_noaccescode_warning,bigbluebuttonbn {{/ str }}");
         return false;
     }

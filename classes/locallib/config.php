@@ -72,9 +72,11 @@ class config {
             'recordingstatus_enabled' => false,
             'meetingevents_enabled' => false,
             'participant_moderator_default' => '0',
-            'participant_moderatorapproval' => '0',
-            'participant_guestlink_enabled' => '1',
-            'participant_guestlink_default' => '0',
+            'guestlink_enabled' => true,
+            'guestlink_default' => false,
+            'guestlink_editable' => true,
+            'guestlink_moderatorapproval_default' => false,
+            'guestlink_moderatorapproval_editable' => true,
             'scheduled_duration_enabled' => false,
             'scheduled_duration_compensation' => '10',
             'scheduled_pre_opening' => '10',
@@ -143,12 +145,12 @@ class config {
     }
 
     /**
-     * Validates if recording settings are enabled.
+     * Validates if guest access link settings are enabled.
      *
      * @return boolean
      */
-    public static function guestlinks_enabled() {
-        return (boolean)self::get('participant_guestlink');
+    public static function guestlink_enabled() {
+        return (boolean)self::get('guestlink_enabled');
     }
 
     /**
@@ -211,6 +213,11 @@ class config {
                'userlimit_default' => self::get('userlimit_default'),
                'userlimit_editable' => self::get('userlimit_editable'),
                'preuploadpresentation_editable' => self::get('preuploadpresentation_editable'),
+               'guestlink_enabled' => self::get('guestlink_enabled'),
+               'guestlink_default' => self::get('guestlink_default'),
+               'guestlink_editable' => self::get('guestlink_editable'),
+               'guestlink_moderatorapproval_default' => self::get('guestlink_moderatorapproval_default'),
+               'guestlink_moderatorapproval_editable' => self::get('guestlink_moderatorapproval_editable'),
                'sendnotifications_enabled' => self::get('sendnotifications_enabled'),
                'recordings_enabled' => self::get('recordings_enabled'),
                'meetingevents_enabled' => self::get('meetingevents_enabled'),

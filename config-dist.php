@@ -214,7 +214,36 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 1.9. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
+ * 1.9. CONFIGURATION FOR "GUEST ACCESS LINK" FEATURE
+ *
+ **/
+/* When the value is set to 0 (unchecked) the all the settings for the guest access link feature
+ *  are ignored. The guest access link feature is enabled by default.
+ *  $CFG->bigbluebuttonbn['guestlink_enabled'] = 1;
+ */
+
+/* When the value is set to 1 (checked) the bigbluebuttonbn activities
+ *  will have the guest access link feature enabled by default.
+ *  $CFG->bigbluebuttonbn['guestlink_default'] = 0;
+ */
+
+/* When the value is set to 1 (checked) the guest access link feature can be
+ *  enabled/disabled by the user creating or editing the room or activity.
+ *  $CFG->bigbluebuttonbn['guestlink_editable'] = 1;
+ */
+
+/* When the value is set to 1 (checked) the aspect that moderators must approve guests
+ *  of the guest access link feature will be enabled by default.
+ *  $CFG->bigbluebuttonbn['guestlink_moderatorapproval_default'] = 0;
+ */
+
+/* When the value is set to 1 (checked) the aspect that moderators must approve guests can be
+ *  enabled/disabled by the user creating or editing the room or activity.
+ *  $CFG->bigbluebuttonbn['guestlink_moderatorapproval_editable'] = 1;
+ */
+
+/*
+ * 1.10. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
  *
  **/
 /*
@@ -225,7 +254,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 1.10. GENERAL CONFIGURATION FOR RECORDINGS UI
+ * 1.11. GENERAL CONFIGURATION FOR RECORDINGS UI
  *
  **/
 /*
@@ -282,7 +311,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
   */
 
 /*
- * 1.11. GENERAL CONFIGURATION FOR CLIENT TYPE SELECTION
+ * 1.12. GENERAL CONFIGURATION FOR CLIENT TYPE SELECTION
  *
  **/
 
@@ -306,7 +335,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 1.12. CONFIGURATION FOR "MUTE ON START" FEATURE
+ * 1.13. CONFIGURATION FOR "MUTE ON START" FEATURE
  *
  * This feature makes the rooms muted on start. When the users joins to the session,
  * they will be muted.
@@ -328,7 +357,7 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  */
 
 /*
- * 1.12. CONFIGURATION FOR LOCKING SETTINGS
+ * 1.14. CONFIGURATION FOR LOCKING SETTINGS
  *
  * These features are locking API options added in BBB v2.2. When the session is created,
  * it will be created with these parameters.

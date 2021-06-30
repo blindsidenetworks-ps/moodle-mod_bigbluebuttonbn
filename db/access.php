@@ -96,7 +96,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         ),
     ),
-    // Ability to change the guestlink password.
+    // Ability to change the guest access link password.
     'mod/bigbluebuttonbn:guestlink_change_password' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -106,7 +106,7 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities',
     ),
-    // Ability to create and view guestlinks.
+    // Ability to create and view guest access links.
     'mod/bigbluebuttonbn:guestlink_view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

@@ -2524,7 +2524,7 @@ function bigbluebuttonbn_get_enabled_features($typeprofiles, $type = null) {
         $features = $typeprofiles[$type]['features'];
     }
     $enabledfeatures['showroom'] = (in_array('all', $features) || in_array('showroom', $features));
-    if (\mod_bigbluebuttonbn\locallib\config::guestlinks_enabled()) {
+    if (\mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
         $enabledfeatures['viewguestlink'] = (in_array('all', $features) || in_array('viewguestlink', $features));
         $enabledfeatures['changeguestlinkpass'] = (in_array('all', $features) || in_array('changeguestlinkpass', $features));
     }
@@ -2975,10 +2975,6 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
     // Configuration for defining the default role/user that will be moderator on new activities.
     if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_moderator_default_shown()) {
         $renderer->render_group_header('participant');
-        $renderer->render_group_element(
-            'participant_guestlink',
-            $renderer->render_group_element_checkbox('participant_guestlink', 0)
-        );
         // UI for 'participants' feature.
         $roles = bigbluebuttonbn_get_roles(null, false);
         $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
@@ -2989,6 +2985,36 @@ function bigbluebuttonbn_settings_participants(&$renderer) {
                 array_keys($owner),
                 $owner + $roles // CONTRIB-7966: don't use array_merge here so it does not reindex the array.
             )
+        );
+    }
+}
+
+/**
+ * Helper function renders guest access link settings if the feature is enabled.
+ *
+ * @param object $renderer
+ *
+ * @return void
+ */
+function bigbluebuttonbn_settings_guestlink(&$renderer) {
+    // Configuration for "guest access link" feature.
+    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_guestlink_shown()) {
+        $renderer->render_group_header('guestlink');
+        $renderer->render_group_element(
+                'guestlink_default',
+                $renderer->render_group_element_checkbox('guestlink_default', 0)
+        );
+        $renderer->render_group_element(
+                'guestlink_editable',
+                $renderer->render_group_element_checkbox('guestlink_editable', 1)
+        );
+        $renderer->render_group_element(
+                'guestlink_moderatorapproval_default',
+                $renderer->render_group_element_checkbox('guestlink_moderatorapproval_default', 0)
+        );
+        $renderer->render_group_element(
+                'guestlink_moderatorapproval_editable',
+                $renderer->render_group_element_checkbox('guestlink_moderatorapproval_editable', 1)
         );
     }
 }

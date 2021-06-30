@@ -160,6 +160,19 @@ class validator {
     }
 
     /**
+     * Validate if guest access link section will be shown.
+     *
+     * @return boolean
+     */
+    public static function section_guestlink_shown() {
+        global $CFG;
+        return (!isset($CFG->bigbluebuttonbn['guestlink_default']) ||
+                !isset($CFG->bigbluebuttonbn['guestlink_editable']) ||
+                !isset($CFG->bigbluebuttonbn['guestlink_moderatorapproval_default']) ||
+                !isset($CFG->bigbluebuttonbn['guestlink_moderatorapproval_editable']));
+    }
+
+    /**
      * Validate if send notification section will be shown.
      *
      * @return boolean

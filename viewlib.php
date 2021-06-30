@@ -216,7 +216,7 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
             userdate($bbbsession['closingtime']);
     }
     $guestlink = [];
-    if ($bbbsession['bigbluebuttonbn']->guestlinkenabled && \mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
+    if ($bbbsession['bigbluebuttonbn']->guestlink && \mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
         $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bbbsession['bigbluebuttonbn']->id);
         $context = context_module::instance($cm->id);
         if (has_capability('mod/bigbluebuttonbn:guestlink_view', $context)) {
@@ -224,8 +224,8 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
             $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
                 ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
             $guestlink['url'] = $guestlinkurl->__toString();
-            if ($bbbsession['bigbluebuttonbn']->guestpass) {
-                $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestpass;
+            if ($bbbsession['bigbluebuttonbn']->guestlinkpass) {
+                $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestlinkpass;
             } else {
                 $guestlink['nopassword'] = true;
             }

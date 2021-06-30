@@ -185,8 +185,17 @@ $string['config_presentation_default_description'] = 'This setting allow to sele
 
 $string['config_participant'] = 'Participant configuration';
 $string['config_participant_description'] = 'These settings define the role by default for participants in a conference.';
-$string['config_participant_guestlink'] = 'Allow guest access links';
-$string['config_participant_guestlink_description'] = 'Allow moderator to create a guest access link for external participants.';
+
+$string['config_guestlink'] = 'Configuration for "Guest access link" feature';
+$string['config_guestlink_description'] = 'These settings enable or disable options in the UI and also define default values for these options.';
+$string['config_guestlink_default'] = 'Guest access link enabled by default';
+$string['config_guestlink_default_description'] = 'Guest access link feature is enabled by default when a new room or conference is added.';
+$string['config_guestlink_editable'] = 'Guest access link feature can be edited';
+$string['config_guestlink_editable_description'] = 'Guest access link feature by default can be edited when the room or conference is added or updated.';
+$string['config_guestlink_moderatorapproval_default'] = 'Moderator must approve guests enabled by default';
+$string['config_guestlink_moderatorapproval_default_description'] = 'Moderator must approve guests feature is enabled by default when a new room or conference is added.';
+$string['config_guestlink_moderatorapproval_editable'] = 'Moderator must approve guests feature can be edited';
+$string['config_guestlink_moderatorapproval_editable_description'] = 'Moderator must approve guests feature by default can be edited when the room or conference is added or updated.';
 
 $string['config_participant_moderator_default'] = 'Moderator by default';
 $string['config_participant_moderator_default_description'] = 'This rule is used by default when a new room is added.';
@@ -310,7 +319,7 @@ $string['index_heading'] = 'BigBlueButton Rooms';
 $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'View for recording';
-$string['mod_form_block_guestlink'] = 'External guest link';
+$string['mod_form_block_guestlink'] = 'Guest access link';
 $string['mod_form_block_presentation'] = 'Presentation content';
 $string['mod_form_block_presentation_default'] = 'Presentation default content';
 $string['mod_form_block_participants'] = 'Role assigned during live session';
@@ -350,7 +359,8 @@ $string['mod_form_field_participant_bbb_role_moderator'] = 'Moderator';
 $string['mod_form_field_participant_bbb_role_viewer'] = 'Viewer';
 $string['mod_form_field_instanceprofiles'] = 'Instance type';
 $string['mod_form_field_instanceprofiles_help'] = 'Select the type for this BigBlueButton instance.';
-$string['mod_form_field_moderatorapproval'] = 'Moderator must approve guests';
+$string['mod_form_field_guestlink'] = 'Create guest access link for external guests';
+$string['mod_form_field_guestlinkmoderatorapproval'] = 'Moderator must approve guests';
 $string['mod_form_field_muteonstart'] = 'Mute on start';
 $string['mod_form_field_notification'] = 'Notify this change to users enrolled';
 $string['mod_form_field_notification_help'] = 'Send a notification to all users enrolled to let them know that this activity has been added or updated';
@@ -377,10 +387,7 @@ $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
 
-
-$string['mod_form_field_guestlinkenabled'] = 'Create guest access link for external participants.';
-
-$string['guestlink_form_guestpass_info'] = 'Enter the room\'s access code';
+$string['guestlink_form_guestlinkpass_info'] = 'Enter the room\'s access code';
 $string['guestlink_form_guestname_info'] = 'Enter your name!';
 $string['guestlink_form_join_button'] = 'Start';
 $string['guestlink_form_join_welcome'] = 'You have been invited to join!';

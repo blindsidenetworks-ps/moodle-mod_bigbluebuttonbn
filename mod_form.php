@@ -94,7 +94,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_block_room($mform, $cfg);
         // Add block 'Lock'.
         $this->bigbluebuttonbn_mform_add_block_locksettings($mform, $cfg);
-        // Add block 'Guestlink'.
+        // Add block 'Guest access link'.
         $this->bigbluebuttonbn_mform_add_block_guestlink($mform, $cfg);
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
@@ -383,22 +383,44 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $field['description_key'], $cfg['muteonstart_default']);
 
     }
+
     /**
-     * Function for showing details of the guestlink settings for external users.
+     * Function for showing details of the guest access link settings for the room.
      *
      * @param object $mform
      * @param array $cfg
      * @return void
      */
     private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg) {
-        if (\mod_bigbluebuttonbn\locallib\config::get('participant_guestlink')) {
-                $mform->addElement('header', 'guestlink', get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
-                $mform->addElement('advcheckbox', 'guestlinkenabled',
-                        get_string('mod_form_field_guestlinkenabled', 'bigbluebuttonbn'), ' ');
-                $mform->addElement('advcheckbox', 'moderatorapproval',
-                        get_string('mod_form_field_moderatorapproval', 'bigbluebuttonbn'), ' ');
+        if ((boolean)\mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
+            if ($cfg['guestlink_editable'] || $cfg['guestlink_moderatorapproval_editable']) {
+                $mform->addElement('header', 'guestlinkheader',
+                        get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
+
+                $field = ['type' => 'hidden', 'name' => 'guestlink', 'data_type' => PARAM_INT,
+                        'description_key' => null];
+                if ($cfg['guestlink_editable']) {
+                    $field['type'] = 'checkbox';
+                    $field['description_key'] = 'mod_form_field_guestlink';
+                }
+                $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                    $field['description_key'], $cfg['guestlink_default']);
+
+                $field = ['type' => 'hidden', 'name' => 'guestlinkmoderatorapproval', 'data_type' => PARAM_INT,
+                        'description_key' => null];
+                if ($cfg['guestlink_moderatorapproval_editable']) {
+                    $field['type'] = 'checkbox';
+                    $field['description_key'] = 'mod_form_field_guestlinkmoderatorapproval';
+                }
+                $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                    $field['description_key'], $cfg['guestlink_moderatorapproval_default']);
+                if ($cfg['guestlink_moderatorapproval_editable'] && $cfg['guestlink_editable']) {
+                    $mform->hideIf('guestlinkmoderatorapproval', 'guestlink', 'notchecked');
+                }
+            }
         }
     }
+
     /**
      * Function for showing details of the lock settings for the room.
      *

@@ -52,6 +52,12 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_userlimit($renderer);
     bigbluebuttonbn_settings_duration($renderer);
     bigbluebuttonbn_settings_participants($renderer);
+    // Evaluates if guest access links are enabled for the Moodle site.
+    if (\mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
+        // Renders settings for guest access link feature.
+        bigbluebuttonbn_settings_guestlink($renderer);
+    }
+    // Continue to render settings for meetings.
     bigbluebuttonbn_settings_notifications($renderer);
     bigbluebuttonbn_settings_clienttype($renderer);
     bigbluebuttonbn_settings_muteonstart($renderer);

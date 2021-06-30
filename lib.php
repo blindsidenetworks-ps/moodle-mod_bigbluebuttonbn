@@ -772,6 +772,12 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->recordings_validate_url)) {
         $bigbluebuttonbn->recordings_validate_url = 1;
     }
+    if (!isset($bigbluebuttonbn->guestlink)) {
+        $bigbluebuttonbn->guestlink = 0;
+    }
+    if (!isset($bigbluebuttonbn->guestlink_moderatorapproval)) {
+        $bigbluebuttonbn->guestlink_moderatorapproval = 0;
+    }
 }
 
 /**
