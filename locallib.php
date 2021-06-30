@@ -3273,6 +3273,10 @@ function bigbluebuttonbn_settings_default_messages(&$renderer) {
         'welcome_default',
         $renderer->render_group_element_textarea('welcome_default', '', PARAM_RAW)
     );
+    $renderer->render_group_element(
+        'welcome_editable',
+        $renderer->render_group_element_checkbox('welcome_editable', 1)
+    );
 }
 
 /**

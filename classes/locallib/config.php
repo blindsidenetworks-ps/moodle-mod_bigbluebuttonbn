@@ -247,6 +247,7 @@ class config {
                'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
+               'welcome_editable' => self::get('welcome_editable'),
           );
     }
 }
