@@ -133,4 +133,4 @@ $curl->setopt([
     },
 ]);
 
-$curl->get(\mod_bigbluebuttonbn\locallib\bigbluebutton::root() . $relativepath);
+$curl->get(\mod_bigbluebuttonbn\locallib\bigbluebutton::root() . ltrim($relativepath, '/'));
