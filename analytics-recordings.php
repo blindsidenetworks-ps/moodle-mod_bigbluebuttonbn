@@ -87,7 +87,7 @@ if (!empty($bn) && !empty($bigbluebuttonbn->id)) {
     $wheresql .= " AND bigbluebuttonbnid = :bigbluebuttonbnid";
     $params['bigbluebuttonbnid'] = $bigbluebuttonbn->id;
 }
-$table->set_sql('id, meta, userid', "{bigbluebuttonbn_logs}", $wheresql, $params);
+$table->set_sql('id, meta, userid, timecreated', "{bigbluebuttonbn_logs}", $wheresql, $params);
 $table->define_baseurl($pageurl);
 
 // Add cloned table modifying the query for Past Month instead.
