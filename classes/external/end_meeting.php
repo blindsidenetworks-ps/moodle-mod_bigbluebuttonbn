@@ -25,6 +25,7 @@
 
 namespace mod_bigbluebuttonbn\external;
 
+use core\notification;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -94,15 +95,21 @@ class end_meeting extends external_api {
         if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
             throw new restricted_context_exception();
         }
+
         // Execute the end command.
         meeting::bigbluebuttonbn_end_meeting($meetingid, $bbbsession['modPW']);
+
         // Moodle event logger: Create an event for meeting ended.
         if (isset($bbbsession['bigbluebuttonbn'])) {
             \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(events::$events['meeting_end'],
                 $bbbsession['bigbluebuttonbn']);
         }
+
         // Update the cache.
         meeting::bigbluebuttonbn_get_meeting_info($meetingid, bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE);
+
+        notification::add(get_string('end_session_notification', 'mod_bigbluebuttonbn'), notification::INFO);
+
         return [];
     }
 

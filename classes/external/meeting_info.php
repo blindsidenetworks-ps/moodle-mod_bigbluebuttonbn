@@ -49,8 +49,9 @@ use restricted_context_exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class meeting_info extends external_api {
+
     /**
-     * Returns description of method parameters
+     * Returns description of method parameters.
      *
      * @return external_function_parameters
      */
@@ -63,18 +64,12 @@ class meeting_info extends external_api {
     }
 
     /**
-     * Updates a recording
+     * Fetch meeting information.
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param string $meetingid
      * @param bool $updatecache
-     * @return array (empty array for now)
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws moodle_exception
-     * @throws restricted_context_exception
+     * @return array
      */
     public static function execute(
         int $bigbluebuttonbnid,
@@ -91,11 +86,13 @@ class meeting_info extends external_api {
             'meetingid' => $meetingid,
             'updatecache' => $updatecache,
         ]);
+
         // Fetch the session, features, and profile.
         [
             'bbbsession' => $bbbsession,
             'context' => $context,
         ] = instance::get_session_from_id($bigbluebuttonbnid);
+
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
         return static::get_meeting_info($bbbsession, $updatecache, $meetingid);
@@ -104,16 +101,22 @@ class meeting_info extends external_api {
     /**
      * Get meeting information
      *
+     * TODO: Move this to \mod_bigbluebuttonbn\meetinginfo as a class.
+     * Note: Andrew has a work-in-progress commit for this.
+     *
      * @param array $bbbsession
      * @param bool $updatecache
      * @param null $meetingidoverride override for the meeting id
      * @return array
      * @throws \coding_exception
      */
-    public static function get_meeting_info($bbbsession,
+    public static function get_meeting_info(
+        $bbbsession,
         bool $updatecache = false,
-        $meetingidoverride = null) {
+        $meetingidoverride = null
+    ) {
         global $USER;
+
         $bbbinfo = new \stdClass();
         if ($bbbsession['openingtime']) {
             $bbbinfo->openingtime = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' .
@@ -164,16 +167,15 @@ class meeting_info extends external_api {
         $bbbinfo->bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         $bbbinfo->cmid = $bbbsession['cm']->id;
         $bbbinfo->userlimit = $bbbsession['userlimit'];
-        $presentation = [];
+        $bbbinfo->presentations = [];
         if (!empty($bbbsession['presentation']) && !empty($bbbsession['presentation']['url'])) {
-            $presentation = [
+            $bbbinfo->presentations[] = [
                 'url' => $bbbsession['presentation']['url'],
                 'iconname' => $bbbsession['presentation']['icon'],
                 'icondesc' => $bbbsession['presentation']['mimetype_description'],
                 'name' => $bbbsession['presentation']['name'],
             ];
         }
-        $bbbinfo->presentation = $presentation;
         if (!empty($bbbsession['group'])) {
             $bbbinfo->group = $bbbsession['group'];
         }
@@ -207,20 +209,15 @@ class meeting_info extends external_api {
                 'participantplural' => new external_value(PARAM_BOOL, 'Several participants ?', VALUE_OPTIONAL),
                 'canjoin' => new external_value(PARAM_BOOL, 'Can join'),
                 'ismoderator' => new external_value(PARAM_BOOL, 'Is moderator'),
-                'presentation' => new \external_multiple_structure(
-                    new external_single_structure(
-                        [
-                            'url' => new external_value(PARAM_URL, 'presentation URL'),
-                            'iconname' => new external_value(PARAM_RAW, 'icon name'),
-                            'icondesc' => new external_value(PARAM_TEXT, 'icon text'),
-                            'name' => new external_value(PARAM_TEXT, 'presentation name'),
-                        ]),
-                    'Presentation',
-                    VALUE_OPTIONAL
+                'presentations' => new \external_multiple_structure(
+                    new external_single_structure([
+                        'url' => new external_value(PARAM_URL, 'presentation URL'),
+                        'iconname' => new external_value(PARAM_RAW, 'icon name'),
+                        'icondesc' => new external_value(PARAM_TEXT, 'icon text'),
+                        'name' => new external_value(PARAM_TEXT, 'presentation name'),
+                    ]), 'Presentation', VALUE_OPTIONAL
                 ),
             ]
         );
     }
 }
-
-

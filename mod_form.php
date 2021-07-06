@@ -63,8 +63,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\local\config::get_options();
 
-        $jsvars = array();
-
         // Get only those that are allowed.
         // TODO: check as here it seems more logical to get this through: $this->_course.
         $course = get_course($this->current->course);
@@ -90,16 +88,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
-        // JavaScript for locales.
-        $PAGE->requires->strings_for_js(array_keys(view::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-        $jsvars['instanceTypeDefault'] = array_keys($instancetyperofiles)[0];
+
+        $jsvars = [
+            'instanceTypeDefault' => array_keys($instancetyperofiles)[0],
+        ];;
+
         // Now add the instance type profiles to the form as a html hidden field.
         $mform->addElement('html', html_writer::div('', 'd-none', [
             'data-profile-types' => json_encode($instancetyperofiles),
             'data-participant-data' => json_encode(roles::bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn)),
         ]));
-        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/modform',
-            'init', array($jsvars));
+
+        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/modform', 'init', [$jsvars]);
     }
 
     /**
