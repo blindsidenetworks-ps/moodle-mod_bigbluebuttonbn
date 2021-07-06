@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,20 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Internal library of functions for module BigBlueButtonBN.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- */
+import './actions';
+import {eventTypes} from './events';
 
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\plugin;
-
-defined('MOODLE_INTERNAL') || die;
-
-global $CFG;
+export const init = () => {
+    document.addEventListener(eventTypes.sessionEnded, () => {
+        window.location.reload();
+    });
+};
