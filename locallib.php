@@ -2093,7 +2093,9 @@ function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
  * @return void
  */
 function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
-    \mod_bigbluebuttonbn\locallib\notifier::notify_recording_ready($bigbluebuttonbn);
+    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recordingready_enabled')) {
+        \mod_bigbluebuttonbn\locallib\notifier::notify_recording_ready($bigbluebuttonbn);
+    }
 }
 
 /**
