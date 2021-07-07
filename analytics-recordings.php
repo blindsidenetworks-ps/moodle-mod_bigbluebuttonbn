@@ -104,12 +104,16 @@ $pastmonthmeetingcreateevents = $pastmonthtable->rawdata;
 
 $output = "";
 
-// Prepare attendee data for Attention Box.
+// Prepare data for main recording analytics table.
+$tablepagesize = $table->pagesize;
 $table->setup();
 $table->query_db(0); // No limit, fetch all rows.
-$table->pageable(false);
 $table->close_recordset();
+$table->pageable(true);
 $meetingcreateevents = $table->rawdata;
+
+$table->query_db($tablepagesize); // No limit, fetch all rows.
+$table->close_recordset();
 
 if (isset($meetingsummary->meta)) {
     $meetingsummary->meta = json_decode($meetingsummary->meta);

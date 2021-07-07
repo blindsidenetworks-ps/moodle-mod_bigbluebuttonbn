@@ -126,4 +126,13 @@ class analytics_per_session_table extends \table_sql {
         return $data->engagement->raisehand;
     }
 
+    /**
+     * Returns the default sort columns defined, without any filtering done by tablelib internally.
+     *
+     * @return array column name => SORT_... constant.
+     */
+    public function get_sort_columns() {
+        return [$this->sort_default_column => $this->sort_default_order];
+    }
+
 }

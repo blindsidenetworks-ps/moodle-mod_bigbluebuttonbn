@@ -1557,7 +1557,26 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
  * @return string
  */
 function bigbluebuttonbn_get_recording_data_row_analytics($bbbsession, $recording) {
-    global $OUTPUT;
+    global $OUTPUT, $DB;
+
+    // Check if the analytics exist for this row, otherwise don't return a link.
+    $sql = "SELECT id
+              FROM {bigbluebuttonbn_logs}
+             WHERE bigbluebuttonbnid = :bigbluebuttonbnid
+                   AND meta IS NOT NULL
+                   AND log = :log
+                   AND userid IS NOT NULL";
+    $params = [
+        'log' => BIGBLUEBUTTON_LOG_EVENT_SUMMARY,
+        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id
+    ];
+    $exists = $DB->record_exists_sql($sql, $params);
+
+    if (!$exists) {
+        return null;
+    }
+
+    // Analytics exist so build and return the link.
     $url = new moodle_url('/mod/bigbluebuttonbn/analytics.php', [
         'id' => $recording['recordID'],
         'bn' => $bbbsession['bigbluebuttonbn']->id
@@ -1978,6 +1997,7 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     }
     $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
     if ($bbbsession['meetinganalytics']) {
+        $analyticscolumnindex = count($table->head);
         $table->head[] = get_string('view_recording_analytics', 'bigbluebuttonbn');
     }
     $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
@@ -2027,6 +2047,35 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
             }
         }
     }
+
+    // Check if analytics column is required at all, by checking if there are any entries that have analytics.
+    if (!empty($analyticscolumnindex)) {
+
+        // If none of the displayed rows have analytics available, then don't even display the column.
+        $analyticsexists = false;
+        foreach ($table->data as $row) {
+            if (!empty($row->cells[$analyticscolumnindex])) {
+                $analyticsexists = true;
+                break;
+            }
+        }
+
+        // If no analytics are available, remove the analytics column.
+        if (!$analyticsexists) {
+            // Remove the header.
+            unset($table->head[$analyticscolumnindex]);
+            $table->head = array_values($table->head);
+
+            // Remove the relevant cells.
+            foreach ($table->data as &$row) {
+                unset($row->cells[$analyticscolumnindex]);
+                $row->cells = array_values($row->cells);
+            }
+
+        }
+
+    }
+
     return $table;
 }
 
@@ -2061,7 +2110,7 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
     }
     $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
     if ($bbbsession['meetinganalytics']) {
-        $row->cells[] = $texthead . $rowdata->analytics . $texttail;
+        $row->cells[] = $rowdata->analytics;
     }
     $row->cells[] = $rowdata->duration_formatted;
     if ($bbbsession['managerecordings']) {
