@@ -156,4 +156,14 @@ class analytics_for_recordings_table extends \table_sql {
         return '-';
     }
 
+    /**
+     * Returns the default sort columns defined, without any filtering done by tablelib internally.
+     *
+     * @return array column name => SORT_... constant.
+     */
+    public function get_sort_columns() {
+        return [$this->sort_default_column => $this->sort_default_order];
+    }
+
 }
+

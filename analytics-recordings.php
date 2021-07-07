@@ -104,7 +104,7 @@ $pastmonthmeetingcreateevents = $pastmonthtable->rawdata;
 
 $output = "";
 
-// Prepare attendee data for Attention Box.
+// Prepare data for main recording analytics table.
 $table->setup();
 $table->query_db(0); // No limit, fetch all rows.
 $table->pageable(false);
