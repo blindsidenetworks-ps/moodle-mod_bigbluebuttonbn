@@ -211,7 +211,7 @@ class bigbluebutton {
             $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
         }
         $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
-        if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
+        if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '' || !config::get('welcome_editable')) {
             // CONTRIB-8573: default to the config and if empty, then the default string.
             $bbbsession['welcome'] = config::get('welcome_default');
             if (!$bbbsession['welcome']) {
