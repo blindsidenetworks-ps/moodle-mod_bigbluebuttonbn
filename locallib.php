@@ -3717,7 +3717,7 @@ function bigbluebuttonbn_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0
         header('Location: '.$bbbsession['logoutURL']);
         return;
     }
-    // Mark guests (from external guestlink)
+    // Mark guests (who join from a guest access link).
     $guest = false;
     if (isset($bbbsession['guest']) && $bbbsession['guest'] == true) {
         $guest = true;
@@ -3727,6 +3727,7 @@ function bigbluebuttonbn_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0
     if ($bbbsession['administrator'] || $bbbsession['moderator']) {
         $password = $bbbsession['modPW'];
     }
+    $bbbsession['createtime'] = $meetinginfo['createTime'];
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'], null, $guest);
     // Moodle event logger: Create an event for meeting joined.
