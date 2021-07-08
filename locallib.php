@@ -3744,7 +3744,7 @@ function bigbluebuttonbn_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0
 }
 
 /**
- * Helperfunction for getting the bigbluebutton instance with guestlink id
+ * Helperfunction for getting the bigbluebuttonbn instance with a given guest link id.
  *
  * @param string $guestlinkid
  * @return mixed|stdClass|false
