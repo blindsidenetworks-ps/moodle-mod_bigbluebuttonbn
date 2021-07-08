@@ -2171,6 +2171,9 @@ function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatur
 
     }
 
+    // Sort the recordings by time, reversed (so this displays the more recent recordings at the top)
+    krsort($recordings);
+
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
