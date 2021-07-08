@@ -46,6 +46,9 @@ M.mod_bigbluebuttonbn.rooms = {
         if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
             this.bigbluebuttonbn.profile_features.indexOf('showroom') != -1) {
             this.initRoom();
+        }
+        if (this.bigbluebuttonbn.profile_features.indexOf('all') != -1 ||
+            this.bigbluebuttonbn.profile_features.indexOf('guestlink') != -1) {
             this.initGuestLink();
         }
         this.initCompletionValidate();

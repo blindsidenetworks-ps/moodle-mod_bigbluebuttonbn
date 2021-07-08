@@ -81,6 +81,9 @@ M.mod_bigbluebuttonbn.modform = {
         // Restrict access validation.
         this.showFieldset('id_availabilityconditionsheader', showAll ||
                           this.isFeatureEnabled(profileType, 'availabilityconditionsheader'));
+        // Guest access link validation.
+        this.showFieldset('id_guestlinkheader', showAll ||
+            this.isFeatureEnabled(profileType, 'guestlink'));
         // Tags validation.
         this.showFieldset('id_tagshdr', showAll || this.isFeatureEnabled(profileType, 'tagshdr'));
         // Competencies validation.
