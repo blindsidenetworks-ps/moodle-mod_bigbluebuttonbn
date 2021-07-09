@@ -50,15 +50,23 @@ if (!$instance) {
 
 $cm = $instance->get_cm();
 $course = $instance->get_course();
-$bigbluebuttonbn = $instance->get_bigbluebuttonbn();
+$bigbluebuttonbn = $instance->get_instance_data();
 
 require_login($course, true, $cm);
 
+$groupid = groups_get_activity_group($cm, true) ?: null;
+if ($groupid) {
+    $instance->set_group_id($groupid);
+}
+
 // In locallib.
+// TODO Move to \mod_bigbluebuttonbn\log::log_event().
 logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
+//END TODO
 
 // Additional info related to the course.
-$bbbsession = $instance->get_legacy_session_object($USER);
+// TODO Drop the need for the bbbsession.
+$bbbsession = $instance->get_legacy_session_object();
 
 // Validates if the BigBlueButton server is working.
 $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();  // In locallib.
@@ -82,13 +90,15 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Print the page header.
-$PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
-$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_url($instance->get_view_url());
+$PAGE->set_title($cm->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
 // Validate if the user is in a role allowed to join.
-if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $PAGE->context)) {
+if (!$instance->can_join()) {
+    // TODO Consider using \core\notification::add('message', \core\notification::ERROR);
+    // Combined with a redirect() to the course homepage.
     echo $OUTPUT->header();
     echo $OUTPUT->confirm(
         sprintf(
@@ -106,16 +116,27 @@ if (!has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], 
 // Output starts.
 echo $OUTPUT->header();
 
+// TODO Update both of these to:
+// a) be a renderable and called through the renderer, and
+// b) take the $instance.
+// i.e.
+// $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
+// echo $renderer->render(new \mod_bigbluebuttonbn\output\group_selector($instance));
+// echo $renderer->render(new \mod_bigbluebuttonbn\output\view_page($instance));
+//
+// Note: You may also wish to move the group selector into the view_page.
 view::view_groups($bbbsession);
-
 view::view_render($bbbsession);
+// End TODO
 
 // Output finishes.
 echo $OUTPUT->footer();
 
 // Shows version as a comment.
-echo '<!-- ' . $bbbsession['originTag'] . ' -->' . "\n";
+echo '<!-- ' . $instance->get_origin_data()->originTag . ' -->' . "\n";
 
 // Initialize session variable used across views.
 // TODO: Get rid of this ASAP !
+// Before this can happen, all places which only retrieve it from the SESSION need to modify the page URL to specify the
+// instanceid.
 $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
