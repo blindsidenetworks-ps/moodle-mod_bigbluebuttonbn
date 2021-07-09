@@ -27,7 +27,7 @@ namespace mod_bigbluebuttonbn\output;
 
 use core\output\inplace_editable;
 use lang_string;
-use mod_bigbluebuttonbn\local\helpers\instance;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use moodle_exception;
 
@@ -42,41 +42,53 @@ use moodle_exception;
  * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
 abstract class recording_editable extends \core\output\inplace_editable {
+
+    /** @var instance The bbb instance */
+    protected $instance;
+
     /**
      * Constructor.
      *
      * @param array $recording
-     * @param array $bbbsession
-     * @throws \moodle_exception
+     * @param instance $instance
      */
-    public function __construct($recording, $bbbsession) {
-        $editable = static::check_capability($bbbsession);
-        $displayvalue =
-            format_string($this->get_recording_value($recording, $bbbsession)
-                , true, array('context' => \context_module::instance($bbbsession['cm']->id)));
+    public function __construct($recording, instance $instance) {
+        $this->instance = $instance;
+
+        $editable = $this->check_capability();
+        $displayvalue = format_string(
+            $this->get_recording_value($recording),
+            true,
+            [
+                'context' => $instance->get_context(),
+            ]
+        );
 
         // Hack here: the ID is the recordID and the meeting ID.
-        parent::__construct('mod_bigbluebuttonbn', static::get_type(),
-            $recording['recordID'] . ',' . $recording['meetingID'], $editable,
-            $displayvalue, $displayvalue);
+        parent::__construct(
+            'mod_bigbluebuttonbn',
+            static::get_type(),
+            $recording['recordID'] . ',' . $recording['meetingID'],
+            $editable,
+            $displayvalue,
+            $displayvalue
+        );
     }
 
     /**
-     * Check user can access and or modify this item
+     * Check user can access and or modify this item.
      *
-     * @param array $bbbsession
      * @return bool
      * @throws \moodle_exception
      */
-    protected static function check_capability($bbbsession) {
+    protected function check_capability() {
         global $USER;
-        if (!can_access_course($bbbsession['course'], $USER)) {
+
+        if (!can_access_course($this->instance->get_course(), $USER)) {
             throw new moodle_exception('noaccess', 'mod_bigbluebuttonbn');
         }
-        if (!$bbbsession['managerecordings']) {
-            return false;
-        }
-        return true;
+
+        return $this->instance->can_manage_recordings();
     }
 
     /**
@@ -90,10 +102,9 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * Get the real recording value
      *
      * @param array $recording
-     * @param array $bbbsession
      * @return mixed
      */
-    abstract public function get_recording_value($recording, $bbbsession);
+    abstract public function get_recording_value($recording);
 
     /**
      * Get all necessary info from itemid
@@ -164,20 +175,16 @@ abstract class recording_editable extends \core\output\inplace_editable {
      */
     public static function update($itemid, $value) {
         list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context,
-            'enabledfeatures' => $enabledfeatures,
-            'typeprofiles' => $typeprofiles,
-        ] = instance::get_session_from_id($bbbid);
-        require_login($bbbsession['course']);
+        $instance = instance::get_from_instanceid($bbbid);
+
+        require_login($instance->get_course());
         $recording = static::get_recording($itemid);
 
         $success = static::edit_recording($recording, static::get_type(), $value);
         // Refresh recording.
         // TODO: we need to reduce the number of calls to the server.
         $recording = static::get_recording($itemid);
-        return new static($recording, $bbbsession);
+        return new static($recording, $instance);
     }
 
     /**

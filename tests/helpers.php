@@ -54,7 +54,6 @@ class bbb_simple_test extends advanced_testcase {
      * @param array $params Array of parameters to pass to the generator
      * @param array $options Array of options to pass to the generator
      * @return array($context, $cm, $instance) Testable wrapper around the assign class.
-     * @throws moodle_exception
      */
     protected function create_instance($course = null, $params = [], $options = []) {
         if (!$course) {
@@ -75,7 +74,6 @@ class bbb_simple_test extends advanced_testcase {
      * @param object $bbactivity the current bigbluebutton activity
      * @param object|null $course the course or null (taken from $this->course if null)
      * @return mixed
-     * @throws coding_exception
      */
     protected function get_form_data_from_instance($bbactivity, $course = null) {
         global $USER;
@@ -93,7 +91,6 @@ class bbb_simple_test extends advanced_testcase {
     /**
      * Clean the temporary mocked up recordings
      *
-     * @throws coding_exception
      */
     public function tearDown(): void {
         parent::tearDown();
@@ -121,9 +118,6 @@ class bbb_simple_test extends advanced_testcase {
      * @param int $numteachers
      * @param int $groupsnum
      * @return array
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     protected function setup_course_students_teachers($courserecord, $numstudents, $numteachers, $groupsnum) {
         global $DB;

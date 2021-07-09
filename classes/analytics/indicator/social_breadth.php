@@ -25,6 +25,8 @@
 
 namespace mod_bigbluebuttonbn\analytics\indicator;
 
+use cm_info;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -63,7 +65,7 @@ class social_breadth extends activity_base {
      *
      * @return integer
      */
-    public function get_social_breadth_level(\cm_info $cm) {
+    public function get_social_breadth_level(cm_info $cm) {
         return self::SOCIAL_LEVEL_1;
     }
 }

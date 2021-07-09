@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer.
+ * Renderer for the mod_bigbluebuttonbn plugin.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -25,19 +25,12 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use html_writer;
+use core\notification;
 use html_table;
+use html_writer;
+use mod_bigbluebuttonbn\instance;
 use plugin_renderer_base;
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Class renderer
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
- */
 class renderer extends plugin_renderer_base {
 
     /**
@@ -53,62 +46,55 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renders the general warning button.
+     * Render the groups selector.
      *
-     * @param string $href
-     * @param string $text
-     * @param string $class
-     * @param string $title
-     *
+     * @param instance $instance
      * @return string
      */
-    public function render_warning_button($href, $text = '', $class = '', $title = '') {
-        if ($text == '') {
-            $text = get_string('ok', 'moodle');
+    public function render_groups_selector(instance $instance): string {
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
+        if ($groupmode === NOGROUPS) {
+            return '';
         }
-        if ($title == '') {
-            $title = $text;
+
+        // Separate or visible group mode.
+        $groups = groups_get_activity_allowed_groups($instance->get_cm());
+        if (empty($groups)) {
+            // No groups in this course.
+            notification::add(get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'), notification::INFO);
+            return '';
         }
-        if ($class == '') {
-            $class = 'btn btn-secondary';
+
+        // Assign group default values.
+        if (count($groups) == 0) {
+            // Only the All participants group exists.
+            notification::add(get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), notification::INFO);
+            return '';
         }
-        $output = '  <form method="post" action="' . $href . '" class="form-inline">' . "\n";
-        $output .= '      <button type="submit" class="' . $class . '"' . "\n";
-        $output .= '          title="' . $title . '"' . "\n";
-        $output .= '          >' . $text . '</button>' . "\n";
-        $output .= '  </form>' . "\n";
-        return $output;
+
+        if (has_capability('moodle/site:accessallgroups', $instance->get_context())) {
+            notification::add(get_string('view_groups_selection_warning', 'bigbluebuttonbn'), notification::INFO);
+        }
+
+        $groupsmenu = groups_print_activity_menu(
+            $instance->get_cm(),
+            $instance->get_view_url(),
+            true
+        );
+
+        return $groupsmenu . '<br><br>';
     }
 
     /**
-     * Renders the general warning message.
+     * Render the view page.
      *
-     * @param string $message
-     * @param string $type
-     * @param string $href
-     * @param string $text
-     * @param string $class
-     *
+     * @param view_page $page
      * @return string
      */
-    public function render_warning($message, $type = 'info', $href = '', $text = '', $class = '') {
-        $output = "\n";
-        // Evaluates if config_warning is enabled.
-        if (empty($message)) {
-            return $output;
-        }
-        $output .= $this->output->box_start(
-                'box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
-                'bigbluebuttonbn_view_general_warning'
-            ) . "\n";
-        $output .= '    ' . $message . "\n";
-        $output .= '  <div class="singlebutton pull-right">' . "\n";
-        if (!empty($href)) {
-            $output .= $this->render_warning_button($href, $text, $class);
-        }
-        $output .= '  </div>' . "\n";
-        $output .= $this->output->box_end() . "\n";
-        return $output;
+    public function render_view_page(view_page $page): string {
+        return $this->render_from_template(
+            'mod_bigbluebuttonbn/view_page',
+            $page->export_for_template($this)
+        );
     }
-
 }

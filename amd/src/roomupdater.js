@@ -39,18 +39,25 @@ export const stop = () => {
 };
 
 export const poll = () => {
-    timerReference = setInterval(() => {
-        if ((updateCount % updateFactor) === 0) {
-            updateRoom(true);
-
+    if ((updateCount % updateFactor) === 0) {
+        updateRoom(true)
+        .then(() => {
             if (updateFactor >= maxFactor) {
                 updateFactor = 1;
             } else {
                 updateFactor++;
             }
-        }
-        updateCount++;
-    }, timeout);
+
+            return;
+
+        })
+        .catch()
+        .then(() => {
+            timerReference = setTimeout(() => poll(), timeout);
+            return;
+        })
+        .catch();
+    }
 };
 
 export const updateRoom = (updatecache = false) => {

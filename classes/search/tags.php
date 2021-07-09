@@ -54,8 +54,6 @@ class tags extends \core_search\base_activity {
      * @param int $modifiedfrom
      * @param \context|null $context
      * @return \moodle_recordset|null
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function get_document_recordset($modifiedfrom = 0, \context $context = null) {
         global $DB;
@@ -76,7 +74,7 @@ class tags extends \core_search\base_activity {
      *
      * @param stdClass $record
      * @param array    $options
-     * @return \core_search\document
+     * @return \core_search\document|bool
      */
     public function get_document($record, $options = array()) {
 

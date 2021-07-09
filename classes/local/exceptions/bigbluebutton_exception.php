@@ -15,57 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Cognitive depth indicator - BigBlueButtonBN.
+ * The mod_bigbluebuttonbn generic exception.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 
-namespace mod_bigbluebuttonbn\analytics\indicator;
+namespace mod_bigbluebuttonbn\local\exceptions;
 
-use cm_info;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Cognitive depth indicator - bigbluebuttonbn.
+ * Class bigbluebutton_exception
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
-class cognitive_depth extends activity_base {
+class bigbluebutton_exception extends \moodle_exception {
 
-    /**
-     * Returns the name.
-     *
-     * If there is a corresponding '_help' string this will be shown as well.
-     *
-     * @return object
-     */
-    public static function get_name() : \lang_string {
-        return new \lang_string('indicator:cognitivedepth', 'mod_bigbluebuttonbn');
-    }
-
-    /**
-     * Returns the indicator type.
-     *
-     * @return integer
-     */
-    public function get_indicator_type() {
-        return self::INDICATOR_COGNITIVE;
-    }
-
-    /**
-     * Returns the cognitive depth level.
-     *
-     * @param cm_info $cm
-     *
-     * @return integer
-     */
-    public function get_cognitive_depth_level(cm_info $cm) {
-        return self::COGNITIVE_LEVEL_4;
-    }
 }
