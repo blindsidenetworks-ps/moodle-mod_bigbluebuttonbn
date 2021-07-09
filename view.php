@@ -64,26 +64,8 @@ if ($groupid) {
 logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 //END TODO
 
-// Additional info related to the course.
-// TODO Drop the need for the bbbsession.
-$bbbsession = $instance->get_legacy_session_object();
-
-// Validates if the BigBlueButton server is working.
-$serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();  // In locallib.
-if ($serverversion === null) {
-    $errmsg = 'view_error_unable_join_student';
-    $errurl = '/course/view.php';
-    $errurlparams = ['id' => $bigbluebuttonbn->course];
-    if ($bbbsession['administrator']) {
-        $errmsg = 'view_error_unable_join';
-        $errurl = '/admin/settings.php';
-        $errurlparams = ['section' => 'modsettingbigbluebuttonbn'];
-    } else if ($bbbsession['moderator']) {
-        $errmsg = 'view_error_unable_join_teacher';
-    }
-    throw new moodle_exception($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
-}
-$bbbsession['serverversion'] = (string) $serverversion;
+// Require a working server.
+bigbluebutton::require_working_server($instance);
 
 // Mark viewed by user (if required).
 $completion = new completion_info($course);
@@ -115,6 +97,9 @@ if (!$instance->can_join()) {
 
 // Output starts.
 echo $OUTPUT->header();
+
+// TODO Drop the need for the bbbsession.
+$bbbsession = $instance->get_legacy_session_object();
 
 // TODO Update both of these to:
 // a) be a renderable and called through the renderer, and

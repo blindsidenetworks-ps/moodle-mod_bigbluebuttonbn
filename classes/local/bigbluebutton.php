@@ -765,4 +765,30 @@ class bigbluebutton {
         }
         return false;
     }
+
+    /**
+     * Ensure that the remote server was contactable.
+     *
+     * @param \mod_bigbluebuttonbn\instance $instance
+     */
+    public static function require_working_server(\mod_bigbluebuttonbn\instance $instance): void {
+        $serverversion = self::bigbluebuttonbn_get_server_version();
+        if ($serverversion !== null) {
+            return;
+        }
+
+        if ($instance->is_admin()) {
+            $errmsg = 'view_error_unable_join';
+            $url = new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);
+        } else if ($instance->is_moderator()) {
+            $errmsg = 'view_error_unable_join_teacher';
+            $url = new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        } else {
+            $errmsg = 'view_error_unable_join_student';
+            $url = new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        }
+
+        \core\notification::add(get_string($errmsg, 'mod_bigbluebuttonbn'), \core\notification::ERROR);
+        redirect($url);
+    }
 }
