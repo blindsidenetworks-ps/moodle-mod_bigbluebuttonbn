@@ -31,6 +31,7 @@ use context_module;
 use curl;
 use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
@@ -688,95 +689,25 @@ class bigbluebutton {
         return 'open';
     }
 
-    /**
-     * Set session URLs.
-     *
-     * @param array $bbbsession
-     * @param int $id
-     * @return string
-     */
-    public static function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
-        // Operation URLs.
-        $bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/view.php',
-            ['id' => $bbbsession['cm']->id]
-        );
-        $bbbsession['logoutURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_view.php',
-            ['action' => 'logout', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['recordingReadyURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_broker.php',
-            ['action' => 'recording_ready', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['meetingEventsURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_broker.php',
-            ['action' => 'meeting_events', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['joinURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_view.php',
-            ['action' => 'join', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-
-        // Check status and set extra values.
-        $activitystatus = self::bigbluebuttonbn_view_get_activity_status($bbbsession); // In locallib.
-        if ($activitystatus == 'ended') {
-            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
-                $bbbsession['context'],
-                $bbbsession['bigbluebuttonbn']->presentation
-            );
-        } else if ($activitystatus == 'open') {
-            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
-                $bbbsession['context'],
-                $bbbsession['bigbluebuttonbn']->presentation,
-                $bbbsession['bigbluebuttonbn']->id
-            );
-        }
-
-        return $activitystatus;
-    }
-
-    /**
-     * Check if a user has access to a given group.
-     *
-     * @param int $groupid
-     * @param object $user
-     * @param object $course
-     * @param \cm_info $cm
-     * @return bool
-     * @throws \coding_exception
-     */
-    public static function user_can_access_groups($groupid, $user, $course, $cm) {
-        $groupmode = groups_get_activity_groupmode($cm);
-        $context = context_course::instance($course->id);
-        $aag = has_capability('moodle/site:accessallgroups', $context, $user);
-        if ($aag) {
-            return true;
-        }
-        if ($groupmode == VISIBLEGROUPS or $aag) {
-            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
-        } else {
-            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
-        }
-        foreach ($allowedgroups as $g) {
-            if ($g->id == $groupid) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Ensure that the remote server was contactable.
      *
-     * @param \mod_bigbluebuttonbn\instance $instance
+     * @param instance $instance
      */
-    public static function require_working_server(\mod_bigbluebuttonbn\instance $instance): void {
+    public static function require_working_server(instance $instance): void {
         $serverversion = self::bigbluebuttonbn_get_server_version();
         if ($serverversion !== null) {
             return;
         }
 
+        self::handle_server_not_available($instance);
+    }
+
+    /**
+     * Handle the server not being available.
+     *
+     * @param instance $instance
+     */
+    public static function handle_server_not_available(instance $instance): void {
         if ($instance->is_admin()) {
             $errmsg = 'view_error_unable_join';
             $url = new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);

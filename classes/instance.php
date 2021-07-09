@@ -309,13 +309,18 @@ EOF;
         return $this->legacydata;
     }
 
+    /**
+     * Get the data for the legacy session object.
+     *
+     * @return array
+     */
     protected function generate_legacy_session_object(): array {
         global $CFG, $USER;
 
         $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
         $bbbsession = [
-            'username' => fullname($USER),
-            'userID' => $USER->id,
+            'username' => get_user_fullname(),
+            'userID' => $this->get_user_id(),
 
             'context' => $this->get_context(),
             'course' => $this->get_course(),
@@ -339,6 +344,7 @@ EOF;
             'recordhidebutton' => $this->should_show_recording_button(),
             'welcome' => $this->get_welcome_message(),
             'presentation' => $this->get_presentation(),
+            'muteonstart' => $this->get_mute_on_start(),
 
             // Metadata.
             'bnserver' => $this->is_blindside_network_server(),
@@ -398,6 +404,39 @@ EOF;
     }
 
     /**
+     * Get the user.
+     *
+     * @return stdClass
+     */
+    public function get_user(): stdClass {
+        global $USER;
+
+        return $USER;
+    }
+
+    /**
+     * Get the id of the user.
+     *
+     * @return int
+     */
+    public function get_user_id(): int {
+        $user = $this->get_user();
+
+        return $user->id;
+    }
+
+    /**
+     * Get the fullname of the current user.
+     *
+     * @return string
+     */
+    public function get_user_fullname(): string {
+        $user = $this->get_user();
+
+        return fullname($user);
+    }
+
+    /**
      * Whether the current user is an administrator.
      *
      * @retur bool
@@ -454,6 +493,38 @@ EOF;
     }
 
     /**
+     * Check whether the user limit has been reached.
+     *
+     * @param int $currentusercount The user count to check
+     * @return bool
+     */
+    public function has_user_limit_been_reached(int $currentusercount): bool {
+        $userlimit = $this->get_user_limit();
+        if (empty($userlimit)) {
+            return false;
+        }
+
+        return $currentusercount >= $userlimit;
+    }
+
+    /**
+     * Check whether the current user counts towards the user limit.
+     *
+     * @return bool
+     */
+    public function does_current_user_count_towards_user_limit(): bool {
+        if ($this->is_admin()) {
+            return false;
+        }
+
+        if ($this->is_moderator()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the voice bridge details.
      *
      * @return null|int
@@ -465,6 +536,15 @@ EOF;
         }
 
         return null;
+    }
+
+    /**
+     * Whether participants are muted on entry.
+     *
+     * @return
+     */
+    public function get_mute_on_start(): bool {
+        return $this->get_instance_var('muteonstart');
     }
 
     /**
@@ -483,6 +563,19 @@ EOF;
      */
     public function get_viewer_password(): string {
         return $this->get_instance_var('viewerpass');
+    }
+
+    /**
+     * Get the appropriate password for the current user.
+     *
+     * @return string
+     */
+    public function get_current_user_password(): string {
+        if ($this->is_admin() || $this->is_moderator()) {
+            return $this->get_moderator_password();
+        }
+
+        return $this->get_viewer_password();
     }
 
     /**
@@ -521,6 +614,27 @@ EOF;
         }
 
         return (bool) $this->get_instance_var('recordallfromstart');
+    }
+
+    /**
+     * Whether recording can be started and stopped.
+     *
+     * @return bool
+     */
+    public function allow_recording_start_stop(): bool {
+        if ($this->is_recorded()) {
+            return false;
+        }
+
+        if (!$this->should_record_from_start()) {
+            return true;
+        }
+
+        if ($this->should_show_recording_button()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -612,6 +726,19 @@ EOF;
         }
 
         return true;
+    }
+
+    /**
+     * Whether the user must wait to join the session.
+     *
+     * @return bool
+     */
+    public function user_must_wait_to_join(): bool {
+        if ($this->is_admin() || $this->is_moderator()) {
+            return false;
+        }
+
+        return (bool) $this->get_instance_var('wait');
     }
 
     /**

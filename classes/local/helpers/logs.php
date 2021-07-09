@@ -22,11 +22,11 @@
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 namespace mod_bigbluebuttonbn\local\helpers;
+
 use context_module;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use stdClass;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Utility class for all logs routines helper
@@ -147,5 +147,84 @@ class logs {
         $event->add_record_snapshot('course', $course);
         $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
         $event->trigger();
+    }
+
+    /**
+     * Log the relevant events for when a meeting was created.
+     *
+     * @param instance $instance
+     */
+    public static function log_meeting_created_event(instance $instance): void {
+        // Moodle event logger: Create an event for meeting created.
+        self::bigbluebuttonbn_event_log(
+            \mod_bigbluebuttonbn\event\events::$events['meeting_create'],
+            $instance->get_instance_data()
+        );
+
+        // Internal logger: Insert a record with the meeting created.
+        self::bigbluebuttonbn_log(
+            $instance->get_instance_data(),
+            bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE,
+            ['meetingid' => $instance->get_meeting_id()],
+            json_encode((object) [
+                'record' => $instance->is_recorded() ? 'true' : 'false',
+            ])
+        );
+    }
+
+    /**
+     * Log the relevant events for when a meeting was joined.
+     *
+     * @param instance $instance
+     * @param int $origin
+     */
+    public static function log_meeting_joined_event(instance $instance, int $origin): void {
+        // Moodle event logger: Create an event for meeting joined.
+        self::bigbluebuttonbn_event_log(
+            \mod_bigbluebuttonbn\event\events::$events['meeting_join'],
+            $instance->get_instance_data()
+        );
+
+        // Internal logger: Instert a record with the meeting created.
+        self::bigbluebuttonbn_log(
+            $instance->get_instance_data(),
+            bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
+            ['meetingid' => $instance->get_meeting_id()],
+            json_encode((object) ['origin' => $origin])
+        );
+    }
+
+    /**
+     * Log the relevant events for when a user left a meeting.
+     *
+     * @param instance $instance
+     */
+    public static function log_meeting_left_event(instance $instance): void {
+        // Moodle event logger: Create an event for meeting left.
+        self::bigbluebuttonbn_event_log(
+            \mod_bigbluebuttonbn\event\events::$events['meeting_left'],
+            $instance->get_instance_data()
+        );
+    }
+
+    /**
+     * Log the relevant events for when a recording has been played.
+     *
+     * @param instance $instance
+     */
+    public static function log_recording_played_event(instance $instance): void {
+        // Moodle event logger: Create an event for recording played.
+        self::bigbluebuttonbn_event_log(
+            \mod_bigbluebuttonbn\event\events::$events['recording_play'],
+            $instance->get_instance_data(),
+            ['other' => $rid]
+        );
+
+        // Internal logger: Instert a record with the playback played.
+        self::bigbluebuttonbn_log(
+            $instance->get_instance_data(),
+            bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED,
+            ['meetingid' => $instance->get_meeting_id()]
+        );
     }
 }
