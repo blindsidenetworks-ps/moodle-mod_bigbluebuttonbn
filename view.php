@@ -25,6 +25,7 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\view;
@@ -32,18 +33,24 @@ use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__ . '/../../config.php');
 
-$id = required_param('id', PARAM_INT);
-$bn = optional_param('bn', 0, PARAM_INT);
-$group = optional_param('group', 0, PARAM_INT);
+// Get the bbb instance from either the cmid (id), or the instanceid (bn).
+$id = optional_param('id', 0, PARAM_INT);
+if ($id) {
+    $instance = instance::get_from_cmid($id);
+} else {
+    $bn = optional_param('bn', 0, PARAM_INT);
+    if ($bn) {
+        $instance = instance::get_from_instanceid($bn);
+    }
+}
 
-$viewinstance = view::bigbluebuttonbn_view_validator($id, $bn); // In locallib.
-if (!$viewinstance) {
+if (!$instance) {
     throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
-$cm = $viewinstance['cm'];
-$course = $viewinstance['course'];
-$bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
+$cm = $instance->get_cm();
+$course = $instance->get_course();
+$bigbluebuttonbn = $instance->get_bigbluebuttonbn();
 
 require_login($course, true, $cm);
 
@@ -51,12 +58,7 @@ require_login($course, true, $cm);
 logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
 // Additional info related to the course.
-$bbbsession['course'] = $course;
-$bbbsession['coursename'] = $course->fullname;
-$bbbsession['cm'] = $cm;
-$bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-// In locallib.
-mod_bigbluebuttonbn\local\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
+$bbbsession = $instance->get_legacy_session_object($USER);
 
 // Validates if the BigBlueButton server is working.
 $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();  // In locallib.
