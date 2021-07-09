@@ -35,11 +35,11 @@ use external_single_structure;
 use external_value;
 use external_warnings;
 use invalid_parameter_exception;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\plugin;
 
@@ -93,33 +93,26 @@ class get_recordings extends external_api {
         ]);
 
         // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context,
-            'enabledfeatures' => $enabledfeatures,
-            'typeprofiles' => $typeprofiles,
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $context = $instance->get_context();
+        $enabledfeatures = $instance->get_enabled_features();
+        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
+        $bbbsession = $instance->get_legacy_session_object();
 
-        if ($bigbluebuttonbnid === 0) {
-            throw new invalid_parameter_exception('Both BigbluebuttonBN and Course IDs are null, we can either
-            have one or the other but not both at the same time');
-        }
         // Validate that the user has access to this activity.
         self::validate_context($context);
 
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        $recordings =
-            recording::bigbluebutton_get_recordings_for_table_view($bbbsession,
-                $enabledfeatures
-            );
+        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
 
         if ($removeimportedid) {
             $recordings = recording::bigbluebuttonbn_unset_existent_recordings_already_imported(
                 $recordings,
-                $bbbsession['course'],
-                $removeimportedid);
+                $instance->get_course(),
+                $removeimportedid
+            );
         }
 
         $tabledata = [
@@ -195,7 +188,7 @@ class get_recordings extends external_api {
             'allowHTML' => false,
             'sortable' => true,
         ];
-        if ($bbbsession['managerecordings']) {
+        if ($instance->can_manage_recordings()) {
             $columns[] = [
                 'key' => 'actionbar',
                 'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),

@@ -31,10 +31,10 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_exception;
@@ -88,21 +88,19 @@ class meeting_info extends external_api {
         ]);
 
         // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context,
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
-        return static::get_meeting_info($bbbsession, $updatecache, $meetingid);
+        return static::get_meeting_info($instance->get_legacy_session_object(), $updatecache, $meetingid);
     }
 
     /**
      * Get meeting information
      *
-     * TODO: Move this to \mod_bigbluebuttonbn\meetinginfo as a class.
-     * Note: Andrew has a work-in-progress commit for this.
+     * TODO: Move this to \mod_bigbluebuttonbn\meetinginfo or \mod_bigbluebuttonbn\output\meetinginfo as appropriate.
+     * Ideally the new version of this should take a \mod_bigbluebuttonbn\instance.
      *
      * @param array $bbbsession
      * @param bool $updatecache

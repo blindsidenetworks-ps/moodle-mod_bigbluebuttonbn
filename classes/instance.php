@@ -828,4 +828,16 @@ EOF;
             'bn' => $this->instancedata->id,
         ]);
     }
+
+    /**
+     * Get the list of enabled features for this instance.
+     *
+     * @return array
+     */
+    public function get_enabled_features(): array {
+        return config::bigbluebuttonbn_get_enabled_features(
+            bigbluebutton::bigbluebuttonbn_get_instance_type_profiles(),
+            $this->get_instance_var('type') ?? null
+        );
+    }
 }
