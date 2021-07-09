@@ -28,6 +28,7 @@ use html_table;
 use html_table_row;
 use html_writer;
 use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
@@ -1009,27 +1010,35 @@ class recording {
     /**
      * Helper function builds a row for the data used by the recording table.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $recording
      * @param array $tools
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording,
-        $tools = ['protect', 'publish', 'delete']) {
+    public static function bigbluebuttonbn_get_recording_data_row(instance $instance, array $recording, ?array $tools = null) {
         global $OUTPUT, $PAGE;
-        if (!self::bigbluebuttonbn_include_recording_table_row($bbbsession, $recording)) {
+        if ($tools === null) {
+            $tools = ['protect', 'publish', 'delete'];
+        }
+
+        $bbbsession = $instance->get_legacy_session_object();
+
+        if (!self::bigbluebuttonbn_include_recording_table_row($instane, $recording)) {
             return;
         }
         $rowdata = new stdClass();
+
         // Set recording_types.
         $rowdata->playback = self::bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
+
         // Set activity name.
-        $recordingname = new recording_name_editable($recording, $bbbsession);
+        $recordingname = new recording_name_editable($recording, $instance);
         $rowdata->recording = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingname->export_for_template($OUTPUT));
+
         // Set activity description.
-        $recordingdescription = new recording_description_editable($recording, $bbbsession);
+        $recordingdescription = new recording_description_editable($recording, $instance);
         $rowdata->description = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingdescription->export_for_template($OUTPUT));
 
