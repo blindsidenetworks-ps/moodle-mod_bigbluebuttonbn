@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer.
+ * Renderer for the mod_bigbluebuttonbn plugin.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -25,19 +25,12 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use html_writer;
+use core\notification;
 use html_table;
+use html_writer;
+use mod_bigbluebuttonbn\instance;
 use plugin_renderer_base;
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Class renderer
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
- */
 class renderer extends plugin_renderer_base {
 
     /**
@@ -111,4 +104,56 @@ class renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Render the groups selector.
+     *
+     * @param instance $instance
+     * @return string
+     */
+    public function render_groups_selector(instance $instance): string {
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
+        if ($groupmode === NOGROUPS) {
+            return '';
+        }
+
+        // Separate or visible group mode.
+        $groups = groups_get_activity_allowed_groups($instance->get_cm());
+        if (empty($groups)) {
+            // No groups in this course.
+            notification::add(get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'), notification::INFO);
+            return '';
+        }
+
+        // Assign group default values.
+        if (count($groups) == 0) {
+            // Only the All participants group exists.
+            notification::add(get_string('view_groups_notenrolled_warning', 'bigbluebuttonbn'), notification::INFO);
+            return '';
+        }
+
+        if (has_capability('moodle/site:accessallgroups', $instance->get_context())) {
+            notification::add(get_string('view_groups_selection_warning', 'bigbluebuttonbn'), notification::INFO);
+        }
+
+        $groupsmenu = groups_print_activity_menu(
+            $instance->get_cm(),
+            $instance->get_view_url(),
+            true
+        );
+
+        return $groupsmenu . '<br><br>';
+    }
+
+    /**
+     * Render the view page.
+     *
+     * @param view_page $page
+     * @return string
+     */
+    public function render_view_page(view_page $page): string {
+        return $this->render_from_template(
+            'mod_bigbluebuttonbn/view_page',
+            $page->export_for_template($this)
+        );
+    }
 }

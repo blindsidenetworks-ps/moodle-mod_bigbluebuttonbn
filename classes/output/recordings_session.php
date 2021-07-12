@@ -25,14 +25,11 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use mod_bigbluebuttonbn\local\bbb_constants;
-use moodle_url;
+use mod_bigbluebuttonbn\instance;
 use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class recordings_session
@@ -44,67 +41,45 @@ defined('MOODLE_INTERNAL') || die();
 class recordings_session implements renderable, templatable {
 
     /**
-     * @var $bbbsession
+     * @var instance
      */
-    protected $bbbsession;
-    /**
-     * @var $type
-     */
-    protected $type;
-    /**
-     * @var mixed|null $enabledfeatures
-     */
-    protected $enabledfeatures;
+    protected $bbbsinstance;
 
     /**
      * recording_section constructor.
      *
-     * @param array $bbbsession
-     * @param string $type
-     * @param array $enabledfeatures
+     * @param instance $instance
      */
-    public function __construct($bbbsession, $type, $enabledfeatures = null) {
-
-        $this->bbbsession = $bbbsession;
-        $this->type = $type;
-        $this->enabledfeatures = $enabledfeatures;
+    public function __construct(instance $instance) {
+        $this->instance = $instance;
     }
 
     /**
      * Export for template
      *
      * @param renderer_base $output
-     * @return array|stdClass|void
-     * @throws \coding_exception
-     * @throws \moodle_exception
+     * @return stdClass
      */
-    public function export_for_template(renderer_base $output) {
+    public function export_for_template(renderer_base $output): stdClass {
+        $isrecordedtype = $this->instance->is_type_room_and_recordings() || $this->instance->is_type_recordings_only();
 
-        $bbbid = $this->bbbsession['bigbluebuttonbn']->id;
-        $hasrecordings = $this->bbbsession['record'];
-        $hasrecordings = $hasrecordings &&
-            (in_array($this->type, [bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
-                bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]));
-        $inputbutton = false;
-        if ($this->enabledfeatures['importrecordings'] || $this->bbbsession['importrecordings']) {
+        $context = (object) [
+            'bbbid' => $this->instance->get_instance_id(),
+            'has_recordings' => $this->instance->is_recorded() && $isrecordedtype,
+            'searchbutton' => [
+                'value' => '',
+            ],
+        ];
+
+
+        if ($this->instance->can_import_recordings()) {
             $button = new \single_button(
-                new moodle_url('/mod/bigbluebuttonbn/import_view.php',
-                    ['originbn' => $bbbid]),
-                get_string('view_recording_button_import', 'mod_bigbluebuttonbn'));
-            $inputbutton = $button->export_for_template($output);
+                $this->instance->get_import_url(),
+                get_string('view_recording_button_import', 'mod_bigbluebuttonbn')
+            );
+            $context->import_button = $button->export_for_template($output);
         }
 
-        $searchbutton = [
-            'value' => ''
-        ];
-
-        $context = (object)
-        [
-            'has_recordings' => $hasrecordings,
-            'import_button' => $inputbutton,
-            'search' => $searchbutton,
-            'bbbid' => intval($bbbid)
-        ];
         return $context;
     }
 }

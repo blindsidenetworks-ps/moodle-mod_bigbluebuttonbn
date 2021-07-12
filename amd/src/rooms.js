@@ -16,7 +16,6 @@
 import './actions';
 import * as repository from './repository';
 import * as roomUpdater from './roomupdater';
-import Config from 'core/config';
 import {
     exception as displayException,
     fetchNotifications,
@@ -30,62 +29,15 @@ export const init = (bigbluebuttonbnid) => {
             repository.completionValidate(bigbluebuttonbnid).catch(displayException);
         });
     }
-};
 
-/**
- * Get the id of the current group.
- *
- * @param {HTMLElement} actionButton
- * @returns {number}
- * @private
- */
-const getCurrentGroupId = actionButton => {
-    const groupSelector = document.querySelector('.groupselector select[name="group"]');
-    if (groupSelector) {
-        return groupSelector.value;
-    }
-
-    return actionButton.dataset.groupId;
-};
-
-/**
- * Join a BBB conference in a new window.
- *
- * @param {string} joinUrl
- * @private
- */
-const joinConference = joinUrl => {
-    roomUpdater.poll();
-    window.open(joinUrl);
-};
-
-/**
- * Init action button
- */
-export const initActions = () => {
-    const actionButtonRegion = document.getElementById('room_view_action_buttons');
-
-    actionButtonRegion.addEventListener('click', e => {
+    document.addEventListener('click', e => {
         const actionButton = e.target.closest('.bbb-btn-action');
         if (!actionButton) {
             return;
         }
 
-        const bbbId = actionButton.dataset.bbbId;
-
         if (actionButton.dataset.action === "join") {
-            e.preventDefault();
-
-            // TODO: This should be a link on the button itself.
-            const joinURL = new URL(`${Config.wwwroot}/mod/bigbluebuttonbn/bbb_view.php`);
-
-            joinURL.searchParams.append('action', 'join');
-            joinURL.searchParams.append('id', actionButton.dataset.cmId);
-            joinURL.searchParams.append('bn', bbbId);
-            joinURL.searchParams.append('group', getCurrentGroupId(actionButton));
-
-            joinConference(joinURL.toString());
-
+            roomUpdater.poll();
             return;
         }
     });

@@ -268,7 +268,12 @@ class files {
 
                 if (count($files) == 0) {
                     // Not exist file by default in "presentationbydefault" setting.
-                    return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
+                    return [
+                        'icondesc' => null,
+                        'iconname' => null,
+                        'name' => null,
+                        'url' => null,
+                    ];
                 }
 
                 // Exists file in general setting to use as default for presentation. Cache image for temp public access.
@@ -297,11 +302,20 @@ class files {
                     $file->get_filepath(),
                     $file->get_filename()
                 );
-                return (array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
-                    'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file)));
+                return [
+                    'icondesc' => get_mimetype_description($file),
+                    'iconname' => file_file_icon($file, 24),
+                    'name' => $file->get_filename(),
+                    'url' => $url->out(false),
+                ];
             }
 
-            return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
+            return [
+                'url' => null,
+                'name' => null,
+                'iconname' => null,
+                'icondesc' => null,
+            ];
         }
         $fs = get_file_storage();
         $files = $fs->get_area_files(
@@ -313,7 +327,12 @@ class files {
             false
         );
         if (count($files) == 0) {
-            return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
+            return [
+                'icondesc' => null,
+                'iconname' => null,
+                'name' => null,
+                'url' => null,
+            ];
         }
         $file = reset($files);
         unset($files);
@@ -339,7 +358,11 @@ class files {
             $file->get_filepath(),
             $file->get_filename()
         );
-        return array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
-            'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
+        return [
+            'icondesc' => get_mimetype_description($file),
+            'iconname' => file_file_icon($file, 24),
+            'name' => $file->get_filename(),
+            'url' => $url->out(false),
+        ];
     }
 }

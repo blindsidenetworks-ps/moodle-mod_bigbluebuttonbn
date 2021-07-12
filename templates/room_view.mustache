@@ -39,8 +39,9 @@
         {{#statusrunning}}
             <div>
             <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn{{/str}}</span>
-                <strong>{{#userdate}} {{startedat}}, {{#str}} strftimetime, core_langconfig{{/str}} {{/userdate}}</strong>
-            <span>{{#moderatorplural}}{{#str}}view_message_moderators, mod_bigbluebuttonbn{{/str}}{{/moderatorplural}}
+            <strong>{{#userdate}} {{startedat}}, {{#str}} strftimetime, core_langconfig{{/str}} {{/userdate}}</strong>
+            <span>
+                {{#moderatorplural}}{{#str}}view_message_moderators, mod_bigbluebuttonbn{{/str}}{{/moderatorplural}}
                 {{^moderatorplural}}{{#str}}view_message_moderator, mod_bigbluebuttonbn{{/str}}{{/moderatorplural}}
                 <strong>{{moderatorcount}}</strong>
             </span>
@@ -52,9 +53,10 @@
         </div>
         {{/statusrunning}}
     </span>
-    <span id="control_panel">
 
+    <span id="control_panel">
     </span>
+
     <div id="room_view_control_panel" data-bbb-id="{{bigbluebuttonbnid}}">
         {{#starttime}}
             <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn, {{startTime}}{{/str}}</span>
@@ -84,15 +86,16 @@
     </div>
     <div id="bigbluebuttonbn_view_action_button_box" class="box py-3 generalbox boxaligncenter">
         <div id="room_view_action_buttons">
-            <input {{!
-                }} type="button"{{!
-                }} value="{{#str}}view_conference_action_join, mod_bigbluebuttonbn{{/str}}"{{!
-                }} data-action="join"{{!
-                }} data-bbb-id="{{bigbluebuttonbnid}}"{{!
-                }} data-cm-id="{{cmid}}"{{!
-                }} {{#group}}data-group-id="{{group}}"{{/group}}{{!
-                }} class="btn btn-primary bbb-btn-action  {{^canjoin}}d-none{{/canjoin}}"{{!
+            {{#canjoin}}
+                <a {{!
+                    }} href="{{{joinurl}}}"{{!
+                    }} class="btn btn-primary bbb-btn-action"{{!
+                    }} data-action="join"{{!
+                    }} target="_blank"{{!
                 }}>
+                    {{#str}}view_conference_action_join, mod_bigbluebuttonbn{{/str}}
+                </a>
+            {{/canjoin}}
 
             {{#ismoderator}}
                 {{> mod_bigbluebuttonbn/end_session_button}}
@@ -100,9 +103,3 @@
         </div>
     </div>
 </div>
-{{#js}}
-require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
-    // Register action on all buttons.
-    rooms.initActions();
-});
-{{/js}}

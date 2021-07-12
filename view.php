@@ -29,6 +29,7 @@ use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\output\view_page;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__ . '/../../config.php');
@@ -96,23 +97,10 @@ if (!$instance->can_join()) {
 }
 
 // Output starts.
+$renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
+
 echo $OUTPUT->header();
-
-// TODO Drop the need for the bbbsession.
-$bbbsession = $instance->get_legacy_session_object();
-
-// TODO Update both of these to:
-// a) be a renderable and called through the renderer, and
-// b) take the $instance.
-// i.e.
-// $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
-// echo $renderer->render(new \mod_bigbluebuttonbn\output\group_selector($instance));
-// echo $renderer->render(new \mod_bigbluebuttonbn\output\view_page($instance));
-//
-// Note: You may also wish to move the group selector into the view_page.
-view::view_groups($bbbsession);
-view::view_render($bbbsession);
-// End TODO
+echo $renderer->render(new view_page($instance));
 
 // Output finishes.
 echo $OUTPUT->footer();
@@ -124,4 +112,4 @@ echo '<!-- ' . $instance->get_origin_data()->originTag . ' -->' . "\n";
 // TODO: Get rid of this ASAP !
 // Before this can happen, all places which only retrieve it from the SESSION need to modify the page URL to specify the
 // instanceid.
-$SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+$SESSION->bigbluebuttonbn_bbbsession = $instance->get_legacy_session_object();

@@ -24,11 +24,12 @@
  */
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\meeting as meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
@@ -110,10 +111,8 @@ switch (strtolower($action)) {
         logs::log_meeting_left_event($instance);
 
         // Update the cache.
-        $meetinginfo = meeting::bigbluebuttonbn_get_meeting_info(
-            $instance->get_meeting_id(),
-            bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE
-        );
+        meeting::update_meeting_cache_for_instance($instance);
+
         // Check the origin page.
         $select = "userid = ? AND log = ?";
         $params = [
@@ -144,7 +143,8 @@ switch (strtolower($action)) {
         }
 
         // See if the session is in progress.
-        if (meeting::bigbluebuttonbn_is_meeting_running($instance->get_meeting_id())) {
+        // TODO COnvert to use meeting.
+        if (meeting_helper::bigbluebuttonbn_is_meeting_running($instance->get_meeting_id())) {
             // Since the meeting is already running, we just join the session.
             bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
             break;
@@ -158,7 +158,7 @@ switch (strtolower($action)) {
 
         // As the meeting doesn't exist, try to create it.
         $presentation = $instance->get_presentation();
-        $response = meeting::bigbluebuttonbn_get_create_meeting_array(
+        $response = meeting_helper::bigbluebuttonbn_get_create_meeting_array(
             bigbluebuttonbn_bbb_view_create_meeting_data($instance),
             bigbluebuttonbn_bbb_view_create_meeting_metadata($instance),
             $presentation['name'],
@@ -338,7 +338,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
  */
 function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
     $bbbsession = $instance->get_legacy_session_object();
-    return meeting::bigbluebuttonbn_create_meeting_metadata($bbbsession);
+    return meeting_helper::bigbluebuttonbn_create_meeting_metadata($bbbsession);
 }
 
 /**
@@ -351,7 +351,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
  */
 function bigbluebuttonbn_bbb_view_join_meeting($instance, $origin = 0): void {
     // Update the cache.
-    $meetinginfo = meeting::bigbluebuttonbn_get_meeting_info(
+    $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info(
         $instance->get_meeting_id(),
         bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE
     );

@@ -25,6 +25,7 @@ namespace mod_bigbluebuttonbn;
 
 use cm_info;
 use context_module;
+use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -162,6 +163,15 @@ EOF;
     }
 
     /**
+     * Check whether this instance is configured to use a group.
+     *
+     * @return bool
+     */
+    public function uses_groups(): bool {
+        return $this->groupid !== null;
+    }
+
+    /**
      * Get the group name for the current group, if a group has been set.
      *
      * @return null|string
@@ -208,6 +218,15 @@ EOF;
     }
 
     /**
+     * Get the id of the course module.
+     *
+     * @return int
+     */
+    public function get_cm_id(): int {
+        return $this->get_cm()->id;
+    }
+
+    /**
      * Get the context.
      *
      * @return context_module
@@ -218,6 +237,15 @@ EOF;
         }
 
         return $this->context;
+    }
+
+    /**
+     * Get the context ID of the module context.
+     *
+     * @return int
+     */
+    public function get_context_id(): int {
+        return $this->get_context()->id;
     }
 
     /**
@@ -244,7 +272,7 @@ EOF;
      * @param string $name
      * @return string
      */
-    protected function get_instance_var(string $name) {
+    public function get_instance_var(string $name) {
         $instance = $this->get_instance_data();
         if (property_exists($instance, $name)) {
             return $instance->{$name};
@@ -287,11 +315,74 @@ EOF;
         $meetingname = $this->get_instance_var('name');
 
         $groupname = $this->get_group_name();
-        if ($groupname === null) {
+        if ($groupname !== null) {
             $meetingname .= " ({$groupname})";
         }
 
         return $meetingname;
+    }
+
+    /**
+     * Get the meeting description with the pluginfile URLs optionally rewritten.
+     *
+     * @param bool $rewritepluginfileurls
+     * @return string
+     */
+    public function get_meeting_description(bool $rewritepluginfileurls = false): string {
+        $description = $this->get_instance_var('intro');
+
+        if ($rewritepluginfileurls) {
+            $description = file_rewrite_pluginfile_urls(
+                $description,
+                'pluginfile.php',
+                $this->get_context_id(),
+                'mod_bigbluebuttonbn',
+                'intro',
+                null
+            );
+        }
+
+        return $description;
+    }
+
+    /**
+     * Get the meeting type if set.
+     *
+     * @return null|string
+     */
+    public function get_type(): ?string {
+        if ($type = $this->get_instance_var('type')) {
+            return $type;
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether this instance is includes both a room, and recordings.
+     *
+     * @return bool
+     */
+    public function is_type_room_and_recordings(): bool {
+        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL;
+    }
+
+    /**
+     * Whether this instance is one that only includes a room.
+     *
+     * @return bool
+     */
+    public function is_type_room_only(): bool {
+        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
+    }
+
+    /**
+     * Whether this instance is one that only includes recordings.
+     *
+     * @return bool
+     */
+    public function is_type_recordings_only(): bool {
+        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY;
     }
 
     /**
@@ -319,7 +410,7 @@ EOF;
 
         $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
         $bbbsession = [
-            'username' => get_user_fullname(),
+            'username' => $this->get_user_fullname(),
             'userID' => $this->get_user_id(),
 
             'context' => $this->get_context(),
@@ -327,6 +418,7 @@ EOF;
             'coursename' => $this->get_course()->fullname,
             'cm' => $this->get_cm(),
             'bigbluebuttonbn' => $this->get_instance_data(),
+            'group' => $this->get_group_id(),
 
             'administrator' => $this->is_admin(),
             'moderator' => $this->is_moderator(),
@@ -603,6 +695,19 @@ EOF;
     }
 
     /**
+     * Whether this instance can import recordings from another instance.
+     *
+     * @return bool
+     */
+    public function can_import_recordings(): bool {
+        if ($this->can_manage_recordings()) {
+            return true;
+        }
+
+        return $this->is_feature_enabled('importrecordings');
+    }
+
+    /**
      * Whether this instance is recorded from the start.
      *
      * @return bool
@@ -830,6 +935,17 @@ EOF;
     }
 
     /**
+     * Get the URL used for the import page.
+     *
+     * @return moodle_url
+     */
+    public function get_import_url(): moodle_url {
+        return new moodle_url('/mod/bigbluebuttonbn/import_view.php', [
+            'originbn' => $this->instancedata->id,
+        ]);
+    }
+
+    /**
      * Get the list of enabled features for this instance.
      *
      * @return array
@@ -839,5 +955,17 @@ EOF;
             bigbluebutton::bigbluebuttonbn_get_instance_type_profiles(),
             $this->get_instance_var('type') ?? null
         );
+    }
+
+    /**
+     * Check whetherthe named features is enabled.
+     *
+     * @param string $feature
+     * @return bool
+     */
+    public function is_feature_enabled(string $feature): bool {
+        $features = $this->get_enabled_features();
+
+        return !empty($features[$feature]);
     }
 }

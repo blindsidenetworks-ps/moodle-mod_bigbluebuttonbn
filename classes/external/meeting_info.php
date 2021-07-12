@@ -32,10 +32,10 @@ use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_exception;
 use restricted_context_exception;
@@ -93,92 +93,10 @@ class meeting_info extends external_api {
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
-        return static::get_meeting_info($instance->get_legacy_session_object(), $updatecache, $meetingid);
-    }
 
-    /**
-     * Get meeting information
-     *
-     * TODO: Move this to \mod_bigbluebuttonbn\meetinginfo or \mod_bigbluebuttonbn\output\meetinginfo as appropriate.
-     * Ideally the new version of this should take a \mod_bigbluebuttonbn\instance.
-     *
-     * @param array $bbbsession
-     * @param bool $updatecache
-     * @param null $meetingidoverride override for the meeting id
-     * @return array
-     * @throws \coding_exception
-     */
-    public static function get_meeting_info(
-        $bbbsession,
-        bool $updatecache = false,
-        $meetingidoverride = null
-    ) {
-        global $USER;
+        $meeting = new meeting($instance);
 
-        $bbbinfo = new \stdClass();
-        if ($bbbsession['openingtime']) {
-            $bbbinfo->openingtime = get_string('mod_form_field_openingtime', 'bigbluebuttonbn') . ': ' .
-                userdate($bbbsession['openingtime']);
-        }
-        if ($bbbsession['closingtime']) {
-            $bbbinfo->closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn') . ': ' .
-                userdate($bbbsession['closingtime']);
-        }
-
-        $meetingid = !empty($meetingidoverride) ? $meetingidoverride : $bbbsession['meetingid'];
-        $info = meeting::bigbluebuttonbn_get_meeting_info($meetingid, $updatecache);
-        $running = false;
-        if ($info['returncode'] == 'SUCCESS') {
-            $running = ($info['running'] === 'true');
-        }
-        $activitystatus = bigbluebutton::bigbluebuttonbn_view_session_config($bbbsession, $bbbsession['bigbluebuttonbn']->id);
-        $bbbinfo->statusrunning = $running;
-        $bbbinfo->statusclosed = ($activitystatus == 'ended');
-        if (!$running) {
-            $bbbinfo->statusopen = ($activitystatus == 'open');
-        }
-        $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
-        $bbbinfo->participantcount = $participantcount;
-        $status = broker::meeting_info_can_join($bbbsession, $running,
-            $bbbinfo->participantcount);
-        $bbbinfo->canjoin = $status["can_join"];
-
-        // When meeting is not running, see if the user can join.
-        $context = context_course::instance($bbbsession['bigbluebuttonbn']->course);
-        $participantlist = roles::bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
-        $isadmin = is_siteadmin($USER->id);
-        $ismoderator = roles::bigbluebuttonbn_is_moderator($context, $participantlist, $USER->id);
-        // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
-        if ($running) {
-            $bbbinfo->statusmessage = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-            $bbbinfo->startedat = floor(intval($info['startTime']) / 1000); // Milliseconds.
-            $bbbinfo->moderatorcount = $info['moderatorCount'];
-            $bbbinfo->moderatorplural = $info['moderatorCount'] > 1;
-            $bbbinfo->participantcount = $info['participantCount'];
-            $bbbinfo->participantplural = $info['participantCount'] > 1;
-        } else if ($isadmin || $ismoderator || !$bbbsession['bigbluebuttonbn']->wait) {
-            $bbbinfo->statusmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-        } else {
-            $bbbinfo->statusmessage = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-        }
-        $bbbinfo->meetingid = $meetingid;
-        $bbbinfo->bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
-        $bbbinfo->cmid = $bbbsession['cm']->id;
-        $bbbinfo->userlimit = $bbbsession['userlimit'];
-        $bbbinfo->presentations = [];
-        if (!empty($bbbsession['presentation']) && !empty($bbbsession['presentation']['url'])) {
-            $bbbinfo->presentations[] = [
-                'url' => $bbbsession['presentation']['url'],
-                'iconname' => $bbbsession['presentation']['icon'],
-                'icondesc' => $bbbsession['presentation']['mimetype_description'],
-                'name' => $bbbsession['presentation']['name'],
-            ];
-        }
-        if (!empty($bbbsession['group'])) {
-            $bbbinfo->group = $bbbsession['group'];
-        }
-        $bbbinfo->ismoderator = $ismoderator;
-        return (array) $bbbinfo;
+        return (array) $meeting->get_meeting_info($updatecache);
     }
 
     /**
@@ -213,8 +131,9 @@ class meeting_info extends external_api {
                         'iconname' => new external_value(PARAM_RAW, 'icon name'),
                         'icondesc' => new external_value(PARAM_TEXT, 'icon text'),
                         'name' => new external_value(PARAM_TEXT, 'presentation name'),
-                    ]), 'Presentation', VALUE_OPTIONAL
+                    ])
                 ),
+                'joinurl' => new external_value(PARAM_URL, 'Join URL'),
             ]
         );
     }

@@ -773,23 +773,27 @@ class recording {
      *
      * @return boolean
      */
-    public static function bigbluebuttonbn_include_recording_table_row($bbbsession, $recording) {
-        // Exclude unpublished recordings, only if user has no rights to manage them.
-        if ($recording['published'] != 'true' && !$bbbsession['managerecordings']) {
+    public static function bigbluebuttonbn_include_recording_table_row($instance, $recording) {
+        if ($recording['published'] != 'true' && !$instance->can_manage_recordings()) {
+            // Exclude unpublished recordings, only if user has no rights to manage them.
             return false;
         }
-        // Imported recordings are always shown as long as they are published.
+
         if (isset($recording['imported'])) {
+            // Imported recordings are always shown as long as they are published.
             return true;
         }
-        // Administrators and moderators are always allowed.
-        if ($bbbsession['administrator'] || $bbbsession['moderator']) {
+
+        if ($instance->is_admin() || $instance->is_moderator()) {
+            // Administrators and moderators are always allowed.
             return true;
         }
-        // When groups are enabled, exclude those to which the user doesn't have access to.
-        if (isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
-            return false;
+
+        if ($instance->uses_groups()) {
+            // When groups are enabled, exclude those to which the user doesn't have access to.
+            return $recording['meetingID'] === $instance->get_meeting_id();
         }
+
         return true;
     }
 
@@ -1024,7 +1028,7 @@ class recording {
 
         $bbbsession = $instance->get_legacy_session_object();
 
-        if (!self::bigbluebuttonbn_include_recording_table_row($instane, $recording)) {
+        if (!self::bigbluebuttonbn_include_recording_table_row($instance, $recording)) {
             return;
         }
         $rowdata = new stdClass();

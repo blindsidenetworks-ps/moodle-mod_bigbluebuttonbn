@@ -689,6 +689,7 @@ class bigbluebutton {
         return 'open';
     }
 
+    /**
      * Ensure that the remote server was contactable.
      *
      * @param instance $instance
