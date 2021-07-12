@@ -25,6 +25,7 @@
 
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\recording_handler;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
@@ -216,6 +217,11 @@ switch (strtolower($action)) {
         if ($response['hasBeenForciblyEnded'] == 'true') {
             throw new moodle_exception(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
             break;
+        }
+        // New recording management: Insert a recordingID that corresponds to the meeting created.
+        if ($bigbluebuttonbn->record) {
+            $handler = new recording_handler($bigbluebuttonbn);
+            $handler->recording_create($response['internalMeetingID'], $response['meetingID']);
         }
         // Moodle event logger: Create an event for meeting created.
         logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);

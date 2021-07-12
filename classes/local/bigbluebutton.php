@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn locallib/bigbluebutton.
+ * The mod_bigbluebuttonbn local/bigbluebutton.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -360,8 +360,7 @@ class bigbluebutton {
      */
     public static function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
         if (extension_loaded('curl')) {
-            $response =
-                self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
+            $response = self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
             if (!$response) {
                 debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
                 return null;

@@ -64,10 +64,18 @@ class meeting {
         }
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
         if ($xml) {
-            $response = array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+            $response = array(
+                'returncode' => (string) $xml->returncode,
+                'message' => (string) $xml->message,
+                'messageKey' => (string) $xml->messageKey
+            );
             if ($xml->meetingID) {
-                $response += array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
-                    'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded);
+                $response += array('meetingID' => (string) $xml->meetingID,
+                    'internalMeetingID' => (string) $xml->internalMeetingID,
+                    'attendeePW' => (string) $xml->attendeePW,
+                    'moderatorPW' => (string) $xml->moderatorPW,
+                    'hasBeenForciblyEnded' => (string) $xml->hasBeenForciblyEnded
+                );
             }
             return $response;
         }
