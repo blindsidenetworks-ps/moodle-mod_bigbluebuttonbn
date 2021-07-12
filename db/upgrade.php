@@ -286,9 +286,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2020101001.10) {
+    if ($oldversion < 2020101001.12) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
         xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
+        // Add field courseid.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'courseid',
+            $fielddefinition);
         // Add field bigbluebuttonbnid.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
@@ -310,12 +315,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
             $fielddefinition);
         // Add index to bigbluebuttonbn_recordings.
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
+            ['courseid']);
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
             ['meetingid']);
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             ['recordingid']);
         // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2020101001.10, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2020101001.12, 'bigbluebuttonbn');
     }
 
     return true;

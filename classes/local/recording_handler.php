@@ -55,14 +55,11 @@ class recording_handler {
         global $DB;
         $recording = new stdClass();
         // Default values.
+        $recording->courseid = (int) $this->bigbluebuttonbn->course;
         $recording->bigbluebuttonbnid = (int) $this->bigbluebuttonbn->id;
+        $recording->timecreated = time();
         $recording->recordingid = $recordingid;
         $recording->meetingid = $meetingid;
-
-        error_log(gettype($recording->bigbluebuttonbnid));
-        error_log(gettype($recording->recordingid));
-        error_log(gettype($recording->meetingid));
-
         return $DB->insert_record('bigbluebuttonbn_recordings', $recording);
     }
 
