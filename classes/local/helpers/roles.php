@@ -318,6 +318,10 @@ class roles {
      */
     public static function bigbluebuttonbn_is_moderator($context, $participantlist, $userid = null) {
         global $USER;
+        // If an admin, then also a moderator.
+        if (has_capability('moodle/site:config', $context)) {
+            return true;
+        }
         if (!is_array($participantlist)) {
             return false;
         }
