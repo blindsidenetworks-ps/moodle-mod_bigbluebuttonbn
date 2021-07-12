@@ -97,27 +97,41 @@ const getFormattedData = response => {
     return formatDates(recordingData.locale, rowData);
 };
 
-/**
- *
- * @param {String} tableId in which we will display the table
- * @returns {[(*|number), string, boolean]}
- */
-const getTableInformations = (tableId) => {
-    const tableElement = document.querySelector(tableId);
-    const bbbid = tableElement.dataset.bbbid;
-    const tools = tableElement.dataset.tools;
-    const removeImportedId = tableElement.dataset.removeImportedId;
-    return [bbbid, removeImportedId, tools];
+const getTableNode = tableSelector => document.querySelector(tableSelector);
+
+const fetchRecordingData = tableSelector => {
+    const tableNode = getTableNode(tableSelector);
+
+    return repository.fetchRecordings(
+        tableNode.dataset.bbbid,
+        tableNode.dataset.groupId,
+        tableNode.dataset.removeImportedId,
+        tableNode.dataset.tools
+    );
 };
 
 /**
+ * Functions to manage the data table.
+ *
+ * @typedef dataTableFunctions
+ * @property function refreshTableData
+ * @property function filterByText
+ * @property function registerEventListeners
+ */
+
+/**
+ * Fetch the data table functinos for the specified table.
  *
  * @param {String} tableId in which we will display the table
  * @param {String} searchFormId The Id of the relate.
  * @param {Object} dataTable
- * @returns {{refreshTableData: refreshTableData, filterByText: filterByText, registerEventListeners: registerEventListeners}}
+ * @returns {dataTable}
+ * @private
  */
 const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
+    const tableNode = getTableNode(tableId);
+    const bbbid = tableNode.dataset.bbbid;
+
     const updateTableFromResponse = response => {
         if (!response || !response.status) {
             // There was no output at all.
@@ -136,8 +150,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         }
     };
 
-    const [bbbid, removeImportedId, tools] = getTableInformations(tableId);
-    const refreshTableData = () => repository.fetchRecordings(bbbid, removeImportedId, tools).then(updateTableFromResponse);
+    const refreshTableData = () => fetchRecordingData(tableId).then(updateTableFromResponse);
 
     const filterByText = value => {
         const dataModel = dataTable.get('currentData');
@@ -373,9 +386,7 @@ const setupDatatable = (tableId, searchFormId, response) => {
  * @param {String} searchFormId The Id of the relate.
  */
 export const init = (tableId, searchFormId) => {
-    const [bbbid, removeImportedId, tools] = getTableInformations(tableId);
-
-    repository.fetchRecordings(bbbid, removeImportedId, tools)
+    fetchRecordingData(tableId)
         .then(response => setupDatatable(tableId, searchFormId, response))
         .catch(displayException);
 };

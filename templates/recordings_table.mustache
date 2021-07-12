@@ -35,20 +35,26 @@
             {{#search}}
                 {{>mod_bigbluebuttonbn/search_input_recordings}}
             {{/search}}
-            <div id="bigbluebuttonbn-recording-table-{{uniqid}}"
-                 data-bbbid="{{bbbid}}" data-tools="{{$tools}}protect,publish,delete{{/tools}}"
-                 data-remove-imported-id="{{$removeimportedid}}0{{/removeimportedid}}"
-                 {{$otherattributes}}{{/otherattributes}}
-            ></div>
+            <div {{!
+                }} id="bigbluebuttonbn-recording-table-{{uniqid}}"{{!
+                }} data-bbbid="{{bbbid}}"{{!
+                }} data-tools="{{$tools}}protect,publish,delete{{/tools}}"{{!
+                }} data-group-id="{{groupid}}"{{!
+                }} data-remove-imported-id="{{$removeimportedid}}0{{/removeimportedid}}"{{!
+                }} {{$otherattributes}}{{/otherattributes}}{{!
+            }}></div>
         </div>
-        {{#js}}
-            require(['mod_bigbluebuttonbn/recordings'], function(recordings) {
-                recordings.init('#bigbluebuttonbn-recording-table-{{uniqid}}', '#searchform-auto-{{uniqid}}');
-            });
-            require(['core/inplace_editable']);
-        {{/js}}
     {{/has_recordings}}
     {{^has_recordings}}
         <div id="bigbluebuttonbn_recordings_table">{{#str}}view_message_norecordings, mod_bigbluebuttonbn{{/str}}</div>
     {{/has_recordings}}
 </div>
+
+{{#has_recordings}}
+    {{#js}}
+        require(['mod_bigbluebuttonbn/recordings'], function(recordings) {
+            recordings.init('#bigbluebuttonbn-recording-table-{{uniqid}}', '#searchform-auto-{{uniqid}}');
+        });
+        require(['core/inplace_editable']);
+    {{/js}}
+{{/has_recordings}}

@@ -62,6 +62,7 @@ class get_recordings extends external_api {
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
             'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
             'tools' => new external_value(PARAM_RAW, 'a set of enablec tools', VALUE_OPTIONAL),
+            'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
         ]);
     }
 
@@ -78,29 +79,61 @@ class get_recordings extends external_api {
      * @throws \restricted_context_exception
      * @throws invalid_parameter_exception
      */
-    public static function execute(int $bigbluebuttonbnid = 0, $removeimportedid = 0, $tools = 'protect,publish,delete'): array {
+    public static function execute(
+        int $bigbluebuttonbnid = 0,
+        $removeimportedid = 0,
+        ?string $tools = null,
+        ?int $groupid = null
+    ): array {
+        global $USER;
+
         $warnings = [];
+
+        if ($tools === null) {
+            $tools = 'protect,publish,delete';
+        }
 
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'removeimportedid' => $removeimportedid,
             'tools' => $tools,
+            'groupid' => $groupid,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'removeimportedid' => $removeimportedid,
             'tools' => $tools,
+            'groupid' => $groupid,
         ]);
 
         // Fetch the session, features, and profile.
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
         $context = $instance->get_context();
-        $enabledfeatures = $instance->get_enabled_features();
-        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
-        $bbbsession = $instance->get_legacy_session_object();
+        $cm = $instance->get_cm();
 
         // Validate that the user has access to this activity.
         self::validate_context($context);
+
+        $groupmode = groups_get_activity_groupmode($cm);
+        if ($groupmode) {
+            $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
+
+            if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
+                $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
+            } else {
+                $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
+            }
+
+            if (!array_key_exists($groupid, $allowedgroups)) {
+                throw new \webservice_access_exception('No access to this group');
+            }
+
+            $instance->set_group_id($groupid);
+        }
+
+        $enabledfeatures = $instance->get_enabled_features();
+        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
+        $bbbsession = $instance->get_legacy_session_object();
 
         $tools = explode(',', $tools);
 

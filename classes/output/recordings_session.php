@@ -65,6 +65,7 @@ class recordings_session implements renderable, templatable {
 
         $context = (object) [
             'bbbid' => $this->instance->get_instance_id(),
+            'groupid' => $this->instance->get_group_id(),
             'has_recordings' => $this->instance->is_recorded() && $isrecordedtype,
             'searchbutton' => [
                 'value' => '',
