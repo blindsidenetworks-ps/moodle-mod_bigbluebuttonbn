@@ -93,21 +93,22 @@ class meeting {
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file(
             bigbluebutton::action_url('getMeetingInfo', ['meetingID' => $meetingid])
         );
-        if ($xml && $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
+        if ($xml && (string) $xml->returncode == 'SUCCESS' && empty($xml->messageKey)) {
             // Meeting info was returned.
-            return array('returncode' => $xml->returncode,
-                'meetingID' => $xml->meetingID,
-                'moderatorPW' => $xml->moderatorPW,
-                'attendeePW' => $xml->attendeePW,
-                'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded,
-                'running' => $xml->running,
-                'recording' => $xml->recording,
-                'startTime' => $xml->startTime,
-                'endTime' => $xml->endTime,
-                'participantCount' => $xml->participantCount,
-                'moderatorCount' => $xml->moderatorCount,
-                'attendees' => $xml->attendees,
-                'metadata' => $xml->metadata,
+            return array(
+                'returncode' => (string) $xml->returncode,
+                'meetingID' => (string) $xml->meetingID,
+                'moderatorPW' => (string) $xml->moderatorPW,
+                'attendeePW' => (string) $xml->attendeePW,
+                'hasBeenForciblyEnded' => (string) $xml->hasBeenForciblyEnded,
+                'running' => (string) $xml->running,
+                'recording' => (string) $xml->recording,
+                'startTime' => (string) $xml->startTime,
+                'endTime' => (string) $xml->endTime,
+                'participantCount' => (string) $xml->participantCount,
+                'moderatorCount' => (string) $xml->moderatorCount,
+                'attendees' => (string) $xml->attendees,
+                'metadata' => (string) $xml->metadata,
             );
         }
         if ($xml) {
@@ -130,7 +131,11 @@ class meeting {
         );
         if ($xml) {
             // If the xml packet returned failure it displays the message to the user.
-            return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+            return array(
+                'returncode' => (string) $xml->returncode,
+                'message' => (string) $xml->message,
+                'messageKey' => (string) $xml->messageKey
+            );
         }
         // If the server is unreachable, then prompts the user of the necessary action.
         return null;
