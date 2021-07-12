@@ -28,6 +28,7 @@ use cache_store;
 use coding_exception;
 use context;
 use context_course;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use moodle_exception;
@@ -405,18 +406,18 @@ class roles {
      * Helper function returns a list of courses a user has access to, wrapped in an array that can be used
      * by a html select.
      *
-     * @param array $bbbsession
-     *
+     * @param instance $instance
      * @return array
      */
-    public static function bigbluebuttonbn_import_get_courses_for_select(array $bbbsession) {
-        if ($bbbsession['administrator']) {
+    public static function bigbluebuttonbn_import_get_courses_for_select(instance $instance) {
+        if ($instance->is_admin()) {
             $courses = get_courses('all', 'c.fullname ASC');
             // It includes the name of the site as a course (category 0), so remove the first one.
             unset($courses['1']);
         } else {
-            $courses = enrol_get_users_courses($bbbsession['userID'], false, 'id,shortname,fullname');
+            $courses = enrol_get_users_courses($instance->get_user_id(), false, 'id,shortname,fullname');
         }
+
         $coursesforselect = [];
         foreach ($courses as $course) {
             $coursesforselect[$course->id] = $course->fullname . " (" . $course->shortname . ")";

@@ -23,32 +23,34 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\local\view;
-use mod_bigbluebuttonbn\plugin;
+use core\notification;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\output\import_view;
-use mod_bigbluebuttonbn\output\renderer;
+use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__ . '/../../config.php');
-global $DB, $PAGE, $OUTPUT;
+
 $originbn = required_param('originbn', PARAM_INT);
 $frombn = optional_param('frombn', 0, PARAM_INT);
 $courseidscope = optional_param('courseidscope', 0, PARAM_INT);
 
-if (!$originbn) {
+$destinationinstance = instance::get_from_instanceid($originbn);
+if (!$destinationinstance) {
     throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
-list('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn) =
-    view::bigbluebuttonbn_view_instance_bigbluebuttonbn($originbn);
+$cm = $destinationinstance->get_cm();
+$course = $destinationinstance->get_course();
+$bigbluebuttonbn = $destinationinstance->get_instance_data();
+
 require_login($course, true, $cm);
 
-// TODO: check if this is still necessary.
-if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    throw new moodle_exception('view_error_invalid_session', plugin::COMPONENT);
-}
-
 if (!(boolean) \mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
-    throw new moodle_exception('view_message_importrecordings_disabled', plugin::COMPONENT);
+    notification::add(
+        get_string('view_message_importrecordings_disabled', plugin::COMPONENT),
+        notification::ERROR
+    );
+    redirect($instance->get_view_url());
 }
 
 // Print the page header.
@@ -57,14 +59,14 @@ $PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
-// View widget must be initialized here in order to properly load javascript.
-$view = new import_view($originbn, $frombn, $courseidscope);
+$sourceinstance = null;
+if ($frombn) {
+    $sourceinstance = instance::get_from_instanceid($frombn);
+}
 
-/** @var renderer $renderer */
+/** @var \mod_bigbluebuttonbn\renderer $renderer */
 $renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
-
-echo $renderer->render($view);
-
+echo $renderer->render(new import_view($destinationinstance, $courseidscope, $sourceinstance));
 echo $OUTPUT->footer();

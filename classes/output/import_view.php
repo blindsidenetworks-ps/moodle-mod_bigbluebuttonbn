@@ -25,16 +25,11 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\local\view;
-use moodle_url;
 use renderable;
 use renderer_base;
 use templatable;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class import_view
@@ -47,13 +42,14 @@ defined('MOODLE_INTERNAL') || die();
 class import_view implements renderable, templatable {
 
     /**
-     * @var $origingbbbid int
+     * @var instance $destinationinstance
      */
-    protected $origingbbbid;
+    protected $destinationinstance;
+
     /**
-     * @var $frombbbid int
+     * @var instance $sourceinstance
      */
-    protected $frombbbid;
+    protected $sourceinstance;
 
     /**
      * @var $courseidscope int
@@ -63,14 +59,14 @@ class import_view implements renderable, templatable {
     /**
      * import_view constructor.
      *
-     * @param int $origingbbbid
-     * @param int $frombbbid
+     * @param instance $destinationinstance
      * @param int $courseidscope
+     * @param instance $frombbbiinstance $sourceinstance
      */
-    public function __construct($origingbbbid, $frombbbid, $courseidscope) {
-        $this->origingbbbid = $origingbbbid;
-        $this->frombbbid = $frombbbid;
+    public function __construct(instance $destinationinstance, ?int $courseidscope, ?instance $sourceinstance) {
+        $this->destinationinstance = $destinationinstance;
         $this->courseidscope = $courseidscope;
+        $this->sourceinstance = $sourceinstance;
     }
 
     /**
@@ -87,75 +83,71 @@ class import_view implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         global $PAGE, $DB;
 
-        list('cm' => $origincm, 'course' => $origincourse, 'bigbluebuttonbn' => $originbigbluebuttonbn) =
-            view::bigbluebuttonbn_view_instance_bigbluebuttonbn($this->origingbbbid);
-        $bbbsession = bigbluebutton::build_bbb_session($origincm, $origincourse, $originbigbluebuttonbn);
-        $courses = roles::bigbluebuttonbn_import_get_courses_for_select($bbbsession);
+        $courses = roles::bigbluebuttonbn_import_get_courses_for_select($this->destinationinstance);
 
-        $hasrecordings = !empty($this->frombbbid);
-        if (!empty($this->frombbbid)) {
-            $context['bbbid'] = $this->frombbbid;
-            $context['bbboriginid'] = $this->origingbbbid;
-            $searchbutton = [
+        $context = (object) [
+            'bbboriginid' => $this->destinationinstance->get_instance_id(),
+            'has_recordings' => false,
+        ];
+
+        if (!empty($this->sourceinstance)) {
+            $context->bbbid = $this->sourceinstance->get_instance_id();
+            $context->search = [
                 'value' => ''
             ];
-            $context['search'] = $searchbutton;
-            list('bigbluebuttonbn' => $frombigbluebuttonbn) =
-                view::bigbluebuttonbn_view_instance_bigbluebuttonbn($this->frombbbid);
-            $hasrecordings = $hasrecordings &&
-                (in_array($frombigbluebuttonbn->type, [bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
-                    bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]));
+
+            if ($this->sourceinstance->is_type_recordings_only()) {
+                $context->has_recordings = true;
+            } else if ($this->sourceinstance->is_type_room_and_recordings()) {
+                $context->has_recordings = true;
+            }
         }
-        $context['has_recordings'] = $hasrecordings;
 
         // Now the selects.
         if ($this->courseidscope) {
-            $bbbrecords = $DB->get_records('bigbluebuttonbn', array('course' => $this->courseidscope));
             $selectrecords = [];
-            foreach ($bbbrecords as $record) {
-                if ($record->id == $this->origingbbbid) {
-                    continue;
-                }
-                // Check if the BBB is not currently scheduled for deletion.
-                list('cm' => $cm) =
-                    view::bigbluebuttonbn_view_instance_bigbluebuttonbn($record->id);
-                if ($cm->deletioninprogress) {
+
+            $cms = get_fast_modinfo($this->courseidscope)->instances['bigbluebuttonbn'];
+            foreach ($cms as $cm) {
+                if ($cm->id == $this->destinationinstance->get_cm_id()) {
+                    // Skip the target instance.
                     continue;
                 }
 
-                $selectrecords[$record->id] = $record->name;
+                if ($cm->deletioninprogress) {
+                    // Check if the BBB is not currently scheduled for deletion.
+                    continue;
+                }
+
+                $selectrecords[$cm->instance] = $cm->name;
             }
-            $actionurl = new moodle_url($PAGE->url);
-            $actionurl->remove_all_params();
-            $actionurl->param('originbn', $this->origingbbbid);
+            $actionurl = $this->destinationinstance->get_import_url();
             $actionurl->param('courseidscope', $this->courseidscope);
+
             $select = new \single_select(
                 $actionurl,
                 'frombn',
                 $selectrecords,
-                empty($this->frombbbid) ? 0 : $this->frombbbid
+                empty($this->sourceinstance) ? 0 : $this->sourceinstance->get_instance_id()
             );
-            $context['bbb_select'] = $select->export_for_template($output);
-            $context['has_selected_course'] = true;
+            $context->bbb_select = $select->export_for_template($output);
+            $context->has_selected_course = true;
         }
-        $actionurl = new moodle_url($PAGE->url);
-        $actionurl->remove_all_params();
-        $actionurl->param('originbn', $this->origingbbbid);
-        $select = new \single_select(
-            $actionurl,
+
+        // Course selector.
+        $context->course_select = (new \single_select(
+            $this->destinationinstance->get_import_url(),
             'courseidscope',
             $courses,
             empty($this->courseidscope) ? 0 : $this->courseidscope
-        );
-        $context['course_select'] = $select->export_for_template($output);
+        ))->export_for_template($output);
 
-        $backurl = new moodle_url('/mod/bigbluebuttonbn/view.php', array(
-            'id' => $origincm->id
-        ));
-        $button = new \single_button(
-            $backurl,
-            get_string('view_recording_button_return', 'mod_bigbluebuttonbn'));
-        $context['back_button'] = $button->export_for_template($output);
+        // Back button.
+        $context->back_button = (new \single_button(
+            $this->destinationinstance->get_view_url(),
+            get_string('view_recording_button_return', 'mod_bigbluebuttonbn')
+        ))->export_for_template($output);
+
         return $context;
     }
 
