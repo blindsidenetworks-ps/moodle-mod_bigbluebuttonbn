@@ -43,35 +43,18 @@ class mobileview {
      * @param array $bbbsession
      * @return string
      */
-    public static function build_url_join_session(&$bbbsession) {
-        $password = $bbbsession['viewerPW'];
-        if ($bbbsession['administrator'] || $bbbsession['moderator']) {
-            $password = $bbbsession['modPW'];
-        }
-        $joinurl = bigbluebutton::bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
-            $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['createtime']);
+    public static function build_url_join_session(instance $instance, ?int $createtime): string {
+        $joinurl = bigbluebutton::bigbluebuttonbn_get_join_url(
+            $instance->get_meeting_id(),
+            $instance->get_user_fullname(),
+            $instance->get_current_user_password(),
+            $instance->get_logout_url(),
+            null,
+            $instance->get_user_id(),
+            $createtime
+        );
 
         return($joinurl);
-    }
-
-    /**
-     * Return the status of an activity [open|not_started|ended].
-     *
-     * @param array $bbbsession
-     * @return string
-     */
-    public static function get_activity_status(&$bbbsession) {
-        $now = time();
-        if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
-            // The activity has not been opened.
-            return 'not_started';
-        }
-        if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
-            // The activity has been closed.
-            return 'ended';
-        }
-        // The activity is open.
-        return 'open';
     }
 
     /**

@@ -709,18 +709,30 @@ class bigbluebutton {
      * @param instance $instance
      */
     public static function handle_server_not_available(instance $instance): void {
-        if ($instance->is_admin()) {
-            $errmsg = 'view_error_unable_join';
-            $url = new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);
-        } else if ($instance->is_moderator()) {
-            $errmsg = 'view_error_unable_join_teacher';
-            $url = new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
-        } else {
-            $errmsg = 'view_error_unable_join_student';
-            $url = new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
-        }
+        \core\notification::add(
+            self::get_server_not_available_message($instance),
+            \core\notification::ERROR
+        );
+        redirect(self::get_server_not_available_url($instance));
+    }
 
-        \core\notification::add(get_string($errmsg, 'mod_bigbluebuttonbn'), \core\notification::ERROR);
-        redirect($url);
+    public static function get_server_not_available_message(instance $instance): string {
+        if ($instance->is_admin()) {
+            return get_string('view_error_unable_join', 'mod_bigbluebuttonbn');
+        } else if ($instance->is_moderator()) {
+            return get_string('view_error_unable_join_teacher', 'mod_bigbluebuttonbn');
+        } else {
+            return get_string('view_error_unable_join_student', 'mod_bigbluebuttonbn');
+        }
+    }
+
+    public static function get_server_not_available_url(instance $instance): string {
+        if ($instance->is_admin()) {
+            return new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);
+        } else if ($instance->is_moderator()) {
+            return new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        } else {
+            return new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        }
     }
 }
