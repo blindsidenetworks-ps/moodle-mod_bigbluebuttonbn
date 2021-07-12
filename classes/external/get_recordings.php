@@ -25,10 +25,7 @@
 
 namespace mod_bigbluebuttonbn\external;
 
-use context_course;
-use context_module;
 use external_api;
-use external_description;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
@@ -37,9 +34,7 @@ use external_warnings;
 use invalid_parameter_exception;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\plugin;
 
@@ -110,12 +105,11 @@ class get_recordings extends external_api {
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
         $context = $instance->get_context();
         $cm = $instance->get_cm();
-
         // Validate that the user has access to this activity.
         self::validate_context($context);
 
         $groupmode = groups_get_activity_groupmode($cm);
-        if ($groupmode) {
+        if ($groupmode && $groupid) {
             $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
 
             if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
@@ -125,6 +119,9 @@ class get_recordings extends external_api {
             }
 
             if (!array_key_exists($groupid, $allowedgroups)) {
+                // Import exception and lib.
+                global $CFG;
+                require_once($CFG->dirroot . '/webservice/lib.php');
                 throw new \webservice_access_exception('No access to this group');
             }
 
@@ -133,23 +130,22 @@ class get_recordings extends external_api {
 
         $enabledfeatures = $instance->get_enabled_features();
         $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
-        $bbbsession = $instance->get_legacy_session_object();
 
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
+        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
 
         if ($removeimportedid) {
             $recordings = recording::bigbluebuttonbn_unset_existent_recordings_already_imported(
                 $recordings,
-                $instance->get_course(),
+                $instance->get_course_id(),
                 $removeimportedid
             );
         }
 
         $tabledata = [
-            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($bbbsession),
+            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
             'locale' => plugin::bigbluebuttonbn_get_localcode(),
             'profile_features' => $typeprofiles[0]['features'],
@@ -196,7 +192,7 @@ class get_recordings extends external_api {
         ];
 
         // Initialize table headers.
-        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($instance)) {
             $columns[] = [
                 'key' => 'preview',
                 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),

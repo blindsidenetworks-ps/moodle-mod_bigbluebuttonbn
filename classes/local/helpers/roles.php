@@ -406,7 +406,7 @@ class roles {
      * Helper function returns a list of courses a user has access to, wrapped in an array that can be used
      * by a html select.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      * @return array
      */
     public static function bigbluebuttonbn_import_get_courses_for_select(instance $instance) {

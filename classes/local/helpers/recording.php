@@ -374,12 +374,12 @@ class recording {
     /**
      * Helper function evaluates if recording preview should be included.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      *
      * @return boolean
      */
-    public static function bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession) {
-        return ((double) $bbbsession['serverversion'] >= 1.0 && $bbbsession['bigbluebuttonbn']->recordings_preview == '1');
+    public static function bigbluebuttonbn_get_recording_data_preview_enabled($instance) {
+        return (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0 && $instance->get_instance_var('recordings_preview') == '1');
     }
 
     /**
@@ -567,11 +567,11 @@ class recording {
      * Helper function renders recording types to be used in row for the data used by the recording table.
      *
      * @param array $recording
-     * @param array $bbbsession
+     * @param instance $instance
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession) {
+    public static function bigbluebuttonbn_get_recording_data_row_types($recording, $instance) {
         $dataimported = 'false';
         $title = '';
         if (isset($recording['imported'])) {
@@ -588,7 +588,7 @@ class recording {
             'title' => $title, $visibility => $visibility));
         foreach ($recording['playbacks'] as $playback) {
             $recordingtypes .= self::bigbluebuttonbn_get_recording_data_row_type($recording,
-                $bbbsession, $playback);
+                $instance, $playback);
         }
         $recordingtypes .= html_writer::end_tag('div');
         return $recordingtypes;
@@ -598,18 +598,18 @@ class recording {
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
      * @param array $recording
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $playback
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback) {
+    public static function bigbluebuttonbn_get_recording_data_row_type($recording, $instance, $playback) {
         global $CFG, $OUTPUT;
-        if (!view::bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback)) {
+        if (!view::bigbluebuttonbn_include_recording_data_row_type($recording, $instance, $playback)) {
             return '';
         }
         $text = self::bigbluebuttonbn_get_recording_type_text($playback['type']);
-        $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
+        $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $instance->get_instance_id() .
             '&mid=' . $recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
         if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));
@@ -652,13 +652,13 @@ class recording {
      * Helper function renders the name for recording used in row for the data used by the recording table.
      *
      * @param array $recording
-     * @param array $bbbsession
+     * @param instance $instance
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession) {
+    public static function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $instance) {
         $payload = array();
-        if (self::bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
+        if (self::bigbluebuttonbn_get_recording_data_row_editable($instance)) {
             $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
                 'action' => 'edit', 'tag' => 'edit',
                 'target' => 'name');
@@ -684,13 +684,13 @@ class recording {
      * Helper function renders the description for recording used in row for the data used by the recording table.
      *
      * @param array $recording
-     * @param array $bbbsession
+     * @param instance $instance
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $bbbsession) {
+    public static function bigbluebuttonbn_get_recording_data_row_meta_description($recording, $instance) {
         $payload = array();
-        if (self::bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
+        if (self::bigbluebuttonbn_get_recording_data_row_editable($instance)) {
             $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
                 'action' => 'edit', 'tag' => 'edit',
                 'target' => 'description');
@@ -731,32 +731,32 @@ class recording {
     /**
      * Get the basic data to display in the table view
      *
-     * @param array $bbbsession the current session
+     * @param instance $instance the current instance
      * @param array $enabledfeatures feature enabled for this activity
      * @return array array containing the recordings indexed by recordID, each recording is also a
      * non sequential array itself that corresponds to the actual recording in BBB
      */
-    public static function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures) {
+    public static function bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures) {
         $bigbluebuttonbnid = null;
         if ($enabledfeatures['showroom']) {
-            $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+            $bigbluebuttonbnid = $instance->get_instance_id();
         }
         // TODO: Check the difference between this this and recording::bigbluebuttonbn_get_allrecordings.
         $recordings = self::bigbluebuttonbn_get_recordings(
-            $bbbsession['course']->id,
+            $instance->get_course_id(),
             $bigbluebuttonbnid,
             $enabledfeatures['showroom'],
-            $bbbsession['bigbluebuttonbn']->recordings_deleted
+            $instance->get_instance_var('recordings_deleted')
         );
         if ($enabledfeatures['importrecordings']) {
             // Get recording links.
-            $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+            $bigbluebuttonbnid = $instance->get_instance_id();
             $recordingsimported = self::bigbluebuttonbn_get_recordings_imported_array(
-                $bbbsession['course']->id, $bigbluebuttonbnid, true
+                $instance->get_course_id(), $bigbluebuttonbnid, true
             );
             /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
              * recordings are not included. */
-            if ($bbbsession['bigbluebuttonbn']->recordings_imported) {
+            if ($instance->get_instance_var('recordings_deleted')) {
                 $recordings = $recordingsimported;
             } else {
                 $recordings += $recordingsimported;
@@ -768,7 +768,7 @@ class recording {
     /**
      * Helper function evaluates if recording row should be included in the table.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $recording
      *
      * @return boolean
@@ -1003,22 +1003,23 @@ class recording {
     /**
      * Helper function evaluates if a row for the data used by the recording table is editable.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      *
      * @return boolean
      */
-    public static function bigbluebuttonbn_get_recording_data_row_editable($bbbsession) {
-        return ($bbbsession['managerecordings'] && ((double) $bbbsession['serverversion'] >= 1.0 || $bbbsession['bnserver']));
+    public static function bigbluebuttonbn_get_recording_data_row_editable($instance) {
+        return $instance->can_manage_recordings()
+            && (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0 || $instance->is_blindside_network_server());
     }
 
     /**
      * Helper function builds a row for the data used by the recording table.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      * @param array $recording
      * @param array $tools
      *
-     * @return array
+     * @return stdClass
      */
     public static function bigbluebuttonbn_get_recording_data_row(instance $instance, array $recording, ?array $tools = null) {
         global $OUTPUT, $PAGE;
@@ -1026,15 +1027,13 @@ class recording {
             $tools = ['protect', 'publish', 'delete'];
         }
 
-        $bbbsession = $instance->get_legacy_session_object();
-
         if (!self::bigbluebuttonbn_include_recording_table_row($instance, $recording)) {
-            return;
+            return null;
         }
         $rowdata = new stdClass();
 
         // Set recording_types.
-        $rowdata->playback = self::bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession);
+        $rowdata->playback = self::bigbluebuttonbn_get_recording_data_row_types($recording, $instance);
 
         // Set activity name.
         $recordingname = new recording_name_editable($recording, $instance);
@@ -1046,7 +1045,7 @@ class recording {
         $rowdata->description = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingdescription->export_for_template($OUTPUT));
 
-        if (self::bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        if (self::bigbluebuttonbn_get_recording_data_preview_enabled($instance)) {
             // Set recording_preview.
             $rowdata->preview = self::bigbluebuttonbn_get_recording_data_row_preview($recording);
         }
@@ -1057,7 +1056,7 @@ class recording {
         // Set formatted duration.
         $rowdata->duration_formatted = $rowdata->duration = self::bigbluebuttonbn_get_recording_data_row_duration($recording);
         // Set actionbar, if user is allowed to manage recordings.
-        if ($bbbsession['managerecordings']) {
+        if ($instance->can_manage_recordings()) {
             $rowdata->actionbar = self::bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools);
         }
         return $rowdata;
@@ -1146,29 +1145,25 @@ class recording {
     /**
      * Helper for performing import on recordings.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param string $recordingid
      * @param string $importmeetingid
-     *
-     * @return string
      */
-    public static function recording_import($bbbsession, $recordingid, $importmeetingid) {
+    public static function recording_import($instance, $recordingid, $importmeetingid) {
         $recordings = self::bigbluebuttonbn_get_recordings_array([$importmeetingid], [$recordingid]);
         $overrides = array('meetingid' => $importmeetingid);
         $meta = json_encode((object) [
             'recording' => $recordings[$recordingid]
         ]);
-        logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'],
+        logs::bigbluebuttonbn_log($instance->get_instance_data(),
             bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT,
             $overrides,
             $meta);
         // Moodle event logger: Create an event for recording imported.
-        if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
-                events::$events['recording_import'],
-                $bbbsession['bigbluebuttonbn'],
-                ['other' => $bbbsession['bigbluebuttonbn']->id]
-            );
-        }
+        \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
+            events::$events['recording_import'],
+            $instance->get_instance_data(),
+            ['other' => $instance->get_instance_id()]
+        );
     }
 }

@@ -52,7 +52,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->participants = '<p>this -&gt; &quot;</p>\n';
         $bbformdata->timemodified = time();
-        instance::bigbluebuttonbn_process_pre_save($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save($bbformdata);
         $this->assertTrue($bbformdata->timemodified != 0);
         $this->assertEquals('<p>this -> "</p>\n', $bbformdata->participants);
     }
@@ -69,7 +69,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->instance = 0;
         $bbformdata->timemodified = time();
-        instance::bigbluebuttonbn_process_pre_save_instance($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_instance($bbformdata);
         $this->assertTrue($bbformdata->timemodified == 0);
     }
 
@@ -85,7 +85,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         unset($bbformdata->wait);
         unset($bbformdata->recordallfromstart);
-        instance::bigbluebuttonbn_process_pre_save_checkboxes($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_checkboxes($bbformdata);
         $this->assertTrue(isset($bbformdata->wait));
         $this->assertTrue(isset($bbformdata->recordallfromstart));
     }
@@ -105,7 +105,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         $bbformdata->groupmode = '1';
-        instance::bigbluebuttonbn_process_pre_save_common($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_common($bbformdata);
         $this->assertEquals(0, $bbformdata->groupmode);
     }
 
@@ -130,7 +130,7 @@ class instance_test extends \bbb_simple_test {
         // Mark the form to trigger notification.
         $bbformdata->notification = true;
         $messagesink = $this->redirectMessages();
-        instance::bigbluebuttonbn_process_post_save($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save($bbformdata);
         // Now run cron.
         ob_start();
         $this->runAdhocTasks();
@@ -157,7 +157,7 @@ class instance_test extends \bbb_simple_test {
         $teacher = $this->generator->create_user(['role' => 'editingteacher']);
         $this->generator->enrol_user($teacher->id, $this->course->id);
 
-        instance::bigbluebuttonbn_process_post_save_notification($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_notification($bbformdata);
         // Now run cron.
         ob_start();
         $this->runAdhocTasks();
@@ -178,7 +178,7 @@ class instance_test extends \bbb_simple_test {
         $eventsink = $this->redirectEvents();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->openingtime = time();
-        instance::bigbluebuttonbn_process_post_save_event($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_event($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 
@@ -195,7 +195,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $eventsink = $this->redirectEvents();
         $bbformdata->completionexpected = 1;
-        instance::bigbluebuttonbn_process_post_save_completion($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_completion($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 

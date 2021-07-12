@@ -159,12 +159,12 @@ class view {
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
      * @param array $recording
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $playback
      *
      * @return boolean
      */
-    public static function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback) {
+    public static function bigbluebuttonbn_include_recording_data_row_type($recording, $instance, $playback) {
         // All types that are not restricted are included.
         if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
             return true;
@@ -178,7 +178,7 @@ class view {
             return false;
         }
         // Exclude non moderators.
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+        if (!$instance->is_admin() && !$instance->is_moderator()) {
             return false;
         }
         return true;

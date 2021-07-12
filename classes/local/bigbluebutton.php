@@ -25,6 +25,7 @@
 
 namespace mod_bigbluebuttonbn\local;
 
+use cache;
 use completion_info;
 use context_course;
 use context_module;
@@ -272,25 +273,22 @@ class bigbluebutton {
      * @throws \required_capability_exception
      */
     public static function can_join_meeting($cmid) {
-        global $CFG;
         $canjoin = array('can_join' => false, 'message' => '');
 
         $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
         if ($viewinstance) {
-            $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
-            if ($bbbsession) {
-                $info = meeting::bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
-                $running = false;
-                if ($info['returncode'] == 'SUCCESS') {
-                    $running = ($info['running'] === 'true');
-                }
-                $participantcount = 0;
-                if (isset($info['participantCount'])) {
-                    $participantcount = $info['participantCount'];
-                }
-                $canjoin = broker::meeting_info_can_join($bbbsession, $running,
-                    $participantcount);
+            $instance = instance::get_from_cmid($cmid);
+            $info = meeting::bigbluebuttonbn_get_meeting_info($instance->get_meeting_id(), false);
+            $running = false;
+            if ($info['returncode'] == 'SUCCESS') {
+                $running = ($info['running'] === 'true');
             }
+            $participantcount = 0;
+            if (isset($info['participantCount'])) {
+                $participantcount = $info['participantCount'];
+            }
+            $canjoin = broker::meeting_info_can_join($instance, $running,
+                $participantcount);
         }
         return $canjoin;
     }
@@ -340,11 +338,18 @@ class bigbluebutton {
      * @return string
      */
     public static function bigbluebuttonbn_get_server_version() {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url()
-        );
-        if ($xml && $xml->returncode == 'SUCCESS') {
-            return $xml->version;
+        $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
+        $serverversion = $cache->get('serverversion');
+        if (!$serverversion) {
+            $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+                self::action_url()
+            );
+            if ($xml && $xml->returncode == 'SUCCESS') {
+                $cache->set('serverversion', (string) $xml->version);
+                return  (double) $xml->version;
+            }
+        } else {
+            return (double) $serverversion;
         }
         return null;
     }
@@ -672,16 +677,16 @@ class bigbluebutton {
     /**
      * Return the status of an activity [open|not_started|ended].
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @return string
      */
-    public static function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
+    public static function bigbluebuttonbn_view_get_activity_status($instance) {
         $now = time();
-        if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
+        if (!empty($instance->get_instance_var('openingtime')) && $now < $instance->get_instance_var('openingtime')) {
             // The activity has not been opened.
             return 'not_started';
         }
-        if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
+        if (!empty($instance->get_instance_var('closingtime')) && $now > $instance->get_instance_var('closingtime')) {
             // The activity has been closed.
             return 'ended';
         }

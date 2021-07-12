@@ -80,7 +80,7 @@ class reset_test extends \bbb_simple_test {
                 ['openingtime' => time()]
         );
         $formdata = $this->get_form_data_from_instance($bbactivity);
-        \mod_bigbluebuttonbn\local\helpers\instance::bigbluebuttonbn_process_post_save_event($formdata);
+        \mod_bigbluebuttonbn\local\helpers\mod_helper::bigbluebuttonbn_process_post_save_event($formdata);
         $this->assertEquals(1, $DB->count_records(
                 'event',
                 array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->course->id)));

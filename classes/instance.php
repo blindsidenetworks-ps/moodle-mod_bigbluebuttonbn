@@ -21,6 +21,7 @@
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_bigbluebuttonbn;
 
 use cm_info;
@@ -34,7 +35,6 @@ use moodle_url;
 use stdClass;
 
 class instance {
-
     /** @var cm_info The cm_info object relating to the instance */
     protected $cm;
 
@@ -406,9 +406,6 @@ EOF;
      * @return array
      */
     protected function generate_legacy_session_object(): array {
-        global $CFG, $USER;
-
-        $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
         $bbbsession = [
             'username' => $this->get_user_fullname(),
             'userID' => $this->get_user_id(),
@@ -423,7 +420,7 @@ EOF;
             'administrator' => $this->is_admin(),
             'moderator' => $this->is_moderator(),
             'managerecordings' => $this->can_manage_recordings(),
-            'importrecordings' =>  $this->can_manage_recordings(),
+            'importrecordings' => $this->can_manage_recordings(),
 
             'modPW' => $this->get_moderator_password(),
             'viewerPW' => $this->get_viewer_password(),
@@ -440,7 +437,6 @@ EOF;
 
             // Metadata.
             'bnserver' => $this->is_blindside_network_server(),
-            'serverversion' => (string) $serverversion,
 
             // URLs.
             'bigbluebuttonbnURL' => $this->get_view_url(),
@@ -578,7 +574,7 @@ EOF;
      */
     public function get_user_limit(): int {
         if ((boolean) config::get('userlimit_editable')) {
-           return intval($this->get_instance_var('userlimit'));
+            return intval($this->get_instance_var('userlimit'));
         }
 
         return intval((int) config::get('userlimit_default'));

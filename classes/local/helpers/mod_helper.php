@@ -44,7 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class instance {
+class mod_helper {
 
     /**
      * Runs any processes that must run before a bigbluebuttonbn insert/update.

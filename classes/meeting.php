@@ -21,6 +21,7 @@
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_bigbluebuttonbn;
 
 use mod_bigbluebuttonbn\local\bigbluebutton;
@@ -70,8 +71,7 @@ class meeting {
 
         $info = meeting_helper::bigbluebuttonbn_get_meeting_info($instance->get_meeting_id(), $updatecache);
         $isrunning = $info['returncode'] === 'SUCCESS' && $info['running'] === 'true';
-        $bbbsession = $instance->get_legacy_session_object();
-        $activitystatus = bigbluebutton::bigbluebuttonbn_view_get_activity_status($bbbsession);
+        $activitystatus = bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
 
         $meetinginfo = (object) [
             'instanceid' => $instance->get_instance_id(),
@@ -97,7 +97,7 @@ class meeting {
         $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
         $meetinginfo->participantcount = $participantcount;
         $status = broker::meeting_info_can_join(
-            $instance->get_legacy_session_object(),
+            $instance,
             $isrunning,
             $meetinginfo->participantcount
         );
@@ -121,7 +121,7 @@ class meeting {
 
         $presentation = $instance->get_presentation();
         if (!empty($presentation)) {
-            $meetinginfo->presentations[] =  $presentation;
+            $meetinginfo->presentations[] = $presentation;
         }
 
         return $meetinginfo;

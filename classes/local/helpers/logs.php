@@ -152,7 +152,7 @@ class logs {
     /**
      * Log the relevant events for when a meeting was created.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      */
     public static function log_meeting_created_event(instance $instance): void {
         // Moodle event logger: Create an event for meeting created.
@@ -175,7 +175,7 @@ class logs {
     /**
      * Log the relevant events for when a meeting was joined.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      * @param int $origin
      */
     public static function log_meeting_joined_event(instance $instance, int $origin): void {
@@ -197,7 +197,7 @@ class logs {
     /**
      * Log the relevant events for when a user left a meeting.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      */
     public static function log_meeting_left_event(instance $instance): void {
         // Moodle event logger: Create an event for meeting left.
@@ -210,7 +210,7 @@ class logs {
     /**
      * Log the relevant events for when a recording has been played.
      *
-     * @param instance $instance
+     * @param mod_helper $instance
      */
     public static function log_recording_played_event(instance $instance): void {
         // Moodle event logger: Create an event for recording played.

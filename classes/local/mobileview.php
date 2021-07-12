@@ -24,6 +24,7 @@
 
 namespace mod_bigbluebuttonbn\local;
 
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,7 +41,7 @@ class mobileview {
     /**
      * Build url for join to session.
      * This method is similar to "join_meeting()" in bbb_view.
-     * @param array $bbbsession
+     * @param instance $instance
      * @return string
      */
     public static function build_url_join_session(instance $instance, ?int $createtime): string {
@@ -60,45 +61,45 @@ class mobileview {
     /**
      * Helper for preparing metadata used while creating the meeting.
      *
-     * @param  array    $bbbsession
+     * @param  instance    $instance
      * @return array
      */
-    public static function create_meeting_metadata(&$bbbsession) {
-        return meeting::bigbluebuttonbn_create_meeting_metadata($bbbsession);
+    public static function create_meeting_metadata($instance) {
+        return meeting::bigbluebuttonbn_create_meeting_metadata($instance);
     }
 
     /**
      * Helper to prepare data used for create meeting.
-     * @param array $bbbsession
+     * @param instance $instance
      * @return array
      * @throws \coding_exception
      */
-    public static function create_meeting_data(&$bbbsession) {
-        $data = ['meetingID' => $bbbsession['meetingid'],
-            'name' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
-            'attendeePW' => $bbbsession['viewerPW'],
-            'moderatorPW' => $bbbsession['modPW'],
-            'logoutURL' => $bbbsession['logoutURL'],
+    public static function create_meeting_data($instance) {
+        $data = ['meetingID' => $instance->get_meeting_id(),
+            'name' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_html2text($instance->get_meeting_name(), 64),
+            'attendeePW' => $instance->get_viewer_password(),
+            'moderatorPW' => $instance->get_moderator_password(),
+            'logoutURL' => $instance->get_logout_url(),
         ];
-        $data['record'] = self::create_meeting_data_record($bbbsession['record']);
+        $data['record'] = self::should_record($instance);
         // Check if auto_start_record is enable.
-        if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
+        if ($data['record'] == 'true' && $instance->should_record_from_start()) {
             $data['autoStartRecording'] = 'true';
             // Check if hide_record_button is enable.
-            if ($bbbsession['recordallfromstart'] && $bbbsession['recordhidebutton']) {
+            if (!$instance->should_show_recording_button()) {
                 $data['allowStartStopRecording'] = 'false';
             }
         }
-        $data['welcome'] = trim($bbbsession['welcome']);
-        $voicebridge = intval($bbbsession['voicebridge']);
+        $data['welcome'] = trim($instance->get_welcome_message());
+        $voicebridge = intval($instance->get_voice_bridge());
         if ($voicebridge > 0 && $voicebridge < 79999) {
             $data['voiceBridge'] = $voicebridge;
         }
-        $maxparticipants = intval($bbbsession['userlimit']);
+        $maxparticipants = intval($instance->get_user_limit());
         if ($maxparticipants > 0) {
             $data['maxParticipants'] = $maxparticipants;
         }
-        if ($bbbsession['muteonstart']) {
+        if ($instance->get_mute_on_start()) {
             $data['muteOnStart'] = 'true';
         }
         return $data;
@@ -107,11 +108,11 @@ class mobileview {
     /**
      * Helper for returning the flag to know if the meeting is recorded.
      *
-     * @param  boolean    $record
+     * @param  instance    $instance
      * @return string
      */
-    public static function create_meeting_data_record($record) {
-        if ((boolean) config::recordings_enabled() && $record) {
+    public static function should_record($instance) {
+        if ((boolean) config::recordings_enabled() && $instance->is_recorded()) {
             return 'true';
         }
         return 'false';

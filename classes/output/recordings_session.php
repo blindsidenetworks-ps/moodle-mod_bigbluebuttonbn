@@ -72,7 +72,6 @@ class recordings_session implements renderable, templatable {
             ],
         ];
 
-
         if ($this->instance->can_import_recordings()) {
             $button = new \single_button(
                 $this->instance->get_import_url(),

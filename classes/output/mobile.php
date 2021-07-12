@@ -28,6 +28,7 @@ namespace mod_bigbluebuttonbn\output;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\logs;
@@ -50,6 +51,7 @@ class mobile {
 
     /**
      * Returns the bigbluebuttonbn course view for the mobile app.
+     *
      * @param mixed $args
      * @return array HTML, javascript and other data.
      * @throws \coding_exception
@@ -72,9 +74,7 @@ class mobile {
         $instance = instance::get_from_cmid($args->cmid);
         $cm = $instance->get_cm();
         $course = $instance->get_course();
-        $context = $instance->get_context();
         $bigbluebuttonbn = $instance->get_instance_data();
-        $bbbsession = $instance->get_legacy_session_object();
 
         // Check activity status.
         if ($instance->before_start_time()) {
@@ -136,12 +136,14 @@ class mobile {
 
         // See if the BBB session is already in progress.
         if (!meeting_helper::bigbluebuttonbn_is_meeting_running($instance->get_meeting_id())) {
+            $presentationname = $instance->get_presentation()['name'] ?? null;
+            $presentationurl = $instance->get_presentation()['url'] ?? null;
             // The meeting doesnt exist in BBB server, must be created.
             $response = meeting_helper::bigbluebuttonbn_get_create_meeting_array(
-                mobileview::create_meeting_data($bbbsession),
-                mobileview::create_meeting_metadata($bbbsession),
-                $bbbsession['presentation']['name'],
-                $bbbsession['presentation']['url']
+                mobileview::create_meeting_data($instance),
+                mobileview::create_meeting_metadata($instance),
+                $presentationname,
+                $presentationurl
             );
 
             if (empty($response)) {
@@ -181,7 +183,7 @@ class mobile {
 
         // Check groups access and show message.
         $msjgroup = array();
-        $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
         if ($groupmode != NOGROUPS) {
             $msjgroup = array("message" => get_string('view_mobile_message_groups_not_supported',
                 'bigbluebuttonbn'));
@@ -217,6 +219,7 @@ class mobile {
 
     /**
      * Returns the view for errors.
+     *
      * @param string $error Error to display.
      *
      * @return array       HTML, javascript and otherdata

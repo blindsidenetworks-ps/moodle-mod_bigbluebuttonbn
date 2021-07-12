@@ -28,6 +28,7 @@ namespace mod_bigbluebuttonbn\local;
 use coding_exception;
 use Exception;
 use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\recording;
@@ -42,58 +43,20 @@ global $CFG;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class broker {
-
-    /**
-     * Callback for meeting info.
-     *
-     * @param array $bbbsession
-     * @param array $params
-     * @param boolean $updatecache
-     *
-     * @return string
-     */
-    public static function meeting_info($bbbsession, $params, $updatecache) {
-        $callbackresponse = array();
-        $info = meeting::bigbluebuttonbn_get_meeting_info($params['id'], $updatecache);
-        $callbackresponse['info'] = $info;
-        $running = false;
-        if ($info['returncode'] == 'SUCCESS') {
-            $running = ($info['running'] === 'true');
-        }
-        $callbackresponse['running'] = $running;
-        $status = array();
-        $status["join_url"] = $bbbsession['joinURL'];
-        $status["join_button_text"] = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $status["end_button_text"] = get_string('view_conference_action_end', 'bigbluebuttonbn');
-        $participantcount = 0;
-        if (isset($info['participantCount'])) {
-            $participantcount = $info['participantCount'];
-        }
-        $canjoin =
-            self::meeting_info_can_join($bbbsession, $running, $participantcount);
-        $status["can_join"] = $canjoin["can_join"];
-        $status["message"] = $canjoin["message"];
-        $canend = self::meeting_info_can_end($bbbsession, $running);
-        $status["can_end"] = $canend["can_end"];
-        $callbackresponse['status'] = $status;
-        $callbackresponsedata = json_encode($callbackresponse);
-        return "{$params['callback']}({$callbackresponsedata});";
-    }
-
     /**
      * Helper for evaluating if meeting can be joined, it is used by meeting info callback.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param boolean $running
      * @param boolean $participantcount
      *
      * @return array
      */
-    public static function meeting_info_can_join($bbbsession, $running, $participantcount) {
+    public static function meeting_info_can_join($instance, $running, $participantcount) {
         $status = array("can_join" => false);
         if ($running) {
             $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-            if ($bbbsession['userlimit'] == 0 || $participantcount < $bbbsession['userlimit']) {
+            if ($instance->get_user_limit() == 0 || $participantcount < $instance->get_user_limit()) {
                 $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
                 $status["can_join"] = true;
             }
@@ -101,7 +64,7 @@ class broker {
         }
         // If user is administrator, moderator or if is viewer and no waiting is required.
         $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-        if ($bbbsession['administrator'] || $bbbsession['moderator'] || !$bbbsession['wait']) {
+        if ($instance->is_admin() || $instance->is_admin() | !$instance->user_must_wait_to_join()) {
             $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
             $status["can_join"] = true;
         }
@@ -111,13 +74,13 @@ class broker {
     /**
      * Helper for evaluating if meeting can be ended, it is used by meeting info callback.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param boolean $running
      *
      * @return boolean
      */
-    public static function meeting_info_can_end($bbbsession, $running) {
-        if ($running && ($bbbsession['administrator'] || $bbbsession['moderator'])) {
+    public static function meeting_info_can_end($instance, $running) {
+        if ($running && ($instance->is_admin() || $instance->is_moderator())) {
             return array("can_end" => true);
         }
         return array("can_end" => false);
@@ -126,23 +89,21 @@ class broker {
     /**
      * Callback for meeting end.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $params
      *
      * @return string
      */
-    public static function meeting_end($bbbsession, $params) {
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+    public static function meeting_end($instance, $params) {
+        if (!$instance->is_admin() && !$instance->is_moderator()) {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
             return;
         }
         // Execute the end command.
-        meeting::bigbluebuttonbn_end_meeting($params['id'], $bbbsession['modPW']);
+        meeting::bigbluebuttonbn_end_meeting($params['id'], $instance->get_moderator_password());
         // Moodle event logger: Create an event for meeting ended.
-        if (isset($bbbsession['bigbluebuttonbn'])) {
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(events::$events['meeting_end'],
-                $bbbsession['bigbluebuttonbn']);
-        }
+        \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(events::$events['meeting_end'],
+            $instance->get_instance_data());
         // Update the cache.
         meeting::bigbluebuttonbn_get_meeting_info($params['id'], bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE);
         $callbackresponse = array('status' => true);
@@ -153,13 +114,13 @@ class broker {
     /**
      * Callback for recording links.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $params
      *
      * @return string
      */
-    public static function recording_links($bbbsession, $params) {
-        if (!$bbbsession['managerecordings']) {
+    public static function recording_links($instance, $params) {
+        if (!$instance->can_manage_recordings()) {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute update command');
             return;
         }
@@ -176,24 +137,24 @@ class broker {
     /**
      * Callback for recording info.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $params
      * @param boolean $showroom
      *
      * @return string
      */
-    public static function recording_info($bbbsession, $params, $showroom) {
-        if (!$bbbsession['managerecordings']) {
+    public static function recording_info($instance, $params, $showroom) {
+        if (!$instance->can_manage_recordings()) {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute command');
             return;
         }
         $callbackresponse = array('status' => true, 'found' => false);
-        $courseid = $bbbsession['course']->id;
+        $courseid = $instance->get_course_id();
         $bigbluebuttonbnid = null;
         if ($showroom) {
-            $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+            $bigbluebuttonbnid = $instance->get_instance_id();
         }
-        $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
+        $includedeleted = $instance->get_instance_data()->recordings_deleted;
         // Retrieve the array of imported recordings.
         $recordings =
             recording::bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
@@ -265,27 +226,27 @@ class broker {
      * Callback for recording action.
      * (publush/unpublish/protect/unprotect/edit/delete)
      *
-     * @param array $bbbsession
+     * @param  instance $instance
      * @param array $params
      * @param boolean $showroom
      *
      * @return string
      */
-    public static function recording_action($bbbsession, $params, $showroom) {
-        if (!$bbbsession['managerecordings']) {
+    public static function recording_action($instance, $params, $showroom) {
+        if (!$instance->can_manage_recordings()) {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
             return;
         }
         // Retrieve array of recordings that includes real and imported.
         $bigbluebuttonbnid = null;
         if ($showroom) {
-            $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
+            $bigbluebuttonbnid = $instance->get_instance_data()->id;
         }
         $recordings = recording::bigbluebuttonbn_get_allrecordings(
-            $bbbsession['course']->id,
+            $instance->get_course_id(),
             $bigbluebuttonbnid,
             $showroom,
-            $bbbsession['bigbluebuttonbn']->recordings_deleted
+            $instance->get_instance_var('recordings_deleted')
         );
 
         $action = strtolower($params['action']);
@@ -296,7 +257,7 @@ class broker {
             // Moodle event logger: Create an event for action performed on recording.
             \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
                 events::$events[$action],
-                $bbbsession['bigbluebuttonbn'],
+                $instance->get_instance_data(),
                 ['other' => $params['id']]
             );
         }
@@ -624,14 +585,14 @@ class broker {
     /**
      * Helper for performing import on recordings.
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @param array $params
      *
      * @return string
      */
-    public static function recording_import($bbbsession, $params) {
+    public static function recording_import($instance, $params) {
         global $SESSION;
-        if (!$bbbsession['managerecordings']) {
+        if (!$instance->can_manage_recordings()) {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
             return;
         }
@@ -645,16 +606,14 @@ class broker {
         $importrecordings[$params['id']]['imported'] = true;
         $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
         $meta = '{"recording":' . json_encode($importrecordings[$params['id']]) . '}';
-        logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides,
+        logs::bigbluebuttonbn_log($instance->get_instance_data(), bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides,
             $meta);
         // Moodle event logger: Create an event for recording imported.
-        if (isset($bbbsession['bigbluebutton']) && isset($bbbsession['cm'])) {
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
-                events::$events['recording_import'],
-                $bbbsession['bigbluebuttonbn'],
-                ['other' => $params['id']]
-            );
-        }
+        \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
+            events::$events['recording_import'],
+            $instance->get_instance_data(),
+            ['other' => $params['id']]
+        );
         $callbackresponsedata = json_encode($callbackresponse);
         return "{$params['callback']}({$callbackresponsedata});";
     }

@@ -85,7 +85,7 @@ if ($timeline || $index) {
     // TODO Remove when all uses of the session have been removed.
     // Initialize session variable used across views.
     $SESSION->bigbluebuttonbn_bbbsession = $instance->get_legacy_session_object();
-    // END TODO
+    // END TODO.
 }
 
 // Print the page header.
@@ -337,8 +337,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
  * @return array
  */
 function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
-    $bbbsession = $instance->get_legacy_session_object();
-    return meeting_helper::bigbluebuttonbn_create_meeting_metadata($bbbsession);
+    return meeting_helper::bigbluebuttonbn_create_meeting_metadata($instance);
 }
 
 /**

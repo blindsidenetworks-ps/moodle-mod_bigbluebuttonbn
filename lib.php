@@ -25,11 +25,11 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
-use mod_bigbluebuttonbn\external\meeting_info;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\local\helpers\instance;
+use mod_bigbluebuttonbn\local\helpers\mod_helper;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\reset;
@@ -88,7 +88,7 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    instance::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    mod_helper::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
     $bigbluebuttonbn->presentation = files::bigbluebuttonbn_get_media_file($bigbluebuttonbn);
     // Insert a record.
@@ -100,7 +100,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     // Log insert action.
     logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_ADD);
     // Complete the process.
-    instance::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    mod_helper::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     return $bigbluebuttonbn->id;
 }
 
@@ -115,7 +115,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    instance::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    mod_helper::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
     $bigbluebuttonbn->presentation = files::bigbluebuttonbn_get_media_file($bigbluebuttonbn);
@@ -126,7 +126,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     // Log update action.
     logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_EDIT);
     // Complete the process.
-    instance::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    mod_helper::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     return true;
 }
 
@@ -482,17 +482,8 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
  * @return bool Returns true if the event is visible to the current user, false otherwise.
  */
 function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $event) {
-    global $DB;
-    $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance), '*', MUST_EXIST);
-    // Create array bbbsession with configuration for BBB server.
-    $bbbsession['course'] = $cm->get_course();
-    $bbbsession['coursename'] = $cm->get_course()->fullname;
-    $bbbsession['cm'] = $cm;
-    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-    $context = context_module::instance($cm->id);
-    mod_bigbluebuttonbn\local\bigbluebutton::view_bbbsession_set($context, $bbbsession);
-    $activitystatus = mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($bbbsession);
+    $instance = instance::get_from_cmid($event->instance);
+    $activitystatus = mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
     return $activitystatus != 'ended';
 }
 

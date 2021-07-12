@@ -26,6 +26,7 @@ namespace mod_bigbluebuttonbn\local\helpers;
 use cache;
 use cache_store;
 use context_course;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
@@ -198,41 +199,42 @@ class meeting {
     /**
      * Helper for preparing metadata used while creating the meeting.
      *
-     * @param  array    $bbbsession
+     * @param  instance    $instance
      * @return array
      */
-    public static function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
+    public static function bigbluebuttonbn_create_meeting_metadata($instance) {
         global $USER;
         // Create standard metadata.
+        $origindata = $instance->get_origin_data();
         $metadata = [
-            'bbb-origin' => $bbbsession['origin'],
-            'bbb-origin-version' => $bbbsession['originVersion'],
-            'bbb-origin-server-name' => $bbbsession['originServerName'],
-            'bbb-origin-server-common-name' => $bbbsession['originServerCommonName'],
-            'bbb-origin-tag' => $bbbsession['originTag'],
-            'bbb-context' => $bbbsession['course']->fullname,
-            'bbb-context-id' => $bbbsession['course']->id,
-            'bbb-context-name' => trim(html_to_text($bbbsession['course']->fullname, 0)),
-            'bbb-context-label' => trim(html_to_text($bbbsession['course']->shortname, 0)),
-            'bbb-recording-name' => plugin::bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
-            'bbb-recording-description' => plugin::bigbluebuttonbn_html2text($bbbsession['meetingdescription'],
+            'bbb-origin' => $origindata->origin,
+            'bbb-origin-version' => $origindata->originVersion,
+            'bbb-origin-server-name' => $origindata->originServerName,
+            'bbb-origin-server-common-name' => $origindata->originServerCommonName,
+            'bbb-origin-tag' => $origindata->originTag,
+            'bbb-context' => $instance->get_course()->fullname,
+            'bbb-context-id' => $instance->get_course_id(),
+            'bbb-context-name' => trim(html_to_text($instance->get_course()->fullname, 0)),
+            'bbb-context-label' => trim(html_to_text($instance->get_course()->shortname, 0)),
+            'bbb-recording-name' => plugin::bigbluebuttonbn_html2text($instance->get_meeting_name(), 64),
+            'bbb-recording-description' => plugin::bigbluebuttonbn_html2text($instance->get_meeting_description(),
                 64),
-            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_get_tags($instance->get_cm_id()), // Same as $id.
         ];
         // Special metadata for recording processing.
         if ((boolean) config::get('recordingstatus_enabled')) {
             $metadata["bn-recording-status"] = json_encode(
                 array(
                     'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
-                    'context' => $bbbsession['bigbluebuttonbnURL'],
+                    'context' => $instance->get_view_url(),
                 )
             );
         }
         if ((boolean) config::get('recordingready_enabled')) {
-            $metadata['bn-recording-ready-url'] = $bbbsession['recordingReadyURL'];
+            $metadata['bn-recording-ready-url'] = $instance->get_record_ready_url();
         }
         if ((boolean) config::get('meetingevents_enabled')) {
-            $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
+            $metadata['analytics-callback-url'] = $instance->get_meeting_event_notification_url();
         }
         return $metadata;
     }

@@ -111,14 +111,13 @@ class update_recording extends external_api {
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
         $context = $instance->get_context();
         $enabledfeatures = $instance->get_enabled_features();
-        $bbbsession = $instance->get_legacy_session_object();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
+        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
 
         // Specific action for import
         // TODO: refactor this so we do all the operation in the recording table instead of the
@@ -127,7 +126,7 @@ class update_recording extends external_api {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
         } else {
-            recording::recording_import($bbbsession, $recordingid, $additionaloptions);
+            recording::recording_import($instance, $recordingid, $additionaloptions);
         }
 
         return [];

@@ -63,7 +63,7 @@ if ($groupid) {
 // In locallib.
 // TODO Move to \mod_bigbluebuttonbn\log::log_event().
 logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
-//END TODO
+// END TODO.
 
 // Require a working server.
 bigbluebutton::require_working_server($instance);
