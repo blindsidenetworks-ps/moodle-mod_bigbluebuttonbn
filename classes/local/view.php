@@ -41,32 +41,6 @@ use pix_icon;
  */
 class view {
 
-
-    /**
-     * Renders the view for importing recordings.
-     *
-     * @param array $bbbsession
-     * @param array $enabledfeatures
-     *
-     * @return string
-     * @throws \coding_exception
-     */
-    public static function view_render_imported($bbbsession, $enabledfeatures) {
-        global $CFG;
-        if (!$enabledfeatures['importrecordings'] || !$bbbsession['importrecordings']) {
-            return '';
-        }
-        $button = html_writer::tag('input', '', [
-            'type' => 'button',
-            'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
-            'class' => 'btn btn-secondary',
-        ]);
-        $output = html_writer::empty_tag('br');
-        $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
-        $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
-        return $output;
-    }
-
     /**
      * Helper function returns array with the instance settings used in views based on id.
      *
