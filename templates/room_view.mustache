@@ -76,13 +76,17 @@
             {{/isrunning}}
             <span>{{.}}</span>
         {{/attendees}}
-        {{#presentations}}
-            <div class="presentation">
-                <h4>{{#str}}view_section_title_presentation, mod_bigbluebuttonbn{{/str}}</h4>
-                {{#pix}}{{iconname}},{{icondesc}}{{/pix}}
-                <a href="{{url}}" class="btn btn-secondary" title="{{name}}">{{name}}</a>
+        {{#presentations.0}}
+            <h4>{{#str}}view_section_title_presentation, mod_bigbluebuttonbn{{/str}}</h4>
+            <div class="list-group list-group-flush">
+              {{#presentations}}
+                <a href="{{url}}" target="_blank" class="list-group-item list-group-item-action">
+                  {{#pix}}{{iconname}},core, {{icondesc}}{{/pix}}
+                  {{name}}
+                </a>
+              {{/presentations}}
             </div>
-        {{/presentations}}
+        {{/presentations.0}}
     </div>
     <div id="bigbluebuttonbn_view_action_button_box" class="box py-3 generalbox boxaligncenter">
         <div id="room_view_action_buttons">
