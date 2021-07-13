@@ -29,7 +29,6 @@ use html_writer;
 use mod_bigbluebuttonbn\plugin;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
 /**
  * Helper class for sending notifications.

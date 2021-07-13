@@ -43,7 +43,7 @@ class recordings_session implements renderable, templatable {
     /**
      * @var instance
      */
-    protected $bbbsinstance;
+    protected $instance;
 
     /**
      * recording_section constructor.

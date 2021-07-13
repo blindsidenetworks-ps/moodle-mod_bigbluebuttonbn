@@ -25,20 +25,12 @@
 
 namespace mod_bigbluebuttonbn\external;
 
-use context_course;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\roles;
-use moodle_exception;
-use restricted_context_exception;
 
 /**
  * External service for meeting

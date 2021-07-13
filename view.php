@@ -112,4 +112,6 @@ echo '<!-- ' . $instance->get_origin_data()->originTag . ' -->' . "\n";
 // TODO: Get rid of this ASAP !
 // Before this can happen, all places which only retrieve it from the SESSION need to modify the page URL to specify the
 // instanceid.
-$SESSION->bigbluebuttonbn_bbbsession = $instance->get_legacy_session_object();
+// Note: I am not sure this is used anymore, it was before used in bbb_view.php/bbb_ajax.php
+// and mobile.php but now we have replaced this by the instance class, this is not necessary.
+// $SESSION->bigbluebuttonbn_bbbsession = $instance->get_legacy_session_object(); .

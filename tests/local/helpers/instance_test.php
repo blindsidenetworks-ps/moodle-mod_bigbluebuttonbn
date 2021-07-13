@@ -43,8 +43,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave test
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save() {
         $this->resetAfterTest();
@@ -60,8 +58,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave instance
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_instance() {
         $this->resetAfterTest();
@@ -76,8 +72,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave checkboxes
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_checkboxes() {
         $this->resetAfterTest();
@@ -93,8 +87,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave common
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_common() {
         global $CFG;
@@ -112,8 +104,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save() {
         global $CFG;
@@ -141,11 +131,8 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save notification
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_notification() {
-        global $CFG;
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
@@ -168,8 +155,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save event
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_event() {
         $this->resetAfterTest();
@@ -185,8 +170,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save completion
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_completion() {
         $this->resetAfterTest();

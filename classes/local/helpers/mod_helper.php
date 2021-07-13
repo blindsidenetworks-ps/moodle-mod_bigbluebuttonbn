@@ -25,14 +25,8 @@ namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\notifier;
-use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
-use context_module;
-use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -68,7 +62,6 @@ class mod_helper {
      * @return void
      **/
     public static function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
-        global $CFG;
         $bigbluebuttonbn->timemodified = time();
         if ((integer) $bigbluebuttonbn->instance == 0) {
             $bigbluebuttonbn->meetingid = 0;

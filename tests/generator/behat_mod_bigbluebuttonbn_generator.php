@@ -58,7 +58,7 @@ class behat_mod_bigbluebuttonbn_generator extends behat_generator_base {
      *
      * @param string $bbactivityname the bigbluebutton activity name, for example 'Test meeting'.
      * @return int corresponding id.
-     * @throws dml_exception
+     * @throws Exception
      */
     protected function get_bigbluebuttonbn_id(string $bbactivityname): int {
         global $DB;

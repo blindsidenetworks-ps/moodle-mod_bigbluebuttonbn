@@ -26,14 +26,11 @@
 namespace mod_bigbluebuttonbn\external;
 
 use external_api;
-use external_description;
 use external_function_parameters;
-use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use moodle_exception;
 
@@ -69,11 +66,6 @@ class update_recording extends external_api {
      * @param null $additionaloptions
      * @return array (empty array for now)
      * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws \restricted_context_exception
-     * @throws moodle_exception
      */
     public static function execute(
         int $bigbluebuttonbnid,

@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -41,7 +41,9 @@ class mobileview {
     /**
      * Build url for join to session.
      * This method is similar to "join_meeting()" in bbb_view.
+     *
      * @param instance $instance
+     * @param int|null $createtime
      * @return string
      */
     public static function build_url_join_session(instance $instance, ?int $createtime): string {
@@ -65,14 +67,13 @@ class mobileview {
      * @return array
      */
     public static function create_meeting_metadata($instance) {
-        return meeting::bigbluebuttonbn_create_meeting_metadata($instance);
+        return meeting_helper::bigbluebuttonbn_create_meeting_metadata($instance);
     }
 
     /**
      * Helper to prepare data used for create meeting.
      * @param instance $instance
      * @return array
-     * @throws \coding_exception
      */
     public static function create_meeting_data($instance) {
         $data = ['meetingID' => $instance->get_meeting_id(),

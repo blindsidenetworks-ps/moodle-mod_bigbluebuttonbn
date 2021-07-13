@@ -66,13 +66,10 @@ class get_recordings extends external_api {
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param int $removeimportedid the removeimportedid instance id
-     * @param string $tools
+     * @param string|null $tools
+     * @param int|null $groupid
      * @return array of warnings and status result
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \restricted_context_exception
-     * @throws invalid_parameter_exception
+     * @throws \webservice_access_exception
      */
     public static function execute(
         int $bigbluebuttonbnid = 0,

@@ -29,7 +29,7 @@ use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
@@ -76,16 +76,6 @@ require_login($course, true, $cm);
 $groupid = groups_get_activity_group($cm, true) ?: null;
 if ($groupid) {
     $instance->set_group_id($groupid);
-}
-
-if ($timeline || $index) {
-    // Require a working server.
-    bigbluebutton::require_working_session($instance);
-
-    // TODO Remove when all uses of the session have been removed.
-    // Initialize session variable used across views.
-    $SESSION->bigbluebuttonbn_bbbsession = $instance->get_legacy_session_object();
-    // END TODO.
 }
 
 // Print the page header.
@@ -161,8 +151,8 @@ switch (strtolower($action)) {
         $response = meeting_helper::bigbluebuttonbn_get_create_meeting_array(
             bigbluebuttonbn_bbb_view_create_meeting_data($instance),
             bigbluebuttonbn_bbb_view_create_meeting_metadata($instance),
-            $presentation['name'],
-            $presentation['url']
+            $presentation['name'] ?? '',
+            $presentation['url'] ?? ''
         );
 
         if (empty($response)) {
@@ -172,18 +162,15 @@ switch (strtolower($action)) {
 
         if ($response['returncode'] == 'FAILED') {
             // The meeting was not created.
+            $printerrorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
             if (!$printerrorkey) {
                 throw new moodle_exception($response['message'], 'bigbluebuttonbn');
-                break;
             }
-            $printerrorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
             throw new moodle_exception($printerrorkey, 'bigbluebuttonbn');
-            break;
         }
 
         if ($response['hasBeenForciblyEnded'] == 'true') {
             throw new moodle_exception(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
-            break;
         }
         // Moodle event logger: Create an event for meeting created.
         logs::log_meeting_created_event($instance);
@@ -194,7 +181,7 @@ switch (strtolower($action)) {
 
     case 'play':
         $href = bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype);
-        logs::log_recording_played_event($instance);
+        logs::log_recording_played_event($instance, $rid);
 
         // Execute the redirect.
         header('Location: '.urldecode($href));
@@ -296,16 +283,15 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
         'lockSettingsDisableMic' => 'disablemic',
         'lockSettingsDisablePrivateChat' => 'disableprivatechat',
         'lockSettingsDisablePublicChat' => 'disablepublicchat',
-        'lockSettingsDisablePublicChat' => 'disablenote',
+        'lockSettingsDisableNote' => 'disablenote',
         'lockSettingsHideUserList' => 'hideuserlist',
         'lockSettingsLockedLayout' => 'lockedlayout',
         'lockSettingsLockOnJoin' => 'lockonjoin',
         'lockSettingsLockOnJoinConfigurable' => 'lockonjoinconfigurable',
     ];
 
-    $instancedata = $instance->get_legacy_session_object();
     foreach ($lockedsettings as $datakey => $instancekey) {
-        $data[$datakey] = $instancedata[$instancekey];
+        $data[$datakey] = $instance->get_instance_var($instancekey);
     }
 
     foreach ($data as $key => $value) {

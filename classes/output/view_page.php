@@ -28,12 +28,18 @@ use core\output\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\external\meeting_info;
 use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
 
+/**
+ * Class view_page
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class view_page implements renderable, templatable {
 
     /** @var instance The instance being rendered */
@@ -41,6 +47,8 @@ class view_page implements renderable, templatable {
 
     /**
      * Constructor for the View Page.
+     *
+     * @param instance $instance
      */
     public function __construct(instance $instance) {
         $this->instance = $instance;
@@ -49,7 +57,7 @@ class view_page implements renderable, templatable {
     /**
      * Export the content required to render the template.
      *
-     * @param  renderer_base $output
+     * @param renderer_base $output
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {

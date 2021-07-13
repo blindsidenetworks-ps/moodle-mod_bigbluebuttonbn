@@ -34,6 +34,13 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_url;
 use stdClass;
 
+/**
+ * Class instance
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class instance {
     /** @var cm_info The cm_info object relating to the instance */
     protected $cm;
@@ -56,6 +63,13 @@ class instance {
     /** @var array Legacy data for caching */
     protected $legacydata;
 
+    /**
+     * instance constructor.
+     *
+     * @param cm_info $cm
+     * @param stdClass $course
+     * @param stdClass $instancedata
+     */
     public function __construct(cm_info $cm, stdClass $course, stdClass $instancedata) {
         $this->cm = $cm;
         $this->course = $course;
@@ -106,7 +120,7 @@ EOF;
     /**
      * Get the instance information from a cmid.
      *
-     * @param int $instanceid The id from the cmid
+     * @param int $cmid
      * @return self
      */
     public static function get_from_cmid(int $cmid): self {
@@ -527,7 +541,7 @@ EOF;
     /**
      * Whether the current user is an administrator.
      *
-     * @retur bool
+     * @return bool
      */
     public function is_admin(): bool {
         global $USER;
@@ -629,7 +643,7 @@ EOF;
     /**
      * Whether participants are muted on entry.
      *
-     * @return
+     * @return bool
      */
     public function get_mute_on_start(): bool {
         return $this->get_instance_var('muteonstart');
@@ -678,7 +692,7 @@ EOF;
             return (bool) $this->get_instance_var('recordhidebutton');
         }
 
-        return $CFG->bigbluebuttonbn_recording_hide_button_default;
+        return !$CFG->bigbluebuttonbn_recording_hide_button_default;
     }
 
     /**
@@ -723,7 +737,7 @@ EOF;
      * @return bool
      */
     public function allow_recording_start_stop(): bool {
-        if ($this->is_recorded()) {
+        if (!$this->is_recorded()) {
             return false;
         }
 
@@ -765,9 +779,9 @@ EOF;
     /**
      * Get the presentation data.
      *
-     * @return array
+     * @return array|null
      */
-    public function get_presentation(): array {
+    public function get_presentation(): ?array {
         if ($this->has_ended()) {
             return files::bigbluebuttonbn_get_presentation_array(
                 $this->get_context(),

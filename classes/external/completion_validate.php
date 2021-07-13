@@ -29,12 +29,8 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\helpers\meeting;
 use moodle_exception;
-use restricted_context_exception;
 
 /**
  * External service to validate completion.
@@ -61,12 +57,6 @@ class completion_validate extends external_api {
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @return array (empty array for now)
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws \restricted_context_exception
-     * @throws moodle_exception
      */
     public static function execute(
         int $bigbluebuttonbnid

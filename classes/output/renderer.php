@@ -31,6 +31,14 @@ use html_writer;
 use mod_bigbluebuttonbn\instance;
 use plugin_renderer_base;
 
+/**
+ * Class renderer
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ */
 class renderer extends plugin_renderer_base {
 
     /**

@@ -25,6 +25,7 @@ namespace mod_bigbluebuttonbn\local\helpers;
 
 use cache;
 use cache_store;
+use coding_exception;
 use context_course;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
@@ -42,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class meeting {
+class meeting_helper {
 
     /**
      * Creates a bigbluebutton meeting and returns the response in an array.
@@ -271,16 +272,30 @@ class meeting {
     }
 
     /**
-     * End the session associated with this instance (if it's running).
+     * Helper for evaluating if meeting can be joined.
      *
-     * @param object $bigbluebuttonbn
+     * @param instance $instance
+     * @param boolean $running
+     * @param boolean $participantcount
      *
-     * @return void
+     * @return array
      */
-    public static function bigbluebuttonbn_end_meeting_if_running($bigbluebuttonbn) {
-        $meetingid = $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id;
-        if (self::bigbluebuttonbn_is_meeting_running($meetingid)) {
-            self::bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
+    public static function meeting_info_can_join($instance, $running, $participantcount) {
+        $status = array("can_join" => false);
+        if ($running) {
+            $status["message"] = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
+            if ($instance->get_user_limit() == 0 || $participantcount < $instance->get_user_limit()) {
+                $status["message"] = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+                $status["can_join"] = true;
+            }
+            return $status;
         }
+        // If user is administrator, moderator or if is viewer and no waiting is required.
+        $status["message"] = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+        if ($instance->is_admin() || $instance->is_admin() | !$instance->user_must_wait_to_join()) {
+            $status["message"] = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+            $status["can_join"] = true;
+        }
+        return $status;
     }
 }

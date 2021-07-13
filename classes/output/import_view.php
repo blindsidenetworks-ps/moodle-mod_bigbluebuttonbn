@@ -60,8 +60,8 @@ class import_view implements renderable, templatable {
      * import_view constructor.
      *
      * @param instance $destinationinstance
-     * @param int $courseidscope
-     * @param instance $frombbbiinstance $sourceinstance
+     * @param int|null $courseidscope
+     * @param instance|null $sourceinstance
      */
     public function __construct(instance $destinationinstance, ?int $courseidscope, ?instance $sourceinstance) {
         $this->destinationinstance = $destinationinstance;
@@ -73,16 +73,9 @@ class import_view implements renderable, templatable {
      * Defer to template.
      *
      * @param renderer_base $output
-     * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
+     * @return object
      */
     public function export_for_template(renderer_base $output) {
-        global $PAGE, $DB;
-
         $courses = roles::bigbluebuttonbn_import_get_courses_for_select($this->destinationinstance);
 
         $context = (object) [

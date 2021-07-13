@@ -25,12 +25,8 @@
 
 namespace mod_bigbluebuttonbn\local;
 
-use context_module;
-use core_renderer;
-use html_writer;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
-use mod_bigbluebuttonbn\plugin;
 use pix_icon;
 
 /**

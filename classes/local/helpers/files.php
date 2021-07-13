@@ -51,7 +51,6 @@ class files {
      * @param string $filearea file area
      *
      * @return false|null false if file not valid
-     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
 
@@ -101,7 +100,6 @@ class files {
      * @param array $args extra arguments
      *
      * @return array|string|null
-     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args) {
 
@@ -193,7 +191,6 @@ class files {
      * Returns an array of file areas.
      *
      * @return array a list of available file areas
-     * @throws \coding_exception
      * @category files
      *
      */
@@ -211,7 +208,6 @@ class files {
      * @param object $bigbluebuttonbn BigBlueButtonBN form data
      *
      * @return string
-     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
         if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
@@ -248,9 +244,9 @@ class files {
      * @param string $presentation
      * @param integer $id
      *
-     * @return array
+     * @return array|null
      */
-    public static function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
+    public static function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null): ?array {
         global $CFG;
         if (empty($presentation)) {
             if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
@@ -310,12 +306,7 @@ class files {
                 ];
             }
 
-            return [
-                'url' => null,
-                'name' => null,
-                'iconname' => null,
-                'icondesc' => null,
-            ];
+            return null; // No presentation.
         }
         $fs = get_file_storage();
         $files = $fs->get_area_files(
@@ -327,12 +318,7 @@ class files {
             false
         );
         if (count($files) == 0) {
-            return [
-                'icondesc' => null,
-                'iconname' => null,
-                'name' => null,
-                'url' => null,
-            ];
+            return null; // No presentation.
         }
         $file = reset($files);
         unset($files);

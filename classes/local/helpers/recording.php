@@ -24,14 +24,11 @@
 
 namespace mod_bigbluebuttonbn\local\helpers;
 
-use html_table;
-use html_table_row;
 use html_writer;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
@@ -283,7 +280,7 @@ class recording {
      * @param object $a
      * @param object $b
      *
-     * @return array
+     * @return int
      */
     public static function bigbluebuttonbn_recording_build_sorter($a, $b) {
         global $CFG;
@@ -379,7 +376,8 @@ class recording {
      * @return boolean
      */
     public static function bigbluebuttonbn_get_recording_data_preview_enabled($instance) {
-        return (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0 && $instance->get_instance_var('recordings_preview') == '1');
+        return (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0
+            && $instance->get_instance_var('recordings_preview') == '1');
     }
 
     /**
@@ -1015,9 +1013,9 @@ class recording {
     /**
      * Helper function builds a row for the data used by the recording table.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
      * @param array $recording
-     * @param array $tools
+     * @param array|null $tools
      *
      * @return stdClass
      */

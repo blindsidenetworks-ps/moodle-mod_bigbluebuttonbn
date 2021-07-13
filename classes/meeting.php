@@ -24,11 +24,19 @@
 
 namespace mod_bigbluebuttonbn;
 
+use coding_exception;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\meeting as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use stdClass;
 
+/**
+ * Class meeting
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class meeting {
 
     /** @var instance The bbb instance */
@@ -96,7 +104,7 @@ class meeting {
 
         $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
         $meetinginfo->participantcount = $participantcount;
-        $status = broker::meeting_info_can_join(
+        $status = meeting_helper::meeting_info_can_join(
             $instance,
             $isrunning,
             $meetinginfo->participantcount

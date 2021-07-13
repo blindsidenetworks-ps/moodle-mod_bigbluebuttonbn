@@ -46,7 +46,6 @@ class custom_completion extends activity_custom_completion {
      *
      * @param string $rule
      * @return int
-     * @throws \dml_exception
      */
     public function get_state(string $rule): int {
         global $DB;
@@ -125,7 +124,6 @@ class custom_completion extends activity_custom_completion {
      * Returns an associative array of the descriptions of custom completion rules.
      *
      * @return array
-     * @throws \coding_exception
      */
     public function get_custom_rule_descriptions(): array {
         $completionengagementchats = $this->cm->customdata['customcompletionrules']['completionengagementchats'] ?? 0;

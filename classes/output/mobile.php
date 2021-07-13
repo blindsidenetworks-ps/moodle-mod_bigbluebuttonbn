@@ -27,16 +27,15 @@ namespace mod_bigbluebuttonbn\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\mobileview;
 use mod_bigbluebuttonbn\local\view;
-use mod_bigbluebuttonbn\output\mod_bigbluebuttonbn\local\helpers\roles;
-
+global $CFG;
 require_once($CFG->dirroot . '/lib/grouplib.php');
 
 /**
@@ -54,10 +53,6 @@ class mobile {
      *
      * @param mixed $args
      * @return array HTML, javascript and other data.
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
      */
     public static function mobile_course_view($args) {
 
@@ -256,8 +251,8 @@ class mobile {
         global $OUTPUT, $CFG;
 
         $data = array(
-            'bigbluebuttonbn' => $bigbluebuttonbn,
-            'cmid' => $cm->id,
+            'bigbluebuttonbn' => $instance->get_instance_data(),
+            'cmid' => $instance->get_cm_id(),
             'message' => $message,
             'not_started' => $notstarted
         );

@@ -30,7 +30,7 @@ use coding_exception;
 use html_table;
 use html_writer;
 use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\plugin;
 use moodle_exception;
 use renderable;
@@ -57,7 +57,6 @@ class index implements renderable {
      *
      * @param stdClass $course
      * @param stdClass[] List of bbbbn instances
-     * @throws coding_exception
      */
     public function __construct(stdClass $course, array $instances) {
         $this->course = $course;
@@ -150,7 +149,7 @@ class index implements renderable {
         ?stdClass $group = null
     ): array {
         $meetingid = plugin::get_meeting_id($instance, $group);
-        $meetinginfo = meeting::bigbluebuttonbn_get_meeting_info_array($meetingid);
+        $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info_array($meetingid);
 
         if (empty($meetinginfo)) {
             // The server was unreachable.

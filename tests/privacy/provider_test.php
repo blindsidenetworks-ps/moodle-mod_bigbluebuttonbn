@@ -50,7 +50,6 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Clean the temporary mocked up recordings
      *
-     * @throws coding_exception
      */
     public function tearDown(): void {
         parent::tearDown();

@@ -42,7 +42,7 @@ class logs {
      *
      * @param object $bigbluebuttonbn
      * @param string $event
-     * @param array  $overrides
+     * @param array $overrides
      * @param string $meta
      *
      * @return bool Success/Failure
@@ -152,7 +152,7 @@ class logs {
     /**
      * Log the relevant events for when a meeting was created.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
      */
     public static function log_meeting_created_event(instance $instance): void {
         // Moodle event logger: Create an event for meeting created.
@@ -175,7 +175,7 @@ class logs {
     /**
      * Log the relevant events for when a meeting was joined.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
      * @param int $origin
      */
     public static function log_meeting_joined_event(instance $instance, int $origin): void {
@@ -197,7 +197,7 @@ class logs {
     /**
      * Log the relevant events for when a user left a meeting.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
      */
     public static function log_meeting_left_event(instance $instance): void {
         // Moodle event logger: Create an event for meeting left.
@@ -210,9 +210,10 @@ class logs {
     /**
      * Log the relevant events for when a recording has been played.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
+     * @param int $rid record id
      */
-    public static function log_recording_played_event(instance $instance): void {
+    public static function log_recording_played_event(instance $instance, $rid): void {
         // Moodle event logger: Create an event for recording played.
         self::bigbluebuttonbn_event_log(
             \mod_bigbluebuttonbn\event\events::$events['recording_play'],

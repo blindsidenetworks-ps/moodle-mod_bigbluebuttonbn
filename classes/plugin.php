@@ -31,7 +31,6 @@ use core_tag_tag;
 use mod_bigbluebuttonbn\local\config;
 use moodle_url;
 use stdClass;
-use variable;
 
 /**
  * Class plugin.
@@ -53,7 +52,6 @@ abstract class plugin {
      * @param  array $params
      * @param  string $anchor
      * @return string
-     * @throws \moodle_exception
      */
     public static function necurl($url, $params = null, $anchor = null) {
         $lurl = new moodle_url($url, $params, $anchor);
@@ -104,7 +102,6 @@ abstract class plugin {
      * Helper function returns the locale set by moodle.
      *
      * @return string
-     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_get_locale() {
         $lang = get_string('locale', 'core_langconfig');

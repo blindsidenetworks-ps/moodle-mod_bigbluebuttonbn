@@ -31,7 +31,7 @@ use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\mod_helper;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
 use mod_bigbluebuttonbn\plugin;
 
@@ -452,7 +452,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     // Get if the room is available.
     list($roomavailable) = bigbluebutton::bigbluebuttonbn_room_is_available($bigbluebuttonbn);
     // Get if the user can join.
-    list($usercanjoin) = meeting::bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    list($usercanjoin) = meeting_helper::bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
 
     // Check if the room is closed and the user has already joined this session or played the record.
     if (!$roomavailable && $usercomplete) {

@@ -58,7 +58,7 @@ class bigbluebuttonbn_activity_management_viewed extends base
     /**
      * Return objectid mapping.
      *
-     * @return string
+     * @return array
      */
     public static function get_objectid_mapping() {
         return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');

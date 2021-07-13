@@ -51,7 +51,6 @@ abstract class recording_editable extends \core\output\inplace_editable {
      *
      * @param array $recording
      * @param instance $instance
-     * @throws \moodle_exception
      */
     public function __construct($recording, instance $instance) {
         $this->instance = $instance;

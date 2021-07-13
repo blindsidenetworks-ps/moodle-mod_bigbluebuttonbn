@@ -81,8 +81,6 @@ class roles {
      * @param context_course $context
      * @param null $bbactivity
      * @return array $users
-     * @throws coding_exception
-     * @throws moodle_exception
      */
     public static function bigbluebuttonbn_get_users_select(context_course $context, $bbactivity = null) {
         // CONTRIB-7972, check the group of current user and course group mode.
@@ -410,7 +408,7 @@ class roles {
      * Helper function returns a list of courses a user has access to, wrapped in an array that can be used
      * by a html select.
      *
-     * @param mod_helper $instance
+     * @param instance $instance
      * @return array
      */
     public static function bigbluebuttonbn_import_get_courses_for_select(instance $instance) {
