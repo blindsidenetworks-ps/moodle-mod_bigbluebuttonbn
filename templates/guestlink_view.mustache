@@ -22,7 +22,6 @@
     Example context (json):
     {
         "url": "https:\/\/moodle.example.org.at\/mod\/bigbluebuttonbn\/guestaccess.php?gid=cXBWfCxKVSgU",
-        "nopassword": false,
         "password": 123456,
         "changepassenabled": true,
         "enabled": true
@@ -53,9 +52,9 @@
                             {{#password}}
                                 <input type="text" id="password" class="form-control" readonly value="{{password}}" size="6" />
                             {{/password}}
-                            {{#nopassword}}
+                            {{^password}}
                                 <input type="text" id="password" class="form-control" readonly value="{{#str}}view_guestlink_password_no_password_set, bigbluebuttonbn{{/str}}" size="6" />
-                            {{/nopassword}}
+                            {{/password}}
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="password-random" title="{{#str}}view_guestlink_password_icon_generate, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_generate, bigbluebuttonbn{{/str}}">{{#pix}}t/random, mod_bigbluebuttonbn{{/pix}}</button>
                                 <button class="btn btn-outline-secondary" type="button" id="password-copy" title="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}">{{#pix}}t/copy, mod_bigbluebuttonbn{{/pix}}</button>
