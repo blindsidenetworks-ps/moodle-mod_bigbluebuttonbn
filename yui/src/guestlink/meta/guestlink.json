@@ -3,10 +3,7 @@
         "requires": [
             "base",
             "node",
-            "datasource-get",
-            "datasource-jsonschema",
-            "datasource-polling",
-            "moodle-core-notification"
+            "datasource-get"
         ]
     }
 }

@@ -15,7 +15,6 @@
 
 /** global: M */
 /** global: Y */
-/** global: opener */
 
 M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 
@@ -45,29 +44,29 @@ M.mod_bigbluebuttonbn.guestlink = {
         var context = this.bigbluebuttonbn.guestlink;
         var datasource = this.datasource;
         var bnid = this.bigbluebuttonbn.bigbluebuttonbnid;
-        window.require(['core/templates',], function(templates) {
+        window.require(['core/templates'], function(templates) {
             templates.render('mod_bigbluebuttonbn/guestlink_view', context)
                     .then(function(html, js) {
                         templates.appendNodeContents('#guestlink_panel', html, js);
-                        /* guestlink things*/
+                        // Guestlink widget.
                         var btn = document.getElementById("guestlink-copy");
                         btn.onclick = function () {
                             var copyText = document.getElementById("guestlink");
                             copyText.select();
-                            copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+                            copyText.setSelectionRange(0, 99999); // For mobile devices.
                             document.execCommand("copy");
                         };
-                        /* passwordthings */
+                        // Password widgets.
                         btn = document.getElementById("password-copy");
                         btn.onclick = function () {
                             var copyText = document.getElementById("password");
-                            if(copyText.value && !isNaN(copyText.value)) {
+                            if (copyText.value && !isNaN(copyText.value)) {
                                 copyText.select();
-                                copyText.setSelectionRange(0, 6); /*For mobile devices*/
+                                copyText.setSelectionRange(0, 6); // For mobile devices.
                                 document.execCommand("copy");
                             }
                         };
-                        if(context.changepassenabled) {
+                        if (context.changepassenabled) {
                             var setpass = function(del) {
                                 datasource.sendRequest({
                                     request: 'action=set_guest_password&bigbluebuttonbn=' + bnid + '&delete=' + del,
@@ -75,15 +74,15 @@ M.mod_bigbluebuttonbn.guestlink = {
                                         success: function(e) {
                                             var input = document.getElementById("password");
                                             var result = e.data;
-                                            if(result) {
+                                            if (result) {
                                                 input.value = ("000000" + result).slice(-6);
                                             } else {
                                                 require(['core/str'], function(str) {
-                                                  str.get_string('view_guestlink_password_no_password_set',
-                                                      'bigbluebuttonbn').then(function(langString) {
-                                                      input.value = langString;
-                                                      return;
-                                                      }).catch(Notification.exception);
+                                                    str.get_string('view_guestlink_password_no_password_set',
+                                                            'bigbluebuttonbn').then(function(langString) {
+                                                        input.value = langString;
+                                                        return;
+                                                    }).catch(Notification.exception);
                                                 });
                                             }
                                         }
