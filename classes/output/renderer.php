@@ -31,14 +31,6 @@ use html_writer;
 use mod_bigbluebuttonbn\instance;
 use plugin_renderer_base;
 
-/**
- * Class renderer
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
- */
 class renderer extends plugin_renderer_base {
 
     /**
@@ -51,65 +43,6 @@ class renderer extends plugin_renderer_base {
         $this->page->requires->js_call_amd('mod_bigbluebuttonbn/index', 'init');
 
         return html_writer::table($index->get_table($this));
-    }
-
-    /**
-     * Renders the general warning button.
-     *
-     * @param string $href
-     * @param string $text
-     * @param string $class
-     * @param string $title
-     *
-     * @return string
-     */
-    public function render_warning_button($href, $text = '', $class = '', $title = '') {
-        if ($text == '') {
-            $text = get_string('ok', 'moodle');
-        }
-        if ($title == '') {
-            $title = $text;
-        }
-        if ($class == '') {
-            $class = 'btn btn-secondary';
-        }
-        $output = '  <form method="post" action="' . $href . '" class="form-inline">' . "\n";
-        $output .= '      <button type="submit" class="' . $class . '"' . "\n";
-        $output .= '          title="' . $title . '"' . "\n";
-        $output .= '          >' . $text . '</button>' . "\n";
-        $output .= '  </form>' . "\n";
-        return $output;
-    }
-
-    /**
-     * Renders the general warning message.
-     *
-     * @param string $message
-     * @param string $type
-     * @param string $href
-     * @param string $text
-     * @param string $class
-     *
-     * @return string
-     */
-    public function render_warning($message, $type = 'info', $href = '', $text = '', $class = '') {
-        $output = "\n";
-        // Evaluates if config_warning is enabled.
-        if (empty($message)) {
-            return $output;
-        }
-        $output .= $this->output->box_start(
-                'box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
-                'bigbluebuttonbn_view_general_warning'
-            ) . "\n";
-        $output .= '    ' . $message . "\n";
-        $output .= '  <div class="singlebutton pull-right">' . "\n";
-        if (!empty($href)) {
-            $output .= $this->render_warning_button($href, $text, $class);
-        }
-        $output .= '  </div>' . "\n";
-        $output .= $this->output->box_end() . "\n";
-        return $output;
     }
 
     /**
