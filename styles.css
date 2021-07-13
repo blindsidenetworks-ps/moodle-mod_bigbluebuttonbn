@@ -66,6 +66,11 @@
     display: inline-block;
 }
 
+/* Guest access link feature */
+.bigbluebuttonbn-guestlink-view .input-group button .icon {
+    margin-right: 0;
+}
+
 .bigbluebuttonbn-guestaccess-view .warning{
     color: #a94442;
 }

@@ -29,35 +29,58 @@
         "enabled": true
     }
 }}
-<div class="mod_bigbluebuttonbn_guestlink_view">
+<div class="bigbluebuttonbn-guestlink-view mb-5">
     {{#enabled}}
-    <div class="w-100">
-        <label for="guestlink" class="d-inline-block w-25"> {{# str }} view_guestlink_label, bigbluebuttonbn {{/ str }}</label>
-        <input type="text" id="guestlink" class="d-inline-block w-50 form-control" readonly value="{{url}}" size="50"/>
-        <a href="#" id="guestlink-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
-    </div>
-    {{#changepassenabled}}
-    <div class="w-100">
-        <label for="password" class="d-inline-block w-25"> {{# str }} view_guestlink_password_label, bigbluebuttonbn {{/ str }} </label>
-        {{#password}}
-            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{password}}" size="6"/>
-        {{/password}}
-        {{#nopassword}}
-            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{# str }} view_guestlink_password_no_password_set, bigbluebuttonbn {{/ str }}" size="6"/>
-        {{/nopassword}}
-        <a href="#" id="password-random" class="d-inline-block">{{#pix}} t/random, mod_bigbluebuttonbn {{/pix}}</a>
-        <a href="#" id="password-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
-        <a href="#" id="password-delete" class="d-inline-block">{{#pix}} t/trash, mod_bigbluebuttonbn {{/pix}}</a>
+        <h4>{{#str}}view_guestlink_heading, bigbluebuttonbn{{/str}}</h4>
+        <p>{{#str}}view_guestlink_description, bigbluebuttonbn{{/str}}</p>
 
-    </div>
-    {{/changepassenabled}}
-    {{#changepassdisabled}}{{#password}}
-        <div class="w-100">
-            <label for="password" class="d-inline-block w-25"> {{# str }} view_guestlink_password_label, bigbluebuttonbn {{/ str }} </label>
-            <input type="text" id="password"  class="d-inline-block form-control w-25" readonly value="{{password}}" size="6"/>
-            <a href="#" id="password-copy" class="d-inline-block">{{#pix}} t/copy, mod_bigbluebuttonbn {{/pix}}</a>
-
-        </div>
-    {{/password}}{{/changepassdisabled}}
+        <form>
+            <div class="form-group row">
+                <label for="guestlink" class="col-sm-3 col-form-label">{{#str}}view_guestlink_link_label, bigbluebuttonbn{{/str}}</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input type="text" id="guestlink" class="form-control" readonly value="{{url}}" />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="guestlink-copy" title="{{#str}}view_guestlink_link_icon_copy, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_link_icon_copy, bigbluebuttonbn{{/str}}">{{#pix}}t/copy, mod_bigbluebuttonbn{{/pix}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{#changepassenabled}}
+                <div class="form-group row">
+                    <label for="password" class="col-sm-3 col-form-label">{{#str}}view_guestlink_password_label, bigbluebuttonbn{{/str}}</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            {{#password}}
+                                <input type="text" id="password" class="form-control" readonly value="{{password}}" size="6" />
+                            {{/password}}
+                            {{#nopassword}}
+                                <input type="text" id="password" class="form-control" readonly value="{{#str}}view_guestlink_password_no_password_set, bigbluebuttonbn{{/str}}" size="6" />
+                            {{/nopassword}}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="password-random" title="{{#str}}view_guestlink_password_icon_generate, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_generate, bigbluebuttonbn{{/str}}">{{#pix}}t/random, mod_bigbluebuttonbn{{/pix}}</button>
+                                <button class="btn btn-outline-secondary" type="button" id="password-copy" title="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}">{{#pix}}t/copy, mod_bigbluebuttonbn{{/pix}}</button>
+                                <button class="btn btn-outline-secondary" type="button" id="password-delete" title="{{#str}}view_guestlink_password_icon_delete, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_delete, bigbluebuttonbn{{/str}}">{{#pix}}t/trash, mod_bigbluebuttonbn{{/pix}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/changepassenabled}}
+            {{#changepassdisabled}}
+                {{#password}}
+                    <div class="form-group row">
+                        <label for="password" class="col-sm-3 col-form-label">{{#str}}view_guestlink_password_label, bigbluebuttonbn{{/str}}</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="text" id="password" class="form-control" readonly value="{{password}}" size="6" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="password-copy" title="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}" aria-label="{{#str}}view_guestlink_password_icon_copy, bigbluebuttonbn{{/str}}">{{#pix}}t/copy, mod_bigbluebuttonbn{{/pix}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{/password}}
+            {{/changepassdisabled}}
+        </form>
     {{/enabled}}
 </div>
