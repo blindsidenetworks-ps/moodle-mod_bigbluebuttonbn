@@ -181,6 +181,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     }
 
     public function get_data() {
+        global $DB;
         $data = parent::get_data();
         $course = get_course($this->current->course);
         $context = context_course::instance($course->id);
@@ -198,7 +199,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             !empty($data->guestlinkenabled)
             && \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_access_code')
         ) {
-            $data->guestpass = bigbluebuttonbn_generate_access_code();
+
+            // Check current guestpass and see if its empty. If there isno
+            // value, generate and set it, otherwise leave it alone.
+            if (isset($data->instance)) {
+                $currentguestpass = $DB->get_field('bigbluebuttonbn', 'guestpass', ['id' => $data->instance]);
+            }
+            $data->guestpass = $currentguestpass ?? bigbluebuttonbn_generate_access_code();
         }
 
         // Apply the default duration of guestlink access if it is set.
