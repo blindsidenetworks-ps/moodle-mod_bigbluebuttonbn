@@ -268,7 +268,7 @@ function bigbluebuttonbn_view_render_guestlink(&$bbbsession, $enabledfeatures, &
             $guestlink['enabled'] = true;
             $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
                 ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
-            $guestlink['url'] = $guestlinkurl->__toString();
+            $guestlink['url'] = $guestlinkurl->out();
             if ($bbbsession['bigbluebuttonbn']->guestlinkpass) {
                 $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestlinkpass;
             } else {
@@ -279,6 +279,8 @@ function bigbluebuttonbn_view_render_guestlink(&$bbbsession, $enabledfeatures, &
             } else {
                 $guestlink['changepassdisabled'] = true;
             }
+        } else {
+            $guestlink['enabled'] = false;
         }
     } else {
         $guestlink['enabled'] = false;
