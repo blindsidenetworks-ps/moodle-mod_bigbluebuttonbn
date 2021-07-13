@@ -266,7 +266,7 @@ function bigbluebuttonbn_view_render_guestlink(&$bbbsession, $enabledfeatures, &
         $context = context_module::instance($cm->id);
         if (has_capability('mod/bigbluebuttonbn:guestlink_view', $context)) {
             $guestlink['enabled'] = true;
-            $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
+            $guestlinkurl = new moodle_url('/mod/bigbluebuttonbn/guestaccess.php',
                 ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
             $guestlink['url'] = $guestlinkurl->out();
             if ($bbbsession['bigbluebuttonbn']->guestlinkpass) {

@@ -32,7 +32,7 @@ global $PAGE, $OUTPUT;
 $gid = required_param('gid', PARAM_ALPHANUM); // This is required.
 $guestname = optional_param('guestname', '', PARAM_TEXT);
 $guestlinkpass = optional_param('guestlinkpass', '', PARAM_TEXT);
-$PAGE->set_url(new moodle_url('/mod/bigbluebuttonbn/guestlink.php',
+$PAGE->set_url(new moodle_url('/mod/bigbluebuttonbn/guestaccess.php',
         ['gid' => $gid, 'guestname' => $guestname, 'guestlinkpass' => $guestlinkpass]));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
