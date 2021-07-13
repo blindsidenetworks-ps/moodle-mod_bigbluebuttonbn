@@ -208,7 +208,7 @@ class broker {
             return "{$params['callback']}({$callbackresponsedata});";
         }
         // As the recordingid was not identified as imported recording link, look up for a real recording.
-        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['id']);
         if (array_key_exists($params['id'], $recordings)) {
             // The recording was found.
             $callbackresponse =
@@ -252,7 +252,7 @@ class broker {
      */
     public static function recording_play($params) {
         $callbackresponse = array('status' => true, 'found' => false);
-        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['id']);
         if (array_key_exists($params['id'], $recordings)) {
             // The recording was found.
             $callbackresponse = self::recording_info_current($recordings[$params['id']], $params);
@@ -346,10 +346,7 @@ class broker {
     public static function recording_action_publish($params, $recordings) {
         if (self::recording_is_imported($recordings, $params['id'])) {
             // Execute publish on imported recording link, if the real recording is published.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
-                $recordings[$params['id']]['meetingID'],
-                $recordings[$params['id']]['recordID']
-            );
+            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(recordings[$params['id']]['recordID']);
             // Only if the physical recording exist and it is published, execute publish on imported recording link.
             if (!isset($realrecordings[$params['id']])) {
                 return array(
@@ -390,10 +387,7 @@ class broker {
     public static function recording_action_unprotect($params, $recordings) {
         if (self::recording_is_imported($recordings, $params['id'])) {
             // Execute unprotect on imported recording link, if the real recording is unprotected.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
-                $recordings[$params['id']]['meetingID'],
-                $recordings[$params['id']]['recordID']
-            );
+            $realrecordings = recording::bigbluebuttonbn_get_recordings_array($recordings[$params['id']]['recordID']);
             // Only if the physical recording exist and it is published, execute unprotect on imported recording link.
             if (!isset($realrecordings[$params['id']])) {
                 return array(

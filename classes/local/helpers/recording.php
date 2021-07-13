@@ -52,33 +52,23 @@ class recording {
     /**
      * Helper function to retrieve recordings from a BigBlueButton server.
      *
-     * @param string|array $meetingids list of meetingIDs "mid1,mid2,mid3" or array("mid1","mid2","mid3")
-     * @param string|array $recordingids list of $recordingids "rid1,rid2,rid3" or array("rid1","rid2","rid3") for filtering
+     * @param string|array $recordingids list of $recordingids "rid1,rid2,rid3" or array("rid1","rid2","rid3")
      *
      * @return array array with recordings indexed by recordID, each recording is a non sequential array
      */
-    public static function bigbluebuttonbn_get_recordings_array($meetingids, $recordingids = []) {
-        $meetingidsarray = $meetingids;
-        if (!is_array($meetingids)) {
-            $meetingidsarray = explode(',', $meetingids);
-        }
-        // If $meetingidsarray is empty there is no need to go further.
-        if (empty($meetingidsarray)) {
-            return array();
-        }
-        $recordings = self::bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
-        // Sort recordings.
-        uasort($recordings, "\\mod_bigbluebuttonbn\\local\\helpers\\recording::bigbluebuttonbn_recording_build_sorter");
-        // Filter recordings based on recordingIDs.
+    public static function bigbluebuttonbn_get_recordings_array($recordingids = []) {
         $recordingidsarray = $recordingids;
         if (!is_array($recordingids)) {
             $recordingidsarray = explode(',', $recordingids);
         }
+        // If $recordingidsarray is empty there is no need to go further.
         if (empty($recordingidsarray)) {
-            // No recording ids, no need to filter.
-            return $recordings;
+            return array();
         }
-        return self::bigbluebuttonbn_get_recordings_array_filter($recordingidsarray, $recordings);
+        $recordings = self::bigbluebuttonbn_get_recordings_array_fetch($recordingidsarray);
+        // Sort recordings.
+        uasort($recordings, "\\mod_bigbluebuttonbn\\local\\helpers\\recording::bigbluebuttonbn_recording_build_sorter");
+        return $recordings;
     }
 
     /**
@@ -120,16 +110,17 @@ class recording {
     /**
      * Helper function to fetch one page of upto 25 recordings from a BigBlueButton server.
      *
-     * @param array $mids
+     * @param array $rids
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
+    public static function bigbluebuttonbn_get_recordings_array_fetch_page($rids) {
         $recordings = array();
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
+        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('checksum: ' . $url . ':' . json_encode($mids));
+        debugging('getRecordingsURL: ' . $url);
+        debugging('recordIDs: ' . json_encode($rids));
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
@@ -865,39 +856,37 @@ class recording {
     public static function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
         global $DB;
-        $select =
-            self::bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
+        $select = self::bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
         $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
         /* Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in
          * the getRecordings request. */
         if ($includedeleted) {
-            $selectdeleted =
-                self::bigbluebuttonbn_get_recordings_deleted_sql_select($courseid, $bigbluebuttonbnid,
-                    $subset);
-            $bigbluebuttonbnsdel = $DB->get_records_select_menu(
-                'bigbluebuttonbn_logs',
-                $selectdeleted,
-                null,
-                'bigbluebuttonbnid',
-                'bigbluebuttonbnid, meetingid'
-            );
-            if (!empty($bigbluebuttonbnsdel)) {
-                // Merge bigbluebuttonbnis from deleted instances, only keys are relevant.
-                // Artimetic merge is used in order to keep the keys.
-                $bigbluebuttonbns += $bigbluebuttonbnsdel;
-            }
+            // TODO: Implement includedeleted based on the new way.
+            // $selectdeleted =
+            //     self::bigbluebuttonbn_get_recordings_deleted_sql_select($courseid, $bigbluebuttonbnid,
+            //         $subset);
+            // $bigbluebuttonbnsdel = $DB->get_records_select_menu(
+            //     'bigbluebuttonbn_logs',
+            //     $selectdeleted,
+            //     null,
+            //     'bigbluebuttonbnid',
+            //     'bigbluebuttonbnid, meetingid'
+            // );
+            // if (!empty($bigbluebuttonbnsdel)) {
+            //     // Merge bigbluebuttonbnis from deleted instances, only keys are relevant.
+            //     // Artimetic merge is used in order to keep the keys.
+            //     $bigbluebuttonbns += $bigbluebuttonbnsdel;
+            // }
         }
         // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true.
         if (empty($bigbluebuttonbns)) {
             return array();
         }
         // Prepare select for loading records based on existent bigbluebuttonbns.
-        $sql = 'SELECT DISTINCT meetingid, bigbluebuttonbnid FROM {bigbluebuttonbn_logs} WHERE ';
+        $sql = 'SELECT DISTINCT recordingid, bigbluebuttonbnid FROM {bigbluebuttonbn_recordings} WHERE ';
         $sql .= '(bigbluebuttonbnid=' . implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)) . ')';
-        // Include only Create events and exclude those with record not true.
-        $sql .= ' AND log = ? AND meta LIKE ? AND meta LIKE ?';
         // Execute select for loading records based on existent bigbluebuttonbns.
-        $records = $DB->get_records_sql_menu($sql, array(bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
+        $records = $DB->get_records_sql_menu($sql);
         // Get actual recordings.
         return self::bigbluebuttonbn_get_recordings_array(array_keys($records));
     }
@@ -1140,7 +1129,7 @@ class recording {
      * @return string
      */
     public static function recording_import($bbbsession, $recordingid, $importmeetingid) {
-        $recordings = self::bigbluebuttonbn_get_recordings_array([$importmeetingid], [$recordingid]);
+        $recordings = self::bigbluebuttonbn_get_recordings_array([$recordingid]);
         $overrides = array('meetingid' => $importmeetingid);
         $meta = json_encode((object) [
             'recording' => $recordings[$recordingid]
