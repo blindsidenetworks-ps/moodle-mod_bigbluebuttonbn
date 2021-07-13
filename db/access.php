@@ -96,8 +96,8 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         ),
     ),
-    // Ability to change the guest access link password.
-    'mod/bigbluebuttonbn:guestlink_change_password' => array(
+    // Ability to set the guest access link password.
+    'mod/bigbluebuttonbn:guestlink_set_password' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

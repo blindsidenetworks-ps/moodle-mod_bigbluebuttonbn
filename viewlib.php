@@ -274,7 +274,7 @@ function bigbluebuttonbn_view_render_guestlink(&$bbbsession, $enabledfeatures, &
             } else {
                 $guestlink['nopassword'] = true;
             }
-            if (has_capability('mod/bigbluebuttonbn:guestlink_change_password', $context)) {
+            if (has_capability('mod/bigbluebuttonbn:guestlink_set_password', $context)) {
                 $guestlink['changepassenabled'] = true;
             } else {
                 $guestlink['changepassdisabled'] = true;

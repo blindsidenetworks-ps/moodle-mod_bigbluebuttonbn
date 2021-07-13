@@ -71,7 +71,7 @@ M.mod_bigbluebuttonbn.guestlink = {
                         if (context.changepassenabled) {
                             var setpass = function(del) {
                                 datasource.sendRequest({
-                                    request: 'action=set_guest_password&bigbluebuttonbn=' + bnid + '&delete=' + del,
+                                    request: 'action=set_guestlink_password&bigbluebuttonbn=' + bnid + '&deletepassword=' + del,
                                     callback: {
                                         success: function(e) {
                                             var input = document.getElementById("password");
