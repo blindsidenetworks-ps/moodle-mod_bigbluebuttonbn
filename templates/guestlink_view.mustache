@@ -25,7 +25,6 @@
         "nopassword": false,
         "password": 123456,
         "changepassenabled": true,
-        "changepassdisabled": false,
         "enabled": true
     }
 }}
@@ -66,7 +65,7 @@
                     </div>
                 </div>
             {{/changepassenabled}}
-            {{#changepassdisabled}}
+            {{^changepassenabled}}
                 {{#password}}
                     <div class="form-group row">
                         <label for="password" class="col-sm-3 col-form-label">{{#str}}view_guestlink_password_label, bigbluebuttonbn{{/str}}</label>
@@ -80,7 +79,7 @@
                         </div>
                     </div>
                 {{/password}}
-            {{/changepassdisabled}}
+            {{/changepassenabled}}
         </form>
     {{/enabled}}
 </div>
