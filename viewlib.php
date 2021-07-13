@@ -127,6 +127,14 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
+    // Guest access link should only be shown if guest access links are enabled in session.
+    if ($enabledfeatures['guestlink'] && $bbbsession['bigbluebuttonbn']->guestlink) {
+        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_guestlink'));
+        $output .= bigbluebuttonbn_view_render_guestlink($bbbsession, $enabledfeatures, $jsvars);
+        $output .= html_writer::end_tag('div');
+        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-guestlink',
+            'M.mod_bigbluebuttonbn.guestlink.init', array($jsvars));
+    }
     // Show recordings should only be enabled if recordings are also enabled in session.
     if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
@@ -215,7 +223,44 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
         $closingtime = get_string('mod_form_field_closingtime', 'bigbluebuttonbn').': '.
             userdate($bbbsession['closingtime']);
     }
+    $jsvars += array(
+        'meetingid' => $bbbsession['meetingid'],
+        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
+        'userlimit' => $bbbsession['userlimit'],
+        'opening' => $openingtime,
+        'closing' => $closingtime,
+    );
+    // Main box.
+    $output  = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+    $output .= '<br><span id="status_bar"></span>';
+    $output .= '<br><span id="control_panel"></span>';
+    $output .= $OUTPUT->box_end();
+    // Action button box.
+    $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
+    $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>'."\n";
+    $output .= $OUTPUT->box_end();
+    if ($activity == 'ended') {
+        $output .= bigbluebuttonbn_view_ended($bbbsession);
+    }
+    return $output;
+}
+
+/**
+ * Renders the view for guest access links.
+ *
+ * @param array $bbbsession
+ * @param array $enabledfeatures
+ * @param array $jsvars
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_render_guestlink(&$bbbsession, $enabledfeatures, &$jsvars) {
+    global $OUTPUT;
+
+    // Initialize guestlink array which will be passed to JS later.
     $guestlink = [];
+
+    // Compose guest link array.
     if ($bbbsession['bigbluebuttonbn']->guestlink && \mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
         $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bbbsession['bigbluebuttonbn']->id);
         $context = context_module::instance($cm->id);
@@ -238,27 +283,17 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
     } else {
         $guestlink['enabled'] = false;
     }
+
+    // Append guestlink array to JS variables.
     $jsvars += array(
-        'meetingid' => $bbbsession['meetingid'],
-        'bigbluebuttonbnid' => $bbbsession['bigbluebuttonbn']->id,
-        'userlimit' => $bbbsession['userlimit'],
-        'opening' => $openingtime,
-        'closing' => $closingtime,
         'guestlink' => $guestlink,
     );
+
     // Main box.
-    $output  = $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_message_box');
+    $output  = $OUTPUT->box_start('generalbox', 'bigbluebuttonbn_view_guestlink_box');
     $output .= '<br><span id="guestlink_panel"></span>';
-    $output .= '<br><span id="status_bar"></span>';
-    $output .= '<br><span id="control_panel"></span>';
     $output .= $OUTPUT->box_end();
-    // Action button box.
-    $output .= $OUTPUT->box_start('generalbox boxaligncenter', 'bigbluebuttonbn_view_action_button_box');
-    $output .= '<br><br><span id="join_button"></span>&nbsp;<span id="end_button"></span>'."\n";
-    $output .= $OUTPUT->box_end();
-    if ($activity == 'ended') {
-        $output .= bigbluebuttonbn_view_ended($bbbsession);
-    }
+
     return $output;
 }
 
