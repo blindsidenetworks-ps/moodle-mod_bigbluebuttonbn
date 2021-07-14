@@ -88,7 +88,7 @@ class notifier
         // Build the message_body.
         $msg->action = $action;
         $msg->activity_url = html_writer::link(
-            plugin::necurl('/mod/bigbluebuttonbn/view.php', ['id' => $bigbluebuttonbn->coursemodule]),
+            new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bigbluebuttonbn->coursemodule]),
             format_string($bigbluebuttonbn->name)
         );
         $msg->activity_title = format_string($bigbluebuttonbn->name);

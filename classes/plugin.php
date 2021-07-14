@@ -47,18 +47,6 @@ abstract class plugin {
     const COMPONENT = 'mod_bigbluebuttonbn';
 
     /**
-     * Outputs url with plain parameters.
-     * @param  string $url
-     * @param  array $params
-     * @param  string $anchor
-     * @return string
-     */
-    public static function necurl($url, $params = null, $anchor = null) {
-        $lurl = new moodle_url($url, $params, $anchor);
-        return $lurl->out(false);
-    }
-
-    /**
      * Helper for setting a value in a bigbluebuttonbn cache.
      *
      * @param  string   $name       BigBlueButtonBN cache

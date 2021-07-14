@@ -41,7 +41,6 @@ if (!$destinationinstance) {
 
 $cm = $destinationinstance->get_cm();
 $course = $destinationinstance->get_course();
-$bigbluebuttonbn = $destinationinstance->get_instance_data();
 
 require_login($course, true, $cm);
 
@@ -54,8 +53,8 @@ if (!(boolean) \mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
 }
 
 // Print the page header.
-$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', ['originbn' => $bigbluebuttonbn->id]);
-$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_url($instsance->get_import_url());
+$PAGE->set_title($instance->get_meeting_name());
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
