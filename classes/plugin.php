@@ -193,32 +193,4 @@ abstract class plugin {
         return implode(',', tag_get_tags('bigbluebuttonbn', $id));
     }
 
-    /**
-     * Helper function returns a sha1 encoded string that is unique and will be used as a seed for meetingid.
-     *
-     * @return string
-     */
-    public static function bigbluebuttonbn_unique_meetingid_seed() {
-        global $DB;
-        do {
-            $encodedseed = sha1(self::bigbluebuttonbn_random_password(12));
-            $meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('meetingid' => $encodedseed));
-        } while ($meetingid == $encodedseed);
-        return $encodedseed;
-    }
-
-    /**
-     * Get the meetingid of the specified BBB Instance.
-     *
-     * @param stdClass $instance
-     * @param null|stdClass $group
-     * @return string
-     */
-    public static function get_meeting_id(stdClass $instance, ?stdClass $group = null): string {
-        if ($group) {
-            return sprintf('%s-%d-%d[%d]', $instance->meetingid, $instance->course, $instance->id, $group->id);
-        } else {
-            return sprintf('%s-%d-%d', $instance->meetingid, $instance->course, $instance->id);
-        }
-    }
 }

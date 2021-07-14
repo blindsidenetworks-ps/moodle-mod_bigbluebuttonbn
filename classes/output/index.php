@@ -32,6 +32,7 @@ use html_writer;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 use moodle_exception;
 use renderable;
@@ -100,13 +101,10 @@ class index implements renderable {
      * @param instance $instance
      */
     protected function add_instance_to_table(renderer_base $output, html_table $table, instance $instance): void {
-        global $PAGE;
-
         $cm = $instance->get_cm();
         if (!$cm->uservisible) {
             return;
         }
-
         $canmoderate = $instance->is_admin() || $instance->is_moderator();
 
         // Add a the data for the bbb instance.
@@ -132,7 +130,6 @@ class index implements renderable {
      * @param instance $instance
      * @param stdClass|null $group
      * @return array
-     * @throws moodle_exception
      */
     protected function add_room_row_to_table(
         renderer_base $output,
@@ -143,18 +140,7 @@ class index implements renderable {
         if ($group) {
             $instance = instance::get_group_instance_from_instance($instance, $group);
         }
-
-        $meetingid = $instance->get_meeting_id();
-        $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info_array($meetingid);
-        if (empty($meetinginfo)) {
-            // The server was unreachable.
-            throw new moodle_exception('index_error_unable_display', plugin::COMPONENT);
-        }
-
-        if (isset($meetinginfo['messageKey']) && ($meetinginfo['messageKey'] == 'checksumError')) {
-            // There was an error returned.
-            throw new moodle_exception('index_error_checksum', plugin::COMPONENT);
-        }
+        $meeting  = new meeting($instance);
 
         $viewurl = $instance->get_view_url();
         if ($groupid = $instance->get_group_id()) {
@@ -164,16 +150,16 @@ class index implements renderable {
         $joinurl = html_writer::link($viewurl, format_string($instance->get_meeting_name()));
 
         // The meeting info was returned.
-        if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
+        if ($meeting->is_running()) {
             return [
                 $instance->get_cm()->sectionnum,
                 $joinurl,
                 $instance->get_group_name(),
-                $this->get_room_usercount($output, $meetinginfo),
-                $this->get_room_attendee_list($output, $meetinginfo, 'VIEWER'),
-                $this->get_room_attendee_list($output, $meetinginfo, 'MODERATOR'),
-                $this->get_room_record_info($output, $meetinginfo),
-                $this->get_room_actions($output, $instance, $meetinginfo),
+                $this->get_room_usercount($output, $meeting),
+                $this->get_room_attendee_list($output, $meeting, 'VIEWER'),
+                $this->get_room_attendee_list($output, $meeting, 'MODERATOR'),
+                $this->get_room_record_info($output, $instance),
+                $this->get_room_actions($output, $instance, $meeting),
             ];
         }
 
@@ -184,33 +170,27 @@ class index implements renderable {
      * Count the number of users in the meeting.
      *
      * @param renderer_base $output
-     * @param array $meetinginfo
+     * @param meeting $meeting
      * @return int
      */
-    protected function get_room_usercount(renderer_base $output, array $meetinginfo): int {
-        if (array_key_exists('attendees', $meetinginfo)) {
-            return count($meetinginfo['attendees']->attendee);
-        }
-
-        return 0;
+    protected function get_room_usercount(renderer_base $output, meeting $meeting): int {
+        return count($meeting->get_attendees());
     }
 
     /**
      * Returns attendee list.
      *
      * @param renderer_base $output
-     * @param array $meetinginfo
+     * @param meeting $meeting
      * @param string $role
      * @return string
      */
-    protected function get_room_attendee_list(renderer_base $output, array $meetinginfo, string $role): string {
+    protected function get_room_attendee_list(renderer_base $output, meeting $meeting, string $role): string {
         $attendees = [];
 
-        if (count($meetinginfo['attendees']->attendee)) {
-            foreach ($meetinginfo['attendees']->attendee as $attendee) {
-                if ((string) $attendee->role == $role) {
-                    $attendees[] = $attendee->fullName;
-                }
+        foreach ($meeting->get_attendees() as $attendee) {
+            if ((string) $attendee->role == $role) {
+                $attendees[] = $attendee->fullName;
             }
         }
 
@@ -221,15 +201,14 @@ class index implements renderable {
      * Returns indication of recording enabled.
      *
      * @param renderer_base $output
-     * @param array $meetinginfo
+     * @param instance $instance
      * @return string
      */
-    protected function get_room_record_info(renderer_base $output, $meetinginfo) {
-        if (isset($meetinginfo['recording']) && $meetinginfo['recording'] === 'true') {
+    protected function get_room_record_info(renderer_base $output, instance $instance) {
+        if ($instance->is_recorded()) {
             // If it has been set when meeting created, set the variable on/off.
             return get_string('index_enabled', 'bigbluebuttonbn');
         }
-
         return '';
     }
 
@@ -238,14 +217,15 @@ class index implements renderable {
      *
      * @param renderer_base $output
      * @param instance $instance
+     * @param meeting $meeting
      * @return string
      */
-    protected function get_room_actions(renderer_base $output, instance $instance, array $meetinginfo): string {
+    protected function get_room_actions(renderer_base $output, instance $instance, meeting $meeting): string {
         if ($instance->is_moderator()) {
             return $output->render_from_template('mod_bigbluebuttonbn/end_session_button', (object) [
                 'bigbluebuttonbnid' => $instance->get_instance_id(),
                 'meetingid' => $instance->get_meeting_id(),
-                'statusrunning' => !empty($meetinginfo['running']),
+                'statusrunning' => $meeting->is_running(),
             ]);
         }
 

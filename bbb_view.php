@@ -101,7 +101,8 @@ switch (strtolower($action)) {
         logs::log_meeting_left_event($instance);
 
         // Update the cache.
-        meeting::update_meeting_cache_for_instance($instance);
+        $meeting = new meeting($instance);
+        $meeting->update_cache();
 
         // Check the origin page.
         $select = "userid = ? AND log = ?";
@@ -133,8 +134,8 @@ switch (strtolower($action)) {
         }
 
         // See if the session is in progress.
-        // TODO COnvert to use meeting.
-        if (meeting_helper::bigbluebuttonbn_is_meeting_running($instance->get_meeting_id())) {
+        $meeting = new meeting($instance);
+        if ($meeting->is_running()) {
             // Since the meeting is already running, we just join the session.
             bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
             break;
@@ -147,13 +148,8 @@ switch (strtolower($action)) {
         }
 
         // As the meeting doesn't exist, try to create it.
-        $presentation = $instance->get_presentation();
-        $response = meeting_helper::bigbluebuttonbn_get_create_meeting_array(
-            bigbluebuttonbn_bbb_view_create_meeting_data($instance),
-            bigbluebuttonbn_bbb_view_create_meeting_metadata($instance),
-            $presentation['name'] ?? '',
-            $presentation['url'] ?? ''
-        );
+        $meeting = new meeting($instance);
+        $response = $meeting->create_meeting();
 
         if (empty($response)) {
             // The server is not available.
@@ -259,7 +255,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
         'name' => plugin::bigbluebuttonbn_html2text($instance->get_meeting_name(), 64),
         'attendeePW' => $instance->get_viewer_password(),
         'moderatorPW' => $instance->get_moderator_password(),
-        'logoutURL' => $instance->get_logout_url(),
+        'logoutURL' => $instance->get_logout_url()->out(false),
         'record' => bigbluebuttonbn_bbb_view_create_meeting_data_record($instance->is_recorded()),
         'autoStartRecording' => $instance->should_record_from_start(),
         'allowStartStopRecording' => $instance->allow_recording_start_stop(),
@@ -335,11 +331,8 @@ function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
  * @param int $origin
  */
 function bigbluebuttonbn_bbb_view_join_meeting($instance, $origin = 0): void {
-    // Update the cache.
-    $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info(
-        $instance->get_meeting_id(),
-        bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE
-    );
+    // Update the cache and retrieve info.
+    $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
 
     if ($instance->has_user_limit_been_reached(intval($meetinginfo['participantCount']))) {
         // No more users allowed to join.

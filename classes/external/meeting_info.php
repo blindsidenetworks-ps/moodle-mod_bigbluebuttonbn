@@ -86,9 +86,7 @@ class meeting_info extends external_api {
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
 
-        $meeting = new meeting($instance);
-
-        return (array) $meeting->get_meeting_info($updatecache);
+        return (array) meeting::get_meeting_info_for_instance($instance, $updatecache);
     }
 
     /**

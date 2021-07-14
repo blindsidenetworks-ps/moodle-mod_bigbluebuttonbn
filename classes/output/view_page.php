@@ -28,6 +28,7 @@ use core\output\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\meeting;
 use renderable;
 use renderer_base;
 use stdClass;
@@ -97,9 +98,7 @@ class view_page implements renderable, templatable {
         }
 
         if ($this->instance->is_feature_enabled('showroom')) {
-            $meeting = new \mod_bigbluebuttonbn\meeting($this->instance);
-            // TODO Move meeting_info into a new location.
-            $templatedata->room = $meeting->get_meeting_info();
+            $templatedata->room = meeting::get_meeting_info_for_instance($this->instance);
         }
 
         if ($this->instance->is_feature_enabled('showrecordings') && $this->instance->is_recorded()) {

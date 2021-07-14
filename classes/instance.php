@@ -230,7 +230,6 @@ EOF;
             'courseid' => $courseid,
         ]);
 
-
         $instances = [];
         foreach ($results as $result) {
             $course = $coursetable->extract_from_result($result);
@@ -382,21 +381,16 @@ EOF;
     /**
      * Get the meeting id for this meeting.
      *
-     * @param null|int $groupid
      * @return string
      */
-    public function get_meeting_id(?int $groupid = null): string {
+    public function get_meeting_id(): string {
         $baseid = sprintf(
             '%s-%s-%s',
             $this->get_instance_var('meetingid'),
             $this->get_course_id(),
             $this->get_instance_var('id')
         );
-
-        if ($groupid === null) {
-            $groupid = $this->get_group_id();
-        }
-
+        $groupid = $this->get_group_id() ?? null;
         if ($groupid === null) {
             return $baseid;
         } else {
@@ -1070,5 +1064,14 @@ EOF;
         $features = $this->get_enabled_features();
 
         return !empty($features[$feature]);
+    }
+
+    /**
+     * Check if meeting is recorded.
+     *
+     * @return boolean
+     */
+    public function should_record() {
+        return (boolean) config::recordings_enabled() && $this->is_recorded();
     }
 }

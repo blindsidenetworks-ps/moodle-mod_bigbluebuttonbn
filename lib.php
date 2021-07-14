@@ -33,6 +33,7 @@ use mod_bigbluebuttonbn\local\helpers\mod_helper;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 
 global $CFG;
@@ -94,7 +95,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     // Insert a record.
     $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
-    $bigbluebuttonbn->meetingid = plugin::bigbluebuttonbn_unique_meetingid_seed();
+    $bigbluebuttonbn->meetingid = meeting::get_unique_meetingid_seed();
     // Set the meetingid column in the bigbluebuttonbn table.
     $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn->meetingid, array('id' => $bigbluebuttonbn->id));
     // Log insert action.

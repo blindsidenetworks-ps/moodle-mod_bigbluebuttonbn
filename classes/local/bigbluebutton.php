@@ -32,7 +32,9 @@ use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
+use moodle_exception;
 use moodle_url;
 use stdClass;
 
@@ -50,8 +52,8 @@ class bigbluebutton {
      * Returns the right URL for the action specified.
      *
      * @param string $action
-     * @param array  $data
-     * @param array  $metadata
+     * @param array $data
+     * @param array $metadata
      * @return string
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
@@ -120,7 +122,7 @@ class bigbluebutton {
         $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
         if ($viewinstance) {
             $instance = instance::get_from_cmid($cmid);
-            $info = meeting_helper::bigbluebuttonbn_get_meeting_info($instance->get_meeting_id(), false);
+            $info = meeting::get_meeting_info_for_instance($instance);
             $running = false;
             if ($info['returncode'] == 'SUCCESS') {
                 $running = ($info['running'] === 'true');
@@ -188,7 +190,7 @@ class bigbluebutton {
             );
             if ($xml && $xml->returncode == 'SUCCESS') {
                 $cache->set('serverversion', (string) $xml->version);
-                return  (double) $xml->version;
+                return (double) $xml->version;
             }
         } else {
             return (double) $serverversion;
@@ -277,7 +279,7 @@ class bigbluebutton {
     /**
      * Helper for getting the owner userid of a bigbluebuttonbn instance.
      *
-     * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
      *
      * @return integer ownerid (a valid user id or null if not registered/found)
      */
@@ -461,7 +463,7 @@ class bigbluebutton {
     /**
      * Helper for evaluating if scheduled activity is avaiable.
      *
-     * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
      *
      * @return array                       status (room available or not and possible warnings)
      */
@@ -519,12 +521,11 @@ class bigbluebutton {
      * @param instance $instance
      */
     public static function require_working_server(instance $instance): void {
-        $serverversion = self::bigbluebuttonbn_get_server_version();
-        if ($serverversion !== null) {
-            return;
+        try {
+            $serverversion = self::bigbluebuttonbn_get_server_version();
+        } catch (moodle_exception $e) {
+            self::handle_server_not_available($instance);
         }
-
-        self::handle_server_not_available($instance);
     }
 
     /**
@@ -571,4 +572,151 @@ class bigbluebutton {
             return new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
         }
     }
+
+    /**
+     * Create a Meeting
+     *
+     * @param array $data
+     * @param array $metadata
+     * @param null $presentationname
+     * @param null $presentationurl
+     * @return array
+     * @throws moodle_exception
+     */
+    public static function create_meeting(array $data, array $metadata, $presentationname = null, $presentationurl = null) {
+        $createmeetingurl = self::action_url('create', $data, $metadata);
+        $method = 'GET';
+        $payload = null;
+        if (!is_null($presentationname) && !is_null($presentationurl)) {
+            $method = 'POST';
+            $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" .
+                $presentationurl . "' /></module></modules>";
+        }
+
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
+        self::assert_returned_xml($xml);
+        if (empty($xml->meetingID)) {
+            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        return array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
+            'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded);
+    }
+
+    /**
+     * Get meeting info for a given meeting id
+     *
+     * @param string $meetingid
+     * @return array
+     * @throws moodle_exception
+     */
+    public static function get_meeting_info(string $meetingid) {
+        $xmlinfo = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('getMeetingInfo', ['meetingID' => $meetingid])
+        );
+        self::assert_returned_xml($xmlinfo);
+        return (array) $xmlinfo;
+    }
+
+    /**
+     * Perform end meeting on BBB.
+     *
+     * @param string $meetingid
+     * @param string $modpw
+     * @throws moodle_exception
+     */
+    public static function end_meeting($meetingid, $modpw) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
+        );
+        self::assert_returned_xml($xml);
+    }
+
+
+    /**
+     * Get recordings from BBB.
+     *
+     * @param array $meetingsids
+     * @throws moodle_exception
+     */
+    public static function get_recordings_from_meetings($meetingsids) {
+        $url = self::action_url('getRecordings', ['meetingID' => implode(',', $meetingsids)]);
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
+        self::assert_returned_xml($xml);
+        if (!isset($xml->recordings)) {
+            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        return $xml->recordings;
+    }
+
+    /**
+     * Get recordings from BBB.
+     *
+     * @param array $recordingsids
+     * @throws moodle_exception
+     */
+    public static function get_recordings($recordingsids) {
+        $url = self::action_url('getRecordings', ['recordID' => implode(',', $recordingsids)]);
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
+        self::assert_returned_xml($xml);
+        if (!isset($xml->recordings)) {
+            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        return $xml->recordings;
+    }
+
+
+    /**
+     * Publish recording.
+     *
+     * @param int $recordingid
+     * @throws moodle_exception
+     */
+    public static function publish_recording($recordingid, $publish) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('publishRecordings',
+                ['recordID' => $recordingid, 'publish' => $publish])
+        );
+        self::assert_returned_xml($xml);
+    }
+
+    /**
+     * Delete recording
+     *
+     * @param int $recordingid
+     * @throws moodle_exception
+     */
+    public static function delete_recording($recordingid) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('deleteRecordings',
+                ['recordID' => $recordingid])
+        );
+        self::assert_returned_xml($xml);
+    }
+
+    /**
+     * Sometimes the server sends back some error and errorKeys that
+     * can be converted to Moodle error messages
+     */
+    const MEETING_ERROR = [
+        'checksumError' => 'index_error_checksum',
+        'notFound' => 'index_error_checksum',
+    ];
+
+    /**
+     * Throw an exception if there is a problem in the returned XML value
+     *
+     * @param $xml
+     * @throws moodle_exception
+     */
+    protected static function assert_returned_xml($xml) {
+        if (empty($xml) || $xml->returncode === 'FAILED') {
+            $messagekey = $xml->messagekey ?? '';
+            $messageDetails = $xml->message ?? '';
+            throw new moodle_exception(
+                self::MEETING_ERROR[$messagekey] ?? 'general_error_unable_connect',
+                plugin::COMPONENT,
+                $messageDetails);
+        }
+    }
+
 }

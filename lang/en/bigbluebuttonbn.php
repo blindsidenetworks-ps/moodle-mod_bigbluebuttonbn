@@ -282,7 +282,7 @@ $string['config_lockonjoinconfigurable_editable_description'] = 'Lock configurat
 $string['config_experimental_features'] = 'Configuration for experimental features';
 $string['config_experimental_features_description'] = 'Configuration for experimental features.';
 
-$string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_unable_connect'] = 'Unable to connect ({$a}). Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';

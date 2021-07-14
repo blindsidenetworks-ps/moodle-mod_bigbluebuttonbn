@@ -33,7 +33,9 @@ use external_value;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
 
@@ -89,9 +91,9 @@ class end_meeting extends external_api {
         if (!$instance->is_admin() && !$instance->is_moderator()) {
             throw new restricted_context_exception();
         }
-
         // Execute the end command.
-        meeting_helper::bigbluebuttonbn_end_meeting($meetingid, $instance->get_moderator_password());
+        $meeting = new meeting($instance);
+        $meeting->end_meeting();
 
         // Moodle event logger: Create an event for meeting ended.
         $instancedata = $instance->get_instance_data();
@@ -103,7 +105,7 @@ class end_meeting extends external_api {
         }
 
         // Update the cache.
-        meeting_helper::bigbluebuttonbn_get_meeting_info($meetingid, bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE);
+        $meeting->update_cache();
 
         notification::add(get_string('end_session_notification', 'mod_bigbluebuttonbn'), notification::INFO);
 

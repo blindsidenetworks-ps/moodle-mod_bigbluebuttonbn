@@ -24,6 +24,7 @@
 
 namespace mod_bigbluebuttonbn\local\helpers;
 
+use core\check\performance\debugging;
 use html_writer;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
@@ -125,34 +126,33 @@ class recording {
     public static function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
         $recordings = array();
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
-        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('checksum: ' . $url . ':' . json_encode($mids));
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+        try {
+            $recordingsxml = bigbluebutton::get_recordings_from_meetings($mids);
+
             // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
+            foreach ($recordingsxml as $recordingxml) {
                 $recording = self::bigbluebuttonbn_get_recording_array_value($recordingxml);
                 $recordings[$recording['recordID']] = $recording;
 
-                // Check if there is childs.
+                // Check if there are children.
                 if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
                     foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                        $url = bigbluebutton::action_url(
-                            'getRecordings',
-                            ['recordID' => implode(',', (array) $breakoutroom)]
-                        );
-                        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-                        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+                        try {
+                            $childrecordingsxml = bigbluebutton::get_recordings_from_meetings((array) $breakoutroom);
                             // If there were meetings already created.
-                            foreach ($xml->recordings->recording as $recordingxml) {
+                            foreach ($childrecordingsxml as $childrecordingxml) {
                                 $recording =
-                                    self::bigbluebuttonbn_get_recording_array_value($recordingxml);
+                                    self::bigbluebuttonbn_get_recording_array_value($childrecordingxml);
                                 $recordings[$recording['recordID']] = $recording;
                             }
+                        } catch (\moodle_exception $e) {
+                            debugging('get_recording_array_fetch_page error:' . $e->getMessage());
                         }
                     }
                 }
             }
+        } catch (\moodle_exception $e) {
+            debugging('get_recording_array_fetch_page error:' . $e->getMessage());
         }
         return $recordings;
     }
@@ -304,12 +304,12 @@ class recording {
      */
     public static function bigbluebuttonbn_delete_recordings($recordids) {
         $ids = explode(',', $recordids);
+        $ids = explode(',', $recordids);
         foreach ($ids as $id) {
-            $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file(
-                bigbluebutton::action_url('deleteRecordings', ['recordID' => $id])
-            );
-            if ($xml && $xml->returncode != 'SUCCESS') {
-                return false;
+            try {
+                bigbluebutton::delete_recording($id);
+            } catch (\moodle_exception $e) {
+                debugging('delete recording error:' . $e->getMessage());
             }
         }
         return true;
@@ -324,12 +324,10 @@ class recording {
     public static function bigbluebuttonbn_publish_recordings($recordids, $publish = 'true') {
         $ids = explode(',', $recordids);
         foreach ($ids as $id) {
-            $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file(
-                bigbluebutton::action_url('publishRecordings',
-                    ['recordID' => $id, 'publish' => $publish])
-            );
-            if ($xml && $xml->returncode != 'SUCCESS') {
-                return false;
+            try {
+                bigbluebutton::publish_recording($id, $publish);
+            } catch (\moodle_exception $e) {
+                debugging('publish recording error:' . $e->getMessage());
             }
         }
         return true;

@@ -28,13 +28,14 @@ namespace mod_bigbluebuttonbn\output;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
-use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\mobileview;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\meeting;
+use mod_bigbluebuttonbn\plugin;
+
 global $CFG;
 require_once($CFG->dirroot . '/lib/grouplib.php');
 
@@ -56,7 +57,7 @@ class mobile {
      */
     public static function mobile_course_view($args) {
 
-        global $OUTPUT, $SESSION;
+        global $OUTPUT;
 
         $args = (object) $args;
         $versionname = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
@@ -130,16 +131,11 @@ class mobile {
         }
 
         // See if the BBB session is already in progress.
-        if (!meeting_helper::bigbluebuttonbn_is_meeting_running($instance->get_meeting_id())) {
-            $presentationname = $instance->get_presentation()['name'] ?? null;
-            $presentationurl = $instance->get_presentation()['url'] ?? null;
+        $meeting = new meeting($instance);
+        if (!$meeting->is_running()) {
             // The meeting doesnt exist in BBB server, must be created.
-            $response = meeting_helper::bigbluebuttonbn_get_create_meeting_array(
-                mobileview::create_meeting_data($instance),
-                mobileview::create_meeting_metadata($instance),
-                $presentationname,
-                $presentationurl
-            );
+            $meeting = new meeting($instance);
+            $response = $meeting->create_meeting();
 
             if (empty($response)) {
                 return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
@@ -147,7 +143,7 @@ class mobile {
 
             if ($response['returncode'] == 'FAILED') {
                 // The meeting could not be created.
-                $errorkey = roles::bigbluebuttonbn_get_participant_listget_error_key($response['messageKey'], 'view_error_create');
+                $errorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
                 $e = get_string($errorkey, 'bigbluebuttonbn');
                 return self::mobile_print_error($e);
             }
@@ -163,10 +159,7 @@ class mobile {
 
         // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.
         // Update the cache.
-        $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info(
-            $instance->get_meeting_id(),
-            bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE
-        );
+        $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
 
         if ($instance->has_user_limit_been_reached(intval($meetinginfo['participantCount']))) {
             // No more users allowed to join.
