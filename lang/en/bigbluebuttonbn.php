@@ -87,8 +87,11 @@ $string['completionengagementtalks'] = 'Talk events';
 $string['completionengagementtalksdesc'] = '{$a} Talk events';
 $string['completionengagementtalktime'] = 'Talk time';
 $string['completionengagementraisehand'] = 'Raise hand events';
+$string['completionengagementraisehanddesc'] = '{$a} Raise Hands events';
 $string['completionengagementpollvotes'] = 'Poll votes';
+$string['completionengagementpollvotesdesc'] = '{$a} Poll votes events';
 $string['completionengagementemojis'] = 'Emojis';
+$string['completionengagementemojisdesc'] = '{$a} Emojis events';
 
 $string['completionengagementdesc'] = 'Student must engage in activities during the meeting';
 $string['completionengagementgroup'] = 'Require engagement';
