@@ -382,16 +382,21 @@ EOF;
     /**
      * Get the meeting id for this meeting.
      *
+     * @param null|int $groupid
      * @return string
      */
-    public function get_meeting_id(): string {
+    public function get_meeting_id(?int $groupid = null): string {
         $baseid = sprintf(
             '%s-%s-%s',
             $this->get_instance_var('meetingid'),
             $this->get_course_id(),
             $this->get_instance_var('id')
         );
-        $groupid = $this->get_group_id() ?? null;
+
+        if ($groupid === null) {
+            $groupid = $this->get_group_id();
+        }
+
         if ($groupid === null) {
             return $baseid;
         } else {

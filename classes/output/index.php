@@ -26,15 +26,11 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use coding_exception;
 use html_table;
 use html_writer;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
-use moodle_exception;
 use renderable;
 use renderer_base;
 use stdClass;
