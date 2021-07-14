@@ -29,12 +29,15 @@
 }}
 
 {{#statusrunning}}
-    <input id="end_button_input"{{!
+    <a {{!
+        }} href="#"{{!
+        }} id="end_button_input"{{!
         }} type="button"{{!
         }} data-action="end"{{!
         }} data-bbb-id="{{bigbluebuttonbnid}}"{{!
         }} data-meeting-id="{{meetingid}}"{{!
-        }} value="{{#str}}view_conference_action_end, mod_bigbluebuttonbn{{/str}}"{{!
         }} class="btn btn-secondary bbb-btn-action"{{!
     }}>
+        {{#str}}view_conference_action_end, mod_bigbluebuttonbn{{/str}}
+    </a>
 {{/statusrunning}}
