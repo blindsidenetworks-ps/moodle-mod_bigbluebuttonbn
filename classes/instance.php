@@ -34,13 +34,6 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_url;
 use stdClass;
 
-/**
- * Class instance
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class instance {
     /** @var cm_info The cm_info object relating to the instance */
     protected $cm;
@@ -70,10 +63,27 @@ class instance {
      * @param stdClass $course
      * @param stdClass $instancedata
      */
-    public function __construct(cm_info $cm, stdClass $course, stdClass $instancedata) {
+    public function __construct(cm_info $cm, stdClass $course, stdClass $instancedata, ?int $groupid = null) {
         $this->cm = $cm;
         $this->course = $course;
         $this->instancedata = $instancedata;
+        $this->groupid = $groupid;
+    }
+
+    /**
+     * Get a group instance of the specified instance.
+     *
+     * @param self $originalinstance
+     * @param int $groupid
+     * @return self
+     */
+    public static function get_group_instance_from_instance(self $originalinstance, int $groupid): self {
+        return new self(
+            $originalinstance->get_cm(),
+            $originalinstance->get_course(),
+            $originalinstance->get_instance_data(),
+            $groupid
+        );
     }
 
     /**
@@ -156,6 +166,80 @@ EOF;
         $cm = get_fast_modinfo($course)->get_cm($cmid);
 
         return new self($cm, $course, $instancedata);
+    }
+
+    /**
+     * Get the instance information from a meetingid.
+     *
+     * If a group is specified in the meetingid then this will also be set.
+     *
+     * @param string $meetingid
+     * @return self
+     */
+    public static function get_from_meetingid(string $meetingid): self {
+        $result = preg_match(
+            '@(?P<meetingid>[^-]*)-(?P<courseid>[^-]*)-(?P<instanceid>\d+)(\[(?P<groupid>\d*)\])?@',
+            $meetingid,
+            $matches
+        );
+
+        if ($result !== 1) {
+            throw new \moodle_exception("Meeting with id '{$meetingid}' not found.");
+        }
+
+        $instance = self::get_from_instanceid($matches['instanceid']);
+
+        if (array_key_exists('groupid', $matches)) {
+            $instance->set_group_id($matches['groupid']);
+        }
+
+        return self;
+    }
+
+    /**
+     * Get all instances in the specified course.
+     *
+     * @param int $courseid
+     * @return self[]
+     */
+    public static function get_all_instances_in_course(int $courseid): array {
+        global $DB;
+
+        $coursetable = new \core\dml\table('course', 'c', 'c');
+        $courseselect = $coursetable->get_field_select();
+        $coursefrom = $coursetable->get_from_sql();
+
+        $cmtable = new \core\dml\table('course_modules', 'cm', 'cm');
+        $cmfrom = $cmtable->get_from_sql();
+
+        $bbbtable = new \core\dml\table('bigbluebuttonbn', 'bbb', 'bbb');
+        $bbbselect = $bbbtable->get_field_select();
+        $bbbfrom = $bbbtable->get_from_sql();
+
+        $sql = <<<EOF
+    SELECT cm.id as cmid, {$courseselect}, {$bbbselect}
+      FROM {$cmfrom}
+INNER JOIN {$coursefrom} ON c.id = cm.course
+INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+INNER JOIN {$bbbfrom} ON cm.instance = bbb.id
+     WHERE cm.course = :courseid
+EOF;
+
+        $results = $DB->get_records_sql($sql, [
+            'modname' => 'bigbluebuttonbn',
+            'courseid' => $courseid,
+        ]);
+
+
+        $instances = [];
+        foreach ($results as $result) {
+            $course = $coursetable->extract_from_result($result);
+            $instancedata = $bbbtable->extract_from_result($result);
+            $cm = get_fast_modinfo($course)->get_cm($result->cmid);
+            $instances[$cm->id] = new self($cm, $course, $instancedata);
+        }
+
+        return $instances;
     }
 
     /**
@@ -882,6 +966,15 @@ EOF;
      */
     public function is_blindside_network_server(): bool {
         return plugin::bigbluebuttonbn_is_bn_server();
+    }
+
+    /**
+     * Get the URL used to access the course that the instance is in.
+     *
+     * @return moodle_url
+     */
+    public function get_course_url(): moodle_url {
+        return new moodle_url('/course/view.php', ['id' => $this->get_course_id()]);
     }
 
     /**

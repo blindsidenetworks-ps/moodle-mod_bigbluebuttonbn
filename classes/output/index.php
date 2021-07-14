@@ -29,6 +29,7 @@ namespace mod_bigbluebuttonbn\output;
 use coding_exception;
 use html_table;
 use html_writer;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\plugin;
@@ -56,7 +57,7 @@ class index implements renderable {
      * Constructor for the index renderable.
      *
      * @param stdClass $course
-     * @param stdClass[] List of bbbbn instances
+     * @param instance[] List of bbbbn instances
      */
     public function __construct(stdClass $course, array $instances) {
         $this->course = $course;
@@ -96,38 +97,29 @@ class index implements renderable {
      *
      * @param renderer_base $output
      * @param html_table $table
-     * @param stdClass $instance
+     * @param instance $instance
      */
-    protected function add_instance_to_table(renderer_base $output, html_table $table, stdClass $instance): void {
+    protected function add_instance_to_table(renderer_base $output, html_table $table, instance $instance): void {
         global $PAGE;
 
-        if (!$instance->visible) {
+        $cm = $instance->get_cm();
+        if (!$cm->uservisible) {
             return;
         }
 
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $instance->coursemodule, 0, false, MUST_EXIST);
-
-        // User roles.
-        $participantlist = roles::bigbluebuttonbn_get_participant_list($instance, $PAGE->context);
-        $moderator = roles::bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
-        $administrator = is_siteadmin();
-        $canmoderate = ($administrator || $moderator);
+        $canmoderate = $instance->is_admin() || $instance->is_moderator();
 
         // Add a the data for the bbb instance.
         if (groups_get_activity_groupmode($cm) == 0) {
             $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance);
         } else {
             // Add the 'All participants' room information.
-            $groupobj = (object) [
-                'id' => 0,
-                'name' => get_string('allparticipants'),
-            ];
-            $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, $groupobj);
+            $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, 0);
 
             // Add a the data for the groups belonging to the bbb instance, if any.
             $groups = groups_get_activity_allowed_groups($cm);
             foreach ($groups as $group) {
-                $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, $group);
+                $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, $group->id);
             }
         }
     }
@@ -137,7 +129,7 @@ class index implements renderable {
      *
      * @param renderer_base $output
      * @param bool $moderator
-     * @param stdClass $instance
+     * @param instance $instance
      * @param stdClass|null $group
      * @return array
      * @throws moodle_exception
@@ -145,12 +137,15 @@ class index implements renderable {
     protected function add_room_row_to_table(
         renderer_base $output,
         bool $moderator,
-        stdClass $instance,
-        ?stdClass $group = null
+        instance $instance,
+        ?int $group = null
     ): array {
-        $meetingid = plugin::get_meeting_id($instance, $group);
-        $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info_array($meetingid);
+        if ($group) {
+            $instance = instance::get_group_instance_from_instance($instance, $group);
+        }
 
+        $meetingid = $instance->get_meeting_id();
+        $meetinginfo = meeting_helper::bigbluebuttonbn_get_meeting_info_array($meetingid);
         if (empty($meetinginfo)) {
             // The server was unreachable.
             throw new moodle_exception('index_error_unable_display', plugin::COMPONENT);
@@ -161,31 +156,23 @@ class index implements renderable {
             throw new moodle_exception('index_error_checksum', plugin::COMPONENT);
         }
 
-        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $instance->coursemodule]);
-        $groupname = '';
-
-        if ($group) {
-            $url->param('group', $group->id);
-            $groupname = $group->name;
-        }
-
-        $joinurl = html_writer::link($url, format_string($instance->name));
+        $joinurl = html_writer::link($instance->get_view_url(), format_string($instance->get_meeting_name()));
 
         // The meeting info was returned.
         if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
             return [
-                $instance->section,
+                $instance->get_cm()->sectionnum,
                 $joinurl,
-                $groupname,
+                $instance->get_group_name(),
                 $this->get_room_usercount($output, $meetinginfo),
                 $this->get_room_attendee_list($output, $meetinginfo, 'VIEWER'),
                 $this->get_room_attendee_list($output, $meetinginfo, 'MODERATOR'),
                 $this->get_room_record_info($output, $meetinginfo),
-                $this->get_room_actions($output, $moderator, $instance, $meetingid),
+                $this->get_room_actions($output, $instance, $meetinginfo),
             ];
         }
 
-        return [$instance->section, $joinurl, $groupname, '', '', '', '', ''];
+        return [$instance->get_cm()->sectionnum, $joinurl, $instance->get_group_name(), '', '', '', '', ''];
     }
 
     /**
@@ -195,8 +182,8 @@ class index implements renderable {
      * @param array $meetinginfo
      * @return int
      */
-    protected function get_room_usercount(renderer_base $output, $meetinginfo): int {
-        if (property_exists($meetinginfo['attendees'], 'attendees')) {
+    protected function get_room_usercount(renderer_base $output, array $meetinginfo): int {
+        if (array_key_exists('attendees', $meetinginfo)) {
             return count($meetinginfo['attendees']->attendee);
         }
 
@@ -211,13 +198,13 @@ class index implements renderable {
      * @param string $role
      * @return string
      */
-    protected function get_room_attendee_list(renderer_base $output, $meetinginfo, $role): string {
+    protected function get_room_attendee_list(renderer_base $output, array $meetinginfo, string $role): string {
         $attendees = [];
 
-        if (count($meetinginfo['attendees']) && count($meetinginfo['attendees']->attendee)) {
+        if (count($meetinginfo['attendees']->attendee)) {
             foreach ($meetinginfo['attendees']->attendee as $attendee) {
-                if ($attendee->role == $role) {
-                    $attendees[] = $attendee->fullname;
+                if ((string) $attendee->role == $role) {
+                    $attendees[] = $attendee->fullName;
                 }
             }
         }
@@ -245,17 +232,15 @@ class index implements renderable {
      * Returns room actions.
      *
      * @param renderer_base $output
-     * @param boolean $ismoderator
-     * @param object $instance
-     * @param string $meetingid
+     * @param instance $instance
      * @return string
-     * @throws moodle_exception
      */
-    protected function get_room_actions(renderer_base $output, $ismoderator, $instance, $meetingid): string {
-        if ($ismoderator) {
+    protected function get_room_actions(renderer_base $output, instance $instance, array $meetinginfo): string {
+        if ($instance->is_moderator()) {
             return $output->render_from_template('mod_bigbluebuttonbn/end_session_button', (object) [
-                'bigbluebuttonbnid' => $instance->id,
-                'meetingid' => $meetingid,
+                'bigbluebuttonbnid' => $instance->get_instance_id(),
+                'meetingid' => $instance->get_meeting_id(),
+                'statusrunning' => !empty($meetinginfo['running']),
             ]);
         }
 
