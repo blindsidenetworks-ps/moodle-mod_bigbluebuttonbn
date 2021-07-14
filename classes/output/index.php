@@ -156,7 +156,12 @@ class index implements renderable {
             throw new moodle_exception('index_error_checksum', plugin::COMPONENT);
         }
 
-        $joinurl = html_writer::link($instance->get_view_url(), format_string($instance->get_meeting_name()));
+        $viewurl = $instance->get_view_url();
+        if ($groupid = $instance->get_group_id()) {
+            $viewurl->param('group', $groupid);
+        }
+
+        $joinurl = html_writer::link($viewurl, format_string($instance->get_meeting_name()));
 
         // The meeting info was returned.
         if (array_key_exists('running', $meetinginfo) && $meetinginfo['running'] == 'true') {
