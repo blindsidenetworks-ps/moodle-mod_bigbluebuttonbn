@@ -33,8 +33,18 @@
     <span id="status_bar">
         <span class="status-message">{{statusmessage}}</span>
         <span class="conf-opening-time">
-            {{#openingtime}}<span class="conf-opening">{{.}}</span>{{/openingtime}}
-            {{#closingtime}}<span class="conf-opening">{{.}}</span>{{/closingtime}}
+          {{#openingtime}}
+          <span class="conf-opening">
+            {{#str}}mod_form_field_openingtime, bigbluebuttonbn{{/str}}:
+            {{#userdate}} {{.}}, {{#str}} strftimedaydatetime, langconfig {{/str}} {{/userdate}}
+          </span>
+          {{/openingtime}}
+          {{#closingtime}}
+          <span class="conf-closing">
+            {{#str}}mod_form_field_closingtime, bigbluebuttonbn{{/str}}:
+            {{#userdate}} {{.}}, {{#str}} strftimedaydatetime, langconfig {{/str}} {{/userdate}}
+          </span>
+          {{/closingtime}}
         </span>
         {{#statusrunning}}
             <div>
