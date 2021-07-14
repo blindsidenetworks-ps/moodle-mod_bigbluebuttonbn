@@ -246,7 +246,7 @@ class files {
      *
      * @return array|null
      */
-    public static function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null): ?array {
+    public static function get_presentation_array($context, $presentation, $id = null): ?array {
         global $CFG;
         if (empty($presentation)) {
             if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
@@ -264,12 +264,7 @@ class files {
 
                 if (count($files) == 0) {
                     // Not exist file by default in "presentationbydefault" setting.
-                    return [
-                        'icondesc' => null,
-                        'iconname' => null,
-                        'name' => null,
-                        'url' => null,
-                    ];
+                    return null;
                 }
 
                 // Exists file in general setting to use as default for presentation. Cache image for temp public access.
