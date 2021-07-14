@@ -60,14 +60,4 @@ class mobileview {
         return($joinurl);
     }
 
-    /**
-     * Helper for preparing metadata used while creating the meeting.
-     *
-     * @param  instance    $instance
-     * @return array
-     */
-    public static function create_meeting_metadata($instance) {
-        return meeting_helper::bigbluebuttonbn_create_meeting_metadata($instance);
-    }
-
 }

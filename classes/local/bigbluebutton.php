@@ -31,6 +31,8 @@ use curl;
 use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
@@ -522,8 +524,8 @@ class bigbluebutton {
      */
     public static function require_working_server(instance $instance): void {
         try {
-            $serverversion = self::bigbluebuttonbn_get_server_version();
-        } catch (moodle_exception $e) {
+            self::bigbluebuttonbn_get_server_version();
+        } catch (server_not_available_exception $e) {
             self::handle_server_not_available($instance);
         }
     }
@@ -581,7 +583,8 @@ class bigbluebutton {
      * @param null $presentationname
      * @param null $presentationurl
      * @return array
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
+     * @throws server_not_available_exception
      */
     public static function create_meeting(array $data, array $metadata, $presentationname = null, $presentationurl = null) {
         $createmeetingurl = self::action_url('create', $data, $metadata);
@@ -596,10 +599,13 @@ class bigbluebutton {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
         self::assert_returned_xml($xml);
         if (empty($xml->meetingID)) {
-            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        if ($xml->hasBeenForciblyEnded === 'true') {
+            throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
         }
         return array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
-            'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded);
+            'moderatorPW' => $xml->moderatorPW);
     }
 
     /**
@@ -607,13 +613,13 @@ class bigbluebutton {
      *
      * @param string $meetingid
      * @return array
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
      */
     public static function get_meeting_info(string $meetingid) {
         $xmlinfo = self::bigbluebuttonbn_wrap_xml_load_file(
             self::action_url('getMeetingInfo', ['meetingID' => $meetingid])
         );
-        self::assert_returned_xml($xmlinfo);
+        self::assert_returned_xml($xmlinfo, $meetingid);
         return (array) $xmlinfo;
     }
 
@@ -622,28 +628,27 @@ class bigbluebutton {
      *
      * @param string $meetingid
      * @param string $modpw
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
      */
     public static function end_meeting($meetingid, $modpw) {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file(
             self::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
         );
-        self::assert_returned_xml($xml);
+        self::assert_returned_xml($xml, $meetingid);
     }
-
 
     /**
      * Get recordings from BBB.
      *
      * @param array $meetingsids
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
      */
     public static function get_recordings_from_meetings($meetingsids) {
         $url = self::action_url('getRecordings', ['meetingID' => implode(',', $meetingsids)]);
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
-        self::assert_returned_xml($xml);
+        self::assert_returned_xml($xml, join(',', $meetingsids));
         if (!isset($xml->recordings)) {
-            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
         }
         return $xml->recordings;
     }
@@ -652,18 +657,17 @@ class bigbluebutton {
      * Get recordings from BBB.
      *
      * @param array $recordingsids
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
      */
     public static function get_recordings($recordingsids) {
         $url = self::action_url('getRecordings', ['recordID' => implode(',', $recordingsids)]);
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
-        self::assert_returned_xml($xml);
+        self::assert_returned_xml($xml, join(',', $recordingsids));
         if (!isset($xml->recordings)) {
-            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
         }
         return $xml->recordings;
     }
-
 
     /**
      * Publish recording.
@@ -683,7 +687,7 @@ class bigbluebutton {
      * Delete recording
      *
      * @param int $recordingid
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
      */
     public static function delete_recording($recordingid) {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file(
@@ -699,22 +703,32 @@ class bigbluebutton {
      */
     const MEETING_ERROR = [
         'checksumError' => 'index_error_checksum',
-        'notFound' => 'index_error_checksum',
+        'notFound' => 'general_error_not_found',
+        'maxConcurrent' => 'view_error_max_concurrent',
     ];
 
     /**
      * Throw an exception if there is a problem in the returned XML value
      *
      * @param $xml
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
+     * @throws server_not_available_exception
      */
-    protected static function assert_returned_xml($xml) {
-        if (empty($xml) || $xml->returncode === 'FAILED') {
-            $messagekey = $xml->messagekey ?? '';
-            $messageDetails = $xml->message ?? '';
-            throw new moodle_exception(
-                self::MEETING_ERROR[$messagekey] ?? 'general_error_unable_connect',
+    protected static function assert_returned_xml($xml, $additionalDetails = '') {
+        if (empty($xml)) {
+            global $CFG;
+            throw new server_not_available_exception('general_error_unable_connect', plugin::COMPONENT,
+                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+        }
+        if ((string) $xml->returncode === 'FAILED') {
+            $messagekey = (string) $xml->messageKey ?? '';
+            $messageDetails = (string) $xml->message ?? '';
+            $messageDetails .= $additionalDetails ? " ($additionalDetails) " : '';
+            throw new bigbluebutton_exception(
+                (empty($messagekey) || empty(self::MEETING_ERROR[$messagekey])) ?
+                    'general_error_unable_connect' : $messagekey,
                 plugin::COMPONENT,
+                '',
                 $messageDetails);
         }
     }

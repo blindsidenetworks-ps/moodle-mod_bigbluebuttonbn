@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use mod_bigbluebuttonbn\local\mobileview;
@@ -135,26 +137,15 @@ class mobile {
         if (!$meeting->is_running()) {
             // The meeting doesnt exist in BBB server, must be created.
             $meeting = new meeting($instance);
-            $response = $meeting->create_meeting();
-
-            if (empty($response)) {
+            try {
+                $meeting->create_meeting();
+                // Event meeting created.
+                logs::log_meeting_created_event($instance);
+            } catch (bigbluebutton_exception $e) {
+               return self::mobile_print_error($e->getMessage());
+            } catch(server_not_available_exception $e) {
                 return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
             }
-
-            if ($response['returncode'] == 'FAILED') {
-                // The meeting could not be created.
-                $errorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
-                $e = get_string($errorkey, 'bigbluebuttonbn');
-                return self::mobile_print_error($e);
-            }
-
-            if ($response['hasBeenForciblyEnded'] == 'true') {
-                $e = get_string('index_error_forciblyended', 'bigbluebuttonbn');
-                return self::mobile_print_error($e);
-            }
-
-            // Event meeting created.
-            logs::log_meeting_created_event($instance);
         }
 
         // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.

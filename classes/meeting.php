@@ -28,8 +28,9 @@ use cache;
 use cache_store;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
-use moodle_exception;
 use stdClass;
 
 /**
@@ -97,8 +98,8 @@ class meeting {
 
             'userlimit' => $instance->get_user_limit(),
             'group' => $instance->get_group_id(),
-
             'presentations' => [],
+            'createtime' => $info['createTime'] ?? null
         ];
         $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
         $meetinginfo->participantcount = $participantcount;
@@ -214,7 +215,8 @@ class meeting {
      * @param string $purl
      *
      * @return array
-     * @throws moodle_exception
+     * @throws bigbluebutton_exception
+     * @throws server_not_available_exception
      */
     public function create_meeting() {
         $data = $this->create_meeting_data();

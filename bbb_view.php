@@ -24,6 +24,7 @@
  */
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
@@ -148,31 +149,16 @@ switch (strtolower($action)) {
         }
 
         // As the meeting doesn't exist, try to create it.
-        $meeting = new meeting($instance);
-        $response = $meeting->create_meeting();
-
-        if (empty($response)) {
-            // The server is not available.
+        try {
+            $meeting = new meeting($instance);
+            $meeting->create_meeting();
+            // Moodle event logger: Create an event for meeting created.
+            logs::log_meeting_created_event($instance);
+            // Since the meeting is already running, we just join the session.
+            bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
+        } catch (server_not_available_exception $e) {
             bigbluebutton::handle_server_not_available($instance);
         }
-
-        if ($response['returncode'] == 'FAILED') {
-            // The meeting was not created.
-            $printerrorkey = plugin::bigbluebuttonbn_get_error_key($response['messageKey'], 'view_error_create');
-            if (!$printerrorkey) {
-                throw new moodle_exception($response['message'], 'bigbluebuttonbn');
-            }
-            throw new moodle_exception($printerrorkey, 'bigbluebuttonbn');
-        }
-
-        if ($response['hasBeenForciblyEnded'] == 'true') {
-            throw new moodle_exception(get_string('index_error_forciblyended', 'bigbluebuttonbn'));
-        }
-        // Moodle event logger: Create an event for meeting created.
-        logs::log_meeting_created_event($instance);
-
-        // Since the meeting is already running, we just join the session.
-        bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
         break;
 
     case 'play':
@@ -334,7 +320,7 @@ function bigbluebuttonbn_bbb_view_join_meeting($instance, $origin = 0): void {
     // Update the cache and retrieve info.
     $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
 
-    if ($instance->has_user_limit_been_reached(intval($meetinginfo['participantCount']))) {
+    if ($meetinginfo->statusrunning && $instance->has_user_limit_been_reached($meetinginfo->participantcount)) {
         // No more users allowed to join.
         redirect($instance->get_logout_url());
         return;
@@ -347,7 +333,7 @@ function bigbluebuttonbn_bbb_view_join_meeting($instance, $origin = 0): void {
         $instance->get_logout_url(),
         null,
         $instance->get_user_id(),
-        $meetinginfo['createTime']
+        $meetinginfo->createtime
     );
 
     // Moodle event logger: Create an event for meeting joined.
