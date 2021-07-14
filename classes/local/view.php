@@ -26,7 +26,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use pix_icon;
 
 /**

@@ -40,7 +40,14 @@ use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
 defined('MOODLE_INTERNAL') || die();
-
+/**
+ * The mod_bigbluebuttonbn settings helper
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
+ */
 class settings {
 
     /** @var admin_setting shared value */
@@ -60,7 +67,7 @@ class settings {
      *
      * @param admin_category $admin
      * @param \core\plugininfo\mod $module
-     * @param string $section for the plugin setting (main setting page)
+     * @param string $categoryname for the plugin setting (main setting page)
      */
     public function __construct(admin_category $admin, \core\plugininfo\mod $module, string $categoryname) {
         $this->moduleenabled = $module->is_enabled() === true;
@@ -629,13 +636,11 @@ class settings {
             $preuploadsettings->add($filemanager);
         }
         $this->admin->add($this->section, $preuploadsettings);
-
     }
 
     /**
      * Helper function renders userlimit settings if the feature is enabled.
      */
-
     protected function add_userlimit_settings(): void {
         $userlimitsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_userlimit",

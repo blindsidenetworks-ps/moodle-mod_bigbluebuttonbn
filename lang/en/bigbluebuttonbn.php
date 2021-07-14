@@ -283,8 +283,11 @@ $string['config_experimental_features'] = 'Configuration for experimental featur
 $string['config_experimental_features_description'] = 'Configuration for experimental features.';
 
 $string['general_error_unable_connect'] = 'Unable to connect ({$a}). Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_no_answer'] = 'Empty response. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 $string['general_error_not_found'] = 'Entity not found : {$a}.';
+$string['general_error_cannot_create_meeting'] = 'Cannot create meeting.';
+$string['general_error_cannot_get_recordings'] = 'Cannot get recordings.';
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_disabled'] = 'disabled';
 $string['index_enabled'] = 'enabled';

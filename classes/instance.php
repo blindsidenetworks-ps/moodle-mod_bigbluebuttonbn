@@ -34,6 +34,13 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_url;
 use stdClass;
 
+/**
+ * Instance record for mod_bigbluebuttonbn.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class instance {
     /** @var cm_info The cm_info object relating to the instance */
     protected $cm;
@@ -194,7 +201,7 @@ EOF;
             $instance->set_group_id($matches['groupid']);
         }
 
-        return self;
+        return $instance;
     }
 
     /**
@@ -938,6 +945,24 @@ EOF;
         }
 
         return (bool) $this->get_instance_var('wait');
+    }
+
+    /**
+     * Whether the user can force join in all cases
+     *
+     * @return bool
+     */
+    public function user_can_force_join(): bool {
+        return $this->is_admin() || $this->is_moderator();
+    }
+
+    /**
+     * Whether the user can end a meeting
+     *
+     * @return bool
+     */
+    public function user_can_end_meeting(): bool {
+        return $this->is_admin() || $this->is_moderator();
     }
 
     /**

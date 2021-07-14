@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn/bigbluebutton/recordings/recording.
+ * The recording entity.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
@@ -23,16 +23,9 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
-
-use stdClass;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\config;
-
-
+namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 defined('MOODLE_INTERNAL') || die();
+use stdClass;
 
 /**
  * Utility class that defines a recording and provides methods for handlinging locally in Moodle and externally in BBB.
@@ -157,13 +150,14 @@ class recording {
     }
 
     /**
+     * Update a recording by selecting it using given attributes
      *
      * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
      * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
      *
      * @return bool Success/Failure
      */
-    public function update_by($attributes, $dataobject) {
+    public static function update_by($attributes, $dataobject) {
         global $DB;
         $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
         if (!$recs) {

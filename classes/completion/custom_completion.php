@@ -67,7 +67,7 @@ class custom_completion extends activity_custom_completion {
 
         switch ($rule) {
             case 'completionattendance':
-                $value = $this->compute_state($logs, $rule, function($summary) {
+                $value = $this->compute_state($logs, $rule, $bigbluebuttonbn, function($summary) {
                     return $summary->data->duration;
                 });
                 break;
@@ -77,7 +77,7 @@ class custom_completion extends activity_custom_completion {
             case 'completionengagementpollvotes':
             case 'completionengagementemojis':
                 $shortname = str_replace('completionengagement', '', $rule);
-                $value = $this->compute_state($logs, $rule, function($summary) use ($shortname) {
+                $value = $this->compute_state($logs, $rule, $bigbluebuttonbn, function($summary) use ($shortname) {
                     return $summary->data->engagement->$shortname;
                 });
                 break;
@@ -89,12 +89,13 @@ class custom_completion extends activity_custom_completion {
     /**
      * Compute current state from logs.
      *
-     * @param $logs
-     * @param $rulename
-     * @param $summaryvaluegetter
+     * @param array $logs
+     * @param string $rulename
+     * @param object $bigbluebuttonbn
+     * @param callable $summaryvaluegetter
      * @return bool
      */
-    protected function compute_state($logs, $rulename, $summaryvaluegetter) {
+    protected function compute_state($logs, $rulename, $bigbluebuttonbn, $summaryvaluegetter) {
         if (!$logs) {
             // As completion by engagement with $rulename hand was required, the activity hasn't been completed.
             return false;

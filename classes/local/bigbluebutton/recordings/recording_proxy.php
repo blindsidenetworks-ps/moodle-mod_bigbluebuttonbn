@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn/bigbluebutton/recordings/proxy is a proxy or wrapper for the bigbluebutton API
- * that works as a helper for handling all the requests.
+ * The recordings_proxy is a proxy or wrapper for the bigbluebutton API that works as a helper for handling all the requests.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
@@ -25,9 +24,9 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
+namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use stdClass;
 
@@ -108,7 +107,7 @@ class recording_proxy {
      *
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
-    public function bigbluebutton_fetch_recordings($recordingids = []) {
+    public static function bigbluebutton_fetch_recordings($recordingids = []) {
         // Normalize recordingids to array.
         if (!is_array($recordingids)) {
             $recordingids = explode(',', $recordingids);
@@ -142,7 +141,7 @@ class recording_proxy {
      *
      * @return array
      */
-    private function bigbluebutton_fetch_recordings_page($rids) {
+    private static function bigbluebutton_fetch_recordings_page($rids) {
         $recordings = array();
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);

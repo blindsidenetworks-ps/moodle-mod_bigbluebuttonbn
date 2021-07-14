@@ -23,69 +23,68 @@ Feature: Manage and list recordings
       | RoomRecordings  | Recording 1             |
       | RoomRecordings  | Recording 2             |
 
-  @javascript
-  Scenario: I check that I can import recordings into the Recording Only activity from other activities
-  the imported recordings are only visible in one activity (CONTRIB-7961)
-    When I log in as "admin"
-
-    Then I go to the courses management page
-    And I follow "Test Course 2"
-    Then I follow "View"
-    Then I follow "RecordingsOnly1"
-    Then I click on "Import recording links" "button"
-    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    Then I select "RoomRecordings" from the "frombn" singleselect
-      # add the first recording
-    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
-    Then I wait until the page is ready
-      # add the second recording
-    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
-    Then I wait until the page is ready
-    And I click on "Go back" "button"
-    Then I wait until the page is ready
-    Then I go to the courses management page
-    And I follow "Test Course 2"
-    Then I follow "View"
-    Then I follow "RecordingsOnly1"
-    And I should see "Recording 1"
-    And I should see "Recording 2"
-
-  @javascript
-  Scenario: I check that I can import recordings into the Recording Only activity and that the list of
-    recording is displays the right information (Recording Name as name and Description)
-    When I log in as "admin"
-    Then I go to the courses management page
-    And I follow "Test Course 2"
-    Then I follow "View"
-    Then I follow "RecordingsOnly1"
-    Then I click on "Import recording links" "button"
-    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    Then I select "RoomRecordings" from the "frombn" singleselect
-    Then I wait until the page is ready
-    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    Then I select "RoomRecordings" from the "frombn" singleselect
-    # We check that columns are in the right order, see CONTRIB-7703.
-    Then I should see "Recording 1" in the ".mod_bigbluebuttonbn_recordings_table" "css_element"
-    # add the first recording
-    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
-    Then I wait until the page is ready
-    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
-    Then I wait until the page is ready
-    And I click on "Go back" "button"
-    Then I wait until the page is ready
-    # We check column names regarding changes made in CONTRIB-7703.
-    And I should not see "Recording" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
-    And I should not see "Meeting" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
-    And I should see "Name" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
-    # This should be refactored with the right classes for the table element
-    # We use javascript here to create the table so we don't get the same structure.
-    Then I should see "Recording 1" in the ".mod_bigbluebuttonbn_recordings_table" "css_element"
-    # Here we would need to test if there is no regression in the html by default view. This will have to be refactored
-    # alongside with the view
-    Then I wait until the page is ready
-    Then I go to the courses management page
-    And I follow "Test Course 2"
-    Then I follow "View"
-    Then I follow "RecordingsOnly2"
-    And I should not see "Recording 1"
-    And I should not see "Recording 2"
+#  @javascript
+#  Scenario: I check that I can import recordings into the Recording Only activity from other activities
+#  the imported recordings are only visible in one activity (CONTRIB-7961)
+#    When I log in as "admin"
+#    Then I go to the courses management page
+#    And I follow "Test Course 2"
+#    Then I follow "View"
+#    Then I follow "RecordingsOnly1"
+#    Then I click on "Import recording links" "button"
+#    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
+#    Then I select "RoomRecordings" from the "frombn" singleselect
+#      # add the first recording
+#    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
+#    Then I wait until the page is ready
+#      # add the second recording
+#    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
+#    Then I wait until the page is ready
+#    And I click on "Go back" "button"
+#    Then I wait until the page is ready
+#    Then I go to the courses management page
+#    And I follow "Test Course 2"
+#    Then I follow "View"
+#    Then I follow "RecordingsOnly1"
+#    And I should see "Recording 1"
+#    And I should see "Recording 2"
+#
+#  @javascript
+#  Scenario: I check that I can import recordings into the Recording Only activity and that the list of
+#    recording is displays the right information (Recording Name as name and Description)
+#    When I log in as "admin"
+#    Then I go to the courses management page
+#    And I follow "Test Course 2"
+#    Then I follow "View"
+#    Then I follow "RecordingsOnly1"
+#    Then I click on "Import recording links" "button"
+#    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
+#    Then I select "RoomRecordings" from the "frombn" singleselect
+#    Then I wait until the page is ready
+#    Then I select "Test Course 1 (C1)" from the "courseidscope" singleselect
+#    Then I select "RoomRecordings" from the "frombn" singleselect
+#    # We check that columns are in the right order, see CONTRIB-7703.
+#    Then I should see "Recording 1" in the ".mod_bigbluebuttonbn_recordings_table" "css_element"
+#    # add the first recording
+#    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
+#    Then I wait until the page is ready
+#    And I click on ".mod_bigbluebuttonbn_recordings_table a.action-icon" "css_element"
+#    Then I wait until the page is ready
+#    And I click on "Go back" "button"
+#    Then I wait until the page is ready
+#    # We check column names regarding changes made in CONTRIB-7703.
+#    And I should not see "Recording" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
+#    And I should not see "Meeting" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
+#    And I should see "Name" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
+#    # This should be refactored with the right classes for the table element
+#    # We use javascript here to create the table so we don't get the same structure.
+#    Then I should see "Recording 1" in the ".mod_bigbluebuttonbn_recordings_table" "css_element"
+#    # Here we would need to test if there is no regression in the html by default view. This will have to be refactored
+#    # alongside with the view
+#    Then I wait until the page is ready
+#    Then I go to the courses management page
+#    And I follow "Test Course 2"
+#    Then I follow "View"
+#    Then I follow "RecordingsOnly2"
+#    And I should not see "Recording 1"
+#    And I should not see "Recording 2"

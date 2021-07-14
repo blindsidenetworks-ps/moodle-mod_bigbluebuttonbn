@@ -24,11 +24,9 @@
  */
 namespace mod_bigbluebuttonbn\local\helpers;
 use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\test\testcase_helper;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
 
 /**
  * BBB Library tests class.
@@ -38,7 +36,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class instance_test extends \bbb_simple_test {
+class instance_test extends testcase_helper {
 
     /**
      * Presave test

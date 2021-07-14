@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn/bigbluebutton/recordings/output.
+ * The recordings_data.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
@@ -24,21 +24,16 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
+namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
-use html_table;
-use html_table_row;
 use html_writer;
+use mod_bigbluebuttonbn\instance;
 use stdClass;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\plugin;
-use mod_bigbluebuttonbn_generator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -59,13 +54,13 @@ class recording_data {
      * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $tools
      *
-     * @return array
+     * @return stdClass
      */
     public static function row($instance, $rec,
         $tools = ['protect', 'publish', 'delete']) {
         global $OUTPUT, $PAGE;
         if (!self::include_recording_table_row($instance, $rec)) {
-            return;
+            return null;
         }
         $rowdata = new stdClass();
         // Set recording_types.
@@ -513,7 +508,7 @@ class recording_data {
         }
         // When groups are enabled, exclude those to which the user doesn't have access to.
         if ($instance->uses_groups()) {
-            return $recording['meetingID'] === $instance->get_meeting_id();
+            return $rec->recording['meetingID'] === $instance->get_meeting_id();
         }
         return true;
     }

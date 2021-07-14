@@ -101,19 +101,18 @@ class index implements renderable {
         if (!$cm->uservisible) {
             return;
         }
-        $canmoderate = $instance->is_admin() || $instance->is_moderator();
 
         // Add a the data for the bbb instance.
         if (groups_get_activity_groupmode($cm) == 0) {
-            $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance);
+            $table->data[] = $this->add_room_row_to_table($output, $instance);
         } else {
             // Add the 'All participants' room information.
-            $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, 0);
+            $table->data[] = $this->add_room_row_to_table($output, $instance, 0);
 
             // Add a the data for the groups belonging to the bbb instance, if any.
             $groups = groups_get_activity_allowed_groups($cm);
             foreach ($groups as $group) {
-                $table->data[] = $this->add_room_row_to_table($output, $canmoderate, $instance, $group->id);
+                $table->data[] = $this->add_room_row_to_table($output, $instance, $group->id);
             }
         }
     }
@@ -122,14 +121,12 @@ class index implements renderable {
      * Displays the general view.
      *
      * @param renderer_base $output
-     * @param bool $moderator
      * @param instance $instance
      * @param int|null $group
      * @return array
      */
     protected function add_room_row_to_table(
         renderer_base $output,
-        bool $moderator,
         instance $instance,
         ?int $group = null
     ): array {

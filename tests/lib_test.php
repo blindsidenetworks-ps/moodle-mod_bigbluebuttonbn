@@ -22,15 +22,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-
-use mod_bigbluebuttonbn\completion\custom_completion;
+namespace mod_bigbluebuttonbn;
+use calendar_event;
+use context_module;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn_mod_form;
+use MoodleQuickForm;
+use navigation_node;
+use ReflectionClass;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
 
 /**
@@ -41,42 +46,13 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class lib_test extends \bbb_simple_test {
+class lib_test extends testcase_helper {
 
     public function test_bigbluebuttonbn_supports() {
         $this->resetAfterTest();
         $this->assertTrue(bigbluebuttonbn_supports(FEATURE_IDNUMBER));
         $this->assertTrue(bigbluebuttonbn_supports(FEATURE_MOD_INTRO));
         $this->assertFalse(bigbluebuttonbn_supports(FEATURE_GRADE_HAS_GRADE));
-    }
-
-    public function test_bigbluebuttonbn_get_completion_state() {
-        $this->resetAfterTest();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $user = $this->generator->create_user();
-        $this->setUser($user);
-        $completion = new custom_completion($bbactivitycm, $user->id);
-        $result = $completion->get_overall_completion_state();
-        // No custom rules so complete.
-        $this->assertEquals(COMPLETION_COMPLETE, $result);
-
-        // Now with a custom rule.
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-            $this->create_instance(null);
-        $bbactivitycm->override_customdata('customcompletionrules', [
-            'completionengagementchats' => '1',
-            'completionattendance' => '1'
-        ]);
-        $completion = new custom_completion($bbactivitycm, $user->id);
-        $result = $completion->get_overall_completion_state();
-        $this->assertEquals(COMPLETION_INCOMPLETE, $result);
-        // Add a couple of fake logs.
-        $overrides = array('meetingid' => $bbactivity->meetingid);
-        $meta = '{"origin":0, "data": {"duration": 120, "engagement": {"chats": 2, "talks":2} }}';
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
-        $result = $completion->get_overall_completion_state();
-        $this->assertEquals(COMPLETION_COMPLETE, $result);
     }
 
     public function test_bigbluebuttonbn_add_instance() {
@@ -196,99 +172,11 @@ class lib_test extends \bbb_simple_test {
         $this->assertEquals($info->name, $bbactivity->name);
     }
 
-    public function test_mod_bigbluebuttonbn_get_completion_active_rule_descriptions() {
-        $this->resetAfterTest();
-        $user = $this->getDataGenerator()->create_user();
-        $this->setUser($user);
-        // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
-        // Inspired from the same test in forum.
-        list($bbactivitycontext, $cm1, $bbactivity) = $this->create_instance($this->course,
-            ['completion' => '2', 'completionattendance' => '1']);
-        list($bbactivitycontext, $cm2, $bbactivity) = $this->create_instance($this->course,
-            ['completion' => '2', 'completionattendance' => '0']);
-
-        // Data for the stdClass input type.
-        // This type of input would occur when checking the default completion rules for an activity type, where we don't have
-        // any access to cm_info, rather the input is a stdClass containing completion and customdata attributes, just like cm_info.
-        $moddefaults = (object) [
-            'customdata' => [
-                'customcompletionrules' => [
-                    'completionsubmit' => '1',
-                ],
-            ],
-            'completion' => 2,
-        ];
-
-        $completioncm1 = new custom_completion($cm1, $user->id);
-        // TODO: check the return value here as there might be an issue with the function compared to the forum for example.
-        $this->assertEquals(
-            [
-                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
-                    1),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
-            ],
-            $completioncm1->get_custom_rule_descriptions());
-        $completioncm2 = new custom_completion($cm2, $user->id);
-        $this->assertEquals(
-            [
-                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
-            ], $completioncm2->get_custom_rule_descriptions());
-    }
-
     public function test_bigbluebuttonbn_pluginfile() {
         $this->resetAfterTest();
         $this->markTestSkipped(
             'For now this test on send file and it should be mocked to avoid the real API CALL.'
         );
-    }
-
-    public function test_bigbluebuttonbn_view() {
-        $this->resetAfterTest();
-        $this->setAdminUser();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance([],
-            array('completion' => 2, 'completionview' => 1));
-
-        // Trigger and capture the event.
-        $sink = $this->redirectEvents();
-
-        bigbluebuttonbn_view($bbactivity, $this->course, $bbactivitycm, context_module::instance($bbactivitycm->id));
-
-        $events = $sink->get_events();
-        $this->assertCount(3, $events);
-        $event = reset($events);
-
-        // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_bigbluebuttonbn\event\activity_viewed', $event);
-        $this->assertEquals($bbactivitycontext, $event->get_context());
-        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $bbactivitycontext->instanceid));
-        $this->assertEquals($url, $event->get_url());
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-
-        // Check completion status.
-        $completion = new completion_info($this->course);
-        $completiondata = $completion->get_data($bbactivitycm);
-        $this->assertEquals(1, $completiondata->completionstate);
     }
 
     public function test_bigbluebuttonbn_check_updates_since() {

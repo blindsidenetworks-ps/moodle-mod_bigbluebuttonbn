@@ -29,8 +29,8 @@ use lang_string;
 use moodle_exception;
 use core\output\inplace_editable;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
 
 /**
  * Renderer for recording in place editable.

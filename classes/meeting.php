@@ -142,11 +142,6 @@ class meeting {
     /**
      * Creates a bigbluebutton meeting, send the message to BBB and returns the response in an array.
      *
-     * @param array $data
-     * @param array $metadata
-     * @param string $pname
-     * @param string $purl
-     *
      * @return array
      * @throws bigbluebutton_exception
      * @throws server_not_available_exception
@@ -212,15 +207,14 @@ class meeting {
         $meetinginfo->participantcount = $participantcount;
         $meetinginfo->canjoin = false;
 
-        $canforcejoin = $instance->is_admin() || $instance->is_moderator();
-        if ($meetinginfo->statusrunning) {
+        if ($meetinginfo->statusrunning || !$instance->user_must_wait_to_join() ) {
             if (!$instance->has_user_limit_been_reached($participantcount)
                 || !$instance->does_current_user_count_towards_user_limit()
             ) {
                 $meetinginfo->canjoin = true;
             }
         }
-        if ($instance->is_room_available() && $canforcejoin) {
+        if ($instance->is_room_available() && $instance->user_can_force_join()) {
             $meetinginfo->canjoin = true;
         }
         // Double check that the user has the capabilities to join.
@@ -235,7 +229,7 @@ class meeting {
             $meetinginfo->participantcount = $info['participantCount'] ?? 0;
             $meetinginfo->participantplural = $meetinginfo->participantcount > 1;
         } else {
-            if ($instance->user_must_wait_to_join() && !$canforcejoin) {
+            if ($instance->user_must_wait_to_join() && !$instance->user_can_force_join()) {
                 $meetinginfo->statusmessage = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
             } else {
                 $meetinginfo->statusmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
@@ -282,7 +276,6 @@ class meeting {
     /**
      * Helper to prepare data used for create meeting.
      *
-     * @param instance $instance
      * @return array
      */
     protected function create_meeting_data() {
@@ -319,7 +312,6 @@ class meeting {
     /**
      * Helper for preparing metadata used while creating the meeting.
      *
-     * @param instance $instance
      * @return array
      */
     protected function create_meeting_metadata() {

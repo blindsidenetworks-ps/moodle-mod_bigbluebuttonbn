@@ -30,10 +30,9 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\broker;
-use moodle_exception;
 
 /**
  * External service to update the details of one recording.
@@ -65,7 +64,8 @@ class update_recording extends external_api {
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param string $recordingid
      * @param string $action
-     * @param null $additionaloptions
+     * @param string|null $recid
+     * @param string|null $additionaloptions
      * @return array (empty array for now)
      * @throws \coding_exception
      */

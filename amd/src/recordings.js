@@ -41,19 +41,19 @@ const getStringsForYui = () => {
     });
 
     return getStrings(stringMap)
-    .then(([first, prev, next, last, goToLabel, goToAction, perPage, showAll]) => {
-        return {
-            first,
-            prev,
-            next,
-            last,
-            goToLabel,
-            goToAction,
-            perPage,
-            showAll,
-        };
-    })
-    .catch();
+        .then(([first, prev, next, last, goToLabel, goToAction, perPage, showAll]) => {
+            return {
+                first,
+                prev,
+                next,
+                last,
+                goToLabel,
+                goToAction,
+                perPage,
+                showAll,
+            };
+        })
+        .catch();
 };
 
 const getYuiInstance = lang => new Promise(resolve => {
@@ -166,11 +166,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
             }
 
             const description = item.get('description');
-            if (description && rsearch.test(description)) {
-                return true;
-            }
-
-            return false;
+            return description && rsearch.test(description);
         }));
     };
 
@@ -196,16 +192,16 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
                     title: Str.get_string('confirm'),
                     body: recordingConfirmationMessage(payload),
                     type: ModalFactory.types.SAVE_CANCEL
-                }).then(modal => {
-                    modal.setSaveButtonText(Str.get_string('ok'));
+                }).then(async(modal) => {
+                    modal.setSaveButtonText(await Str.get_string('ok'));
 
                     // Handle save event.
-                    modal.getRoot().on(ModalEvents.save, function() {
+                    modal.getRoot().on(ModalEvents.save, function () {
                         resolve(true);
                     });
 
                     // Handle hidden event.
-                    modal.getRoot().on(ModalEvents.hidden, function() {
+                    modal.getRoot().on(ModalEvents.hidden, function () {
                         // Destroy when hidden.
                         modal.destroy();
                         resolve(false);
@@ -223,7 +219,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         }
     };
 
-    const recordingConfirmationMessage = async(data) => {
+    const recordingConfirmationMessage = async (data) => {
         let confirmation = await Str.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
         if (typeof confirmation === 'undefined') {
             return '';
@@ -346,37 +342,37 @@ const setupDatatable = (tableId, searchFormId, response) => {
     }
 
     return Promise.all([getYuiInstance(recordingData.locale), getStringsForYui()])
-    .then(([yuiInstance, strings]) => {
-        // Add the fetched strings to the YUI Instance.
-        yuiInstance.Intl.add('datatable-paginator', yuiInstance.config.lang, {...strings});
+        .then(([yuiInstance, strings]) => {
+            // Add the fetched strings to the YUI Instance.
+            yuiInstance.Intl.add('datatable-paginator', yuiInstance.config.lang, {...strings});
 
-        return yuiInstance;
-    })
-    .then(yuiInstance => {
-        const tableData = getFormattedData(response);
+            return yuiInstance;
+        })
+        .then(yuiInstance => {
+            const tableData = getFormattedData(response);
 
-        const dataTable = new yuiInstance.DataTable({
-            width: "1195px",
-            columns: recordingData.columns,
-            data: tableData,
-            rowsPerPage: 3,
-            paginatorLocation: ['header', 'footer']
+            const dataTable = new yuiInstance.DataTable({
+                width: "1195px",
+                columns: recordingData.columns,
+                data: tableData,
+                rowsPerPage: 3,
+                paginatorLocation: ['header', 'footer']
+            });
+            dataTable.set('currentData', dataTable.get('data'));
+            dataTable.set('currentFilter', '');
+
+            return dataTable;
+        })
+        .then(dataTable => {
+            dataTable.render(tableId);
+            const {registerEventListeners} = getDataTableFunctions(
+                tableId,
+                searchFormId,
+                dataTable);
+            registerEventListeners();
+
+            return dataTable;
         });
-        dataTable.set('currentData', dataTable.get('data'));
-        dataTable.set('currentFilter', '');
-
-        return dataTable;
-    })
-    .then(dataTable => {
-        dataTable.render(tableId);
-        const {registerEventListeners} = getDataTableFunctions(
-            tableId,
-            searchFormId,
-            dataTable);
-        registerEventListeners();
-
-        return dataTable;
-    });
 };
 
 /**
