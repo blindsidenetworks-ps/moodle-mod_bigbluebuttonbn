@@ -731,28 +731,21 @@ class recording {
         if ($enabledfeatures['showroom']) {
             $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         }
-        // TODO: Check the difference between this this and recording::bigbluebuttonbn_get_allrecordings.
-        $recordings = self::bigbluebuttonbn_get_recordings(
+        if ($enabledfeatures['importrecordings']) {
+            return self::bigbluebuttonbn_get_allrecordings(
+                $bbbsession['course']->id,
+                $bigbluebuttonbnid,
+                $enabledfeatures['showroom'],
+                $bbbsession['bigbluebuttonbn']->recordings_deleted
+            );
+        }
+        return self::bigbluebuttonbn_get_recordings(
             $bbbsession['course']->id,
             $bigbluebuttonbnid,
             $enabledfeatures['showroom'],
             $bbbsession['bigbluebuttonbn']->recordings_deleted
         );
-        if ($enabledfeatures['importrecordings']) {
-            // Get recording links.
-            $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
-            $recordingsimported = self::bigbluebuttonbn_get_recordings_imported_array(
-                $bbbsession['course']->id, $bigbluebuttonbnid, true
-            );
-            /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
-             * recordings are not included. */
-            if ($bbbsession['bigbluebuttonbn']->recordings_imported) {
-                $recordings = $recordingsimported;
-            } else {
-                $recordings += $recordingsimported;
-            }
-        }
-        return $recordings;
+
     }
 
     /**
@@ -842,13 +835,12 @@ class recording {
     }
 
     /**
-     * Helper function to retrieve recordings from the BigBlueButton. The references are stored as events
-     * in bigbluebuttonbn_logs.
+     * Helper function to retrieve recordings from the BigBlueButton.
      *
      * @param string $courseid
      * @param string $bigbluebuttonbnid
-     * @param bool $subset
-     * @param bool $includedeleted
+     * @param bool $subset. If $subset=true the query is performed on one single bigbluebuttonbn instance.
+     * @param bool $includedeleted. If $includedeleted=true the query is performed on one single bigbluebuttonbn instance.
      *
      * @return array array containing the recordings indexed by recordID, each recording is also a
      * non sequential array itself that corresponds to the actual recording in BBB
@@ -856,39 +848,13 @@ class recording {
     public static function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
         global $DB;
-        $select = self::bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset);
-        $bigbluebuttonbns = $DB->get_records_select_menu('bigbluebuttonbn', $select, null, 'id', 'id, meetingid');
-        /* Consider logs from deleted bigbluebuttonbn instances whose meetingids should be included in
-         * the getRecordings request. */
-        if ($includedeleted) {
-            // TODO: Implement includedeleted based on the new way.
-            // $selectdeleted =
-            //     self::bigbluebuttonbn_get_recordings_deleted_sql_select($courseid, $bigbluebuttonbnid,
-            //         $subset);
-            // $bigbluebuttonbnsdel = $DB->get_records_select_menu(
-            //     'bigbluebuttonbn_logs',
-            //     $selectdeleted,
-            //     null,
-            //     'bigbluebuttonbnid',
-            //     'bigbluebuttonbnid, meetingid'
-            // );
-            // if (!empty($bigbluebuttonbnsdel)) {
-            //     // Merge bigbluebuttonbnis from deleted instances, only keys are relevant.
-            //     // Artimetic merge is used in order to keep the keys.
-            //     $bigbluebuttonbns += $bigbluebuttonbnsdel;
-            // }
-        }
-        // Gather the meetingids from bigbluebuttonbn logs that include a create with record=true.
-        if (empty($bigbluebuttonbns)) {
+        $select = self::bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
+        $records = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
+        if (empty($records)) {
             return array();
         }
-        // Prepare select for loading records based on existent bigbluebuttonbns.
-        $sql = 'SELECT DISTINCT recordingid, bigbluebuttonbnid FROM {bigbluebuttonbn_recordings} WHERE ';
-        $sql .= '(bigbluebuttonbnid=' . implode(' OR bigbluebuttonbnid=', array_keys($bigbluebuttonbns)) . ')';
-        // Execute select for loading records based on existent bigbluebuttonbns.
-        $records = $DB->get_records_sql_menu($sql);
         // Get actual recordings.
-        return self::bigbluebuttonbn_get_recordings_array(array_keys($records));
+        return self::bigbluebuttonbn_get_recordings_array(array_values($records));
     }
 
     /**
@@ -968,20 +934,30 @@ class recording {
      * @param string $courseid
      * @param string $bigbluebuttonbnid
      * @param bool $subset
+     * @param bool $includedeleted.
      *
      * @return string containing the sql used for getting the target bigbluebuttonbn instances
      */
-    public static function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid = null, $subset = true) {
+    public static function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid = null, $subset = true,
+        $includedeleted = false) {
         if (empty($courseid)) {
             $courseid = 0;
         }
+        $select = "";
+        if (!$includedeleted) {
+            // Exclude headless recordings from getRecordings requests unless includedeleted.
+            $select = "headless = false AND ";
+        }
         if (empty($bigbluebuttonbnid)) {
-            return "course = '{$courseid}'";
+            // Fetch all recordings in given course if bigbluebuttonbnid filter is not included.
+            return $select . "courseid = '{$courseid}'";
         }
         if ($subset) {
-            return "id = '{$bigbluebuttonbnid}'";
+            // Fetch only one bigbluebutton instance if subset filter is included.
+            return $select . "id = '{$bigbluebuttonbnid}'";
         }
-        return "id <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
+        // Fetch only from one course and instance is used for imported recordings.
+        return $select . "id <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
     }
 
     /**

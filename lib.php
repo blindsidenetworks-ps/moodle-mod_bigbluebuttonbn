@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 use mod_bigbluebuttonbn\external\meeting_info;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\recording_handler;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
@@ -150,17 +151,22 @@ function bigbluebuttonbn_delete_instance($id) {
 
     $result = true;
 
-    // Delete any dependent records here.
-    if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
+    // Delete the instance.
+    if (!$DB->delete_records('bigbluebuttonbn', ['id' => $id])) {
         $result = false;
     }
 
-    if (!$DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
+    // Delete dependant events.
+    if (!$DB->delete_records('event', ['modulename' => 'bigbluebuttonbn', 'instance' => $id])) {
         $result = false;
     }
 
     // Log action performed.
     logs::bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+
+    // Mark dependant recordings as headless.
+    $handler = new recording_handler($bigbluebuttonbn);
+    $handler->recording_update_all(['id' => $id], (object)['headless' => recording_handler::RECORDING_HEADLESS]);
 
     return $result;
 }

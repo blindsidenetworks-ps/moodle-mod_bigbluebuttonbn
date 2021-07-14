@@ -286,35 +286,51 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2020101001.12) {
+    if ($oldversion < 2020101001.16) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
         xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
-        // Add field courseid.
+        // Add column courseid.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'courseid',
             $fielddefinition);
-        // Add field bigbluebuttonbnid.
+        // Add column bigbluebuttonbnid.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'bigbluebuttonbnid',
             $fielddefinition);
-        // Add field timecreated.
+        // Add column timecreated.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'timecreated',
             $fielddefinition);
-        // Add field recordingid.
-        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
-            $fielddefinition);
-        // Add field meetingid.
+        // Add column meetingid.
         $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
             $fielddefinition);
-        // Add index to bigbluebuttonbn_recordings.
+        // Add column recordingid.
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
+            $fielddefinition);
+        // Add column headless for deleted recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'headless',
+            $fielddefinition);
+        // Add column imported for imported recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'imported',
+            $fielddefinition);
+        // Add column meta for storing the recording meta parameters on imported recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
+            'notnull' => false, 'sequence' => null, 'default' => '', 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'meta',
+            $fielddefinition);
+
+            // Add index to bigbluebuttonbn_recordings.
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
             ['courseid']);
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
@@ -322,7 +338,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             ['recordingid']);
         // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2020101001.12, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2020101001.16, 'bigbluebuttonbn');
     }
 
     return true;

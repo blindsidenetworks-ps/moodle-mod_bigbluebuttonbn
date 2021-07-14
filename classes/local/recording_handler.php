@@ -39,6 +39,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class recording_handler {
 
+    /** @var int RECORDING_HEADLESS integer set to 1 defines that the activity used to create the recording no longer exists */
+    public const RECORDING_HEADLESS = 1;
+    /** @var int RECORDING_IMPORTED integer set to 1 defines that the recording is not the original but an imported one */
+    public const RECORDING_IMPORTED = 1;
+
     /** @var stdClass course_module record. */
     private $bigbluebuttonbn;
 
@@ -75,6 +80,34 @@ class recording_handler {
 
     public function recording_update($recordingid) {
     }
+
+    /**
+     *
+     * @param array $conditions optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
+     * @param object $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
+     *
+     * @return bool Success/Failure
+     */
+    public function recording_update_all($conditions, $dataobject) {
+        global $DB;
+        $recordings = $DB->get_records('bigbluebuttonbn_recordings', $conditions);
+        if (!$recordings) {
+            return false;
+        }
+        foreach ($recordings as $recording) {
+            $dataobject->id = $recording->id;
+            if (!$this->recording_update_one($dataobject)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function recording_update_one($dataobject) {
+        global $DB;
+        return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
+    }
+
 
     public function recording_delete($recordingid) {
     }
