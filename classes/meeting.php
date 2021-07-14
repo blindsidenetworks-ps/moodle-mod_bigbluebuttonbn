@@ -27,7 +27,7 @@ namespace mod_bigbluebuttonbn;
 use coding_exception;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use stdClass;
 
 /**
