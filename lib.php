@@ -700,10 +700,10 @@ function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
         // As it is a new activity, assign passwords.
         $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
         $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
-        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_guestlinkid(12);
     }
     if (!property_exists($bigbluebuttonbn, 'guestlinkid') ) {
-        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->guestlinkid = bigbluebuttonbn_random_guestlinkid(12);
     }
 }
 

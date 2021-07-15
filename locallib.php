@@ -1171,6 +1171,23 @@ function bigbluebuttonbn_random_password($length = 8, $unique = "") {
 }
 
 /**
+ * Helper generates a random guest link id, making sure that it does not exist yet in another BigBlueButton instance.
+ *
+ * @param integer $length
+ *
+ * @return string
+ */
+function bigbluebuttonbn_random_guestlinkid($length = 8) {
+    global $DB;
+
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    do {
+        $password = substr(str_shuffle($chars), 0, $length);
+    } while ($DB->record_exists('bigbluebuttonbn', array('guestlinkid' => $password)));
+    return $password;
+}
+
+/**
  * Helper register a bigbluebuttonbn event.
  *
  * @param string $type
