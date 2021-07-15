@@ -104,20 +104,19 @@ class recording_test extends advanced_testcase {
     }
 
     /**
-     * Test for bigbluebuttonbn_get_allrecordings().
+     * Test for get_recordings().
      */
-    public function test_bigbluebuttonbn_get_allrecordings() {
+    public function test_get_recordings() {
         $this->resetAfterTest();
 
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[0]->course, $this->bbactivities[0]->id);
+        $recordings = recording::get_recordings($this->bbactivities[0]->course, $this->bbactivities[0]->id);
         $this->assertCount(2, $recordings);
 
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[1]->course, $this->bbactivities[1]->id);
+        $recordings = recording::get_recordings($this->bbactivities[1]->course, $this->bbactivities[1]->id);
         $this->assertCount(3, $recordings);
 
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[2]->course, $this->bbactivities[2]->id);
+        $recordings = recording::get_recordings($this->bbactivities[2]->course, $this->bbactivities[2]->id);
         $this->assertCount(3, $recordings);
-
     }
 
     /**

@@ -78,7 +78,15 @@ class recording_handler {
         return $DB->get_record('bigbluebuttonbn_recordings', array('recordingid' => $recordingid), '*', MUST_EXIST);
     }
 
-    public function recording_update($recordingid) {
+    public function recording_update_or_create($id, stdClass $dataobject) {
+        global $DB;
+        if (empty($id)) {
+            $id = 0;
+        }
+        $recording = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id]);
+        if ($recording) {
+            return $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id]);
+        }
     }
 
     /**
@@ -95,16 +103,21 @@ class recording_handler {
             return false;
         }
         foreach ($recordings as $recording) {
-            $dataobject->id = $recording->id;
-            if (!$this->recording_update_one($dataobject)){
+            if (!$this->recording_update_one($recording->id, $dataobject)) {
+                // TODO: There should be a way to rollback if it fails after updating one or many of the recordings.
                 return false;
             }
         }
         return true;
     }
 
-    public function recording_update_one($dataobject) {
+
+    public function recording_update_one($id, $dataobject) {
         global $DB;
+        if (empty($id)) {
+            return false;
+        }
+        $dataobject->id = $id;
         return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
     }
 

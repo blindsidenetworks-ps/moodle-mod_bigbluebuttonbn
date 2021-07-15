@@ -57,8 +57,8 @@ class reset {
      * @return array status array
      */
     public static function bigbluebuttonbn_reset_recordings($courseid) {
-        // Criteria for search : courseid or bigbluebuttonbn=null or subset=false or includedeleted=true.
-        $recordings = recording::bigbluebuttonbn_get_recordings($courseid, null, false, true);
+        // Criteria for search : courseid or bigbluebuttonbn=null or subset=false or includedeleted=true and includeimported=false.
+        $recordings = recording::get_recordings($courseid, null, false, true, false);
         // Remove all the recordings.
         recording::bigbluebuttonbn_delete_recordings(implode(",", array_keys($recordings)));
     }

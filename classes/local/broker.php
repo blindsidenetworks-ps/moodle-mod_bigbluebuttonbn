@@ -196,7 +196,13 @@ class broker {
         $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
         // Retrieve the array of imported recordings.
         $recordings =
-            recording::bigbluebuttonbn_get_allrecordings($courseid, $bigbluebuttonbnid, $showroom, $includedeleted);
+            recording::get_recordings(
+                $courseid,
+                $bigbluebuttonbnid,
+                $showroom,
+                $includedeleted,
+                recording::INCLUDE_IMPORTED_RECORDINGS
+            );
         if (array_key_exists($params['id'], $recordings)) {
             // Look up for an update on the imported recording.
             if (!array_key_exists('messageKey', $recordings[$params['id']])) {
@@ -281,11 +287,12 @@ class broker {
         if ($showroom) {
             $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         }
-        $recordings = recording::bigbluebuttonbn_get_allrecordings(
+        $recordings = recording::get_recordings(
             $bbbsession['course']->id,
             $bigbluebuttonbnid,
             $showroom,
-            $bbbsession['bigbluebuttonbn']->recordings_deleted
+            $bbbsession['bigbluebuttonbn']->recordings_deleted,
+            recording::INCLUDE_IMPORTED_RECORDINGS
         );
 
         $action = strtolower($params['action']);
