@@ -25,72 +25,30 @@
         "guestlinkpassenabled": true
     }
 }}
-<div class="bigbluebuttonbn-guestaccess-view">
-<div class="row shiftrow">
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-            <h4 class="text-left">{{# str }} guestlink_form_join_welcome,bigbluebuttonbn {{/ str }} </h4>
-    </div>
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-
-</div>
-<div class="row">
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-9 col-md-9 col-sm-9">
-        <h1 class="display-3 text-left mb-3 font-weight-400">{{name}}</h1>
-        <hr class="mt-2 float-left w-25">
-    </div>
-</div>
-<form action="guestaccess.php" name="guestlinkform" accept-charset="UTF-8" method="get">
-{{#guestlinkpassenabled}}
-<div class="row">
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-    {{#guestlinkpasserrormessage}}
-        <div class="warning">
-            {{# str }} guestlink_form_join_wrong_password,bigbluebuttonbn {{/ str }}
-        </div>
-    {{/guestlinkpasserrormessage}}
-    </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-        <input type="text" class="form-control" name="guestlinkpass" id="id_guestlinkpass" value="" size="" placeholder="{{# str }} guestlink_form_guestlinkpass_info,bigbluebuttonbn {{/ str }}" >
-    </div>
-    <div class="col-lg-5 col-md-5 col-sm-5"> </div>
-</div>
-{{/guestlinkpassenabled}}
-<div class="row shiftrow">
-    <input type="hidden" name="gid" value="{{gid}}"/>
-    <div class="col-lg-3 col-md-3 col-sm-3"> </div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-    {{#guestnameerrormessage}}
-        <div class="warning">
-            {{# str }} guestlink_form_join_no_username,bigbluebuttonbn {{/ str }}
-        </div>
-    {{/guestnameerrormessage}}
-    </div>    <div class="col-lg-2 col-md-2 col-sm-2">
-            <input type="text" class="form-control " name="guestname" id="id_guestname" value="{{guestname}}" size="" placeholder="{{# str }} guestlink_form_guestname_info,bigbluebuttonbn {{/ str }}" >
-    </div>
-    <div class="col-lg-5 col-md-5 col-sm-5"  style="padding-left:0px;">
-            <input type="submit" class="btn btn-primary inputbutton" name="joinbutton" id="id_joinbutton" value="{{# str }} guestlink_form_join_button,bigbluebuttonbn {{/ str }}">
+<div class="bigbluebuttonbn-guestaccess-view row justify-content-center">
+    <div class="col-xl-4 col-lg-6 col-sm-8">
+        <h1>{{name}}</h1>
+        <p class="mb-3">{{#str}}guestaccess_join_welcome, bigbluebuttonbn{{/str}}</p>
+        <hr />
+        <form action="{{action}}" id="guestaccessform" method="get">
+            <input type="hidden" name="gid" value="{{gid}}" />
+            <div class="form-group">
+                <label for="guestname">{{#str}}guestaccess_guestname_label, bigbluebuttonbn{{/str}}</label>
+                <input type="text" class="form-control{{#guestnameerror}} is-invalid{{/guestnameerror}}" name="guestname" id="guestname" maxlength="50"{{#guestname}} value="{{guestname}}{{/guestname}}" />
+                {{#guestnameerror}}
+                    <div class="form-text text-danger">{{#str}}guestaccess_join_error_nousername, bigbluebuttonbn{{/str}}</div>
+                {{/guestnameerror}}
+            </div>
+            {{#guestlinkpassenabled}}
+                <div class="form-group">
+                    <label for="guestlinkpass">{{#str}}guestaccess_guestlinkpass_label, bigbluebuttonbn{{/str}}</label>
+                    <input type="text" class="form-control{{#guestlinkpasserror}} is-invalid{{/guestlinkpasserror}}" name="guestlinkpass" id="guestlinkpass" maxlength="6"{{#guestlinkpass}} value="{{guestlinkpass}}{{/guestlinkpass}}" />
+                    {{#guestlinkpasserror}}
+                        <div class="form-text text-danger">{{#str}}guestaccess_join_error_wrongpassword, bigbluebuttonbn{{/str}}</div>
+                    {{/guestlinkpasserror}}
+                </div>
+            {{/guestlinkpassenabled}}
+            <button type="submit" class="btn btn-primary btn-block" id="submit">{{#str}}guestaccess_join_button, bigbluebuttonbn{{/str}}</button>
+        </form>
     </div>
 </div>
-</form>
-</div>
-{{^element.frozen}}
-{{#js}}
-var validateForm = function() {
-    var guestname = document.forms["guestlinkform"]["guestname"].value;
-    var guestlinkpass = document.forms["guestlinkform"]["guestlinkpass"];
-    if (guestname == "") {
-        alert("{{# str }} guestlink_form_noname_warning,bigbluebuttonbn {{/ str }}");
-        return false;
-    }
-    if(guestlinkpass && !guestlinkpass.value) {
-        alert("{{# str }} guestlink_form_noaccescode_warning,bigbluebuttonbn {{/ str }}");
-        return false;
-    }
-};
-
-document.getElementById("id_joinbutton").onclick = validateForm;
-{{/js}}
-{{/element.frozen}}

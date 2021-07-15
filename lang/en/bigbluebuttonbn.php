@@ -387,17 +387,15 @@ $string['mod_form_field_lockonjoin'] = 'Ignore lock settings';
 $string['mod_form_field_lockonjoinconfigurable'] = 'Allow ignore locking settings';
 $string['mod_form_locksettings'] = 'Lock settings';
 
-$string['guestlink_form_guestlinkpass_info'] = 'Enter the room\'s access code';
-$string['guestlink_form_guestname_info'] = 'Enter your name!';
-$string['guestlink_form_join_button'] = 'Start';
-$string['guestlink_form_join_welcome'] = 'You have been invited to join!';
-$string['guestlink_form_join_wrong_password'] = 'Wrong access code!';
-$string['guestlink_form_join_no_username'] = 'Please enter your name!';
-$string['guestlink_form_join_waiting'] = 'The meeting has not (yet) started. You will automatically join, once it started.';
-$string['guestlink_form_noname_warning'] = 'Please enter a name!';
-$string['guestlink_form_noaccescode_warning'] = 'Please enter the valid acces code for this conference.';
-$string['guestlink_form_guestlink_disabled'] = 'The administrator has not enabled this feature.';
-$string['guestlink_form_guestlink_disabled_instance'] = 'The guest access link for this room has been disabled.';
+$string['guestaccess_guestlinkpass_label'] = 'Enter the room\'s access code';
+$string['guestaccess_guestname_label'] = 'Enter your name';
+$string['guestaccess_join_button'] = 'Join the conference';
+$string['guestaccess_join_welcome'] = 'You have been invited to join this conference room.';
+$string['guestaccess_join_error_wrongpassword'] = 'Please enter the correct access code';
+$string['guestaccess_join_error_nousername'] = 'Please enter your name';
+$string['guestaccess_join_waiting'] = 'This conference has not started yet.<br />Please wait. You will automatically join once it starts.';
+$string['guestaccess_feature_disabled'] = 'The guest access link feature is disabled on this Moodle instance.';
+$string['guestaccess_instance_notfound'] = 'There isn\'t any BigBlueButton room which matches this guest access link.';
 
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
