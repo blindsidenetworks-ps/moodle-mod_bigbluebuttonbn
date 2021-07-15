@@ -369,6 +369,9 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['bigbluebuttonbn']->guestlinkmoderatorapproval) {
         $data['guestPolicy'] = 'ASK_MODERATOR';
     }
+    if ($bbbsession['bigbluebuttonbn']->guestlinkmoderatormessage) {
+        $data['moderatorOnlyMessage'] = $bbbsession['moderatorOnlyMessage'];
+    }
     return $data;
 }
 

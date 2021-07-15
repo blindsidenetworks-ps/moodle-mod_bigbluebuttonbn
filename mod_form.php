@@ -393,7 +393,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     private function bigbluebuttonbn_mform_add_block_guestlink(&$mform, $cfg) {
         if ((boolean)\mod_bigbluebuttonbn\locallib\config::guestlink_enabled()) {
-            if ($cfg['guestlink_editable'] || $cfg['guestlink_moderatorapproval_editable']) {
+            if ($cfg['guestlink_editable'] || $cfg['guestlink_moderatorapproval_editable'] ||
+                    $cfg['guestlink_moderatormessage_editable']) {
                 $mform->addElement('header', 'guestlinkheader',
                         get_string('mod_form_block_guestlink', 'bigbluebuttonbn'));
 
@@ -416,6 +417,18 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                     $field['description_key'], $cfg['guestlink_moderatorapproval_default']);
                 if ($cfg['guestlink_moderatorapproval_editable'] && $cfg['guestlink_editable']) {
                     $mform->hideIf('guestlinkmoderatorapproval', 'guestlink', 'notchecked');
+                }
+
+                $field = ['type' => 'hidden', 'name' => 'guestlinkmoderatormessage', 'data_type' => PARAM_INT,
+                        'description_key' => null];
+                if ($cfg['guestlink_moderatormessage_editable']) {
+                    $field['type'] = 'checkbox';
+                    $field['description_key'] = 'mod_form_field_guestlinkmoderatormessage';
+                }
+                $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                        $field['description_key'], $cfg['guestlink_moderatormessage_default']);
+                if ($cfg['guestlink_moderatormessage_editable'] && $cfg['guestlink_editable']) {
+                    $mform->hideIf('guestlinkmoderatormessage', 'guestlink', 'notchecked');
                 }
             }
         }

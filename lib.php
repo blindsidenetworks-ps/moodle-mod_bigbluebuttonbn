@@ -778,6 +778,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->guestlink_moderatorapproval)) {
         $bigbluebuttonbn->guestlink_moderatorapproval = 0;
     }
+    if (!isset($bigbluebuttonbn->guestlink_moderatormessage)) {
+        $bigbluebuttonbn->guestlink_moderatormessage = 0;
+    }
 }
 
 /**

@@ -259,6 +259,12 @@ class bigbluebutton {
         if (!config::clienttype_enabled()) {
             $bbbsession['clienttype'] = BIGBLUEBUTTON_CLIENTTYPE_FLASH;
         }
+        if ($bbbsession['bigbluebuttonbn']->guestlink && $bbbsession['bigbluebuttonbn']->guestlinkmoderatormessage) {
+            $guestlinkurl = new \moodle_url('/mod/bigbluebuttonbn/guestaccess.php',
+                    ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
+            $bbbsession['moderatorOnlyMessage'] =
+                    get_string('view_guestlink_moderatormessage', 'bigbluebuttonbn', $guestlinkurl->out());
+        }
     }
 
     /**

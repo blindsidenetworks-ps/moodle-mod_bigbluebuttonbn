@@ -169,7 +169,9 @@ class validator {
         return (!isset($CFG->bigbluebuttonbn['guestlink_default']) ||
                 !isset($CFG->bigbluebuttonbn['guestlink_editable']) ||
                 !isset($CFG->bigbluebuttonbn['guestlink_moderatorapproval_default']) ||
-                !isset($CFG->bigbluebuttonbn['guestlink_moderatorapproval_editable']));
+                !isset($CFG->bigbluebuttonbn['guestlink_moderatorapproval_editable']) ||
+                !isset($CFG->bigbluebuttonbn['guestlink_moderatormessage_default']) ||
+                !isset($CFG->bigbluebuttonbn['guestlink_moderatormessage_editable']));
     }
 
     /**

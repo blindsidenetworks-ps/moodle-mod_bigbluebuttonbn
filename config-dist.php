@@ -242,6 +242,16 @@ $CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
  *  $CFG->bigbluebuttonbn['guestlink_moderatorapproval_editable'] = 1;
  */
 
+/* When the value is set to 1 (checked) the aspect that moderators receive the guest access link in the room's chat
+ *  of the guest access link feature will be enabled by default.
+ *  $CFG->bigbluebuttonbn['guestlink_moderatormessage_default'] = 0;
+ */
+
+/* When the value is set to 1 (checked) the aspect that moderators receive the guest access link in the room's chat
+ *  can be enabled/disabled by the user creating or editing the room or activity.
+ *  $CFG->bigbluebuttonbn['guestlink_moderatormessage_editable'] = 1;
+ */
+
 /*
  * 1.10. CONFIGURATION FOR "NOTIFICATION SENDING" FEATURE
  *

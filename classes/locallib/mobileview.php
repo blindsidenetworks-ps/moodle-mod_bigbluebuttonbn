@@ -129,6 +129,9 @@ class mobileview {
         if ($bbbsession['muteonstart']) {
             $data['muteOnStart'] = 'true';
         }
+        if ($bbbsession['bigbluebuttonbn']->guestlinkmoderatormessage) {
+            $data['moderatorOnlyMessage'] = $bbbsession['moderatorOnlyMessage'];
+        }
         return $data;
     }
 

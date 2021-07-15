@@ -305,6 +305,15 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkmoderatorapproval', $fielddefinition);
         upgrade_mod_savepoint(true, 2019101010, 'bigbluebuttonbn');
     }
+
+    if ($oldversion < 2019101011) {
+        // Add field for guestlinkmoderatormessage.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+                'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestlinkmoderatormessage', $fielddefinition);
+        upgrade_mod_savepoint(true, 2019101011, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 

@@ -3033,6 +3033,14 @@ function bigbluebuttonbn_settings_guestlink(&$renderer) {
                 'guestlink_moderatorapproval_editable',
                 $renderer->render_group_element_checkbox('guestlink_moderatorapproval_editable', 1)
         );
+        $renderer->render_group_element(
+                'guestlink_moderatormessage_default',
+                $renderer->render_group_element_checkbox('guestlink_moderatormessage_default', 0)
+        );
+        $renderer->render_group_element(
+                'guestlink_moderatormessage_editable',
+                $renderer->render_group_element_checkbox('guestlink_moderatormessage_editable', 1)
+        );
     }
 }
 
