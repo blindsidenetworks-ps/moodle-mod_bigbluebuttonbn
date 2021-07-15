@@ -253,9 +253,8 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
 
     if (!empty($guestlink['enabled'])) {
         $actionurl = new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bbbsession['cm']->id]);
-
         $guestlinkexpiresatrequired = \mod_bigbluebuttonbn\locallib\config::get('participant_guestlink_requires_access_duration');
-        $mform = new \mod_bigbluebuttonbn\form\guestlink_access_form($actionurl, [
+        $mform = new \mod_bigbluebuttonbn\form\guestlink_access_form($actionurl->out(), [
             'guestlinkurl' => $guestlink['url'],
             'guestlinkpassword' => $guestlink['password'] ?? '',
             'guestlinkchangepassenabled' => $guestlink['changepassenabled'],
