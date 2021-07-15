@@ -62,6 +62,7 @@ class instance {
      * @param cm_info $cm
      * @param stdClass $course
      * @param stdClass $instancedata
+     * @param int|null $groupid
      */
     public function __construct(cm_info $cm, stdClass $course, stdClass $instancedata, ?int $groupid = null) {
         $this->cm = $cm;
@@ -1073,5 +1074,51 @@ EOF;
      */
     public function should_record() {
         return (boolean) config::recordings_enabled() && $this->is_recorded();
+    }
+
+
+    /**
+     * Check if room is available
+     *
+     */
+    public function is_room_available() {
+        $open = true;
+        $closed = false;
+        $timenow = time();
+        $timeopen = $this->get_instance_var('openingtime');
+        $timeclose = $this->get_instance_var('closingtime');
+        if (!empty($timeopen) && $timeopen > $timenow) {
+            $open = false;
+        }
+        if (!empty($timeclose) && $timenow > $timeclose) {
+            $closed = true;
+        }
+        if (!$open || $closed) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Get instance info for display
+     *
+     * @return object
+     */
+    public function get_instance_info() {
+        return (object) [
+            'instanceid' => $this->get_instance_id(),
+            'bigbluebuttonbnid' => $this->get_instance_id(),
+            'meetingid' => $this->get_meeting_id(),
+            'cmid' => $this->get_cm_id(),
+            'ismoderator' => $this->is_moderator(),
+
+            'joinurl' => $this->get_join_url()->out(),
+            'openingtime' => $this->get_instance_var('openingtime'),
+            'closingtime' => $this->get_instance_var('closingtime'),
+
+            'userlimit' => $this->get_user_limit(),
+            'group' => $this->get_group_id(),
+            'presentations' => [],
+        ];
     }
 }

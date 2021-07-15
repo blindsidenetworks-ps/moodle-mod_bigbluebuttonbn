@@ -125,16 +125,7 @@ class bigbluebutton {
         if ($viewinstance) {
             $instance = instance::get_from_cmid($cmid);
             $info = meeting::get_meeting_info_for_instance($instance);
-            $running = false;
-            if ($info['returncode'] == 'SUCCESS') {
-                $running = ($info['running'] === 'true');
-            }
-            $participantcount = 0;
-            if (isset($info['participantCount'])) {
-                $participantcount = $info['participantCount'];
-            }
-            $canjoin = meeting_helper::meeting_info_can_join($instance, $running,
-                $participantcount);
+            $canjoin = $info->canjoin;
         }
         return $canjoin;
     }
@@ -462,40 +453,6 @@ class bigbluebutton {
         return $profilesarray;
     }
 
-    /**
-     * Helper for evaluating if scheduled activity is avaiable.
-     *
-     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
-     *
-     * @return array                       status (room available or not and possible warnings)
-     */
-    public static function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
-        $open = true;
-        $closed = false;
-        $warnings = array();
-
-        $timenow = time();
-        $timeopen = $bigbluebuttonbn->openingtime;
-        $timeclose = $bigbluebuttonbn->closingtime;
-        if (!empty($timeopen) && $timeopen > $timenow) {
-            $open = false;
-        }
-        if (!empty($timeclose) && $timenow > $timeclose) {
-            $closed = true;
-        }
-
-        if (!$open || $closed) {
-            if (!$open) {
-                $warnings['notopenyet'] = userdate($timeopen);
-            }
-            if ($closed) {
-                $warnings['expired'] = userdate($timeclose);
-            }
-            return array(false, $warnings);
-        }
-
-        return array(true, $warnings);
-    }
 
     /**
      * Return the status of an activity [open|not_started|ended].
@@ -650,7 +607,7 @@ class bigbluebutton {
         if (!isset($xml->recordings)) {
             throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
         }
-        return $xml->recordings;
+        return iterator_to_array($xml->recordings->children(), false);
     }
 
     /**
@@ -666,13 +623,14 @@ class bigbluebutton {
         if (!isset($xml->recordings)) {
             throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
         }
-        return $xml->recordings;
+        return iterator_to_array($xml->recordings->children(), false);
     }
 
     /**
      * Publish recording.
      *
      * @param int $recordingid
+     * @param bool $publish
      * @throws moodle_exception
      */
     public static function publish_recording($recordingid, $publish) {
@@ -710,11 +668,12 @@ class bigbluebutton {
     /**
      * Throw an exception if there is a problem in the returned XML value
      *
-     * @param $xml
+     * @param \SimpleXMLElement $xml
+     * @param string $additionaldetails
      * @throws bigbluebutton_exception
      * @throws server_not_available_exception
      */
-    protected static function assert_returned_xml($xml, $additionalDetails = '') {
+    protected static function assert_returned_xml($xml, $additionaldetails = '') {
         if (empty($xml)) {
             global $CFG;
             throw new server_not_available_exception('general_error_unable_connect', plugin::COMPONENT,
@@ -722,14 +681,14 @@ class bigbluebutton {
         }
         if ((string) $xml->returncode === 'FAILED') {
             $messagekey = (string) $xml->messageKey ?? '';
-            $messageDetails = (string) $xml->message ?? '';
-            $messageDetails .= $additionalDetails ? " ($additionalDetails) " : '';
+            $messagedetails = (string) $xml->message ?? '';
+            $messagedetails .= $additionaldetails ? " ($additionaldetails) " : '';
             throw new bigbluebutton_exception(
                 (empty($messagekey) || empty(self::MEETING_ERROR[$messagekey])) ?
                     'general_error_unable_connect' : $messagekey,
                 plugin::COMPONENT,
                 '',
-                $messageDetails);
+                $messagedetails);
         }
     }
 

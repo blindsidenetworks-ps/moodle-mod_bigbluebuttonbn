@@ -45,6 +45,9 @@ class meeting {
     /** @var instance The bbb instance */
     protected $instance;
 
+    /** @var stdClass Info about the meeting */
+    protected $meetinginfo = null;
+
     /**
      * Constructor for the meeting object.
      *
@@ -55,84 +58,16 @@ class meeting {
     }
 
     /**
-     * Force an update of the meeting cache for this instance.
+     * Get currently stored meeting info
      *
-     * @param instance $instance
+     * @return mixed|stdClass
+     * @throws \coding_exception
      */
-    public static function update_meeting_cache_for_instance(instance $instance): void {
-        $meeting = new self($instance);
-        $meeting->update_cache();
-    }
-
-    /**
-     * Return meeting information for this meeting.
-     *
-     * @param bool $updatecache Whether to update the cache when fetching the information
-     * @return stdClass
-     */
-    public function get_meeting_info(bool $updatecache = false): stdClass {
-        $instance = $this->instance;
-        $meeting = new meeting($instance);
-        if ($updatecache) {
-            $meeting->update_cache();
+    public function get_meeting_info() {
+        if (!$this->meetinginfo) {
+            $this->meetinginfo = $this->do_get_meeting_info();
         }
-        // This might raise an exception if info cannot be retrieved.
-        $info = self::retrieve_meeting_info($this->instance->get_meeting_id());
-        $isrunning = $info['returncode'] === 'SUCCESS' && $info['running'] === 'true';
-        $activitystatus = bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
-
-        $meetinginfo = (object) [
-            'instanceid' => $instance->get_instance_id(),
-            'bigbluebuttonbnid' => $instance->get_instance_id(),
-            'meetingid' => $instance->get_meeting_id(),
-            'cmid' => $instance->get_cm_id(),
-            'ismoderator' => $instance->is_moderator(),
-
-            'joinurl' => $instance->get_join_url()->out(),
-            'openingtime' => $instance->get_instance_var('openingtime'),
-            'closingtime' => $instance->get_instance_var('closingtime'),
-
-            'statusrunning' => $isrunning,
-            'statusclosed' => $activitystatus === 'ended',
-            'statusopen' => !$isrunning && $activitystatus === 'open',
-
-            'userlimit' => $instance->get_user_limit(),
-            'group' => $instance->get_group_id(),
-            'presentations' => [],
-            'createtime' => $info['createTime'] ?? null
-        ];
-        $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
-        $meetinginfo->participantcount = $participantcount;
-        $status = meeting_helper::meeting_info_can_join(
-            $instance,
-            $isrunning,
-            $info['participantCount'] ?? 0
-        );
-        $meetinginfo->canjoin = $status["can_join"];
-
-        // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
-        if ($isrunning) {
-            $meetinginfo->statusmessage = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
-            $meetinginfo->startedat = floor(intval($info['startTime']) / 1000); // Milliseconds.
-            $meetinginfo->moderatorcount = $info['moderatorCount'];
-            $meetinginfo->moderatorplural = $info['moderatorCount'] > 1;
-            $meetinginfo->participantcount = $info['participantCount']?? 0;
-            $meetinginfo->participantplural = $meetinginfo->participantcount > 1;
-        } else {
-            if ($instance->user_must_wait_to_join()) {
-                $meetinginfo->statusmessage = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-            } else {
-                $meetinginfo->statusmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
-            }
-        }
-
-        $presentation = $instance->get_presentation();
-        if (!empty($presentation)) {
-            $meetinginfo->presentations[] = $presentation;
-        }
-        $meetinginfo->attendees = $info['attendees'] ?? [];
-
-        return $meetinginfo;
+        return $this->meetinginfo;
     }
 
     /**
@@ -142,37 +77,9 @@ class meeting {
      * @param bool $updatecache Whether to update the cache when fetching the information
      * @return stdClass
      */
-    public static function get_meeting_info_for_instance(instance $instance, bool $updatecache=false): stdClass {
+    public static function get_meeting_info_for_instance(instance $instance, bool $updatecache = false): stdClass {
         $meeting = new self($instance);
-        if ($updatecache) {
-            $meeting->update_cache();
-        }
-        return $meeting->get_meeting_info();
-    }
-
-
-    /**
-     * Gets a meeting info object cached or fetched from the live session.
-     *
-     * @param string $meetingid
-     * @param boolean $updatecache
-     *
-     * @return array
-     */
-    protected static function retrieve_meeting_info($meetingid, $updatecache = false) {
-        $cachettl = (int) config::get('waitformoderator_cache_ttl');
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
-        $result = $cache->get($meetingid);
-        $now = time();
-        if (!$updatecache && !empty($result) && $now < ($result['creation_time'] + $cachettl)) {
-            // Use the value in the cache.
-            return (array) json_decode($result['meeting_info']);
-        }
-        // Ping again and refresh the cache.
-        $meetinginfo = bigbluebutton::get_meeting_info($meetingid);
-
-        $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
-        return $meetinginfo;
+        return $meeting->do_get_meeting_info($updatecache);
     }
 
     /**
@@ -195,15 +102,41 @@ class meeting {
      * @return bool
      */
     public function is_running() {
-        $meetinginfo = self::retrieve_meeting_info($this->instance->get_meeting_id(), true);
-        return ($meetinginfo['returncode'] === 'SUCCESS');
+        return $this->get_meeting_info()->statusrunning ?? false;
     }
 
     /**
      * Force update the meeting in cache.
      */
     public function update_cache() {
-        self::retrieve_meeting_info($this->instance->get_meeting_id(), true);
+        $this->meetinginfo = $this->do_get_meeting_info(true);
+    }
+
+    /**
+     * Get meeting attendees
+     *
+     * @return mixed
+     */
+    public function get_attendees() {
+        return $this->get_meeting_info()->attendees ?? [];
+    }
+
+    /**
+     * Can the meeting be joined ?
+     *
+     * @return bool
+     */
+    public function can_join() {
+        return $this->get_meeting_info()->canjoin;
+    }
+
+    /**
+     * Number of participants
+     *
+     * @return int
+     */
+    public function get_participant_count() {
+        return $this->get_meeting_info()->participantcount;
     }
 
     /**
@@ -226,9 +159,129 @@ class meeting {
         return bigbluebutton::create_meeting($data, $metadata, $presentationname, $presentationurl);
     }
 
+    /**
+     * Send an end meeting message to BBB server
+     */
+    public function end_meeting() {
+        bigbluebutton::end_meeting($this->instance->get_meeting_id(), $this->instance->get_moderator_password());
+    }
+
+    /**
+     * Get meeting join URL
+     *
+     * @return string
+     * @throws \coding_exception
+     */
+    public function get_join_url() {
+        return bigbluebutton::bigbluebuttonbn_get_join_url(
+            $this->instance->get_meeting_id(),
+            $this->instance->get_user_fullname(),
+            $this->instance->get_current_user_password(),
+            $this->instance->get_logout_url()->out(false),
+            null,
+            $this->instance->get_user_id(),
+            $this->get_meeting_info()->createtime
+        );
+    }
+
+    /**
+     * Return meeting information for this meeting.
+     *
+     * @param bool $updatecache Whether to update the cache when fetching the information
+     * @return stdClass
+     */
+    protected function do_get_meeting_info(bool $updatecache = false): stdClass {
+        $instance = $this->instance;
+        $meetinginfo = $instance->get_instance_info();
+        $activitystatus = bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
+        // This might raise an exception if info cannot be retrieved.
+        // But this might be totally fine as the meeting is maybe not yet created on BBB side.
+        $participantcount = 0;
+        try {
+            $info = self::retrieve_cached_meeting_info($this->instance->get_meeting_id(), $updatecache);
+            $meetinginfo->statusrunning = $info['running'] === 'true';
+            $meetinginfo->createtime = $info['createTime'] ?? null;
+            $participantcount = isset($info['participantCount']) ? $info['participantCount'] : 0;
+        } catch (bigbluebutton_exception $e) {
+            // The meeting is not created on BBB side, so we have to setup a couple of values here.
+            $meetinginfo->statusrunning = false;
+            $meetinginfo->createtime = null;
+        }
+        $meetinginfo->statusclosed = $activitystatus === 'ended';
+        $meetinginfo->statusopen = !$meetinginfo->statusrunning && $activitystatus === 'open';
+        $meetinginfo->participantcount = $participantcount;
+        $meetinginfo->canjoin = false;
+
+        $canforcejoin = $instance->is_admin() || $instance->is_moderator();
+        if ($meetinginfo->statusrunning) {
+            if (!$instance->has_user_limit_been_reached($participantcount)
+                || !$instance->does_current_user_count_towards_user_limit()
+            ) {
+                $meetinginfo->canjoin = true;
+            }
+        }
+        if ($instance->is_room_available() && $canforcejoin) {
+            $meetinginfo->canjoin = true;
+        }
+        // Double check that the user has the capabilities to join.
+        $meetinginfo->canjoin = $meetinginfo->canjoin && $instance->can_join();
+
+        // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
+        if ($meetinginfo->statusrunning) {
+            $meetinginfo->statusmessage = get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
+            $meetinginfo->startedat = floor(intval($info['startTime']) / 1000); // Milliseconds.
+            $meetinginfo->moderatorcount = $info['moderatorCount'];
+            $meetinginfo->moderatorplural = $info['moderatorCount'] > 1;
+            $meetinginfo->participantcount = $info['participantCount'] ?? 0;
+            $meetinginfo->participantplural = $meetinginfo->participantcount > 1;
+        } else {
+            if ($instance->user_must_wait_to_join() && !$canforcejoin) {
+                $meetinginfo->statusmessage = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
+            } else {
+                $meetinginfo->statusmessage = get_string('view_message_conference_room_ready', 'bigbluebuttonbn');
+            }
+        }
+
+        $presentation = $instance->get_presentation();
+        if (!empty($presentation)) {
+            $meetinginfo->presentations[] = $presentation;
+        }
+        $meetinginfo->attendees = [];
+
+        $meetinginfo->attendees = $info['attendees'] ?? [];
+        return $meetinginfo;
+    }
+
+    /**
+     * Gets a meeting info object cached or fetched from the live session.
+     *
+     * @param string $meetingid
+     * @param boolean $updatecache
+     *
+     * @return array
+     * @throws \coding_exception
+     * @throws bigbluebutton_exception
+     */
+    protected static function retrieve_cached_meeting_info($meetingid, $updatecache = false) {
+        $cachettl = (int) config::get('waitformoderator_cache_ttl');
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
+        $result = $cache->get($meetingid);
+        $now = time();
+        if (!$updatecache && !empty($result) && $now < ($result['creation_time'] + $cachettl)) {
+            // Use the value in the cache.
+            return (array) json_decode($result['meeting_info']);
+        }
+        $cache->delete($meetingid); // Make sure we purges the cache before checking info.
+        // Ping again and refresh the cache.
+        $meetinginfo = bigbluebutton::get_meeting_info($meetingid);
+
+        $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
+        return $meetinginfo;
+    }
 
     /**
      * Helper to prepare data used for create meeting.
+     *
      * @param instance $instance
      * @return array
      */
@@ -237,7 +290,7 @@ class meeting {
             'name' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_name(), 64),
             'attendeePW' => $this->instance->get_viewer_password(),
             'moderatorPW' => $this->instance->get_moderator_password(),
-            'logoutURL' => $this->instance->get_logout_url(),
+            'logoutURL' => $this->instance->get_logout_url()->out(false),
         ];
         $data['record'] = $this->instance->should_record() ? 'true' : 'false';
         // Check if auto_start_record is enable.
@@ -266,7 +319,7 @@ class meeting {
     /**
      * Helper for preparing metadata used while creating the meeting.
      *
-     * @param  instance    $instance
+     * @param instance $instance
      * @return array
      */
     protected function create_meeting_metadata() {
@@ -286,7 +339,8 @@ class meeting {
             'bbb-recording-name' => plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_name(), 64),
             'bbb-recording-description' => plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_description(),
                 64),
-            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_get_tags($this->instance->get_cm_id()), // Same as $id.
+            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_get_tags($this->instance->get_cm_id()),
+            // Same as $id.
         ];
         // Special metadata for recording processing.
         if ((boolean) config::get('recordingstatus_enabled')) {
@@ -304,22 +358,5 @@ class meeting {
             $metadata['analytics-callback-url'] = $this->instance->get_meeting_event_notification_url()->out(false);
         }
         return $metadata;
-    }
-
-    /**
-     * Send an end meeting message to BBB server
-     */
-    public function end_meeting() {
-        bigbluebutton::end_meeting($this->instance->get_meeting_id(), $this->instance->get_moderator_password());
-    }
-
-    /**
-     * Get meeting attendees
-     *
-     * @return mixed
-     */
-    public function get_attendees() {
-        $info = $this->get_meeting_info();
-        return $info->attendees;
     }
 }

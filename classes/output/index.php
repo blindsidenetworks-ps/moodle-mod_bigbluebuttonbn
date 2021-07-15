@@ -128,7 +128,7 @@ class index implements renderable {
      * @param renderer_base $output
      * @param bool $moderator
      * @param instance $instance
-     * @param stdClass|null $group
+     * @param int|null $group
      * @return array
      */
     protected function add_room_row_to_table(

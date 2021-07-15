@@ -49,12 +49,12 @@ if (!(boolean) \mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
         get_string('view_message_importrecordings_disabled', plugin::COMPONENT),
         notification::ERROR
     );
-    redirect($instance->get_view_url());
+    redirect($destinationinstance->get_view_url());
 }
 
 // Print the page header.
-$PAGE->set_url($instsance->get_import_url());
-$PAGE->set_title($instance->get_meeting_name());
+$PAGE->set_url($destinationinstance->get_import_url());
+$PAGE->set_title($destinationinstance->get_meeting_name());
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 

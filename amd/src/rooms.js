@@ -61,5 +61,6 @@ export const setupWindowAutoClose = () => {
         }, 5000);
         window.close();
     };
-    window.close();
+    window.close(); // This does not work as scripts can only close windows that are
+    // opened by themselves.
 };

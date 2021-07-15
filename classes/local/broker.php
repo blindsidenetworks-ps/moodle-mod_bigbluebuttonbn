@@ -84,7 +84,7 @@ class broker {
      * @return array
      */
     public static function recording_action_publish($params, $recordings) {
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute publish on imported recording link, if the real recording is published.
             $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
                 $recordings[$params['id']]['meetingID'],
@@ -128,7 +128,7 @@ class broker {
      * @return array
      */
     public static function recording_action_unprotect($params, $recordings) {
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute unprotect on imported recording link, if the real recording is unprotected.
             $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
                 $recordings[$params['id']]['meetingID'],
@@ -173,7 +173,7 @@ class broker {
      */
     public static function recording_action_unpublish($params, $recordings) {
         global $DB;
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute unpublish or protect on imported recording link.
             return array(
                 'status' => recording::bigbluebuttonbn_publish_recording_imported(
@@ -212,7 +212,7 @@ class broker {
      */
     public static function recording_action_protect($params, $recordings) {
         global $DB;
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute unpublish or protect on imported recording link.
             return array(
                 'status' => recording::bigbluebuttonbn_protect_recording_imported(
@@ -251,7 +251,7 @@ class broker {
      */
     public static function recording_action_delete($params, $recordings) {
         global $DB;
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute delete on imported recording link.
             return array(
                 'status' => recording::bigbluebuttonbn_delete_recording_imported(
@@ -283,7 +283,7 @@ class broker {
      * @return array
      */
     public static function recording_action_edit($params, $recordings) {
-        if (self::recording_is_imported($recordings, $params['id'])) {
+        if (recording::recording_is_imported($recordings, $params['id'])) {
             // Execute update on imported recording link.
             return array(
                 'status' => recording::bigbluebuttonbn_update_recording_imported(
@@ -454,7 +454,7 @@ class broker {
             json_encode($meta));
         if (recording::bigbluebuttonbn_get_count_callback_event_log($meta['recordid'], 'meeting_events') == 1) {
             // Process the events.
-            meeting_helper::bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
+            self::bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
             header('HTTP/1.0 200 Accepted. Enqueued.');
             return;
         }
@@ -570,18 +570,6 @@ class broker {
     }
 
     /**
-     * Helper for validating if a recording is an imported link or a real one.
-     *
-     * @param array $recordings
-     * @param string $recordingid
-     *
-     * @return boolean
-     */
-    public static function recording_is_imported($recordings, $recordingid) {
-        return (isset($recordings[$recordingid]) && isset($recordings[$recordingid]['imported']));
-    }
-
-    /**
      * Helper for performing validation of completion.
      *
      * @param object $bigbluebuttonbn
@@ -595,7 +583,33 @@ class broker {
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         foreach ($users as $user) {
             // Enqueue a task for processing the completion.
-            \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
+            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
+        }
+    }
+
+    /**
+     * Helper function enqueues list of meeting events to be stored and processed as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param object $jsonobj
+     *
+     * @return void
+     */
+    protected static function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
+        $meetingid = $jsonobj->{'meeting_id'};
+        $recordid = $jsonobj->{'internal_meeting_id'};
+        $attendees = $jsonobj->{'data'}->{'attendees'};
+        foreach ($attendees as $attendee) {
+            $userid = $attendee->{'ext_user_id'};
+            $overrides['meetingid'] = $meetingid;
+            $overrides['userid'] = $userid;
+            $meta['recordid'] = $recordid;
+            $meta['data'] = $attendee;
+            // Stores the log.
+            logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides,
+                json_encode($meta));
+            // Enqueue a task for processing the completion.
+            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
         }
     }
 }

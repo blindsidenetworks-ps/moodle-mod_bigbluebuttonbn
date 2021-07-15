@@ -138,7 +138,7 @@ class recording {
                 if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
                     foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
                         try {
-                            $childrecordingsxml = bigbluebutton::get_recordings_from_meetings((array) $breakoutroom);
+                            $childrecordingsxml = bigbluebutton::get_recordings((array) $breakoutroom);
                             // If there were meetings already created.
                             foreach ($childrecordingsxml as $childrecordingxml) {
                                 $recording =
@@ -752,7 +752,7 @@ class recording {
             );
             /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
              * recordings are not included. */
-            if ($instance->get_instance_var('recordings_deleted')) {
+            if ($instance->get_instance_var('recordings_imported')) {
                 $recordings = $recordingsimported;
             } else {
                 $recordings += $recordingsimported;
@@ -1161,5 +1161,17 @@ class recording {
             $instance->get_instance_data(),
             ['other' => $instance->get_instance_id()]
         );
+    }
+
+    /**
+     * Helper for validating if a recording is an imported link or a real one.
+     *
+     * @param array $recordings
+     * @param string $recordingid
+     *
+     * @return boolean
+     */
+    public static function recording_is_imported($recordings, $recordingid) {
+        return (isset($recordings[$recordingid]) && isset($recordings[$recordingid]['imported']));
     }
 }

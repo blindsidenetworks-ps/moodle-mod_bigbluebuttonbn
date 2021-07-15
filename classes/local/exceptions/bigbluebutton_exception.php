@@ -20,7 +20,7 @@
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 
 namespace mod_bigbluebuttonbn\local\exceptions;
@@ -28,6 +28,14 @@ namespace mod_bigbluebuttonbn\local\exceptions;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class bigbluebutton_exception
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
+ */
 class bigbluebutton_exception extends \moodle_exception {
 
 }

@@ -450,10 +450,12 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 
     // Get if the user has joined in live session or viewed the recorded.
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
+    $instance = instance::get_from_instanceid($bigbluebuttonbn->id);
     // Get if the room is available.
-    list($roomavailable) = bigbluebutton::bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    $roomavailable = $instance->is_room_available();
     // Get if the user can join.
-    list($usercanjoin) = meeting_helper::bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    $meetinginfo = meeting::get_meeting_info_for_instance($instance);
+    $usercanjoin = $meetinginfo->canjoin;
 
     // Check if the room is closed and the user has already joined this session or played the record.
     if (!$roomavailable && $usercomplete) {

@@ -28,6 +28,7 @@ use core\output\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\meeting;
 use renderable;
 use renderer_base;

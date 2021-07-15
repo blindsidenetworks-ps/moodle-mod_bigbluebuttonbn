@@ -138,7 +138,7 @@ switch (strtolower($action)) {
         $meeting = new meeting($instance);
         if ($meeting->is_running()) {
             // Since the meeting is already running, we just join the session.
-            bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
+            bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin);
             break;
         }
 
@@ -155,7 +155,7 @@ switch (strtolower($action)) {
             // Moodle event logger: Create an event for meeting created.
             logs::log_meeting_created_event($instance);
             // Since the meeting is already running, we just join the session.
-            bigbluebuttonbn_bbb_view_join_meeting($instance, $origin);
+            bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin);
         } catch (server_not_available_exception $e) {
             bigbluebutton::handle_server_not_available($instance);
         }
@@ -216,6 +216,8 @@ function bigbluebuttonbn_bbb_view_playback_href_lookup($playbacks, $type) {
 function bigbluebuttonbn_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
     echo $OUTPUT->header();
+    // This will not work for now. The intent is to close the BBB windows
+    // to go back to the main page.
     $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
     echo $OUTPUT->footer();
 }
@@ -313,28 +315,21 @@ function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
  *
  * TODO Move to local\bigbluebutton
  *
+ * @param meeting $meeting
  * @param instance $instance
  * @param int $origin
  */
-function bigbluebuttonbn_bbb_view_join_meeting($instance, $origin = 0): void {
+function bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin = 0): void {
     // Update the cache and retrieve info.
     $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
 
-    if ($meetinginfo->statusrunning && $instance->has_user_limit_been_reached($meetinginfo->participantcount)) {
+    if ($meeting->is_running() && !$meeting->can_join()) {
         // No more users allowed to join.
         redirect($instance->get_logout_url());
         return;
     }
 
-    $joinurl = bigbluebutton::bigbluebuttonbn_get_join_url(
-        $instance->get_meeting_id(),
-        $instance->get_user_fullname(),
-        $instance->get_current_user_password(),
-        $instance->get_logout_url(),
-        null,
-        $instance->get_user_id(),
-        $meetinginfo->createtime
-    );
+    $joinurl = $meeting->get_join_url();
 
     // Moodle event logger: Create an event for meeting joined.
     logs::log_meeting_joined_event($instance, $origin);
