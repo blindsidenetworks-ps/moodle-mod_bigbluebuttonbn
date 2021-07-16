@@ -23,13 +23,13 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\recording_handler;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\local\helpers\recording as recording_helper;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
@@ -220,8 +220,8 @@ switch (strtolower($action)) {
         }
         // New recording management: Insert a recordingID that corresponds to the meeting created.
         if ($bigbluebuttonbn->record) {
-            $handler = new recording_handler($bigbluebuttonbn);
-            $handler->recording_create($response['internalMeetingID'], $response['meetingID']);
+            $recording = new recording($bigbluebuttonbn);
+            $recording->create($response['internalMeetingID'], (object)['meetingid' => $response['meetingID']]);
         }
         // Moodle event logger: Create an event for meeting created.
         logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
@@ -260,7 +260,7 @@ function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
     if ($href != '' || $rid == '') {
         return $href;
     }
-    $recordings = recording::bigbluebuttonbn_get_recordings_array($rid);
+    $recordings = recording_helper::fetch_recordings($rid);
     if (empty($recordings)) {
         return '';
     }

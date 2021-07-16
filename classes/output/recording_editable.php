@@ -115,7 +115,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
      */
     public static function get_recording($itemid) {
         list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
-        $recordings = recording::bigbluebuttonbn_get_recordings_array([$recordingid]);
+        $recordings = recording::fetch_recordings([$recordingid]);
         if (!empty($recordings)) {
             return reset($recordings);
         }

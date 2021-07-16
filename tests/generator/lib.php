@@ -209,7 +209,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * @return array
      * @throws dml_exception
      */
-    public static function bigbluebuttonbn_get_recordings_array_fetch($meetingsid) {
+    public static function fetch_recordings($meetingsid) {
         global $CFG;
         $allrecordings = get_config('mod_bigbluebuttonbn', static::FAKE_RECORDING_VAR_NAME);
         if (!$allrecordings) {

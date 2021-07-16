@@ -25,10 +25,11 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+use mod_bigbluebuttonbn\bigbluebutton\recordings\base as recording_base;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
 use mod_bigbluebuttonbn\external\meeting_info;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\recording_handler;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
@@ -165,8 +166,8 @@ function bigbluebuttonbn_delete_instance($id) {
     logs::bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
 
     // Mark dependant recordings as headless.
-    $handler = new recording_handler($bigbluebuttonbn);
-    $handler->recording_update_all(['id' => $id], (object)['headless' => recording_handler::RECORDING_HEADLESS]);
+    $handler = new handler($bigbluebuttonbn);
+    $handler->update_all_recordings(['bigbluebuttonbnid' => $id], (object)['headless' => recording_base::RECORDING_HEADLESS]);
 
     return $result;
 }

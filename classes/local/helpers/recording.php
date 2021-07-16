@@ -49,127 +49,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class recording {
 
-    /** @var int INCLUDE_IMPORTED_RECORDINGS boolean set to true defines that the list should include imported recordings */
-    public const INCLUDE_IMPORTED_RECORDINGS = true;
-
-    /**
-     * Helper function to retrieve recordings from a BigBlueButton server.
-     *
-     * @param string|array $recordingids list of $recordingids "rid1,rid2,rid3" or array("rid1","rid2","rid3")
-     *
-     * @return array array with recordings indexed by recordID, each recording is a non sequential array
-     */
-    public static function bigbluebuttonbn_get_recordings_array($recordingids = []) {
-        $recordingidsarray = $recordingids;
-        if (!is_array($recordingids)) {
-            $recordingidsarray = explode(',', $recordingids);
-        }
-        // If $recordingidsarray is empty there is no need to go further.
-        if (empty($recordingidsarray)) {
-            return array();
-        }
-        $recordings = self::bigbluebuttonbn_get_recordings_array_fetch($recordingidsarray);
-        // Sort recordings.
-        uasort($recordings, "\\mod_bigbluebuttonbn\\local\\helpers\\recording::bigbluebuttonbn_recording_build_sorter");
-        return $recordings;
-    }
-
-    /**
-     * Helper function to fetch recordings from a BigBlueButton server.
-     *
-     * @param array $meetingidsarray array with meeting ids in the form array("mid1","mid2","mid3")
-     *
-     * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
-     */
-    public static function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
-        // TODO: We will need to completely rewrite this by
-        // Having a recording singleton which instantiation would depend on the condition here or
-        // overriding the higher level function (bigbluebuttonbn_get_recordings_array).
-
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)
-            || defined('BEHAT_SITE_RUNNING')
-            || defined('BEHAT_TEST')
-            || defined('BEHAT_UTIL')) {
-            // Just return the fake recording.
-            global $CFG;
-            require_once($CFG->libdir . '/testing/generator/lib.php');
-            require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/generator/lib.php');
-            return mod_bigbluebuttonbn_generator::bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray);
-        }
-        $recordings = array();
-        // Execute a paginated getRecordings request.
-        $pagecount = 25;
-        $pages = floor(count($meetingidsarray) / $pagecount) + 1;
-        if (count($meetingidsarray) > 0 && count($meetingidsarray) % $pagecount == 0) {
-            $pages--;
-        }
-        for ($page = 1; $page <= $pages; ++$page) {
-            $mids = array_slice($meetingidsarray, ($page - 1) * $pagecount, $pagecount);
-            $recordings += self::bigbluebuttonbn_get_recordings_array_fetch_page($mids);
-        }
-        return $recordings;
-    }
-
-    /**
-     * Helper function to fetch one page of upto 25 recordings from a BigBlueButton server.
-     *
-     * @param array $rids
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recordings_array_fetch_page($rids) {
-        $recordings = array();
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
-        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('getRecordingsURL: ' . $url);
-        debugging('recordIDs: ' . json_encode($rids));
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = self::bigbluebuttonbn_get_recording_array_value($recordingxml);
-                $recordings[$recording['recordID']] = $recording;
-
-                // Check if there is childs.
-                if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
-                    foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                        $url = bigbluebutton::action_url(
-                            'getRecordings',
-                            ['recordID' => implode(',', (array) $breakoutroom)]
-                        );
-                        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-                        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                            // If there were meetings already created.
-                            foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording =
-                                    self::bigbluebuttonbn_get_recording_array_value($recordingxml);
-                                $recordings[$recording['recordID']] = $recording;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $recordings;
-    }
-
-    /**
-     * Helper function to remove a set of recordings from an array.
-     *
-     * @param array $rids
-     * @param array $recordings
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recordings_array_filter($rids, &$recordings) {
-        foreach ($recordings as $key => $recording) {
-            if (!in_array($recording['recordID'], $rids)) {
-                unset($recordings[$key]);
-            }
-        }
-        return $recordings;
-    }
-
     /**
      * Helper function to retrieve imported recordings from the Moodle database.
      * The references are stored as events in bigbluebuttonbn_logs.
@@ -181,10 +60,10 @@ class recording {
      * @return array with imported recordings indexed by recordID, each recording
      * is a non sequential array that corresponds to the actual recording in BBB
      */
-    public static function bigbluebuttonbn_get_recordings_imported_array($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
+    public static function fetch_imported_recording($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
         global $DB;
         $select =
-            self::bigbluebuttonbn_get_recordings_imported_sql_select($courseid, $bigbluebuttonbnid,
+            self::sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid,
                 $subset);
         $recordsimported = $DB->get_records_select('bigbluebuttonbn_logs', $select);
         $recordsimportedarray = array();
@@ -199,96 +78,6 @@ class recording {
             $recordsimportedarray[$recording['recordID']] = $recording;
         }
         return $recordsimportedarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording object to an array in the format used by the plugin.
-     *
-     * @param object $recording
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recording_array_value($recording) {
-        // Add formats.
-        $playbackarray = array();
-        foreach ($recording->playback->format as $format) {
-            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
-                'url' => trim((string) $format->url), 'length' => (string) $format->length);
-            // Add preview per format when existing.
-            if ($format->preview) {
-                $playbackarray[(string) $format->type]['preview'] =
-                    self::bigbluebuttonbn_get_recording_preview_images($format->preview);
-            }
-        }
-        // Add the metadata to the recordings array.
-        $metadataarray =
-            self::bigbluebuttonbn_get_recording_array_meta(get_object_vars($recording->metadata));
-        $recordingarray = array('recordID' => (string) $recording->recordID,
-            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
-            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
-        if (isset($recording->protected)) {
-            $recordingarray['protected'] = (string) $recording->protected;
-        }
-        return $recordingarray + $metadataarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
-     *
-     * @param object $preview
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recording_preview_images($preview) {
-        $imagesarray = array();
-        foreach ($preview->images->image as $image) {
-            $imagearray = array('url' => trim((string) $image));
-            foreach ($image->attributes() as $attkey => $attvalue) {
-                $imagearray[$attkey] = (string) $attvalue;
-            }
-            array_push($imagesarray, $imagearray);
-        }
-        return $imagesarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
-     *
-     * @param array $metadata
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recording_array_meta($metadata) {
-        $metadataarray = array();
-        foreach ($metadata as $key => $value) {
-            if (is_object($value)) {
-                $value = '';
-            }
-            $metadataarray['meta_' . $key] = $value;
-        }
-        return $metadataarray;
-    }
-
-    /**
-     * Helper function to sort an array of recordings. It compares the startTime in two recording objecs.
-     *
-     * @param object $a
-     * @param object $b
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_recording_build_sorter($a, $b) {
-        global $CFG;
-        $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
-        $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
-        if ($a['startTime'] < $b['startTime']) {
-            return $resultless;
-        }
-        if ($a['startTime'] == $b['startTime']) {
-            return 0;
-        }
-        return $resultmore;
     }
 
     /**
@@ -729,7 +518,7 @@ class recording {
      * @return array array containing the recordings indexed by recordID, each recording is also a
      * non sequential array itself that corresponds to the actual recording in BBB
      */
-    public static function bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures) {
+    public static function get_recordings_for_table_view($bbbsession, $enabledfeatures) {
         $bigbluebuttonbnid = null;
         if ($enabledfeatures['showroom']) {
             $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
@@ -773,17 +562,6 @@ class recording {
     }
 
     /**
-     * Helper function triggers a send notification when the recording is ready.
-     *
-     * @param object $bigbluebuttonbn
-     *
-     * @return void
-     */
-    public static function bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn) {
-        \mod_bigbluebuttonbn\local\notifier::notify_recording_ready($bigbluebuttonbn);
-    }
-
-    /**
      * Helper function returns an array with all the instances of imported recordings for a recordingid.
      *
      * @param string $recordid
@@ -820,8 +598,8 @@ class recording {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_unset_existent_recordings_already_imported($recordings, $courseid, $bigbluebuttonbnid) {
-        $recordingsimported = self::bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, true);
+    public static function unset_existent_imported_recordings($recordings, $courseid, $bigbluebuttonbnid) {
+        $recordingsimported = self::fetch_imported_recording($courseid, $bigbluebuttonbnid, true);
         foreach ($recordings as $key => $recording) {
             if (isset($recordingsimported[$recording['recordID']])) {
                 unset($recordings[$key]);
@@ -845,12 +623,12 @@ class recording {
     public static function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false, $includeimported = false) {
         global $DB;
-        $select = self::bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
+        $select = self::sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
         $records = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
         // Get actual recordings.
-        $recordings = self::bigbluebuttonbn_get_recordings_array(array_values($records));
+        $recordings = self::fetch_recordings(array_values($records));
         if ($includeimported) {
-            $recordings += self::bigbluebuttonbn_get_recordings_imported_array($courseid, $bigbluebuttonbnid, $subset);
+            $recordings += self::fetch_imported_recording($courseid, $bigbluebuttonbnid, $subset);
         }
         return $recordings;
     }
@@ -865,7 +643,7 @@ class recording {
      *
      * @return string containing the sql used for getting the target bigbluebuttonbn instances
      */
-    public static function bigbluebuttonbn_get_recordings_imported_sql_select($courseid = 0, $bigbluebuttonbnid = null,
+    public static function sql_select_for_imported_recordings($courseid = 0, $bigbluebuttonbnid = null,
         $subset = true) {
         $sql = "log = '" . bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT . "'";
         if (empty($courseid)) {
@@ -882,32 +660,6 @@ class recording {
 
     /**
      * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
-     * in the getRecordings request considering only those that belong to deleted activities.
-     *
-     * @param string $courseid
-     * @param string $bigbluebuttonbnid
-     * @param bool $subset
-     *
-     * @return string containing the sql used for getting the target bigbluebuttonbn instances
-     */
-    public static function bigbluebuttonbn_get_recordings_deleted_sql_select($courseid = 0, $bigbluebuttonbnid = null,
-        $subset = true) {
-        $sql = "log = '" . bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_DELETE .
-            "' AND meta like '%has_recordings%' AND meta like '%true%'";
-        if (empty($courseid)) {
-            $courseid = 0;
-        }
-        if (empty($bigbluebuttonbnid)) {
-            return $sql . " AND courseid = {$courseid}";
-        }
-        if ($subset) {
-            return $sql . " AND bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
-        }
-        return $sql . " AND courseid = {$courseid} AND bigbluebuttonbnid <> '{$bigbluebuttonbnid}'";
-    }
-
-    /**
-     * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
      * in the getRecordings request
      *
      * @param string $courseid
@@ -917,7 +669,7 @@ class recording {
      *
      * @return string containing the sql used for getting the target bigbluebuttonbn instances
      */
-    public static function bigbluebuttonbn_get_recordings_sql_select($courseid, $bigbluebuttonbnid = null, $subset = true,
+    public static function sql_select_for_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false) {
         if (empty($courseid)) {
             $courseid = 0;
@@ -1084,7 +836,7 @@ class recording {
      * @return string
      */
     public static function recording_import($bbbsession, $recordingid, $importmeetingid) {
-        $recordings = self::bigbluebuttonbn_get_recordings_array([$recordingid]);
+        $recordings = self::fetch_recordings([$recordingid]);
         $overrides = array('meetingid' => $importmeetingid);
         $meta = json_encode((object) [
             'recording' => $recordings[$recordingid]

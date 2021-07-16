@@ -31,6 +31,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
@@ -119,8 +120,11 @@ class update_recording extends external_api {
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession,
-            $enabledfeatures
+        $handler = new handler($bigbluebuttonbn);
+        $recordings = $handler->get_recordings_for_view(
+            $enabledfeatures['showroom'],
+            $bigbluebuttonbn->recordings_deleted,
+            $enabledfeatures['importrecordings']
         );
 
         // Specific action for import

@@ -26,7 +26,6 @@
  */
 
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\recording_handler;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;

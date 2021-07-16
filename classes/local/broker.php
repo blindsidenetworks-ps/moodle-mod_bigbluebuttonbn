@@ -27,7 +27,9 @@ namespace mod_bigbluebuttonbn\local;
 
 use coding_exception;
 use Exception;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\base as recording_base;
 use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\local\notifier;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\recording;
@@ -201,7 +203,7 @@ class broker {
                 $bigbluebuttonbnid,
                 $showroom,
                 $includedeleted,
-                recording::INCLUDE_IMPORTED_RECORDINGS
+                recording_base::INCLUDE_IMPORTED_RECORDINGS
             );
         if (array_key_exists($params['id'], $recordings)) {
             // Look up for an update on the imported recording.
@@ -214,7 +216,7 @@ class broker {
             return "{$params['callback']}({$callbackresponsedata});";
         }
         // As the recordingid was not identified as imported recording link, look up for a real recording.
-        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['id']);
+        $recordings = recording::fetch_recordings($params['id']);
         if (array_key_exists($params['id'], $recordings)) {
             // The recording was found.
             $callbackresponse =
@@ -258,7 +260,7 @@ class broker {
      */
     public static function recording_play($params) {
         $callbackresponse = array('status' => true, 'found' => false);
-        $recordings = recording::bigbluebuttonbn_get_recordings_array($params['id']);
+        $recordings = recording::fetch_recordings($params['id']);
         if (array_key_exists($params['id'], $recordings)) {
             // The recording was found.
             $callbackresponse = self::recording_info_current($recordings[$params['id']], $params);
@@ -292,7 +294,7 @@ class broker {
             $bigbluebuttonbnid,
             $showroom,
             $bbbsession['bigbluebuttonbn']->recordings_deleted,
-            recording::INCLUDE_IMPORTED_RECORDINGS
+            recording_base::INCLUDE_IMPORTED_RECORDINGS
         );
 
         $action = strtolower($params['action']);
@@ -353,7 +355,7 @@ class broker {
     public static function recording_action_publish($params, $recordings) {
         if (self::recording_is_imported($recordings, $params['id'])) {
             // Execute publish on imported recording link, if the real recording is published.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(recordings[$params['id']]['recordID']);
+            $realrecordings = recording::fetch_recordings(recordings[$params['id']]['recordID']);
             // Only if the physical recording exist and it is published, execute publish on imported recording link.
             if (!isset($realrecordings[$params['id']])) {
                 return array(
@@ -394,7 +396,7 @@ class broker {
     public static function recording_action_unprotect($params, $recordings) {
         if (self::recording_is_imported($recordings, $params['id'])) {
             // Execute unprotect on imported recording link, if the real recording is unprotected.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array($recordings[$params['id']]['recordID']);
+            $realrecordings = recording::fetch_recordings($recordings[$params['id']]['recordID']);
             // Only if the physical recording exist and it is published, execute unprotect on imported recording link.
             if (!isset($realrecordings[$params['id']])) {
                 return array(
@@ -600,7 +602,7 @@ class broker {
             // Workaround for CONTRIB-7438.
             // Proceed as before when no record_id is provided.
             if (!isset($decodedparameters->record_id)) {
-                recording::bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                notifier::notify_recording_ready($bigbluebuttonbn);
                 header('HTTP/1.0 202 Accepted');
                 return;
             }
@@ -608,7 +610,7 @@ class broker {
             if (
                 \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
                     $decodedparameters->record_id) == 0) {
-                recording::bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                notifier::notify_recording_ready($bigbluebuttonbn);
             }
             $overrides = array('meetingid' => $decodedparameters->meeting_id);
             $meta['recordid'] = $decodedparameters->record_id;
