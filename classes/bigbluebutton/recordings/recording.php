@@ -44,10 +44,23 @@ class recording extends base {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance object
      */
-    public function __construct($bigbluebuttonbn) {
-        $this->bigbluebuttonbn = $bigbluebuttonbn;
+    public function __construct($id, $courseid, $bigbluebuttonbnid, $recordingid, $meetingid) {
+        $this->id = $id;
+        $this->courseid = $courseid;
+        $this->bigbluebuttonbnid = $bigbluebuttonbnid;
+        $this->recordingid = $recordingid;
+        $this->meetingid = $meetingid;
     }
-    
+
+    /**
+     * Setter for $xml.
+     *
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance object
+     */
+    public function set_record($record) {
+        $this->record = $record;
+    }
+
     /**
      * CRUD create.
      *
@@ -56,19 +69,21 @@ class recording extends base {
      * 
      * @return bool|int true or new id
      */
-    public function create($recordingid, $dataobject) {
+    public function create() {
         global $DB;
-        if (empty($recordingid)) {
+        $r = new stdClass();
+        // Default values.
+        $r->courseid = $this->courseid;
+        $r->bigbluebuttonbnid = $this->bigbluebuttonbnid;
+        $r->timecreated = time();
+        $r->recordingid = $this->recordingid;
+        $r->meetingid = $this->meetingid;
+        $rid = $DB->insert_record('bigbluebuttonbn_recordings', $r);
+        if (!$rid) {
             return false;
         }
-        $recording = new stdClass();
-        // Default values.
-        $recording->courseid = (int) $this->bigbluebuttonbn->course;
-        $recording->bigbluebuttonbnid = (int) $this->bigbluebuttonbn->id;
-        $recording->timecreated = time();
-        $recording->recordingid = $recordingid;
-        $recording->meetingid = $dataobject->meetingid;
-        return $DB->insert_record('bigbluebuttonbn_recordings', $recording);
+        $this->id = $rid;
+        return $rid;
     }
 
     /**
@@ -79,17 +94,9 @@ class recording extends base {
      * 
      * @return bool|int true or new id
      */
-    public function read($recordingid) {
+    public function read() {
         global $DB;
-        if (empty($recordingid)) {
-            return false;
-        }
-        return $DB->get_record('bigbluebuttonbn_recordings',
-                array(
-                    'bigbluebuttonbn' => $this->bigbluebuttonbn->id,
-                    'recordingid' => $recordingid
-                ),
-                '*', MUST_EXIST);
+        return $DB->get_record('bigbluebuttonbn_recordings', ['id' => $this->id], '*', MUST_EXIST);
     }
 
     /**
@@ -100,37 +107,10 @@ class recording extends base {
      * 
      * @return bool true
      */
-    public function update($recordingid, $dataobject) {
+    public function update($dataobject) {
         global $DB;
-        if (empty($recordingid)) {
-            return false;
-        }
-        $recording = $this->read($recordingid);
-        if (!$recording) {
-            return false;
-        }
-        $dataobject->id = $recording->id;
+        $dataobject->id = $this->id;
         return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
-    }
-
-    /**
-     * CRUD update or create.
-     *
-     * @param string $recordingid
-     * @param stdClass $dataobject
-     * 
-     * @return bool|int true or new id
-     */
-    public function recording_update_or_create($recordingid, $dataobject) {
-        global $DB;
-        if (empty($recordingid)) {
-            return false;
-        }
-        $recording = $this->update($recordingid, $dataobject);
-        if ($recording) {
-            return $recording;
-        }
-        return $this->create($recordingid, $dataobject);
     }
 
     /**
@@ -140,11 +120,7 @@ class recording extends base {
      * 
      * @return bool true
      */
-    public function delete($recordingid) {
-        return $DB->delete_record('bigbluebuttonbn_recordings',
-                array(
-                    'bigbluebuttonbn' => $this->bigbluebuttonbn->id,
-                    'recordingid' => $recordingid
-                ));
+    public function delete() {
+        return $DB->delete_record('bigbluebuttonbn_recordings', ['id' => $this->id]);
     }
 }

@@ -189,6 +189,7 @@ class broker {
             header('HTTP/1.0 401 Unauthorized. User not authorized to execute command');
             return;
         }
+        // Retrieve array of recordings that includes real and imported.
         $callbackresponse = array('status' => true, 'found' => false);
         $courseid = $bbbsession['course']->id;
         $bigbluebuttonbnid = null;
@@ -196,15 +197,16 @@ class broker {
             $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         }
         $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
+        $handler = new handler($bbbsession['bigbluebuttonbn']);
         // Retrieve the array of imported recordings.
-        $recordings =
-            recording::get_recordings(
-                $courseid,
-                $bigbluebuttonbnid,
-                $showroom,
-                $includedeleted,
-                recording_base::INCLUDE_IMPORTED_RECORDINGS
-            );
+        $recordings = $handler->get_recordings(
+            $courseid,
+            $bigbluebuttonbnid,
+            $showroom,
+            $includedeleted,
+            recording_base::INCLUDE_IMPORTED_RECORDINGS
+        );
+
         if (array_key_exists($params['id'], $recordings)) {
             // Look up for an update on the imported recording.
             if (!array_key_exists('messageKey', $recordings[$params['id']])) {
@@ -281,19 +283,24 @@ class broker {
      */
     public static function recording_action($bbbsession, $params, $showroom) {
         if (!$bbbsession['managerecordings']) {
-            header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
+            header('HTTP/1.0 401 Unauthorized. User not authorized to execute command');
             return;
         }
         // Retrieve array of recordings that includes real and imported.
+        $callbackresponse = array('status' => true, 'found' => false);
+        $courseid = $bbbsession['course']->id;
         $bigbluebuttonbnid = null;
         if ($showroom) {
             $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
         }
-        $recordings = recording::get_recordings(
-            $bbbsession['course']->id,
+        $includedeleted = $bbbsession['bigbluebuttonbn']->recordings_deleted;
+        $handler = new handler($bbbsession['bigbluebuttonbn']);
+        // Retrieve the array of imported recordings.
+        $recordings = $handler->get_recordings(
+            $courseid,
             $bigbluebuttonbnid,
             $showroom,
-            $bbbsession['bigbluebuttonbn']->recordings_deleted,
+            $includedeleted,
             recording_base::INCLUDE_IMPORTED_RECORDINGS
         );
 

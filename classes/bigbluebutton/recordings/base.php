@@ -48,11 +48,22 @@ abstract class base {
     /** @var int INCLUDE_IMPORTED_RECORDINGS boolean set to true defines that the list should include imported recordings */
     public const INCLUDE_IMPORTED_RECORDINGS = true;
 
-    /** @var stdClass mod_bigbluebuttonbn instance. */
-    protected $bigbluebuttonbn;
+    /** @var int mod_bigbluebuttonbn_recordings instance id. */
+    protected int $id;
+    /** @var int course instance id. */
+    protected int $courseid;
+    /** @var int mod_bigbluebuttonbn instance id. */
+    protected int $bigbluebuttonbnid;
+    /** @var string bbb recordID or internalMeetingID. */
+    protected string $recordingid;
+    /** @var string bbb meetingID used to generate the recording. */
+    protected string $meetingid;
+
+    /** @var array  bigbluebutton recording. */
+    protected array $record;
 
     abstract function create();
     abstract function read();
-    abstract function update();
+    abstract function update($dataobject);
     abstract function delete();
  }

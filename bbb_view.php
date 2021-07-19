@@ -220,8 +220,8 @@ switch (strtolower($action)) {
         }
         // New recording management: Insert a recordingID that corresponds to the meeting created.
         if ($bigbluebuttonbn->record) {
-            $recording = new recording($bigbluebuttonbn);
-            $recording->create($response['internalMeetingID'], (object)['meetingid' => $response['meetingID']]);
+            $recording = new recording(0, $bigbluebuttonbn->course, $bigbluebuttonbn->id, $response['internalMeetingID'], $response['meetingID']);
+            $recording->create();
         }
         // Moodle event logger: Create an event for meeting created.
         logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
