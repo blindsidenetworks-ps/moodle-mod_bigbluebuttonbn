@@ -49,7 +49,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
-            print_error('general_error_unable_connect', 'bigbluebuttonbn',
+            throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT,
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
             return;
         }
@@ -79,7 +79,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
                 );
             // If still none is allowed, fail and return.
             if (empty($jsvars['instanceTypeProfiles'])) {
-                print_error('general_error_not_allowed_to_create_instances)', 'bigbluebuttonbn',
+                throw new moodle_exception('general_error_not_allowed_to_create_instances)', plugin::COMPONENT,
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
                 return;
             }
@@ -716,10 +716,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      *
      * This method is designed to add an element in a way that will work in both Moodle and Totara.
      *
-     * @param $mform Moodle form object
-     * @param $name Form element name
-     * @param $descriptionkey String key for the element label and help description
-     * @param $html HTML string to be displayed in the static element.
+     * @param object $mform Moodle form object
+     * @param string $name Form element name
+     * @param string $descriptionkey String key for the element label and help description
+     * @param string $html HTML string to be displayed in the static element.
      *
      * @return null No return but form element added to $mform as a side-effect.
      */

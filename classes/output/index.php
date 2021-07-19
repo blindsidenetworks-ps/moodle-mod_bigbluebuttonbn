@@ -126,11 +126,11 @@ class index implements renderable {
         $meetinginfo = bigbluebuttonbn_get_meeting_info_array($meetingid);
         if (empty($meetinginfo)) {
             // The server was unreachable.
-            print_error('index_error_unable_display', plugin::COMPONENT);
+            throw new moodle_exception('index_error_unable_display', plugin::COMPONENT);
         }
         if (isset($meetinginfo['messageKey']) && ($meetinginfo['messageKey'] == 'checksumError')) {
             // There was an error returned.
-            print_error('index_error_checksum', plugin::COMPONENT);
+            throw new moodle_exception('index_error_checksum', plugin::COMPONENT);
         }
         // Output Users in the meeting.
         $joinurl = html_writer::link(

@@ -37,7 +37,7 @@ $g = optional_param('g', 0, PARAM_INT);
 
 $course = $DB->get_record('course', ['id' => $id]);
 if (!$course) {
-    print_error('invalidcourseid');
+    throw new moodle_exception('invalidcourseid', plugin::COMPONENT);
 }
 
 require_login($course, true);
@@ -55,7 +55,7 @@ if ($action === 'end') {
     // A request to end the meeting.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $a]);
     if (!$bigbluebuttonbn) {
-        print_error('index_error_bbtn', plugin::COMPONENT, '', $a);
+        throw new moodle_exception('index_error_bbtn', plugin::COMPONENT, '', $a);
     }
     $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);

@@ -34,7 +34,7 @@ $bn = required_param('bn', PARAM_INT);
 $tc = optional_param('tc', 0, PARAM_INT);
 
 if (!$bn) {
-    print_error('view_error_url_missing_parameters', plugin::COMPONENT);
+    throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
 $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $bn], '*', MUST_EXIST);
@@ -44,11 +44,11 @@ $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $c
 require_login($course, true, $cm);
 
 if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    print_error('view_error_invalid_session', plugin::COMPONENT);
+    throw new moodle_exception('view_error_invalid_session', plugin::COMPONENT);
 }
 
 if (!(boolean)\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
-    print_error('view_message_importrecordings_disabled', plugin::COMPONENT);
+    throw new moodle_exception('view_message_importrecordings_disabled', plugin::COMPONENT);
 }
 
 // Print the page header.
