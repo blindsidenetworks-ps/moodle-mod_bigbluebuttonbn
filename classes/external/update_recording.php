@@ -128,8 +128,7 @@ class update_recording extends external_api {
         );
 
         // Specific action for import
-        // TODO: refactor this so we do all the operation in the recording table instead of the
-        // broker.
+        // TODO: refactor this so we do all the operation in the recording table instead of the broker.
         if ($action != 'import') {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);

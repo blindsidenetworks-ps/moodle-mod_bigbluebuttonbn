@@ -67,8 +67,9 @@ class handler {
             return false;
         }
         foreach ($recordings as $r) {
-            $recording = new recording($r->id, $courseid->id, $r->bigbluebuttonbnid, $r->recordingid, $r->meetingid);
-            if (!$recording->update($dataobject)) {
+            global $DB;
+            $dataobject->id = $r->id;
+            if(!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
                 // TODO: There should be a way to rollback if it fails after updating one or many of the recordings.
                 return false;
             }

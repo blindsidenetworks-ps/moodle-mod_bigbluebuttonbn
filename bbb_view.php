@@ -220,8 +220,17 @@ switch (strtolower($action)) {
         }
         // New recording management: Insert a recordingID that corresponds to the meeting created.
         if ($bigbluebuttonbn->record) {
-            $recording = new recording(0, $bigbluebuttonbn->course, $bigbluebuttonbn->id, $response['internalMeetingID'], $response['meetingID']);
-            $recording->create();
+            global $DB;
+            $dbrecordingid = $DB->insert_record('bigbluebuttonbn_recordings',
+                array(
+                    'courseid' => $bigbluebuttonbn->course,
+                    'bigbluebuttonbnid' => $bigbluebuttonbn->id,
+                    'timecreated' => time(),
+                    'recordingid' => $response['internalMeetingID'],
+                    'meetingid' => $response['meetingID']
+                    )
+                );
+            // TODO: We want to catch if the record was not created.
         }
         // Moodle event logger: Create an event for meeting created.
         logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
