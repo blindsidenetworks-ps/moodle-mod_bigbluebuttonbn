@@ -347,4 +347,65 @@ class handler {
         return $resultmore;
     }
 
+    /**
+     * Helper function iterates an array with recordings and unset those already imported.
+     *
+     * @param array $recordings
+     * @param integer $courseid
+     * @param integer $bigbluebuttonbnid
+     *
+     * @return array
+     */
+    public function unset_existent_imported_recordings($recordings, $courseid, $bigbluebuttonbnid) {
+        // Retrieve DB imported recordings.
+        $select = $this->sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid, true);
+        $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
+        // Index the $importedrecordings for the response.
+        $importedrecordings = array();
+        foreach ($dbrecordings as $id => $dbrecording) {
+            $importedrecordings[$dbrecording->recordingid] = $dbrecording;
+        }
+        // Unset from $recordings if recording is already imported.
+        foreach ($recordings as $recordingid => $recording) {
+            if (isset($recordingsimported[$recordingid])) {
+                unset($recordings[$recordingid]);
+            }
+        }
+        return $recordings;
+    }
+
+    /**
+     * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
+     * in the getRecordings request
+     *
+     * @param string $courseid
+     * @param string $bigbluebuttonbnid
+     * @param bool $subset
+     * @param bool $includedeleted
+     *
+     * @return string containing the sql used for getting the target bigbluebuttonbn instances
+     */
+    private function sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
+        $includedeleted = false) {
+        if (empty($courseid)) {
+            $courseid = 0;
+        }
+        $select = "imported = true AND ";
+        // Start with the filters.
+        if (!$includedeleted) {
+            // Exclude headless recordings unless includedeleted.
+            $select .= "headless = false AND ";
+        }
+        // Add the meain criteria for the search.
+        if (empty($bigbluebuttonbnid)) {
+            // Include all recordings in given course if bigbluebuttonbnid is not included.
+            return $select . "courseid = '{$courseid}'";
+        }
+        if ($subset) {
+            // Include only one bigbluebutton instance if subset filter is included.
+            return $select . "bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
+        }
+        // Include only from one course and instance is used for imported recordings.
+        return $select . "bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
+    }
 }

@@ -112,15 +112,15 @@ class get_recordings extends external_api {
 
         // Fetch the list of recordings.
         $bigbluebuttonbn = $bbbsession['bigbluebuttonbn'];
-        $handler = new handler($bigbluebuttonbn);
-        $recordings = $handler->get_recordings_for_view(
+        $recording_handler = new handler($bigbluebuttonbn);
+        $recordings = $recording_handler->get_recordings_for_view(
             $enabledfeatures['showroom'],
             $bigbluebuttonbn->recordings_deleted,
             $enabledfeatures['importrecordings']
         );
 
         if ($removeimportedid) {
-            $recordings = recording::unset_existent_imported_recordings(
+            $recordings = $recording_handler->unset_existent_imported_recordings(
                 $recordings,
                 $bigbluebuttonbn->course,
                 $removeimportedid);

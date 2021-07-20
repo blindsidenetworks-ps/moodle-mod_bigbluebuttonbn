@@ -590,25 +590,6 @@ class recording {
     }
 
     /**
-     * Helper function iterates an array with recordings and unset those already imported.
-     *
-     * @param array $recordings
-     * @param integer $courseid
-     * @param integer $bigbluebuttonbnid
-     *
-     * @return array
-     */
-    public static function unset_existent_imported_recordings($recordings, $courseid, $bigbluebuttonbnid) {
-        $recordingsimported = self::fetch_imported_recording($courseid, $bigbluebuttonbnid, true);
-        foreach ($recordings as $key => $recording) {
-            if (isset($recordingsimported[$recording['recordID']])) {
-                unset($recordings[$key]);
-            }
-        }
-        return $recordings;
-    }
-
-    /**
      * Helper function to retrieve recordings from the BigBlueButton.
      *
      * @param string $courseid
