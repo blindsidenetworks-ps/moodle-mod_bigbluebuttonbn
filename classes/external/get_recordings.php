@@ -138,13 +138,10 @@ class get_recordings extends external_api {
         $data = [];
 
         // Build table content.
-        if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
-            // There are recordings for this meeting.
-            foreach ($recordings as $recording) {
-                $rowdata = recording::bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
-                if (!empty($rowdata)) {
-                    $data[] = $rowdata;
-                }
+        foreach ($recordings as $recording) {
+            $rowdata = recording::bigbluebuttonbn_get_recording_data_row($bbbsession, $recording->recording, $tools);
+            if (!empty($rowdata)) {
+                $data[] = $rowdata;
             }
         }
 

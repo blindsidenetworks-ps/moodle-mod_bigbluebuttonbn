@@ -286,7 +286,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2020101001.16) {
+    if ($oldversion < 2020101001.19) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
         xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
         // Add column courseid.
@@ -324,10 +324,10 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'imported',
             $fielddefinition);
-        // Add column meta for storing the recording meta parameters on imported recordings.
+        // Add column recording for storing the recording data of imported recordings.
         $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
-            'notnull' => false, 'sequence' => null, 'default' => '', 'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'meta',
+            'notnull' => false, 'sequence' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recording',
             $fielddefinition);
 
             // Add index to bigbluebuttonbn_recordings.
@@ -338,7 +338,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             ['recordingid']);
         // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2020101001.16, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2020101001.19, 'bigbluebuttonbn');
     }
 
     return true;

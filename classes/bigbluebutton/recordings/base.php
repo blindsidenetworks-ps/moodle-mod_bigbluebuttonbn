@@ -66,4 +66,14 @@ abstract class base {
     abstract function read();
     abstract function update($dataobject);
     abstract function delete();
+
+    public function as_array() {
+        return array(
+            'id' => $this->id,
+            'courseid' => $this->courseid,
+            'bigbluebuttonbnid' => $this->bigbluebuttonbnid,
+            'recordingid' => $this->recordingid,
+            'meetingid' => $this->meetingid
+        );
+    }
  }

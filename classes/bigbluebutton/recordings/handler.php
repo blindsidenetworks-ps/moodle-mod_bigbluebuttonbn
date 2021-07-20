@@ -109,40 +109,33 @@ class handler {
      * @param bool $subset. If $subset=true the query is performed on one single bigbluebuttonbn instance.
      * @param bool $includedeleted. If $includedeleted=true the query is performed on one single bigbluebuttonbn instance.
      * @param bool $includeimported. If $includeimported=true the returned array also includes imported recordings.
-     * @param bool $compatibility. If $compatibility=true the returned array containes the bbb recording as a value instead
-     *             of a mod_bigbluebuttonbn/bigbluebuyttoon/recordings/recording object.
      *
      * @return array associative array containing the recordings indexed by recordingid, each recording is also a
      * mod_bigbluebuttonbn/bigbluebutton/recordings/recording object which contains a non sequential array itself ($xml)
      * that corresponds to the actual recording in BBB.
      */
     public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false, $includeimported = false, $compatibility = true) {
+        $includedeleted = false, $includeimported = false) {
         global $DB;
         // Retrieve DB recordings.
-        $select = $this->sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted);
-        $dbrecordings = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
+        $select = $this->sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted, $includeimported);
+        $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
         // Fetch BBB recordings.
-        $bbbrecordings = $this->fetch_recordings(array_values($dbrecordings));
+        $recordingsids = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
+        $bbbrecordings = $this->fetch_recordings(array_values($recordingsids));
 
-        // Prepare the $recordings for the response.
+        // Prepare the $oldrecordings for the response.
         $recordings = array();
-        $modrecordings = array();
-        foreach ($dbrecordings as $id => $recordingid) {
-            if (isset($bbbrecordings[$recordingid])) {
-                $bbbrecording = $bbbrecordings[$recordingid];
-                $recordings[$recordingid] = $bbbrecording;
-                $modrecordings[$recordingid] = new recording($id, $courseid, $bigbluebuttonbnid, $bbbrecording["recordID"], $bbbrecording["meetingID"]);
-                $modrecordings[$recordingid]->set_record($bbbrecording);
+        foreach ($dbrecordings as $id => $dbrecording) {
+            if (isset($bbbrecordings[$dbrecording->recordingid])) {
+                $bbbrecording = $bbbrecordings[$dbrecording->recordingid];
+                if (!$dbrecording->imported) {
+                    $dbrecording->recording = $bbbrecording;
+                }
+                $recordings[$dbrecording->recordingid] = $dbrecording;
             }
         }
-        if ($includeimported) {
-            $recordings += $this->fetch_imported_recording($courseid, $bigbluebuttonbnid, $subset);
-        }
-        if ($compatibility) {
-            return $recordings;
-        }
-        return $modrecordings;
+        return $recordings;
     }
 
     /**
@@ -152,29 +145,36 @@ class handler {
      * @param string $courseid
      * @param string $bigbluebuttonbnid
      * @param bool $subset
-     * @param bool $includedeleted.
+     * @param bool $includedeleted
+     * @param bool $includeimported
      *
      * @return string containing the sql used for getting the target bigbluebuttonbn instances
      */
     private function sql_select_for_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false) {
+        $includedeleted = false, $includeimported =  false) {
         if (empty($courseid)) {
             $courseid = 0;
         }
         $select = "";
+        // Start with the filters.
         if (!$includedeleted) {
-            // Exclude headless recordings from getRecordings requests unless includedeleted.
-            $select = "headless = false AND ";
+            // Exclude headless recordings unless includedeleted.
+            $select .= "headless = false AND ";
         }
+        if (!$includeimported) {
+            // Exclude imported recordings unless includedeleted.
+            $select .= "imported = false AND ";
+        }
+        // Add the meain criteria for the search.
         if (empty($bigbluebuttonbnid)) {
-            // Fetch all recordings in given course if bigbluebuttonbnid filter is not included.
+            // Include all recordings in given course if bigbluebuttonbnid is not included.
             return $select . "courseid = '{$courseid}'";
         }
         if ($subset) {
-            // Fetch only one bigbluebutton instance if subset filter is included.
+            // Include only one bigbluebutton instance if subset filter is included.
             return $select . "bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
         }
-        // Fetch only from one course and instance is used for imported recordings.
+        // Include only from one course and instance is used for imported recordings.
         return $select . "bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
     }
 
@@ -198,15 +198,15 @@ class handler {
         }
 
         $recordings = array();
-        // Execute a paginated getRecordings request.
+        // Execute a paginated getRecordings request. The page size is arbitrarily hardcoded to 25.
         $pagecount = 25;
         $pages = floor(count($recordingids) / $pagecount) + 1;
         if (count($recordingids) > 0 && count($recordingids) % $pagecount == 0) {
             $pages--;
         }
         for ($page = 1; $page <= $pages; ++$page) {
-            $mids = array_slice($recordingids, ($page - 1) * $pagecount, $pagecount);
-            $recordings += $this->fetch_recordings_page($mids);
+            $rids = array_slice($recordingids, ($page - 1) * $pagecount, $pagecount);
+            $recordings += $this->fetch_recordings_page($rids);
         }
         // Sort recordings.
         uasort($recordings, "\\mod_bigbluebuttonbn\\bigbluebutton\\recordings\\handler::recording_build_sorter");
@@ -221,57 +221,6 @@ class handler {
      * @return array
      */
     private function fetch_recordings_page($rids) {
-        $recordings = array();
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
-        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('getRecordingsURL: ' . $url);
-        debugging('recordIDs: ' . json_encode($rids));
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = $this->parse_recording($recordingxml);
-                $recordings[$recording['recordID']] = $recording;
-
-                // Check if there is childs.
-                if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
-                    foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                        $url = bigbluebutton::action_url(
-                            'getRecordings',
-                            ['recordID' => implode(',', (array) $breakoutroom)]
-                        );
-                        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-                        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                            // If there were meetings already created.
-                            foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording =
-                                    $this->parse_recording($recordingxml);
-                                $recordings[$recording['recordID']] = $recording;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $recordings;
-    }
-
-    /**
-     * Helper function to retrieve imported recordings from the Moodle database.
-     * The references are stored as events in bigbluebuttonbn_logs.
-     *
-     * @param string $courseid
-     * @param string $bigbluebuttonbnid
-     * @param bool $subset
-     *
-     * @return array with imported recordings indexed by recordID, each recording
-     * is a non sequential array that corresponds to the actual recording in BBB
-     */
-    private function fetch_imported_recording($courseid = 0, $bigbluebuttonbnid = null, $subset = true) {
-        global $DB;
-        $importedrecordings = array();
-        return $importedrecordings;
-
         $recordings = array();
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
