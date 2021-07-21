@@ -452,33 +452,4 @@ class view {
         $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger');
         return $PAGE->get_renderer('core')->action_link('#', get_string($data['action']), null, $linkattributes);
     }
-
-    /**
-     * Helper function renders the link used for recording type in row for the data used by the recording table.
-     *
-     * @param array $recording
-     * @param array $bbbsession
-     * @param array $playback
-     *
-     * @return boolean
-     */
-    public static function bigbluebuttonbn_include_recording_data_row_type($recording, $bbbsession, $playback) {
-        // All types that are not restricted are included.
-        if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
-            return true;
-        }
-        // All types that are not statistics are included.
-        if ($playback['type'] != 'statistics') {
-            return true;
-        }
-        // Exclude imported recordings.
-        if (isset($recording['imported'])) {
-            return false;
-        }
-        // Exclude non moderators.
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
-            return false;
-        }
-        return true;
-    }
 }

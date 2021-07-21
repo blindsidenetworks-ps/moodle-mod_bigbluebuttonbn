@@ -35,13 +35,13 @@ use external_single_structure;
 use external_value;
 use external_warnings;
 use invalid_parameter_exception;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\data as recording_data;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\handler as recording_handler;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\plugin;
 
 /**
@@ -112,15 +112,15 @@ class get_recordings extends external_api {
 
         // Fetch the list of recordings.
         $bigbluebuttonbn = $bbbsession['bigbluebuttonbn'];
-        $recording_handler = new handler($bigbluebuttonbn);
-        $recordings = $recording_handler->get_recordings_for_view(
+        $recordinghandler = new recording_handler($bigbluebuttonbn);
+        $recordings = $recordinghandler->get_recordings_for_view(
             $enabledfeatures['showroom'],
             $bigbluebuttonbn->recordings_deleted,
             $enabledfeatures['importrecordings']
         );
 
         if ($removeimportedid) {
-            $recordings = $recording_handler->unset_existent_imported_recordings(
+            $recordings = $recordinghandler->unset_existent_imported_recordings(
                 $recordings,
                 $bigbluebuttonbn->course,
                 $removeimportedid);
@@ -139,7 +139,7 @@ class get_recordings extends external_api {
 
         // Build table content.
         foreach ($recordings as $recording) {
-            $rowdata = recording::bigbluebuttonbn_get_recording_data_row($bbbsession, $recording->recording, $tools);
+            $rowdata = recording_data::row($bbbsession, $recording->recording, $tools);
             if (!empty($rowdata)) {
                 $data[] = $rowdata;
             }
@@ -171,7 +171,7 @@ class get_recordings extends external_api {
         ];
 
         // Initialize table headers.
-        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+        if (recording_data::preview_enabled($bbbsession)) {
             $columns[] = [
                 'key' => 'preview',
                 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),

@@ -25,11 +25,12 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use core\output\inplace_editable;
 use lang_string;
+use moodle_exception;
+use core\output\inplace_editable;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
-use moodle_exception;
 
 /**
  * Renderer for recording in place editable.
@@ -114,8 +115,13 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return false|mixed matching recording
      */
     public static function get_recording($itemid) {
+        global $DB;
         list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
-        $recordings = recording::fetch_recordings([$recordingid]);
+        // Retrieve a bigbluebuttonbn instance from the target $bbbid and instantiate a handler.
+        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bbbid), '*', MUST_EXIST);
+        $recording_handler = new handler($bigbluebuttonbn);
+        // Fetch the recordings for the given recordingid.
+        $recordings = $recording_handler->fetch_recordings([$recordingid]);
         if (!empty($recordings)) {
             return reset($recordings);
         }

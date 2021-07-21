@@ -31,11 +31,11 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\handler as recording_handler;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use moodle_exception;
 
 /**
@@ -80,7 +80,7 @@ class update_recording extends external_api {
         int $bigbluebuttonbnid,
         string $recordingid,
         string $action,
-        $additionaloptions = null
+        string $additionaloptions = null
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
@@ -120,8 +120,9 @@ class update_recording extends external_api {
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        $handler = new handler($bigbluebuttonbn);
-        $recordings = $handler->get_recordings_for_view(
+        $bigbluebuttonbn = $bbbsession['bigbluebuttonbn'];
+        $recordinghandler = new recording_handler($bigbluebuttonbn);
+        $recordings = $recordinghandler->get_recordings_for_view(
             $enabledfeatures['showroom'],
             $bigbluebuttonbn->recordings_deleted,
             $enabledfeatures['importrecordings']
@@ -133,7 +134,12 @@ class update_recording extends external_api {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
         } else {
-            recording::recording_import($bbbsession, $recordingid, $additionaloptions);
+            // TODO: Not importing yet
+            error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> importing recording");
+            error_log(json_encode($recordingid));
+            error_log(json_encode($additionaloptions));
+            //recording::recording_import($bbbsession, $recordingid, $additionaloptions);
+            //$recordings = self::read_by(['recordingid' => $recordingid ]);
         }
 
         return [];

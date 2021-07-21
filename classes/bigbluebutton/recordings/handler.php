@@ -21,6 +21,7 @@
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
 
 namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
@@ -187,7 +188,7 @@ class handler {
      *
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
-    private function fetch_recordings($recordingids = []) {
+    public function fetch_recordings($recordingids = []) {
         // Normalize recordingids to array.
         if (!is_array($recordingids)) {
             $recordingids = explode(',', $recordingids);
@@ -357,6 +358,7 @@ class handler {
      * @return array
      */
     public function unset_existent_imported_recordings($recordings, $courseid, $bigbluebuttonbnid) {
+        global $DB;
         // Retrieve DB imported recordings.
         $select = $this->sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid, true);
         $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
