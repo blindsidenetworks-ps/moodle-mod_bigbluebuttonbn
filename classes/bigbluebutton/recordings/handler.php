@@ -27,7 +27,7 @@
 namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
 
 use stdClass;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\base as recording_base;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 
 defined('MOODLE_INTERNAL') || die();
@@ -116,7 +116,7 @@ class handler {
      * mod_bigbluebuttonbn/bigbluebutton/recordings/recording object which contains a non sequential array itself ($xml)
      * that corresponds to the actual recording in BBB.
      */
-    public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
+    public function get_recordings1($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
         $includedeleted = false, $includeimported = false) {
         global $DB;
         // Retrieve DB recordings.
@@ -133,9 +133,58 @@ class handler {
                 $bbbrecording = $bbbrecordings[$dbrecording->recordingid];
                 if (!$dbrecording->imported) {
                     $dbrecording->recording = $bbbrecording;
+                    error_log(">>>>>>>>>>>>>>>>>>>>>>");
+                    error_log(gettype($bbbrecording));
+                    error_log(json_encode($bbbrecording));
+                } else if (empty($dbrecording->recording)) {
+                    continue;
+                } else {
+                    error_log("----------------------");
+                    $dbrecording->recording = json_decode($dbrecording->recording, true);
+                    error_log(gettype($dbrecording->recording));
+                    error_log(json_encode($bbbrecording));
                 }
                 $recordings[$dbrecording->recordingid] = $dbrecording;
             }
+        }
+        return $recordings;
+    }
+
+
+    public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
+        $includedeleted = false, $includeimported = false) {
+        global $DB;
+        // Retrieve DB recordings.
+        $select = $this->sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted, $includeimported);
+        $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
+        // Fetch BBB recordings.
+        $recordingsids = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
+        $bbbrecordings = $this->fetch_recordings(array_values($recordingsids));
+
+        /* Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
+         * the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
+         */
+        $recordings = array();
+        foreach ($dbrecordings as $id => $dbrecording) {
+            $recordingid = $dbrecording->recordingid;
+            // If there is not a BBB recording assiciated, continue.
+            if (!isset($bbbrecordings[$recordingid])) {
+                continue;
+            }
+            // Always assign the recording value fetched from BBB.
+            $dbrecording->recording = $bbbrecordings[$recordingid];
+            // But if the recording was imported, override the metadata with the value stored in the database.
+            if ($dbrecording->imported) {
+                $importedrecording = json_decode($dbrecording->recording, true);
+                foreach($importedrecording as $varname => $value) {
+                    $varnames = explode('_', $varname);
+                    if ($varnames[0] == 'meta' ) {
+                        $dbrecording->recording[$varname] = $value;
+                    }
+                }
+            }
+            // Finally, add the dbrecording to the indexed array to be returned.
+            $recordings[$recordingid] = $dbrecording;
         }
         return $recordings;
     }
@@ -232,7 +281,7 @@ class handler {
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = $this->parse_recording($recordingxml);
+                $recording = recording::parse_recording($recordingxml);
                 $recordings[$recording['recordID']] = $recording;
 
                 // Check if there is childs.
@@ -246,8 +295,7 @@ class handler {
                         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
                             // If there were meetings already created.
                             foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording =
-                                    $this->parse_recording($recordingxml);
+                                $recording = recording::parse_recording($recordingxml);
                                 $recordings[$recording['recordID']] = $recording;
                             }
                         }
@@ -259,75 +307,6 @@ class handler {
     }
 
     /**
-     * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
-     *
-     * @param object $recording
-     *
-     * @return array
-     */
-    private function parse_recording($recording) {
-        // Add formats.
-        $playbackarray = array();
-        foreach ($recording->playback->format as $format) {
-            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
-                'url' => trim((string) $format->url), 'length' => (string) $format->length);
-            // Add preview per format when existing.
-            if ($format->preview) {
-                $playbackarray[(string) $format->type]['preview'] =
-                    $this->parse_preview_images($format->preview);
-            }
-        }
-        // Add the metadata to the recordings array.
-        $metadataarray =
-            $this->parse_recording_meta(get_object_vars($recording->metadata));
-        $recordingarray = array('recordID' => (string) $recording->recordID,
-            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
-            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
-        if (isset($recording->protected)) {
-            $recordingarray['protected'] = (string) $recording->protected;
-        }
-        return $recordingarray + $metadataarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
-     *
-     * @param array $metadata
-     *
-     * @return array
-     */
-    private function parse_recording_meta($metadata) {
-        $metadataarray = array();
-        foreach ($metadata as $key => $value) {
-            if (is_object($value)) {
-                $value = '';
-            }
-            $metadataarray['meta_' . $key] = $value;
-        }
-        return $metadataarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
-     *
-     * @param object $preview
-     *
-     * @return array
-     */
-    private function parse_preview_images($preview) {
-        $imagesarray = array();
-        foreach ($preview->images->image as $image) {
-            $imagearray = array('url' => trim((string) $image));
-            foreach ($image->attributes() as $attkey => $attvalue) {
-                $imagearray[$attkey] = (string) $attvalue;
-            }
-            array_push($imagesarray, $imagearray);
-        }
-        return $imagesarray;
-    }
-
-        /**
      * Helper function to sort an array of recordings. It compares the startTime in two recording objecs.
      *
      * @param object $a

@@ -26,6 +26,10 @@
 namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
 
 use stdClass;
+use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\config;
+
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -63,25 +67,26 @@ class recording {
     /**
      * CRUD create.
      *
-     * @param string $recordingid
      * @param stdClass $dataobject
      * 
      * @return bool|int true or new id
      */
-    public function create() {
+    public static function create($dataobject) {
         global $DB;
         $r = new stdClass();
         // Default values.
-        $r->courseid = $this->courseid;
-        $r->bigbluebuttonbnid = $this->bigbluebuttonbnid;
+        $r->courseid = $dataobject->courseid;
+        $r->bigbluebuttonbnid = $dataobject->bigbluebuttonbnid;
         $r->timecreated = time();
-        $r->recordingid = $this->recordingid;
-        $r->meetingid = $this->meetingid;
+        $r->recordingid = $dataobject->recordingid;
+        $r->meetingid = $dataobject->meetingid;
+        $r->headless = $dataobject->headless;
+        $r->imported = $dataobject->imported;
+        $r->recording = $dataobject->recording;
         $rid = $DB->insert_record('bigbluebuttonbn_recordings', $r);
         if (!$rid) {
             return false;
         }
-        $this->id = $rid;
         return $rid;
     }
 
@@ -95,9 +100,12 @@ class recording {
     public static function read($id) {
         global $DB;
         $dbrecording = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id], '*', MUST_EXIST);
-        $recording = new stdClass();
+        if (!$dbrecording) {
+            $dbrecordings = new stdClass();
+        }
+        $recording = $dbrecording;
         if (!$dbrecording->imported) {
-            $bbbrecording = self::fetch([$dbrecording->recordingid]);
+            $bbbrecording = self::fetch_one($dbrecording->recordingid);
             $recording->recording = $bbbrecording;
         }
         return $recording;
@@ -123,14 +131,37 @@ class recording {
         }
         $recordings = array();
         foreach ($dbrecordings as $dbrecording) {
-            $recording = new stdClass();
+            $recording = $dbrecording;
             if (!$dbrecording->imported) {
-                $bbbrecording = self::fetch([$dbrecording->recordingid]);
+                $bbbrecording = self::fetch_one($dbrecording->recordingid);
                 $recording->recording = $bbbrecording;
             }
             $recordings[] = $recording;
         }
         return $recordings;
+    }
+
+    /**
+     * Helper function to fetch one recording from a BigBlueButton server.
+     *
+     * @param string $rid
+     *
+     * @return array one bigbluebuttonbn_recording records.
+     */
+    public static function fetch_one($rid) {
+        $recordings = array();
+        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
+        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => $rid]);
+        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
+        debugging('getRecordingsURL: ' . $url);
+        debugging('recordIDs: ' . json_encode($rids));
+        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+            // If there were meetings already created.
+            foreach ($xml->recordings->recording as $recordingxml) {
+                $recording = self::parse_recording($recordingxml);
+            }
+        }
+        return $recording;
     }
 
     /**
@@ -140,7 +171,7 @@ class recording {
      *
      * @return array one or many bigbluebuttonbn_recordings records.
      */
-    public static function fetch($rids) {
+    public static function fetch_many($rids) {
         $recordings = array();
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
@@ -150,7 +181,7 @@ class recording {
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = $this->parse_recording($recordingxml);
+                $recording = self::parse_recording($recordingxml);
                 $recordings[$recording['recordID']] = $recording;
 
                 // Check if there is childs.
@@ -165,7 +196,7 @@ class recording {
                             // If there were meetings already created.
                             foreach ($xml->recordings->recording as $recordingxml) {
                                 $recording =
-                                    $this->parse_recording($recordingxml);
+                                    self::parse_recording($recordingxml);
                                 $recordings[$recording['recordID']] = $recording;
                             }
                         }
@@ -184,7 +215,7 @@ class recording {
      * 
      * @return bool true
      */
-    public function update($dataobject) {
+    public static function update($dataobject) {
         global $DB;
         $dataobject->id = $this->id;
         return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
@@ -197,20 +228,99 @@ class recording {
      * 
      * @return bool true
      */
-    public function delete() {
+    public static function delete() {
         return $DB->delete_record('bigbluebuttonbn_recordings', ['id' => $this->id]);
     }
 
 
-    public function to_array() {
-        return array(
-            'id' => $this->id,
-            'courseid' => $this->courseid,
-            'bigbluebuttonbnid' => $this->bigbluebuttonbnid,
-            'recordingid' => $this->recordingid,
-            'meetingid' => $this->meetingid,
-            'recording' => $this->recording
-        );
+    /**
+     * Helper convert bigbluebuttonbn_recordings row to array
+     *
+     * @param stdClass $dataobject
+     * 
+     * @return array
+     */
+    public static function to_array($dataobject) {
+        return get_object_vars($dataobject);
     }
 
+    /**
+     * Helper convert bigbluebuttonbn_recordings row to array
+     *
+     * @param stdClass $dataobject
+     * 
+     * @return array
+     */
+    public static function to_json($dataobject) {
+        return json_encode(self::to_array($dataobject));
+    }
+
+    /**
+     * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
+     *
+     * @param object $recording
+     *
+     * @return array
+     */
+    public static function parse_recording($recording) {
+        // Add formats.
+        $playbackarray = array();
+        foreach ($recording->playback->format as $format) {
+            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
+                'url' => trim((string) $format->url), 'length' => (string) $format->length);
+            // Add preview per format when existing.
+            if ($format->preview) {
+                $playbackarray[(string) $format->type]['preview'] =
+                    self::parse_preview_images($format->preview);
+            }
+        }
+        // Add the metadata to the recordings array.
+        $metadataarray =
+            self::parse_recording_meta(get_object_vars($recording->metadata));
+        $recordingarray = array('recordID' => (string) $recording->recordID,
+            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
+            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
+            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
+        if (isset($recording->protected)) {
+            $recordingarray['protected'] = (string) $recording->protected;
+        }
+        return $recordingarray + $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
+     *
+     * @param array $metadata
+     *
+     * @return array
+     */
+    public static function parse_recording_meta($metadata) {
+        $metadataarray = array();
+        foreach ($metadata as $key => $value) {
+            if (is_object($value)) {
+                $value = '';
+            }
+            $metadataarray['meta_' . $key] = $value;
+        }
+        return $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
+     *
+     * @param object $preview
+     *
+     * @return array
+     */
+    public static function parse_preview_images($preview) {
+        $imagesarray = array();
+        foreach ($preview->images->image as $image) {
+            $imagearray = array('url' => trim((string) $image));
+            foreach ($image->attributes() as $attkey => $attvalue) {
+                $imagearray[$attkey] = (string) $attvalue;
+            }
+            array_push($imagesarray, $imagearray);
+        }
+        return $imagesarray;
+    }
 }

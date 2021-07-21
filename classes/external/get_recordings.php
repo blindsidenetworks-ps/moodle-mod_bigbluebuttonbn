@@ -139,7 +139,7 @@ class get_recordings extends external_api {
 
         // Build table content.
         foreach ($recordings as $recording) {
-            $rowdata = recording_data::row($bbbsession, $recording->recording, $tools);
+            $rowdata = recording_data::row($bbbsession, $recording, $tools);
             if (!empty($rowdata)) {
                 $data[] = $rowdata;
             }

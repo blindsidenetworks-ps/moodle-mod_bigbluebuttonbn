@@ -116,33 +116,34 @@ class data {
     /**
      * Helper function builds recording actionbar used in row for the data used by the recording table.
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $tools
      *
      * @return string
      */
-    public static function row_actionbar($recording, $tools) {
+    public static function row_actionbar($rec, $tools) {
         $actionbar = '';
         foreach ($tools as $tool) {
             $buttonpayload =
-                self::row_actionbar_payload($recording, $tool);
+                self::row_actionbar_payload($rec->recording, $tool);
             if ($tool == 'protect') {
-                if (isset($recording['imported'])) {
+                if (isset($rec->recording['imported'])) {
                     $buttonpayload['disabled'] = 'disabled';
                 }
-                if (!isset($recording['protected'])) {
+                if (!isset($rec->recording['protected'])) {
                     $buttonpayload['disabled'] = 'invisible';
                 }
             }
             if ($tool == 'delete') {
                 $buttonpayload['requireconfirmation'] = true;
             }
-            $actionbar .= view::bigbluebuttonbn_actionbar_render_button($recording, $buttonpayload);
+            $actionbar .= view::bigbluebuttonbn_actionbar_render_button($rec->recording, $buttonpayload);
         }
         $head = html_writer::start_tag('div', array(
-            'id' => 'recording-actionbar-' . $recording['recordID'],
-            'data-recordingid' => $recording['recordID'],
-            'data-additionaloptions' => $recording['meetingID']));
+            'id' => 'recording-actionbar-' . $rec->recording['recordID'],
+            'data-recid' => $rec->id,
+            'data-recordingid' => $rec->recording['recordID'],
+            'data-additionaloptions' => $rec->recording['meetingID']));
         $tail = html_writer::end_tag('div');
         return $head . $actionbar . $tail;
     }
@@ -261,29 +262,28 @@ class data {
     /**
      * Helper function renders recording types to be used in row for the data used by the recording table.
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row 
      * @param array $bbbsession
      *
      * @return string
      */
-    public static function row_types($recording, $bbbsession) {
+    public static function row_types($rec, $bbbsession) {
         $dataimported = 'false';
         $title = '';
-        if (isset($recording['imported'])) {
+        if (isset($rec->recording['imported'])) {
             $dataimported = 'true';
             $title = get_string('view_recording_link_warning', 'bigbluebuttonbn');
         }
         $visibility = '';
-        if ($recording['published'] === 'false') {
+        if ($rec->recording['published'] === 'false') {
             $visibility = 'hidden ';
         }
-        $id = 'playbacks-' . $recording['recordID'];
-        $recordingtypes = html_writer::start_tag('div', array('id' => $id, 'data-imported' => $dataimported,
-            'data-additionaloptions' => $recording['meetingID'], 'data-recordingid' => $recording['recordID'],
-            'title' => $title, $visibility => $visibility));
-        foreach ($recording['playbacks'] as $playback) {
-            $recordingtypes .= self::row_type($recording,
-                $bbbsession, $playback);
+        $id = 'playbacks-' . $rec->recording['recordID'];
+        $recordingtypes = html_writer::start_tag('div', array('id' => $id, 'data-recid' => $rec->id,
+            'data-imported' => $dataimported, 'data-additionaloptions' => $rec->recording['meetingID'],
+            'data-recordingid' => $rec->recording['recordID'], 'title' => $title, $visibility => $visibility));
+        foreach ($rec->recording['playbacks'] as $playback) {
+            $recordingtypes .= self::row_type($rec, $bbbsession, $playback);
         }
         $recordingtypes .= html_writer::end_tag('div');
         return $recordingtypes;
@@ -292,25 +292,25 @@ class data {
     /**
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row 
      * @param array $bbbsession
      * @param array $playback
      *
      * @return string
      */
-    public static function row_type($recording, $bbbsession, $playback) {
+    public static function row_type($rec, $bbbsession, $playback) {
         global $CFG, $OUTPUT;
-        if (!self::include_recording_data_row_type($recording, $bbbsession, $playback)) {
+        if (!self::include_recording_data_row_type($rec->recording, $bbbsession, $playback)) {
             return '';
         }
         $text = self::type_text($playback['type']);
         $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
-            '&mid=' . $recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
-        if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
+            '&mid=' . $rec->recording['meetingID'] . '&rid=' . $rec->recording['recordID'] . '&rtype=' . $playback['type'];
+        if (!isset($rec->recording['imported']) || !isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));
         }
         $linkattributes = array(
-            'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
+            'id' => 'recording-play-' . $playback['type'] . '-' . $rec->recording['recordID'],
             'class' => 'btn btn-sm btn-default',
             'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
             'data-action' => 'play',
@@ -438,42 +438,42 @@ class data {
      * Helper function builds a row for the data used by the recording table.
      *
      * @param array $bbbsession
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $tools
      *
      * @return array
      */
-    public static function row($bbbsession, $recording,
+    public static function row($bbbsession, $rec,
         $tools = ['protect', 'publish', 'delete']) {
         global $OUTPUT, $PAGE;
-        if (!self::include_recording_table_row($bbbsession, $recording)) {
+        if (!self::include_recording_table_row($bbbsession, $rec)) {
             return;
         }
         $rowdata = new stdClass();
         // Set recording_types.
-        $rowdata->playback = self::row_types($recording, $bbbsession);
+        $rowdata->playback = self::row_types($rec, $bbbsession);
         // Set activity name.
-        $recordingname = new recording_name_editable($recording, $bbbsession);
+        $recordingname = new recording_name_editable($rec->recording, $bbbsession);
         $rowdata->recording = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingname->export_for_template($OUTPUT));
         // Set activity description.
-        $recordingdescription = new recording_description_editable($recording, $bbbsession);
+        $recordingdescription = new recording_description_editable($rec->recording, $bbbsession);
         $rowdata->description = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingdescription->export_for_template($OUTPUT));
 
         if (self::preview_enabled($bbbsession)) {
             // Set recording_preview.
-            $rowdata->preview = self::row_preview($recording);
+            $rowdata->preview = self::row_preview($rec->recording);
         }
         // Set date.
-        $rowdata->date = self::row_date($recording);
+        $rowdata->date = self::row_date($rec->recording);
         // Set formatted date.
         $rowdata->date_formatted = self::row_date_formatted($rowdata->date);
         // Set formatted duration.
-        $rowdata->duration_formatted = $rowdata->duration = self::row_duration($recording);
+        $rowdata->duration_formatted = $rowdata->duration = self::row_duration($rec->recording);
         // Set actionbar, if user is allowed to manage recordings.
         if ($bbbsession['managerecordings']) {
-            $rowdata->actionbar = self::row_actionbar($recording, $tools);
+            $rowdata->actionbar = self::row_actionbar($rec, $tools);
         }
         return $rowdata;
     }
@@ -482,17 +482,17 @@ class data {
      * Helper function evaluates if recording row should be included in the table.
      *
      * @param array $bbbsession
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      *
      * @return boolean
      */
-    public static function include_recording_table_row($bbbsession, $recording) {
+    public static function include_recording_table_row($bbbsession, $rec) {
         // Exclude unpublished recordings, only if user has no rights to manage them.
-        if ($recording['published'] != 'true' && !$bbbsession['managerecordings']) {
+        if ($rec->recording['published'] != 'true' && !$bbbsession['managerecordings']) {
             return false;
         }
         // Imported recordings are always shown as long as they are published.
-        if (isset($recording['imported'])) {
+        if (isset($rec->recording['imported'])) {
             return true;
         }
         // Administrators and moderators are always allowed.
@@ -500,7 +500,7 @@ class data {
             return true;
         }
         // When groups are enabled, exclude those to which the user doesn't have access to.
-        if (isset($bbbsession['group']) && $recording['meetingID'] != $bbbsession['meetingid']) {
+        if (isset($bbbsession['group']) && $rec->recording['meetingID'] != $bbbsession['meetingid']) {
             return false;
         }
         return true;

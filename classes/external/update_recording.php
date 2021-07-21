@@ -57,7 +57,8 @@ class update_recording extends external_api {
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
             'recordingid' => new external_value(PARAM_ALPHANUMEXT, 'The bigbluebutton recording ID'),
             'action' => new external_value(PARAM_ALPHANUMEXT, 'The action to perform'),
-            'additionaloptions' => new external_value(PARAM_RAW, 'additional options', VALUE_OPTIONAL),
+            'recid' => new external_value(PARAM_RAW, 'The bigbluebuttonbn_recordings row id', VALUE_OPTIONAL),
+            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_OPTIONAL),
         ]);
     }
 
@@ -67,6 +68,7 @@ class update_recording extends external_api {
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param string $recordingid
      * @param string $action
+     * @param null $recid
      * @param null $additionaloptions
      * @return array (empty array for now)
      * @throws \coding_exception
@@ -80,6 +82,7 @@ class update_recording extends external_api {
         int $bigbluebuttonbnid,
         string $recordingid,
         string $action,
+        string $recid = null,
         string $additionaloptions = null
     ): array {
         // Validate the bigbluebuttonbnid ID.
@@ -87,11 +90,13 @@ class update_recording extends external_api {
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
+            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
+            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ]);
 
@@ -134,12 +139,14 @@ class update_recording extends external_api {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
         } else {
-            // TODO: Not importing yet
-            error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> importing recording");
-            error_log(json_encode($recordingid));
-            error_log(json_encode($additionaloptions));
-            //recording::recording_import($bbbsession, $recordingid, $additionaloptions);
-            //$recordings = self::read_by(['recordingid' => $recordingid ]);
+            $recording = recording::read($recid);
+            $recording->bigbluebuttonbnid = $bigbluebuttonbn->id;
+            $recording->courseid = $bigbluebuttonbn->course;
+            if (!$recording->imported) {
+                $recording->imported = true;
+                $recording->recording = json_encode($recording->recording);
+            }
+            recording::create($recording);
         }
 
         return [];
