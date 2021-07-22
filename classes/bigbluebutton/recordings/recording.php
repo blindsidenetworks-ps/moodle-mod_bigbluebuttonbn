@@ -116,7 +116,7 @@ class recording {
      *
      * @param array $attributes
      *
-     * @return stdClass|[stdClass] one or many bigbluebuttonbn_recordings records.
+     * @return [stdClass] one or many bigbluebuttonbn_recordings records indexed by recordingid.
      */
     public static function read_by($attributes) {
         global $DB;
@@ -136,9 +136,21 @@ class recording {
                 $bbbrecording = self::fetch_one($dbrecording->recordingid);
                 $recording->recording = $bbbrecording;
             }
-            $recordings[] = $recording;
+            $recordings[$recording->recordingid] = $recording;
         }
         return $recordings;
+    }
+
+    /**
+     * Helper function to count the imported recordings for a recordingid.
+     *
+     * @param array $attributes
+     *
+     * @return integer
+     */
+    public static function count_by($attributes) {
+        global $DB;
+        return $DB->count_records('bigbluebuttonbn_recordings', $attributes);
     }
 
     /**
@@ -153,8 +165,8 @@ class recording {
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => $rid]);
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('getRecordingsURL: ' . $url);
-        debugging('recordIDs: ' . json_encode($rids));
+        // debugging('getRecordingsURL: ' . $url);
+        // debugging('recordIDs: ' . json_encode($rids));
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
@@ -176,8 +188,8 @@ class recording {
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        debugging('getRecordingsURL: ' . $url);
-        debugging('recordIDs: ' . json_encode($rids));
+        //debugging('getRecordingsURL: ' . $url);
+        //debugging('recordIDs: ' . json_encode($rids));
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
@@ -210,15 +222,39 @@ class recording {
     /**
      * CRUD update.
      *
-     * @param string $recordingid
-     * @param stdClass $dataobject
+     * @param string $id
+     * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
      * 
      * @return bool true
      */
-    public static function update($dataobject) {
+    public static function update($id, $dataobject) {
         global $DB;
-        $dataobject->id = $this->id;
+        $dataobject->id = $id;
         return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
+    }
+
+    /**
+     *
+     * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
+     * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
+     *
+     * @return bool Success/Failure
+     */
+    public function update_by($attributes, $dataobject) {
+        global $DB;
+        $recordings = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
+        if (!$recordings) {
+            return false;
+        }
+        foreach ($recordings as $r) {
+            global $DB;
+            $dataobject->id = $r->id;
+            if(!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
+                // TODO: There should be a way to rollback if it fails after updating one or many of the recordings.
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -228,10 +264,22 @@ class recording {
      * 
      * @return bool true
      */
-    public static function delete() {
-        return $DB->delete_record('bigbluebuttonbn_recordings', ['id' => $this->id]);
+    public static function delete($recordingid) {
+        return $DB->delete_record('bigbluebuttonbn_recordings', ['id' => $recordingid]);
     }
 
+    /**
+     *
+     * CRUD delete by indicated attributes.
+     * 
+     * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
+     *
+     * @return bool Success/Failure
+     */
+    public static function delete_by($attributes) {
+        global $DB;
+        return $DB->delete_records('bigbluebuttonbn_recordings', $attributes);
+    }
 
     /**
      * Helper convert bigbluebuttonbn_recordings row to array

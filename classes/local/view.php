@@ -28,9 +28,9 @@ namespace mod_bigbluebuttonbn\local;
 use context_module;
 use core_renderer;
 use html_writer;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\external\meeting_info;
 use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\output\recordings_session;
 use mod_bigbluebuttonbn\plugin;
 use pix_icon;
@@ -432,8 +432,11 @@ class view {
                 'data-require-confirmation' => !empty($data['requireconfirmation']),
             );
             if (!isset($recording['imported'])) {
-                $linkattributes['data-links'] = recording::bigbluebuttonbn_count_recording_imported_instances(
-                    $recording['recordID']
+                $linkattributes['data-links'] = recording::count_by(
+                    [
+                        'recordingid' => $recording['recordID'],
+                        'imported' => true,
+                    ]
                 );
             }
             if (isset($data['disabled'])) {

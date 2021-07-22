@@ -28,9 +28,9 @@ namespace mod_bigbluebuttonbn\output;
 use lang_string;
 use moodle_exception;
 use core\output\inplace_editable;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\handler;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\local\helpers\recording as recording_broker;
 
 /**
  * Renderer for recording in place editable.
@@ -119,9 +119,8 @@ abstract class recording_editable extends \core\output\inplace_editable {
         list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
         // Retrieve a bigbluebuttonbn instance from the target $bbbid and instantiate a handler.
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bbbid), '*', MUST_EXIST);
-        $recording_handler = new handler($bigbluebuttonbn);
         // Fetch the recordings for the given recordingid.
-        $recordings = $recording_handler->fetch_recordings([$recordingid]);
+        $recordings = recording_proxy::bigbluebutton_fetch_recordings([$recordingid]);
         if (!empty($recordings)) {
             return reset($recordings);
         }
@@ -143,7 +142,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
         if ($recording['imported']) {
             // Execute update on imported recording link.
             return array(
-                'status' => recording::bigbluebuttonbn_update_recording_imported(
+                'status' => recording_proxy::bigbluebutton_update_recording_imported(
                     $recording['imported'],
                     $meta
                 )
@@ -154,7 +153,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
         // (No need to update imported links as the update only affects the actual recording).
         // Execute update on actual recording.
         return array(
-            'status' => recording::bigbluebuttonbn_update_recordings(
+            'status' => recording_broker::bigbluebutton_update_recordings(
                 $recording['recordID'],
                 $meta
             )

@@ -50,7 +50,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class data {
+class recording_data {
     
     /**
      * Helper function converts recording date used in row for the data used by the recording table.

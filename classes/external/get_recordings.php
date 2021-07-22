@@ -35,8 +35,8 @@ use external_single_structure;
 use external_value;
 use external_warnings;
 use invalid_parameter_exception;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\data as recording_data;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\handler as recording_handler;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_data;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\config;
@@ -112,15 +112,16 @@ class get_recordings extends external_api {
 
         // Fetch the list of recordings.
         $bigbluebuttonbn = $bbbsession['bigbluebuttonbn'];
-        $recordinghandler = new recording_handler($bigbluebuttonbn);
-        $recordings = $recordinghandler->get_recordings_for_view(
+        $recordings = recording_helper::get_recordings(
+            $bigbluebuttonbn->course,
+            $bigbluebuttonbn->id,
             $enabledfeatures['showroom'],
             $bigbluebuttonbn->recordings_deleted,
             $enabledfeatures['importrecordings']
         );
 
         if ($removeimportedid) {
-            $recordings = $recordinghandler->unset_existent_imported_recordings(
+            $recordings = recording_helper::unset_existent_imported_recordings(
                 $recordings,
                 $bigbluebuttonbn->course,
                 $removeimportedid);
