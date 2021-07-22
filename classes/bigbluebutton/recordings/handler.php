@@ -175,7 +175,7 @@ class handler {
             $dbrecording->recording = $bbbrecordings[$recordingid];
             // But if the recording was imported, override the metadata with the value stored in the database.
             if ($dbrecording->imported) {
-                $importedrecording = json_decode($dbrecording->recording, true);
+                $importedrecording = $dbrecording->recording;
                 foreach($importedrecording as $varname => $value) {
                     $varnames = explode('_', $varname);
                     if ($varnames[0] == 'meta' ) {
@@ -330,7 +330,7 @@ class handler {
     /**
      * Helper function iterates an array with recordings and unset those already imported.
      *
-     * @param array $recordings
+     * @param array $recordings the source recordings.
      * @param integer $courseid
      * @param integer $bigbluebuttonbnid
      *
@@ -348,7 +348,7 @@ class handler {
         }
         // Unset from $recordings if recording is already imported.
         foreach ($recordings as $recordingid => $recording) {
-            if (isset($recordingsimported[$recordingid])) {
+            if (isset($importedrecordings[$recordingid])) {
                 unset($recordings[$recordingid]);
             }
         }

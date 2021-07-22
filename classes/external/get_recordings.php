@@ -62,15 +62,15 @@ class get_recordings extends external_api {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
             'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
-            'tools' => new external_value(PARAM_RAW, 'a set of enablec tools', VALUE_OPTIONAL),
+            'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_OPTIONAL),
         ]);
     }
 
     /**
      * Get a list of recordings
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param int $removeimportedid the removeimportedid instance id
+     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id to which the recordings are referred.
+     * @param int $removeimportedid the bigbluebuttonbn instance id where recordings have been already imported.
      * @param string $tools
      * @return array of warnings and status result
      * @throws \coding_exception
