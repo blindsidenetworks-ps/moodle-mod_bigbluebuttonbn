@@ -453,11 +453,11 @@ class recording_data {
         // Set recording_types.
         $rowdata->playback = self::row_types($rec, $bbbsession);
         // Set activity name.
-        $recordingname = new recording_name_editable($rec->recording, $bbbsession);
+        $recordingname = new recording_name_editable($rec, $bbbsession);
         $rowdata->recording = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingname->export_for_template($OUTPUT));
         // Set activity description.
-        $recordingdescription = new recording_description_editable($rec->recording, $bbbsession);
+        $recordingdescription = new recording_description_editable($rec, $bbbsession);
         $rowdata->description = $PAGE->get_renderer('core')
             ->render_from_template('core/inplace_editable', $recordingdescription->export_for_template($OUTPUT));
 

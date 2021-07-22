@@ -102,51 +102,6 @@ class recording_proxy {
     }
 
     /**
-     * Protect/Unprotect an imported recording.
-     *
-     * @param string $id
-     * @param boolean $protect
-     *
-     * @return boolean
-     */
-    public static function bigbluebutton_protect_recording_imported($id, $protect = true) {
-        global $DB;
-        // Locate the record to be updated.
-        $record = $DB->get_record('bigbluebuttonbn_logs', array('id' => $id));
-        $meta = json_decode($record->meta, true);
-        // Prepare data for the update.
-        $meta['recording']['protected'] = ($protect) ? 'true' : 'false';
-        $record->meta = json_encode($meta);
-        // Proceed with the update.
-        $DB->update_record('bigbluebuttonbn_logs', $record);
-        return true;
-    }
-
-    /**
-     * Update an imported recording.
-     *
-     * @param string $id
-     * @param array $params ['key'=>param_key, 'value']
-     *
-     * @return boolean
-     */
-    public static function bigbluebutton_update_recording_imported($id, $params) {
-        global $DB;
-        // Locate the record to be updated.
-        // TODO: rework this routine completely (use object/array instead of json data).
-        $record = $DB->get_record('bigbluebuttonbn_logs', array('id' => $id));
-        $meta = json_decode($record->meta, true);
-        // Prepare data for the update.
-        $meta['recording'] = $params + $meta['recording'];
-        $record->meta = json_encode($meta);
-        // Proceed with the update.
-        if (!$DB->update_record('bigbluebuttonbn_logs', $record)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Helper function to fetch recordings from a BigBlueButton server.
      *
      * @param string|array $recordingids list of $recordingids "rid1,rid2,rid3" or array("rid1","rid2","rid3")

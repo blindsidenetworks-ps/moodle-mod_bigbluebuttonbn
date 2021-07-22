@@ -28,9 +28,9 @@ namespace mod_bigbluebuttonbn\output;
 use lang_string;
 use moodle_exception;
 use core\output\inplace_editable;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\recording as recording_broker;
 
 /**
  * Renderer for recording in place editable.
@@ -46,19 +46,21 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Constructor.
      *
-     * @param array $recording
+     * @param array $rec
      * @param array $bbbsession
      * @throws \moodle_exception
      */
-    public function __construct($recording, $bbbsession) {
+    public function __construct($rec, $bbbsession) {
+        error_log(gettype($rec));
+        error_log(json_encode($rec));
         $editable = static::check_capability($bbbsession);
         $displayvalue =
-            format_string($this->get_recording_value($recording, $bbbsession)
-                , true, array('context' => \context_module::instance($bbbsession['cm']->id)));
+            format_string($this->get_recording_value($rec, $bbbsession), 
+                true, array('context' => \context_module::instance($bbbsession['cm']->id)));
 
         // Hack here: the ID is the recordID and the meeting ID.
         parent::__construct('mod_bigbluebuttonbn', static::get_type(),
-            $recording['recordID'] . ',' . $recording['meetingID'], $editable,
+            $rec->id . ',' . $rec->recording['recordID'] . ',' . $rec->recording['meetingID'], $editable,
             $displayvalue, $displayvalue);
     }
 
@@ -103,47 +105,27 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return array
      */
     public static function get_info_fromid($itemid) {
-        list($recordingid, $meetingid) = explode(',', $itemid);
-        list($meeting, $courseid, $bbbid)  = explode('-', $meetingid);
-        return [$recordingid, $meetingid, $courseid, $bbbid];
-    }
-
-    /**
-     * Get recording from the recording ID / Meeting ID
-     *
-     * @param string $itemid
-     * @return false|mixed matching recording
-     */
-    public static function get_recording($itemid) {
-        global $DB;
-        list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
-        // Retrieve a bigbluebuttonbn instance from the target $bbbid and instantiate a handler.
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bbbid), '*', MUST_EXIST);
-        // Fetch the recordings for the given recordingid.
-        $recordings = recording_proxy::bigbluebutton_fetch_recordings([$recordingid]);
-        if (!empty($recordings)) {
-            return reset($recordings);
-        }
-        return false;
+        list($recid, $recordingid, $meetingid) = explode(',', $itemid);
+        return [$recid, $recordingid, $meetingid];
     }
 
     /**
      * Edit recording
      *
-     * @param array $recording
+     * @param array $rec
      * @param string $metainfoname
      * @param mixed $value
      * @return array
      */
-    public static function edit_recording($recording, $metainfoname, $value) {
+    public static function edit_recording($rec, $metainfoname, $value) {
         // Here we use something similar to the broker.
         // TODO: remove the broker and use some sort of interface.
         $meta = [$metainfoname => $value];
-        if ($recording['imported']) {
+        if ($rec->imported) {
             // Execute update on imported recording link.
             return array(
                 'status' => recording_proxy::bigbluebutton_update_recording_imported(
-                    $recording['imported'],
+                    $rec->imported,
                     $meta
                 )
             );
@@ -153,8 +135,8 @@ abstract class recording_editable extends \core\output\inplace_editable {
         // (No need to update imported links as the update only affects the actual recording).
         // Execute update on actual recording.
         return array(
-            'status' => recording_broker::bigbluebutton_update_recordings(
-                $recording['recordID'],
+            'status' => recording_proxy::bigbluebutton_update_recordings(
+                $rec->recordingid,
                 $meta
             )
         );
@@ -168,21 +150,20 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return recording_editable
      */
     public static function update($itemid, $value) {
-        list($recordingid, $meetingid, $courseid, $bbbid) = static::get_info_fromid($itemid);
+        list($recid, $recordingid, $meetingid) = static::get_info_fromid($itemid);
+        $rec = recording::read($recid);
         [
             'bbbsession' => $bbbsession,
             'context' => $context,
             'enabledfeatures' => $enabledfeatures,
             'typeprofiles' => $typeprofiles,
-        ] = instance::get_session_from_id($bbbid);
+        ] = instance::get_session_from_id($rec->bigbluebuttonbnid);
         require_login($bbbsession['course']);
-        $recording = static::get_recording($itemid);
-
-        $success = static::edit_recording($recording, static::get_type(), $value);
+        $success = static::edit_recording($rec, static::get_type(), $value);
         // Refresh recording.
         // TODO: we need to reduce the number of calls to the server.
-        $recording = static::get_recording($itemid);
-        return new static($recording, $bbbsession);
+        $rec = recording::read($recid);
+        return new static($rec, $bbbsession);
     }
 
     /**

@@ -39,12 +39,12 @@ class recording_name_editable extends recording_editable {
     /**
      * Get the value to display
      *
-     * @param array $recording
+     * @param array $rec
      * @param array $bbbsession
      * @return string
      */
-    public function get_recording_value($recording, $bbbsession) {
-        return recording_data::row_meta_activity($recording, $bbbsession);
+    public function get_recording_value($rec, $bbbsession) {
+        return recording_data::row_meta_activity($rec->recording, $bbbsession);
     }
 
     /**
