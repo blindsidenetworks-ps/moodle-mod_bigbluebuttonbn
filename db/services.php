@@ -92,4 +92,12 @@ $functions = array(
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
     ),
+    'mod_bigbluebutton_opencast_recording_list_table' => array(
+        'classname'     => 'mod_bigbluebuttonbn\external\get_opencast_recordings',
+        'methodname'    => 'execute',
+        'description'   => 'Returns a list of Opencast recordings ready to be processed by a datatable.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
+    ),
 );

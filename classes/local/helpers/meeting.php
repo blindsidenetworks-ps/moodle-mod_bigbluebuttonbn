@@ -31,6 +31,7 @@ use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\plugin;
 use stdClass;
+use mod_bigbluebuttonbn\local\helpers\opencast;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -233,6 +234,16 @@ class meeting {
         }
         if ((boolean) config::get('meetingevents_enabled')) {
             $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
+        }
+        // If block_opencast is installed and the option to send the Opencast series ID to BBB is enabled,
+        // pass the Opencast series ID of the course as opencast-dc-isPartOf within the BBB metadata.
+        // Additionally, in order to identify and get the BBB recording on opencast, $bbbsession['meetingid'] as opencast-dc-subject metadata will be sent.
+        if ((boolean) config::get('opencast_recording')) {
+            $ocseriesid = opencast::bigbluebuttonbn_check_opencast($bbbsession['course']->id);
+            if ($ocseriesid != false) {
+                $metadata['opencast-dc-isPartOf'] = $ocseriesid;
+                $metadata['opencast-dc-subject'] = $bbbsession['meetingid'];
+            }
         }
         return $metadata;
     }

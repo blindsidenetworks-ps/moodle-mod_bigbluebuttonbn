@@ -42,6 +42,8 @@ $bbbsettings->bigbluebuttonbn_settings_record();
 $bbbsettings->bigbluebuttonbn_settings_importrecordings();
 // Renders settings for showing recordings.
 $bbbsettings->bigbluebuttonbn_settings_showrecordings();
+// Renders settings for Opencast integration.
+$bbbsettings->bigbluebuttonbn_settings_opencast_integration();
 
 // Renders settings for meetings.
 $bbbsettings->bigbluebuttonbn_settings_waitmoderator();

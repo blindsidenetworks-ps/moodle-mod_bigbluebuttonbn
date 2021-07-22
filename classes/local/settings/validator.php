@@ -26,6 +26,7 @@
 namespace mod_bigbluebuttonbn\local\settings;
 
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\helpers\opencast;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/adminlib.php');
@@ -278,5 +279,16 @@ class validator {
         global $CFG;
         return (!isset($CFG->bigbluebuttonbn['lockonjoinconfigurable_default']) ||
             !isset($CFG->bigbluebuttonbn['lockonjoinconfigurable_editable']));
+    }
+
+    /**
+     * Validate if opencast section will be shown.
+     * It uses the opencast::bigbluebuttonbn_check_opencast() without courseid, in order to check only if block_opencast is installed.
+     *
+     * @return boolean
+     */
+    public static function section_opencast_shown() {
+        //if the block_opencast is installed.
+        return opencast::bigbluebuttonbn_check_opencast();
     }
 }

@@ -1076,4 +1076,44 @@ class settings {
         }
         $this->admin->add($this->section, $experimentalfeaturessetting);
     }
+
+    /**
+     * Helper function renders Opencast integration settings if block_opencast is installed.
+     *
+     *
+     * @return void
+     */
+    function bigbluebuttonbn_settings_opencast_integration() {
+        // Configuration for 'Opencast integration' feature when Opencast plugins are installed.
+        // Through validator::section_opencast_shown(), it checks if the block_opencast is installed.
+        $opencastrecordingsetting = new admin_settingpage('opencast', get_string('config_opencast', 'bigbluebuttonbn'),
+            'moodle/site:config', !((boolean) validator::section_opencast_shown()) && ($this->moduleenabled));
+        if ($this->admin->fulltree) {
+            $item = new admin_setting_heading('bigbluebuttonbn_config_opencast_recording',
+                '',
+                get_string('config_opencast_description', 'bigbluebuttonbn'));
+            $opencastrecordingsetting->add($item);
+            $item = new admin_setting_configcheckbox('bigbluebuttonbn_opencast_recording',
+                get_string('config_opencast_recording', 'bigbluebuttonbn'),
+                get_string('config_opencast_recording_description', 'bigbluebuttonbn'),
+                1);
+            $this->add_conditional_element(
+                'opencast_recording',
+                $item,
+                $opencastrecordingsetting
+            );
+            $item = new admin_setting_configcheckbox('bigbluebuttonbn_opencast_show_recording',
+                get_string('config_opencast_show_recording', 'bigbluebuttonbn'),
+                get_string('config_opencast_show_recording_description', 'bigbluebuttonbn'),
+                1);
+            $this->add_conditional_element(
+                'opencast_show_recording',
+                $item,
+                $opencastrecordingsetting
+            );
+           
+        }
+        $this->admin->add($this->section, $opencastrecordingsetting);
+    }
+
 }
