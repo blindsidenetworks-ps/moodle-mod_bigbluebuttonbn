@@ -139,10 +139,10 @@ class recording_data {
                     $buttonpayload['disabled'] = 'disabled';
                 }
             }
-            if ($tool == 'delete') {
+            if (!$rec->imported && ($tool == 'delete' || $tool == 'publish') ) {
                 $buttonpayload['requireconfirmation'] = true;
             }
-            $actionbar .= view::actionbar_render_button($rec->recording, $buttonpayload);
+            $actionbar .= view::actionbar_render_button($rec, $buttonpayload);
         }
         $head = html_writer::start_tag('div', array(
             'id' => 'recording-actionbar-' . $rec->recording['recordID'],
@@ -267,7 +267,7 @@ class recording_data {
     /**
      * Helper function renders recording types to be used in row for the data used by the recording table.
      *
-     * @param stdClass $rec a bigbluebuttonbn_recordings row 
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $bbbsession
      *
      * @return string
@@ -275,7 +275,7 @@ class recording_data {
     public static function row_types($rec, $bbbsession) {
         $dataimported = 'false';
         $title = '';
-        if (isset($rec->recording['imported'])) {
+        if ($rec->imported) {
             $dataimported = 'true';
             $title = get_string('view_recording_link_warning', 'bigbluebuttonbn');
         }
@@ -297,7 +297,7 @@ class recording_data {
     /**
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
-     * @param stdClass $rec a bigbluebuttonbn_recordings row 
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $bbbsession
      * @param array $playback
      *
@@ -305,13 +305,13 @@ class recording_data {
      */
     public static function row_type($rec, $bbbsession, $playback) {
         global $CFG, $OUTPUT;
-        if (!self::include_recording_data_row_type($rec->recording, $bbbsession, $playback)) {
+        if (!self::include_recording_data_row_type($rec, $bbbsession, $playback)) {
             return '';
         }
         $text = self::type_text($playback['type']);
         $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
             '&mid=' . $rec->recording['meetingID'] . '&rid=' . $rec->recording['recordID'] . '&rtype=' . $playback['type'];
-        if (!isset($rec->recording['imported']) || !isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
+        if (!$rec->imported || !isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));
         }
         $linkattributes = array(
@@ -497,7 +497,7 @@ class recording_data {
             return false;
         }
         // Imported recordings are always shown as long as they are published.
-        if (isset($rec->recording['imported'])) {
+        if ($rec->imported) {
             return true;
         }
         // Administrators and moderators are always allowed.
@@ -514,13 +514,13 @@ class recording_data {
         /**
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $bbbsession
      * @param array $playback
      *
      * @return boolean
      */
-    public static function include_recording_data_row_type($recording, $bbbsession, $playback) {
+    public static function include_recording_data_row_type($rec, $bbbsession, $playback) {
         // All types that are not restricted are included.
         if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
             return true;
@@ -530,7 +530,7 @@ class recording_data {
             return true;
         }
         // Exclude imported recordings.
-        if (isset($recording['imported'])) {
+        if ($rec->imported) {
             return false;
         }
         // Exclude non moderators.

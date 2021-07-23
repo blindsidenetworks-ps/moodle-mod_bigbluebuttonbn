@@ -279,7 +279,7 @@ class view {
      */
     public static function render_warning_button($href, $text = '', $class = '', $title = '') {
         if ($text == '') {
-            $text = get_string('ok');
+            $text = get_string('ok', 'core');
         }
         if ($title == '') {
             $title = $text;
@@ -408,13 +408,14 @@ class view {
     /**
      * Helper function render a button for the recording action bar
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row 
      * @param array $data
      *
      * @return string
      */
-    public static function actionbar_render_button($recording, $data) {
+    public static function actionbar_render_button($rec, $data) {
         global $PAGE;
+        $recording = $rec->recording;
         if (empty($data)) {
             return '';
         }
@@ -431,7 +432,7 @@ class view {
                 'data-action' => $data['action'],
                 'data-require-confirmation' => !empty($data['requireconfirmation']),
             );
-            if (!isset($recording['imported'])) {
+            if (!$rec->imported) {
                 $linkattributes['data-links'] = recording::count_by(
                     [
                         'recordingid' => $recording['recordID'],
