@@ -313,7 +313,7 @@ class recording_data {
         '&rid=' . $rec->id . '&rtype=' . $playback['type'];
         // SECURITY WARNING.
         // A parameter href with the URL to the recording is added only when the BBB server doesn't implement "protected recording".
-        // This is equivalent to use an a tag with href and target="_blank". The vulnerability is in BBB and not Moodle. 
+        // This is equivalent to use an a tag with href and target="_blank". The vulnerability is in BBB and not Moodle.
         // Using of a proxy that protects the recordings such as Scalelite (v1.2 or later by Blindside Networks) is encouraged.
         if (!isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));

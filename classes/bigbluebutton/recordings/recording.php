@@ -173,7 +173,7 @@ class recording {
         foreach ($recs as $r) {
             global $DB;
             $dataobject->id = $r->id;
-            if(!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
+            if (!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
                 // TODO: There should be a way to rollback if it fails after updating one or many of the recordings.
                 return false;
             }
