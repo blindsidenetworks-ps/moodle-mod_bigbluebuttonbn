@@ -53,7 +53,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
     public function __construct($rec, $bbbsession) {
         $editable = static::check_capability($bbbsession);
         $displayvalue =
-            format_string($this->get_recording_value($rec, $bbbsession), 
+            format_string($this->get_recording_value($rec, $bbbsession),
                 true, array('context' => \context_module::instance($bbbsession['cm']->id)));
 
         // Hack here: the ID is the recordID and the meeting ID.
@@ -123,7 +123,6 @@ abstract class recording_editable extends \core\output\inplace_editable {
             // Execute update on imported recording link.
             $recording = $rec->recording;
             $recording[$metainfoname] = $value;
-            //recording::update_by(['id' => $rec->id], (object)['recording' => json_encode($recording)]);
             recording::update($rec->id, (object)['recording' => json_encode($recording)]);
             return array(
                 'status' => 'done'

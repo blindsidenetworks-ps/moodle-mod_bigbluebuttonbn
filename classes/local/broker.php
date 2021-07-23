@@ -401,7 +401,7 @@ class broker {
         );
     }
 
-        /**
+    /**
      * Helper for performing protect on recordings.
      *
      * @param array $params

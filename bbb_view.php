@@ -110,7 +110,7 @@ if ($timeline || $index) {
             $bbbsession['meetingid'] .= '[' . $bbbsession['group'] . ']';
             $bbbsession['meetingname'] .= ' (' . $groupname . ')';
         } else {
-            print_error('invalidaccess');
+            moodle_exception('invalidaccess');
         }
     }
 

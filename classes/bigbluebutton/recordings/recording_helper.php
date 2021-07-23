@@ -58,17 +58,17 @@ class recording_helper {
         $recordings = array();
         foreach ($recs as $id => $rec) {
             $recordingid = $rec->recordingid;
-            // If there is not a BBB recording assiciated, continue.
-            // NOTE: This is verifying that the recording actually exists, even imported recordings, therefore, if the recording
-            // does not exist, the imported link will no longer be shown in the list.
+            // If there is not a BBB recording assiciated skip the record.
+            // NOTE: This verifyes that the recording exists, even imported recordings.
+            // If the recording doesn't exist, the imported link will no longer be shown in the list.
             if (!isset($bbbrecordings[$recordingid])) {
                 continue;
             }
             // If the recording was imported, override the metadata with the value stored in the database.
             if ($rec->imported) {
-                // We need to convert rec->recording to array with json_decode because we pulled the records directly from the database.
+                // We must convert rec->recording to array because the records directly pulled from the database.
                 $rec->recording = json_decode($rec->recording, true);
-                foreach($rec->recording as $varname => $value) {
+                foreach ($rec->recording as $varname => $value) {
                     $varnames = explode('_', $varname);
                     if ($varnames[0] == 'meta' ) {
                         $bbbrecordings[$recordingid][$varname] = $value;

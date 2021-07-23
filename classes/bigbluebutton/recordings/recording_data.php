@@ -51,7 +51,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class recording_data {
-    
+
     /**
      * Helper function converts recording date used in row for the data used by the recording table.
      *
@@ -311,11 +311,10 @@ class recording_data {
         $text = self::type_text($playback['type']);
         $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
         '&rid=' . $rec->id . '&rtype=' . $playback['type'];
-        /** SECURITY WARNING: A parameter including the URL to the actual recording is added only when the BBB server does not
-         *  implement "protected recording" capabilities. This is equivalent to use an a tag with href and target="_blank".
-         *  The vulnerability or risk is really in BBB and not Moodle. The use of a Proxy that protects the recordings such as
-         *  Scalelite v1.2 or later (by Blindside Networks) is encouraged.
-         */
+        // SECURITY WARNING.
+        // A parameter href with the URL to the recording is added only when the BBB server doesn't implement "protected recording".
+        // This is equivalent to use an a tag with href and target="_blank". The vulnerability is in BBB and not Moodle. 
+        // Using of a proxy that protects the recordings such as Scalelite (v1.2 or later by Blindside Networks) is encouraged.
         if (!isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));
         }
@@ -516,7 +515,7 @@ class recording_data {
         return true;
     }
 
-        /**
+    /**
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
      * @param stdClass $rec a bigbluebuttonbn_recordings row

@@ -52,24 +52,11 @@ class recording {
     /** @var int INCLUDE_IMPORTED_RECORDINGS boolean set to true defines that the list should include imported recordings */
     public const INCLUDE_IMPORTED_RECORDINGS = true;
 
-    /** @var int mod_bigbluebuttonbn_recordings instance id. */
-    protected int $id;
-    /** @var int course instance id. */
-    protected int $courseid;
-    /** @var int mod_bigbluebuttonbn instance id. */
-    protected int $bigbluebuttonbnid;
-    /** @var string bbb recordID or internalMeetingID. */
-    protected string $recordingid;
-    /** @var string bbb meetingID used to generate the recording. */
-    protected string $meetingid;
-    /** @var array  bigbluebutton recording. */
-    protected array $recording;
-
     /**
      * CRUD create.
      *
      * @param stdClass $dataobject
-     * 
+     *
      * @return bool|int true or new id
      */
     public static function create($dataobject) {
@@ -95,7 +82,7 @@ class recording {
      * CRUD read.
      *
      * @param string $id
-     * 
+     *
      * @return stdClass a bigbluebuttonbn_recordings record.
      */
     public static function read($id) {
@@ -161,7 +148,7 @@ class recording {
      *
      * @param string $id
      * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
-     * 
+     *
      * @return bool true
      */
     public static function update($id, $dataobject) {
@@ -198,7 +185,7 @@ class recording {
      * CRUD delete.
      *
      * @param string $recordingid
-     * 
+     *
      * @return bool true
      */
     public static function delete($recordingid) {
@@ -207,9 +194,8 @@ class recording {
     }
 
     /**
-     *
      * CRUD delete by indicated attributes.
-     * 
+     *
      * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
      *
      * @return bool Success/Failure

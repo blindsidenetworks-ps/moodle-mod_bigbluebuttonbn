@@ -408,7 +408,7 @@ class view {
     /**
      * Helper function render a button for the recording action bar
      *
-     * @param stdClass $rec a bigbluebuttonbn_recordings row 
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $data
      *
      * @return string
