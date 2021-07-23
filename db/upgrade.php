@@ -305,12 +305,12 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'timecreated',
             $fielddefinition);
         // Add column meetingid.
-        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '64', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
             $fielddefinition);
         // Add column recordingid.
-        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '64', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             $fielddefinition);
