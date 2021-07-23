@@ -333,8 +333,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             // Add index to bigbluebuttonbn_recordings.
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
             ['courseid']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'meetingid',
-            ['meetingid']);
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             ['recordingid']);
         // Bigbluebuttonbn savepoint reached.

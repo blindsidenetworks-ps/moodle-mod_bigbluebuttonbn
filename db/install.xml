@@ -93,7 +93,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
-        <INDEX NAME="meetingid" UNIQUE="false" FIELDS="meetingid"/>
         <INDEX NAME="recordingid" UNIQUE="false" FIELDS="recordingid"/>
       </INDEXES>
     </TABLE>
