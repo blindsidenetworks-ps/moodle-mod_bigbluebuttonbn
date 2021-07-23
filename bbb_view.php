@@ -24,12 +24,12 @@
  */
 
 use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\recording as recording_helper;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
@@ -42,7 +42,6 @@ $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $href = optional_param('href', '', PARAM_TEXT);
-$mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
@@ -266,14 +265,14 @@ switch (strtolower($action)) {
  * @return string
  */
 function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
-    if ($href != '' || $rid == '') {
+    if ($href != '') {
         return $href;
     }
-    $recordings = recording_helper::fetch_recordings($rid);
-    if (empty($recordings)) {
+    $recording = recording::read($rid);
+    if (empty($recording)) {
         return '';
     }
-    return bigbluebuttonbn_bbb_view_playback_href_lookup($recordings[$rid]['playbacks'], $rtype);
+    return bigbluebuttonbn_bbb_view_playback_href_lookup($recording->recording['playbacks'], $rtype);
 }
 
 /**

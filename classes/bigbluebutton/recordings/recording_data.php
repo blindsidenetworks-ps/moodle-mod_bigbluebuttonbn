@@ -310,12 +310,17 @@ class recording_data {
         }
         $text = self::type_text($playback['type']);
         $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
-            '&mid=' . $rec->recording['meetingID'] . '&rid=' . $rec->recording['recordID'] . '&rtype=' . $playback['type'];
-        if (!$rec->imported || !isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
+        '&rid=' . $rec->id . '&rtype=' . $playback['type'];
+        /** SECURITY WARNING: A parameter including the URL to the actual recording is added only when the BBB server does not
+         *  implement "protected recording" capabilities. This is equivalent to use an a tag with href and target="_blank".
+         *  The vulnerability or risk is really in BBB and not Moodle. The use of a Proxy that protects the recordings such as
+         *  Scalelite v1.2 or later (by Blindside Networks) is encouraged.
+         */
+        if (!isset($rec->recording['protected']) || $rec->recording['protected'] === 'false') {
             $href .= '&href=' . urlencode(trim($playback['url']));
         }
         $linkattributes = array(
-            'id' => 'recording-play-' . $playback['type'] . '-' . $rec->recording['recordID'],
+            'id' => 'recording-play-' . $playback['type'] . '-' . $rec->id,
             'class' => 'btn btn-sm btn-default',
             'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
             'data-action' => 'play',

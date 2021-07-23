@@ -147,8 +147,7 @@ class recording_proxy {
         // Do getRecordings is executed using a method GET (supported by all versions of BBB).
         $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
         $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        //debugging('getRecordingsURL: ' . $url);
-        //debugging('recordIDs: ' . json_encode($rids));
+        debugging('getRecordingsURL: ' . $url);
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
