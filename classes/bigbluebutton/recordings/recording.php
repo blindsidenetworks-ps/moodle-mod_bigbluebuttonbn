@@ -202,7 +202,8 @@ class recording {
      * @return bool true
      */
     public static function delete($recordingid) {
-        return $DB->delete_record('bigbluebuttonbn_recordings', ['id' => $recordingid]);
+        global $DB;
+        return $DB->delete_records('bigbluebuttonbn_recordings', ['id' => $recordingid]);
     }
 
     /**
