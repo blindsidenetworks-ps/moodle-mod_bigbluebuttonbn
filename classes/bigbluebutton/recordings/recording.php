@@ -26,6 +26,7 @@
 namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
 
 use stdClass;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
@@ -99,16 +100,15 @@ class recording {
      */
     public static function read($id) {
         global $DB;
-        $dbrecording = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id], '*', MUST_EXIST);
-        if (!$dbrecording) {
-            $dbrecordings = new stdClass();
+        $rec = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id], '*', MUST_EXIST);
+        if ($rec->imported) {
+            // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
+            $rec->recording = json_decode($rec->recording, true);
+        } else {
+            $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
+            $rec->recording = $bbbrecordings[$rec->recordingid];
         }
-        $recording = $dbrecording;
-        if (!$dbrecording->imported) {
-            $bbbrecording = self::fetch_one($dbrecording->recordingid);
-            $recording->recording = $bbbrecording;
-        }
-        return $recording;
+        return $rec;
     }
 
     /**
@@ -120,20 +120,23 @@ class recording {
      */
     public static function read_by($attributes) {
         global $DB;
-        $dbrecordings = $DB->get_record('bigbluebuttonbn_recordings', $attributes, '*');
+        $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
         // Assign default value to empty.
-        if (!$dbrecordings) {
-            $dbrecordings = array();
+        if (!$recs) {
+            $recs = array();
         }
         // Normalize to array.
-        if (!is_array($dbrecordings)) {
-            $dbrecordings = array($dbrecordings);
+        if (!is_array($recs)) {
+            $recs = array($recs);
         }
         $recordings = array();
-        foreach ($dbrecordings as $dbrecording) {
-            $recording = $dbrecording;
-            if (!$dbrecording->imported) {
-                $bbbrecording = self::fetch_one($dbrecording->recordingid);
+        foreach ($recs as $rec) {
+            $recording = $rec;
+            if ($rec->imported) {
+                // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
+                $rec->recording = json_decode($rec->recording, true);
+            } else {
+                $bbbrecording = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
                 $recording->recording = $bbbrecording;
             }
             $recordings[$recording->recordingid] = $recording;
@@ -151,72 +154,6 @@ class recording {
     public static function count_by($attributes) {
         global $DB;
         return $DB->count_records('bigbluebuttonbn_recordings', $attributes);
-    }
-
-    /**
-     * Helper function to fetch one recording from a BigBlueButton server.
-     *
-     * @param string $rid
-     *
-     * @return array one bigbluebuttonbn_recording records.
-     */
-    public static function fetch_one($rid) {
-        $recordings = array();
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => $rid]);
-        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        // debugging('getRecordingsURL: ' . $url);
-        // debugging('recordIDs: ' . json_encode($rids));
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = self::parse_recording($recordingxml);
-            }
-        }
-        return $recording;
-    }
-
-    /**
-     * Helper function to fetch one or many recordings from a BigBlueButton server.
-     *
-     * @param array $rids
-     *
-     * @return array one or many bigbluebuttonbn_recordings records.
-     */
-    public static function fetch_many($rids) {
-        $recordings = array();
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        $url = bigbluebutton::action_url('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
-        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-        //debugging('getRecordingsURL: ' . $url);
-        //debugging('recordIDs: ' . json_encode($rids));
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = self::parse_recording($recordingxml);
-                $recordings[$recording['recordID']] = $recording;
-
-                // Check if there is childs.
-                if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
-                    foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                        $url = bigbluebutton::action_url(
-                            'getRecordings',
-                            ['recordID' => implode(',', (array) $breakoutroom)]
-                        );
-                        $xml = bigbluebutton::bigbluebuttonbn_wrap_xml_load_file($url);
-                        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                            // If there were meetings already created.
-                            foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording =
-                                    self::parse_recording($recordingxml);
-                                $recordings[$recording['recordID']] = $recording;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $recordings;
     }
 
     /**
@@ -242,11 +179,11 @@ class recording {
      */
     public function update_by($attributes, $dataobject) {
         global $DB;
-        $recordings = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
-        if (!$recordings) {
+        $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
+        if (!$recs) {
             return false;
         }
-        foreach ($recordings as $r) {
+        foreach ($recs as $r) {
             global $DB;
             $dataobject->id = $r->id;
             if(!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
@@ -279,96 +216,5 @@ class recording {
     public static function delete_by($attributes) {
         global $DB;
         return $DB->delete_records('bigbluebuttonbn_recordings', $attributes);
-    }
-
-    /**
-     * Helper convert bigbluebuttonbn_recordings row to array
-     *
-     * @param stdClass $dataobject
-     * 
-     * @return array
-     */
-    public static function to_array($dataobject) {
-        return get_object_vars($dataobject);
-    }
-
-    /**
-     * Helper convert bigbluebuttonbn_recordings row to array
-     *
-     * @param stdClass $dataobject
-     * 
-     * @return array
-     */
-    public static function to_json($dataobject) {
-        return json_encode(self::to_array($dataobject));
-    }
-
-    /**
-     * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
-     *
-     * @param object $recording
-     *
-     * @return array
-     */
-    public static function parse_recording($recording) {
-        // Add formats.
-        $playbackarray = array();
-        foreach ($recording->playback->format as $format) {
-            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
-                'url' => trim((string) $format->url), 'length' => (string) $format->length);
-            // Add preview per format when existing.
-            if ($format->preview) {
-                $playbackarray[(string) $format->type]['preview'] =
-                    self::parse_preview_images($format->preview);
-            }
-        }
-        // Add the metadata to the recordings array.
-        $metadataarray =
-            self::parse_recording_meta(get_object_vars($recording->metadata));
-        $recordingarray = array('recordID' => (string) $recording->recordID,
-            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
-            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
-        if (isset($recording->protected)) {
-            $recordingarray['protected'] = (string) $recording->protected;
-        }
-        return $recordingarray + $metadataarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
-     *
-     * @param array $metadata
-     *
-     * @return array
-     */
-    public static function parse_recording_meta($metadata) {
-        $metadataarray = array();
-        foreach ($metadata as $key => $value) {
-            if (is_object($value)) {
-                $value = '';
-            }
-            $metadataarray['meta_' . $key] = $value;
-        }
-        return $metadataarray;
-    }
-
-    /**
-     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
-     *
-     * @param object $preview
-     *
-     * @return array
-     */
-    public static function parse_preview_images($preview) {
-        $imagesarray = array();
-        foreach ($preview->images->image as $image) {
-            $imagearray = array('url' => trim((string) $image));
-            foreach ($image->attributes() as $attkey => $attvalue) {
-                $imagearray[$attkey] = (string) $attvalue;
-            }
-            array_push($imagesarray, $imagearray);
-        }
-        return $imagesarray;
     }
 }

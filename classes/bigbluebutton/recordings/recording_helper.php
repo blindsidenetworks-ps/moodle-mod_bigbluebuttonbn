@@ -45,8 +45,9 @@ class recording_helper {
         $includedeleted = false, $includeimported = false) {
         global $DB;
         // Retrieve DB recordings.
+        // TODO: These DB queries should be performed with the recording:::read helper method to guarantee consistency.
         $select = self::sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted, $includeimported);
-        $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
+        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
         // Fetch BBB recordings.
         $recordingsids = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
         $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings(array_values($recordingsids));
@@ -55,26 +56,29 @@ class recording_helper {
          * the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
          */
         $recordings = array();
-        foreach ($dbrecordings as $id => $dbrecording) {
-            $recordingid = $dbrecording->recordingid;
+        foreach ($recs as $id => $rec) {
+            $recordingid = $rec->recordingid;
             // If there is not a BBB recording assiciated, continue.
+            // NOTE: This is verifying that the recording actually exists, even imported recordings, therefore, if the recording
+            // does not exist, the imported link will no longer be shown in the list.
             if (!isset($bbbrecordings[$recordingid])) {
                 continue;
             }
-            // Always assign the recording value fetched from BBB.
-            $dbrecording->recording = $bbbrecordings[$recordingid];
-            // But if the recording was imported, override the metadata with the value stored in the database.
-            if ($dbrecording->imported) {
-                $importedrecording = $dbrecording->recording;
-                foreach($importedrecording as $varname => $value) {
+            // If the recording was imported, override the metadata with the value stored in the database.
+            if ($rec->imported) {
+                // We need to convert rec->recording to array with json_decode because we pulled the records directly from the database.
+                $rec->recording = json_decode($rec->recording, true);
+                foreach($rec->recording as $varname => $value) {
                     $varnames = explode('_', $varname);
                     if ($varnames[0] == 'meta' ) {
-                        $dbrecording->recording[$varname] = $value;
+                        $bbbrecordings[$recordingid][$varname] = $value;
                     }
                 }
             }
-            // Finally, add the dbrecording to the indexed array to be returned.
-            $recordings[$recordingid] = $dbrecording;
+            // Always assign the recording value fetched from BBB.
+            $rec->recording = $bbbrecordings[$recordingid];
+            // Finally, add the rec to the indexed array to be returned.
+            $recordings[$recordingid] = $rec;
         }
         return $recordings;
     }
@@ -188,11 +192,11 @@ class recording_helper {
         global $DB;
         // Retrieve DB imported recordings.
         $select = self::sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid, true);
-        $dbrecordings = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
+        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
         // Index the $importedrecordings for the response.
         $importedrecordings = array();
-        foreach ($dbrecordings as $id => $dbrecording) {
-            $importedrecordings[$dbrecording->recordingid] = $dbrecording;
+        foreach ($recs as $id => $rec) {
+            $importedrecordings[$rec->recordingid] = $rec;
         }
         // Unset from $recordings if recording is already imported.
         foreach ($recordings as $recordingid => $recording) {
@@ -201,5 +205,74 @@ class recording_helper {
             }
         }
         return $recordings;
+    }
+
+    /**
+     * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
+     *
+     * @param object $recording
+     *
+     * @return array
+     */
+    public static function parse_recording($recording) {
+        // Add formats.
+        $playbackarray = array();
+        foreach ($recording->playback->format as $format) {
+            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
+                'url' => trim((string) $format->url), 'length' => (string) $format->length);
+            // Add preview per format when existing.
+            if ($format->preview) {
+                $playbackarray[(string) $format->type]['preview'] =
+                    self::parse_preview_images($format->preview);
+            }
+        }
+        // Add the metadata to the recordings array.
+        $metadataarray =
+            self::parse_recording_meta(get_object_vars($recording->metadata));
+        $recordingarray = array('recordID' => (string) $recording->recordID,
+            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
+            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
+            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
+        if (isset($recording->protected)) {
+            $recordingarray['protected'] = (string) $recording->protected;
+        }
+        return $recordingarray + $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
+     *
+     * @param array $metadata
+     *
+     * @return array
+     */
+    public static function parse_recording_meta($metadata) {
+        $metadataarray = array();
+        foreach ($metadata as $key => $value) {
+            if (is_object($value)) {
+                $value = '';
+            }
+            $metadataarray['meta_' . $key] = $value;
+        }
+        return $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
+     *
+     * @param object $preview
+     *
+     * @return array
+     */
+    public static function parse_preview_images($preview) {
+        $imagesarray = array();
+        foreach ($preview->images->image as $image) {
+            $imagearray = array('url' => trim((string) $image));
+            foreach ($image->attributes() as $attkey => $attvalue) {
+                $imagearray[$attkey] = (string) $attvalue;
+            }
+            array_push($imagesarray, $imagearray);
+        }
+        return $imagesarray;
     }
 }

@@ -46,13 +46,11 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Constructor.
      *
-     * @param array $rec
+     * @param stdClass $rec
      * @param array $bbbsession
      * @throws \moodle_exception
      */
     public function __construct($rec, $bbbsession) {
-        error_log(gettype($rec));
-        error_log(json_encode($rec));
         $editable = static::check_capability($bbbsession);
         $displayvalue =
             format_string($this->get_recording_value($rec, $bbbsession), 
@@ -92,7 +90,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Get the real recording value
      *
-     * @param array $recording
+     * @param stdClass $rec
      * @param array $bbbsession
      * @return mixed
      */
@@ -112,7 +110,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Edit recording
      *
-     * @param array $rec
+     * @param stdClass $rec
      * @param string $metainfoname
      * @param mixed $value
      * @return array
@@ -123,16 +121,16 @@ abstract class recording_editable extends \core\output\inplace_editable {
         $meta = [$metainfoname => $value];
         if ($rec->imported) {
             // Execute update on imported recording link.
+            $recording = $rec->recording;
+            $recording[$metainfoname] = $value;
+            //recording::update_by(['id' => $rec->id], (object)['recording' => json_encode($recording)]);
+            recording::update($rec->id, (object)['recording' => json_encode($recording)]);
             return array(
-                'status' => recording_proxy::bigbluebutton_update_recording_imported(
-                    $rec->imported,
-                    $meta
-                )
+                'status' => 'done'
             );
         }
-
         // As the recordingid was not identified as imported recording link, execute update on a real recording.
-        // (No need to update imported links as the update only affects the actual recording).
+        // Note: No need to update imported links as the update only affects the actual recording.
         // Execute update on actual recording.
         return array(
             'status' => recording_proxy::bigbluebutton_update_recordings(

@@ -27,7 +27,7 @@
 
 namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
 
-use mod_bigbluebuttonbn\bigbluebutton\recordings\helper;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use stdClass;
 
@@ -131,7 +131,7 @@ class recording_proxy {
             $recordings += self::bigbluebutton_fetch_recordings_page($rids);
         }
         // Sort recordings.
-        uasort($recordings, "\\mod_bigbluebuttonbn\\bigbluebutton\\recordings\\recording::recording_build_sorter");
+        uasort($recordings, "\\mod_bigbluebuttonbn\\bigbluebutton\\recordings\\recording_helper::recording_build_sorter");
         return $recordings;
     }
 
@@ -152,7 +152,7 @@ class recording_proxy {
         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
             // If there were meetings already created.
             foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = recording::parse_recording($recordingxml);
+                $recording = recording_helper::parse_recording($recordingxml);
                 $recordings[$recording['recordID']] = $recording;
 
                 // Check if there is childs.
@@ -166,7 +166,7 @@ class recording_proxy {
                         if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
                             // If there were meetings already created.
                             foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording = recording::parse_recording($recordingxml);
+                                $recording = recording_helper::parse_recording($recordingxml);
                                 $recordings[$recording['recordID']] = $recording;
                             }
                         }
