@@ -91,7 +91,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
         // JavaScript for locales.
-        $PAGE->requires->strings_for_js(array_keys(view::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+        $PAGE->requires->strings_for_js(array_keys(view::get_strings_for_js()), 'bigbluebuttonbn');
         $jsvars['instanceTypeDefault'] = array_keys($instancetyperofiles)[0];
         // Now add the instance type profiles to the form as a html hidden field.
         $mform->addElement('html', html_writer::div('', 'd-none', [

@@ -36,7 +36,7 @@ $id = required_param('id', PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 
-$viewinstance = view::bigbluebuttonbn_view_validator($id, $bn); // In locallib.
+$viewinstance = view::view_validator($id, $bn); // In locallib.
 if (!$viewinstance) {
     throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }

@@ -50,7 +50,7 @@ $timeline = optional_param('timeline', 0, PARAM_INT);
 $index = optional_param('index', 0, PARAM_INT);
 $group = optional_param('group', -1, PARAM_INT);
 
-$bbbviewinstance = view::bigbluebuttonbn_view_validator($id, $bn);
+$bbbviewinstance = view::view_validator($id, $bn);
 if (!$bbbviewinstance) {
     throw new moodle_exception('view_error_url_missing_parameters', 'bigbluebuttonbn');
 }

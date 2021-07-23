@@ -127,17 +127,22 @@ class recording_data {
             $buttonpayload =
                 self::row_actionbar_payload($rec->recording, $tool);
             if ($tool == 'protect') {
-                if (isset($rec->recording['imported'])) {
+                if ($rec->imported) {
                     $buttonpayload['disabled'] = 'disabled';
                 }
                 if (!isset($rec->recording['protected'])) {
                     $buttonpayload['disabled'] = 'invisible';
                 }
             }
+            if ($tool == 'publish') {
+                if ($rec->imported) {
+                    $buttonpayload['disabled'] = 'disabled';
+                }
+            }
             if ($tool == 'delete') {
                 $buttonpayload['requireconfirmation'] = true;
             }
-            $actionbar .= view::bigbluebuttonbn_actionbar_render_button($rec->recording, $buttonpayload);
+            $actionbar .= view::actionbar_render_button($rec->recording, $buttonpayload);
         }
         $head = html_writer::start_tag('div', array(
             'id' => 'recording-actionbar-' . $rec->recording['recordID'],

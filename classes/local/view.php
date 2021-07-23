@@ -131,7 +131,7 @@ class view {
         $enabledfeatures = config::bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
         $pinginterval = (int) config::get('waitformoderator_ping_interval') * 1000;
         // JavaScript for locales.
-        $PAGE->requires->strings_for_js(array_keys(self::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+        $PAGE->requires->strings_for_js(array_keys(self::get_strings_for_js()), 'bigbluebuttonbn');
         // JavaScript variables.
         $output = '';
         // Renders warning messages when configured.
@@ -161,7 +161,7 @@ class view {
 
         } else if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
             $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
-            $output .= self::bigbluebuttonbn_render_warning($recordingsdisabled, 'danger');
+            $output .= self::render_warning($recordingsdisabled, 'danger');
         }
         echo $output . html_writer::empty_tag('br') . html_writer::empty_tag('br')
             . html_writer::empty_tag('br');
@@ -243,7 +243,7 @@ class view {
         if (bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != config::get('server_url')) {
             return '';
         }
-        return self::bigbluebuttonbn_render_warning(get_string('view_warning_default_server',
+        return self::render_warning(get_string('view_warning_default_server',
             'bigbluebuttonbn'), 'warning');
     }
 
@@ -258,7 +258,7 @@ class view {
         if (!self::view_warning_shown($bbbsession)) {
             return '';
         }
-        return self::bigbluebuttonbn_render_warning(
+        return self::render_warning(
             (string) config::get('general_warning_message'),
             (string) config::get('general_warning_box_type'),
             (string) config::get('general_warning_button_href'),
@@ -277,9 +277,9 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_render_warning_button($href, $text = '', $class = '', $title = '') {
+    public static function render_warning_button($href, $text = '', $class = '', $title = '') {
         if ($text == '') {
-            $text = get_string('ok', 'moodle');
+            $text = get_string('ok');
         }
         if ($title == '') {
             $title = $text;
@@ -306,7 +306,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_render_warning($message, $type = 'info', $href = '', $text = '', $class = '') {
+    public static function render_warning($message, $type = 'info', $href = '', $text = '', $class = '') {
         global $OUTPUT;
         $output = "\n";
         // Evaluates if config_warning is enabled.
@@ -320,7 +320,7 @@ class view {
         $output .= '    ' . $message . "\n";
         $output .= '  <div class="singlebutton pull-right">' . "\n";
         if (!empty($href)) {
-            $output .= self::bigbluebuttonbn_render_warning_button($href, $text, $class);
+            $output .= self::render_warning_button($href, $text, $class);
         }
         $output .= '  </div>' . "\n";
         $output .= $OUTPUT->box_end() . "\n";
@@ -334,7 +334,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_id($id) {
+    public static function view_instance_id($id) {
         global $DB;
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -349,7 +349,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
+    public static function view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB;
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid), '*', MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -365,12 +365,12 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
+    public static function view_validator($id, $bigbluebuttonbnid) {
         if ($id) {
-            return self::bigbluebuttonbn_view_instance_id($id);
+            return self::view_instance_id($id);
         }
         if ($bigbluebuttonbnid) {
-            return self::bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
+            return self::view_instance_bigbluebuttonbn($bigbluebuttonbnid);
         }
     }
 
@@ -379,7 +379,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_strings_for_js() {
+    public static function get_strings_for_js() {
         $locale = plugin::bigbluebuttonbn_get_locale();
         $stringman = get_string_manager();
         $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
@@ -393,7 +393,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_format_activity_time($time) {
+    public static function format_activity_time($time) {
         global $CFG;
         require_once($CFG->dirroot . '/calendar/lib.php');
         $activitytime = '';
@@ -413,7 +413,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_actionbar_render_button($recording, $data) {
+    public static function actionbar_render_button($recording, $data) {
         global $PAGE;
         if (empty($data)) {
             return '';

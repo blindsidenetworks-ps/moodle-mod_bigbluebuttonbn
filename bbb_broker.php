@@ -44,7 +44,7 @@ if (!empty($error)) {
     return;
 }
 
-$bbbbrokerinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+$bbbbrokerinstance = view::view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
 $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
 $context = context_course::instance($bigbluebuttonbn->course);
 $PAGE->set_context($context);

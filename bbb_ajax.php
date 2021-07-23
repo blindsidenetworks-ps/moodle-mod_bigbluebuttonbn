@@ -58,7 +58,7 @@ if (!empty($error)) {
 }
 
 if ($params['bigbluebuttonbn']) {
-    $bbbbrokerinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+    $bbbbrokerinstance = view::view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
     $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
     $context = context_module::instance($cm->id);

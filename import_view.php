@@ -39,7 +39,7 @@ if (!$originbn) {
 }
 
 list('cm' => $cm, 'course' => $course, 'bigbluebuttonbn' => $bigbluebuttonbn) =
-    view::bigbluebuttonbn_view_instance_bigbluebuttonbn($originbn);
+    view::view_instance_bigbluebuttonbn($originbn);
 require_login($course, true, $cm);
 
 // TODO: check if this is still necessary.

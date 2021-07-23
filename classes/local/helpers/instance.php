@@ -269,7 +269,7 @@ class instance {
      */
     public static function get_session_from_id(int $instanceid): array {
         // Fetch the view instnace using the instanceid.
-        $viewinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($instanceid);
+        $viewinstance = view::view_instance_bigbluebuttonbn($instanceid);
         if (!$viewinstance) {
             throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
         }

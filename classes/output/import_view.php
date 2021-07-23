@@ -88,7 +88,7 @@ class import_view implements renderable, templatable {
         global $PAGE, $DB;
 
         list('cm' => $origincm, 'course' => $origincourse, 'bigbluebuttonbn' => $originbigbluebuttonbn) =
-            view::bigbluebuttonbn_view_instance_bigbluebuttonbn($this->origingbbbid);
+            view::view_instance_bigbluebuttonbn($this->origingbbbid);
         $bbbsession = bigbluebutton::build_bbb_session($origincm, $origincourse, $originbigbluebuttonbn);
         $courses = roles::bigbluebuttonbn_import_get_courses_for_select($bbbsession);
 
@@ -101,7 +101,7 @@ class import_view implements renderable, templatable {
             ];
             $context['search'] = $searchbutton;
             list('bigbluebuttonbn' => $frombigbluebuttonbn) =
-                view::bigbluebuttonbn_view_instance_bigbluebuttonbn($this->frombbbid);
+                view::view_instance_bigbluebuttonbn($this->frombbbid);
             $hasrecordings = $hasrecordings &&
                 (in_array($frombigbluebuttonbn->type, [bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
                     bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]));
@@ -118,7 +118,7 @@ class import_view implements renderable, templatable {
                 }
                 // Check if the BBB is not currently scheduled for deletion.
                 list('cm' => $cm) =
-                    view::bigbluebuttonbn_view_instance_bigbluebuttonbn($record->id);
+                    view::view_instance_bigbluebuttonbn($record->id);
                 if ($cm->deletioninprogress) {
                     continue;
                 }

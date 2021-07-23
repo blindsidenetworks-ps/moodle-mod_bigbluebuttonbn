@@ -274,7 +274,7 @@ class bigbluebutton {
         global $CFG;
         $canjoin = array('can_join' => false, 'message' => '');
 
-        $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
+        $viewinstance = view::view_validator($cmid, null);
         if ($viewinstance) {
             $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
             if ($bbbsession) {
