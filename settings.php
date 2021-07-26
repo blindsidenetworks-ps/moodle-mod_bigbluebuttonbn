@@ -24,6 +24,8 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 $bbbsettings = new mod_bigbluebuttonbn\settings($ADMIN, $module, $section);
 $bbbsettings->add_all_settings();
 
