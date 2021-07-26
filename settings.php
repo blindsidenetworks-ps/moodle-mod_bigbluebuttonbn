@@ -24,38 +24,9 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\local\settings\renderer;
-use mod_bigbluebuttonbn\local\settings\settings;
-use mod_bigbluebuttonbn\local\settings\validator;
-
 defined('MOODLE_INTERNAL') || die;
 
-global $CFG;
-
-$bbbsettings = new settings($ADMIN, $module, $section);
-
-// Evaluates if recordings are enabled for the Moodle site.
-
-// Renders settings for record feature.
-$bbbsettings->bigbluebuttonbn_settings_record();
-// Renders settings for import recordings.
-$bbbsettings->bigbluebuttonbn_settings_importrecordings();
-// Renders settings for showing recordings.
-$bbbsettings->bigbluebuttonbn_settings_showrecordings();
-
-// Renders settings for meetings.
-$bbbsettings->bigbluebuttonbn_settings_waitmoderator();
-$bbbsettings->bigbluebuttonbn_settings_voicebridge();
-$bbbsettings->bigbluebuttonbn_settings_preupload();
-$bbbsettings->bigbluebuttonbn_settings_userlimit();
-$bbbsettings->bigbluebuttonbn_settings_participants();
-$bbbsettings->bigbluebuttonbn_settings_notifications();
-$bbbsettings->bigbluebuttonbn_settings_muteonstart();
-$bbbsettings->bigbluebuttonbn_settings_locksettings();
-// Renders settings for extended capabilities.
-$bbbsettings->bigbluebuttonbn_settings_extended();
-// Renders settings for experimental features.
-$bbbsettings->bigbluebuttonbn_settings_experimental();
+$bbbsettings = new mod_bigbluebuttonbn\settings($ADMIN, $module, $section);
+$bbbsettings->add_all_settings();
 
 $settings = null;
-

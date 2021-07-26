@@ -23,7 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\local\settings;
+namespace mod_bigbluebuttonbn;
 
 use mod_bigbluebuttonbn\local\bigbluebutton;
 
@@ -36,7 +36,7 @@ require_once($CFG->libdir.'/adminlib.php');
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class validator {
+class setting_validator {
 
     /**
      * Validate if general section will be shown.
