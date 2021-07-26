@@ -14,7 +14,7 @@ jobs:
         include:
           - php: '7.4'
             moodle-branch: 'master'
-            database: 'pgsql'
+            database: 'mariadb'
 
     services:
       postgres:
