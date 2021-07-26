@@ -27,6 +27,7 @@ namespace mod_bigbluebuttonbn\local;
 
 use html_writer;
 use mod_bigbluebuttonbn\plugin;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
