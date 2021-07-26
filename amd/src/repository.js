@@ -24,7 +24,7 @@ import {call as fetchMany} from 'core/ajax';
  * @returns {Promise}
  */
 
-const getListTableRequest = (bigbluebuttonbnid, removeimportedid, tools)  => {
+const getListTableRequest = (bigbluebuttonbnid, removeimportedid, tools) => {
     return {
         methodname: 'mod_bigbluebutton_recording_list_table',
         args: {
@@ -39,7 +39,7 @@ const getListTableRequest = (bigbluebuttonbnid, removeimportedid, tools)  => {
  * Fetch the list of recordings from the server.
  *
  * @param   {Number} bigbluebuttonbnid The instance ID
- * @param   {Boolean} removeimported Remove already imported record
+ * @param   {Boolean} removeImportedId Remove already imported record
  * @param   {String} tools the set of tools to display
  * @returns {Promise}
  */
@@ -60,21 +60,27 @@ export const updateRecording = args => fetchMany([
 ])[0];
 
 /**
- * end Meeting
- * @param args
- * @returns {*}
+ * End the Meeting
+ *
+ * @param {number} bigbluebuttonbnid
+ * @param {string} meetingid
+ * @returns {Promise}
  */
-export const endMeeting = args => fetchMany([
+export const endMeeting = (bigbluebuttonbnid, meetingid) => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_end',
-        args,
+        args: {
+            bigbluebuttonbnid,
+            meetingid,
+        },
     }
 ])[0];
 
 /**
- * completionValidate
- * @param args
- * @returns {*}
+ * Validate completion.
+ *
+ * @param {object} args
+ * @returns {Promise}
  */
 export const completionValidate = args => fetchMany([
     {
@@ -85,13 +91,20 @@ export const completionValidate = args => fetchMany([
 
 
 /**
- * MeetingInfo
- * @param args
- * @returns {*}
+ * Fetch meeting info for the specified meeting.
+ *
+ * @param {number} bigbluebuttonbnid
+ * @param {string} meetingid
+ * @param {boolean} [updatecache=false]
+ * @returns {Promise}
  */
-export const meetingInfo = args => fetchMany([
+export const getMeetingInfo = (bigbluebuttonbnid, meetingid, updatecache = false) => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_info',
-        args,
+        args: {
+            bigbluebuttonbnid,
+            meetingid,
+            updatecache,
+        },
     }
 ])[0];

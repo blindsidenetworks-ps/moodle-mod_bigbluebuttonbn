@@ -130,10 +130,10 @@ class view {
         $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
         $enabledfeatures = config::bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
         $pinginterval = (int) config::get('waitformoderator_ping_interval') * 1000;
-        // JavaScript for locales.
-        $PAGE->requires->strings_for_js(array_keys(self::bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+
         // JavaScript variables.
         $output = '';
+
         // Renders warning messages when configured.
         $output .= self::view_warning_default_server($bbbsession);
         $output .= self::view_warning_general($bbbsession);
@@ -372,18 +372,6 @@ class view {
         if ($bigbluebuttonbnid) {
             return self::bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
         }
-    }
-
-    /**
-     * Helper function returns array with all the strings to be used in javascript.
-     *
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_strings_for_js() {
-        $locale = plugin::bigbluebuttonbn_get_locale();
-        $stringman = get_string_manager();
-        $strings = $stringman->load_component_strings('bigbluebuttonbn', $locale);
-        return $strings;
     }
 
     /**

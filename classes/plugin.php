@@ -30,9 +30,8 @@ use cache_store;
 use core_tag_tag;
 use mod_bigbluebuttonbn\local\config;
 use moodle_url;
+use stdClass;
 use variable;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class plugin.
@@ -223,4 +222,18 @@ abstract class plugin {
         return $encodedseed;
     }
 
+    /**
+     * Get the meetingid of the specified BBB Instance.
+     *
+     * @param stdClass $instance
+     * @param null|stdClass $group
+     * @return string
+     */
+    public static function get_meeting_id(stdClass $instance, ?stdClass $group = null): string {
+        if ($group) {
+            return sprintf('%s-%d-%d[%d]', $instance->meetingid, $instance->course, $instance->id, $group->id);
+        } else {
+            return sprintf('%s-%d-%d', $instance->meetingid, $instance->course, $instance->id);
+        }
+    }
 }

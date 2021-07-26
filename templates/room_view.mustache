@@ -74,36 +74,35 @@
             {{/isrunning}}
             <span>{{.}}</span>
         {{/attendees}}
-        {{#presentation}}
+        {{#presentations}}
             <div class="presentation">
-                <h4>view_section_title_presentation,mod_bigbluebuttonbn</h4>
+                <h4>{{#str}}view_section_title_presentation, mod_bigbluebuttonbn{{/str}}</h4>
                 {{#pix}}{{iconname}},{{icondesc}}{{/pix}}
                 <a href="{{url}}" class="btn btn-secondary" title="{{name}}">{{name}}</a>
             </div>
-        {{/presentation}}
+        {{/presentations}}
     </div>
     <div id="bigbluebuttonbn_view_action_button_box" class="box py-3 generalbox boxaligncenter">
         <div id="room_view_action_buttons">
-            <input id="join_button_input"
-                   type="button"
-                   value="{{#str}}view_conference_action_join, mod_bigbluebuttonbn{{/str}}"
-                   data-bbb-id="{{bigbluebuttonbnid}}"
-                   data-cm-id="{{cmid}}"
-                   {{#group}}data-group-id="{{group}}"{{/group}}
-                   class="btn btn-primary bbb-btn-action  {{^canjoin}}d-none{{/canjoin}}">
+            <input {{!
+                }} type="button"{{!
+                }} value="{{#str}}view_conference_action_join, mod_bigbluebuttonbn{{/str}}"{{!
+                }} data-action="join"{{!
+                }} data-bbb-id="{{bigbluebuttonbnid}}"{{!
+                }} data-cm-id="{{cmid}}"{{!
+                }} {{#group}}data-group-id="{{group}}"{{/group}}{{!
+                }} class="btn btn-primary bbb-btn-action  {{^canjoin}}d-none{{/canjoin}}"{{!
+                }}>
+
             {{#ismoderator}}
-            <input id="end_button_input"
-                   type="button"
-                   data-bbb-id="{{bigbluebuttonbnid}}"
-                   data-meeting-id="{{meetingid}}"
-                   value="{{#str}}view_conference_action_end, mod_bigbluebuttonbn{{/str}}"
-                   class="btn btn-secondary bbb-btn-action  {{#statusopen}}d-none{{/statusopen}}">
+                {{> mod_bigbluebuttonbn/end_session_button}}
             {{/ismoderator}}
         </div>
     </div>
 </div>
 {{#js}}
-    require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
-    rooms.initActions(); // Register action on all buttons.
-    });
+require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
+    // Register action on all buttons.
+    rooms.initActions();
+});
 {{/js}}
