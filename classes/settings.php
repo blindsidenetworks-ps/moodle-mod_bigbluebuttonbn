@@ -145,33 +145,44 @@ class settings {
                 get_string('config_general_description', 'bigbluebuttonbn'));
 
             $settingsgeneral->add($item);
-            $item = new admin_setting_configtext('bigbluebuttonbn_server_url',
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_server_url',
                 get_string('config_server_url', 'bigbluebuttonbn'),
                 get_string('config_server_url_description', 'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL, PARAM_RAW);
+                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
+                PARAM_RAW
+            );
             $this->add_conditional_element(
                 'server_url',
                 $item,
                 $settingsgeneral
             );
-            $item = new admin_setting_configtext('bigbluebuttonbn_shared_secret',
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_shared_secret',
                 get_string('config_shared_secret', 'bigbluebuttonbn'),
                 get_string('config_shared_secret_description', 'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET, PARAM_RAW);
+                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+                PARAM_RAW
+            );
             $this->add_conditional_element(
                 'shared_secret',
                 $item,
                 $settingsgeneral
             );
             $settingsgeneral->add($item);
-            $item = new admin_setting_heading('bigbluebuttonbn_config_default_messages',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_default_messages',
                 get_string('config_default_messages', 'bigbluebuttonbn'),
-                get_string('config_default_messages_description', 'bigbluebuttonbn'));
+                get_string('config_default_messages_description', 'bigbluebuttonbn')
+            );
             $settingsgeneral->add($item);
-            $item = new admin_setting_configtextarea('bigbluebuttonbn_welcome_default',
+            $item = new admin_setting_configtextarea(
+                'bigbluebuttonbn_welcome_default',
                 get_string('config_welcome_default', 'bigbluebuttonbn'),
                 get_string('config_welcome_default_description', 'bigbluebuttonbn'),
-                '', PARAM_TEXT);
+                '',
+                PARAM_TEXT
+            );
             $this->add_conditional_element(
                 'welcome_default',
                 $item,
@@ -194,32 +205,40 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_recording',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_recording',
                 '',
-                get_string('config_recording_description', 'bigbluebuttonbn'));
+                get_string('config_recording_description', 'bigbluebuttonbn')
+            );
             $recordingsetting->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_default',
                 get_string('config_recording_default', 'bigbluebuttonbn'),
                 get_string('config_recording_default_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'recording_default',
                 $item,
                 $recordingsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_editable',
                 get_string('config_recording_editable', 'bigbluebuttonbn'),
                 get_string('config_recording_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'recording_editable',
                 $item,
                 $recordingsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_icons_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_icons_enabled',
                 get_string('config_recording_icons_enabled', 'bigbluebuttonbn'),
                 get_string('config_recording_icons_enabled_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'recording_icons_enabled',
                 $item,
@@ -227,37 +246,45 @@ class settings {
             );
 
             // Add recording start to load and allow/hide stop/pause.
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_all_from_start_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_all_from_start_default',
                 get_string('config_recording_all_from_start_default', 'bigbluebuttonbn'),
                 get_string('config_recording_all_from_start_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'recording_all_from_start_default',
                 $item,
                 $recordingsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_all_from_start_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_all_from_start_editable',
                 get_string('config_recording_all_from_start_editable', 'bigbluebuttonbn'),
                 get_string('config_recording_all_from_start_editable_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'recording_all_from_start_editable',
                 $item,
                 $recordingsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_hide_button_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_hide_button_default',
                 get_string('config_recording_hide_button_default', 'bigbluebuttonbn'),
                 get_string('config_recording_hide_button_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'recording_hide_button_default',
                 $item,
                 $recordingsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recording_hide_button_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recording_hide_button_editable',
                 get_string('config_recording_hide_button_editable', 'bigbluebuttonbn'),
                 get_string('config_recording_hide_button_editable_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'recording_hide_button_editable',
                 $item,
@@ -280,23 +307,29 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_importrecordings',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_importrecordings',
                 '',
-                get_string('config_importrecordings_description', 'bigbluebuttonbn'));
+                get_string('config_importrecordings_description', 'bigbluebuttonbn')
+            );
             $importrecordingsettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_importrecordings_enabled',
                 get_string('config_importrecordings_enabled', 'bigbluebuttonbn'),
                 get_string('config_importrecordings_enabled_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'importrecordings_enabled',
                 $item,
                 $importrecordingsettings
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_importrecordings_from_deleted_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_importrecordings_from_deleted_enabled',
                 get_string('config_importrecordings_from_deleted_enabled', 'bigbluebuttonbn'),
                 get_string('config_importrecordings_from_deleted_enabled_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'importrecordings_from_deleted_enabled',
                 $item,
@@ -452,41 +485,53 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_waitformoderator',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_waitformoderator',
                 '',
-                get_string('config_waitformoderator_description', 'bigbluebuttonbn'));
+                get_string('config_waitformoderator_description', 'bigbluebuttonbn')
+            );
             $waitmoderatorsettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_waitformoderator_default',
                 get_string('config_waitformoderator_default', 'bigbluebuttonbn'),
                 get_string('config_waitformoderator_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'waitformoderator_default',
                 $item,
                 $waitmoderatorsettings
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_waitformoderator_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_waitformoderator_editable',
                 get_string('config_waitformoderator_editable', 'bigbluebuttonbn'),
                 get_string('config_waitformoderator_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'waitformoderator_editable',
                 $item,
                 $waitmoderatorsettings
             );
-            $item = new admin_setting_configtext('bigbluebuttonbn_waitformoderator_ping_interval',
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_waitformoderator_ping_interval',
                 get_string('config_waitformoderator_ping_interval', 'bigbluebuttonbn'),
                 get_string('config_waitformoderator_ping_interval_description', 'bigbluebuttonbn'),
-                10, PARAM_INT);
+                10,
+                PARAM_INT
+            );
             $this->add_conditional_element(
                 'waitformoderator_ping_interval',
                 $item,
                 $waitmoderatorsettings
             );
-            $item = new admin_setting_configtext('bigbluebuttonbn_waitformoderator_cache_ttl',
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_waitformoderator_cache_ttl',
                 get_string('config_waitformoderator_cache_ttl', 'bigbluebuttonbn'),
                 get_string('config_waitformoderator_cache_ttl_description', 'bigbluebuttonbn'),
-                60, PARAM_INT);
+                60,
+                PARAM_INT
+            );
             $this->add_conditional_element(
                 'waitformoderator_cache_ttl',
                 $item,
@@ -509,14 +554,18 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_voicebridge',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_voicebridge',
                 '',
-                get_string('config_voicebridge_description', 'bigbluebuttonbn'));
+                get_string('config_voicebridge_description', 'bigbluebuttonbn')
+            );
             $voicebridgesettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_voicebridge_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_voicebridge_editable',
                 get_string('config_voicebridge_editable', 'bigbluebuttonbn'),
                 get_string('config_voicebridge_editable_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'voicebridge_editable',
                 $item,
@@ -540,15 +589,19 @@ class settings {
 
         if ($this->admin->fulltree) {
             // This feature only works if curl is installed (but it is as now required by Moodle). The checks have been removed.
-            $item = new admin_setting_heading('bigbluebuttonbn_config_preuploadpresentation',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_preuploadpresentation',
                 '',
-                get_string('config_preuploadpresentation_description', 'bigbluebuttonbn'));
+                get_string('config_preuploadpresentation_description', 'bigbluebuttonbn')
+            );
             $preuploadsettings->add($item);
 
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_preuploadpresentation_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_preuploadpresentation_enabled',
                 get_string('config_preuploadpresentation_enabled', 'bigbluebuttonbn'),
                 get_string('config_preuploadpresentation_enabled_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'preuploadpresentation_enabled',
                 $item,
@@ -562,12 +615,14 @@ class settings {
             $filemanageroptions['maxfiles'] = 1;
             $filemanageroptions['mainfile'] = true;
 
-            $filemanager = new admin_setting_configstoredfile('mod_bigbluebuttonbn/presentationdefault',
+            $filemanager = new admin_setting_configstoredfile(
+                'mod_bigbluebuttonbn/presentationdefault',
                 get_string('config_presentation_default', 'bigbluebuttonbn'),
                 get_string('config_presentation_default_description', 'bigbluebuttonbn'),
                 'presentationdefault',
                 0,
-                $filemanageroptions);
+                $filemanageroptions
+            );
 
             $preuploadsettings->add($filemanager);
         }
@@ -589,23 +644,30 @@ class settings {
 
         if ($this->admin->fulltree) {
             // Configuration for "user limit" feature.
-            $item = new admin_setting_heading('bigbluebuttonbn_config_userlimit',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_userlimit',
                 '',
-                get_string('config_userlimit_description', 'bigbluebuttonbn'));
+                get_string('config_userlimit_description', 'bigbluebuttonbn')
+            );
             $userlimitsettings->add($item);
-            $item = new admin_setting_configtext('bigbluebuttonbn_userlimit_default',
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_userlimit_default',
                 get_string('config_userlimit_default', 'bigbluebuttonbn'),
                 get_string('config_userlimit_default_description', 'bigbluebuttonbn'),
-                0, PARAM_INT);
+                0,
+                PARAM_INT
+            );
             $this->add_conditional_element(
                 'userlimit_default',
                 $item,
                 $userlimitsettings
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_userlimit_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_userlimit_editable',
                 get_string('config_userlimit_editable', 'bigbluebuttonbn'),
                 get_string('config_userlimit_editable_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'userlimit_editable',
                 $item,
@@ -628,17 +690,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_participant',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_participant',
                 '',
-                get_string('config_participant_description', 'bigbluebuttonbn'));
+                get_string('config_participant_description', 'bigbluebuttonbn')
+            );
             $participantsettings->add($item);
+
             // UI for 'participants' feature.
             $roles = roles::bigbluebuttonbn_get_roles(null, false);
             $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
-            $item = new admin_setting_configmultiselect('bigbluebuttonbn_participant_moderator_default',
+            $item = new admin_setting_configmultiselect(
+                'bigbluebuttonbn_participant_moderator_default',
                 get_string('config_participant_moderator_default', 'bigbluebuttonbn'),
                 get_string('config_participant_moderator_default_description', 'bigbluebuttonbn'),
-                array_keys($owner), $owner + $roles);
+                array_keys($owner),
+                $owner + $roles
+            );
             $this->add_conditional_element(
                 'participant_moderator_default',
                 $item,
@@ -661,14 +729,18 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_sendnotifications',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_sendnotifications',
                 '',
-                get_string('config_sendnotifications_description', 'bigbluebuttonbn'));
+                get_string('config_sendnotifications_description', 'bigbluebuttonbn')
+            );
             $notificationssettings->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_sendnotifications_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_sendnotifications_enabled',
                 get_string('config_sendnotifications_enabled', 'bigbluebuttonbn'),
                 get_string('config_sendnotifications_enabled_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'sendnotifications_enabled',
                 $item,
@@ -691,23 +763,29 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_muteonstart',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_muteonstart',
                 '',
-                get_string('config_muteonstart_description', 'bigbluebuttonbn'));
+                get_string('config_muteonstart_description', 'bigbluebuttonbn')
+            );
             $muteonstartsetting->add($item);
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_muteonstart_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_muteonstart_default',
                 get_string('config_muteonstart_default', 'bigbluebuttonbn'),
                 get_string('config_muteonstart_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'muteonstart_default',
                 $item,
                 $muteonstartsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_muteonstart_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_muteonstart_editable',
                 get_string('config_muteonstart_editable', 'bigbluebuttonbn'),
                 get_string('config_muteonstart_editable_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'muteonstart_editable',
                 $item,
@@ -755,19 +833,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablecam_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablecam_default',
                 get_string('config_disablecam_default', 'bigbluebuttonbn'),
                 get_string('config_disablecam_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'disablecam_default',
                 $item,
                 $disablecamsettings
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablecam_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablecam_editable',
                 get_string('config_disablecam_editable', 'bigbluebuttonbn'),
                 get_string('config_disablecam_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'disablecam_editable',
                 $item,
@@ -792,19 +874,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablemic_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablemic_default',
                 get_string('config_disablemic_default', 'bigbluebuttonbn'),
                 get_string('config_disablemic_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'disablemic_default',
                 $item,
                 $disablemicsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablemic_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablemic_editable',
                 get_string('config_disablemic_editable', 'bigbluebuttonbn'),
                 get_string('config_disablemic_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'disablecam_editable',
                 $item,
@@ -829,19 +915,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disableprivatechat_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disableprivatechat_default',
                 get_string('config_disableprivatechat_default', 'bigbluebuttonbn'),
                 get_string('config_disableprivatechat_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'disableprivatechat_default',
                 $item,
                 $disableprivatechatsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disableprivatechat_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disableprivatechat_editable',
                 get_string('config_disableprivatechat_editable', 'bigbluebuttonbn'),
                 get_string('config_disableprivatechat_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'disableprivatechat_editable',
                 $item,
@@ -903,19 +993,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablenote_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablenote_default',
                 get_string('config_disablenote_default', 'bigbluebuttonbn'),
                 get_string('config_disablenote_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'disablenote_default',
                 $item,
                 $disablenotesetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_disablenote_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_disablenote_editable',
                 get_string('config_disablenote_editable', 'bigbluebuttonbn'),
                 get_string('config_disablenote_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'disablenote_editable',
                 $item,
@@ -940,19 +1034,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_hideuserlist_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_hideuserlist_default',
                 get_string('config_hideuserlist_default', 'bigbluebuttonbn'),
                 get_string('config_hideuserlist_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'hideuserlist_default',
                 $item,
                 $hideuserlistsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_hideuserlist_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_hideuserlist_editable',
                 get_string('config_hideuserlist_editable', 'bigbluebuttonbn'),
                 get_string('config_hideuserlist_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'hideuserlist_editable',
                 $item,
@@ -977,19 +1075,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockedlayout_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_lockedlayout_default',
                 get_string('config_lockedlayout_default', 'bigbluebuttonbn'),
                 get_string('config_lockedlayout_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'lockedlayout_default',
                 $item,
                 $lockedlayoutsetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockedlayout_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_lockedlayout_editable',
                 get_string('config_lockedlayout_editable', 'bigbluebuttonbn'),
                 get_string('config_lockedlayout_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'lockedlayout_editable',
                 $item,
@@ -1015,19 +1117,23 @@ class settings {
 
         if ($this->admin->fulltree) {
             if ((boolean) setting_validator::section_lockonjoin_shown()) {
-                $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockonjoin_default',
+                $item = new admin_setting_configcheckbox(
+                    'bigbluebuttonbn_lockonjoin_default',
                     get_string('config_lockonjoin_default', 'bigbluebuttonbn'),
                     get_string('config_lockonjoin_default_description', 'bigbluebuttonbn'),
-                    0);
+                    0
+                );
                 $this->add_conditional_element(
                     'lockonjoin_default',
                     $item,
                     $lockonjoinsetting
                 );
-                $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockonjoin_editable',
+                $item = new admin_setting_configcheckbox(
+                    'bigbluebuttonbn_lockonjoin_editable',
                     get_string('config_lockonjoin_editable', 'bigbluebuttonbn'),
                     get_string('config_lockonjoin_editable_description', 'bigbluebuttonbn'),
-                    1);
+                    1
+                );
                 $this->add_conditional_element(
                     'lockonjoin_editable',
                     $item,
@@ -1053,19 +1159,23 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockonjoinconfigurable_default',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_lockonjoinconfigurable_default',
                 get_string('config_lockonjoinconfigurable_default', 'bigbluebuttonbn'),
                 get_string('config_lockonjoinconfigurable_default_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'lockonjoinconfigurable_default',
                 $item,
                 $lockonjoinconfigurablesetting
             );
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_lockonjoinconfigurable_editable',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_lockonjoinconfigurable_editable',
                 get_string('config_lockonjoinconfigurable_editable', 'bigbluebuttonbn'),
                 get_string('config_lockonjoinconfigurable_editable_description', 'bigbluebuttonbn'),
-                1);
+                1
+            );
             $this->add_conditional_element(
                 'lockonjoinconfigurable_editable',
                 $item,
@@ -1088,15 +1198,19 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_extended_capabilities',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_extended_capabilities',
                 '',
-                get_string('config_extended_capabilities_description', 'bigbluebuttonbn'));
+                get_string('config_extended_capabilities_description', 'bigbluebuttonbn')
+            );
             $extendedcapabilitiessetting->add($item);
             // UI for 'notify users when recording ready' feature.
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_recordingready_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_recordingready_enabled',
                 get_string('config_recordingready_enabled', 'bigbluebuttonbn'),
                 get_string('config_recordingready_enabled_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'recordingready_enabled',
                 $item,
@@ -1120,15 +1234,19 @@ class settings {
         );
 
         if ($this->admin->fulltree) {
-            $item = new admin_setting_heading('bigbluebuttonbn_config_experimental_features',
+            $item = new admin_setting_heading(
+                'bigbluebuttonbn_config_experimental_features',
                 '',
-                get_string('config_experimental_features_description', 'bigbluebuttonbn'));
+                get_string('config_experimental_features_description', 'bigbluebuttonbn')
+            );
             $experimentalfeaturessetting->add($item);
             // UI for 'register meeting events' feature.
-            $item = new admin_setting_configcheckbox('bigbluebuttonbn_meetingevents_enabled',
+            $item = new admin_setting_configcheckbox(
+                'bigbluebuttonbn_meetingevents_enabled',
                 get_string('config_meetingevents_enabled', 'bigbluebuttonbn'),
                 get_string('config_meetingevents_enabled_description', 'bigbluebuttonbn'),
-                0);
+                0
+            );
             $this->add_conditional_element(
                 'meetingevents_enabled',
                 $item,
