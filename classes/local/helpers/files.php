@@ -51,6 +51,7 @@ class files {
      * @param string $filearea file area
      *
      * @return false|null false if file not valid
+     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
 
@@ -100,6 +101,7 @@ class files {
      * @param array $args extra arguments
      *
      * @return array|string|null
+     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args) {
 
@@ -191,6 +193,7 @@ class files {
      * Returns an array of file areas.
      *
      * @return array a list of available file areas
+     * @throws \coding_exception
      * @category files
      *
      */
@@ -208,6 +211,7 @@ class files {
      * @param object $bigbluebuttonbn BigBlueButtonBN form data
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
         if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
@@ -244,9 +248,9 @@ class files {
      * @param string $presentation
      * @param integer $id
      *
-     * @return array|null
+     * @return array
      */
-    public static function get_presentation_array($context, $presentation, $id = null): ?array {
+    public static function bigbluebuttonbn_get_presentation_array($context, $presentation, $id = null) {
         global $CFG;
         if (empty($presentation)) {
             if ($CFG->bigbluebuttonbn_preuploadpresentation_enabled) {
@@ -264,7 +268,7 @@ class files {
 
                 if (count($files) == 0) {
                     // Not exist file by default in "presentationbydefault" setting.
-                    return null;
+                    return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
                 }
 
                 // Exists file in general setting to use as default for presentation. Cache image for temp public access.
@@ -293,15 +297,11 @@ class files {
                     $file->get_filepath(),
                     $file->get_filename()
                 );
-                return [
-                    'icondesc' => get_mimetype_description($file),
-                    'iconname' => file_file_icon($file, 24),
-                    'name' => $file->get_filename(),
-                    'url' => $url->out(false),
-                ];
+                return (array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+                    'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file)));
             }
 
-            return null; // No presentation.
+            return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
         }
         $fs = get_file_storage();
         $files = $fs->get_area_files(
@@ -313,7 +313,7 @@ class files {
             false
         );
         if (count($files) == 0) {
-            return null; // No presentation.
+            return array('url' => null, 'name' => null, 'icon' => null, 'mimetype_description' => null);
         }
         $file = reset($files);
         unset($files);
@@ -339,11 +339,7 @@ class files {
             $file->get_filepath(),
             $file->get_filename()
         );
-        return [
-            'icondesc' => get_mimetype_description($file),
-            'iconname' => file_file_icon($file, 24),
-            'name' => $file->get_filename(),
-            'url' => $url->out(false),
-        ];
+        return array('name' => $file->get_filename(), 'icon' => file_file_icon($file, 24),
+            'url' => $url->out(false), 'mimetype_description' => get_mimetype_description($file));
     }
 }

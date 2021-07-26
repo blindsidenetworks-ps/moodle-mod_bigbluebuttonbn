@@ -16,27 +16,35 @@
 import {call as fetchMany} from 'core/ajax';
 
 /**
- * Fetch the list of recordings from the server.
+ * Request for recording
  *
  * @param   {Number} bigbluebuttonbnid The instance ID
- * @param   {number} groupid
- * @param   {Boolean} removeimportedid Remove already imported record
+ * @param   {Boolean} removeimported Remove already imported record
  * @param   {String} tools the set of tools to display
  * @returns {Promise}
  */
-export const fetchRecordings = (bigbluebuttonbnid, groupid, removeimportedid, tools) => {
-    const args = {
-        bigbluebuttonbnid,
-        removeimportedid,
-        tools,
+
+const getListTableRequest = (bigbluebuttonbnid, removeimportedid, tools)  => {
+    return {
+        methodname: 'mod_bigbluebutton_recording_list_table',
+        args: {
+            bigbluebuttonbnid,
+            removeimportedid,
+            tools
+        }
     };
-
-    if (groupid) {
-        args.groupid = groupid;
-    }
-
-    return fetchMany([{methodname: 'mod_bigbluebutton_recording_list_table', args}])[0];
 };
+
+/**
+ * Fetch the list of recordings from the server.
+ *
+ * @param   {Number} bigbluebuttonbnid The instance ID
+ * @param   {Boolean} removeimported Remove already imported record
+ * @param   {String} tools the set of tools to display
+ * @returns {Promise}
+ */
+export const fetchRecordings = (bigbluebuttonbnid, removeImportedId, tools) =>
+    fetchMany([getListTableRequest(bigbluebuttonbnid, removeImportedId, tools)])[0];
 
 /**
  * Perform an update on a single recording.
@@ -52,27 +60,21 @@ export const updateRecording = args => fetchMany([
 ])[0];
 
 /**
- * End the Meeting
- *
- * @param {number} bigbluebuttonbnid
- * @param {string} meetingid
- * @returns {Promise}
+ * end Meeting
+ * @param args
+ * @returns {*}
  */
-export const endMeeting = (bigbluebuttonbnid, meetingid) => fetchMany([
+export const endMeeting = args => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_end',
-        args: {
-            bigbluebuttonbnid,
-            meetingid,
-        },
+        args,
     }
 ])[0];
 
 /**
- * Validate completion.
- *
- * @param {object} args
- * @returns {Promise}
+ * completionValidate
+ * @param args
+ * @returns {*}
  */
 export const completionValidate = args => fetchMany([
     {
@@ -83,20 +85,13 @@ export const completionValidate = args => fetchMany([
 
 
 /**
- * Fetch meeting info for the specified meeting.
- *
- * @param {number} bigbluebuttonbnid
- * @param {string} meetingid
- * @param {boolean} [updatecache=false]
- * @returns {Promise}
+ * MeetingInfo
+ * @param args
+ * @returns {*}
  */
-export const getMeetingInfo = (bigbluebuttonbnid, meetingid, updatecache = false) => fetchMany([
+export const meetingInfo = args => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_info',
-        args: {
-            bigbluebuttonbnid,
-            meetingid,
-            updatecache,
-        },
+        args,
     }
 ])[0];

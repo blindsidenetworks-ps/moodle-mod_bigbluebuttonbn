@@ -25,8 +25,6 @@
 
 namespace mod_bigbluebuttonbn\analytics\indicator;
 
-use cm_info;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -65,7 +63,7 @@ class cognitive_depth extends activity_base {
      *
      * @return integer
      */
-    public function get_cognitive_depth_level(cm_info $cm) {
+    public function get_cognitive_depth_level(\cm_info $cm) {
         return self::COGNITIVE_LEVEL_4;
     }
 }

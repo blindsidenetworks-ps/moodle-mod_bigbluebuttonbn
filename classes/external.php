@@ -57,6 +57,7 @@ class mod_bigbluebuttonbn_external extends external_api {
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @return array of warnings and status result
      * @since Moodle 3.0
+     * @throws moodle_exception
      */
     public static function view_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB, $CFG;
@@ -219,9 +220,12 @@ class mod_bigbluebuttonbn_external extends external_api {
     /**
      * This will check if current user can join the session from this module
      * @param int $cmid
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function can_join($cmid) {
-        self::validate_parameters(self::can_join_parameters(),
+        global $SESSION, $CFG;
+        $params = self::validate_parameters(self::can_join_parameters(),
             array(
                 'cmid' => $cmid
             ));

@@ -50,6 +50,8 @@ class files_test extends bbb_simple_test {
     /**
      * Plugin valid test case
      *
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function test_bigbluebuttonbn_pluginfile_valid() {
         $this->resetAfterTest();
@@ -97,6 +99,8 @@ class files_test extends bbb_simple_test {
     /**
      * Get presentation file
      *
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_default_presentation_get_file() {
         $this->resetAfterTest();
@@ -118,6 +122,8 @@ class files_test extends bbb_simple_test {
     /**
      * Get filename test
      *
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_pluginfile_filename() {
         $this->resetAfterTest();
@@ -136,6 +142,7 @@ class files_test extends bbb_simple_test {
     /**
      * Get file area
      *
+     * @throws \coding_exception
      */
     public function test_bigbluebuttonbn_get_file_areas() {
         $this->resetAfterTest();
@@ -148,6 +155,10 @@ class files_test extends bbb_simple_test {
     /**
      * Get media files
      *
+     * @throws \coding_exception
+     * @throws \file_exception
+     * @throws \moodle_exception
+     * @throws \stored_file_creation_exception
      */
     public function test_bigbluebuttonbn_get_media_file() {
         $this->resetAfterTest();

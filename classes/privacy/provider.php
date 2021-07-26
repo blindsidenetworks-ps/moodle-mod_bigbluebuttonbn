@@ -36,6 +36,8 @@ use \core_privacy\local\request\writer;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 /**
  * Privacy class for requesting user data.
  *

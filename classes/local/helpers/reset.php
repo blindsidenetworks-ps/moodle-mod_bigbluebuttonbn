@@ -42,6 +42,7 @@ class reset {
      *
      * @param string $courseid
      * @return bool status array
+     * @throws \dml_exception
      */
     public static function bigbluebuttonbn_reset_logs($courseid) {
         global $DB;
@@ -67,6 +68,8 @@ class reset {
      *
      * @param array $courseid
      * @return array status array
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function bigbluebuttonbn_reset_tags($courseid) {
         global $DB;
