@@ -73,7 +73,7 @@ class settings {
 
         $admin->add('modsettings', $modbigbluebuttobnfolder);
 
-        $mainsettings = $this->bigbluebuttonbn_settings_general($categoryname);
+        $mainsettings = $this->add_general_settings($categoryname);
         $admin->add($categoryname, $mainsettings);
     }
 
@@ -84,25 +84,25 @@ class settings {
         // Evaluates if recordings are enabled for the Moodle site.
 
         // Renders settings for record feature.
-        $this->bigbluebuttonbn_settings_record();
+        $this->add_record_settings();
         // Renders settings for import recordings.
-        $this->bigbluebuttonbn_settings_importrecordings();
+        $this->add_importrecordings_settings();
         // Renders settings for showing recordings.
-        $this->bigbluebuttonbn_settings_showrecordings();
+        $this->add_showrecordings_settings();
 
         // Renders settings for meetings.
-        $this->bigbluebuttonbn_settings_waitmoderator();
-        $this->bigbluebuttonbn_settings_voicebridge();
-        $this->bigbluebuttonbn_settings_preupload();
-        $this->bigbluebuttonbn_settings_userlimit();
-        $this->bigbluebuttonbn_settings_participants();
-        $this->bigbluebuttonbn_settings_notifications();
-        $this->bigbluebuttonbn_settings_muteonstart();
-        $this->bigbluebuttonbn_settings_locksettings();
+        $this->add_waitmoderator_settings();
+        $this->add_voicebridge_settings();
+        $this->add_preupload_settings();
+        $this->add_userlimit_settings();
+        $this->add_participants_settings();
+        $this->add_notifications_settings();
+        $this->add_muteonstart_settings();
+        $this->add_locksettings_settings();
         // Renders settings for extended capabilities.
-        $this->bigbluebuttonbn_settings_extended();
+        $this->add_extended_settings();
         // Renders settings for experimental features.
-        $this->bigbluebuttonbn_settings_experimental();
+        $this->add_experimental_settings();
     }
 
     /**
@@ -131,7 +131,7 @@ class settings {
      * @return admin_settingpage
      * @throws \coding_exception
      */
-    protected function bigbluebuttonbn_settings_general(): admin_settingpage {
+    protected function add_general_settings(): admin_settingpage {
         $settingsgeneral = new admin_settingpage(
             "{$this->sectionnameprefix}_general",
             get_string('config_general', 'bigbluebuttonbn'),
@@ -184,7 +184,7 @@ class settings {
     /**
      * Helper function renders record settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_record(): void {
+    protected function add_record_settings(): void {
         // Configuration for 'recording' feature.
         $recordingsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_recording",
@@ -270,7 +270,7 @@ class settings {
     /**
      * Helper function renders import recording settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_importrecordings(): void {
+    protected function add_importrecordings_settings(): void {
         // Configuration for 'import recordings' feature.
         $importrecordingsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_importrecording",
@@ -309,7 +309,7 @@ class settings {
     /**
      * Helper function renders show recording settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_showrecordings(): void {
+    protected function add_showrecordings_settings(): void {
         // Configuration for 'show recordings' feature.
         $showrecordingsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_showrecordings",
@@ -442,7 +442,7 @@ class settings {
     /**
      * Helper function renders wait for moderator settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_waitmoderator(): void {
+    protected function add_waitmoderator_settings(): void {
         // Configuration for wait for moderator feature.
         $waitmoderatorsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_waitformoderator",
@@ -499,7 +499,7 @@ class settings {
     /**
      * Helper function renders static voice bridge settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_voicebridge(): void {
+    protected function add_voicebridge_settings(): void {
         // Configuration for "static voice bridge" feature.
         $voicebridgesettings = new admin_settingpage(
             "{$this->sectionnameprefix}_voicebridge",
@@ -529,7 +529,7 @@ class settings {
     /**
      * Helper function renders preuploaded presentation settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_preupload(): void {
+    protected function add_preupload_settings(): void {
         // Configuration for "preupload presentation" feature.
         $preuploadsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_preupload",
@@ -579,7 +579,7 @@ class settings {
      * Helper function renders userlimit settings if the feature is enabled.
      */
 
-    protected function bigbluebuttonbn_settings_userlimit(): void {
+    protected function add_userlimit_settings(): void {
         $userlimitsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_userlimit",
             get_string('config_userlimit', 'bigbluebuttonbn'),
@@ -618,7 +618,7 @@ class settings {
     /**
      * Helper function renders participant settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_participants(): void {
+    protected function add_participants_settings(): void {
         // Configuration for defining the default role/user that will be moderator on new activities.
         $participantsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_participant",
@@ -651,7 +651,7 @@ class settings {
     /**
      * Helper function renders notification settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_notifications(): void {
+    protected function add_notifications_settings(): void {
         // Configuration for "send notifications" feature.
         $notificationssettings = new admin_settingpage(
             "{$this->sectionnameprefix}_notifications",
@@ -681,7 +681,7 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_muteonstart(): void {
+    protected function add_muteonstart_settings(): void {
         // Configuration for BigBlueButton.
         $muteonstartsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_muteonstart",
@@ -720,7 +720,7 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      */
-    protected function bigbluebuttonbn_settings_locksettings(): void {
+    protected function add_locksettings_settings(): void {
         $category = new admin_category(
             "{$this->sectionnameprefix}_locksettings",
             get_string('config_locksettings', 'bigbluebuttonbn'),
@@ -730,14 +730,14 @@ class settings {
         $this->admin->add($this->section, $category);
 
         // Configuration for various lock settings for meetings.
-        $this->bigbluebuttonbn_settings_disablecam($category);
-        $this->bigbluebuttonbn_settings_disablemic($category);
-        $this->bigbluebuttonbn_settings_disablepublicchat($category);
-        $this->bigbluebuttonbn_settings_disablenote($category);
-        $this->bigbluebuttonbn_settings_hideuserlist($category);
-        $this->bigbluebuttonbn_settings_lockedlayout($category);
-        $this->bigbluebuttonbn_settings_lockonjoin($category);
-        $this->bigbluebuttonbn_settings_lockonjoinconfigurable($category);
+        $this->add_disablecam_settings($category);
+        $this->add_disablemic_settings($category);
+        $this->add_disablepublicchat_settings($category);
+        $this->add_disablenote_settings($category);
+        $this->add_hideuserlist_settings($category);
+        $this->add_lockedlayout_settings($category);
+        $this->add_lockonjoin_settings($category);
+        $this->add_lockonjoinconfigurable_settings($category);
     }
 
     /**
@@ -745,7 +745,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_disablecam(admin_category $category): void {
+    protected function add_disablecam_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $disablecamsettings = new admin_settingpage(
             "{$this->sectionnameprefix}_disablecam",
@@ -782,7 +782,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_disablemic(admin_category $category): void {
+    protected function add_disablemic_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $disablemicsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_disablemic",
@@ -817,8 +817,9 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
+     * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_disableprivatechat(admin_category $category): void {
+    protected function add_disableprivatechat_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $disableprivatechatsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_disableprivatechat",
@@ -855,7 +856,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_disablepublicchat(admin_category $category): void {
+    protected function add_disablepublicchat_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $disablepublicchatsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_disablepublicchat",
@@ -892,7 +893,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_disablenote(admin_category $category): void {
+    protected function add_disablenote_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $disablenotesetting = new admin_settingpage(
             "{$this->sectionnameprefix}_disablenote",
@@ -929,7 +930,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_hideuserlist(admin_category $category): void {
+    protected function add_hideuserlist_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $hideuserlistsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_hideuserlist",
@@ -966,7 +967,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_lockedlayout(admin_category $category): void {
+    protected function add_lockedlayout_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $lockedlayoutsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_lockedlayout",
@@ -1003,7 +1004,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_lockonjoin(admin_category $category): void {
+    protected function add_lockonjoin_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $lockonjoinsetting = new admin_settingpage(
             "{$this->sectionnameprefix}_lockonjoin",
@@ -1042,7 +1043,7 @@ class settings {
      *
      * @param admin_category $category The parent category to add to
      */
-    protected function bigbluebuttonbn_settings_lockonjoinconfigurable(admin_category $category): void {
+    protected function add_lockonjoinconfigurable_settings(admin_category $category): void {
         // Configuration for BigBlueButton.
         $lockonjoinconfigurablesetting = new admin_settingpage(
             "{$this->sectionnameprefix}_lockonjoinconfigurable",
@@ -1077,7 +1078,7 @@ class settings {
     /**
      * Helper function renders extended settings if any of the features there is enabled.
      */
-    protected function bigbluebuttonbn_settings_extended(): void {
+    protected function add_extended_settings(): void {
         // Configuration for extended capabilities.
         $extendedcapabilitiessetting = new admin_settingpage(
             "{$this->sectionnameprefix}_extendedcapabilities",
@@ -1109,7 +1110,7 @@ class settings {
     /**
      * Helper function renders experimental settings if any of the features there is enabled.
      */
-    protected function bigbluebuttonbn_settings_experimental(): void {
+    protected function add_experimental_settings(): void {
         // Configuration for experimental features should go here.
         $experimentalfeaturessetting = new admin_settingpage(
             "{$this->sectionnameprefix}_experimentalfeatures",
