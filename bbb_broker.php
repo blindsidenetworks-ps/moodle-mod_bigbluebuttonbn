@@ -23,7 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
-defined('MOODLE_INTERNAL') || die;
+
 require(__DIR__.'/../../config.php');
 
 use mod_bigbluebuttonbn\local\broker;
