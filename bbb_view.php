@@ -136,7 +136,9 @@ switch (strtolower($action)) {
             );
         $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id ASC', 'id, meta', 1);
         $lastaccess = end($accesses);
-        $lastaccess = json_decode($lastaccess->meta);
+        if (!empty($lastaccess->meta)) {
+            $lastaccess = json_decode($lastaccess->meta);
+        }
         // If the user acceded from Timeline it should be redirected to the Dashboard.
         if (isset($lastaccess->origin) && $lastaccess->origin == BIGBLUEBUTTON_ORIGIN_TIMELINE) {
             redirect($CFG->wwwroot . '/my/');
