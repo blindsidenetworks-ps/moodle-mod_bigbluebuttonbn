@@ -229,12 +229,6 @@ class lib_test extends \bbb_simple_test {
                     0),
                 'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
                     1),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
             ],
             $completioncm1->get_custom_rule_descriptions());
         $completioncm2 = new custom_completion($cm2, $user->id);
@@ -246,12 +240,6 @@ class lib_test extends \bbb_simple_test {
                     0),
                 'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
                     0),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
             ], $completioncm2->get_custom_rule_descriptions());
     }
 
@@ -339,6 +327,7 @@ class lib_test extends \bbb_simple_test {
      * @param object $bbbactivity The bigbluebutton activity to create an event for
      * @param string $eventtype The event type. eg. ASSIGN_EVENT_TYPE_DUE.
      * @return bool|calendar_event
+     * @throws coding_exception
      */
     private function create_action_event($course, $bbbactivity, $eventtype) {
         $event = new stdClass();
@@ -354,9 +343,6 @@ class lib_test extends \bbb_simple_test {
         return calendar_event::create($event);
     }
 
-    /**
-     * Test setting navigation admin menu
-     */
     public function test_bigbluebuttonbn_extend_settings_navigation_admin() {
         global $PAGE, $CFG;
         $this->resetAfterTest();

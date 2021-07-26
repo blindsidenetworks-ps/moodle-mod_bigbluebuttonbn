@@ -77,6 +77,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * @param object $record  for the record
      * @param array|null $options other specific options
      * @return array the recording array
+     * @throws dml_exception
      */
     public function create_recording($record, array $options = null) {
         global $CFG, $DB;
@@ -162,6 +163,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * Create a log record
      * @param null $record
      * @param array|null $options
+     * @throws dml_exception
      */
     public function create_log($record = null, array $options = null) {
         global $DB;
@@ -187,6 +189,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     /**
      * This add a new mocked up recording
      * @param array $recording
+     * @throws dml_exception
      */
     public function bigbluebuttonbn_add_to_recordings_array_fetch($recording) {
         global $CFG;
@@ -204,6 +207,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * Method to fetch all mocked up recordings
      * @param int $meetingsid
      * @return array
+     * @throws dml_exception
      */
     public static function bigbluebuttonbn_get_recordings_array_fetch($meetingsid) {
         global $CFG;

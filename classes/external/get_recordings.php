@@ -25,16 +25,21 @@
 
 namespace mod_bigbluebuttonbn\external;
 
+use context_course;
+use context_module;
 use external_api;
+use external_description;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use external_warnings;
 use invalid_parameter_exception;
-use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\helpers\instance;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\plugin;
 
@@ -57,7 +62,6 @@ class get_recordings extends external_api {
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
             'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
             'tools' => new external_value(PARAM_RAW, 'a set of enablec tools', VALUE_OPTIONAL),
-            'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
         ]);
     }
 
@@ -66,83 +70,60 @@ class get_recordings extends external_api {
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param int $removeimportedid the removeimportedid instance id
-     * @param string|null $tools
-     * @param int|null $groupid
+     * @param string $tools
      * @return array of warnings and status result
-     * @throws \webservice_access_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     * @throws \restricted_context_exception
+     * @throws invalid_parameter_exception
      */
-    public static function execute(
-        int $bigbluebuttonbnid = 0,
-        $removeimportedid = 0,
-        ?string $tools = null,
-        ?int $groupid = null
-    ): array {
-        global $USER;
-
+    public static function execute(int $bigbluebuttonbnid = 0, $removeimportedid = 0, $tools = 'protect,publish,delete'): array {
         $warnings = [];
-
-        if ($tools === null) {
-            $tools = 'protect,publish,delete';
-        }
 
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'removeimportedid' => $removeimportedid,
             'tools' => $tools,
-            'groupid' => $groupid,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'removeimportedid' => $removeimportedid,
             'tools' => $tools,
-            'groupid' => $groupid,
         ]);
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        $context = $instance->get_context();
-        $cm = $instance->get_cm();
+        [
+            'bbbsession' => $bbbsession,
+            'context' => $context,
+            'enabledfeatures' => $enabledfeatures,
+            'typeprofiles' => $typeprofiles,
+        ] = instance::get_session_from_id($bigbluebuttonbnid);
+
+        if ($bigbluebuttonbnid === 0) {
+            throw new invalid_parameter_exception('Both BigbluebuttonBN and Course IDs are null, we can either
+            have one or the other but not both at the same time');
+        }
         // Validate that the user has access to this activity.
         self::validate_context($context);
-
-        $groupmode = groups_get_activity_groupmode($cm);
-        if ($groupmode && $groupid) {
-            $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
-
-            if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
-                $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
-            } else {
-                $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
-            }
-
-            if (!array_key_exists($groupid, $allowedgroups)) {
-                // Import exception and lib.
-                global $CFG;
-                require_once($CFG->dirroot . '/webservice/lib.php');
-                throw new \webservice_access_exception('No access to this group');
-            }
-
-            $instance->set_group_id($groupid);
-        }
-
-        $enabledfeatures = $instance->get_enabled_features();
-        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
 
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
+        $recordings =
+            recording::bigbluebutton_get_recordings_for_table_view($bbbsession,
+                $enabledfeatures
+            );
 
         if ($removeimportedid) {
             $recordings = recording::bigbluebuttonbn_unset_existent_recordings_already_imported(
                 $recordings,
-                $instance->get_course_id(),
-                $removeimportedid
-            );
+                $bbbsession['course'],
+                $removeimportedid);
         }
 
         $tabledata = [
-            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance),
+            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($bbbsession),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
             'locale' => plugin::bigbluebuttonbn_get_localcode(),
             'profile_features' => $typeprofiles[0]['features'],
@@ -156,7 +137,7 @@ class get_recordings extends external_api {
         if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
             // There are recordings for this meeting.
             foreach ($recordings as $recording) {
-                $rowdata = recording::bigbluebuttonbn_get_recording_data_row($instance, $recording, $tools);
+                $rowdata = recording::bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools);
                 if (!empty($rowdata)) {
                     $data[] = $rowdata;
                 }
@@ -189,7 +170,7 @@ class get_recordings extends external_api {
         ];
 
         // Initialize table headers.
-        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($instance)) {
+        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
             $columns[] = [
                 'key' => 'preview',
                 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
@@ -214,7 +195,7 @@ class get_recordings extends external_api {
             'allowHTML' => false,
             'sortable' => true,
         ];
-        if ($instance->can_manage_recordings()) {
+        if ($bbbsession['managerecordings']) {
             $columns[] = [
                 'key' => 'actionbar',
                 'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),

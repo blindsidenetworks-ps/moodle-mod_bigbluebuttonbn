@@ -25,7 +25,6 @@
 
 namespace mod_bigbluebuttonbn\event;
 
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -37,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class base extends \core\event\base {
 
-    /** @var $bigbluebuttonbn */
+    /** @var \bigbluebuttonbn */
     protected $bigbluebuttonbn;
 
     /**

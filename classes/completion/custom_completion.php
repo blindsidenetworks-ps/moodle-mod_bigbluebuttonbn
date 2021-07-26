@@ -46,6 +46,7 @@ class custom_completion extends activity_custom_completion {
      *
      * @param string $rule
      * @return int
+     * @throws \dml_exception
      */
     public function get_state(string $rule): int {
         global $DB;
@@ -67,46 +68,48 @@ class custom_completion extends activity_custom_completion {
 
         switch ($rule) {
             case 'completionattendance':
-                $value = $this->compute_state($logs, $rule, function($summary) {
-                    return $summary->data->duration;
-                });
+                if (!$logs) {
+                    // As completion by attendance was required, the activity hasn't been completed.
+                    return false;
+                }
+                $attendancecount = 0;
+                foreach ($logs as $log) {
+                    $summary = json_decode($log->meta);
+                    $attendancecount += $summary->data->duration;
+                }
+                $attendancecount /= 60;
+                $value =
+                    isset($bigbluebuttonbn->completionattendance) && $bigbluebuttonbn->completionattendance <= $attendancecount;
                 break;
             case 'completionengagementchats':
+                if (!$logs) {
+                    // As completion by engagement with chat was required, the activity hasn't been completed.
+                    return false;
+                }
+                $engagementchatscount = 0;
+                foreach ($logs as $log) {
+                    $summary = json_decode($log->meta);
+                    $engagementchatscount += $summary->data->engagement->chats;
+                }
+                $value = isset($bigbluebuttonbn->completionengagementchats) &&
+                    $bigbluebuttonbn->completionengagementchats <= $engagementchatscount;
+                break;
             case 'completionengagementtalks':
-            case 'completionengagementraisehand':
-            case 'completionengagementpollvotes':
-            case 'completionengagementemojis':
-                $shortname = str_replace('completionengagement', '', $rule);
-                $value = $this->compute_state($logs, $rule, function($summary) use ($shortname) {
-                    return $summary->data->engagement->$shortname;
-                });
+                if (!$logs) {
+                    // As completion by engagement with talk was required, the activity hasn't been completed.
+                    return false;
+                }
+                $engagementtalkscount = 0;
+                foreach ($logs as $log) {
+                    $summary = json_decode($log->meta);
+                    $engagementtalkscount += $summary->data->engagement->talks;
+                }
+                $value = isset($bigbluebuttonbn->completionengagementtalks) &&
+                    $bigbluebuttonbn->completionengagementtalks <= $engagementtalkscount;
                 break;
         }
         return $value ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
 
-    }
-
-    /**
-     * Compute current state from logs.
-     *
-     * @param $logs
-     * @param $rulename
-     * @param $summaryvaluegetter
-     * @return bool
-     */
-    protected function compute_state($logs, $rulename, $summaryvaluegetter) {
-        if (!$logs) {
-            // As completion by engagement with $rulename hand was required, the activity hasn't been completed.
-            return false;
-        }
-        $valuecount = 0;
-        foreach ($logs as $log) {
-            $summary = json_decode($log->meta);
-            $valuecount += $summaryvaluegetter($summary);
-        }
-        $value = isset($bigbluebuttonbn->$rulename) &&
-            $bigbluebuttonbn->$rulename <= $valuecount;
-        return $value;
     }
 
     /**
@@ -122,25 +125,17 @@ class custom_completion extends activity_custom_completion {
      * Returns an associative array of the descriptions of custom completion rules.
      *
      * @return array
+     * @throws \coding_exception
      */
     public function get_custom_rule_descriptions(): array {
         $completionengagementchats = $this->cm->customdata['customcompletionrules']['completionengagementchats'] ?? 0;
         $completionengagementtalks = $this->cm->customdata['customcompletionrules']['completionengagementtalks'] ?? 0;
-        $completionengagementraisehand = $this->cm->customdata['customcompletionrules']['completionengagementraisehand'] ?? 0;
-        $completionengagementpollvotes = $this->cm->customdata['customcompletionrules']['completionengagementpollvotes'] ?? 0;
-        $completionengagementemojis = $this->cm->customdata['customcompletionrules']['completionengagementemojis'] ?? 0;
         $completionattendance = $this->cm->customdata['customcompletionrules']['completionattendance'] ?? 0;
         return [
             'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
                 $completionengagementchats),
             'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
                 $completionengagementtalks),
-            'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                $completionengagementraisehand),
-            'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                $completionengagementpollvotes),
-            'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                $completionengagementemojis),
             'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
                 $completionattendance),
         ];
@@ -153,12 +148,8 @@ class custom_completion extends activity_custom_completion {
      */
     public function get_sort_order(): array {
         return [
-            'completionview',
             'completionengagementchats',
             'completionengagementtalks',
-            'completionengagementraisehand',
-            'completionengagementpollvotes',
-            'completionengagementemojis',
             'completionattendance',
         ];
     }
