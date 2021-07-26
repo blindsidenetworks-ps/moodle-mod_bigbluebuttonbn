@@ -30,9 +30,7 @@ use cache_store;
 use core_tag_tag;
 use mod_bigbluebuttonbn\local\config;
 use moodle_url;
-use variable;
-
-defined('MOODLE_INTERNAL') || die();
+use stdClass;
 
 /**
  * Class plugin.
@@ -47,19 +45,6 @@ abstract class plugin {
      * Component name.
      */
     const COMPONENT = 'mod_bigbluebuttonbn';
-
-    /**
-     * Outputs url with plain parameters.
-     * @param  string $url
-     * @param  array $params
-     * @param  string $anchor
-     * @return string
-     * @throws \moodle_exception
-     */
-    public static function necurl($url, $params = null, $anchor = null) {
-        $lurl = new moodle_url($url, $params, $anchor);
-        return $lurl->out(false);
-    }
 
     /**
      * Helper for setting a value in a bigbluebuttonbn cache.
@@ -105,7 +90,6 @@ abstract class plugin {
      * Helper function returns the locale set by moodle.
      *
      * @return string
-     * @throws \coding_exception
      */
     public static function bigbluebuttonbn_get_locale() {
         $lang = get_string('locale', 'core_langconfig');
@@ -207,20 +191,6 @@ abstract class plugin {
             return implode(',', core_tag_tag::get_item_tags_array('core', 'course_modules', $id));
         }
         return implode(',', tag_get_tags('bigbluebuttonbn', $id));
-    }
-
-    /**
-     * Helper function returns a sha1 encoded string that is unique and will be used as a seed for meetingid.
-     *
-     * @return string
-     */
-    public static function bigbluebuttonbn_unique_meetingid_seed() {
-        global $DB;
-        do {
-            $encodedseed = sha1(self::bigbluebuttonbn_random_password(12));
-            $meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('meetingid' => $encodedseed));
-        } while ($meetingid == $encodedseed);
-        return $encodedseed;
     }
 
 }

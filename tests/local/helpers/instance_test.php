@@ -43,8 +43,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave test
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save() {
         $this->resetAfterTest();
@@ -52,7 +50,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->participants = '<p>this -&gt; &quot;</p>\n';
         $bbformdata->timemodified = time();
-        instance::bigbluebuttonbn_process_pre_save($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save($bbformdata);
         $this->assertTrue($bbformdata->timemodified != 0);
         $this->assertEquals('<p>this -> "</p>\n', $bbformdata->participants);
     }
@@ -60,8 +58,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave instance
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_instance() {
         $this->resetAfterTest();
@@ -69,15 +65,13 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->instance = 0;
         $bbformdata->timemodified = time();
-        instance::bigbluebuttonbn_process_pre_save_instance($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_instance($bbformdata);
         $this->assertTrue($bbformdata->timemodified == 0);
     }
 
     /**
      * Presave checkboxes
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_checkboxes() {
         $this->resetAfterTest();
@@ -85,7 +79,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         unset($bbformdata->wait);
         unset($bbformdata->recordallfromstart);
-        instance::bigbluebuttonbn_process_pre_save_checkboxes($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_checkboxes($bbformdata);
         $this->assertTrue(isset($bbformdata->wait));
         $this->assertTrue(isset($bbformdata->recordallfromstart));
     }
@@ -93,8 +87,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Presave common
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_pre_save_common() {
         global $CFG;
@@ -105,15 +97,13 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         $bbformdata->groupmode = '1';
-        instance::bigbluebuttonbn_process_pre_save_common($bbformdata);
+        mod_helper::bigbluebuttonbn_process_pre_save_common($bbformdata);
         $this->assertEquals(0, $bbformdata->groupmode);
     }
 
     /**
      * Post save
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save() {
         global $CFG;
@@ -130,7 +120,7 @@ class instance_test extends \bbb_simple_test {
         // Mark the form to trigger notification.
         $bbformdata->notification = true;
         $messagesink = $this->redirectMessages();
-        instance::bigbluebuttonbn_process_post_save($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save($bbformdata);
         // Now run cron.
         ob_start();
         $this->runAdhocTasks();
@@ -141,11 +131,8 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save notification
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_notification() {
-        global $CFG;
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
@@ -157,7 +144,7 @@ class instance_test extends \bbb_simple_test {
         $teacher = $this->generator->create_user(['role' => 'editingteacher']);
         $this->generator->enrol_user($teacher->id, $this->course->id);
 
-        instance::bigbluebuttonbn_process_post_save_notification($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_notification($bbformdata);
         // Now run cron.
         ob_start();
         $this->runAdhocTasks();
@@ -168,8 +155,6 @@ class instance_test extends \bbb_simple_test {
     /**
      * Post save event
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_event() {
         $this->resetAfterTest();
@@ -178,15 +163,13 @@ class instance_test extends \bbb_simple_test {
         $eventsink = $this->redirectEvents();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->openingtime = time();
-        instance::bigbluebuttonbn_process_post_save_event($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_event($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 
     /**
      * Post save completion
      *
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_process_post_save_completion() {
         $this->resetAfterTest();
@@ -195,7 +178,7 @@ class instance_test extends \bbb_simple_test {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $eventsink = $this->redirectEvents();
         $bbformdata->completionexpected = 1;
-        instance::bigbluebuttonbn_process_post_save_completion($bbformdata);
+        mod_helper::bigbluebuttonbn_process_post_save_completion($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 

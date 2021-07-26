@@ -40,11 +40,10 @@ class recording_name_editable extends recording_editable {
      * Get the value to display
      *
      * @param array $recording
-     * @param array $bbbsession
      * @return string
      */
-    public function get_recording_value($recording, $bbbsession) {
-        return recording::bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
+    public function get_recording_value($recording) {
+        return recording::bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $this->instance);
     }
 
     /**

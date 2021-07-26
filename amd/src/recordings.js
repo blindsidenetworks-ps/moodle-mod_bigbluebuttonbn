@@ -21,54 +21,49 @@ import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import * as Str from 'core/str';
 
-// eslint-disable-next-line
-const convertFeaturesToMap = profileFeatures => {
-    const mappedFeatures = new Map();
-    for (const feature of profileFeatures) {
-        mappedFeatures.set(feature, true);
-    }
+const stringList = [
+    'view_recording_yui_first',
+    'view_recording_yui_prev',
+    'view_recording_yui_next',
+    'view_recording_yui_last',
+    'view_recording_yui_page',
+    'view_recording_yui_go',
+    'view_recording_yui_rows',
+    'view_recording_yui_show_all',
+];
 
-    return mappedFeatures;
-};
-
-/**
- * Initiate the YUI langauge strings with appropriate values for the sortable list from Moodle.
- *
- * @param   {YUI} Y
- * @returns {Promise}
- */
-const initYuiLanguage = Y => {
-    const stringList = [
-        'view_recording_yui_first',
-        'view_recording_yui_prev',
-        'view_recording_yui_next',
-        'view_recording_yui_last',
-        'view_recording_yui_page',
-        'view_recording_yui_go',
-        'view_recording_yui_rows',
-        'view_recording_yui_show_all',
-    ].map(key => {
+const getStringsForYui = () => {
+    const stringMap = stringList.map(key => {
         return {
             key,
             component: 'bigbluebuttonbn',
         };
     });
 
-    return getStrings(stringList)
-        .then(([first, prev, next, last, goToLabel, goToAction, perPage, showAll]) => {
-            Y.Intl.add('datatable-paginator', Y.config.lang, {
-                first,
-                prev,
-                next,
-                last,
-                goToLabel,
-                goToAction,
-                perPage,
-                showAll,
-            });
-        })
-        .catch();
+    return getStrings(stringMap)
+    .then(([first, prev, next, last, goToLabel, goToAction, perPage, showAll]) => {
+        return {
+            first,
+            prev,
+            next,
+            last,
+            goToLabel,
+            goToAction,
+            perPage,
+            showAll,
+        };
+    })
+    .catch();
 };
+
+const getYuiInstance = lang => new Promise(resolve => {
+    // eslint-disable-next-line
+    YUI({
+        lang,
+    }).use('intl', 'datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', Y => {
+        resolve(Y);
+    });
+});
 
 /**
  * Format the supplied date per the specified locale.
@@ -83,7 +78,7 @@ const formatDates = (locale, dateList) => dateList.map(row => {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
     });
 
     return row;
@@ -97,33 +92,46 @@ const formatDates = (locale, dateList) => dateList.map(row => {
  */
 const getFormattedData = response => {
     const recordingData = response.tabledata;
-    let rowData = JSON.parse(recordingData.data);
+    const rowData = JSON.parse(recordingData.data);
 
-    rowData = formatDates(recordingData.locale, rowData);
-
-    return rowData;
+    return formatDates(recordingData.locale, rowData);
 };
+
+const getTableNode = tableSelector => document.querySelector(tableSelector);
+
+const fetchRecordingData = tableSelector => {
+    const tableNode = getTableNode(tableSelector);
+
+    return repository.fetchRecordings(
+        tableNode.dataset.bbbid,
+        tableNode.dataset.groupId,
+        tableNode.dataset.removeImportedId,
+        tableNode.dataset.tools
+    );
+};
+
 /**
+ * Functions to manage the data table.
  *
- * @param {String} tableId in which we will display the table
- * @returns {[(*|number), string, boolean]}
+ * @typedef dataTableFunctions
+ * @property function refreshTableData
+ * @property function filterByText
+ * @property function registerEventListeners
  */
-const getTableInformations = (tableId) => {
-    const tableElement = document.querySelector(tableId);
-    const bbbid = tableElement.dataset.bbbid;
-    const tools = tableElement.dataset.tools;
-    const removeImportedId = tableElement.dataset.removeImportedId;
-    return [bbbid, removeImportedId, tools];
-};
 
 /**
+ * Fetch the data table functinos for the specified table.
  *
  * @param {String} tableId in which we will display the table
  * @param {String} searchFormId The Id of the relate.
  * @param {Object} dataTable
- * @returns {{refreshTableData: refreshTableData, filterByText: filterByText, registerEventListeners: registerEventListeners}}
+ * @returns {dataTable}
+ * @private
  */
 const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
+    const tableNode = getTableNode(tableId);
+    const bbbid = tableNode.dataset.bbbid;
+
     const updateTableFromResponse = response => {
         if (!response || !response.status) {
             // There was no output at all.
@@ -142,8 +150,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         }
     };
 
-    const [bbbid, removeImportedId, tools] = getTableInformations(tableId);
-    const refreshTableData = () => repository.fetchRecordings(bbbid, removeImportedId, tools).then(updateTableFromResponse);
+    const refreshTableData = () => fetchRecordingData(tableId).then(updateTableFromResponse);
 
     const filterByText = value => {
         const dataModel = dataTable.get('currentData');
@@ -188,16 +195,16 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
                     title: Str.get_string('confirm'),
                     body: recordingConfirmationMessage(payload),
                     type: ModalFactory.types.SAVE_CANCEL
-                }).then((modal) => {
+                }).then(modal => {
                     modal.setSaveButtonText(Str.get_string('ok'));
 
                     // Handle save event.
-                    modal.getRoot().on(ModalEvents.save, function () {
+                    modal.getRoot().on(ModalEvents.save, function() {
                         resolve(true);
                     });
 
                     // Handle hidden event.
-                    modal.getRoot().on(ModalEvents.hidden, function () {
+                    modal.getRoot().on(ModalEvents.hidden, function() {
                         // Destroy when hidden.
                         modal.destroy();
                         resolve(false);
@@ -205,6 +212,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
 
                     modal.show();
 
+                    return modal;
                 }).catch(Notification.exception)
             ).then((proceed) =>
                 proceed ? repository.updateRecording(payload) : () => null
@@ -214,7 +222,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         }
     };
 
-    const recordingConfirmationMessage = async (data) => {
+    const recordingConfirmationMessage = async(data) => {
         let confirmation = await Str.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
         if (typeof confirmation === 'undefined') {
             return '';
@@ -275,7 +283,8 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
             requestAction(clickedLink)
                 .then(refreshTableData)
                 .catch(displayException)
-                .then(iconPromise.resolve);
+                .then(iconPromise.resolve)
+                .catch();
         }
     };
 
@@ -332,44 +341,41 @@ const setupDatatable = (tableId, searchFormId, response) => {
     if (!showRecordings) {
         // TODO: This should be handled by the web service.
         // This user is not allowed to view recordings.
-        return Promise.resolve();
+        return Promise.reject();
     }
 
-    return new Promise(function (resolve) {
-        // eslint-disable-next-line
-        YUI({
-            lang: recordingData.locale,
-        }).use('intl', 'datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', Y => {
-            initYuiLanguage(Y)
-                .then(() => {
-                    const tableData = getFormattedData(response);
+    return Promise.all([getYuiInstance(recordingData.locale), getStringsForYui()])
+    .then(([yuiInstance, strings]) => {
+        // Add the fetched strings to the YUI Instance.
+        yuiInstance.Intl.add('datatable-paginator', yuiInstance.config.lang, {...strings});
 
-                    const dataTable = new Y.DataTable({
-                        width: "1195px",
-                        columns: recordingData.columns,
-                        data: tableData,
-                        rowsPerPage: 3,
-                        paginatorLocation: ['header', 'footer']
-                    });
-                    dataTable.set('currentData', dataTable.get('data'));
-                    dataTable.set('currentFilter', '');
-
-                    return dataTable;
-                })
-                .then(resolve)
-                .catch();
-        });
+        return yuiInstance;
     })
-        .then(dataTable => {
-            dataTable.render(tableId);
-            const {registerEventListeners} = getDataTableFunctions(
-                tableId,
-                searchFormId,
-                dataTable);
-            registerEventListeners();
+    .then(yuiInstance => {
+        const tableData = getFormattedData(response);
 
-            return dataTable;
+        const dataTable = new yuiInstance.DataTable({
+            width: "1195px",
+            columns: recordingData.columns,
+            data: tableData,
+            rowsPerPage: 3,
+            paginatorLocation: ['header', 'footer']
         });
+        dataTable.set('currentData', dataTable.get('data'));
+        dataTable.set('currentFilter', '');
+
+        return dataTable;
+    })
+    .then(dataTable => {
+        dataTable.render(tableId);
+        const {registerEventListeners} = getDataTableFunctions(
+            tableId,
+            searchFormId,
+            dataTable);
+        registerEventListeners();
+
+        return dataTable;
+    });
 };
 
 /**
@@ -380,8 +386,7 @@ const setupDatatable = (tableId, searchFormId, response) => {
  * @param {String} searchFormId The Id of the relate.
  */
 export const init = (tableId, searchFormId) => {
-    const [bbbid, removeImportedId, tools] = getTableInformations(tableId);
-    repository.fetchRecordings(bbbid, removeImportedId, tools)
+    fetchRecordingData(tableId)
         .then(response => setupDatatable(tableId, searchFormId, response))
         .catch(displayException);
 };

@@ -26,14 +26,11 @@
 namespace mod_bigbluebuttonbn\external;
 
 use external_api;
-use external_description;
 use external_function_parameters;
-use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\recording;
 use moodle_exception;
 
@@ -69,11 +66,6 @@ class update_recording extends external_api {
      * @param null $additionaloptions
      * @return array (empty array for now)
      * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws \restricted_context_exception
-     * @throws moodle_exception
      */
     public static function execute(
         int $bigbluebuttonbnid,
@@ -108,20 +100,16 @@ class update_recording extends external_api {
         }
 
         // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context,
-            'enabledfeatures' => $enabledfeatures,
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $context = $instance->get_context();
+        $enabledfeatures = $instance->get_enabled_features();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($bbbsession,
-            $enabledfeatures
-        );
+        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
 
         // Specific action for import
         // TODO: refactor this so we do all the operation in the recording table instead of the
@@ -130,7 +118,7 @@ class update_recording extends external_api {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
         } else {
-            recording::recording_import($bbbsession, $recordingid, $additionaloptions);
+            recording::recording_import($instance, $recordingid, $additionaloptions);
         }
 
         return [];

@@ -44,9 +44,6 @@ class roles_test extends \bbb_simple_test {
     /**
      * Test select separate group prevent all
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_get_users_select_separate_groups_prevent_all() {
         $this->resetAfterTest();
@@ -82,9 +79,6 @@ class roles_test extends \bbb_simple_test {
     /**
      * Test select separate groups
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_get_users_select_separate_groups() {
         $this->resetAfterTest();

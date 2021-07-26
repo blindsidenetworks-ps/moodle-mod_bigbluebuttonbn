@@ -59,7 +59,6 @@ class recording_test extends advanced_testcase {
     /**
      * Setup
      *
-     * @throws coding_exception
      */
     public function setUp(): void {
         parent::setUp();
@@ -95,7 +94,6 @@ class recording_test extends advanced_testcase {
     /**
      * Clean the temporary mocked up recordings
      *
-     * @throws coding_exception
      */
     public function tearDown(): void {
         parent::tearDown();

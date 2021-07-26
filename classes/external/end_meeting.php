@@ -25,14 +25,17 @@
 
 namespace mod_bigbluebuttonbn\external;
 
+use core\notification;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
 
@@ -63,12 +66,7 @@ class end_meeting extends external_api {
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @param string $meetingid
      * @return array (empty array for now)
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
      * @throws \restricted_context_exception
-     * @throws moodle_exception
      */
     public static function execute(
         int $bigbluebuttonbnid,
@@ -84,25 +82,33 @@ class end_meeting extends external_api {
         ]);
 
         // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator']) {
+
+        if (!$instance->is_admin() && !$instance->is_moderator()) {
             throw new restricted_context_exception();
         }
         // Execute the end command.
-        meeting::bigbluebuttonbn_end_meeting($meetingid, $bbbsession['modPW']);
+        $meeting = new meeting($instance);
+        $meeting->end_meeting();
+
         // Moodle event logger: Create an event for meeting ended.
-        if (isset($bbbsession['bigbluebuttonbn'])) {
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(events::$events['meeting_end'],
-                $bbbsession['bigbluebuttonbn']);
+        $instancedata = $instance->get_instance_data();
+        if (isset($instancedata)) {
+            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
+                events::$events['meeting_end'],
+                $instancedata
+            );
         }
+
         // Update the cache.
-        meeting::bigbluebuttonbn_get_meeting_info($meetingid, bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE);
+        $meeting->update_cache();
+
+        notification::add(get_string('end_session_notification', 'mod_bigbluebuttonbn'), notification::INFO);
+
         return [];
     }
 

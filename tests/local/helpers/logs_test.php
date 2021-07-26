@@ -40,8 +40,6 @@ class logs_test extends \bbb_simple_test {
     /**
      * Test delete instance logs
      *
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_delete_instance_log() {
         global $DB;
@@ -54,8 +52,6 @@ class logs_test extends \bbb_simple_test {
 
     /**
      * Test log method
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public function test_bigbluebuttonbn_log() {
         global $DB;

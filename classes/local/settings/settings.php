@@ -118,7 +118,6 @@ class settings {
      * @param string $sectioname
      *
      * @return admin_settingpage
-     * @throws \coding_exception
      */
     public function bigbluebuttonbn_settings_general($sectioname) {
         $settingsgeneral = new admin_settingpage($sectioname, get_string('config_general', 'bigbluebuttonbn'),
@@ -252,9 +251,7 @@ class settings {
     /**
      * Helper function renders import recording settings if the feature is enabled.
      *
-     *
      * @return void
-     * @throws \coding_exception
      */
     public function bigbluebuttonbn_settings_importrecordings() {
         // Configuration for 'import recordings' feature.
@@ -457,7 +454,6 @@ class settings {
     /**
      * Helper function renders static voice bridge settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_voicebridge() {
@@ -486,7 +482,6 @@ class settings {
 
     /**
      * Helper function renders preuploaded presentation settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -536,7 +531,6 @@ class settings {
     /**
      * Helper function renders userlimit settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_userlimit() {
@@ -575,7 +569,6 @@ class settings {
     /**
      * Helper function renders participant settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_participants() {
@@ -608,7 +601,6 @@ class settings {
     /**
      * Helper function renders notification settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_notifications() {
@@ -637,7 +629,6 @@ class settings {
 
     /**
      * Helper function renders general settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -677,7 +668,6 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_locksettings() {
@@ -698,7 +688,6 @@ class settings {
 
     /**
      * Helper function renders general settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -734,7 +723,6 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_disablemic() {
@@ -769,9 +757,7 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
-     * @throws \coding_exception
      */
     public function bigbluebuttonbn_settings_disableprivatechat() {
         // Configuration for BigBlueButton.
@@ -804,7 +790,6 @@ class settings {
 
     /**
      * Helper function renders general settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -840,7 +825,6 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_disablenote() {
@@ -874,7 +858,6 @@ class settings {
 
     /**
      * Helper function renders general settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -910,7 +893,6 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_lockedlayout() {
@@ -944,7 +926,6 @@ class settings {
 
     /**
      * Helper function renders general settings if the feature is enabled.
-     *
      *
      * @return void
      */
@@ -982,7 +963,6 @@ class settings {
     /**
      * Helper function renders general settings if the feature is enabled.
      *
-     *
      * @return void
      */
     public function bigbluebuttonbn_settings_lockonjoinconfigurable() {
@@ -1017,9 +997,7 @@ class settings {
     /**
      * Helper function renders extended settings if any of the features there is enabled.
      *
-     *
      * @return void
-     * @throws \coding_exception
      */
     public function bigbluebuttonbn_settings_extended() {
         // Configuration for extended capabilities.

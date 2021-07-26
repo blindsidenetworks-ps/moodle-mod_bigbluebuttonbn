@@ -24,11 +24,7 @@
  */
 
 namespace mod_bigbluebuttonbn\local;
-
-use mod_bigbluebuttonbn\local\bbb_constants;
-
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
 /**
  * Handles the global configuration based on config.php.

@@ -20,8 +20,8 @@ Feature: bigbluebuttonbn instance
     And I wait until the page is ready
     Then I should see "RoomRecordings"
     And I should see "This conference room is ready. You can join the session now."
-    # The button text is somewhat not considered as "visible".
-    And "#join_button_input" "css_element" should be visible
+    # The button is now a link.
+    And I should see "Join session"
     And I should see "Recordings"
     When I follow "testcourse"
     And I add a "BigBlueButton" to section "1" and I fill the form with:
@@ -32,7 +32,7 @@ Feature: bigbluebuttonbn instance
     Then I should see "RoomOnly"
     And I wait until the page is ready
     And I should see "This conference room is ready. You can join the session now."
-    And "#join_button_input" "css_element" should be visible
+    And I should see "Join session"
     And I should see "Recordings"
     When I follow "testcourse"
     And I add a "BigBlueButton" to section "1" and I fill the form with:
@@ -43,7 +43,7 @@ Feature: bigbluebuttonbn instance
     Then I should see "RecordingsOnly"
     And I wait until the page is ready
     And I should not see "This conference room is ready. You can join the session now."
-    And "#join_button_input" "css_element" should not be visible
+    And I should not see "Join session"
     And I should see "Recordings"
 
   @javascript

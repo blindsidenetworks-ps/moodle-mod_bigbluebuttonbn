@@ -25,14 +25,8 @@ namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\notifier;
-use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
-use context_module;
-use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class instance {
+class mod_helper {
 
     /**
      * Runs any processes that must run before a bigbluebuttonbn insert/update.
@@ -68,7 +62,6 @@ class instance {
      * @return void
      **/
     public static function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
-        global $CFG;
         $bigbluebuttonbn->timemodified = time();
         if ((integer) $bigbluebuttonbn->instance == 0) {
             $bigbluebuttonbn->meetingid = 0;
@@ -256,63 +249,5 @@ class instance {
                 $bigbluebuttonbn->completionexpected
             );
         }
-    }
-
-    /**
-     * Get session from the id.
-     *
-     * @param int $instanceid
-     * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws moodle_exception
-     */
-    public static function get_session_from_id(int $instanceid): array {
-        // Fetch the view instnace using the instanceid.
-        $viewinstance = view::bigbluebuttonbn_view_instance_bigbluebuttonbn($instanceid);
-        if (!$viewinstance) {
-            throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
-        }
-
-        $cm = $viewinstance['cm'];
-        $context = context_module::instance($cm->id);
-        $course = $viewinstance['course'];
-        $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-
-        // Log the fetch.
-        logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
-
-        // Additional info related to the course.
-        $bbbsession = [
-            'course'           => $course,
-            'coursename'       => $course->fullname,
-            'cm'               => $cm,
-            'bigbluebuttonbn'  => $bigbluebuttonbn,
-        ];
-
-        // Update the bbbsession set.
-        // Note: bbbsession is passed by reference.
-        bigbluebutton::view_bbbsession_set($context, $bbbsession);
-
-        // Validates if the BigBlueButton server is working.
-        $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
-
-        if ($serverversion === null) {
-            throw new moodle_exception("Unable to fetch information form server");
-        }
-
-        $bbbsession['serverversion'] = (string) $serverversion;
-
-        $enabledfeatures = config::bigbluebuttonbn_get_enabled_features(
-            bigbluebutton::bigbluebuttonbn_get_instance_type_profiles(),
-            $bbbsession['bigbluebuttonbn']->type ?? null
-        );
-
-        return [
-            'bbbsession' => $bbbsession,
-            'context' => $context,
-            'enabledfeatures' => $enabledfeatures,
-            'typeprofiles' => bigbluebutton::bigbluebuttonbn_get_instance_type_profiles(),
-        ];
     }
 }

@@ -29,13 +29,8 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\helpers\instance;
-use mod_bigbluebuttonbn\local\helpers\meeting;
 use moodle_exception;
-use restricted_context_exception;
 
 /**
  * External service to validate completion.
@@ -62,12 +57,6 @@ class completion_validate extends external_api {
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
      * @return array (empty array for now)
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \required_capability_exception
-     * @throws \restricted_context_exception
-     * @throws moodle_exception
      */
     public static function execute(
         int $bigbluebuttonbnid
@@ -80,10 +69,8 @@ class completion_validate extends external_api {
         ]);
 
         // Fetch the session, features, and profile.
-        [
-            'bbbsession' => $bbbsession,
-            'context' => $context
-        ] = instance::get_session_from_id($bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
@@ -94,8 +81,7 @@ class completion_validate extends external_api {
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         foreach ($users as $user) {
             // Enqueue a task for processing the completion.
-            bigbluebutton::bigbluebuttonbn_enqueue_completion_update(
-                $bbbsession['bigbluebuttonbn'], $user->id);
+            bigbluebutton::bigbluebuttonbn_enqueue_completion_update( $instance->get_instance_data(), $user->id);
         }
         // We might want to return a status here or some warnings.
         return [];

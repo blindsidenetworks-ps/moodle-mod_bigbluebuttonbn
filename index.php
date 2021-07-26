@@ -24,24 +24,15 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\roles;
+use core\notification;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\output\index;
-use mod_bigbluebuttonbn\output\renderer;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__.'/../../config.php');
 
 $id = required_param('id', PARAM_INT);
-$a = optional_param('a', 0, PARAM_INT);
-$g = optional_param('g', 0, PARAM_INT);
-
-$course = $DB->get_record('course', ['id' => $id]);
-if (!$course) {
-    throw new moodle_exception('invalidcourseid');
-}
-
+$course = get_course($id);
 require_login($course, true);
 
 $PAGE->set_url('/mod/bigbluebuttonbn/index.php', ['id' => $id]);
@@ -52,36 +43,18 @@ $PAGE->set_pagelayout('incourse');
 
 $PAGE->navbar->add($PAGE->title, $PAGE->url);
 
-$action = optional_param('action', '', PARAM_TEXT);
-if ($action === 'end') {
-    // A request to end the meeting.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $a]);
-    if (!$bigbluebuttonbn) {
-        throw new moodle_exception('index_error_bbtn', plugin::COMPONENT, '', $a);
-    }
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-    // User roles.
-    $participantlist = roles::bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $PAGE->context);
-    $moderator = roles::bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
-    $administrator = is_siteadmin();
-    if ($moderator || $administrator) {
-        logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
-        echo get_string('index_ending', plugin::COMPONENT);
-        $meetingid = sprintf('%s-%d-%d', $bigbluebuttonbn->meetingid, $course->id, $bigbluebuttonbn->id);
-        if ($g != 0) {
-            $meetingid .= sprintf('[%d]', $g);
-        }
+$instances = instance::get_all_instances_in_course($course->id);
+if (empty($instances)) {
+    \core\notification::add(
+        get_string('index_error_noinstances', plugin::COMPONENT),
+        \core\notification::ERROR
+    );
 
-        meeting::bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
-        redirect($PAGE->url);
-    }
+    redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
 }
-
-/** @var renderer $renderer */
-$renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
-echo $renderer->render(new index($course));
+$renderer = $PAGE->get_renderer(plugin::COMPONENT);
+echo $renderer->render(new index($course, $instances));
 echo $OUTPUT->footer();

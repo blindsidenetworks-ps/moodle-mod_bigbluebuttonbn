@@ -27,15 +27,18 @@ namespace mod_bigbluebuttonbn\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use mod_bigbluebuttonbn\local\mobileview;
 use mod_bigbluebuttonbn\local\view;
-use mod_bigbluebuttonbn\output\mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\meeting;
+use mod_bigbluebuttonbn\plugin;
 
+global $CFG;
 require_once($CFG->dirroot . '/lib/grouplib.php');
 
 /**
@@ -50,42 +53,35 @@ class mobile {
 
     /**
      * Returns the bigbluebuttonbn course view for the mobile app.
+     *
      * @param mixed $args
      * @return array HTML, javascript and other data.
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
      */
     public static function mobile_course_view($args) {
 
-        global $OUTPUT, $SESSION;
+        global $OUTPUT;
 
         $args = (object) $args;
         $versionname = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
         $viewinstance = view::bigbluebuttonbn_view_validator($args->cmid, null);
         if (!$viewinstance) {
             $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
-            return(self::mobile_print_error($error));
+            return self::mobile_print_error($error);
         }
 
-        $bbbsession = bigbluebutton::build_bbb_session_fromviewinstance($viewinstance);
-
-        // Create variables for easy access.
-        $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-        $serverversion = $bbbsession['serverversion'];
-        $cm = $bbbsession['cm'];
-        $course = $bbbsession['course'];
-        $context = $bbbsession['context'];
+        $instance = instance::get_from_cmid($args->cmid);
+        $cm = $instance->get_cm();
+        $course = $instance->get_course();
+        $bigbluebuttonbn = $instance->get_instance_data();
 
         // Check activity status.
-        $activitystatus = mobileview::get_activity_status($bbbsession);
-        if ($activitystatus == 'not_started') {
+        if ($instance->before_start_time()) {
             $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
-            $notstarted = array();
-            $notstarted['starts_at'] = '';
-            $notstarted['ends_at'] = '';
+            $notstarted = [
+                'starts_at' => '',
+                'ends_at' => '',
+            ];
             if (!empty($bigbluebuttonbn->openingtime)) {
                 $notstarted['starts_at'] = sprintf(
                     '%s: %s',
@@ -93,6 +89,7 @@ class mobile {
                     userdate($bigbluebuttonbn->openingtime)
                 );
             }
+
             if (!empty($bigbluebuttonbn->closingtime)) {
                 $notstarted['ends_at'] = sprintf(
                     '%s: %s',
@@ -101,25 +98,18 @@ class mobile {
                 );
             }
 
-            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted));
+            return self::mobile_print_notification($instance, $message, $notstarted);
         }
-        if ($activitystatus == 'ended') {
+
+        if ($instance->has_ended()) {
             $message = get_string('view_message_conference_has_ended', 'bigbluebuttonbn');
-            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+            return self::mobile_print_notification($instance, $message);
         }
 
         // Check if the BBB server is working.
-        if (is_null($serverversion)) {
-
-            if ($bbbsession['administrator']) {
-                $error = get_string('view_error_unable_join', 'bigbluebuttonbn');
-            } else if ($bbbsession['moderator']) {
-                $error = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
-            } else {
-                $error = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
-            }
-
-            return(self::mobile_print_error($error));
+        $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
+        if ($serverversion === null) {
+            return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
         }
 
         // Mark viewed by user (if required).
@@ -127,85 +117,53 @@ class mobile {
         $completion->set_module_viewed($cm);
 
         // Validate if the user is in a role allowed to join.
-        if (!has_capability('moodle/category:manage', $context) &&
-            !has_capability('mod/bigbluebuttonbn:join', $context)) {
-            $error = get_string('view_nojoin', 'bigbluebuttonbn');
-            return(self::mobile_print_error($error));
+        if (!$instance->has_join()) {
+            return self::mobile_print_error(get_string('view_nojoin', 'bigbluebuttonbn'));
         }
 
-        // Initialize session variable used across views.
-        $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+        // Note: This logic should match bbb_view.php.
 
         // Logic of bbb_view for join to session.
-        // If user is not administrator nor moderator (user is student) and waiting is required.
-        if (!$bbbsession['administrator'] && !$bbbsession['moderator'] && $bbbsession['wait']) {
-            $canjoin = bigbluebutton::can_join_meeting($args->cmid);
-            if (!$canjoin['can_join']) {
-                $message = get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn');
-                return (self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
-            }
+        if ($instance->user_must_wait_to_join()) {
+            // If user is not administrator nor moderator (user is student) and waiting is required.
+            return self::mobile_print_notification(
+                $instance,
+                get_string('view_message_conference_wait_for_moderator', 'bigbluebuttonbn')
+            );
         }
 
         // See if the BBB session is already in progress.
-        if (!meeting::bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
-
+        $meeting = new meeting($instance);
+        if (!$meeting->is_running()) {
             // The meeting doesnt exist in BBB server, must be created.
-            $response = meeting::bigbluebuttonbn_get_create_meeting_array(
-                mobileview::create_meeting_data($bbbsession),
-                mobileview::create_meeting_metadata($bbbsession),
-                $bbbsession['presentation']['name'],
-                $bbbsession['presentation']['url']
-            );
-
-            if (empty($response)) {
-                // The BBB server is failing.
-                if ($bbbsession['administrator']) {
-                    $e = get_string('view_error_unable_join', 'bigbluebuttonbn');
-                } else if ($bbbsession['moderator']) {
-                    $e = get_string('view_error_unable_join_teacher', 'bigbluebuttonbn');
-                } else {
-                    $e = get_string('view_error_unable_join_student', 'bigbluebuttonbn');
-                }
-                return(self::mobile_print_error($e));
+            try {
+                $meeting->create_meeting();
+                // Event meeting created.
+                logs::log_meeting_created_event($instance);
+            } catch (bigbluebutton_exception $e) {
+                return self::mobile_print_error($e->getMessage());
+            } catch (server_not_available_exception $e) {
+                return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
             }
-            if ($response['returncode'] == 'FAILED') {
-                // The meeting could not be created.
-                $errorkey = roles::bigbluebuttonbn_get_participant_listget_error_key($response['messageKey'], 'view_error_create');
-                $e = get_string($errorkey, 'bigbluebuttonbn');
-                return(self::mobile_print_error($e));
-            }
-            if ($response['hasBeenForciblyEnded'] == 'true') {
-                $e = get_string('index_error_forciblyended', 'bigbluebuttonbn');
-                return(self::mobile_print_error($e));
-            }
-
-            // Event meeting created.
-            logs::bigbluebuttonbn_event_log(events::$events['meeting_create'],
-                $bigbluebuttonbn);
-            // Insert a record that meeting was created.
-            $overrides = array('meetingid' => $bbbsession['meetingid']);
-            $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
-            logs::bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'],
-                bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         }
 
         // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.
         // Update the cache.
-        $meetinginfo = meeting::bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'],
-            bbb_constants::BIGBLUEBUTTONBN_UPDATE_CACHE);
-        if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
+        $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
+
+        if ($instance->has_user_limit_been_reached($meetinginfo->participantcount)
+            && $instance->does_current_user_count_towards_user_limit()
+        ) {
             // No more users allowed to join.
-            $message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');
-            return(self::mobile_print_notification($bigbluebuttonbn, $cm, $message));
+            return self::mobile_print_notification($instance, get_string('view_error_userlimit_reached', 'bigbluebuttonbn'));
         }
 
         // Build final url to BBB.
-        $bbbsession['createtime'] = $meetinginfo['createTime'];
-        $urltojoin = mobileview::build_url_join_session($bbbsession);
+        $urltojoin = $meeting->get_join_url();
 
         // Check groups access and show message.
         $msjgroup = array();
-        $groupmode = groups_get_activity_groupmode($bbbsession['cm']);
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
         if ($groupmode != NOGROUPS) {
             $msjgroup = array("message" => get_string('view_mobile_message_groups_not_supported',
                 'bigbluebuttonbn'));
@@ -213,7 +171,6 @@ class mobile {
 
         $data = array(
             'bigbluebuttonbn' => $bigbluebuttonbn,
-            'bbbsession' => (object) $bbbsession,
             'msjgroup' => $msjgroup,
             'urltojoin' => $urltojoin,
             'cmid' => $cm->id,
@@ -242,13 +199,14 @@ class mobile {
 
     /**
      * Returns the view for errors.
+     *
      * @param string $error Error to display.
      *
      * @return array       HTML, javascript and otherdata
      */
     protected static function mobile_print_error($error) {
-
         global $OUTPUT;
+
         $data = array(
             'error' => $error
         );
@@ -268,18 +226,18 @@ class mobile {
 
     /**
      * Returns the view for messages.
-     * @param object $bigbluebuttonbn
-     * @param stdClass $cm
+     *
+     * @param instance $instance
      * @param string $message Message to display.
      * @param array $notstarted Extra messages for not started session.
      * @return array HTML, javascript and otherdata
      */
-    protected static function mobile_print_notification($bigbluebuttonbn, $cm, $message, $notstarted = array()) {
-
+    protected static function mobile_print_notification(instance $instance, $message, $notstarted = array()) {
         global $OUTPUT, $CFG;
+
         $data = array(
-            'bigbluebuttonbn' => $bigbluebuttonbn,
-            'cmid' => $cm->id,
+            'bigbluebuttonbn' => $instance->get_instance_data(),
+            'cmid' => $instance->get_cm_id(),
             'message' => $message,
             'not_started' => $notstarted
         );
