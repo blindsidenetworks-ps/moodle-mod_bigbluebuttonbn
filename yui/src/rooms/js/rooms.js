@@ -98,11 +98,26 @@ M.mod_bigbluebuttonbn.rooms = {
                     request: 'action=generate_guest_password&bigbluebuttonbn=' + bnid + '&delete=' + del,
                     callback: {
                         success: function(e) {
-                            var input = document.getElementById("id_password");
-                            var result = e.data;
-                            if(result) {
-                                input.value = ("000000" + result).slice(-6);
-                            }
+                            require(['core/notification'], function(Notification) {
+                                var input = document.getElementById('id_password');
+                                var result = e.data;
+                                if (result) {
+                                    input.value = ("000000" + result).slice(-6);
+                                }
+
+                                var message = M.util.get_string(
+                                    'view_guestlink_update_access_code', 'bigbluebuttonbn',
+                                    '<b class="notification_access_code">' + input.value + '</b>'
+                                );
+                                // Remove previous 'access code' notifications of this type.
+                                $('#user-notifications .notification_access_code').each(function() {
+                                    $(this).closest('.alert').remove();
+                                });
+                                Notification.addNotification({
+                                    message: message,
+                                    type: 'info'
+                                });
+                            });
                         }
                     }
                 });

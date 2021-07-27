@@ -535,6 +535,7 @@ $string['view_guestlink_password_label'] = 'Access Code';
 $string['view_guestlink_expires_at_label'] = 'Guest Access Available Until';
 $string['view_guestlink_password_no_password_set'] = 'Generate an optional room access code.';
 $string['view_guestlink_save_settings'] = 'Update Guest Access Settings';
+$string['view_guestlink_update_access_code'] = 'Access code is now {$a}';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_section_title_analytics'] = 'Analytics';
