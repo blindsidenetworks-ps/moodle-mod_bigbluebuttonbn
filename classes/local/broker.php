@@ -29,9 +29,11 @@ use coding_exception;
 use Exception;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
-use mod_bigbluebuttonbn\local\helpers\recording;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -84,81 +86,17 @@ class broker {
      * @return array
      */
     public static function recording_action_publish($params, $recordings) {
-        if (recording::recording_is_imported($recordings, $params['id'])) {
-            // Execute publish on imported recording link, if the real recording is published.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
-                $recordings[$params['id']]['meetingID'],
-                $recordings[$params['id']]['recordID']
-            );
-            // Only if the physical recording exist and it is published, execute publish on imported recording link.
-            if (!isset($realrecordings[$params['id']])) {
-                return array(
-                    'status' => false,
-                    'message' => get_string('view_recording_publish_link_deleted', 'bigbluebuttonbn')
-                );
-            }
-            if ($realrecordings[$params['id']]['published'] !== 'true') {
-                return array(
-                    'status' => false,
-                    'message' => get_string('view_recording_publish_link_not_published', 'bigbluebuttonbn')
-                );
-            }
-            return array(
-                'status' => recording::bigbluebuttonbn_publish_recording_imported(
-                    $recordings[$params['id']]['imported'],
-                    true
-                )
-            );
+        if ($recordings[$params['id']]->imported) {
+            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
+             * unpublished. There is no need to do anything else.
+             */
+            return array('status' => 'This action can not be performed on imported links.');
         }
-        // As the recordingid was not identified as imported recording link, execute actual publish.
+        // As the recordingid was not identified as imported recording link, execute publish on a real recording.
         return array(
-            'status' => recording::bigbluebuttonbn_publish_recordings(
+            'status' => recording_proxy::bigbluebutton_publish_recordings(
                 $params['id'],
                 'true'
-            )
-        );
-    }
-
-    /**
-     * Helper for performing unprotect on recordings.
-     *
-     * @param array $params
-     * @param array $recordings
-     *
-     * @return array
-     */
-    public static function recording_action_unprotect($params, $recordings) {
-        if (recording::recording_is_imported($recordings, $params['id'])) {
-            // Execute unprotect on imported recording link, if the real recording is unprotected.
-            $realrecordings = recording::bigbluebuttonbn_get_recordings_array(
-                $recordings[$params['id']]['meetingID'],
-                $recordings[$params['id']]['recordID']
-            );
-            // Only if the physical recording exist and it is published, execute unprotect on imported recording link.
-            if (!isset($realrecordings[$params['id']])) {
-                return array(
-                    'status' => false,
-                    'message' => get_string('view_recording_unprotect_link_deleted', 'bigbluebuttonbn')
-                );
-            }
-            if ($realrecordings[$params['id']]['protected'] === 'true') {
-                return array(
-                    'status' => false,
-                    'message' => get_string('view_recording_unprotect_link_not_unprotected', 'bigbluebuttonbn')
-                );
-            }
-            return array(
-                'status' => recording::bigbluebuttonbn_protect_recording_imported(
-                    $recordings[$params['id']]['imported'],
-                    false
-                )
-            );
-        }
-        // As the recordingid was not identified as imported recording link, execute actual uprotect.
-        return array(
-            'status' => recording::bigbluebuttonbn_update_recordings(
-                $params['id'],
-                array('protect' => 'false')
             )
         );
     }
@@ -172,35 +110,21 @@ class broker {
      * @return array
      */
     public static function recording_action_unpublish($params, $recordings) {
-        global $DB;
-        if (recording::recording_is_imported($recordings, $params['id'])) {
-            // Execute unpublish or protect on imported recording link.
-            return array(
-                'status' => recording::bigbluebuttonbn_publish_recording_imported(
-                    $recordings[$params['id']]['imported'],
-                    false
-                )
-            );
+        if ($recordings[$params['id']]->imported) {
+            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
+             * unpublished. There is no need to do anything else.
+             */
+            return array('status' => 'This action can not be performed on imported links.');
         }
         // As the recordingid was not identified as imported recording link, execute unpublish on a real recording.
-        // First: Unpublish imported links associated to the recording.
-        $importedall = recording::bigbluebuttonbn_get_recording_imported_instances($params['id']);
-        foreach ($importedall as $key => $record) {
-            $meta = json_decode($record->meta, true);
-            // Prepare data for the update.
-            $meta['recording']['published'] = 'false';
-            $importedall[$key]->meta = json_encode($meta);
-            // Proceed with the update.
-            $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
-        }
-        // Second: Execute the actual unpublish.
         return array(
-            'status' => recording::bigbluebuttonbn_publish_recordings(
+            'status' => recording_proxy::bigbluebutton_publish_recordings(
                 $params['id'],
                 'false'
             )
         );
     }
+
 
     /**
      * Helper for performing protect on recordings.
@@ -211,32 +135,41 @@ class broker {
      * @return array
      */
     public static function recording_action_protect($params, $recordings) {
-        global $DB;
-        if (recording::recording_is_imported($recordings, $params['id'])) {
-            // Execute unpublish or protect on imported recording link.
-            return array(
-                'status' => recording::bigbluebuttonbn_protect_recording_imported(
-                    $recordings[$params['id']]['imported'],
-                    true
-                )
-            );
+        if ($recordings[$params['id']]->imported) {
+            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
+             * protected. There is no need to do anything else.
+             */
+            return array('status' => 'This action can not be performed on imported links.');
         }
         // As the recordingid was not identified as imported recording link, execute protect on a real recording.
-        // First: Protect imported links associated to the recording.
-        $importedall = recording::bigbluebuttonbn_get_recording_imported_instances($params['id']);
-        foreach ($importedall as $key => $record) {
-            $meta = json_decode($record->meta, true);
-            // Prepare data for the update.
-            $meta['recording']['protected'] = 'true';
-            $importedall[$key]->meta = json_encode($meta);
-            // Proceed with the update.
-            $DB->update_record('bigbluebuttonbn_logs', $importedall[$key]);
-        }
-        // Second: Execute the actual protect.
         return array(
-            'status' => recording::bigbluebuttonbn_update_recordings(
+            'status' => recording_proxy::bigbluebutton_update_recordings(
                 $params['id'],
                 array('protect' => 'true')
+            )
+        );
+    }
+
+    /**
+     * Helper for performing unprotect on recordings.
+     *
+     * @param array $params
+     * @param array $recordings
+     *
+     * @return array
+     */
+    public static function recording_action_unprotect($params, $recordings) {
+        if ($recordings[$params['id']]->imported) {
+            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
+             * unprotected. There is no need to do anything else.
+             */
+            return array('status' => 'This action can not be performed on imported links.');
+        }
+        // As the recordingid was not identified as imported recording link, execute unprotect on a real recording.
+        return array(
+            'status' => recording_proxy::bigbluebutton_update_recordings(
+                $params['id'],
+                array('protect' => 'false')
             )
         );
     }
@@ -250,27 +183,23 @@ class broker {
      * @return array
      */
     public static function recording_action_delete($params, $recordings) {
-        global $DB;
-        if (recording::recording_is_imported($recordings, $params['id'])) {
+        if ($recordings[$params['id']]->imported) {
             // Execute delete on imported recording link.
             return array(
-                'status' => recording::bigbluebuttonbn_delete_recording_imported(
-                    $recordings[$params['id']]['imported']
+                'status' => recording::delete(
+                    $recordings[$params['id']]->id
                 )
             );
         }
         // As the recordingid was not identified as imported recording link, execute delete on a real recording.
-        // First: Delete imported links associated to the recording.
-        $importedall = recording::bigbluebuttonbn_get_recording_imported_instances($params['id']);
-        if ($importedall > 0) {
-            foreach (array_keys($importedall) as $key) {
-                // Execute delete on imported links.
-                $DB->delete_records('bigbluebuttonbn_logs', array('id' => $key));
-            }
-        }
-        // Second: Execute the actual delete.
+        // Step 1, delete imported links associated to the recording.
+        recording::delete_by(
+            ['recordingid' => $recordings[$params['id']]->recordingid,
+            'imported' => true]
+        );
+        // Step 2, perform the actual delete by sending the corresponding request to BBB.
         return array(
-            'status' => recording::bigbluebuttonbn_delete_recordings($params['id'])
+            'status' => recording_proxy::bigbluebutton_delete_recordings($params['id'])
         );
     }
 
@@ -283,10 +212,10 @@ class broker {
      * @return array
      */
     public static function recording_action_edit($params, $recordings) {
-        if (recording::recording_is_imported($recordings, $params['id'])) {
+        if ($recordings[$params['id']]->imported) {
             // Execute update on imported recording link.
             return array(
-                'status' => recording::bigbluebuttonbn_update_recording_imported(
+                'status' => recording_proxy::bigbluebutton_update_recording_imported(
                     $recordings[$params['id']]['imported'],
                     json_decode($params['meta'], true)
                 )
@@ -294,10 +223,8 @@ class broker {
         }
 
         // As the recordingid was not identified as imported recording link, execute update on a real recording.
-        // (No need to update imported links as the update only affects the actual recording).
-        // Execute update on actual recording.
         return array(
-            'status' => recording::bigbluebuttonbn_update_recordings(
+            'status' => recording_proxy::bigbluebutton_update_recordings(
                 $params['id'],
                 json_decode($params['meta'])
             )
@@ -338,7 +265,7 @@ class broker {
             // Workaround for CONTRIB-7438.
             // Proceed as before when no record_id is provided.
             if (!isset($decodedparameters->record_id)) {
-                recording::bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                notifier::notify_recording_ready($bigbluebuttonbn);
                 header('HTTP/1.0 202 Accepted');
                 return;
             }
@@ -346,7 +273,7 @@ class broker {
             if (
                 \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
                     $decodedparameters->record_id) == 0) {
-                recording::bigbluebuttonbn_send_notification_recording_ready($bigbluebuttonbn);
+                        notifier::notify_recording_ready($bigbluebuttonbn);
             }
             $overrides = array('meetingid' => $decodedparameters->meeting_id);
             $meta['recordid'] = $decodedparameters->record_id;
@@ -358,39 +285,6 @@ class broker {
             $error = 'Caught exception: ' . $e->getMessage();
             header('HTTP/1.0 503 Service Unavailable. ' . $error);
         }
-    }
-
-    /**
-     * Helper for performing import on recordings.
-     *
-     * @param instance $instance
-     * @param array $params
-     *
-     * @return void
-     */
-    public static function recording_import($instance, $params) {
-        global $SESSION;
-        if (!$instance->can_manage_recordings()) {
-            header('HTTP/1.0 401 Unauthorized. User not authorized to execute end command');
-            return;
-        }
-        $importrecordings = $SESSION->bigbluebuttonbn_importrecordings;
-        if (!isset($importrecordings[$params['id']])) {
-            $error = "Recording {$params['id']} could not be found. It can not be imported";
-            header('HTTP/1.0 404 Not found. ' . $error);
-            return;
-        }
-        $importrecordings[$params['id']]['imported'] = true;
-        $overrides = array('meetingid' => $importrecordings[$params['id']]['meetingID']);
-        $meta = '{"recording":' . json_encode($importrecordings[$params['id']]) . '}';
-        logs::bigbluebuttonbn_log($instance->get_instance_data(), bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_IMPORT, $overrides,
-            $meta);
-        // Moodle event logger: Create an event for recording imported.
-        \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
-            events::$events['recording_import'],
-            $instance->get_instance_data(),
-            ['other' => $params['id']]
-        );
     }
 
     /**
@@ -452,11 +346,13 @@ class broker {
         $meta['callback'] = 'meeting_events';
         logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
             json_encode($meta));
-        if (recording::bigbluebuttonbn_get_count_callback_event_log($meta['recordid'], 'meeting_events') == 1) {
-            // Process the events.
-            self::bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
-            header('HTTP/1.0 200 Accepted. Enqueued.');
-            return;
+        if (
+            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
+                $meta['recordid'], 'meeting_events') == 1) {
+                    // Process the events.
+                    self::bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
+                    header('HTTP/1.0 200 Accepted. Enqueued.');
+                    return;
         }
 
         header('HTTP/1.0 202 Accepted. Already processed.');

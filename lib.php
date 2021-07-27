@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -151,17 +152,21 @@ function bigbluebuttonbn_delete_instance($id) {
 
     $result = true;
 
-    // Delete any dependent records here.
-    if (!$DB->delete_records('bigbluebuttonbn', array('id' => $bigbluebuttonbn->id))) {
+    // Delete the instance.
+    if (!$DB->delete_records('bigbluebuttonbn', ['id' => $id])) {
         $result = false;
     }
 
-    if (!$DB->delete_records('event', array('modulename' => 'bigbluebuttonbn', 'instance' => $bigbluebuttonbn->id))) {
+    // Delete dependant events.
+    if (!$DB->delete_records('event', ['modulename' => 'bigbluebuttonbn', 'instance' => $id])) {    
         $result = false;
     }
 
     // Log action performed.
     logs::bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+
+    // Mark dependant recordings as headless.
+    recording::update_by(['bigbluebuttonbnid' => $id], (object)['headless' => recording::RECORDING_HEADLESS]);
 
     return $result;
 }
