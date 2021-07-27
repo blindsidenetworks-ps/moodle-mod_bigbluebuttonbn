@@ -87,8 +87,11 @@ $string['completionengagementtalks'] = 'Talk events';
 $string['completionengagementtalksdesc'] = '{$a} Talk events';
 $string['completionengagementtalktime'] = 'Talk time';
 $string['completionengagementraisehand'] = 'Raise hand events';
+$string['completionengagementraisehanddesc'] = '{$a} Raise Hands events';
 $string['completionengagementpollvotes'] = 'Poll votes';
+$string['completionengagementpollvotesdesc'] = '{$a} Poll votes events';
 $string['completionengagementemojis'] = 'Emojis';
+$string['completionengagementemojisdesc'] = '{$a} Emojis events';
 
 $string['completionengagementdesc'] = 'Student must engage in activities during the meeting';
 $string['completionengagementgroup'] = 'Require engagement';
@@ -279,9 +282,9 @@ $string['config_lockonjoinconfigurable_editable_description'] = 'Lock configurat
 $string['config_experimental_features'] = 'Configuration for experimental features';
 $string['config_experimental_features_description'] = 'Configuration for experimental features.';
 
-$string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_unable_connect'] = 'Unable to connect ({$a}). Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
-
+$string['general_error_not_found'] = 'Entity not found : {$a}.';
 $string['index_confirm_end'] = 'Do you wish to end the virtual class?';
 $string['index_disabled'] = 'disabled';
 $string['index_enabled'] = 'enabled';

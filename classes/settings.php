@@ -39,6 +39,8 @@ use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
+defined('MOODLE_INTERNAL') || die();
+
 class settings {
 
     /** @var admin_setting shared value */

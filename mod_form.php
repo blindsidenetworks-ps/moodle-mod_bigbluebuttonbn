@@ -30,7 +30,7 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 /**
@@ -45,6 +45,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Define (add) particular settings this activity can have.
      *
      * @return void
+     * @throws moodle_exception
      */
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
@@ -106,7 +107,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Get instance type profile.
      *
      * @return array|array[]
-     * @throws coding_exception
      * @throws moodle_exception
      */
     protected function get_instance_type_profiles() {

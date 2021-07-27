@@ -25,21 +25,22 @@
 
 namespace mod_bigbluebuttonbn\local;
 
+use cache;
 use completion_info;
-use context_course;
-use context_module;
 use curl;
 use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
-use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
+use moodle_exception;
+use moodle_url;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
 /**
  * Wrapper for executing http requests on a BigBlueButton server.
@@ -53,8 +54,8 @@ class bigbluebutton {
      * Returns the right URL for the action specified.
      *
      * @param string $action
-     * @param array  $data
-     * @param array  $metadata
+     * @param array $data
+     * @param array $metadata
      * @return string
      */
     public static function action_url($action = '', $data = array(), $metadata = array()) {
@@ -112,184 +113,19 @@ class bigbluebutton {
     }
 
     /**
-     * Get BBB session information from viewinstance
-     *
-     * @param object $viewinstance
-     * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
-     */
-    public static function build_bbb_session_fromviewinstance($viewinstance) {
-        $cm = $viewinstance['cm'];
-        $course = $viewinstance['course'];
-        $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-        return self::build_bbb_session($cm, $course, $bigbluebuttonbn);
-    }
-
-    /**
-     * Get BBB session from parameters
-     *
-     * @param \course_modinfo $cm
-     * @param object $course
-     * @param object $bigbluebuttonbn
-     * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
-     */
-    public static function build_bbb_session($cm, $course, $bigbluebuttonbn) {
-        global $CFG;
-        $context = context_module::instance($cm->id);
-        require_login($course->id, false, $cm, true, true);
-        require_capability('mod/bigbluebuttonbn:join', $context);
-
-        // Add view event.
-        logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
-
-        // Create array bbbsession with configuration for BBB server.
-        $bbbsession['course'] = $course;
-        $bbbsession['coursename'] = $course->fullname;
-        $bbbsession['cm'] = $cm;
-        $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
-        self::view_bbbsession_set($context, $bbbsession);
-
-        $serverversion = self::bigbluebuttonbn_get_server_version();
-        $bbbsession['serverversion'] = (string) $serverversion;
-
-        // Operation URLs.
-        $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $cm->id;
-        $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id=' . $cm->id .
-            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
-            'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
-            '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
-            '&bn=' . $bbbsession['bigbluebuttonbn']->id;
-
-        return $bbbsession;
-    }
-
-    /**
-     * Build standard array with configurations required for BBB server.
-     *
-     * @param \context $context
-     * @param array $bbbsession
-     * @throws \coding_exception
-     * @throws \dml_exception
-     */
-    public static function view_bbbsession_set($context, &$bbbsession) {
-
-        global $CFG, $USER;
-
-        $bbbsession['username'] = fullname($USER);
-        $bbbsession['userID'] = $USER->id;
-        $bbbsession['administrator'] = is_siteadmin($bbbsession['userID']);
-        $participantlist =
-            roles::bigbluebuttonbn_get_participant_list($bbbsession['bigbluebuttonbn'], $context);
-        $bbbsession['moderator'] = roles::bigbluebuttonbn_is_moderator($context, $participantlist);
-        $bbbsession['managerecordings'] = ($bbbsession['administrator']
-            || has_capability('mod/bigbluebuttonbn:managerecordings', $context));
-        $bbbsession['importrecordings'] = ($bbbsession['managerecordings']);
-        $bbbsession['modPW'] = $bbbsession['bigbluebuttonbn']->moderatorpass;
-        $bbbsession['viewerPW'] = $bbbsession['bigbluebuttonbn']->viewerpass;
-        $bbbsession['meetingid'] = $bbbsession['bigbluebuttonbn']->meetingid.'-'.$bbbsession['course']->id.'-'.
-            $bbbsession['bigbluebuttonbn']->id;
-        $bbbsession['meetingname'] = $bbbsession['bigbluebuttonbn']->name;
-        $bbbsession['meetingdescription'] = $bbbsession['bigbluebuttonbn']->intro;
-        $bbbsession['userlimit'] = intval((int) config::get('userlimit_default'));
-        if ((boolean) config::get('userlimit_editable')) {
-            $bbbsession['userlimit'] = intval($bbbsession['bigbluebuttonbn']->userlimit);
-        }
-        $bbbsession['voicebridge'] = $bbbsession['bigbluebuttonbn']->voicebridge;
-        if ($bbbsession['bigbluebuttonbn']->voicebridge > 0) {
-            $bbbsession['voicebridge'] = 70000 + $bbbsession['bigbluebuttonbn']->voicebridge;
-        }
-        $bbbsession['wait'] = $bbbsession['bigbluebuttonbn']->wait;
-        $bbbsession['record'] = $bbbsession['bigbluebuttonbn']->record;
-        $bbbsession['recordallfromstart'] = $CFG->bigbluebuttonbn_recording_all_from_start_default;
-        if ($CFG->bigbluebuttonbn_recording_all_from_start_editable) {
-            $bbbsession['recordallfromstart'] = $bbbsession['bigbluebuttonbn']->recordallfromstart;
-        }
-        $bbbsession['recordhidebutton'] = $CFG->bigbluebuttonbn_recording_hide_button_default;
-        if ($CFG->bigbluebuttonbn_recording_hide_button_editable) {
-            $bbbsession['recordhidebutton'] = $bbbsession['bigbluebuttonbn']->recordhidebutton;
-        }
-        $bbbsession['welcome'] = $bbbsession['bigbluebuttonbn']->welcome;
-        if (!isset($bbbsession['welcome']) || $bbbsession['welcome'] == '') {
-            $bbbsession['welcome'] = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
-        }
-        if ($bbbsession['bigbluebuttonbn']->record) {
-            // Check if is enable record all from start.
-            if ($bbbsession['recordallfromstart']) {
-                $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordallfromstartwarning',
-                        'bigbluebuttonbn');
-            } else {
-                $bbbsession['welcome'] .= '<br><br>'.get_string('bbbrecordwarning', 'bigbluebuttonbn');
-            }
-        }
-        $bbbsession['openingtime'] = $bbbsession['bigbluebuttonbn']->openingtime;
-        $bbbsession['closingtime'] = $bbbsession['bigbluebuttonbn']->closingtime;
-        $bbbsession['muteonstart'] = $bbbsession['bigbluebuttonbn']->muteonstart;
-        // Lock settings.
-        $bbbsession['disablecam'] = $bbbsession['bigbluebuttonbn']->disablecam;
-        $bbbsession['disablemic'] = $bbbsession['bigbluebuttonbn']->disablemic;
-        $bbbsession['disableprivatechat'] = $bbbsession['bigbluebuttonbn']->disableprivatechat;
-        $bbbsession['disablepublicchat'] = $bbbsession['bigbluebuttonbn']->disablepublicchat;
-        $bbbsession['disablenote'] = $bbbsession['bigbluebuttonbn']->disablenote;
-        $bbbsession['hideuserlist'] = $bbbsession['bigbluebuttonbn']->hideuserlist;
-        $bbbsession['lockedlayout'] = $bbbsession['bigbluebuttonbn']->lockedlayout;
-        $bbbsession['lockonjoin'] = $bbbsession['bigbluebuttonbn']->lockonjoin;
-        $bbbsession['lockonjoinconfigurable'] = $bbbsession['bigbluebuttonbn']->lockonjoinconfigurable;
-        // Additional info related to the course.
-        $bbbsession['context'] = $context;
-        // Metadata (origin).
-        $bbbsession['origin'] = 'Moodle';
-        $bbbsession['originVersion'] = $CFG->release;
-        $parsedurl = parse_url($CFG->wwwroot);
-        $bbbsession['originServerName'] = $parsedurl['host'];
-        $bbbsession['originServerUrl'] = $CFG->wwwroot;
-        $bbbsession['originServerCommonName'] = '';
-        $bbbsession['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $bbbsession['bnserver'] = plugin::bigbluebuttonbn_is_bn_server();
-    }
-
-    /**
      * Can join meeting.
      *
      * @param int $cmid
      * @return array|bool[]
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \require_login_exception
-     * @throws \required_capability_exception
      */
     public static function can_join_meeting($cmid) {
-        global $CFG;
         $canjoin = array('can_join' => false, 'message' => '');
 
         $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
         if ($viewinstance) {
-            $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
-            if ($bbbsession) {
-                $info = meeting::bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
-                $running = false;
-                if ($info['returncode'] == 'SUCCESS') {
-                    $running = ($info['running'] === 'true');
-                }
-                $participantcount = 0;
-                if (isset($info['participantCount'])) {
-                    $participantcount = $info['participantCount'];
-                }
-                $canjoin = broker::meeting_info_can_join($bbbsession, $running,
-                    $participantcount);
-            }
+            $instance = instance::get_from_cmid($cmid);
+            $info = meeting::get_meeting_info_for_instance($instance);
+            $canjoin = $info->canjoin;
         }
         return $canjoin;
     }
@@ -339,11 +175,18 @@ class bigbluebutton {
      * @return string
      */
     public static function bigbluebuttonbn_get_server_version() {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url()
-        );
-        if ($xml && $xml->returncode == 'SUCCESS') {
-            return $xml->version;
+        $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
+        $serverversion = $cache->get('serverversion');
+        if (!$serverversion) {
+            $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+                self::action_url()
+            );
+            if ($xml && $xml->returncode == 'SUCCESS') {
+                $cache->set('serverversion', (string) $xml->version);
+                return (double) $xml->version;
+            }
+        } else {
+            return (double) $serverversion;
         }
         return null;
     }
@@ -398,7 +241,7 @@ class bigbluebutton {
      * @param string $data
      * @param string $contenttype
      *
-     * @return object
+     * @return object|bool|string
      */
     public static function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null,
         $contenttype = 'text/xml') {
@@ -427,32 +270,9 @@ class bigbluebutton {
     }
 
     /**
-     * Helper function to retrive the default config.xml file.
-     *
-     * @return string
-     */
-    public static function bigbluebuttonbn_get_default_config_xml() {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url('getDefaultConfigXML')
-        );
-        return $xml;
-    }
-
-    /**
-     * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
-     *
-     * @return boolean
-     */
-    public static function bigbluebuttonbn_has_html5_client() {
-        $checkurl = self::root() . "html5client/check";
-        $curlinfo = self::bigbluebuttonbn_wrap_xml_load_file_curl_request($checkurl, 'HEAD');
-        return (isset($curlinfo['http_code']) && $curlinfo['http_code'] == 200);
-    }
-
-    /**
      * Helper for getting the owner userid of a bigbluebuttonbn instance.
      *
-     * @param  stdClass $bigbluebuttonbn  BigBlueButtonBN instance
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
      *
      * @return integer ownerid (a valid user id or null if not registered/found)
      */
@@ -633,54 +453,20 @@ class bigbluebutton {
         return $profilesarray;
     }
 
-    /**
-     * Helper for evaluating if scheduled activity is avaiable.
-     *
-     * @param  stdClass  $bigbluebuttonbn  BigBlueButtonBN instance
-     *
-     * @return array                       status (room available or not and possible warnings)
-     */
-    public static function bigbluebuttonbn_room_is_available($bigbluebuttonbn) {
-        $open = true;
-        $closed = false;
-        $warnings = array();
-
-        $timenow = time();
-        $timeopen = $bigbluebuttonbn->openingtime;
-        $timeclose = $bigbluebuttonbn->closingtime;
-        if (!empty($timeopen) && $timeopen > $timenow) {
-            $open = false;
-        }
-        if (!empty($timeclose) && $timenow > $timeclose) {
-            $closed = true;
-        }
-
-        if (!$open || $closed) {
-            if (!$open) {
-                $warnings['notopenyet'] = userdate($timeopen);
-            }
-            if ($closed) {
-                $warnings['expired'] = userdate($timeclose);
-            }
-            return array(false, $warnings);
-        }
-
-        return array(true, $warnings);
-    }
 
     /**
      * Return the status of an activity [open|not_started|ended].
      *
-     * @param array $bbbsession
+     * @param instance $instance
      * @return string
      */
-    public static function bigbluebuttonbn_view_get_activity_status(&$bbbsession) {
+    public static function bigbluebuttonbn_view_get_activity_status($instance) {
         $now = time();
-        if (!empty($bbbsession['bigbluebuttonbn']->openingtime) && $now < $bbbsession['bigbluebuttonbn']->openingtime) {
+        if (!empty($instance->get_instance_var('openingtime')) && $now < $instance->get_instance_var('openingtime')) {
             // The activity has not been opened.
             return 'not_started';
         }
-        if (!empty($bbbsession['bigbluebuttonbn']->closingtime) && $now > $bbbsession['bigbluebuttonbn']->closingtime) {
+        if (!empty($instance->get_instance_var('closingtime')) && $now > $instance->get_instance_var('closingtime')) {
             // The activity has been closed.
             return 'ended';
         }
@@ -689,80 +475,221 @@ class bigbluebutton {
     }
 
     /**
-     * Set session URLs.
+     * Ensure that the remote server was contactable.
      *
-     * @param array $bbbsession
-     * @param int $id
-     * @return string
+     * @param instance $instance
      */
-    public static function bigbluebuttonbn_view_session_config(&$bbbsession, $id) {
-        // Operation URLs.
-        $bbbsession['bigbluebuttonbnURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/view.php',
-            ['id' => $bbbsession['cm']->id]
-        );
-        $bbbsession['logoutURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_view.php',
-            ['action' => 'logout', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['recordingReadyURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_broker.php',
-            ['action' => 'recording_ready', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['meetingEventsURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_broker.php',
-            ['action' => 'meeting_events', 'bigbluebuttonbn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-        $bbbsession['joinURL'] = plugin::necurl(
-            '/mod/bigbluebuttonbn/bbb_view.php',
-            ['action' => 'join', 'id' => $id, 'bn' => $bbbsession['bigbluebuttonbn']->id]
-        );
-
-        // Check status and set extra values.
-        $activitystatus = self::bigbluebuttonbn_view_get_activity_status($bbbsession); // In locallib.
-        if ($activitystatus == 'ended') {
-            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
-                $bbbsession['context'],
-                $bbbsession['bigbluebuttonbn']->presentation
-            );
-        } else if ($activitystatus == 'open') {
-            $bbbsession['presentation'] = files::bigbluebuttonbn_get_presentation_array(
-                $bbbsession['context'],
-                $bbbsession['bigbluebuttonbn']->presentation,
-                $bbbsession['bigbluebuttonbn']->id
-            );
+    public static function require_working_server(instance $instance): void {
+        try {
+            self::bigbluebuttonbn_get_server_version();
+        } catch (server_not_available_exception $e) {
+            self::handle_server_not_available($instance);
         }
-
-        return $activitystatus;
     }
 
     /**
-     * Check if a user has access to a given group.
+     * Handle the server not being available.
      *
-     * @param int $groupid
-     * @param object $user
-     * @param object $course
-     * @param \cm_info $cm
-     * @return bool
-     * @throws \coding_exception
+     * @param instance $instance
      */
-    public static function user_can_access_groups($groupid, $user, $course, $cm) {
-        $groupmode = groups_get_activity_groupmode($cm);
-        $context = context_course::instance($course->id);
-        $aag = has_capability('moodle/site:accessallgroups', $context, $user);
-        if ($aag) {
-            return true;
-        }
-        if ($groupmode == VISIBLEGROUPS or $aag) {
-            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
-        } else {
-            $allowedgroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid);
-        }
-        foreach ($allowedgroups as $g) {
-            if ($g->id == $groupid) {
-                return true;
-            }
-        }
-        return false;
+    public static function handle_server_not_available(instance $instance): void {
+        \core\notification::add(
+            self::get_server_not_available_message($instance),
+            \core\notification::ERROR
+        );
+        redirect(self::get_server_not_available_url($instance));
     }
+
+    /**
+     * Get message when server not available
+     *
+     * @param instance $instance
+     * @return string
+     */
+    public static function get_server_not_available_message(instance $instance): string {
+        if ($instance->is_admin()) {
+            return get_string('view_error_unable_join', 'mod_bigbluebuttonbn');
+        } else if ($instance->is_moderator()) {
+            return get_string('view_error_unable_join_teacher', 'mod_bigbluebuttonbn');
+        } else {
+            return get_string('view_error_unable_join_student', 'mod_bigbluebuttonbn');
+        }
+    }
+
+    /**
+     * Get URL to the page displaying that the server is not available
+     *
+     * @param instance $instance
+     * @return string
+     */
+    public static function get_server_not_available_url(instance $instance): string {
+        if ($instance->is_admin()) {
+            return new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);
+        } else if ($instance->is_moderator()) {
+            return new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        } else {
+            return new moodle_url('/course/view.php', ['id' => $instance->get_course_id()]);
+        }
+    }
+
+    /**
+     * Create a Meeting
+     *
+     * @param array $data
+     * @param array $metadata
+     * @param null $presentationname
+     * @param null $presentationurl
+     * @return array
+     * @throws bigbluebutton_exception
+     * @throws server_not_available_exception
+     */
+    public static function create_meeting(array $data, array $metadata, $presentationname = null, $presentationurl = null) {
+        $createmeetingurl = self::action_url('create', $data, $metadata);
+        $method = 'GET';
+        $payload = null;
+        if (!is_null($presentationname) && !is_null($presentationurl)) {
+            $method = 'POST';
+            $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" .
+                $presentationurl . "' /></module></modules>";
+        }
+
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
+        self::assert_returned_xml($xml);
+        if (empty($xml->meetingID)) {
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        if ($xml->hasBeenForciblyEnded === 'true') {
+            throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
+        }
+        return array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
+            'moderatorPW' => $xml->moderatorPW);
+    }
+
+    /**
+     * Get meeting info for a given meeting id
+     *
+     * @param string $meetingid
+     * @return array
+     * @throws bigbluebutton_exception
+     */
+    public static function get_meeting_info(string $meetingid) {
+        $xmlinfo = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('getMeetingInfo', ['meetingID' => $meetingid])
+        );
+        self::assert_returned_xml($xmlinfo, $meetingid);
+        return (array) $xmlinfo;
+    }
+
+    /**
+     * Perform end meeting on BBB.
+     *
+     * @param string $meetingid
+     * @param string $modpw
+     * @throws bigbluebutton_exception
+     */
+    public static function end_meeting($meetingid, $modpw) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
+        );
+        self::assert_returned_xml($xml, $meetingid);
+    }
+
+    /**
+     * Get recordings from BBB.
+     *
+     * @param array $meetingsids
+     * @throws bigbluebutton_exception
+     */
+    public static function get_recordings_from_meetings($meetingsids) {
+        $url = self::action_url('getRecordings', ['meetingID' => implode(',', $meetingsids)]);
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
+        self::assert_returned_xml($xml, join(',', $meetingsids));
+        if (!isset($xml->recordings)) {
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        return iterator_to_array($xml->recordings->children(), false);
+    }
+
+    /**
+     * Get recordings from BBB.
+     *
+     * @param array $recordingsids
+     * @throws bigbluebutton_exception
+     */
+    public static function get_recordings($recordingsids) {
+        $url = self::action_url('getRecordings', ['recordID' => implode(',', $recordingsids)]);
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
+        self::assert_returned_xml($xml, join(',', $recordingsids));
+        if (!isset($xml->recordings)) {
+            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+        }
+        return iterator_to_array($xml->recordings->children(), false);
+    }
+
+    /**
+     * Publish recording.
+     *
+     * @param int $recordingid
+     * @param bool $publish
+     * @throws moodle_exception
+     */
+    public static function publish_recording($recordingid, $publish) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('publishRecordings',
+                ['recordID' => $recordingid, 'publish' => $publish])
+        );
+        self::assert_returned_xml($xml);
+    }
+
+    /**
+     * Delete recording
+     *
+     * @param int $recordingid
+     * @throws bigbluebutton_exception
+     */
+    public static function delete_recording($recordingid) {
+        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
+            self::action_url('deleteRecordings',
+                ['recordID' => $recordingid])
+        );
+        self::assert_returned_xml($xml);
+    }
+
+    /**
+     * Sometimes the server sends back some error and errorKeys that
+     * can be converted to Moodle error messages
+     */
+    const MEETING_ERROR = [
+        'checksumError' => 'index_error_checksum',
+        'notFound' => 'general_error_not_found',
+        'maxConcurrent' => 'view_error_max_concurrent',
+    ];
+
+    /**
+     * Throw an exception if there is a problem in the returned XML value
+     *
+     * @param \SimpleXMLElement $xml
+     * @param string $additionaldetails
+     * @throws bigbluebutton_exception
+     * @throws server_not_available_exception
+     */
+    protected static function assert_returned_xml($xml, $additionaldetails = '') {
+        if (empty($xml)) {
+            global $CFG;
+            throw new server_not_available_exception('general_error_unable_connect', plugin::COMPONENT,
+                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+        }
+        if ((string) $xml->returncode === 'FAILED') {
+            $messagekey = (string) $xml->messageKey ?? '';
+            $messagedetails = (string) $xml->message ?? '';
+            $messagedetails .= $additionaldetails ? " ($additionaldetails) " : '';
+            throw new bigbluebutton_exception(
+                (empty($messagekey) || empty(self::MEETING_ERROR[$messagekey])) ?
+                    'general_error_unable_connect' : $messagekey,
+                plugin::COMPONENT,
+                '',
+                $messagedetails);
+        }
+    }
+
 }

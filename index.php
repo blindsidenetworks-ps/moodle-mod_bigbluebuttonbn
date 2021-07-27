@@ -25,6 +25,7 @@
  */
 
 use core\notification;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\output\index;
 use mod_bigbluebuttonbn\plugin;
 
@@ -42,18 +43,18 @@ $PAGE->set_pagelayout('incourse');
 
 $PAGE->navbar->add($PAGE->title, $PAGE->url);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
-if ($instances = get_all_instances_in_course('bigbluebuttonbn', $course)) {
-    /** @var mod_bigbluebuttonbn\output\renderer $renderer */
-    $renderer = $PAGE->get_renderer(plugin::COMPONENT);
-    echo $renderer->render(new index($course, $instances));
-} else {
+$instances = instance::get_all_instances_in_course($course->id);
+if (empty($instances)) {
     \core\notification::add(
         get_string('index_error_noinstances', plugin::COMPONENT),
         \core\notification::ERROR
     );
 
-    redirect(plugin::necurl('/course/view.php', ['id' => $course->id]));
+    redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
 }
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
+$renderer = $PAGE->get_renderer(plugin::COMPONENT);
+echo $renderer->render(new index($course, $instances));
 echo $OUTPUT->footer();

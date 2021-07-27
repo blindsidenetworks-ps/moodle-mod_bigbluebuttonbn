@@ -16,35 +16,27 @@
 import {call as fetchMany} from 'core/ajax';
 
 /**
- * Request for recording
- *
- * @param   {Number} bigbluebuttonbnid The instance ID
- * @param   {Boolean} removeimported Remove already imported record
- * @param   {String} tools the set of tools to display
- * @returns {Promise}
- */
-
-const getListTableRequest = (bigbluebuttonbnid, removeimportedid, tools) => {
-    return {
-        methodname: 'mod_bigbluebutton_recording_list_table',
-        args: {
-            bigbluebuttonbnid,
-            removeimportedid,
-            tools
-        }
-    };
-};
-
-/**
  * Fetch the list of recordings from the server.
  *
  * @param   {Number} bigbluebuttonbnid The instance ID
- * @param   {Boolean} removeImportedId Remove already imported record
+ * @param   {number} groupid
+ * @param   {Boolean} removeimportedid Remove already imported record
  * @param   {String} tools the set of tools to display
  * @returns {Promise}
  */
-export const fetchRecordings = (bigbluebuttonbnid, removeImportedId, tools) =>
-    fetchMany([getListTableRequest(bigbluebuttonbnid, removeImportedId, tools)])[0];
+export const fetchRecordings = (bigbluebuttonbnid, groupid, removeimportedid, tools) => {
+    const args = {
+        bigbluebuttonbnid,
+        removeimportedid,
+        tools,
+    };
+
+    if (groupid) {
+        args.groupid = groupid;
+    }
+
+    return fetchMany([{methodname: 'mod_bigbluebutton_recording_list_table', args}])[0];
+};
 
 /**
  * Perform an update on a single recording.

@@ -60,7 +60,7 @@ class meeting_ended extends base
     /**
      * Return objectid mapping.
      *
-     * @return string
+     * @return array
      */
     public static function get_objectid_mapping() {
         return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
