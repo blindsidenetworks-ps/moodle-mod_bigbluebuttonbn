@@ -226,13 +226,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2019101001, 'bigbluebuttonbn');
     }
-    if ($oldversion < 2019101006) {
-        // Add field for moderatorapproval.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'moderatorapproval', $fielddefinition);
-        upgrade_mod_savepoint(true, 2019101006, 'bigbluebuttonbn');
-    }
     if ($oldversion < 2020050500) {
 
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
@@ -341,6 +334,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             'notnull' => null, 'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'guestpass', $fielddefinition);
         upgrade_mod_savepoint(true, 2020050518, 'bigbluebuttonbn');
+    }
+    if ($oldversion < 2020050521) {
+        // Add field for moderatorapproval.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'moderatorapproval', $fielddefinition);
+        upgrade_mod_savepoint(true, 2020050521, 'bigbluebuttonbn');
     }
 
     return true;
