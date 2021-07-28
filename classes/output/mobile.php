@@ -63,7 +63,7 @@ class mobile {
 
         $args = (object) $args;
         $versionname = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
-        $viewinstance = view::bigbluebuttonbn_view_validator($args->cmid, null);
+        $viewinstance = view::validator($args->cmid, null);
         if (!$viewinstance) {
             $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
             return self::mobile_print_error($error);

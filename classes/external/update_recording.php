@@ -114,8 +114,6 @@ class update_recording extends external_api {
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>> external/update_recordings");
-        error_log(json_encode(get_object_vars($instance)));
         $recordings = recording_helper::get_recordings(
             $instance->get_course_id(),
             $instance->get_instance_id(),

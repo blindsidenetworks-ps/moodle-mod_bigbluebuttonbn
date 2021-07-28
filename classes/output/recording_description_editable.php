@@ -43,7 +43,7 @@ class recording_description_editable extends recording_editable {
      * @return string
      */
     public function get_recording_value($rec) {
-        return recording::bigbluebuttonbn_get_recording_data_row_meta_description($rec->recording,
+        return recording_data::row_meta_description($rec->recording,
             $this->instance);
     }
 

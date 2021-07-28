@@ -67,7 +67,6 @@ class recording {
         $r->bigbluebuttonbnid = $dataobject->bigbluebuttonbnid;
         $r->timecreated = time();
         $r->recordingid = $dataobject->recordingid;
-        $r->meetingid = $dataobject->meetingid;
         $r->headless = $dataobject->headless;
         $r->imported = $dataobject->imported;
         $r->recording = $dataobject->recording;

@@ -133,8 +133,6 @@ class get_recordings extends external_api {
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>> external/get_recordings");
-        error_log(json_encode(get_object_vars($instance)));
         $recordings = recording_helper::get_recordings(
             $instance->get_course_id(),
             $instance->get_instance_id(),
@@ -164,11 +162,14 @@ class get_recordings extends external_api {
 
         // Build table content.
         foreach ($recordings as $recording) {
+            error_log(">>>>>>>>>>>>>>>>>> execute/get_recordings");
+            error_log(gettype($recording));
+            error_log(json_encode(get_object_vars($recording)));
             $rowdata = recording_data::row($instance, $recording, $tools);
             if (!empty($rowdata)) {
                 $data[] = $rowdata;
 
-                $rowdata = recording::bigbluebuttonbn_get_recording_data_row($instance, $recording, $tools);
+                $rowdata = recording_data::row($instance, $recording, $tools);
                 if (!empty($rowdata)) {
                     $data[] = $rowdata;
                 }
@@ -201,7 +202,7 @@ class get_recordings extends external_api {
         ];
 
         // Initialize table headers.
-        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($instance)) {
+        if (recording_data::preview_enabled($instance)) {
             $columns[] = [
                 'key' => 'preview',
                 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),

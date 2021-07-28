@@ -117,7 +117,7 @@ class recording_data {
      *
      * @return boolean
      */
-    public static function preview_enabled($bbbsession) {
+    public static function preview_enabled($instance) {
         return (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0
             && $instance->get_instance_var('recordings_preview') == '1');
     }

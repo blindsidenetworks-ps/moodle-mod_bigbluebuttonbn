@@ -42,7 +42,7 @@ class recording_name_editable extends recording_editable {
      * @param array $rec
      * @return string
      */
-    public function get_recording_value($recording) {
+    public function get_recording_value($rec) {
         return recording_data::row_meta_activity($rec->recording, $this->instance);
     }
 

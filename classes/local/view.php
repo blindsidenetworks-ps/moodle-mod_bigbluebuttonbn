@@ -44,7 +44,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_id($id) {
+    public static function instance_id($id) {
         global $DB;
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -59,7 +59,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
+    public static function instance_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB;
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid), '*', MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -75,12 +75,12 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
+    public static function validator($id, $bigbluebuttonbnid) {
         if ($id) {
-            return self::bigbluebuttonbn_view_instance_id($id);
+            return self::instance_id($id);
         }
         if ($bigbluebuttonbnid) {
-            return self::bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
+            return self::instance_bigbluebuttonbn($bigbluebuttonbnid);
         }
     }
 
@@ -91,7 +91,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_format_activity_time($time) {
+    public static function format_activity_time($time) {
         global $CFG;
         require_once($CFG->dirroot . '/calendar/lib.php');
         $activitytime = '';
@@ -111,7 +111,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_actionbar_render_button($rec, $data) {
+    public static function actionbar_render_button($rec, $data) {
         global $PAGE;
         if (empty($data)) {
             return '';

@@ -161,7 +161,6 @@ switch (strtolower($action)) {
                         'bigbluebuttonbnid' => $bigbluebuttonbn->id,
                         'timecreated' => time(),
                         'recordingid' => $response['internalMeetingID'],
-                        'meetingid' => $response['meetingID']
                         )
                     );
                 // TODO: We may want to catch if the record was not created.

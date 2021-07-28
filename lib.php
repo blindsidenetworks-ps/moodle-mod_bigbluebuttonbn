@@ -158,7 +158,7 @@ function bigbluebuttonbn_delete_instance($id) {
     }
 
     // Delete dependant events.
-    if (!$DB->delete_records('event', ['modulename' => 'bigbluebuttonbn', 'instance' => $id])) {    
+    if (!$DB->delete_records('event', ['modulename' => 'bigbluebuttonbn', 'instance' => $id])) {
         $result = false;
     }
 
