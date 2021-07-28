@@ -82,6 +82,16 @@ $curl = new curl();
 if (!empty($_SERVER['HTTP_RANGE'])) {
     $curl->setHeader("Range: {$_SERVER['HTTP_RANGE']}");
 }
+$curl->setopt(['CURLOPT_FOLLOWLOCATION' => false]);
+
+// First we need to see if we are going to be redirected from 2.0 to 2.3.
+$curl->get(\mod_bigbluebuttonbn\locallib\bigbluebutton::root() . ltrim($relativepath, '/'));
+if (!empty($curl->info['redirect_url'])) {
+    // We need to curl ourselves, with the updated URL, using what we know.
+    $meetingid = required_param('meetingId', PARAM_TEXT);
+    $relativepath = '/playback/presentation/2.3/' . $meetingid . '/';
+    redirect($CFG->wwwroot . '/mod/bigbluebuttonbn/proxy_presentation.php/' . ltrim($relativepath, '/'));
+}
 
 $curl->setopt([
     'CURLOPT_CERTINFO'          => 1,
