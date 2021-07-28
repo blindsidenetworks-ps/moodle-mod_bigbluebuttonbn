@@ -120,7 +120,7 @@ class view {
         if (isset($data['target'])) {
             $target .= '-' . $data['target'];
         }
-        $id = 'recording-' . $target . '-' . $recording['recordID'];
+        $id = 'recording-' . $target . '-' . $rec->recording['recordID'];
         if ((boolean) config::get('recording_icons_enabled')) {
             // With icon for $manageaction.
             $iconattributes = array('id' => $id, 'class' => 'iconsmall');
@@ -132,7 +132,7 @@ class view {
             if (!$rec->imported) {
                 $linkattributes['data-links'] = recording::count_by(
                     [
-                        'recordingid' => $recording['recordID'],
+                        'recordingid' => $rec->recording['recordID'],
                         'imported' => true,
                     ]
                 );

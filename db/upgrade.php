@@ -401,8 +401,7 @@ function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $
 function xmldb_bigbluebuttonbn_add_table($dbman, $tablename) {
     $table = new xmldb_table($tablename);
     if ($dbman->table_exists($table)) {
-        $dbman->drop_table($table);
-        //return;
+        return;
     }
     $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
     $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);

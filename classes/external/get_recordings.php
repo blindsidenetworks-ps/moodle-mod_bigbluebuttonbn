@@ -135,7 +135,8 @@ class get_recordings extends external_api {
         // Fetch the list of recordings.
         $recordings = recording_helper::get_recordings(
             $instance->get_course_id(),
-            $instance->get_instance_id(),
+            // Include the instanceid only if view fro room is enabled.
+            $enabledfeatures['showroom'] ? $instance->get_instance_id() : false,
             $enabledfeatures['showroom'],
             $instance->get_instance_var('recordings_deleted'),
             $enabledfeatures['importrecordings']
@@ -162,17 +163,9 @@ class get_recordings extends external_api {
 
         // Build table content.
         foreach ($recordings as $recording) {
-            error_log(">>>>>>>>>>>>>>>>>> execute/get_recordings");
-            error_log(gettype($recording));
-            error_log(json_encode(get_object_vars($recording)));
             $rowdata = recording_data::row($instance, $recording, $tools);
             if (!empty($rowdata)) {
                 $data[] = $rowdata;
-
-                $rowdata = recording_data::row($instance, $recording, $tools);
-                if (!empty($rowdata)) {
-                    $data[] = $rowdata;
-                }
             }
         }
 

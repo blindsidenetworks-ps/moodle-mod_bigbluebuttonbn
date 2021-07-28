@@ -114,8 +114,8 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return array
      */
     public static function get_info_fromid($itemid) {
-        list($recid, $recordingid, $meetingid) = explode(',', $itemid);
-        return [$recid, $recordingid, $meetingid];
+        list($recid, $recordingid) = explode(',', $itemid);
+        return [$recid, $recordingid];
     }
 
     /**
@@ -132,9 +132,8 @@ abstract class recording_editable extends \core\output\inplace_editable {
         $meta = [$metainfoname => $value];
         if ($rec->imported) {
             // Execute update on imported recording link.
-            $recording = $rec->recording;
-            $recording[$metainfoname] = $value;
-            recording::update($rec->id, (object)['recording' => json_encode($recording)]);
+            $rec->recording[$metainfoname] = $value;
+            recording::update($rec->id, (object)['recording' => json_encode($rec->recording)]);
             return array(
                 'status' => 'done'
             );
@@ -145,7 +144,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
         // Execute update on actual recording.
         return array(
             'status' => recording_proxy::bigbluebutton_update_recordings(
-                $recording['recordID'],
+                $rec->recording['recordID'],
                 $meta
             )
         );
@@ -159,8 +158,9 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return recording_editable
      */
     public static function update($itemid, $value) {
-        list($recid, $recordingid, $meetingid) = static::get_info_fromid($itemid);
+        list($recid, $recordingid) = static::get_info_fromid($itemid);
         $rec = recording::read($recid);
+        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
 
         require_login($instance->get_course());
 

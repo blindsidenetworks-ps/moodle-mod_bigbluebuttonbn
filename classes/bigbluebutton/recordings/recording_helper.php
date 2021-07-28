@@ -59,7 +59,7 @@ class recording_helper {
         foreach ($recs as $id => $rec) {
             $recordingid = $rec->recordingid;
             // If there is not a BBB recording assiciated skip the record.
-            // NOTE: This verifyes that the recording exists, even imported recordings.
+            // NOTE: This verifies that the recording exists, even imported recordings.
             // If the recording doesn't exist, the imported link will no longer be shown in the list.
             if (!isset($bbbrecordings[$recordingid])) {
                 continue;
