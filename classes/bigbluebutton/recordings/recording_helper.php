@@ -41,12 +41,28 @@ defined('MOODLE_INTERNAL') || die();
 
 class recording_helper {
 
-    public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false, $includeimported = false) {
+    /**
+     * 
+     * Helper function to retrieve recordings from the BigBlueButton. The references are stored as events
+     * in bigbluebuttonbn_logs.
+     *
+     * @param string $courseid
+     * @param string $bigbluebuttonbnid
+     * @param bool   $onlyfrominstance
+     * @param bool   $includedeleted
+     * @param bool   $includeimported
+     * @param bool   $onlyimported
+     *
+     * @return associative array containing the recordings indexed by recordID, each recording is also a
+     * non sequential associative array itself that corresponds to the actual recording in BBB
+     */
+    public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $onlyfrominstance = true,
+        $includedeleted = false, $includeimported = false, $onlyimported = false) {
         global $DB;
         // Retrieve DB recordings.
         // TODO: These DB queries should be performed with the recording:::read helper method to guarantee consistency.
-        $select = self::sql_select_for_recordings($courseid, $bigbluebuttonbnid, $subset, $includedeleted, $includeimported);
+        $select = self::sql_select_for_recordings(
+            $courseid, $bigbluebuttonbnid, $onlyfrominstance, $includedeleted, $includeimported, $onlyimported);
         $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
         // Fetch BBB recordings.
         $recordingsids = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
@@ -87,16 +103,17 @@ class recording_helper {
      * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
      * in the getRecordings request
      *
-     * @param string $courseid
-     * @param string $bigbluebuttonbnid
-     * @param bool $subset
-     * @param bool $includedeleted
-     * @param bool $includeimported
+     * @param string    $courseid
+     * @param string    $bigbluebuttonbnid
+     * @param bool      $onlyfrominstance
+     * @param bool      $includedeleted
+     * @param bool      $includeimported
+     * @param bool      $onlyimported
      *
      * @return string containing the sql used for getting the target bigbluebuttonbn instances
      */
-    public static function sql_select_for_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false, $includeimported =  false) {
+    public static function sql_select_for_recordings($courseid, $bigbluebuttonbnid = null, $onlyfrominstance = true,
+        $includedeleted = false, $includeimported =  false, $onlyimported = false) {
         if (empty($courseid)) {
             $courseid = 0;
         }
@@ -109,13 +126,16 @@ class recording_helper {
         if (!$includeimported) {
             // Exclude imported recordings unless includedeleted.
             $select .= "imported = false AND ";
+        } else if ($onlyimported) {
+            // Exclude non-imported recordings.
+            $select .= "imported = true AND ";
         }
         // Add the main criteria for the search.
         if (empty($bigbluebuttonbnid)) {
             // Include all recordings in given course if bigbluebuttonbnid is not included.
             return $select . "courseid = '{$courseid}'";
         }
-        if ($subset) {
+        if ($onlyfrominstance) {
             // Include only one bigbluebutton instance if subset filter is included.
             return $select . "bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
         }

@@ -139,7 +139,8 @@ class get_recordings extends external_api {
             $enabledfeatures['showroom'] ? $instance->get_instance_id() : false,
             $enabledfeatures['showroom'],
             $instance->get_instance_var('recordings_deleted'),
-            $enabledfeatures['importrecordings']
+            $enabledfeatures['importrecordings'],
+            $instance->get_instance_var('recordings_imported')
         );
 
         if ($removeimportedid) {
