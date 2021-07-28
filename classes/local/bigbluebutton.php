@@ -561,8 +561,12 @@ class bigbluebutton {
         if ($xml->hasBeenForciblyEnded === 'true') {
             throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
         }
-        return array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
-            'moderatorPW' => $xml->moderatorPW);
+        return array(
+                'meetingID' => (string) $xml->meetingID,
+                'internalMeetingID' => (string) $xml->internalMeetingID,
+                'attendeePW' => (string) $xml->attendeePW,
+                'moderatorPW' => (string) $xml->moderatorPW
+            );
     }
 
     /**

@@ -42,7 +42,6 @@ defined('MOODLE_INTERNAL') || die();
 class recording_helper {
 
     /**
-     * 
      * Helper function to retrieve recordings from the BigBlueButton. The references are stored as events
      * in bigbluebuttonbn_logs.
      *
