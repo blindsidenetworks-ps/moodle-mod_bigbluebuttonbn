@@ -181,6 +181,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         const payload = {
             bigbluebuttonbnid: bbbid,
             recordingid: getDataFromAction(element, 'recordingid'),
+            recid: getDataFromAction(element, 'recid'),
             additionaloptions: getDataFromAction(element, 'additionaloptions'),
             action: elementData.action,
         };

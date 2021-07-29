@@ -286,6 +286,54 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2020101001.20) {
+        // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
+        xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
+        // Add column courseid.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'courseid',
+            $fielddefinition);
+        // Add column bigbluebuttonbnid.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'bigbluebuttonbnid',
+            $fielddefinition);
+        // Add column timecreated.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'timecreated',
+            $fielddefinition);
+        // Add column recordingid.
+        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '64', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
+            $fielddefinition);
+        // Add column headless for deleted recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'headless',
+            $fielddefinition);
+        // Add column imported for imported recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'imported',
+            $fielddefinition);
+        // Add column recording for storing the recording data of imported recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
+            'notnull' => false, 'sequence' => null, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recording',
+            $fielddefinition);
+
+            // Add index to bigbluebuttonbn_recordings.
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
+            ['courseid']);
+        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
+            ['recordingid']);
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2020101001.20, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 
@@ -342,6 +390,22 @@ function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $
     if ($dbman->field_exists($table, $field)) {
         $dbman->rename_field($table, $field, $fieldnamenew, true, true);
     }
+}
+
+/**
+ * Generic helper function for adding a new table.
+ *
+ * @param   object    $dbman
+ * @param   string    $tablename
+ */
+function xmldb_bigbluebuttonbn_add_table($dbman, $tablename) {
+    $table = new xmldb_table($tablename);
+    if ($dbman->table_exists($table)) {
+        return;
+    }
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $dbman->create_table($table, true, true);
 }
 
 /**

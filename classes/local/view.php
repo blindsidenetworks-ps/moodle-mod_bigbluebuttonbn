@@ -26,7 +26,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
 use pix_icon;
 
 /**
@@ -44,7 +44,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_id($id) {
+    public static function instance_id($id) {
         global $DB;
         $cm = get_coursemodule_from_id('bigbluebuttonbn', $id, 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -59,7 +59,7 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid) {
+    public static function instance_bigbluebuttonbn($bigbluebuttonbnid) {
         global $DB;
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid), '*', MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
@@ -75,12 +75,12 @@ class view {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_view_validator($id, $bigbluebuttonbnid) {
+    public static function validator($id, $bigbluebuttonbnid) {
         if ($id) {
-            return self::bigbluebuttonbn_view_instance_id($id);
+            return self::instance_id($id);
         }
         if ($bigbluebuttonbnid) {
-            return self::bigbluebuttonbn_view_instance_bigbluebuttonbn($bigbluebuttonbnid);
+            return self::instance_bigbluebuttonbn($bigbluebuttonbnid);
         }
     }
 
@@ -91,7 +91,7 @@ class view {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_format_activity_time($time) {
+    public static function format_activity_time($time) {
         global $CFG;
         require_once($CFG->dirroot . '/calendar/lib.php');
         $activitytime = '';
@@ -106,12 +106,12 @@ class view {
     /**
      * Helper function render a button for the recording action bar
      *
-     * @param array $recording
+     * @param stdClass $rec a bigbluebuttonbn_recordings row
      * @param array $data
      *
      * @return string
      */
-    public static function bigbluebuttonbn_actionbar_render_button($recording, $data) {
+    public static function actionbar_render_button($rec, $data) {
         global $PAGE;
         if (empty($data)) {
             return '';
@@ -120,7 +120,7 @@ class view {
         if (isset($data['target'])) {
             $target .= '-' . $data['target'];
         }
-        $id = 'recording-' . $target . '-' . $recording['recordID'];
+        $id = 'recording-' . $target . '-' . $rec->recording['recordID'];
         if ((boolean) config::get('recording_icons_enabled')) {
             // With icon for $manageaction.
             $iconattributes = array('id' => $id, 'class' => 'iconsmall');
@@ -129,9 +129,12 @@ class view {
                 'data-action' => $data['action'],
                 'data-require-confirmation' => !empty($data['requireconfirmation']),
             );
-            if (!isset($recording['imported'])) {
-                $linkattributes['data-links'] = recording::bigbluebuttonbn_count_recording_imported_instances(
-                    $recording['recordID']
+            if (!$rec->imported) {
+                $linkattributes['data-links'] = recording::count_by(
+                    [
+                        'recordingid' => $rec->recording['recordID'],
+                        'imported' => true,
+                    ]
                 );
             }
             if (isset($data['disabled'])) {
@@ -149,34 +152,5 @@ class view {
         // With text for $manageaction.
         $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger');
         return $PAGE->get_renderer('core')->action_link('#', get_string($data['action']), null, $linkattributes);
-    }
-
-    /**
-     * Helper function renders the link used for recording type in row for the data used by the recording table.
-     *
-     * @param array $recording
-     * @param instance $instance
-     * @param array $playback
-     *
-     * @return boolean
-     */
-    public static function bigbluebuttonbn_include_recording_data_row_type($recording, $instance, $playback) {
-        // All types that are not restricted are included.
-        if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
-            return true;
-        }
-        // All types that are not statistics are included.
-        if ($playback['type'] != 'statistics') {
-            return true;
-        }
-        // Exclude imported recordings.
-        if (isset($recording['imported'])) {
-            return false;
-        }
-        // Exclude non moderators.
-        if (!$instance->is_admin() && !$instance->is_moderator()) {
-            return false;
-        }
-        return true;
     }
 }

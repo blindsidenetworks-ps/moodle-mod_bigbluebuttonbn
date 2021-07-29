@@ -33,6 +33,8 @@ use external_value;
 use external_warnings;
 use invalid_parameter_exception;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_data;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\recording;
@@ -56,7 +58,7 @@ class get_recordings extends external_api {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
             'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
-            'tools' => new external_value(PARAM_RAW, 'a set of enablec tools', VALUE_OPTIONAL),
+            'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_OPTIONAL),
             'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
         ]);
     }
@@ -64,8 +66,8 @@ class get_recordings extends external_api {
     /**
      * Get a list of recordings
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param int $removeimportedid the removeimportedid instance id
+     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id to which the recordings are referred.
+     * @param int $removeimportedid the bigbluebuttonbn instance id where recordings have been already imported.
      * @param string|null $tools
      * @param int|null $groupid
      * @return array of warnings and status result
@@ -131,10 +133,18 @@ class get_recordings extends external_api {
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
+        $recordings = recording_helper::get_recordings(
+            $instance->get_course_id(),
+            // Include the instanceid only if view fro room is enabled.
+            $enabledfeatures['showroom'] ? $instance->get_instance_id() : false,
+            $enabledfeatures['showroom'],
+            $instance->get_instance_var('recordings_deleted'),
+            $enabledfeatures['importrecordings'],
+            $instance->get_instance_var('recordings_imported')
+        );
 
         if ($removeimportedid) {
-            $recordings = recording::bigbluebuttonbn_unset_existent_recordings_already_imported(
+            $recordings = recording_helper::unset_existent_imported_recordings(
                 $recordings,
                 $instance->get_course_id(),
                 $removeimportedid
@@ -153,13 +163,10 @@ class get_recordings extends external_api {
         $data = [];
 
         // Build table content.
-        if (isset($recordings) && !array_key_exists('messageKey', $recordings)) {
-            // There are recordings for this meeting.
-            foreach ($recordings as $recording) {
-                $rowdata = recording::bigbluebuttonbn_get_recording_data_row($instance, $recording, $tools);
-                if (!empty($rowdata)) {
-                    $data[] = $rowdata;
-                }
+        foreach ($recordings as $recording) {
+            $rowdata = recording_data::row($instance, $recording, $tools);
+            if (!empty($rowdata)) {
+                $data[] = $rowdata;
             }
         }
 
@@ -189,7 +196,7 @@ class get_recordings extends external_api {
         ];
 
         // Initialize table headers.
-        if (recording::bigbluebuttonbn_get_recording_data_preview_enabled($instance)) {
+        if (recording_data::preview_enabled($instance)) {
             $columns[] = [
                 'key' => 'preview',
                 'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),

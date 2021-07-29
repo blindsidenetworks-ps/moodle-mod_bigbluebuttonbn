@@ -26,12 +26,13 @@
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
@@ -44,7 +45,6 @@ $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $href = optional_param('href', '', PARAM_TEXT);
-$mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
@@ -151,7 +151,20 @@ switch (strtolower($action)) {
         // As the meeting doesn't exist, try to create it.
         try {
             $meeting = new meeting($instance);
-            $meeting->create_meeting();
+            $response = $meeting->create_meeting();
+            // New recording management: Insert a recordingID that corresponds to the meeting created.
+            if ($bigbluebuttonbn->record) {
+                global $DB;
+                $dbrecordingid = $DB->insert_record('bigbluebuttonbn_recordings',
+                    array(
+                        'courseid' => $bigbluebuttonbn->course,
+                        'bigbluebuttonbnid' => $bigbluebuttonbn->id,
+                        'timecreated' => time(),
+                        'recordingid' => $response['internalMeetingID'],
+                        )
+                    );
+                // TODO: We may want to catch if the record was not created.
+            }
             // Moodle event logger: Create an event for meeting created.
             logs::log_meeting_created_event($instance);
             // Since the meeting is already running, we just join the session.
@@ -162,7 +175,7 @@ switch (strtolower($action)) {
         break;
 
     case 'play':
-        $href = bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype);
+        $href = bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype);
         logs::log_recording_played_event($instance, $rid);
 
         // Execute the redirect.
@@ -176,20 +189,19 @@ switch (strtolower($action)) {
  * Helper for getting the playback url that corresponds to an specific type.
  *
  * @param  string   $href
- * @param  string   $mid
  * @param  string   $rid
  * @param  string   $rtype
  * @return string
  */
-function bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype) {
-    if ($href != '' || $mid == '' || $rid == '') {
+function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
+    if ($href != '') {
         return $href;
     }
-    $recordings = recording::bigbluebuttonbn_get_recordings_array($mid, $rid);
-    if (empty($recordings)) {
+    $recording = recording::read($rid);
+    if (empty($recording)) {
         return '';
     }
-    return bigbluebuttonbn_bbb_view_playback_href_lookup($recordings[$rid]['playbacks'], $rtype);
+    return bigbluebuttonbn_bbb_view_playback_href_lookup($recording->recording['playbacks'], $rtype);
 }
 
 /**

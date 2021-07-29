@@ -30,8 +30,9 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\broker;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use moodle_exception;
 
 /**
@@ -53,7 +54,8 @@ class update_recording extends external_api {
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
             'recordingid' => new external_value(PARAM_ALPHANUMEXT, 'The bigbluebutton recording ID'),
             'action' => new external_value(PARAM_ALPHANUMEXT, 'The action to perform'),
-            'additionaloptions' => new external_value(PARAM_RAW, 'additional options', VALUE_OPTIONAL),
+            'recid' => new external_value(PARAM_RAW, 'The bigbluebuttonbn_recordings row id', VALUE_OPTIONAL),
+            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_OPTIONAL),
         ]);
     }
 
@@ -71,18 +73,21 @@ class update_recording extends external_api {
         int $bigbluebuttonbnid,
         string $recordingid,
         string $action,
-        $additionaloptions = null
+        string $recid = null,
+        string $additionaloptions = null
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
+            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
+            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ]);
 
@@ -109,16 +114,28 @@ class update_recording extends external_api {
         require_capability('mod/bigbluebuttonbn:managerecordings', $context);
 
         // Fetch the list of recordings.
-        $recordings = recording::bigbluebutton_get_recordings_for_table_view($instance, $enabledfeatures);
+        $recordings = recording_helper::get_recordings(
+            $instance->get_course_id(),
+            $instance->get_instance_id(),
+            $enabledfeatures['showroom'],
+            $instance->get_instance_var('recordings_deleted'),
+            $enabledfeatures['importrecordings']
+        );
 
         // Specific action for import
-        // TODO: refactor this so we do all the operation in the recording table instead of the
-        // broker.
+        // TODO: refactor this so we do all the operation in the recording table instead of the broker.
         if ($action != 'import') {
             // Perform the action.
             broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
         } else {
-            recording::recording_import($instance, $recordingid, $additionaloptions);
+            $recording = recording::read($recid);
+            $recording->bigbluebuttonbnid = $instance->get_instance_id();
+            $recording->courseid = $instance->get_course_id();
+            if (!$recording->imported) {
+                $recording->imported = true;
+                $recording->recording = json_encode($recording->recording);
+            }
+            recording::create($recording);
         }
 
         return [];

@@ -25,7 +25,7 @@
 
 namespace mod_bigbluebuttonbn\output;
 
-use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_data;
 
 /**
  * Renderer for recording name in place editable.
@@ -39,11 +39,11 @@ class recording_name_editable extends recording_editable {
     /**
      * Get the value to display
      *
-     * @param array $recording
+     * @param array $rec
      * @return string
      */
-    public function get_recording_value($recording) {
-        return recording::bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $this->instance);
+    public function get_recording_value($rec) {
+        return recording_data::row_meta_activity($rec->recording, $this->instance);
     }
 
     /**

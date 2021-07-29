@@ -143,5 +143,4 @@ class import_view implements renderable, templatable {
 
         return $context;
     }
-
 }

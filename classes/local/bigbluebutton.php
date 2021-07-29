@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn locallib/bigbluebutton.
+ * The mod_bigbluebuttonbn local/bigbluebutton.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -121,7 +121,7 @@ class bigbluebutton {
     public static function can_join_meeting($cmid) {
         $canjoin = array('can_join' => false, 'message' => '');
 
-        $viewinstance = view::bigbluebuttonbn_view_validator($cmid, null);
+        $viewinstance = view::view_validator($cmid, null);
         if ($viewinstance) {
             $instance = instance::get_from_cmid($cmid);
             $info = meeting::get_meeting_info_for_instance($instance);
@@ -561,8 +561,12 @@ class bigbluebutton {
         if ($xml->hasBeenForciblyEnded === 'true') {
             throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
         }
-        return array('meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW,
-            'moderatorPW' => $xml->moderatorPW);
+        return array(
+                'meetingID' => (string) $xml->meetingID,
+                'internalMeetingID' => (string) $xml->internalMeetingID,
+                'attendeePW' => (string) $xml->attendeePW,
+                'moderatorPW' => (string) $xml->moderatorPW
+            );
     }
 
     /**
