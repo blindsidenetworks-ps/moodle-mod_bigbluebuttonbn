@@ -24,13 +24,8 @@
  */
 namespace mod_bigbluebuttonbn\local\helpers;
 defined('MOODLE_INTERNAL') || die();
-
 use context_course;
-use core_tag_tag;
-use mod_bigbluebuttonbn\local\bbb_constants;
-
-global $CFG;
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
+use mod_bigbluebuttonbn\test\testcase_helper;
 
 /**
  * BBB Library tests class.
@@ -40,7 +35,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class roles_test extends \bbb_simple_test {
+class roles_test extends testcase_helper {
     /**
      * Test select separate group prevent all
      *

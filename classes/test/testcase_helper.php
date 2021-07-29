@@ -22,8 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-
+namespace mod_bigbluebuttonbn\test;
 defined('MOODLE_INTERNAL') || die();
+
+use advanced_testcase;
+use context_module;
+use testing_data_generator;
 
 /**
  * BBB Library tests class.
@@ -33,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class bbb_simple_test extends advanced_testcase {
+class testcase_helper extends advanced_testcase {
     /**
      * @var testing_data_generator|null $generator
      */
@@ -54,6 +58,7 @@ class bbb_simple_test extends advanced_testcase {
      * @param array $params Array of parameters to pass to the generator
      * @param array $options Array of options to pass to the generator
      * @return array($context, $cm, $instance) Testable wrapper around the assign class.
+     * @throws \moodle_exception
      */
     protected function create_instance($course = null, $params = [], $options = []) {
         if (!$course) {
@@ -127,8 +132,8 @@ class bbb_simple_test extends advanced_testcase {
         for ($i = 0; $i < $groupsnum; $i++) {
             $groups[] = $generator->create_group(array('courseid' => $course->id));
         }
-        $group1 = $generator->create_group(array('courseid' => $course->id));
-        $group2 = $generator->create_group(array('courseid' => $course->id));
+        $generator->create_group(array('courseid' => $course->id));
+        $generator->create_group(array('courseid' => $course->id));
 
         $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
 

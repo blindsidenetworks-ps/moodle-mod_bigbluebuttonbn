@@ -26,6 +26,8 @@
 
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\testing\generator\mockedserver;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -43,6 +45,17 @@ global $CFG;
 class mod_bigbluebuttonbn_generator extends \testing_module_generator {
 
     /**
+     * Get mocked server instance
+     *
+     * @return mockedserver
+     */
+    protected function get_mocked_server(): mockedserver {
+        require_once(__DIR__ . '/mockedserver.php');
+
+        return new mockedserver();
+    }
+
+    /**
      * Creates an instance of bigbluebuttonbn for testing purposes.
      *
      * @param array|stdClass $record data for module being generated.
@@ -51,18 +64,22 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      */
     public function create_instance($record = null, array $options = null) {
         $now = time();
-        $defaults = array(
-                "type" => 0,
-                "meetingid" => sha1(rand()),
-                "record" => true,
-                "moderatorpass" => "mp",
-                "viewerpass" => "ap",
-                "participants" => "{}",
-                "timecreated" => $now,
-                "timemodified" => $now,
-                "presentation" => null,
-        );
+        $defaults = [
+            "type" => 0,
+            "meetingid" => sha1(rand()),
+            "record" => true,
+            "moderatorpass" => "mp",
+            "viewerpass" => "ap",
+            "participants" => "{}",
+            "timecreated" => $now,
+            "timemodified" => $now,
+            "presentation" => null,
+        ];
+
         $record = (array) $record;
+
+        $record['participants'] = json_encode($this->get_participants_from_record($record));
+
         foreach ($defaults as $key => $value) {
             if (!isset($record[$key])) {
                 $record[$key] = $value;
@@ -72,8 +89,91 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     }
 
     /**
+     * Create the participants field data from create_instance data.
+     *
+     * @param array $record
+     * @return array
+     */
+    protected function get_participants_from_record(array $record): array {
+        $roles = [];
+        if (array_key_exists('moderators', $record)) {
+            $roles = array_merge(
+                $roles,
+                $this->get_participant_configuration($record['moderators'], 'moderator')
+            );
+            unset($record['moderators']);
+        }
+
+        if (array_key_exists('viewers', $record)) {
+            $roles = array_merge(
+                $roles,
+                $this->get_participant_configuration($record['viewers'], 'viewer')
+            );
+            unset($record['viewers']);
+        }
+
+        if (!empty($roles)) {
+            array_unshift($roles, (object) [
+                'selectiontype' => 'all',
+                'selectionid' => 'all',
+                'role' => 'viewer',
+            ]);
+        }
+
+        return $roles;
+    }
+
+    /**
+     * Get the participnat configuration for a field and role.
+     *
+     * @param string $field
+     * @param string $role
+     * @return array
+     */
+    protected function get_participant_configuration(string $field, string $role): array {
+        global $DB;
+
+        $values = explode(',', $field);
+
+        $roles = $DB->get_records_menu('role', [], '', 'shortname, id');
+
+        $configuration = [];
+        foreach ($values as $value) {
+            if (empty($value)) {
+                // Empty value.
+                continue;
+            }
+            [$type, $name] = explode(':', $value);
+
+            $participant = (object) [
+                'selectiontype' => $type,
+                'role' => $role,
+            ];
+            switch ($type) {
+                case 'role':
+                    if (!array_key_exists($name, $roles)) {
+                        throw new \coding_exception("Unknown role '{$name}'");
+                    }
+                    $participant->selectionid = $roles[$name];
+
+                    break;
+                case 'user':
+                    $participant->selectionid = $DB->get_field('user', 'id', ['username' => $name], MUST_EXIST);
+                    break;
+                default:
+                    throw new \coding_exception("Unknown participant type: '{$type}'");
+            }
+
+            $configuration[] = $participant;
+        }
+
+        return $configuration;
+    }
+
+    /**
      * Create a recording for the given bbb activity
      *
+     * TODO
      * @param object $record  for the record
      * @param array|null $options other specific options
      * @return array the recording array
@@ -156,6 +256,49 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
 
         $this->bigbluebuttonbn_add_to_recordings_array_fetch($recording);
         return $recording;
+    }
+
+    /**
+     * Mock an in-progress meeting on the remote server.
+     *
+     * @param array $data
+     * @return stdClass
+     */
+    public function create_meeting(array $data): stdClass {
+        $data = (object) $data;
+        $instance = instance::get_from_instanceid($data->instanceid);
+
+        if (property_exists($data, 'groupid')) {
+            $instance->set_group_id($data->groupid);
+        }
+
+        $meetingid = $instance->get_meeting_id();
+
+        // Default room configuration.
+        $roomconfig = (object) [
+            'meetingID' => $meetingid,
+            'meetingName' => $instance->get_meeting_name(),
+            'attendeePW' => $instance->get_viewer_password(),
+            'moderatorPW' => $instance->get_moderator_password(),
+            'voiceBridge' => $instance->get_voice_bridge(),
+            'metadata' => (object) [
+                'bbb-context' => $instance->get_course()->fullname,
+                'bbb-context-id' => $instance->get_course()->id,
+                'bbb-context-label' => $instance->get_course()->shortname,
+                'bbb-context-name' => $instance->get_course()->fullname,
+                'bbb-origin' => 'Moodle',
+                'bbb-origin-tag' => 'moodle-mod_bigbluebuttonbn (TODO version)',
+                'bbb-recording-description' => $instance->get_meeting_description(),
+                'bbb-recording-name' => $instance->get_meeting_name(),
+            ],
+        ];
+
+        foreach ((array) $data as $key => $value) {
+            $roomconfig->{$key} = $value;
+        }
+
+        $servermock = $this->get_mocked_server();
+        return $servermock->add_meeting($meetingid, $roomconfig);
     }
 
     /**

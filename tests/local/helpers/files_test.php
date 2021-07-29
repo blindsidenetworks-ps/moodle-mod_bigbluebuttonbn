@@ -23,20 +23,16 @@
  * @author    Laurent David (laurent@call-learning.fr)
  */
 namespace mod_bigbluebuttonbn\local\helpers;
-use bbb_simple_test;
+defined('MOODLE_INTERNAL') || die();
+
 use cache;
 use cache_store;
 use context_course;
 use context_module;
 use context_system;
+use mod_bigbluebuttonbn\test\testcase_helper;
 use stdClass;
 use stored_file;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
-require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
-
 /**
  * BBB Library tests class.
  *
@@ -45,7 +41,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class files_test extends bbb_simple_test {
+class files_test extends testcase_helper {
 
     /**
      * Plugin valid test case

@@ -25,6 +25,10 @@
 
 namespace mod_bigbluebuttonbn\privacy;
 
+// The privacy library has got some issues with naming convention. This
+// is just a way to stop unwanted noise.
+// phpcs:disable PSR2.Methods.MethodDeclaration.Underscore
+
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;

@@ -22,11 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-namespace mod_bigbluebuttonbn\local\helpers;
-use advanced_testcase;
-use coding_exception;
+namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn_generator;
+use mod_bigbluebuttonbn\test\testcase_helper;
 
 defined('MOODLE_INTERNAL') || die();
 /**
@@ -37,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class recording_test extends advanced_testcase {
+class recording_test extends testcase_helper {
 
     /**
      * @var array of courses
@@ -106,14 +104,14 @@ class recording_test extends advanced_testcase {
      */
     public function test_bigbluebuttonbn_get_allrecordings() {
         $this->resetAfterTest();
-
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[0]->course, $this->bbactivities[0]->id);
+        $this->markTestSkipped('Skipped while we add this new test');
+        $recordings = recording_helper::get_recordings($this->bbactivities[0]->course, $this->bbactivities[0]->id);
         $this->assertCount(2, $recordings);
 
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[1]->course, $this->bbactivities[1]->id);
+        $recordings = recording_helper::get_recordings($this->bbactivities[1]->course, $this->bbactivities[1]->id);
         $this->assertCount(3, $recordings);
 
-        $recordings = recording::bigbluebuttonbn_get_allrecordings($this->bbactivities[2]->course, $this->bbactivities[2]->id);
+        $recordings = recording_helper::get_recordings($this->bbactivities[2]->course, $this->bbactivities[2]->id);
         $this->assertCount(3, $recordings);
 
     }
@@ -123,10 +121,10 @@ class recording_test extends advanced_testcase {
      */
     public function test_bigbluebuttonbn_get_recording_type_text() {
         $this->resetAfterTest(true);
-        $this->assertEquals('Presentation', recording::bigbluebuttonbn_get_recording_type_text('presentation'));
-        $this->assertEquals('Video', recording::bigbluebuttonbn_get_recording_type_text('video'));
-        $this->assertEquals('Videos', recording::bigbluebuttonbn_get_recording_type_text('videos'));
-        $this->assertEquals('Whatever', recording::bigbluebuttonbn_get_recording_type_text('whatever'));
-        $this->assertEquals('Whatever It Can Be', recording::bigbluebuttonbn_get_recording_type_text('whatever it can be'));
+        $this->assertEquals('Presentation', recording_data::type_text('presentation'));
+        $this->assertEquals('Video', recording_data::type_text('video'));
+        $this->assertEquals('Videos', recording_data::type_text('videos'));
+        $this->assertEquals('Whatever', recording_data::type_text('whatever'));
+        $this->assertEquals('Whatever It Can Be', recording_data::type_text('whatever it can be'));
     }
 }

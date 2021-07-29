@@ -29,9 +29,9 @@ use coding_exception;
 use Exception;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 

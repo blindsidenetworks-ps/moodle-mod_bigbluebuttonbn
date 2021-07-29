@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Performs data migrations and updates on upgrade.
  *
- * @param   integer   $oldversion
+ * @param integer $oldversion
  * @return  boolean
  */
 function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
@@ -120,7 +120,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             // However, as the code was relocated to upgrade.php in version 2017101010, a new issue came up.
             // There is now a timeout error when the plugin is upgraded in large Moodle sites.
             // The script should only be considered when migrating from this version.
-            $sql  = "SELECT * FROM {bigbluebuttonbn} ";
+            $sql = "SELECT * FROM {bigbluebuttonbn} ";
             $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
             $instances = $DB->get_records_sql($sql, array('', ''));
             foreach ($instances as $instance) {
@@ -286,7 +286,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2020101001.20) {
+    if ($oldversion < 2021072901) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
         xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
         // Add column courseid.
@@ -325,13 +325,42 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'recording',
             $fielddefinition);
 
-            // Add index to bigbluebuttonbn_recordings.
+        // Add index to bigbluebuttonbn_recordings.
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
             ['courseid']);
         xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             ['recordingid']);
         // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2020101001.20, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2021072901, 'bigbluebuttonbn');
+    }
+
+    if ($oldversion < 2021072902) {
+
+        // Define table bigbluebuttonbn_recordings to be created.
+        $table = new xmldb_table('bigbluebuttonbn_recordings');
+        // Adding fields to table bigbluebuttonbn_recordings.
+        // Add column timemodified.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'timemodified',
+            $fielddefinition);
+
+        // Drop key before if needed.
+        $usermodifiedkey = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        if ($dbman->find_key_name($table, $usermodifiedkey)) {
+            $dbman->drop_key($table, $usermodifiedkey);
+        }
+        // Add column usermodified.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_recordings', 'usermodified',
+            $fielddefinition);
+
+        // Adding foreign key to table bigbluebuttonbn_recordings.
+        $dbman->add_key($table, $usermodifiedkey);
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021072902, 'bigbluebuttonbn');
     }
 
     return true;
@@ -340,10 +369,10 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 /**
  * Generic helper function for adding or changing a field in a table.
  *
- * @param   object    $dbman
- * @param   string    $tablename
- * @param   string    $fieldname
- * @param   array     $fielddefinition
+ * @param object $dbman
+ * @param string $tablename
+ * @param string $fieldname
+ * @param array $fielddefinition
  */
 function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
     $table = new xmldb_table($tablename);
@@ -364,9 +393,9 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
 /**
  * Generic helper function for dropping a field from a table.
  *
- * @param   object    $dbman
- * @param   string    $tablename
- * @param   string    $fieldname
+ * @param object $dbman
+ * @param string $tablename
+ * @param string $fieldname
  */
 function xmldb_bigbluebuttonbn_drop_field($dbman, $tablename, $fieldname) {
     $table = new xmldb_table($tablename);
@@ -379,10 +408,10 @@ function xmldb_bigbluebuttonbn_drop_field($dbman, $tablename, $fieldname) {
 /**
  * Generic helper function for renaming a field in a table.
  *
- * @param   object    $dbman
- * @param   string    $tablename
- * @param   string    $fieldnameold
- * @param   string    $fieldnamenew
+ * @param object $dbman
+ * @param string $tablename
+ * @param string $fieldnameold
+ * @param string $fieldnamenew
  */
 function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $fieldnamenew) {
     $table = new xmldb_table($tablename);
@@ -395,8 +424,8 @@ function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $
 /**
  * Generic helper function for adding a new table.
  *
- * @param   object    $dbman
- * @param   string    $tablename
+ * @param object $dbman
+ * @param string $tablename
  */
 function xmldb_bigbluebuttonbn_add_table($dbman, $tablename) {
     $table = new xmldb_table($tablename);
@@ -411,9 +440,9 @@ function xmldb_bigbluebuttonbn_add_table($dbman, $tablename) {
 /**
  * Generic helper function for renaming a table.
  *
- * @param   object    $dbman
- * @param   string    $tablenameold
- * @param   string    $tablenamenew
+ * @param object $dbman
+ * @param string $tablenameold
+ * @param string $tablenamenew
  */
 function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew) {
     $table = new xmldb_table($tablenameold);
@@ -425,14 +454,14 @@ function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew
 /**
  * Generic helper function for adding index to a table.
  *
- * @param   object    $dbman
- * @param   string    $tablename
- * @param   string    $indexname
- * @param   array     $indexfields
- * @param   string    $indextype
+ * @param object $dbman
+ * @param string $tablename
+ * @param string $indexname
+ * @param array $indexfields
+ * @param string $indextype
  */
 function xmldb_bigbluebuttonbn_index_table($dbman, $tablename, $indexname, $indexfields,
-        $indextype = XMLDB_INDEX_NOTUNIQUE) {
+    $indextype = XMLDB_INDEX_NOTUNIQUE) {
     $table = new xmldb_table($tablename);
     if (!$dbman->table_exists($table)) {
         return;

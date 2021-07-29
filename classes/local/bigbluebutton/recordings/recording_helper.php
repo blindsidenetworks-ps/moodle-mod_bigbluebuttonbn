@@ -23,11 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\bigbluebutton\recordings;
-
-use stdClass;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
-
+namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -38,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class recording_helper {
 
     /**
@@ -52,10 +47,10 @@ class recording_helper {
      * @param bool   $includeimported
      * @param bool   $onlyimported
      *
-     * @return associative array containing the recordings indexed by recordID, each recording is also a
+     * @return array containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
-    public function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $onlyfrominstance = true,
+    public static function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $onlyfrominstance = true,
         $includedeleted = false, $includeimported = false, $onlyimported = false) {
         global $DB;
         // Retrieve DB recordings.
@@ -180,12 +175,13 @@ class recording_helper {
     /**
      * Helper function to sort an array of recordings. It compares the startTime in two recording objecs.
      *
+     * Note: is it used somewhere ?
      * @param object $a
      * @param object $b
      *
-     * @return array
+     * @return int
      */
-    public static function recording_build_sorter($a, $b) {
+    protected static function recording_build_sorter($a, $b) {
         global $CFG;
         $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
         $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;

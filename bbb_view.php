@@ -26,8 +26,8 @@
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\bigbluebutton\recordings\recording_proxy;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;

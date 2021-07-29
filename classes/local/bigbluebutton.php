@@ -80,6 +80,10 @@ class bigbluebutton {
      */
     public static function sanitized_url() {
         $serverurl = trim(config::get('server_url'));
+        if (defined('BEHAT_SITE_RUNNING')) {
+            // TODO Make this a setting.
+            $serverurl = (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/mockedserver.php'))->out(false);
+        }
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
         }
@@ -556,7 +560,7 @@ class bigbluebutton {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
         self::assert_returned_xml($xml);
         if (empty($xml->meetingID)) {
-            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_cannot_create_meeting', plugin::COMPONENT);
         }
         if ($xml->hasBeenForciblyEnded === 'true') {
             throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
@@ -609,7 +613,8 @@ class bigbluebutton {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
         self::assert_returned_xml($xml, join(',', $meetingsids));
         if (!isset($xml->recordings)) {
-            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_cannot_get_recordings',
+                plugin::COMPONENT, '', null, var_dump($meetingsids));
         }
         return iterator_to_array($xml->recordings->children(), false);
     }
@@ -625,7 +630,8 @@ class bigbluebutton {
         $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
         self::assert_returned_xml($xml, join(',', $recordingsids));
         if (!isset($xml->recordings)) {
-            throw new bigbluebutton_exception('general_error_unable_connect', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_cannot_get_recordings',
+                plugin::COMPONENT, '', null, var_dump($recordingsids));
         }
         return iterator_to_array($xml->recordings->children(), false);
     }
@@ -680,8 +686,8 @@ class bigbluebutton {
     protected static function assert_returned_xml($xml, $additionaldetails = '') {
         if (empty($xml)) {
             global $CFG;
-            throw new server_not_available_exception('general_error_unable_connect', plugin::COMPONENT,
-                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+            throw new server_not_available_exception('general_error_no_answer', plugin::COMPONENT,
+                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn', );
         }
         if ((string) $xml->returncode === 'FAILED') {
             $messagekey = (string) $xml->messageKey ?? '';

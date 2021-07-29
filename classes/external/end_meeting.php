@@ -88,7 +88,7 @@ class end_meeting extends external_api {
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
 
-        if (!$instance->is_admin() && !$instance->is_moderator()) {
+        if (!$instance->user_can_end_meeting()) {
             throw new restricted_context_exception();
         }
         // Execute the end command.

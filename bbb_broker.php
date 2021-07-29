@@ -24,6 +24,8 @@
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 
+// We should not have any require login or MOODLE_INTERNAL Check in this file.
+// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState,moodle.Files.RequireLogin.Missing
 require(__DIR__.'/../../config.php');
 
 use mod_bigbluebuttonbn\local\broker;

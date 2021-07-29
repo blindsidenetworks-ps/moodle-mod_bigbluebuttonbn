@@ -15,20 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version for BigBlueButtonBN Moodle Activity Module.
+ * Mocked BigBlueButton Server.
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
+ * This file provides sample responses for use in testing.
+ *
+ * @package mod_bigbluebuttonbn
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace mod_bigbluebuttonbn\testing\fixtures;
 
-$plugin->version = 2021072902;
-$plugin->requires = 2020061500;
-$plugin->cron = 0;
-$plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '2.5-alpha.1';
+use  mod_bigbluebuttonbn\testing\generator\mockedserver;
+// We should not have any require login or MOODLE_INTERNAL Check in this file.
+// phpcs:disable moodle.Files.RequireLogin.Missing
+require_once(__DIR__ . '/../../../../config.php');
+
+defined('BEHAT_SITE_RUNNING') || redirect(new moodle_url('/'));
+
+require_once(__DIR__ . '/../generator/mockedserver.php');
+
+$server = new mockedserver();
+$server->serve($_SERVER['PATH_INFO']);
