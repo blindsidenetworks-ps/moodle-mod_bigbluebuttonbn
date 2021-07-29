@@ -225,7 +225,8 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
                 ['gid' => $bbbsession['bigbluebuttonbn']->guestlinkid]);
             $guestlink['url'] = $guestlinkurl->__toString();
             $hasguestpass = !empty($bbbsession['bigbluebuttonbn']->guestpass);
-            $accesscoderequired = \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_access_code');
+            $accesscoderequired = (bool) \mod_bigbluebuttonbn\locallib\config::get('participant_guest_requires_access_code');
+            $guestlink['required'] = $accesscoderequired;
             if ($hasguestpass) { // If there is a guestpass/access-code/password set for this session.
                 $guestlink['password'] = $bbbsession['bigbluebuttonbn']->guestpass;
             } else { // No password/access code is required.

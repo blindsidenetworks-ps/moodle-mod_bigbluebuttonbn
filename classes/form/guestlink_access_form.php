@@ -74,12 +74,14 @@ class guestlink_access_form extends \moodleform {
         }
         $accesscodegroup[] =& $mform->createElement('button', 'password_copy', get_string('mod_guestlink_access_form_copy', 'bigbluebuttonbn'));
         $mform->addGroup($accesscodegroup, 'accesscodegroup', get_string('view_guestlink_password_label', 'bigbluebuttonbn'), array(' '), false);
-        $mform->addRule(
-            'accesscodegroup',
-            get_string('mod_guestlink_access_form_accesscoderequired', 'bigbluebuttonbn'),
-            'required',
-            null
-        );
+        if ($this->_customdata['guestlinkaccesscoderequired']) {
+            $mform->addRule(
+                'accesscodegroup',
+                get_string('mod_guestlink_access_form_accesscoderequired', 'bigbluebuttonbn'),
+                'required',
+                null
+            );
+        }
 
         // Expires At.
         $defaultdateoptions = [

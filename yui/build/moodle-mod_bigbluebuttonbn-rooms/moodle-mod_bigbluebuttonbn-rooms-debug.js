@@ -137,6 +137,13 @@ M.mod_bigbluebuttonbn.rooms = {
                     setpass(false);
                 });
             }
+            // If there is no code already, and one is required, generate one.
+            if (context.required) {
+                var input = document.getElementById("id_password");
+                if (input.value === "") {
+                    setpass(false);
+                }
+            }
         }
     },
 
