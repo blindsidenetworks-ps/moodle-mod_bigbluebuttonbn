@@ -46,11 +46,10 @@ if (!empty($error)) {
     return;
 }
 
-$bbbbrokerinstance = view::view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
+$bbbbrokerinstance = view::instance_bigbluebuttonbn($params['bigbluebuttonbn']);
 $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
 $context = context_course::instance($bigbluebuttonbn->course);
 $PAGE->set_context($context);
-
 try {
     $a = strtolower($params['action']);
     if ($a == 'recording_ready') {

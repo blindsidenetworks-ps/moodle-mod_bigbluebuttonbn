@@ -173,28 +173,6 @@ class recording_helper {
     }
 
     /**
-     * Helper function to sort an array of recordings. It compares the startTime in two recording objecs.
-     *
-     * Note: is it used somewhere ?
-     * @param object $a
-     * @param object $b
-     *
-     * @return int
-     */
-    protected static function recording_build_sorter($a, $b) {
-        global $CFG;
-        $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
-        $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
-        if ($a['startTime'] < $b['startTime']) {
-            return $resultless;
-        }
-        if ($a['startTime'] == $b['startTime']) {
-            return 0;
-        }
-        return $resultmore;
-    }
-
-    /**
      * Helper function iterates an array with recordings and unset those already imported.
      *
      * @param array $recordings the source recordings.

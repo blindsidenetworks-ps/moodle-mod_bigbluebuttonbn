@@ -45,6 +45,15 @@ class recording {
     /** @var int INCLUDE_IMPORTED_RECORDINGS boolean set to true defines that the list should include imported recordings */
     public const INCLUDE_IMPORTED_RECORDINGS = true;
 
+    /** @var int RECORDING_STATE_AWAITING integer set to 0. A meeting set to be recorded still awaits for a recording update */
+    public const RECORDING_STATE_AWAITING = 0;
+    /** @var int RECORDING_STATE_DISMISSED integer set to 1. A meeting set to be recorded was not recorded and dismissed by BBB */
+    public const RECORDING_STATE_DISMISSED = 1;
+    /** @var int RECORDING_STATE_PROCESSED integer set to 2. A meeting set to be recorded has a recording processed */
+    public const RECORDING_STATE_PROCESSED = 2;
+    /** @var int RECORDING_STATE_NOTIFIED integer set to 3. A meeting set to be recorded received notification callback from BBB */
+    public const RECORDING_STATE_NOTIFIED = 3;
+
     /**
      * CRUD create.
      *

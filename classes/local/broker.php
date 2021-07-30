@@ -252,34 +252,29 @@ class broker {
             header('HTTP/1.0 400 Bad Request. ' . $error);
             return;
         }
-        // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
-        $meetingidelements = explode('[', $decodedparameters->meeting_id);
-        $meetingidelements = explode('-', $meetingidelements[0]);
-
-        if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
+        // Validations.
+        if (!isset($decodedparameters->record_id)) {
+            header('HTTP/1.0 400 Bad request. Missing record_id parameter');
+            return;
+        }
+        $recs = recording::read_by(['recordingid' => $decodedparameters->record_id]);
+        if (!isset($recs)) {
+            header('HTTP/1.0 400 Bad request. Invalid record_id');
+            return;
+        }
+        $rec = $recs[$decodedparameters->record_id];
+        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
+        if (!isset($instance)) {
             header('HTTP/1.0 410 Gone. The activity may have been deleted');
             return;
         }
         // Sends the messages.
         try {
-            // Workaround for CONTRIB-7438.
-            // Proceed as before when no record_id is provided.
-            if (!isset($decodedparameters->record_id)) {
-                notifier::notify_recording_ready($bigbluebuttonbn);
-                header('HTTP/1.0 202 Accepted');
-                return;
-            }
             // We make sure messages are sent only once.
-            if (
-                \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
-                    $decodedparameters->record_id) == 0) {
-                        notifier::notify_recording_ready($bigbluebuttonbn);
+            if ($rec->state != recording::RECORDING_STATE_NOTIFIED) {
+                notifier::notify_recording_ready($bigbluebuttonbn);
+                recording::update($rec->id, (object)['state' => recording::RECORDING_STATE_NOTIFIED]);
             }
-            $overrides = array('meetingid' => $decodedparameters->meeting_id);
-            $meta['recordid'] = $decodedparameters->record_id;
-            $meta['callback'] = 'recording_ready';
-            logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
-                json_encode($meta));
             header('HTTP/1.0 202 Accepted');
         } catch (Exception $e) {
             $error = 'Caught exception: ' . $e->getMessage();

@@ -159,8 +159,8 @@ switch (strtolower($action)) {
                     array(
                         'courseid' => $bigbluebuttonbn->course,
                         'bigbluebuttonbnid' => $bigbluebuttonbn->id,
-                        'timecreated' => time(),
                         'recordingid' => $response['internalMeetingID'],
+                        'timecreated' => time(),
                         )
                     );
                 // TODO: We may want to catch if the record was not created.
