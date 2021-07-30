@@ -26,10 +26,13 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use cache_store;
+use Exception;
+use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
+use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use stdClass;
 
@@ -350,5 +353,102 @@ class meeting {
             $metadata['analytics-callback-url'] = $this->instance->get_meeting_event_notification_url()->out(false);
         }
         return $metadata;
+    }
+
+    /**
+     * Helper for responding when storing live meeting events is requested.
+     *
+     * The callback with a POST request includes:
+     *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
+     *  - Content Type: application/json
+     *  - Body: <A JSON Object>
+     *
+     * @param object $bigbluebuttonbn
+     *
+     * @return void
+     */
+    public static function meeting_events($bigbluebuttonbn) {
+        // Decodes the received JWT string.
+        try {
+            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
+            $headers = getallheaders();
+
+            // Pull the Bearer from the headers.
+            if (!array_key_exists('Authorization', $headers)) {
+                $msg = 'Authorization failed';
+                header('HTTP/1.0 400 Bad Request. ' . $msg);
+                return;
+            }
+            $authorization = explode(" ", $headers['Authorization']);
+
+            // Verify the authenticity of the request.
+            $token = \Firebase\JWT\JWT::decode(
+                $authorization[1],
+                config::get('shared_secret'),
+                array('HS512')
+            );
+
+            // Get JSON string from the body.
+            $jsonstr = file_get_contents('php://input');
+
+            // Convert JSON string to a JSON object.
+            $jsonobj = json_decode($jsonstr);
+        } catch (Exception $e) {
+            $msg = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $msg);
+            return;
+        }
+
+        // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
+        $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
+        $meetingidelements = explode('-', $meetingidelements[0]);
+        if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
+            $msg = 'The activity may have been deleted';
+            header('HTTP/1.0 410 Gone. ' . $msg);
+            return;
+        }
+
+        // We make sure events are processed only once.
+        $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
+        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
+        $meta['callback'] = 'meeting_events';
+        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
+            json_encode($meta));
+        if (
+            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
+                $meta['recordid'], 'meeting_events') == 1) {
+            // Process the events.
+            self::process_meeting_events($bigbluebuttonbn, $jsonobj);
+            header('HTTP/1.0 200 Accepted. Enqueued.');
+            return;
+        }
+
+        header('HTTP/1.0 202 Accepted. Already processed.');
+    }
+
+    /**
+     * Helper function enqueues list of meeting events to be stored and processed as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param object $jsonobj
+     *
+     * @return void
+     */
+    protected static function process_meeting_events($bigbluebuttonbn, $jsonobj) {
+        $meetingid = $jsonobj->{'meeting_id'};
+        $recordid = $jsonobj->{'internal_meeting_id'};
+        $attendees = $jsonobj->{'data'}->{'attendees'};
+        foreach ($attendees as $attendee) {
+            $userid = $attendee->{'ext_user_id'};
+            $overrides['meetingid'] = $meetingid;
+            $overrides['userid'] = $userid;
+            $meta['recordid'] = $recordid;
+            $meta['data'] = $attendee;
+            // Stores the log.
+            logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides,
+                json_encode($meta));
+            // Enqueue a task for processing the completion.
+            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
+        }
     }
 }

@@ -23,7 +23,10 @@
  */
 
 namespace mod_bigbluebuttonbn\testing\generator;
+
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use moodle_url;
 use SimpleXMLElement;
 use stdClass;
 
@@ -49,25 +52,109 @@ class mockedserver {
      * @param string $path The PATH_INFO
      */
     public function serve(string $path): void {
+        $metaparamconverter = function($paramkeys) {
+            $allparams = [];
+            foreach ($paramkeys as $key) {
+                $allparams[$key] = optional_param('meta_' . $key, null, PARAM_RAW);
+            }
+            return $allparams;
+        };
+        $obtainparams = function($paramname, $default = '') {
+            return optional_param($paramname, $default, PARAM_RAW);
+        };
+        list($status, $code, $response) = $this->do_serve($path, $metaparamconverter, $obtainparams);
+
+        $this->http_respond($status, $code, $response);
+    }
+
+    /**
+     * Handle the response for the specified path.
+     *
+     * @param string $path The PATH_INFO
+     */
+    public function query_server(string $path): string {
+        list('path' => $realpath, 'query' => $query) = parse_url($path);
+        $params = [];
+        parse_str(str_replace('&amp;', '&', $query), $params);
+        $metaparamconverter = function($paramkeys) use ($params) {
+            $allparams = [];
+            foreach ($paramkeys as $key) {
+                $allparams[$key] = $params['meta_' . $key] ?? null;
+            }
+            return $allparams;
+        };
+        $obtainparams = function($paramname, $default = '') use ($params) {
+            return $params[$paramname] ?? '';
+        };
+
+        list($status, $code, $response) = $this->do_serve($realpath, $metaparamconverter, $obtainparams);
+        $response = (object) $response;
+        $response->returncode = $status;
+        $document = new SimpleXMLElement('<?xml version="1.0"?><response></response>');
+        $this->convert_to_xml($document, $response);
+        return $document->saveXML();
+    }
+
+    /**
+     * Common routine for PHP unit and Behat
+     *
+     * @param string $path
+     * @param callable $metaparamconverter
+     * @param callable $obtainparams
+     * @return array|string[]
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    protected function do_serve(string $path, callable $metaparamconverter, callable $obtainparams) {
+        list($status, $code, $response) = ['', '', ''];
+        $meetingid = $obtainparams('meetingID');
+        // TODO: the API seems to be oriented toward one or several recordings.
+        $recordingsid = $obtainparams('recordID');
         switch ($path) {
             case '/api/':
-                $this->handle_status();
+                list($status, $code, $response) = $this->handle_status();
                 break;
             case '/api/create':
-                $this->handle_create_room();
+                $metadata = $this->build_metadata(
+                    $metaparamconverter(
+                        array_keys($this->get_base_metadata())
+                    ));
+                $roomconfig = $this->build_room_from_params(
+                    (object) $metadata,
+                    $obtainparams('name'),
+                    $obtainparams('attendeePW'),
+                    $obtainparams('moderatorPW'),
+                    $obtainparams('voiceBridge', '7000'),
+                    $obtainparams('dialNumber', 0000)
+                );
+                list($status, $code, $response) = $this->handle_create_room((object) $roomconfig, $meetingid);
                 break;
             case '/api/end':
-                $this->handle_end_meeting();
+                list($status, $code, $response) = $this->handle_end_meeting($meetingid);
                 break;
             case '/api/getMeetingInfo':
-                $this->handle_get_meeting_info();
+                list($status, $code, $response) = $this->handle_get_meeting_info($meetingid);
                 break;
             case '/api/join':
-                $this->handle_join_meeting();
+                list($status, $code, $response) = $this->handle_join_meeting($meetingid);
                 break;
             case '/api/getRecordings':
-                $this->handle_get_recordings();
+                list($status, $code, $response) = $this->handle_get_recordings($meetingid, $recordingsid);
+                break;
+            case '/api/updateRecordings':
+                $metadata = $this->build_metadata(
+                    $metaparamconverter(
+                        array_merge(
+                            array_keys($this->get_base_metadata()),
+                            ['bbb-recording-description', 'bbb-recording-name', 'bbb-recording-tags']
+                        )));
+                list($status, $code, $response) = $this->handle_update_recording($recordingsid, $metadata);
+                break;
+            case '/api/deleteRecordings':
+                list($status, $code, $response) = $this->handle_delete_recording($recordingsid);
+                break;
         }
+        return array($status, $code, $response);
     }
 
     /**
@@ -80,18 +167,17 @@ class mockedserver {
     public function add_meeting(string $meetingid, stdClass $data): stdClass {
         $creationtime = time();
 
-        // Default room configuration.
-        $roomconfig = (object) [
-            'meetingID' => $meetingid,
+        $metadata = $this->build_metadata([
+            'bn-meetingid' => $meetingid,
+            'bn-priority' => '20',
+            'bn-protected' => 'true',
+            'bn-userid' => 'moodle-testing',
+        ]);
+        $roomconfig = $this->build_room_from_params((object) $metadata, $meetingid, 'meetingname',
+            'ap', 'mp', 0, 0000);
+        $roomconfig = array_merge($roomconfig, [
             'internalMeetingID' => sha1($meetingid),
             'parentMeetingID' => 'bbb-none',
-
-            'meetingName' => 'meetingname',
-
-            'attendeePW' => 'ap',
-            'moderatorPW' => 'mp',
-            'voiceBridge' => 0,
-            'dialNumber' => 0000,
             'createTime' => $creationtime,
             'startTime' => $creationtime,
             'endTime' => 0,
@@ -106,26 +192,11 @@ class mockedserver {
             'maxUsers' => 0,
             'moderatorCount' => 0,
             'attendees' => [],
-            'metadata' => (object) [
-                'bbb-context' => '',
-                'bbb-context-id' => 0,
-                'bbb-context-label' => '',
-                'bbb-context-name' => '',
-                'bbb-origin' => '',
-                'bbb-origin-server-common-name' => '',
-                'bbb-origin-server-name' => '',
-                'bbb-origin-tag' => '',
-                'bbb-origin-version' => '',
-                'bbb-recording-description' => '',
-                'bbb-recording-name' => '',
-                'bbb-recording-tags' => '',
-                'bn-meetingid' => $meetingid,
-                'bn-priority' => '20',
-                'bn-protected' => 'true',
-                'bn-userid' => 'moodle-testing',
-            ],
-            'running' => 'true',
-        ];
+            'running' => 'true'
+        ]);
+
+        // Default room configuration.
+        $roomconfig = (object) $roomconfig;
 
         // Merge in any existing room configuration.
         // This may be pre-configured from a test, or it may be from when the room was created.
@@ -151,58 +222,97 @@ class mockedserver {
     /**
      * Add a recording for the specified meeting.
      *
-     * @param string $meetingid
-     * @param stdClass $data
-     * @param string $presentername
-     * @param int $start
-     * @param int $end
+     * @param instance $instance
+     * @param array $data
+     * @return string newly created recording id
      */
-    public function add_recording(string $meetingid, stdClass $data, string $presentername, int $start, int $end): void {
-        global $CFG;
+    public function add_recording(instance $instance, array $data): string {
+        $presentername = $data['presentername'] ?? 'Fake presenter';
+        $starttime = $data['startTime'] ?? (time() - HOURSECS * rand(1, 15) * 24) * 1000; // Time is in ms.
+        $endtime = $data['endTime'] ?? $starttime + HOURSECS * rand(1, 5) * 1000;// Time is in ms.
+        $recordingname = $data['meta_bbb-recording-name'] ?? $instance->get_meeting_name();
+        $recordingdesc = $data['meta_bbb-recording-description'] ?? '';
+        $recordingtags = $data['meta_bbb-recording-tags'] ?? '';
+        $meetingid = $instance->get_meeting_id();
 
-        $instance = instance::get_from_meetingid($meetingid);
+        $metadata = $this->build_metadata(
+            [
+                'bbb-context' => $instance->get_course()->fullname,
+                'bbb-context-id' => $instance->get_course()->id,
+                'bbb-context-label' => $instance->get_course()->shortname,
+                'bbb-context-name' => $instance->get_course()->fullname,
+                'bbb-recording-description' => $recordingdesc,
+                'bbb-recording-name' => $recordingname,
+                'bbb-recording-tags' => $recordingtags
+            ]
+        );
 
-        $recordings = $this->find_recordings($meetingid);
-        $pluginversion = get_config('mod_bigbluebuttonbn')->version;
-        $basic = [
-            'recordingID' => '',
-            'meetingID' => $meetingid,
-            'name' => '',
+        $metadata = (object) array_merge($metadata, [
+            'isBreakout' => 'false',
+            'bn-presenter-name' => $presentername,
+            'bn-recording-ready-url' => new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php',
+                array(
+                    'action' => 'recording_ready',
+                    'bigbluebuttonbn' => $instance->get_instance_id()
+                )),
+        ]);
+        $roomconfig = $this->build_room_from_params($metadata, $meetingid);
+        $recordingconfig = array_merge($roomconfig, [
+            'recordID' => self::create_recording_id($meetingid),
             'published' => 'true',
             'protected' => 'true',
-            'startTime' => time() - HOURSECS - rand(0, 3600),
-            'endTime' => time() - rand(0, 3600),
+            'startTime' => $starttime, // Time is in ms.
+            'endTime' => $endtime,
             'participants' => 1,
-            'metadata' => [
-                'bbb-origin-version' => $CFG->release,
-                'bbb-recording-tags' => '',
-                'bbb-origin-server-name' => parse_url($CFG->wwwroot, PHP_URL_HOST),
-                'bbb-recording-name' => $instance->get_meeting_name(),
-                'bbb-recording-description' => '',
-                'bbb-context-label' => $instance->get_course()->shortname,
-                'bbb-context-id' => $instance->get_course()->id,
-                'bbb-origin-server-common-name' => '',
-                'bbb-origin-tag' => "moodle-mod_bigbluebuttonbn ({$pluginversion})",
-                'bbb-context' => $instance->get_course()->fullname,
-                'bbb-origin' => 'Moodle',
-                'isBreakout' => 'false',
-                'bbb-context-name' => $instance->get_course()->fullname,
-                'bn-presenter-name' => $presentername
-            ],
-            'playback' => [
-                'format' => [
+            'playback' => (object) [
+                'format' => (object) [
                     'type' => 'presentation',
                     'url' => '',
-                    'length' => $end - $start,
+                    'length' => ($endtime - $starttime) / 1000, // In seconds.
                 ],
             ],
-        ];
+        ]);
 
-        $recording = array_merge($basic, (array) $data);
-        $recording->playback->format->length = $recording->endTime - $recording->startTime;
-        $recordings[] = $recording;
+        $recording = (object) $recordingconfig;
+        $recordings = $this->find_api_recordings_from_meetingid($meetingid);
+        $recordings[$recording->recordID] = $recording;
 
         $this->save_room_state($meetingid, self::TYPE_RECORDINGS, $recordings);
+        return $recording->recordID;
+    }
+
+    /**
+     * Fetch recording data as it would be returned by the API
+     *
+     * @param string $meetingid
+     * @param string $recordingid
+     * @return array
+     */
+    public function fetch_recording(string $meetingid, string $recordingid): array {
+        $filename = $this->get_meeting_status_filename($meetingid, self::TYPE_RECORDINGS);
+        if (file_exists($filename)) {
+            $recordings = json_decode(file_get_contents($filename));
+            if ($recordings) {
+                $recording = array_filter($recordings, function($rec) use ($recordingid) {
+                    return $rec->recordID == $recordingid;
+                });
+                return $recording[0] ?? [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Generate a recordingId as would BBB do it
+     *
+     * @param string $meetingid
+     * @return string
+     */
+    public static function create_recording_id(string $meetingid): string {
+        $baserecordid = md5($meetingid);
+        $uid = time() + rand(1, 100000);
+        return "$baserecordid-$uid";
     }
 
     /**
@@ -251,18 +361,79 @@ class mockedserver {
     }
 
     /**
-     * Find all recordings for the specified meeting
+     * Find all recordings as returned by the API for the specified meeting
      *
      * @param string $meetingid
      * @return array
      */
-    protected function find_recordings(string $meetingid): array {
+    protected function find_api_recordings_from_meetingid(string $meetingid): array {
         $filename = $this->get_meeting_status_filename($meetingid, self::TYPE_RECORDINGS);
         if (file_exists($filename)) {
-            return json_decode(file_get_contents($filename));
+            $recordings = json_decode(file_get_contents($filename));
+            $returnedrecordings = [];
+            foreach ($recordings as $recording) {
+                $returnedrecordings[$recording->recordID] = $recording;
+            }
+            return $returnedrecordings;
         }
 
         return [];
+    }
+
+    /**
+     * Find all recordings returned by the API for the specified recordingsid
+     *
+     * @param array $recordingids
+     * @return array
+     */
+    protected function find_api_recordings(array $recordingids): array {
+        // We only have a trace of the meetingid in the bbbtable.
+        $allrecordings = [];
+        foreach ($recordingids as $rid) {
+            $recording = $this->find_api_recording($rid);
+            if ($recording) {
+                $allrecordings[$recording->recordID] = $recording;
+            }
+        }
+        return $allrecordings;
+    }
+
+    /**
+     * Find related returned by the API for the specified recordingsid
+     *
+     * @param string $recordingid
+     * @return object|null
+     */
+    protected function find_api_recording(string $recordingid): ?object {
+        global $DB;
+        // TODO: clarify if the read_by method of recording should really do a fetch.
+        // currenly we are creating an infinite loop if we use recording::read_by. So best is
+        // for now to directly query the DB to get the bigbluebuttonbnid.
+        $recordings = recording::read_by(array('recordingid' => $recordingid, 'imported' => false), false);
+        $recording = end($recordings);
+        $instance = instance::get_from_instanceid($recording->bigbluebuttonbnid);
+        // Here we will check in all possible groups for this course. This is not what BBB API is doing,
+        // but as in the mock server the handle is the meetingId, we need to go through each group to check.
+
+        $filenames = [];
+        $filenames[] = $this->get_meeting_status_filename($instance->get_meeting_id(), self::TYPE_RECORDINGS);
+        // TODO this might be an issue also on the real server as here we open up Moodle to retrieve
+        // any recording even if we are not in the same group. Maybe we will need to add a groupid column to the recording table.
+        if ($allgroups = groups_get_all_groups($instance->get_course_id())) {
+            foreach ($allgroups as $g) {
+                $filenames[] = $this->get_meeting_status_filename($instance->get_meeting_id($g->id), self::TYPE_RECORDINGS);
+            }
+        }
+        foreach ($filenames as $filename) {
+            if (file_exists($filename)) {
+                foreach (json_decode(file_get_contents($filename)) as $recording) {
+                    if ($recording->recordID == $recordingid) {
+                        return $recording;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -270,9 +441,9 @@ class mockedserver {
      *
      * @param string $meetingid
      * @param string $type (See type constants)
-     * @param stdClass $meetingdata
+     * @param mixed $meetingdata
      */
-    protected function save_room_state(string $meetingid, string $type, stdClass $meetingdata): void {
+    protected function save_room_state(string $meetingid, string $type, $meetingdata): void {
         $filename = $this->get_meeting_status_filename($meetingid, $type);
 
         file_put_contents($filename, json_encode($meetingdata));
@@ -286,17 +457,28 @@ class mockedserver {
      */
     protected function convert_to_xml(SimpleXMLElement $node, $data): void {
         foreach ((array) $data as $key => $value) {
-            if (is_object($value)) {
-                $value = (array) $value;
-            }
-            if (is_numeric($key)) {
-                $key = "_{$key}";
-            }
-            if (is_array($value)) {
+            if (is_object($value) && !empty($value->forcexmlarraytype)) {
+                $newkey = $value->forcexmlarraytype;
+                $value = array_values($value->array);
                 $subnode = $node->addChild($key);
-                $this->convert_to_xml($subnode, $value);
+                foreach ($value as $val) {
+                    $arraynode = $subnode->addChild($newkey);
+                    $this->convert_to_xml($arraynode, $val);
+                }
+
             } else {
-                $node->addChild((string) $key, htmlspecialchars($value));
+                if (is_object($value)) {
+                    $value = (array) $value;
+                }
+                if (is_numeric($key)) {
+                    $key = "_{$key}";
+                }
+                if (is_array($value)) {
+                    $subnode = $node->addChild($key);
+                    $this->convert_to_xml($subnode, $value);
+                } else {
+                    $node->addChild((string) $key, htmlspecialchars($value));
+                }
             }
         }
     }
@@ -304,40 +486,18 @@ class mockedserver {
     /**
      * Handle a request for the status page.
      */
-    protected function handle_status(): void {
-        $this->respond('SUCCESS', 200, (object) ['version' => 0.9]);
+    protected function handle_status(): array {
+        return array('SUCCESS', 200, (object) ['version' => 0.9]);
     }
 
     /**
      * Handle a request to create a new room.
+     *
+     * @param object $roomconfig
+     * @param string $meetingid
+     * @return array
      */
-    protected function handle_create_room(): void {
-        $meetingid = optional_param('meetingID', '', PARAM_RAW);
-
-        // Default room configuration.
-        $roomconfig = (object) [
-            'meetingID' => $meetingid,
-            'meetingName' => optional_param('name', '', PARAM_RAW),
-            'attendeePW' => optional_param('attendeePW', '', PARAM_RAW),
-            'moderatorPW' => optional_param('moderatorPW', '', PARAM_RAW),
-            'voiceBridge' => optional_param('voiceBridge', '70000', PARAM_RAW),
-            'dialNumber' => optional_param('dialNumber', 0000, PARAM_RAW),
-            'metadata' => (object) [
-                'bbb-context' => optional_param('meta_bbb-context', '', PARAM_RAW),
-                'bbb-context-id' => optional_param('meta_bbb-context-id', '', PARAM_RAW),
-                'bbb-context-label' => optional_param('meta_bbb-context-label', '', PARAM_RAW),
-                'bbb-context-name' => optional_param('meta_bbb-context-name', '', PARAM_RAW),
-                'bbb-origin' => optional_param('meta_bbb-origin', '', PARAM_RAW),
-                'bbb-origin-server-common-name' => optional_param('meta_bbb-server-common-name', '', PARAM_RAW),
-                'bbb-origin-server-name' => optional_param('meta_bbb-server-name', '', PARAM_RAW),
-                'bbb-origin-tag' => optional_param('meta_bbb-origin-tag', '', PARAM_RAW),
-                'bbb-origin-version' => optional_param('meta_bbb-version', '', PARAM_RAW),
-                'bbb-recording-description' => optional_param('meta_bbb-recording-description', '', PARAM_RAW),
-                'bbb-recording-name' => optional_param('meta_bbb-recording-name', '', PARAM_RAW),
-                'bbb-recording-tags' => optional_param('meta_bbb-recording-tags', '', PARAM_RAW),
-            ],
-        ];
-
+    protected function handle_create_room(object $roomconfig, string $meetingid = ''): array {
         $roomconfig = $this->add_meeting($meetingid, $roomconfig);
 
         $responsekeys = [
@@ -359,46 +519,116 @@ class mockedserver {
         foreach ($responsekeys as $key) {
             $response->{$key} = $roomconfig->{$key};
         }
+        return array('SUCCESS', 200, $response);
+    }
 
-        $this->respond('SUCCESS', 200, $response);
+    /**
+     * Build room config from either optional_params (priority 1) and/or default value provided as parameters
+     *
+     * @param object $metadata
+     * @param string $meetingid
+     * @param string $meetingname
+     * @param string $attendeepw
+     * @param string $moderatorpw
+     * @param string $voicebridge
+     * @param int $dialnumber
+     * @return object
+     * @throws \coding_exception
+     */
+    protected function build_room_from_params(object $metadata, string $meetingid = '', string $meetingname = '',
+        string $attendeepw = '', string $moderatorpw = '',
+        string $voicebridge = '7000',
+        int $dialnumber = 0000): array {
+        // Default room configuration.
+        return [
+            'meetingID' => $meetingid,
+            'meetingName' => $meetingname,
+            'attendeePW' => $attendeepw,
+            'moderatorPW' => $moderatorpw,
+            'voiceBridge' => $voicebridge,
+            'dialNumber' => $dialnumber,
+            'metadata' => $metadata,
+        ];
+    }
+
+    /**
+     * Build room config from either optional_params (priority 1) and/or default value provided as parameter
+     *
+     * @param array $additionalinfo an array with value that will override default values. If values are null they
+     * will be ignored.
+     * @return array
+     */
+    protected function build_metadata(array $additionalinfo): array {
+        $basemetadata = $this->get_base_metadata();
+        // We ignore null values.
+        return array_merge($basemetadata, array_filter($additionalinfo,
+            function($a) {
+                return !is_null($a);
+            }
+        ));
+    }
+
+    /**
+     * Get base metadata
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    protected function get_base_metadata(): array {
+        global $CFG;
+        $pluginversion = get_config('mod_bigbluebuttonbn')->version;
+        return [
+            'bbb-context' => '',
+            'bbb-context-id' => '',
+            'bbb-context-label' => '',
+            'bbb-context-name' => '',
+            'bbb-origin' => 'Moodle',
+            'bbb-origin-server-common-name' => parse_url($CFG->wwwroot, PHP_URL_HOST),
+            'bbb-origin-server-name' => 'BBB Moodle',
+            'bbb-origin-tag' => "moodle-mod_bigbluebuttonbn ({$pluginversion})",
+            'bbb-origin-version' => $CFG->release
+        ];
     }
 
     /**
      * Handle a request to end a meeting.
+     *
+     * @param string $meetingid
+     * @return array
+     * @throws \coding_exception
      */
-    protected function handle_end_meeting(): void {
-        $meetingid = optional_param('meetingID', '', PARAM_RAW);
-
+    protected function handle_end_meeting(string $meetingid = ''): array {
         $roomconfig = $this->find_room_configuration($meetingid);
         if ($roomconfig === null) {
-            $this->send_room_not_found($meetingid);
+            return $this->send_room_not_found($meetingid);
         }
 
         $password = required_param('password', PARAM_RAW);
         if ($password !== $roomconfig->moderatorPW) {
-            $this->respond('FAILED', 403, $this->get_message('denied', 'Access denied'));
+            return array('FAILED', 403, $this->get_message('denied', 'Access denied'));
         }
 
         // Remove the config.
         $this->remove_room_configuration($meetingid);
 
-        $this->respond('SUCCESS', 200, $this->get_message(
+        return array('SUCCESS', 200, $this->get_message(
             'sentEndMeetingRequest',
             'A request to end the meeting was sent. Please wait a few seconds, and then use '
-            .'the getMeetingInfo or isMeetingRunning API calls to verify that it was ended.'
+            . 'the getMeetingInfo or isMeetingRunning API calls to verify that it was ended.'
         ));
     }
 
     /**
      * Handle a request to fetch meeting info for a room.
+     *
+     * @param string $meetingid
+     * @return array
      */
-    protected function handle_get_meeting_info(): void {
-        $meetingid = optional_param('meetingID', '', PARAM_RAW);
-
+    protected function handle_get_meeting_info(string $meetingid = ''): array {
         $roomconfig = $this->find_room_configuration($meetingid);
 
         if ($roomconfig === null) {
-            $this->send_room_not_found($meetingid);
+            return $this->send_room_not_found($meetingid);
         }
 
         $responsekeys = [
@@ -437,18 +667,20 @@ class mockedserver {
         // phpcs:disable moodle.PHP.ForbiddenFunctions.FoundWithAlternative,moodle.PHP.ForbiddenFunctions.Found
         error_log(print_r($response, true));
         // phpcs:enable moodle.PHP.ForbiddenFunctions.FoundWithAlternative,moodle.PHP.ForbiddenFunctions.Found
-        $this->respond('SUCCESS', 200, $response);
+        return array('SUCCESS', 200, $response);
     }
 
     /**
      * Handle a request to join a meeting.
+     *
+     * @param string $meetingid
+     * @return array
+     * @throws \coding_exception
      */
-    protected function handle_join_meeting(): void {
-        $meetingid = optional_param('meetingID', '', PARAM_RAW);
-
+    protected function handle_join_meeting(string $meetingid = ''): array {
         $roomconfig = $this->find_room_configuration($meetingid);
         if ($roomconfig === null) {
-            $this->send_room_not_found($meetingid);
+            return $this->send_room_not_found($meetingid);
         }
 
         $attendee = (object) [
@@ -471,7 +703,7 @@ class mockedserver {
             $attendee->isPresenter = 'false';
             $roomconfig->participantCount++;
         } else {
-            $this->respond('FAILED', 503, (object) []);
+            return array('FAILED', 503, (object) []);
         }
 
         $roomconfig->attendees[] = $attendee;
@@ -497,35 +729,97 @@ EOF;
 
     /**
      * Handle a request to fetch a list of recordings for a room.
+     *
+     * @param string $meetingid
+     * @param string $recordingsid
+     * @return array
      */
-    protected function handle_get_recordings(): void {
-        $meetingid = optional_param('meetingID', '', PARAM_RAW);
-
-        $recordings = $this->find_recordings($meetingid);
+    protected function handle_get_recordings(string $meetingid = '', string $recordingsid = ''): array {
+        if ($meetingid) {
+            $recordings = $this->find_api_recordings_from_meetingid($meetingid);
+        } else {
+            $recordings = $this->find_api_recordings(explode(',', $recordingsid));
+        }
         if (empty($recordings)) {
             $response = $this->get_message('noRecordings', 'There are no recordings for the meeting(s).');
             $response->recordings = [];
         } else {
             $response = (object) [
-                'recordings' => $recordings,
+                'recordings' => (object) ['forcexmlarraytype' => 'recording', 'array' => $recordings]
             ];
         }
 
-        $this->respond('SUCCESS', 200, $response);
+        return array('SUCCESS', 200, $response);
+    }
+
+    /**
+     * Handle a request to delete a recording
+     *
+     * @param string $recordingsid
+     * @return array
+     */
+    protected function handle_delete_recording($recordingsid) {
+        $recording = $this->find_api_recording($recordingsid);
+        if ($recording) {
+            $recordings = $this->find_api_recordings_from_meetingid($recording->meetingID);
+            $recordings = array_filter($recordings, function($r) use ($recording) {
+                return $r->recordID != $recording->recordID;
+            });
+            $this->save_room_state($recording->meetingID, self::TYPE_RECORDINGS, $recordings);
+            return array('SUCCESS', 200, ['deleted' => true]);
+        } else {
+            $response = (object) [
+                'messageKey' => 'notFound',
+                'message' => 'We could not find a recording with that recording ID',
+            ];
+            return array('FAILED', 404, $response);
+        }
+    }
+
+    /**
+     * Handle a request to update a recording.
+     *
+     * @param string $recordingid
+     * @param array $metadata
+     * @return array
+     */
+    protected function handle_update_recording(string $recordingid, array $metadata): array {
+        $recording = $this->find_api_recording($recordingid);
+        if ($recording) {
+            $updated = false;
+            foreach ($metadata as $metakey => $metavalue) {
+                if (!is_null($metavalue)) {
+                    $recording->metadata->$metakey = $metavalue;
+                    $updated = true;
+                }
+            }
+            if ($updated) {
+                $allrecordings = $this->find_api_recordings_from_meetingid($recording->meetingID);
+                $allrecordings[$recording->recordID] = $recording;
+                $this->save_room_state($recording->meetingID, self::TYPE_RECORDINGS, $allrecordings);
+            }
+            return array('SUCCESS', 200, ['updated' => true]);
+        }
+        $response = (object) [
+            'messageKey' => 'notFound',
+            'message' => 'We could not find a recording with that recording ID',
+        ];
+        return array('FAILED', 404, $response);
     }
 
     /**
      * Send a room not found response for a specific meeting.
      *
      * @param string $meetingid
+     * @return array
      */
-    protected function send_room_not_found(string $meetingid): void {
+    protected function send_room_not_found(string $meetingid): array {
         $response = (object) [
             'messageKey' => 'notFound',
             'message' => 'We could not find a meeting with that meeting ID',
         ];
 
-        $this->respond('FAILED', 404, $response);
+        return array('FAILED', 404, $response);
     }
 
     /**
@@ -533,7 +827,7 @@ EOF;
      *
      * @param string $messagekey
      * @param string $message
-     * @return stdClas
+     * @return stdClass
      */
     protected function get_message(string $messagekey, string $message): stdClass {
         return (object) [
@@ -549,7 +843,7 @@ EOF;
      * @param int $code
      * @param stdClass $response
      */
-    protected function respond(string $status, int $code, stdClass $response): void {
+    protected function http_respond(string $status, int $code, stdClass $response): void {
         header('Content-Type: text/xml');
         header("HTTP/1.0 {$code}");
 

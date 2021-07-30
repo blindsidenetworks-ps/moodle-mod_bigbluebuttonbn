@@ -26,7 +26,7 @@
 
 namespace mod_bigbluebuttonbn\testing\fixtures;
 
-use  mod_bigbluebuttonbn\testing\generator\mockedserver;
+use mod_bigbluebuttonbn\testing\generator\mockedserver;
 // We should not have any require login or MOODLE_INTERNAL Check in this file.
 // phpcs:disable moodle.Files.RequireLogin.Missing
 require_once(__DIR__ . '/../../../../config.php');

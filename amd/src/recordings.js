@@ -193,7 +193,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
                     body: recordingConfirmationMessage(payload),
                     type: ModalFactory.types.SAVE_CANCEL
                 }).then(async(modal) => {
-                    modal.setSaveButtonText(await Str.get_string('ok'));
+                    modal.setSaveButtonText(await Str.get_string('ok', 'moodle'));
 
                     // Handle save event.
                     modal.getRoot().on(ModalEvents.save, function () {

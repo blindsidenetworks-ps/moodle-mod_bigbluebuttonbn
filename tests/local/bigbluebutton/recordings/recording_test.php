@@ -22,11 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
+
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
+
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\test\testcase_helper;
 
 defined('MOODLE_INTERNAL') || die();
+
 /**
  * Privacy provider tests class.
  *
@@ -35,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class recording_test extends testcase_helper {
+class recording_test extends \advanced_testcase {
 
     /**
      * @var array of courses
@@ -60,7 +63,6 @@ class recording_test extends testcase_helper {
      */
     public function setUp(): void {
         parent::setUp();
-
         $maxcourseindexindex = array_reduce(
             static::BB_ACTIVITIES,
             function($acc, $item) {
@@ -69,7 +71,7 @@ class recording_test extends testcase_helper {
             0
         );
         for ($i = 0; $i <= $maxcourseindexindex; $i++) {
-            $this->courses[] = $this->getDataGenerator()->create_course();
+            $this->courses[] = $this->getDataGenerator()->create_course(['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS]);
         }
         $bbngenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         foreach (static::BB_ACTIVITIES as $aname => $activity) {
@@ -83,20 +85,11 @@ class recording_test extends testcase_helper {
             for ($nbrecordings = 0; $nbrecordings < $activity['nbrecordings']; $nbrecordings++) {
                 $this->getDataGenerator()
                     ->get_plugin_generator('mod_bigbluebuttonbn')
-                    ->create_recording(['bigbluebuttonbnid' => $bbactivity->id]);
+                    ->create_recording(['bigbluebuttonbnid' => $bbactivity->id,
+                        'meta_bbb-recording-name' => "Pre-Recording $nbrecordings"]);
             }
             $this->bbactivities[] = $bbactivity;
         }
-    }
-
-    /**
-     * Clean the temporary mocked up recordings
-     *
-     */
-    public function tearDown(): void {
-        parent::tearDown();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
-            ->bigbluebuttonbn_clean_recordings_array_fetch();
     }
 
     /**
@@ -104,16 +97,69 @@ class recording_test extends testcase_helper {
      */
     public function test_bigbluebuttonbn_get_allrecordings() {
         $this->resetAfterTest();
-        $this->markTestSkipped('Skipped while we add this new test');
-        $recordings = recording_helper::get_recordings($this->bbactivities[0]->course, $this->bbactivities[0]->id);
+        $recordings = recording_helper::get_recordings_for_instance(instance::get_from_instanceid($this->bbactivities[0]->id));
         $this->assertCount(2, $recordings);
 
-        $recordings = recording_helper::get_recordings($this->bbactivities[1]->course, $this->bbactivities[1]->id);
+        $recordings = recording_helper::get_recordings_for_instance(instance::get_from_instanceid($this->bbactivities[1]->id));
         $this->assertCount(3, $recordings);
 
-        $recordings = recording_helper::get_recordings($this->bbactivities[2]->course, $this->bbactivities[2]->id);
+        $recordings = recording_helper::get_recordings_for_instance(instance::get_from_instanceid($this->bbactivities[2]->id));
         $this->assertCount(3, $recordings);
 
+    }
+
+    /**
+     * Test for bigbluebuttonbn_get_allrecordings().
+     *
+     * TODO: rewrite this with @dataProvider
+     */
+    public function test_bigbluebuttonbn_get_recording_for_group() {
+        $this->resetAfterTest();
+        $testcourse = $this->courses[0];
+        $bbactivity = $this->bbactivities[0];
+        $group1 = $this->getDataGenerator()->create_group(['idnumber' => 'G1', 'courseid' => $testcourse->id]);
+        $group2 = $this->getDataGenerator()->create_group(['idnumber' => 'G2', 'courseid' => $testcourse->id]);
+        $student1 = $this->getDataGenerator()->create_and_enrol($testcourse);
+        $student2 = $this->getDataGenerator()->create_and_enrol($testcourse);
+        $student3 = $this->getDataGenerator()->create_and_enrol($testcourse); // No group.
+        $teacher = $this->getDataGenerator()->create_and_enrol($testcourse, 'teacher');
+        $this->getDataGenerator()->create_group_member(['userid' => $student1, 'groupid' => $group1->id]);
+        $this->getDataGenerator()->create_group_member(['userid' => $student2, 'groupid' => $group2->id]);
+
+        $recording1 = $this->getDataGenerator()
+            ->get_plugin_generator('mod_bigbluebuttonbn')
+            ->create_recording(['bigbluebuttonbnid' => $bbactivity->id, 'Group' => $group1->idnumber,
+                'meta_bbb-recording-name' => 'Recording 1']);
+
+        $recording2 = $this->getDataGenerator()
+            ->get_plugin_generator('mod_bigbluebuttonbn')
+            ->create_recording(['bigbluebuttonbnid' => $bbactivity->id, 'Group' => $group2->idnumber,
+                'meta_bbb-recording-name' => 'Recording 2']);
+
+        $this->setUser($student1);
+        $instance1 = instance::get_from_instanceid($this->bbactivities[0]->id);
+        $instance1->set_group_id($group1->id);
+        $recordings = recording_helper::get_recordings_for_instance($instance1);
+        $this->assertCount(1, $recordings);
+        $this->assertEquals($recordings[$recording1->recordingid]->recording['meta_bbb-recording-name'], 'Recording 1');
+
+        $this->setUser($student2);
+        $instance2 = instance::get_from_instanceid($this->bbactivities[0]->id);
+        $instance2->set_group_id($group2->id);
+        $recordings = recording_helper::get_recordings_for_instance($instance2);
+        $this->assertCount(1, $recordings);
+        $this->assertEquals($recordings[$recording2->recordingid]->recording['meta_bbb-recording-name'], 'Recording 2');
+
+        $this->setUser($student3);
+        $instance3 = instance::get_from_instanceid($this->bbactivities[0]->id);
+        $recordings = recording_helper::get_recordings_for_instance($instance3);
+        $this->assertIsArray($recordings);
+        $recordingnames = array_map(function($r) {
+            return $r->recording['meta_bbb-recording-name'];
+        }, $recordings);
+        $this->assertCount(4, $recordingnames);
+        $this->assertContains('Pre-Recording 0', $recordingnames);
+        $this->assertContains('Pre-Recording 1', $recordingnames);
     }
 
     /**
@@ -128,3 +174,4 @@ class recording_test extends testcase_helper {
         $this->assertEquals('Whatever It Can Be', recording_data::type_text('whatever it can be'));
     }
 }
+

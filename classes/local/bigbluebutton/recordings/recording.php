@@ -25,12 +25,15 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 defined('MOODLE_INTERNAL') || die();
+
 use stdClass;
 
 /**
  * Utility class that defines a recording and provides methods for handlinging locally in Moodle and externally in BBB.
  *
  * Utility class for recording helper
+ * TODO: replace by persistent.
+ *
  * @package mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -69,9 +72,11 @@ class recording {
         $r->bigbluebuttonbnid = $dataobject->bigbluebuttonbnid;
         $r->timecreated = time();
         $r->recordingid = $dataobject->recordingid;
-        $r->headless = $dataobject->headless;
-        $r->imported = $dataobject->imported;
-        $r->recording = $dataobject->recording;
+        $r->headless = $dataobject->headless ?? false;
+        $r->imported = $dataobject->imported ?? false;
+        $r->recording = $dataobject->recording ?? null;
+        $r->groupid = $dataobject->groupid ?? 0;
+        $r->state = $dataobject->state ?? self::RECORDING_STATE_AWAITING;
         $rid = $DB->insert_record('bigbluebuttonbn_recordings', $r);
         if (!$rid) {
             return false;
@@ -82,19 +87,22 @@ class recording {
     /**
      * CRUD read.
      *
-     * @param string $id
+     * @param int $id the id from the database
+     * @param bool $fetchremote are we fetching remote recording info too ?
      *
      * @return stdClass a bigbluebuttonbn_recordings record.
      */
-    public static function read($id) {
+    public static function read($id, $fetchremote = true) {
         global $DB;
         $rec = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id], '*', MUST_EXIST);
         if ($rec->imported) {
             // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
             $rec->recording = json_decode($rec->recording, true);
         } else {
-            $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
-            $rec->recording = $bbbrecordings[$rec->recordingid];
+            if ($fetchremote) {
+                $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
+                $rec->recording = $bbbrecordings[$rec->recordingid] ?? $rec->recording;
+            }
         }
         return $rec;
     }
@@ -103,10 +111,11 @@ class recording {
      * CRUD read by indicated attributes.
      *
      * @param array $attributes
+     * @param bool $fetchremote are we fetching remote recording info too ?
      *
      * @return [stdClass] one or many bigbluebuttonbn_recordings records indexed by recordingid.
      */
-    public static function read_by($attributes) {
+    public static function read_by($attributes, $fetchremote = true) {
         global $DB;
         $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
         // Assign default value to empty.
@@ -124,8 +133,10 @@ class recording {
                 // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
                 $rec->recording = json_decode($rec->recording, true);
             } else {
-                $bbbrecording = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
-                $recording->recording = $bbbrecording;
+                if ($fetchremote) {
+                    $bbbrecording = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
+                    $recording->recording = $bbbrecording[$rec->recordingid] ?? $recording->recording;
+                }
             }
             $recordings[$recording->recordingid] = $recording;
         }
@@ -147,15 +158,26 @@ class recording {
     /**
      * CRUD update.
      *
-     * @param string $id
-     * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
-     *
+     * @param stdClass $recordingdata the dataobject to update
+     * @param bool $updateremote are we updating remote recording info too ?
      * @return bool true
      */
-    public static function update($id, $dataobject) {
+    public static function update($recordingdata, $updateremote = true) {
         global $DB;
-        $dataobject->id = $id;
-        return $DB->update_record('bigbluebuttonbn_recordings', $dataobject);
+        // Update local first.
+        $recordingdata->recording = !is_string($recordingdata->recording) ?
+            json_encode($recordingdata->recording, true) : $recordingdata->recording;
+        $DB->update_record('bigbluebuttonbn_recordings', $recordingdata);
+        if (!$recordingdata->imported && $updateremote) {
+            // As the recordingid was not identified as imported recording link, execute update on a real recording.
+            // (No need to update imported links as the update only affects the actual recording).
+            // Execute update on actual recording.
+            $meta = is_string($recordingdata->recording) ? json_decode($recordingdata->recording) : $recordingdata->recording;
+            recording_proxy::bigbluebutton_update_recording(
+                $recordingdata->recordingid,
+                $meta);
+        }
+        return true;
     }
 
     /**

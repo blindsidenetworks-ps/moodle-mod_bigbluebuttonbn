@@ -264,7 +264,7 @@ EOF;
      * @return null|int
      */
     public function get_group_id(): ?int {
-        return $this->groupid;
+        return empty($this->groupid) ? 0 : $this->groupid;
     }
 
     /**
@@ -488,96 +488,6 @@ EOF;
      */
     public function is_type_recordings_only(): bool {
         return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY;
-    }
-
-    /**
-     * Get the legacy $bbbsession data.
-     *
-     * Note: Anything using this function should aim to stop doing so.
-     *
-     * @return array
-     */
-    public function get_legacy_session_object(): array {
-        if ($this->legacydata === null) {
-            $this->legacydata = $this->generate_legacy_session_object();
-        }
-
-        return $this->legacydata;
-    }
-
-    /**
-     * Get the data for the legacy session object.
-     *
-     * @return array
-     */
-    protected function generate_legacy_session_object(): array {
-        $bbbsession = [
-            'username' => $this->get_user_fullname(),
-            'userID' => $this->get_user_id(),
-
-            'context' => $this->get_context(),
-            'course' => $this->get_course(),
-            'coursename' => $this->get_course()->fullname,
-            'cm' => $this->get_cm(),
-            'bigbluebuttonbn' => $this->get_instance_data(),
-            'group' => $this->get_group_id(),
-
-            'administrator' => $this->is_admin(),
-            'moderator' => $this->is_moderator(),
-            'managerecordings' => $this->can_manage_recordings(),
-            'importrecordings' => $this->can_manage_recordings(),
-
-            'modPW' => $this->get_moderator_password(),
-            'viewerPW' => $this->get_viewer_password(),
-            'meetingid' => $this->get_meeting_id(),
-            'meetingname' => $this->get_meeting_name(),
-            'meetingdescription' => $this->get_instance_var('intro'),
-            'userlimit' => $this->get_user_limit(),
-            'voicebridge' => $this->get_voice_bridge() ?? 0,
-            'recordallfromstart' => $this->should_record_from_start(),
-            'recordhidebutton' => $this->should_show_recording_button(),
-            'welcome' => $this->get_welcome_message(),
-            'presentation' => $this->get_presentation(),
-            'muteonstart' => $this->get_mute_on_start(),
-
-            // Metadata.
-            'bnserver' => $this->is_blindside_network_server(),
-
-            // URLs.
-            'bigbluebuttonbnURL' => $this->get_view_url(),
-            'logoutURL' => $this->get_logout_url(),
-            'recordingReadyURL' => $this->get_record_ready_url(),
-            'meetingEventsURL' => $this->get_meeting_event_notification_url(),
-            'joinURL' => $this->get_join_url(),
-        ];
-
-        $instancesettings = [
-            'openingtime',
-            'closingtime',
-            'muteonstart',
-            'disablecam',
-            'disablemic',
-            'disableprivatechat',
-            'disablepublicchat',
-            'disablenote',
-            'hideuserlist',
-            'lockedlayout',
-            'lockonjoin',
-            'lockonjoinconfigurable',
-            'wait',
-            'record',
-            'welcome',
-        ];
-        foreach ($instancesettings as $settingname) {
-            $bbbsession[$settingname] = $this->get_instance_var($settingname);
-        }
-
-        $bbbsession = array_merge(
-            $bbbsession,
-            (array) $this->get_origin_data()
-        );
-
-        return $bbbsession;
     }
 
     /**

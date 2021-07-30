@@ -15,7 +15,9 @@ jobs:
           - php: '7.4'
             moodle-branch: 'MOODLE_311_STABLE'
             database: 'mariadb'
-
+          - php: '7.4'
+            moodle-branch: 'MOODLE_311_STABLE'
+            database: 'pgsql'
     services:
       postgres:
         image: postgres
@@ -103,10 +105,10 @@ jobs:
       #   if: ${{ always() }}
       #   run: moodle-plugin-ci grunt
 
-      #- name: phpunit
-      #  if: ${{ always() }}
-      #  run: moodle-plugin-ci phpunit
+      - name: phpunit
+        if: ${{ always() }}
+        run: moodle-plugin-ci phpunit
 
-      #- name: behat
-      #  if: ${{ always() }}
-      #  run: moodle-plugin-ci behat --profile chrome
+      - name: behat
+        if: ${{ always() }}
+        run: moodle-plugin-ci behat --profile chrome

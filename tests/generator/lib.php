@@ -25,6 +25,7 @@
  */
 
 use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\testing\generator\mockedserver;
@@ -173,88 +174,40 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     /**
      * Create a recording for the given bbb activity
      *
-     * TODO
-     * @param object $record  for the record
-     * @param array|null $options other specific options
-     * @return array the recording array
+     * @param array $data
+     * @return stdClass the recording object
      */
-    public function create_recording($record, array $options = null) {
-        global $CFG, $DB;
-        $record = (array) $record;
-
-        $bbactivityid = $record['bigbluebuttonbnid']; // Must be there.
-        unset($record['bigbluebuttonbnid']);
-        $bbactivity = $DB->get_record('bigbluebuttonbn', array('id' => $bbactivityid));
-
-        $options = (array) $options;
-        $defaultoptions = [
-                'playbacknotes' => true,
-                'playbackpresentation' => true,
-                'recordingtime' => 1000,
-                'remotehost' => 'localhost.com'
-        ];
-        $options = array_merge($defaultoptions, $options);
-
-        // Get options.
-        $recordingtime = $options['recordingtime'];
-        $playbacknotes = $options['playbacknotes'];
-        $playbackpresentation = $options['playbackpresentation'];
-        $remotehost = $options['remotehost'];
-
-        $timenow = time();
-        $recordid = sha1(rand()) . '-' . $timenow;
-        $playbacks = [];
-        if ($playbacknotes) {
-            $playbacks['notes'] = array(
-                    'type' => 'notes',
-                    'url' => "https://{$remotehost}/test-install/{$recordid}/notes",
-                    'length' => '',
-            );
+    public function create_recording(array $data) {
+        $instance = instance::get_from_instanceid($data['bigbluebuttonbnid']);
+        $servermock = $this->get_mocked_server();
+        if (isset($data['imported']) && filter_var($data['imported'], FILTER_VALIDATE_BOOLEAN)) {
+            if (empty($data['importedid'])) {
+                throw new moodle_exception('error');
+            }
+            $recording = recording::read_by(['recordingid' => $data['importedid']]);
+        } else {
+            $recording = new stdClass();
+            $recording->headless = false;
+            $recording->imported = false;
+            $recording->recording = '';
+            $recording->state = $data['state'] ?? recording::RECORDING_STATE_NOTIFIED;
         }
-        if ($playbackpresentation) {
-            $playbacks['presentation'] = array(
-                    'type' => 'presentation',
-                    'url' =>
-                            "https://{$remotehost}/test-install/{$recordid}/presentation",
-                    'length' => '',
-            );
+        $recording->bigbluebuttonbnid = $instance->get_instance_id();
+        if (!empty($data['Group'])) {
+            $group = groups_get_group_by_idnumber($instance->get_course_id(), $data['Group']);
+            if ($group) {
+                $instance->set_group_id($group->id);
+                $recording->groupid = $group->id;
+            }
         }
-
-        // Build the recording data.
-        $recording = [
-                'recordID' => $recordid,
-                'meetingID' => $bbactivity->meetingid,
-                'meetingName' => $bbactivity->name,
-                'startTime' => $timenow,
-                'endTime' => $timenow + $recordingtime,
-                'playbacks' => $playbacks,
-                'published' => 'true',
-                'protected' => 'false',
-                'meta_bbb-context-label' => 'testcourse_12',
-                'meta_bbb-origin-server-name' => 'bigbluebuttonm.local',
-                'meta_bbb-context' => 'Test course: BBB',
-                'meta_analytics-callback-url' => $CFG->wwwroot .
-                        '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting_events&bigbluebuttonbn=' . $bbactivity->id,
-                'meta_bbb-origin-tag' => 'moodle-mod_bigbluebuttonbn (2019101001)',
-                'meta_bbb-origin-version' => '3.7.4+ (Build: 20200117)',
-                'meta_bbb-recording-description' => '',
-                'meta_bbb-recording-name' => $bbactivity->name,
-                'meta_bbb-origin-server-common-name' => '',
-                'meta_bbb-context-name' => get_course($bbactivity->course)->fullname,
-                'meta_bbb-context-id' => \context_course::instance($bbactivity->course)->instanceid,
-                'meta_bbb-recording-tags' => '',
-                'meta_bbb-origin' => 'Moodle',
-                'meta_isBreakout' => 'false',
-                'meta_bn-presenter-name' => fullname(core_user::get_support_user()),
-        ];
-
-        $recording = array_merge($recording, $record); // Get all other values.
-
-        // Add the logs if not we won't find anything.
-        $this->create_log(['bigbluebuttonbnid' => $bbactivity->id, 'userid' => core_user::get_support_user()->id,
-                'meta' => "{'record':true}"]);
-
-        $this->bigbluebuttonbn_add_to_recordings_array_fetch($recording);
+        $recording->courseid = $instance->get_course_id();
+        if (isset($options['imported']) && $options['imported']) {
+            $recording->imported = true;
+            $recordingdata = $servermock->fetch_recording($instance->get_meeting_id(), $instance->get_meeting_id());
+            $recording->recording = json_encode($recordingdata);
+        }
+        $recording->recordingid = $servermock->add_recording($instance, $data);
+        recording::create($recording);
         return $recording;
     }
 
@@ -303,6 +256,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
 
     /**
      * Create a log record
+     *
      * @param null $record
      * @param array|null $options
      */
@@ -312,62 +266,9 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         $bigbluebuttonbnid = $record['bigbluebuttonbnid'];
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid));
         $default = [
-                'meetingid' => $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id,
+            'meetingid' => $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id,
         ];
         $record = array_merge($default, $record);
         logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $record);
-    }
-
-    /**
-     * Manages fake recording so we can cut off the API call while testing
-     */
-
-    /**
-     * This the name of the $CFG entry to store the recording info in
-     */
-    const FAKE_RECORDING_VAR_NAME = 'bbb_fake_recordings';
-
-    /**
-     * This add a new mocked up recording
-     * @param array $recording
-     */
-    public function bigbluebuttonbn_add_to_recordings_array_fetch($recording) {
-        global $CFG;
-        $currentrecordings = get_config('mod_bigbluebuttonbn', static::FAKE_RECORDING_VAR_NAME);
-        if (!$currentrecordings) {
-            $currentrecordings = [];
-        } else {
-            $currentrecordings = unserialize($currentrecordings);
-        }
-        $currentrecordings[$recording['recordID']] = $recording;
-        set_config(static::FAKE_RECORDING_VAR_NAME, serialize($currentrecordings), 'mod_bigbluebuttonbn');
-    }
-
-    /**
-     * Method to fetch all mocked up recordings
-     * @param int $meetingsid
-     * @return array
-     */
-    public static function bigbluebuttonbn_get_recordings_array_fetch($meetingsid) {
-        global $CFG;
-        $allrecordings = get_config('mod_bigbluebuttonbn', static::FAKE_RECORDING_VAR_NAME);
-        if (!$allrecordings) {
-            $allrecordings = [];
-        }
-        $allrecordings = unserialize($allrecordings);
-        return array_filter($allrecordings,
-                function($bbitem) use ($meetingsid) {
-                    $meetingidrexp = "/{$bbitem['meetingID']}.*/";
-                    return !empty(preg_grep($meetingidrexp, $meetingsid));
-                }
-        );
-    }
-
-    /**
-     * Clean local recording array (between tests)
-     */
-    public function bigbluebuttonbn_clean_recordings_array_fetch() {
-        global $CFG;
-        set_config(static::FAKE_RECORDING_VAR_NAME, null, 'mod_bigbluebuttonbn');
     }
 }

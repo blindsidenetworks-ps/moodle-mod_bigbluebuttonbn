@@ -33,7 +33,6 @@ use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 use moodle_exception;
@@ -84,6 +83,10 @@ class bigbluebutton {
             // TODO Make this a setting.
             $serverurl = (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/mockedserver.php'))->out(false);
         }
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+            // In this case we just return the interesting part of the URL.
+            $serverurl = '';
+        }
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
         }
@@ -125,7 +128,7 @@ class bigbluebutton {
     public static function can_join_meeting($cmid) {
         $canjoin = array('can_join' => false, 'message' => '');
 
-        $viewinstance = view::view_validator($cmid, null);
+        $viewinstance = view::validator($cmid, null);
         if ($viewinstance) {
             $instance = instance::get_from_cmid($cmid);
             $info = meeting::get_meeting_info_for_instance($instance);
@@ -206,6 +209,18 @@ class bigbluebutton {
      * @return object
      */
     public static function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+            global $CFG;
+            // TODO: We would need to have an base instance of the the bigbluebutton class then an instance
+            // per type of test (behat, phpunit), this would greatly improve the code here.
+
+            // Here we force import this as it is not through namespace/autoloading.
+            require_once(__DIR__ . '/../../tests/generator/mockedserver.php');
+            $server = new \mod_bigbluebuttonbn\testing\generator\mockedserver();
+            $returnedvalue = $server->query_server($url);
+            $xml = simplexml_load_string($returnedvalue, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+            return $xml;
+        }
         if (extension_loaded('curl')) {
             $response =
                 self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
@@ -457,7 +472,6 @@ class bigbluebutton {
         return $profilesarray;
     }
 
-
     /**
      * Return the status of an activity [open|not_started|ended].
      *
@@ -566,11 +580,11 @@ class bigbluebutton {
             throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
         }
         return array(
-                'meetingID' => (string) $xml->meetingID,
-                'internalMeetingID' => (string) $xml->internalMeetingID,
-                'attendeePW' => (string) $xml->attendeePW,
-                'moderatorPW' => (string) $xml->moderatorPW
-            );
+            'meetingID' => (string) $xml->meetingID,
+            'internalMeetingID' => (string) $xml->internalMeetingID,
+            'attendeePW' => (string) $xml->attendeePW,
+            'moderatorPW' => (string) $xml->moderatorPW
+        );
     }
 
     /**
@@ -687,7 +701,7 @@ class bigbluebutton {
         if (empty($xml)) {
             global $CFG;
             throw new server_not_available_exception('general_error_no_answer', plugin::COMPONENT,
-                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn', );
+                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
         }
         if ((string) $xml->returncode === 'FAILED') {
             $messagekey = (string) $xml->messageKey ?? '';

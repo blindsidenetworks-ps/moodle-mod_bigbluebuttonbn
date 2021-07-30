@@ -85,22 +85,11 @@ class testcase_helper extends advanced_testcase {
         if (!$course) {
             $course = $this->course;
         }
-        $currentuser = $USER;
         $this->setAdminUser();
         $bbactivitycm = get_coursemodule_from_instance('bigbluebuttonbn', $bbactivity->id);
         list($cm, $context, $module, $data, $cw) = get_moduleinfo_data($bbactivitycm, $course);
         $this->setUser($USER);
         return $data;
-    }
-
-    /**
-     * Clean the temporary mocked up recordings
-     *
-     */
-    public function tearDown(): void {
-        parent::tearDown();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')
-            ->bigbluebuttonbn_clean_recordings_array_fetch();
     }
     /**
      * Setup

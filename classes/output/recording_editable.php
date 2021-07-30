@@ -31,6 +31,7 @@ use core\output\inplace_editable;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
+use stdClass;
 
 /**
  * Renderer for recording in place editable.
@@ -52,8 +53,11 @@ abstract class recording_editable extends \core\output\inplace_editable {
      *
      * @param stdClass $rec
      * @param instance $instance
+     * @param string $edithint
+     * @param string $editlabel
+     * @throws moodle_exception
      */
-    public function __construct($rec, instance $instance) {
+    public function __construct($rec, instance $instance, string $edithint, string $editlabel) {
         $this->instance = $instance;
 
         $editable = $this->check_capability();
@@ -72,7 +76,9 @@ abstract class recording_editable extends \core\output\inplace_editable {
             $rec->id . ',' . $rec->recording['meetingID'],
             $editable,
             $displayvalue,
-            $displayvalue
+            $displayvalue,
+            $edithint,
+            $editlabel
         );
     }
 
@@ -119,38 +125,6 @@ abstract class recording_editable extends \core\output\inplace_editable {
     }
 
     /**
-     * Edit recording
-     *
-     * @param stdClass $rec
-     * @param string $metainfoname
-     * @param mixed $value
-     * @return array
-     */
-    public static function edit_recording($rec, $metainfoname, $value) {
-        // Here we use something similar to the broker.
-        // TODO: remove the broker and use some sort of interface.
-        $meta = [$metainfoname => $value];
-        if ($rec->imported) {
-            // Execute update on imported recording link.
-            $rec->recording[$metainfoname] = $value;
-            recording::update($rec->id, (object)['recording' => json_encode($rec->recording)]);
-            return array(
-                'status' => 'done'
-            );
-        }
-
-        // As the recordingid was not identified as imported recording link, execute update on a real recording.
-        // (No need to update imported links as the update only affects the actual recording).
-        // Execute update on actual recording.
-        return array(
-            'status' => recording_proxy::bigbluebutton_update_recordings(
-                $rec->recording['recordID'],
-                $meta
-            )
-        );
-    }
-
-    /**
      * Update the recording with the new value
      *
      * @param int $itemid
@@ -158,13 +132,15 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return recording_editable
      */
     public static function update($itemid, $value) {
-        list($recid, $recordingid) = static::get_info_fromid($itemid);
+        list($recid, $meetingid) = static::get_info_fromid($itemid);
         $rec = recording::read($recid);
         $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
 
         require_login($instance->get_course());
 
-        $success = static::edit_recording($rec, static::get_type(), $value);
+        $rec->recording[static::get_type()] = $value;
+        recording::update($rec);
+
         // Refresh recording.
         // TODO: we need to reduce the number of calls to the server.
         $rec = recording::read($recid);

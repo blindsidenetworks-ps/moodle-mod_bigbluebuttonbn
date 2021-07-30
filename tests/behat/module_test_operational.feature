@@ -6,14 +6,15 @@ Feature: Test the complete sequence of operational steps for an activity module
   And backup/restore the course to verify the module instance persists
   And delete an instance of the module within a course
   And delete a course containing an instance of the module
+  Background:  Make sure that a course is created
+    Given the following "courses" exist:
+      | fullname    | shortname  | category |
+      | Test Course | testcourse | 0        |
 
   @javascript
   Scenario: Testing the complete sequence of operational steps for an activity module
     When I log in as "admin"
-    And I create a course with:
-      | Course full name | Test Course |
-      | Course short name | testcourse |
-    And I follow "Test Course"
+    And I am on "Test Course" course homepage
     And I turn editing mode on
     And I add a "BigBlueButton" to section "1" and I fill the form with:
       | Virtual classroom name | TestActivity |

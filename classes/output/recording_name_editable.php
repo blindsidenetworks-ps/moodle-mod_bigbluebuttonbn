@@ -25,6 +25,7 @@
 
 namespace mod_bigbluebuttonbn\output;
 
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 
 /**
@@ -36,6 +37,18 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
  * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
 class recording_name_editable extends recording_editable {
+    /**
+     * Specific constructor with the right label/hint for this editable
+     *
+     * @param stdClass $rec
+     * @param instance $instance
+     * @throws \coding_exception
+     */
+    public function __construct($rec, instance $instance) {
+        parent::__construct($rec, $instance,
+            get_string('view_recording_name_editlabel', 'mod_bigbluebuttonbn'),
+            get_string('view_recording_name_edithint', 'mod_bigbluebuttonbn'));
+    }
     /**
      * Get the value to display
      *
