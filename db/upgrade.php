@@ -286,7 +286,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019101004, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2021072903) {
+    if ($oldversion < 2021072904) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
         xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
         // Add column courseid.
@@ -301,7 +301,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $fielddefinition);
         // Add column recordingid.
         $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '64', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => null);
+            'sequence' => null, 'default' => null, 'previous' => null);
         xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
             $fielddefinition);
         // Add column headless for deleted recordings.
@@ -313,6 +313,11 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
         xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'imported',
+            $fielddefinition);
+        // Add column state for imported recordings.
+        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
+        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'state',
             $fielddefinition);
         // Add column recording for storing the recording data of imported recordings.
         $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
@@ -344,7 +349,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             ['usermodified']);
 
         // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2021072903, 'bigbluebuttonbn');
+        upgrade_mod_savepoint(true, 2021072904, 'bigbluebuttonbn');
     }
 
     return true;
