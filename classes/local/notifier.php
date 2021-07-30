@@ -121,10 +121,13 @@ class notifier
      */
     public static function htmlmsg_recording_ready($bigbluebuttonbn) {
         $instance = instance::get_from_instanceid($bigbluebuttonbn->id);
+        $coursemodinfo = \course_modinfo::instance($bigbluebuttonbn->course);
+        $course = $coursemodinfo->get_course($bigbluebuttonbn->course);
         $link = html_writer::link($instance->get_view_url(), format_string($bigbluebuttonbn->name));
-        return '<p>'.get_string('email_body_recording_ready_for', 'bigbluebuttonbn') .
+        return '<p>' . get_string('email_body_recording_ready_for', 'bigbluebuttonbn') .
             ' <b>' . $link . '</b> ' .
-            get_string('email_body_recording_ready_is_ready', 'bigbluebuttonbn').'.</p>';
+            get_string('email_body_recording_ready_in_course', 'bigbluebuttonbn') .
+            ' ' . $course->fullname . '.</p>';
     }
 
     /**

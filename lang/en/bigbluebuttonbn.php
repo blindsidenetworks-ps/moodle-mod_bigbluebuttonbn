@@ -549,8 +549,8 @@ $string['email_body_notification_meeting_description'] = 'Description';
 $string['email_body_notification_meeting_start_date'] = 'Start date';
 $string['email_body_notification_meeting_end_date'] = 'End date';
 $string['email_body_notification_meeting_by'] = 'by';
-$string['email_body_recording_ready_for'] = 'Recording for';
-$string['email_body_recording_ready_is_ready'] = 'is ready';
+$string['email_body_recording_ready_for'] = 'There is a recording ready for';
+$string['email_body_recording_ready_in_course'] = 'in the course';
 $string['email_footer_sent_by'] = 'This automatic notification message was sent by';
 $string['email_footer_sent_from'] = 'from the course';
 
