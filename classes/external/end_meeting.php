@@ -69,7 +69,7 @@ class end_meeting extends external_api {
      * @throws \restricted_context_exception
      */
     public static function execute(
-        int $bigbluebuttonbnid,
+        int $bigbluebuttonbnid, // TODO: we might want to remove the $bigbluebuttonid here as we can just rely on meetingid.
         string $meetingid
     ): array {
         // Validate the bigbluebuttonbnid ID.
@@ -82,7 +82,7 @@ class end_meeting extends external_api {
         ]);
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $instance = instance::get_from_meetingid($meetingid);
         $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.

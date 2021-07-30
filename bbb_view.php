@@ -37,9 +37,9 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\plugin;
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-global $SESSION;
+global $SESSION, $PAGE, $CFG, $DB, $USER;
 
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
@@ -74,6 +74,7 @@ $context = $instance->get_context();
 
 require_login($course, true, $cm);
 
+// Note : this uses the group optional_param as a value to decide which groupid.
 $groupid = groups_get_activity_group($cm, true) ?: null;
 if ($groupid) {
     $instance->set_group_id($groupid);
@@ -153,16 +154,14 @@ switch (strtolower($action)) {
             $meeting = new meeting($instance);
             $response = $meeting->create_meeting();
             // New recording management: Insert a recordingID that corresponds to the meeting created.
-            if ($bigbluebuttonbn->record) {
-                global $DB;
-                $dbrecordingid = $DB->insert_record('bigbluebuttonbn_recordings',
-                    array(
-                        'courseid' => $bigbluebuttonbn->course,
-                        'bigbluebuttonbnid' => $bigbluebuttonbn->id,
-                        'recordingid' => $response['internalMeetingID'],
-                        'timecreated' => time(),
-                        )
-                    );
+            if ($instance->is_recorded()) {
+                $dbrecordingid = recording::create((object) array(
+                    'courseid' => $instance->get_course_id(),
+                    'bigbluebuttonbnid' => $instance->get_instance_id(),
+                    'recordingid' => $response['internalMeetingID'],
+                    'timecreated' => time(),
+                    'groupid' => $instance->get_group_id()
+                ));
                 // TODO: We may want to catch if the record was not created.
             }
             // Moodle event logger: Create an event for meeting created.
@@ -179,7 +178,7 @@ switch (strtolower($action)) {
         logs::log_recording_played_event($instance, $rid);
 
         // Execute the redirect.
-        header('Location: '.urldecode($href));
+        header('Location: ' . urldecode($href));
         break;
     default:
         bigbluebuttonbn_bbb_view_close_window();
@@ -188,16 +187,16 @@ switch (strtolower($action)) {
 /**
  * Helper for getting the playback url that corresponds to an specific type.
  *
- * @param  string   $href
- * @param  string   $rid
- * @param  string   $rtype
+ * @param string $href
+ * @param string $rid
+ * @param string $rtype
  * @return string
  */
 function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
     if ($href != '') {
         return $href;
     }
-    $recording = recording::read($rid);
+    $recording = recording::read_by(['recordingid' => $rid]);
     if (empty($recording)) {
         return '';
     }
@@ -207,8 +206,8 @@ function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
 /**
  * Helper for looking up playback url in the recording playback array.
  *
- * @param  array    $playbacks
- * @param  string   $type
+ * @param array $playbacks
+ * @param string $type
  * @return string
  */
 function bigbluebuttonbn_bbb_view_playback_href_lookup($playbacks, $type) {
@@ -246,7 +245,7 @@ function bigbluebuttonbn_bbb_view_close_window_manually() {
 /**
  * Helper for preparing data used for creating the meeting.
  *
- * @param  instance $instance
+ * @param instance $instance
  * @return object
  */
 function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
@@ -302,11 +301,11 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
 /**
  * Helper for returning the flag to know if the meeting is recorded.
  *
- * @param  boolean    $record
+ * @param boolean $record
  * @return string
  */
 function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
-    if ((boolean)\mod_bigbluebuttonbn\local\config::recordings_enabled() && $record) {
+    if ((boolean) \mod_bigbluebuttonbn\local\config::recordings_enabled() && $record) {
         return 'true';
     }
     return 'false';
@@ -315,7 +314,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
 /**
  * Helper for preparing metadata used while creating the meeting.
  *
- * @param  instance $instance
+ * @param instance $instance
  * @return array
  */
 function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
@@ -356,8 +355,8 @@ function bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin = 0)
 /**
  * Helper for showinf error messages if any.
  *
- * @param  string   $serrors
- * @param  string   $id
+ * @param string $serrors
+ * @param string $id
  * @return string
  */
 function bigbluebuttonbn_bbb_view_errors($serrors, $id) {
@@ -365,10 +364,10 @@ function bigbluebuttonbn_bbb_view_errors($serrors, $id) {
     $errors = (array) json_decode(urldecode($serrors));
     $msgerrors = '';
     foreach ($errors as $error) {
-        $msgerrors .= html_writer::tag('p', $error->{'message'}, array('class' => 'alert alert-danger'))."\n";
+        $msgerrors .= html_writer::tag('p', $error->{'message'}, array('class' => 'alert alert-danger')) . "\n";
     }
     echo $OUTPUT->header();
     throw new moodle_exception('view_error_bigbluebutton', 'bigbluebuttonbn',
-        $CFG->wwwroot.'/mod/bigbluebuttonbn/view.php?id='.$id, $msgerrors, $serrors);
+        $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $id, $msgerrors, $serrors);
     echo $OUTPUT->footer();
 }

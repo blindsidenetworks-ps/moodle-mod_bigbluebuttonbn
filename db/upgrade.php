@@ -352,6 +352,21 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021072904, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2021072905) {
+
+        // Define field groupid to be added to bigbluebuttonbn_recordings.
+        $table = new xmldb_table('bigbluebuttonbn_recordings');
+        $field = new xmldb_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, 0, 'recording');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021072905, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 
@@ -375,8 +390,8 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
     }
     // Drop key before if needed.
     $fieldkey = new xmldb_key($fieldname, XMLDB_KEY_FOREIGN, [$fieldname], 'user', ['id']);
-    if ($dbman->find_key_name($table, $usermodifiedkey)) {
-        $dbman->drop_key($table, $usermodifiedkey);
+    if ($dbman->find_key_name($table, $fieldkey)) {
+        $dbman->drop_key($table, $fieldkey);
     }
     $dbman->change_field_type($table, $field, true, true);
     $dbman->change_field_precision($table, $field, true, true);

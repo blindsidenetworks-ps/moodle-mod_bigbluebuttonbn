@@ -28,6 +28,7 @@
 // phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState,moodle.Files.RequireLogin.Missing
 require(__DIR__.'/../../config.php');
 
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\view;
 
@@ -53,7 +54,7 @@ $PAGE->set_context($context);
 try {
     $a = strtolower($params['action']);
     if ($a == 'recording_ready') {
-        broker::recording_ready($params, $bigbluebuttonbn);
+        recording_helper::recording_ready($params, $bigbluebuttonbn);
         return;
     }
     if ($a == 'meeting_events') {
