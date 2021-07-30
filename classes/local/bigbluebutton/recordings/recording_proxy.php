@@ -130,7 +130,20 @@ class recording_proxy {
             $recordings += self::bigbluebutton_fetch_recordings_page($rids);
         }
         // Sort recordings.
-        uasort($recordings, "\\mod_bigbluebuttonbn\\bigbluebutton\\recordings\\recording_helper::recording_build_sorter");
+        uasort($recordings, function($a, $b)
+            {
+                global $CFG;
+                $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+                $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+                if ($a['startTime'] < $b['startTime']) {
+                    return $resultless;
+                }
+                if ($a['startTime'] == $b['startTime']) {
+                    return 0;
+                }
+                return $resultmore;
+            }
+        );
         return $recordings;
     }
 
