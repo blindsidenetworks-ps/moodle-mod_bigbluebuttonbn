@@ -45,57 +45,6 @@ global $CFG;
 class broker {
 
     /**
-     * Helper for responding when recording ready is performed.
-     *
-     * @param array $params
-     * @param object $bigbluebuttonbn
-     *
-     * @return void
-     */
-    public static function recording_ready($params, $bigbluebuttonbn) {
-        // Decodes the received JWT string.
-        try {
-            $decodedparameters = \Firebase\JWT\JWT::decode(
-                $params['signed_parameters'],
-                config::get('shared_secret'),
-                array('HS256')
-            );
-        } catch (Exception $e) {
-            $error = 'Caught exception: ' . $e->getMessage();
-            header('HTTP/1.0 400 Bad Request. ' . $error);
-            return;
-        }
-        // Validations.
-        if (!isset($decodedparameters->record_id)) {
-            header('HTTP/1.0 400 Bad request. Missing record_id parameter');
-            return;
-        }
-        $recs = recording::read_by(['recordingid' => $decodedparameters->record_id]);
-        if (!isset($recs)) {
-            header('HTTP/1.0 400 Bad request. Invalid record_id');
-            return;
-        }
-        $rec = $recs[$decodedparameters->record_id];
-        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
-        if (!isset($instance)) {
-            header('HTTP/1.0 410 Gone. The activity may have been deleted');
-            return;
-        }
-        // Sends the messages.
-        try {
-            // We make sure messages are sent only once.
-            if ($rec->state != recording::RECORDING_STATE_NOTIFIED) {
-                notifier::notify_recording_ready($bigbluebuttonbn);
-                recording::update($rec->id, (object)['state' => recording::RECORDING_STATE_NOTIFIED]);
-            }
-            header('HTTP/1.0 202 Accepted');
-        } catch (Exception $e) {
-            $error = 'Caught exception: ' . $e->getMessage();
-            header('HTTP/1.0 503 Service Unavailable. ' . $error);
-        }
-    }
-
-    /**
      * Helper for validating the parameters received.
      *
      * @param array $params
@@ -119,7 +68,7 @@ class broker {
      *
      * @return string
      */
-    public static function validate_parameters_message($params, $requiredparams) {
+    protected static function validate_parameters_message($params, $requiredparams) {
         foreach ($requiredparams as $param => $message) {
             if (!array_key_exists($param, $params) || $params[$param] == '') {
                 return $message;
@@ -130,7 +79,7 @@ class broker {
     /**
      * Helper for definig rules for validating required parameters.
      */
-    public static function required_parameters() {
+    protected static function required_parameters() {
         $params['server_ping'] = [
             'callback' => 'This request must include a javascript callback.',
             'id' => 'The meetingID must be specified.'
@@ -209,7 +158,7 @@ class broker {
      * @param array $params
      *
      */
-    public static function completion_validate($bigbluebuttonbn, $params) {
+    protected static function completion_validate($bigbluebuttonbn, $params) {
         $context = \context_course::instance($bigbluebuttonbn->course);
         // Get list with all the users enrolled in the course.
         list($sort, $sqlparams) = users_order_by_sql('u');
