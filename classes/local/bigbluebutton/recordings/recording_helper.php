@@ -268,4 +268,153 @@ class recording_helper {
         }
         return $imagesarray;
     }
+
+    /**
+     * Helper for responding when recording ready is performed.
+     *
+     * @param array $params
+     * @param object $bigbluebuttonbn
+     *
+     * @return void
+     */
+    public static function recording_ready(array $params, object $bigbluebuttonbn) {
+        // Decodes the received JWT string.
+        try {
+            $decodedparameters = \Firebase\JWT\JWT::decode(
+                $params['signed_parameters'],
+                config::get('shared_secret'),
+                array('HS256')
+            );
+        } catch (Exception $e) {
+            $error = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $error);
+            return;
+        }
+        // Validations.
+        if (!isset($decodedparameters->record_id)) {
+            header('HTTP/1.0 400 Bad request. Missing record_id parameter');
+            return;
+        }
+        $recs = recording::read_by(['recordingid' => $decodedparameters->record_id]);
+        if (!isset($recs)) {
+            header('HTTP/1.0 400 Bad request. Invalid record_id');
+            return;
+        }
+        $rec = $recs[$decodedparameters->record_id];
+        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
+        if (!isset($instance)) {
+            header('HTTP/1.0 410 Gone. The activity may have been deleted');
+            return;
+        }
+        // Sends the messages.
+        try {
+            // We make sure messages are sent only once.
+            if ($rec->state != recording::RECORDING_STATE_NOTIFIED) {
+                notifier::notify_recording_ready($bigbluebuttonbn);
+                $rec->state = recording::RECORDING_STATE_NOTIFIED;
+                recording::update($rec, false);
+            }
+            header('HTTP/1.0 202 Accepted');
+        } catch (Exception $e) {
+            $error = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 503 Service Unavailable. ' . $error);
+        }
+    }
+
+    /**
+     * Helper for responding when storing live meeting events is requested.
+     *
+     * The callback with a POST request includes:
+     *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
+     *  - Content Type: application/json
+     *  - Body: <A JSON Object>
+     *
+     * @param object $bigbluebuttonbn
+     *
+     * @return void
+     */
+    public static function meeting_events($bigbluebuttonbn) {
+        // Decodes the received JWT string.
+        try {
+            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
+            $headers = getallheaders();
+
+            // Pull the Bearer from the headers.
+            if (!array_key_exists('Authorization', $headers)) {
+                $msg = 'Authorization failed';
+                header('HTTP/1.0 400 Bad Request. ' . $msg);
+                return;
+            }
+            $authorization = explode(" ", $headers['Authorization']);
+
+            // Verify the authenticity of the request.
+            $token = \Firebase\JWT\JWT::decode(
+                $authorization[1],
+                config::get('shared_secret'),
+                array('HS512')
+            );
+
+            // Get JSON string from the body.
+            $jsonstr = file_get_contents('php://input');
+
+            // Convert JSON string to a JSON object.
+            $jsonobj = json_decode($jsonstr);
+        } catch (Exception $e) {
+            $msg = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $msg);
+            return;
+        }
+
+        // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
+        $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
+        $meetingidelements = explode('-', $meetingidelements[0]);
+        if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
+            $msg = 'The activity may have been deleted';
+            header('HTTP/1.0 410 Gone. ' . $msg);
+            return;
+        }
+
+        // We make sure events are processed only once.
+        $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
+        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
+        $meta['callback'] = 'meeting_events';
+        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
+            json_encode($meta));
+        if (
+            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
+                $meta['recordid'], 'meeting_events') == 1) {
+                    // Process the events.
+                    self::process_meeting_events($bigbluebuttonbn, $jsonobj);
+                    header('HTTP/1.0 200 Accepted. Enqueued.');
+                    return;
+        }
+
+        header('HTTP/1.0 202 Accepted. Already processed.');
+    }
+
+    /**
+     * Helper function enqueues list of meeting events to be stored and processed as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param object $jsonobj
+     *
+     * @return void
+     */
+    protected static function process_meeting_events($bigbluebuttonbn, $jsonobj) {
+        $meetingid = $jsonobj->{'meeting_id'};
+        $recordid = $jsonobj->{'internal_meeting_id'};
+        $attendees = $jsonobj->{'data'}->{'attendees'};
+        foreach ($attendees as $attendee) {
+            $userid = $attendee->{'ext_user_id'};
+            $overrides['meetingid'] = $meetingid;
+            $overrides['userid'] = $userid;
+            $meta['recordid'] = $recordid;
+            $meta['data'] = $attendee;
+            // Stores the log.
+            logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides,
+                json_encode($meta));
+            // Enqueue a task for processing the completion.
+            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
+        }
+    }
 }

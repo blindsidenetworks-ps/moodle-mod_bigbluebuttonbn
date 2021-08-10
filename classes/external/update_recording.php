@@ -32,7 +32,7 @@ use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\local\broker;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action;
 
 /**
  * External service to update the details of one recording.
@@ -122,22 +122,15 @@ class update_recording extends external_api {
             $enabledfeatures['importrecordings']
         );
 
-        // Specific action for import
-        // TODO: refactor this so we do all the operation in the recording table instead of the broker.
-        if ($action != 'import') {
-            // Perform the action.
-            broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
-        } else {
-            $recording = recording::read($recid);
-            $recording->bigbluebuttonbnid = $instance->get_instance_id();
-            $recording->courseid = $instance->get_course_id();
-            if (!$recording->imported) {
-                $recording->imported = true;
-                $recording->recording = json_encode($recording->recording);
-            }
-            recording::create($recording);
+        // Specific action such as import, delete, publish, unpublish, edit,....
+        if (method_exists(recording_action::class, $action)) {
+            forward_static_call_array(
+                array('\mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action',
+                    $action),
+                array(['id' => $recordingid, 'instanceid' => $instance->get_instance_id()],
+                    $recordings)
+            );
         }
-
         return [];
     }
 

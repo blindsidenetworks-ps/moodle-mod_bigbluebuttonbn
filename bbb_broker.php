@@ -30,6 +30,7 @@ require(__DIR__.'/../../config.php');
 
 use mod_bigbluebuttonbn\local\broker;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
@@ -53,13 +54,13 @@ $PAGE->set_context($context);
 try {
     $a = strtolower($params['action']);
     if ($a == 'recording_ready') {
-        broker::recording_ready($params, $bigbluebuttonbn);
+        recording_helper::recording_ready($params, $bigbluebuttonbn);
         return;
     }
     if ($a == 'meeting_events') {
         // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
         // which is processed in the function using super globals.
-        broker::meeting_events($bigbluebuttonbn);
+        recording_helper::meeting_events($bigbluebuttonbn);
         return;
     }
     header('HTTP/1.0 400 Bad request. The action '. $a . ' doesn\'t exist');
