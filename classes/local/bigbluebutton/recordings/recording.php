@@ -37,8 +37,12 @@ use stdClass;
  */
 class recording {
 
+    /** @var int RECORDING_HEADED integer set to 0 defines that the activity used to create the recording exists */
+    public const RECORDING_HEADED = 0;
     /** @var int RECORDING_HEADLESS integer set to 1 defines that the activity used to create the recording no longer exists */
     public const RECORDING_HEADLESS = 1;
+    /** @var int RECORDING_ORIGINAL integer set to 0 defines that the recording is the original */
+    public const RECORDING_ORIGINAL = 0;
     /** @var int RECORDING_IMPORTED integer set to 1 defines that the recording is not the original but an imported one */
     public const RECORDING_IMPORTED = 1;
 
@@ -67,10 +71,11 @@ class recording {
         // Default values.
         $r->courseid = $dataobject->courseid;
         $r->bigbluebuttonbnid = $dataobject->bigbluebuttonbnid;
-        $r->timecreated = time();
+        $r->groupid = $dataobject->groupid;
         $r->recordingid = $dataobject->recordingid;
         $r->headless = $dataobject->headless;
         $r->imported = $dataobject->imported;
+        $r->timecreated = time();
         $r->recording = $dataobject->recording;
         $rid = $DB->insert_record('bigbluebuttonbn_recordings', $r);
         if (!$rid) {

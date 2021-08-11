@@ -207,6 +207,7 @@ class recording_action {
             $recording->bigbluebuttonbnid = $params['instanceid'];
             $instance = instance::get_from_instanceid($params['instanceid']);
             $recording->courseid = $instance->get_course_id();
+            $recording->groupid = $instance->get_group_id();
             if (!$recording->imported) {
                 $recording->imported = true;
                 $recording->recording = json_encode($recording->recording);
