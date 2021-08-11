@@ -29,11 +29,7 @@ use coding_exception;
 use Exception;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -45,76 +41,6 @@ global $CFG;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class broker {
-    /**
-     * Helper for responding when storing live meeting events is requested.
-     *
-     * The callback with a POST request includes:
-     *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
-     *  - Content Type: application/json
-     *  - Body: <A JSON Object>
-     *
-     * @param object $bigbluebuttonbn
-     *
-     * @return void
-     */
-    public static function meeting_events($bigbluebuttonbn) {
-        // Decodes the received JWT string.
-        try {
-            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
-            $headers = getallheaders();
-
-            // Pull the Bearer from the headers.
-            if (!array_key_exists('Authorization', $headers)) {
-                $msg = 'Authorization failed';
-                header('HTTP/1.0 400 Bad Request. ' . $msg);
-                return;
-            }
-            $authorization = explode(" ", $headers['Authorization']);
-
-            // Verify the authenticity of the request.
-            $token = \Firebase\JWT\JWT::decode(
-                $authorization[1],
-                config::get('shared_secret'),
-                array('HS512')
-            );
-
-            // Get JSON string from the body.
-            $jsonstr = file_get_contents('php://input');
-
-            // Convert JSON string to a JSON object.
-            $jsonobj = json_decode($jsonstr);
-        } catch (Exception $e) {
-            $msg = 'Caught exception: ' . $e->getMessage();
-            header('HTTP/1.0 400 Bad Request. ' . $msg);
-            return;
-        }
-
-        // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
-        $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
-        $meetingidelements = explode('-', $meetingidelements[0]);
-        if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-            $msg = 'The activity may have been deleted';
-            header('HTTP/1.0 410 Gone. ' . $msg);
-            return;
-        }
-
-        // We make sure events are processed only once.
-        $overrides = array('meetingid' => $jsonobj->{'meeting_id'});
-        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
-        $meta['callback'] = 'meeting_events';
-        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_CALLBACK, $overrides,
-            json_encode($meta));
-        if (
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_get_count_callback_event_log(
-                $meta['recordid'], 'meeting_events') == 1) {
-                    // Process the events.
-                    self::bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj);
-                    header('HTTP/1.0 200 Accepted. Enqueued.');
-                    return;
-        }
-
-        header('HTTP/1.0 202 Accepted. Already processed.');
-    }
 
     /**
      * Helper for validating the parameters received.
@@ -140,7 +66,7 @@ class broker {
      *
      * @return string
      */
-    public static function validate_parameters_message($params, $requiredparams) {
+    protected static function validate_parameters_message($params, $requiredparams) {
         foreach ($requiredparams as $param => $message) {
             if (!array_key_exists($param, $params) || $params[$param] == '') {
                 return $message;
@@ -151,7 +77,7 @@ class broker {
     /**
      * Helper for definig rules for validating required parameters.
      */
-    public static function required_parameters() {
+    protected static function required_parameters() {
         $params['server_ping'] = [
             'callback' => 'This request must include a javascript callback.',
             'id' => 'The meetingID must be specified.'
@@ -230,7 +156,7 @@ class broker {
      * @param array $params
      *
      */
-    public static function completion_validate($bigbluebuttonbn, $params) {
+    protected static function completion_validate($bigbluebuttonbn, $params) {
         $context = \context_course::instance($bigbluebuttonbn->course);
         // Get list with all the users enrolled in the course.
         list($sort, $sqlparams) = users_order_by_sql('u');
@@ -238,32 +164,6 @@ class broker {
         foreach ($users as $user) {
             // Enqueue a task for processing the completion.
             bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
-        }
-    }
-
-    /**
-     * Helper function enqueues list of meeting events to be stored and processed as for completion.
-     *
-     * @param object $bigbluebuttonbn
-     * @param object $jsonobj
-     *
-     * @return void
-     */
-    protected static function bigbluebuttonbn_process_meeting_events($bigbluebuttonbn, $jsonobj) {
-        $meetingid = $jsonobj->{'meeting_id'};
-        $recordid = $jsonobj->{'internal_meeting_id'};
-        $attendees = $jsonobj->{'data'}->{'attendees'};
-        foreach ($attendees as $attendee) {
-            $userid = $attendee->{'ext_user_id'};
-            $overrides['meetingid'] = $meetingid;
-            $overrides['userid'] = $userid;
-            $meta['recordid'] = $recordid;
-            $meta['data'] = $attendee;
-            // Stores the log.
-            logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides,
-                json_encode($meta));
-            // Enqueue a task for processing the completion.
-            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid);
         }
     }
 }

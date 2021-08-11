@@ -107,6 +107,6 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit
 
-      - name: behat
-        if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome
+      # - name: behat
+      #   if: ${{ always() }}
+      #   run: moodle-plugin-ci behat --profile chrome
