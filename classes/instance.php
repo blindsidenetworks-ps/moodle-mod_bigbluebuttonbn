@@ -264,7 +264,7 @@ EOF;
      * @return null|int
      */
     public function get_group_id(): ?int {
-        return empty($this->groupid)?0:$this->groupid;
+        return empty($this->groupid) ? 0 : $this->groupid;
     }
 
     /**
