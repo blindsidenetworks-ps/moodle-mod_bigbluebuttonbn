@@ -39,7 +39,11 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     $dbman = $DB->get_manager();
     if ($oldversion < 2015080605) {
         // Drop field description.
-        xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'description');
+        $table5 = new xmldb_table('bigbluebuttonbn');
+        $field4 = new xmldb_field('description');
+        if ($dbman->field_exists($table5, $field4)) {
+            $dbman->drop_field($table5, $field4, true, true);
+        }
         // Change welcome, allow null.
         $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type');
@@ -57,18 +61,33 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     }
     if ($oldversion < 2016011305) {
         // Define field type to be droped from bigbluebuttonbn.
-        xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'type');
+        $table4 = new xmldb_table('bigbluebuttonbn');
+        $field3 = new xmldb_field('type');
+        if ($dbman->field_exists($table4, $field3)) {
+            $dbman->drop_field($table4, $field3, true, true);
+        }
         // Rename table bigbluebuttonbn_log to bigbluebuttonbn_logs.
-        xmldb_bigbluebuttonbn_rename_table($dbman, 'bigbluebuttonbn_log', 'bigbluebuttonbn_logs');
+        $table = new xmldb_table('bigbluebuttonbn_log');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'bigbluebuttonbn_logs', true, true);
+        }
         // Rename field event to log in table bigbluebuttonbn_logs.
-        xmldb_bigbluebuttonbn_rename_field($dbman, 'bigbluebuttonbn_logs', 'event', 'log');
+        $table1 = new xmldb_table('bigbluebuttonbn_logs');
+        $field = new xmldb_field('event');
+        if ($dbman->field_exists($table1, $field)) {
+            $dbman->rename_field($table1, $field, 'log', true, true);
+        }
         // No settings to migrate.
         // Update db version tag.
         upgrade_mod_savepoint(true, 2016011305, 'bigbluebuttonbn');
     }
     if ($oldversion < 2017101000) {
         // Drop field newwindow.
-        xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'newwindow');
+        $table3 = new xmldb_table('bigbluebuttonbn');
+        $field2 = new xmldb_field('newwindow');
+        if ($dbman->field_exists($table3, $field2)) {
+            $dbman->drop_field($table3, $field2, true, true);
+        }
         // Add field type.
         $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id');
@@ -90,7 +109,11 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
         // Drop field newwindow.
-        xmldb_bigbluebuttonbn_drop_field($dbman, 'bigbluebuttonbn', 'tagging');
+        $table2 = new xmldb_table('bigbluebuttonbn');
+        $field1 = new xmldb_field('tagging');
+        if ($dbman->field_exists($table2, $field1)) {
+            $dbman->drop_field($table2, $field1, true, true);
+        }
         // Migrate settings.
         unset_config('bigbluebuttonbn_recordingtagging_default', '');
         unset_config('bigbluebuttonbn_recordingtagging_editable', '');
@@ -288,71 +311,36 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 
     if ($oldversion < 2021072905) {
         // Add table bigbluebuttonbn_recordings (CONTRIB-7994).
-        xmldb_bigbluebuttonbn_add_table($dbman, 'bigbluebuttonbn_recordings');
-        // Add column courseid.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'courseid',
-            $fielddefinition);
-        // Add column bigbluebuttonbnid.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'bigbluebuttonbnid',
-            $fielddefinition);
-        // Add column groupid.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'groupid',
-            $fielddefinition);
-        // Add column recordingid.
-        $fielddefinition = array('type' => XMLDB_TYPE_CHAR, 'precision' => '64', 'unsigned' => null,
-            'sequence' => null, 'default' => null, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
-            $fielddefinition);
-        // Add column headless for deleted recordings.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'headless',
-            $fielddefinition);
-        // Add column imported for imported recordings.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'imported',
-            $fielddefinition);
-        // Add column state for imported recordings.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'state',
-            $fielddefinition);
-        // Add column recording for storing the recording data of imported recordings.
-        $fielddefinition = array('type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
-            'notnull' => false, 'sequence' => null, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'recording',
-            $fielddefinition);
-        // Add column timecreated.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'timecreated',
-            $fielddefinition);
-        // Add column timemodified.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'timemodified',
-            $fielddefinition);
-        // Add column usermodified.
-        $fielddefinition = array('type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null);
-        xmldb_bigbluebuttonbn_add_field($dbman, 'bigbluebuttonbn_recordings', 'usermodified',
-            $fielddefinition);
+        // Define table bigbluebuttonbn_recordings to be created.
+        $table = new xmldb_table('bigbluebuttonbn_recordings');
 
-        // Add index to bigbluebuttonbn_recordings.
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'courseid',
-            ['courseid']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'recordingid',
-            ['recordingid']);
-        xmldb_bigbluebuttonbn_index_table($dbman, 'bigbluebuttonbn_recordings', 'usermodified',
-            ['usermodified']);
+        // Adding fields to table bigbluebuttonbn_recordings.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('bigbluebuttonbnid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('recordingid', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('headless', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('imported', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('state', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('recording', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
+        // Adding keys to table bigbluebuttonbn_recordings.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fk_bigbluebuttonbnid', XMLDB_KEY_FOREIGN, ['bigbluebuttonbnid'], 'bigbluebuttonbn', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Adding indexes to table bigbluebuttonbn_recordings.
+        $table->add_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+        $table->add_index('recordingid', XMLDB_INDEX_NOTUNIQUE, ['recordingid']);
+
+        // Conditionally launch create table for bigbluebuttonbn_recordings.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
         // Bigbluebuttonbn savepoint reached.
         upgrade_mod_savepoint(true, 2021072905, 'bigbluebuttonbn');
     }
@@ -363,6 +351,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 /**
  * Generic helper function for adding or changing a field in a table.
  *
+ * @deprecated  please do not use this anymore (historical migrations)
  * @param object $dbman
  * @param string $tablename
  * @param string $fieldname
@@ -390,111 +379,9 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
 }
 
 /**
- * Generic helper function for adding or changing a field in a table.
- *
- * @param object $dbman
- * @param string $tablename
- * @param string $fieldname
- * @param array $fielddefinition
- */
-function xmldb_bigbluebuttonbn_add_field($dbman, $tablename, $fieldname, $fielddefinition) {
-    $table = new xmldb_table($tablename);
-    $field = new xmldb_field($fieldname);
-    $field->set_attributes($fielddefinition['type'], $fielddefinition['precision'], $fielddefinition['unsigned'],
-        $fielddefinition['notnull'], $fielddefinition['sequence'], $fielddefinition['default'],
-        $fielddefinition['previous']);
-    if ($dbman->field_exists($table, $field)) {
-        return;
-    }
-    $dbman->add_field($table, $field, true, true);
-}
-
-/**
- * Generic helper function for adding or changing a field in a table.
- *
- * @param object $dbman
- * @param string $tablename
- * @param string $fieldname
- * @param array $fielddefinition
- */
-function xmldb_bigbluebuttonbn_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
-    $table = new xmldb_table($tablename);
-    $field = new xmldb_field($fieldname);
-    $field->set_attributes($fielddefinition['type'], $fielddefinition['precision'], $fielddefinition['unsigned'],
-        $fielddefinition['notnull'], $fielddefinition['sequence'], $fielddefinition['default'],
-        $fielddefinition['previous']);
-    if ($dbman->field_exists($table, $field)) {
-        $dbman->change_field_type($table, $field, true, true);
-        $dbman->change_field_precision($table, $field, true, true);
-        $dbman->change_field_notnull($table, $field, true, true);
-        $dbman->change_field_default($table, $field, true, true);
-    }
-}
-
-/**
- * Generic helper function for dropping a field from a table.
- *
- * @param object $dbman
- * @param string $tablename
- * @param string $fieldname
- */
-function xmldb_bigbluebuttonbn_drop_field($dbman, $tablename, $fieldname) {
-    $table = new xmldb_table($tablename);
-    $field = new xmldb_field($fieldname);
-    if ($dbman->field_exists($table, $field)) {
-        $dbman->drop_field($table, $field, true, true);
-    }
-}
-
-/**
- * Generic helper function for renaming a field in a table.
- *
- * @param object $dbman
- * @param string $tablename
- * @param string $fieldnameold
- * @param string $fieldnamenew
- */
-function xmldb_bigbluebuttonbn_rename_field($dbman, $tablename, $fieldnameold, $fieldnamenew) {
-    $table = new xmldb_table($tablename);
-    $field = new xmldb_field($fieldnameold);
-    if ($dbman->field_exists($table, $field)) {
-        $dbman->rename_field($table, $field, $fieldnamenew, true, true);
-    }
-}
-
-/**
- * Generic helper function for adding a new table.
- *
- * @param object $dbman
- * @param string $tablename
- */
-function xmldb_bigbluebuttonbn_add_table($dbman, $tablename) {
-    $table = new xmldb_table($tablename);
-    if ($dbman->table_exists($table)) {
-        return;
-    }
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-    $dbman->create_table($table, true, true);
-}
-
-/**
- * Generic helper function for renaming a table.
- *
- * @param object $dbman
- * @param string $tablenameold
- * @param string $tablenamenew
- */
-function xmldb_bigbluebuttonbn_rename_table($dbman, $tablenameold, $tablenamenew) {
-    $table = new xmldb_table($tablenameold);
-    if ($dbman->table_exists($table)) {
-        $dbman->rename_table($table, $tablenamenew, true, true);
-    }
-}
-
-/**
  * Generic helper function for adding index to a table.
  *
+ * @deprecated please do not use this anymore (historical migrations)
  * @param object $dbman
  * @param string $tablename
  * @param string $indexname
