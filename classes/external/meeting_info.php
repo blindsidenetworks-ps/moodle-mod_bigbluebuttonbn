@@ -50,7 +50,7 @@ class meeting_info extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'meetingid' => new external_value(PARAM_RAW, 'bigbluebuttonbn meetingid'),
+            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_OPTIONAL, 0),
             'updatecache' => new external_value(PARAM_BOOL, 'update cache ?', VALUE_DEFAULT, false),
         ]);
     }
@@ -59,28 +59,29 @@ class meeting_info extends external_api {
      * Fetch meeting information.
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param string $meetingid
+     * @param int $groupid
      * @param bool $updatecache
      * @return array
      */
     public static function execute(
-        int $bigbluebuttonbnid, // TODO: we might want to remove the $bigbluebuttonid here as we can just rely on meetingid.
-        string $meetingid,
+        int $bigbluebuttonbnid,
+        int $groupid,
         bool $updatecache = false
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'meetingid' => $meetingid,
+            'groupid' => $groupid,
             'updatecache' => $updatecache,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'meetingid' => $meetingid,
+            'groupid' => $groupid,
             'updatecache' => $updatecache,
         ]);
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_meetingid($meetingid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $instance->set_group_id($groupid);
         $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.

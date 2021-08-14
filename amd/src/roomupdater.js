@@ -63,9 +63,9 @@ export const poll = () => {
 export const updateRoom = (updatecache = false) => {
     const bbbRoomViewElement = document.getElementById('bbb-room-view');
     const bbbId = bbbRoomViewElement.dataset.bbbId;
-    const meetingId = bbbRoomViewElement.dataset.meetingId;
+    const groupId = bbbRoomViewElement.dataset.groupId;
 
-    return getMeetingInfo(bbbId, meetingId, updatecache)
+    return getMeetingInfo(bbbId, groupId, updatecache)
         .then(data => Templates.renderForPromise('mod_bigbluebuttonbn/room_view', data))
         .then(({html, js}) => Templates.replaceNodeContents(bbbRoomViewElement, html, js))
         .catch(displayException);

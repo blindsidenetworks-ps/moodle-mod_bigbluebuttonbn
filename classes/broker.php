@@ -141,22 +141,4 @@ class broker {
         // Everything is valid.
         return null;
     }
-
-    /**
-     * Helper for performing validation of completion.
-     *
-     * @param object $bigbluebuttonbn
-     * @param array $params
-     *
-     */
-    protected static function completion_validate($bigbluebuttonbn, $params) {
-        $context = \context_course::instance($bigbluebuttonbn->course);
-        // Get list with all the users enrolled in the course.
-        list($sort, $sqlparams) = users_order_by_sql('u');
-        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
-        foreach ($users as $user) {
-            // Enqueue a task for processing the completion.
-            bigbluebutton_proxy::enqueue_completion_update($bigbluebuttonbn, $user->id);
-        }
-    }
 }

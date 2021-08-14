@@ -23,8 +23,8 @@ export const eventTypes = {
      * @event mod_bigbluebuttonbn/sessionEnded
      * @type CustomEvent
      * @property {object} detail
-     * @property {string} detail.bbbId
-     * @property {string} detail.meetingId
+     * @property {number} detail.bbbId
+     * @property {number} detail.groupId
      */
     sessionEnded: 'mod_bigbluebuttonbn/sessionEnded',
 };
@@ -32,12 +32,12 @@ export const eventTypes = {
 /**
  * Trigger the sessionEnded event.
  *
- * @param {string} bbbId
- * @param {string} meetingId
+ * @param {number} bbbId
+ * @param {number} groupId
  * @returns {CustomEvent}
  * @fires event:mod_bigbluebuttonbn/sessionEnded
  */
-export const notifySessionEnded = (bbbId, meetingId) => dispatchEvent(eventTypes.sessionEnded, {
+export const notifySessionEnded = (bbbId, groupId) => dispatchEvent(eventTypes.sessionEnded, {
     bbbId,
-    meetingId,
+    groupId,
 });

@@ -55,7 +55,7 @@ class end_meeting extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'meetingid' => new external_value(PARAM_RAW, 'bigbluebuttonbn meetingid'),
+            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_OPTIONAL, 0),
         ]);
     }
 
@@ -63,25 +63,26 @@ class end_meeting extends external_api {
      * Updates a recording
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param string $meetingid
+     * @param int $groupid the groupid (either 0 or the groupid)
      * @return array (empty array for now)
      * @throws \restricted_context_exception
      */
     public static function execute(
-        int $bigbluebuttonbnid, // TODO: we might want to remove the $bigbluebuttonid here as we can just rely on meetingid.
-        string $meetingid
+        int $bigbluebuttonbnid,
+        int $groupid
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'meetingid' => $meetingid,
+            'groupid' => $groupid,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'meetingid' => $meetingid,
+            'groupid' => $groupid,
         ]);
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_meetingid($meetingid);
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        $instance->set_group_id($groupid);
         $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.

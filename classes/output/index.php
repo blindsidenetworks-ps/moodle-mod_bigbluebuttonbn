@@ -217,7 +217,7 @@ class index implements renderable {
         if ($instance->is_moderator()) {
             return $output->render_from_template('mod_bigbluebuttonbn/end_session_button', (object) [
                 'bigbluebuttonbnid' => $instance->get_instance_id(),
-                'meetingid' => $instance->get_meeting_id(),
+                'groupid' => $instance->get_group_id(),
                 'statusrunning' => $meeting->is_running(),
             ]);
         }

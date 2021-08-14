@@ -1065,6 +1065,7 @@ EOF;
         return (object) [
             'instanceid' => $this->get_instance_id(),
             'bigbluebuttonbnid' => $this->get_instance_id(),
+            'groupid' => $this->get_group_id(),
             'meetingid' => $this->get_meeting_id(),
             'cmid' => $this->get_cm_id(),
             'ismoderator' => $this->is_moderator(),
