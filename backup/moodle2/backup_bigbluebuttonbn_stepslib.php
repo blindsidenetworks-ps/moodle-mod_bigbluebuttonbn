@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step
-{
+class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step {
     /**
      * Define the complete bigbluebuttonbn structure for backup, with file and id annotations.
      *
@@ -47,24 +46,25 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
-                            'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
-                            'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
-                            'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
-                            'timemodified', 'presentation', 'participants', 'userlimit',
-                            'recordings_html', 'recordings_deleted', 'recordings_imported', 'recordings_preview',
-                            'clienttype', 'muteonstart', 'completionattendance',
-                            'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
-                            'completionengagementpollvotes', 'completionengagementemojis'));
+            'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
+            'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
+            'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
+            'timemodified', 'presentation', 'participants', 'userlimit',
+            'recordings_html', 'recordings_deleted', 'recordings_imported', 'recordings_preview',
+            'clienttype', 'muteonstart', 'completionattendance',
+            'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
+            'completionengagementpollvotes', 'completionengagementemojis'));
 
         $logs = new backup_nested_element('logs');
 
         $log = new backup_nested_element('log', array('id'), array(
-                'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta', ));
+            'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta'));
 
         $recordings = new backup_nested_element('recordings');
 
         $recording = new backup_nested_element('recording', array('id'), array(
-                'courseid', 'bigbluebuttonbnid', 'timecreated', 'recordingid', ));
+            'courseid', 'bigbluebuttonbnid', 'groupid', 'recordingid', 'headlesss', 'imported', 'status', 'remotedata',
+            'remotedatatstamp', 'timecreated'));
 
         // Build the tree.
         $bigbluebuttonbn->add_child($logs);

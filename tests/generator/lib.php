@@ -29,8 +29,6 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\testing\generator\mockedserver;
 
-defined('MOODLE_INTERNAL') || die();
-
 global $CFG;
 
 /**
@@ -174,14 +172,13 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
             if (empty($data['importedid'])) {
                 throw new moodle_exception('error');
             }
-            $recording = recording::read_by(['recordingid' => $data['importedid']]);
+            $recording = recording::get_record(['recordingid' => $data['importedid']]);
             $recording->imported = true;
         } else {
             $recording = (object) [
                 'headless' => false,
                 'imported' => false,
-                'recording' => '',
-                'state' => $data['state'] ?? recording::RECORDING_STATE_NOTIFIED,
+                'status' => $data['status'] ?? recording::RECORDING_STATUS_NOTIFIED,
             ];
         }
 
@@ -191,19 +188,20 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         }
 
         $recording->bigbluebuttonbnid = $instance->get_instance_id();
-        $recording->meetingID = $instance->get_meeting_id();
         $recording->courseid = $instance->get_course_id();
-
-        if ($recording->imported) {
-            $result = $this->send_mock_request('backoffice/recordings', [
-                'meetingID' => $instance->get_meeting_id(),
-                'recordID' => $instance->get_meeting_id(),
-            ]);
-            $recordingdata = $servermock->fetch_recording($instance->get_meeting_id(), $instance->get_meeting_id());
-            $recording->recording = json_encode($recordingdata);
+        if (isset($options['imported']) && $options['imported']) {
+            $precording = $recording->create_imported_recording($instance);
+        } else {
+            $recording->recordingid = $this->add_recording($instance, $recording, $data);
+            $precording = new recording(0, $recording);
+            $precording->create();
         }
+        return $precording->to_record();
+    }
 
-        $mockdata = array_merge_recursive((array) $recording, [
+    protected function add_recording(instance $instance, stdClass $recording, array $data): string {
+        $mockdata = array_merge((array) $recording, [
+            'meetingID' => $instance->get_meeting_id(),
             'meta' => [
                 'isBreakout' => 'false',
                 'bn-presenter-name' => $data['presentername'] ?? 'Fake presenter',
@@ -218,10 +216,8 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         ]);
 
         $result = $this->send_mock_request('backoffice/createRecording', [], $mockdata);
-        $recording->recordingid = (string) $result->recordID;
 
-        recording::create($recording);
-        return $recording;
+        return (string) $result->recordID;
     }
 
     /**

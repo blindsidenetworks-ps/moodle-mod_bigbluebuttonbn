@@ -153,13 +153,13 @@ switch (strtolower($action)) {
             $response = $meeting->create_meeting();
             // New recording management: Insert a recordingID that corresponds to the meeting created.
             if ($instance->is_recorded()) {
-                $dbrecordingid = recording::create((object) array(
+                $recording = new recording(0, (object) array(
                     'courseid' => $instance->get_course_id(),
                     'bigbluebuttonbnid' => $instance->get_instance_id(),
                     'recordingid' => $response['internalMeetingID'],
-                    'timecreated' => time(),
-                    'groupid' => $instance->get_group_id()
-                ));
+                    'groupid' => $instance->get_group_id())
+                    );
+                $recording->create();
                 // TODO: We may want to catch if the record was not created.
             }
             // Moodle event logger: Create an event for meeting created.
@@ -194,11 +194,11 @@ function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
     if ($href != '') {
         return $href;
     }
-    $recording = recording::read_by(['recordingid' => $rid]);
+    $recording = recording::get_record(['recordingid' => $rid]);
     if (empty($recording)) {
         return '';
     }
-    return bigbluebuttonbn_bbb_view_playback_href_lookup($recording->recording['playbacks'], $rtype);
+    return bigbluebuttonbn_bbb_view_playback_href_lookup($recording->get('playbacks'), $rtype);
 }
 
 /**

@@ -72,7 +72,7 @@ class recording_helper {
                 $params = array_merge_recursive($params, $groupparams);
             }
         }
-        return self::do_fetch_recordings(implode(" AND ", $selects), $params);
+        return recording::get_records_select(implode(" AND ", $selects), $params);
     }
 
     /**
@@ -107,7 +107,7 @@ class recording_helper {
             $selects[] = 'bigbluebuttonbnid ' . $sqlexcluded;
             $params = array_merge_recursive($params, $paramexcluded);
         }
-        return self::do_fetch_recordings(implode(" AND ", $selects), $params);
+        return recording::get_records_select(implode(" AND ", $selects), $params);
     }
 
     /**
@@ -171,6 +171,7 @@ class recording_helper {
     protected static function do_fetch_recordings(string $sql, array $params): array {
         global $DB;
         $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $sql, $params, 'id, recordingid');
+
         $recordingsids = array_map(function($r) {
             return $r->recordingid;
         }, $recs);
@@ -232,8 +233,8 @@ class recording_helper {
             $selects[] = "imported = " . recording::RECORDING_IMPORTED;
         }
         // Now get only recordings that have been validated by recording ready callback.
-        $selects[] = "status = :status";
-        $params['status'] = recording::RECORDING_STATE_NOTIFIED;
+        $selects[] = "status =:status";
+        $params['status'] = recording::RECORDING_STATUS_NOTIFIED;
         return array($selects, $params);
     }
 
@@ -352,13 +353,12 @@ class recording_helper {
             header('HTTP/1.0 400 Bad request. Missing record_id parameter');
             return;
         }
-        $recs = recording::read_by(['recordingid' => $decodedparameters->record_id]);
-        if (!isset($recs)) {
+        $recording = recording::get_record(['recordingid' => $decodedparameters->record_id]);
+        if (!isset($recording)) {
             header('HTTP/1.0 400 Bad request. Invalid record_id');
             return;
         }
-        $rec = $recs[$decodedparameters->record_id];
-        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
+        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
         if (!isset($instance)) {
             header('HTTP/1.0 410 Gone. The activity may have been deleted');
             return;
@@ -366,10 +366,10 @@ class recording_helper {
         // Sends the messages.
         try {
             // We make sure messages are sent only once.
-            if ($rec->state != recording::RECORDING_STATE_NOTIFIED) {
+            if ($recording->get('status') != recording::RECORDING_STATUS_NOTIFIED) {
                 notifier::notify_recording_ready($bigbluebuttonbn);
-                $rec->state = recording::RECORDING_STATE_NOTIFIED;
-                recording::update($rec, false);
+                $recording->set('status', recording::RECORDING_STATUS_NOTIFIED);
+                $recording->update();
             }
             header('HTTP/1.0 202 Accepted');
         } catch (Exception $e) {

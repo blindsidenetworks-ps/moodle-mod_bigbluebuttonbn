@@ -26,6 +26,7 @@
 namespace mod_bigbluebuttonbn\output;
 
 use lang_string;
+use mod_bigbluebuttonbn\local\bigbluebutton;
 use moodle_exception;
 use core\output\inplace_editable;
 use mod_bigbluebuttonbn\instance;
@@ -52,13 +53,13 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Constructor.
      *
-     * @param stdClass $rec
+     * @param recording $rec
      * @param instance $instance
      * @param string $edithint
      * @param string $editlabel
      * @throws moodle_exception
      */
-    public function __construct($rec, instance $instance, string $edithint, string $editlabel) {
+    public function __construct(recording $rec, instance $instance, string $edithint, string $editlabel) {
         $this->instance = $instance;
 
         $editable = $this->check_capability();
@@ -74,7 +75,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
         parent::__construct(
             'mod_bigbluebuttonbn',
             static::get_type(),
-            $rec->id . ',' . $rec->recording['meetingID'],
+            $rec->get('id'),
             $editable,
             $displayvalue,
             $displayvalue,
@@ -109,21 +110,10 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Get the real recording value
      *
-     * @param stdClass $rec
+     * @param recording $rec
      * @return mixed
      */
-    abstract public function get_recording_value($rec);
-
-    /**
-     * Get all necessary info from itemid
-     *
-     * @param string $itemid
-     * @return array
-     */
-    public static function get_info_fromid($itemid) {
-        list($recid, $recordingid) = explode(',', $itemid);
-        return [$recid, $recordingid];
-    }
+    abstract public function get_recording_value(recording $rec): string;
 
     /**
      * Update the recording with the new value
@@ -133,37 +123,15 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return recording_editable
      */
     public static function update($itemid, $value) {
-        list($recid, $meetingid) = static::get_info_fromid($itemid);
-        $rec = recording::read($recid);
-        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
+        $recording = recording::get_record(['id' => $itemid]);
+        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
 
         require_login($instance->get_course());
 
-        $rec->recording[static::get_type()] = $value;
-        recording::update($rec);
+        $recording->set(static::get_type(), $value);
+        $recording->update();
 
-        // Refresh recording.
-        // TODO: we need to reduce the number of calls to the server.
-        $rec = recording::read($recid);
-        return new static($rec, $instance);
-    }
-
-    /**
-     * Get editable from type
-     *
-     * @param string $type
-     * @return string
-     */
-    public static function get_editable_class($type) {
-        switch ($type) {
-            case recording_name_editable::get_type():
-                return \mod_bigbluebuttonbn\output\recording_name_editable::class;
-                break;
-            case recording_description_editable::get_type():
-                return \mod_bigbluebuttonbn\output\recording_description_editable::class;
-                break;
-        }
-        return '';
+        return new static($recording, $instance);
     }
 
     /**

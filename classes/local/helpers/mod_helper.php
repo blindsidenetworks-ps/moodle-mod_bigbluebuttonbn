@@ -203,7 +203,7 @@ class mod_helper {
             'instance' => $bigbluebuttonbn->id,
             'timestart' => $bigbluebuttonbn->openingtime,
             'timeduration' => 0,
-            'timesort' => $event->timestart,
+            'timesort' => $bigbluebuttonbn->openingtime,
             'visible' => instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn),
             'priority' => null,
         ];

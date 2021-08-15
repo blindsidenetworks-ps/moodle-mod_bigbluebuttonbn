@@ -25,6 +25,8 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
+use core\persistent;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use stdClass;
 
@@ -32,198 +34,432 @@ use stdClass;
  * Utility class that defines a recording and provides methods for handlinging locally in Moodle and externally in BBB.
  *
  * Utility class for recording helper
- * TODO: replace by persistent.
  *
  * @package mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class recording {
+class recording extends persistent {
+    /** The table name. */
+    const TABLE = 'bigbluebuttonbn_recordings';
 
-    /** @var int RECORDING_HEADLESS integer set to 1 defines that the activity used to create the recording no longer exists */
+    /** @var int Defines that the activity used to create the recording no longer exists */
     public const RECORDING_HEADLESS = 1;
-    /** @var int RECORDING_IMPORTED integer set to 1 defines that the recording is not the original but an imported one */
+
+    /** @var int Defines that the recording is not the original but an imported one */
     public const RECORDING_IMPORTED = 1;
 
-    /** @var int INCLUDE_IMPORTED_RECORDINGS boolean set to true defines that the list should include imported recordings */
+    /** @var int Defines that the list should include imported recordings */
     public const INCLUDE_IMPORTED_RECORDINGS = true;
 
-    /** @var int RECORDING_STATE_AWAITING integer set to 0. A meeting set to be recorded still awaits for a recording update */
-    public const RECORDING_STATE_AWAITING = 0;
-    /** @var int RECORDING_STATE_DISMISSED integer set to 1. A meeting set to be recorded was not recorded and dismissed by BBB */
-    public const RECORDING_STATE_DISMISSED = 1;
-    /** @var int RECORDING_STATE_PROCESSED integer set to 2. A meeting set to be recorded has a recording processed */
-    public const RECORDING_STATE_PROCESSED = 2;
-    /** @var int RECORDING_STATE_NOTIFIED integer set to 3. A meeting set to be recorded received notification callback from BBB */
-    public const RECORDING_STATE_NOTIFIED = 3;
+    /** @var int A meeting set to be recorded still awaits for a recording update */
+    public const RECORDING_STATUS_AWAITING = 0;
+
+    /** @var int A meeting set to be recorded was not recorded and dismissed by BBB */
+    public const RECORDING_STATUS_DISMISSED = 1;
+
+    /** @var int A meeting set to be recorded has a recording processed */
+    public const RECORDING_STATUS_PROCESSED = 2;
+
+    /** @var int A meeting set to be recorded received notification callback from BBB */
+    public const RECORDING_STATUS_NOTIFIED = 3;
+
+    /** @var bool $metadatachanged has metadata been changed so the remote information needs to be updated ? */
+    protected $metadatachanged = false;
 
     /**
-     * CRUD create.
+     * Create an instance of this class.
      *
-     * @param stdClass $dataobject
-     *
-     * @return bool|int true or new id
+     * @param int $id If set, this is the id of an existing record, used to load the data.
+     * @param stdClass|null $record If set will be passed to from_record
      */
-    public static function create($dataobject) {
-        global $DB;
-        $r = new stdClass();
-        // Default values.
-        $r->courseid = $dataobject->courseid;
-        $r->bigbluebuttonbnid = $dataobject->bigbluebuttonbnid;
-        $r->timecreated = time();
-        $r->recordingid = $dataobject->recordingid;
-        $r->headless = $dataobject->headless ?? false;
-        $r->imported = $dataobject->imported ?? false;
-        $r->recording = $dataobject->recording ?? null;
-        $r->groupid = $dataobject->groupid ?? 0;
-        $r->state = $dataobject->state ?? self::RECORDING_STATE_AWAITING;
-        $rid = $DB->insert_record('bigbluebuttonbn_recordings', $r);
-        if (!$rid) {
-            return false;
+    public function __construct($id = 0, stdClass $record = null) {
+        if ($record) {
+            $record->headless = $record->headless ?? false;
+            $record->imported = $record->imported ?? false;
+            $record->groupid = $record->groupid ?? 0;
+            $record->status = $record->status ?? self::RECORDING_STATUS_AWAITING;
         }
-        return $rid;
+        parent::__construct($id, $record);
     }
 
     /**
-     * CRUD read.
+     * Return the definition of the properties of this model.
      *
-     * @param int $id the id from the database
-     * @param bool $fetchremote are we fetching remote recording info too ?
-     *
-     * @return stdClass a bigbluebuttonbn_recordings record.
+     * @return array
      */
-    public static function read($id, $fetchremote = true) {
-        global $DB;
-        $rec = $DB->get_record('bigbluebuttonbn_recordings', ['id' => $id], '*', MUST_EXIST);
-        if ($rec->imported) {
-            // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
-            $rec->recording = json_decode($rec->recording, true);
-        } else {
-            if ($fetchremote) {
-                $bbbrecordings = recording_proxy::fetch_recordings([$rec->recordingid]);
-                $rec->recording = $bbbrecordings[$rec->recordingid] ?? $rec->recording;
+    protected static function define_properties() {
+        return array(
+            'courseid' => array(
+                'type' => PARAM_INT,
+            ),
+            'bigbluebuttonbnid' => array(
+                'type' => PARAM_INT,
+            ),
+            'groupid' => array(
+                'type' => PARAM_INT,
+                'null' => NULL_ALLOWED,
+            ),
+            'recordingid' => array(
+                'type' => PARAM_RAW,
+            ),
+            'headless' => array(
+                'type' => PARAM_BOOL,
+            ),
+            'imported' => array(
+                'type' => PARAM_BOOL,
+            ),
+            'status' => array(
+                'type' => PARAM_INT,
+            ),
+            'remotedata' => array(
+                'type' => PARAM_RAW,
+                'null' => NULL_ALLOWED,
+                'default' => ''
+            ),
+            'remotedatatstamp' => array(
+                'type' => PARAM_INT,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'name' => array(
+                'type' => PARAM_TEXT,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'description' => array(
+                'type' => PARAM_TEXT,
+                'null' => NULL_ALLOWED,
+                'default' => 0
+            ),
+            'protected' => array(
+                'type' => PARAM_BOOL,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'starttime' => array(
+                'type' => PARAM_INT,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'endtime' => array(
+                'type' => PARAM_INT,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'published' => array(
+                'type' => PARAM_BOOL,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'protect' => array(
+                'type' => PARAM_BOOL,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+            'playbacks' => array(
+                'type' => PARAM_RAW,
+                'null' => NULL_ALLOWED,
+                'default' => null
+            ),
+        );
+    }
+
+    /**
+     * Before doing the database update, let's update metadata
+     *
+     * @return void
+     */
+    protected function before_update() {
+        // We update if the remote metadata has been changed locally.
+        $this->update_remotedata();
+        $this->sync_remote_recording(); // Fetch again to be sure.
+    }
+
+    /**
+     * Update remote data if metadata has changed.
+     *
+     */
+    protected function update_remotedata() {
+        // We update if the remote metadata has been changed locally.
+        if ($this->metadatachanged) {
+            if (!$this->get('imported') && $this->metadatachanged) {
+                // As the recordingid was not identified as imported recording link, execute update on a real recording.
+                // (No need to update imported links as the update only affects the actual recording).
+                // Execute update on actual recording.
+                // Check if any of the metatadata was touched then, we need to update the remote recording.
+                recording_proxy::update_recording(
+                    $this->get('recordingid'),
+                    $this->remote_meta_convert());
+                $this->metadatachanged = false;
+                $this->set('remotedatatstamp', time());
             }
         }
-        return $rec;
     }
 
     /**
-     * CRUD read by indicated attributes.
-     *
-     * @param array $attributes
-     * @param bool $fetchremote are we fetching remote recording info too ?
-     *
-     * @return [stdClass] one or many bigbluebuttonbn_recordings records indexed by recordingid.
+     * Update locally stored metadata from remote recording values.
      */
-    public static function read_by($attributes, $fetchremote = true) {
-        global $DB;
-        $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
-        // Assign default value to empty.
-        if (!$recs) {
-            $recs = array();
-        }
-        // Normalize to array.
-        if (!is_array($recs)) {
-            $recs = array($recs);
-        }
-        $recordings = array();
-        foreach ($recs as $rec) {
-            $recording = $rec;
-            if ($rec->imported) {
-                // On imported recordings we always need to convert rec->recording to array since it is stored serialized.
-                $rec->recording = json_decode($rec->recording, true);
-            } else {
-                if ($fetchremote) {
-                    $bbbrecording = recording_proxy::fetch_recordings([$rec->recordingid]);
-                    $recording->recording = $bbbrecording[$rec->recordingid] ?? $recording->recording;
-                }
-            }
-            $recordings[$recording->recordingid] = $recording;
-        }
-        return $recordings;
-    }
-
-    /**
-     * Helper function to count the imported recordings for a recordingid.
-     *
-     * @param array $attributes
-     *
-     * @return integer
-     */
-    public static function count_by($attributes) {
-        global $DB;
-        return $DB->count_records('bigbluebuttonbn_recordings', $attributes);
-    }
-
-    /**
-     * CRUD update.
-     *
-     * @param stdClass $recordingdata the dataobject to update
-     * @param bool $updateremote are we updating remote recording info too ?
-     * @return bool true
-     */
-    public static function update($recordingdata, $updateremote = true) {
-        global $DB;
-        // Update local first.
-        $recordingdata->recording = !is_string($recordingdata->recording) ?
-            json_encode($recordingdata->recording, true) : $recordingdata->recording;
-        $DB->update_record('bigbluebuttonbn_recordings', $recordingdata);
-        if (!$recordingdata->imported && $updateremote) {
-            // As the recordingid was not identified as imported recording link, execute update on a real recording.
-            // (No need to update imported links as the update only affects the actual recording).
-            // Execute update on actual recording.
-            $meta = is_string($recordingdata->recording) ? json_decode($recordingdata->recording) : $recordingdata->recording;
-            recording_proxy::update_recording($recordingdata->recordingid, (array) $meta);
-        }
-        return true;
-    }
-
-    /**
-     * Update a recording by selecting it using given attributes
-     *
-     * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
-     * @param stdClass $dataobject An object with contents equal to fieldname=>fieldvalue. Used for updating each recording.
-     *
-     * @return bool Success/Failure
-     */
-    public static function update_by($attributes, $dataobject) {
-        global $DB;
-        $recs = $DB->get_records('bigbluebuttonbn_recordings', $attributes);
-        if (!$recs) {
-            return false;
-        }
-        foreach ($recs as $r) {
-            global $DB;
-            $dataobject->id = $r->id;
-            if (!$DB->update_record('bigbluebuttonbn_recordings', $dataobject)) {
-                // TODO: There should be a way to rollback if it fails after updating one or many of the recordings.
-                return false;
+    public function sync_remote_recording() {
+        if (!$this->get('imported')) {
+            $rid = $this->get('recordingid');
+            $this->raw_set('remotedatatstamp', time()); // Make sure we stop refreshing now.
+            $bbbrecording = recording_proxy::fetch_recordings([$rid]);
+            if (!empty($bbbrecording[$rid])) {
+                $this->raw_set('remotedata', json_encode($bbbrecording[$rid]));
+                $this->metadatachanged = false;
             }
         }
-        return true;
     }
 
     /**
-     * CRUD delete.
+     * Create a new imported recording from current recording
      *
-     * @param string $recordingid
-     *
-     * @return bool true
+     * @param instance $instance
+     * @return recording
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
      */
-    public static function delete($recordingid) {
-        global $DB;
-        return $DB->delete_records('bigbluebuttonbn_recordings', ['id' => $recordingid]);
+    public function create_imported_recording(instance $instance) {
+        $recordingrec = $this->to_record();
+        if ($this->must_sync()) {
+            $this->sync_remote_recording(); // Make sure we have the right metadata.
+        }
+        unset($recordingrec->id);
+        $recordingrec->bigbluebuttonbnid = $instance->get_instance_id();
+        $recordingrec->courseid = $instance->get_course_id();
+        $recordingrec->groupid = 0; // The recording is available to everyone.
+        $recordingrec->remotedata = $this->raw_get('remotedata');
+        $recordingrec->imported = true;
+        $importedrecording = new recording(0, $recordingrec);
+        $importedrecording->create();
+        return $importedrecording;
     }
 
     /**
-     * CRUD delete by indicated attributes.
+     * Delete the recording in the BBB button
      *
-     * @param array $attributes optional array $fieldname=>requestedvalue with AND in between. Used for locating recordings.
-     *
-     * @return bool Success/Failure
+     * @return void
      */
-    public static function delete_by($attributes) {
-        global $DB;
-        return $DB->delete_records('bigbluebuttonbn_recordings', $attributes);
+    protected function before_delete() {
+        $recordid = $this->get('recordingid');
+        $imported = $this->get('imported');
+        if ($recordid && !$imported) {
+            recording_proxy::delete_recording($recordid);
+        }
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $value
+     */
+    protected function set_name($value) {
+        $this->remote_meta_set('name', trim($value));
+    }
+
+    /**
+     * Set Description
+     *
+     * @param string $value
+     */
+    protected function set_description($value) {
+        $this->remote_meta_set('description', trim($value));
+    }
+
+    /**
+     * Recording is protected
+     *
+     * @param bool $value
+     */
+    protected function set_protected($value) {
+        $realvalue = $value ? "true" : "false";
+        $this->remote_meta_set('protected', $realvalue);
+    }
+
+    /**
+     * Recording starttime
+     *
+     * @param int $value
+     */
+    protected function set_starttime($value) {
+        $this->remote_meta_set('starttime', $value);
+    }
+
+    /**
+     * Recording endtime
+     *
+     * @param int $value
+     */
+    protected function set_endtime($value) {
+        $this->remote_meta_set('endtime', $value);
+    }
+
+    /**
+     * Recording is published
+     *
+     * @param bool $value
+     */
+    protected function set_published($value) {
+        $realvalue = $value ? "true" : "false";
+        $this->remote_meta_set('published', $realvalue);
+        // Now set this flag onto the remote bbb server.
+        recording_proxy::publish_recording($this->get('recordingid'), $realvalue);
+    }
+
+    /**
+     * POSSIBLE_REMOTE_META_SOURCE match a field type and its metadataname (historical and current).
+     */
+    const POSSIBLE_REMOTE_META_SOURCE = [
+        'description' => array('meta_bbb-recording-description', 'meta_contextactivitydescription'),
+        'name' => array('meta_bbb-recording-name', 'meta_contextactivity', 'meetingName'),
+        'playbacks' => array('playbacks'),
+        'starttime' => array('startTime'),
+        'endtime' => array('endTime'),
+        'published' => array('published'),
+        'protected' => array('protect'),
+        'tags' => array('meta_bbb-recording-tags')
+    ];
+
+    /**
+     * Get the real metadata name for the possible source.
+     *
+     * @param string $sourcetype the name of the source we look for (name, description...)
+     * @param array $metadata current metadata
+     */
+    protected function get_possible_meta_name_for_source($sourcetype, $metadata): string {
+        $possiblesource = self::POSSIBLE_REMOTE_META_SOURCE[$sourcetype];
+        $possiblesourcename = $possiblesource[0];
+        foreach ($possiblesource as $possiblesname) {
+            if (isset($meta[$possiblesname])) {
+                $possiblesourcename = $possiblesname;
+            }
+        }
+        return $possiblesourcename;
+    }
+
+    /**
+     * Convert string (metadata) to json object
+     *
+     * @return mixed|null
+     */
+    protected function remote_meta_convert() {
+        $remotemeta = $this->raw_get('remotedata');
+        return json_decode($remotemeta, true);
+    }
+
+    /**
+     * Description is stored in the metadata, so we sometimes needs to do some conversion.
+     */
+    protected function get_description() {
+        return trim($this->remote_meta_get('description'));
+
+    }
+
+    /**
+     * Name is stored in the metadata
+     */
+    protected function get_name() {
+        return trim($this->remote_meta_get('name'));
+    }
+
+    /**
+     * List of playbacks for this recording
+     *
+     * @return mixed|null
+     * @throws \coding_exception
+     */
+    protected function get_playbacks() {
+        return $this->remote_meta_get('playbacks');
+    }
+
+    /**
+     * Is protected
+     *
+     * @return mixed|null
+     * @throws \coding_exception
+     */
+    protected function get_protected() {
+        return $this->remote_meta_get('protected');
+    }
+
+    /**
+     * Start time
+     *
+     * @return mixed|null
+     * @throws \coding_exception
+     */
+    protected function get_starttime() {
+        return $this->remote_meta_get('starttime');
+    }
+
+    /**
+     * Start time
+     *
+     * @return mixed|null
+     * @throws \coding_exception
+     */
+    protected function get_endtime() {
+        return $this->remote_meta_get('endtime');
+    }
+
+    /**
+     * Is published
+     *
+     * @return mixed|null
+     * @throws \coding_exception
+     */
+    protected function get_published() {
+        $publishedtext = $this->remote_meta_get('published');
+        return $publishedtext === "true" ? true : false;
+    }
+
+    /**
+     * Set locally stored metadata from this instance
+     *
+     * @param string $fieldname
+     * @param mixed $value
+     * @throws \coding_exception
+     */
+    protected function remote_meta_set($fieldname, $value) {
+        $this->metadatachanged = true;
+        $meta = $this->remote_meta_convert();
+        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $meta);
+        $meta[$possiblesourcename] = $value;
+        $this->raw_set('remotedata', json_encode($meta));
+        $this->raw_set('remotedatatstamp', time());
+    }
+
+    /**
+     * Get locally stored metadata from this instance
+     *
+     * @param string $fieldname
+     * @return mixed|null
+     */
+    protected function remote_meta_get($fieldname) {
+        if ($this->must_sync()) {
+            $this->sync_remote_recording();
+        }
+        $meta = $this->remote_meta_convert();
+        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $meta);
+        return $meta[$possiblesourcename] ?? null;
+    }
+
+    /**
+     * RESYNC_INTERVAL
+     */
+    const RESYNC_INTERVAL = 600; // 10 mins ?
+
+    /**
+     * Should we sync the metadata with remote recording metadata ?
+     *
+     * @return bool
+     * @throws \coding_exception
+     */
+    protected function must_sync() {
+        $rdatats = $this->raw_get('remotedatatstamp');
+        $rdata = $this->raw_get('remotedata');
+
+        return (empty($rdata) || ($rdatats + self::RESYNC_INTERVAL) < time());
     }
 }

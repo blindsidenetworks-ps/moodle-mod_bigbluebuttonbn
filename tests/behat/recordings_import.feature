@@ -33,7 +33,7 @@ Feature: Manage and list recordings
     And I should not see "Meeting" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
     And I should see "Name" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
 
-  @javascript
+  @javascript @current
   Scenario: I check that I can import recordings into the Recording Only activity from other activities
     When I log in as "admin"
     And I am on "Test Course 2" course homepage
@@ -53,7 +53,7 @@ Feature: Manage and list recordings
 
   @javascript
   Scenario: I check that I can import recordings into the Recording Only activity and then if I delete them
-    they are back into the pool to be imported again
+  they are back into the pool to be imported again
     When I log in as "admin"
     And I am on "Test Course 2" course homepage
     Then I follow "RecordingsOnly1"

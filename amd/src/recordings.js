@@ -20,6 +20,7 @@ import {addIconToContainerWithPromise} from 'core/loadingicon';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import * as Str from 'core/str';
+import Pending from 'core/pending';
 
 const stringList = [
     'view_recording_yui_first',
@@ -114,9 +115,9 @@ const fetchRecordingData = tableSelector => {
  * Functions to manage the data table.
  *
  * @typedef dataTableFunctions
- * @property function refreshTableData
- * @property function filterByText
- * @property function registerEventListeners
+ * @property callable refreshTableData
+ * @property callable filterByText
+ * @property callable registerEventListeners
  */
 
 /**
@@ -171,13 +172,19 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
     };
 
     const requestAction = (element) => {
-        const getDataFromAction = (element, dataType) => element.closest(`[data-${dataType}]`).dataset[dataType];
+        const getDataFromAction = (element, dataType) => {
+            const dataElement = element.closest(`[data-${dataType}]`);
+            if (dataElement) {
+                return dataElement.dataset[dataType];
+            }
+
+            return null;
+        };
 
         const elementData = element.dataset;
         const payload = {
             bigbluebuttonbnid: bbbid,
             recordingid: getDataFromAction(element, 'recordingid'),
-            recid: getDataFromAction(element, 'recid'),
             additionaloptions: getDataFromAction(element, 'additionaloptions'),
             action: elementData.action,
         };
@@ -196,12 +203,12 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
                     modal.setSaveButtonText(await Str.get_string('ok', 'moodle'));
 
                     // Handle save event.
-                    modal.getRoot().on(ModalEvents.save, function () {
+                    modal.getRoot().on(ModalEvents.save, () => {
                         resolve(true);
                     });
 
                     // Handle hidden event.
-                    modal.getRoot().on(ModalEvents.hidden, function () {
+                    modal.getRoot().on(ModalEvents.hidden, () => {
                         // Destroy when hidden.
                         modal.destroy();
                         resolve(false);
@@ -219,34 +226,34 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
         }
     };
 
-    const recordingConfirmationMessage = async (data) => {
-        let confirmation = await Str.get_string('view_recording_' + data.action + '_confirmation', 'bigbluebuttonbn');
-        if (typeof confirmation === 'undefined') {
-            return '';
-        }
-        let recordingType = await Str.get_string('view_recording', 'bigbluebuttonbn');
-        const playbackElement = document.querySelector('#playbacks-' + data.recordingid);
-        if (playbackElement.dataset.imported === 'true') {
-            recordingType = await Str.get_string('view_recording_link', 'bigbluebuttonbn');
-        }
-        confirmation = confirmation.replace("{$a}", recordingType);
+    const recordingConfirmationMessage = async(data) => {
+
+        const playbackElement = document.querySelector(`#playbacks-${data.recordingid}`);
+        const recordingType = await Str.get_string(
+            playbackElement.dataset.imported === 'true' ? 'view_recording_link' : 'view_recording',
+            'bigbluebuttonbn'
+        );
+
+        const confirmation = await Str.get_string(`view_recording_${data.action}_confirmation`, 'bigbluebuttonbn', recordingType);
+
         if (data.action === 'import') {
             return confirmation;
         }
-        // If it has associated links imported in a different course/activity, show that in confirmation dialog.
-        const associatedLinks = document.querySelector(`a#recording-${data.action}-${data.recordingid}`);
 
-        if (associatedLinks && associatedLinks.dataset && associatedLinks.dataset.links === 0) {
+        // If it has associated links imported in a different course/activity, show that in confirmation dialog.
+        const associatedLinkCount = document.querySelector(`a#recording-${data.action}-${data.recordingid}`)?.dataset?.links;
+        if (!associatedLinkCount || associatedLinkCount == 0) {
             return confirmation;
         }
-        const numberAssociatedLinks = Number.parseInt(associatedLinks.dataset.links);
-        let confirmationWarning = await Str.get_string('view_recording_' + data.action + '_confirmation_warning_p',
-            'bigbluebuttonbn', numberAssociatedLinks);
-        if (numberAssociatedLinks === 1) {
-            confirmationWarning = await Str.get_string('view_recording_' + data.action + '_confirmation_warning_s',
-                'bigbluebuttonbn');
-        }
-        confirmationWarning = confirmationWarning.replace("{$a}", numberAssociatedLinks) + '. ';
+
+        const confirmationWarning = await Str.get_string(
+            associatedLinkCount === 1
+                ? `view_recording_${data.action}_confirmation_warning_p`
+                : `view_recording_${data.action}_confirmation_warning_s`,
+            'bigbluebuttonbn',
+            associatedLinkCount
+        );
+
         return confirmationWarning + '\n\n' + confirmation;
     };
 
@@ -341,6 +348,7 @@ const setupDatatable = (tableId, searchFormId, response) => {
         return Promise.reject();
     }
 
+    const pendingPromise = new Pending('mod_bigbluebuttonbn/recordings/setupDatatable');
     return Promise.all([getYuiInstance(recordingData.locale), getStringsForYui()])
         .then(([yuiInstance, strings]) => {
             // Add the fetched strings to the YUI Instance.
@@ -371,6 +379,10 @@ const setupDatatable = (tableId, searchFormId, response) => {
                 dataTable);
             registerEventListeners();
 
+            return dataTable;
+        })
+        .then(dataTable => {
+            pendingPromise.resolve();
             return dataTable;
         });
 };

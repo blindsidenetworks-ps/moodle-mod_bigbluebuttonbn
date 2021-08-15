@@ -182,21 +182,21 @@ class recording_test extends \advanced_testcase {
         $instance1->set_group_id($group1->id);
         $recordings = recording_helper::get_recordings_for_instance($instance1);
         $this->assertCount(1, $recordings);
-        $this->assertEquals('Group 1 Recording 1', $recordings[$recording1->recordingid]->recording['meta_bbb-recording-name']);
+        $this->assertEquals('Group 1 Recording 1', $recordings[$recording1->id]->get('name'));
 
         $this->setUser($student2);
         $instance2 = instance::get_from_instanceid($activity->id);
         $instance2->set_group_id($group2->id);
         $recordings = recording_helper::get_recordings_for_instance($instance2);
         $this->assertCount(1, $recordings);
-        $this->assertEquals('Group 2 Recording 1', $recordings[$recording2->recordingid]->recording['meta_bbb-recording-name']);
+        $this->assertEquals('Group 2 Recording 1', $recordings[$recording2->id]->get('name'));
 
         $this->setUser($student3);
         $instance3 = instance::get_from_instanceid($activity->id);
         $recordings = recording_helper::get_recordings_for_instance($instance3);
         $this->assertIsArray($recordings);
         $recordingnames = array_map(function($r) {
-            return $r->recording['meta_bbb-recording-name'];
+            return $r->get('name');
         }, $recordings);
         $this->assertCount(4, $recordingnames);
         $this->assertContains('Pre-Recording 1', $recordingnames);

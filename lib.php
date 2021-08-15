@@ -41,6 +41,8 @@ global $CFG;
 /**
  * Indicates API features that the bigbluebuttonbn supports.
  *
+ * @param string $feature
+ * @return mixed True if yes (some features may use other values)
  * @uses FEATURE_IDNUMBER
  * @uses FEATURE_GROUPS
  * @uses FEATURE_GROUPINGS
@@ -52,8 +54,6 @@ global $CFG;
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
  * @uses FEATURE_SHOW_DESCRIPTION
- * @param string $feature
- * @return mixed True if yes (some features may use other values)
  */
 function bigbluebuttonbn_supports($feature) {
     if (!$feature) {
@@ -83,7 +83,7 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $bigbluebuttonbn  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
@@ -112,18 +112,21 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $bigbluebuttonbn  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn An object from the form in mod_form.php
  * @return bool Success/Fail
  */
 function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
     mod_helper::process_pre_save($bigbluebuttonbn);
+
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
     $bigbluebuttonbn->presentation = files::get_media_file($bigbluebuttonbn);
+
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+
     // Get the meetingid column in the bigbluebuttonbn table.
     $bigbluebuttonbn->meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $bigbluebuttonbn->id));
 
@@ -169,8 +172,11 @@ function bigbluebuttonbn_delete_instance($id) {
     // Log action performed.
     logger::log_instance_deleted($instance);
 
-    // Mark dependant recordings as headless.
-    recording::update_by(['bigbluebuttonbnid' => $id], (object)['headless' => recording::RECORDING_HEADLESS]);
+    // Mark dependent recordings as headless.
+    foreach (recording::get_records(['bigbluebuttonbnid' => $id]) as $recording) {
+        $recording->set('headless', recording::RECORDING_HEADLESS);
+        $recording->update();
+    }
 
     return $result;
 }
@@ -211,12 +217,12 @@ function bigbluebuttonbn_user_complete($courseorid, $userorid, $bigbluebuttonbn)
     if (is_object($courseorid)) {
         $course = $courseorid;
     } else {
-        $course = (object)array('id' => $courseorid);
+        $course = (object) array('id' => $courseorid);
     }
     if (is_object($userorid)) {
         $user = $userorid;
     } else {
-        $user = (object)array('id' => $userorid);
+        $user = (object) array('id' => $userorid);
     }
     $sql = "SELECT COUNT(*) FROM {bigbluebuttonbn_logs} ";
     $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
@@ -344,17 +350,17 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
 /**
  * Serves the bigbluebuttonbn attachments. Implements needed access control ;-).
  *
- * @category files
- *
- * @param stdClass $course        course object
- * @param stdClass $cm            course module object
- * @param stdClass $context       context object
- * @param string   $filearea      file area
- * @param array    $args          extra arguments
- * @param bool     $forcedownload whether or not force download
- * @param array    $options       additional options affecting the file serving
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
  *
  * @return false|null false if file not found, does not return if found - justsend the file
+ * @category files
+ *
  */
 function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
     if (!files::pluginfile_valid($context, $filearea)) {
@@ -371,10 +377,10 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 /**
  * Mark the activity completed (if required) and trigger the course_module_viewed event.
  *
- * @param  stdClass $bigbluebuttonbn        bigbluebuttonbn object
- * @param  stdClass $course     course object
- * @param  stdClass $cm         course module object
- * @param  stdClass $context    context object
+ * @param stdClass $bigbluebuttonbn bigbluebuttonbn object
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
  * @since Moodle 3.0
  */
 function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
@@ -399,9 +405,9 @@ function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
 /**
  * Check if the module has any update that affects the current user since a given time.
  *
- * @param  cm_info $cm course module data
- * @param  int $from the time to check updates from
- * @param  array $filter  if we need to check only specific updates
+ * @param cm_info $cm course module data
+ * @param int $from the time to check updates from
+ * @param array $filter if we need to check only specific updates
  * @return stdClass an object with the different type of areas indicating if they were updated or not
  * @since Moodle 3.2
  */
@@ -409,7 +415,6 @@ function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array
     $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
     return $updates;
 }
-
 
 /**
  * Get icon mapping for font-awesome.
@@ -497,7 +502,6 @@ function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $even
     return $activitystatus != 'ended';
 }
 
-
 /**
  * Adds module specific settings to the settings block
  *
@@ -507,7 +511,7 @@ function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $even
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
     global $PAGE, $USER;
     // Don't add validate completion if the callback for meetingevents is NOT enabled.
-    if (!(boolean)\mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
+    if (!(boolean) \mod_bigbluebuttonbn\local\config::get('meetingevents_enabled')) {
         return;
     }
     // Don't add validate completion if user is not allowed to edit the activity.
@@ -529,8 +533,9 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
  * @return mixed
  */
 function bigbluebuttonbn_inplace_editable($itemtype, $itemid, $newvalue) {
-    $editableclass = \mod_bigbluebuttonbn\output\recording_editable::get_editable_class($itemtype);
-    if ($editableclass) {
-        return $editableclass::update($itemid, $newvalue);
+    $editableclass = "\\mod_bigbluebuttonbn\\output\\recording_{$itemtype}_editable";
+    if (class_exists($editableclass)) {
+        return call_user_func(array($editableclass, 'update'), $itemid, $newvalue);
     }
+    return null; // Will raise an exception in core update_inplace_editable method.
 }

@@ -57,7 +57,9 @@ class get_recordings extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
-            'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
+            'removeimportedid' => new external_value(PARAM_INT,
+                'Id of the other BBB we target for importing recordings into.'
+                . 'The idea here is to remove already imported recordings', VALUE_OPTIONAL),
             'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_OPTIONAL),
             'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
         ]);
@@ -159,9 +161,13 @@ class get_recordings extends external_api {
                 true
             );
             // Unset from $recordings if recording is already imported.
-            foreach ($recordings as $recordingid => $recording) {
-                if (isset($importedrecordings[$recordingid])) {
-                    unset($recordings[$recordingid]);
+            // Recording $recordings are indexed by $id (moodle table column id).
+            foreach ($recordings as $index => $recording) {
+                $recordingid = $recording->get('recordingid');
+                foreach ($importedrecordings as $irecord) {
+                    if ($irecord->get('recordingid') == $recording->get('recordingid')) {
+                        unset($recordings[$index]);
+                    }
                 }
             }
         }

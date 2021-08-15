@@ -58,7 +58,9 @@ class reset {
         );
 
         // Remove all the recordings.
-        recording::delete(implode(",", array_keys($recordings)));
+        $recordingid = implode(",", array_keys($recordings));
+        $recordingtodelete = recording::get_record( ['id' => $recordingid]);
+        $recordingtodelete->delete();
     }
 
     /**
