@@ -16,10 +16,12 @@ Feature: Manage and list recordings
       | activity        | name            | intro                              | course | idnumber         | type | recordings_imported |
       | bigbluebuttonbn | RoomRecordings  | Test Room Recording description    | C1     | bigbluebuttonbn1 | 0    | 0                   |
       | bigbluebuttonbn | RecordingsOnly1 | Test Recordings only description 1 | C2     | bigbluebuttonbn3 | 2    | 1                   |
+    And the following "mod_bigbluebuttonbn > meeting" exists:
+      | activity         | RoomRecordings |
     And the following "mod_bigbluebuttonbn > recordings" exist:
-      | bigbluebuttonbn | meta_bbb-recording-name |
-      | RoomRecordings  | Recording 1             |
-      | RoomRecordings  | Recording 2             |
+      | bigbluebuttonbn | name        |
+      | RoomRecordings  | Recording 1 |
+      | RoomRecordings  | Recording 2 |
 
   @javascript
   Scenario: I check we display the right information (Recording Name as name and Description)

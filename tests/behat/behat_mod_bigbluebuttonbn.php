@@ -25,6 +25,9 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Moodle\BehatExtension\Exception\SkippedException;
+
 /**
  * Behat custom steps and configuration for mod_bigbluebuttonbn.
  *
@@ -33,6 +36,28 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_bigbluebuttonbn extends behat_base {
+
+    /**
+     * BeforeScenario hook to reset the remote testpoint.
+     *
+     * @BeforeScenario @mod_bigbluebuttonbn
+     */
+    public function before_scenario(BeforeScenarioScope $scope) {
+        if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            throw new SkippedException(
+                'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
+            );
+        }
+
+        $reseturl = self::get_mocked_server_url('backoffice/reset');
+
+        $curl = new \curl();
+        $curl->get($reseturl->out_omit_querystring(), $reseturl->params());
+    }
+
+    public static function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
+        return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
+    }
 
     /**
      * Return the list of partial named selectors.

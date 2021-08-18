@@ -28,7 +28,6 @@ use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\testing\generator\mockedserver;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,17 +43,6 @@ global $CFG;
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class mod_bigbluebuttonbn_generator extends \testing_module_generator {
-
-    /**
-     * Get mocked server instance
-     *
-     * @return mockedserver
-     */
-    protected function get_mocked_server(): mockedserver {
-        require_once(__DIR__ . '/mockedserver.php');
-
-        return new mockedserver();
-    }
 
     /**
      * Creates an instance of bigbluebuttonbn for testing purposes.
@@ -125,7 +113,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     }
 
     /**
-     * Get the participnat configuration for a field and role.
+     * Get the participant configuration for a field and role for use in get_participants_from_record.
      *
      * @param string $field
      * @param string $role
@@ -172,41 +160,66 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     }
 
     /**
-     * Create a recording for the given bbb activity
+     * Create a recording for the given bbb activity.
+     *
+     * The recording is created both locally, and a recording record is created on the mocked BBB server.
      *
      * @param array $data
      * @return stdClass the recording object
      */
-    public function create_recording(array $data) {
+    public function create_recording(array $data): stdClass {
         $instance = instance::get_from_instanceid($data['bigbluebuttonbnid']);
-        $servermock = $this->get_mocked_server();
+
         if (isset($data['imported']) && filter_var($data['imported'], FILTER_VALIDATE_BOOLEAN)) {
             if (empty($data['importedid'])) {
                 throw new moodle_exception('error');
             }
             $recording = recording::read_by(['recordingid' => $data['importedid']]);
-        } else {
-            $recording = new stdClass();
-            $recording->headless = false;
-            $recording->imported = false;
-            $recording->recording = '';
-            $recording->state = $data['state'] ?? recording::RECORDING_STATE_NOTIFIED;
-        }
-        $recording->bigbluebuttonbnid = $instance->get_instance_id();
-        if (!empty($data['Group'])) {
-            $group = groups_get_group_by_idnumber($instance->get_course_id(), $data['Group']);
-            if ($group) {
-                $instance->set_group_id($group->id);
-                $recording->groupid = $group->id;
-            }
-        }
-        $recording->courseid = $instance->get_course_id();
-        if (isset($options['imported']) && $options['imported']) {
             $recording->imported = true;
+        } else {
+            $recording = (object) [
+                'headless' => false,
+                'imported' => false,
+                'recording' => '',
+                'state' => $data['state'] ?? recording::RECORDING_STATE_NOTIFIED,
+            ];
+        }
+
+        if (!empty($data['groupid'])) {
+            $instance->set_group_id($data['groupid']);
+            $recording->groupid = $data['groupid'];
+        }
+
+        $recording->bigbluebuttonbnid = $instance->get_instance_id();
+        $recording->meetingID = $instance->get_meeting_id();
+        $recording->courseid = $instance->get_course_id();
+
+        if ($recording->imported) {
+            $result = $this->send_mock_request('backoffice/recordings', [
+                'meetingID' => $instance->get_meeting_id(),
+                'recordID' => $instance->get_meeting_id(),
+            ]);
             $recordingdata = $servermock->fetch_recording($instance->get_meeting_id(), $instance->get_meeting_id());
             $recording->recording = json_encode($recordingdata);
         }
-        $recording->recordingid = $servermock->add_recording($instance, $data);
+
+        $mockdata = array_merge_recursive((array) $recording, [
+            'meta' => [
+                'isBreakout' => 'false',
+                'bn-presenter-name' => $data['presentername'] ?? 'Fake presenter',
+                'bn-recording-ready-url' => new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', [
+                    'action' => 'recording_ready',
+                    'bigbluebuttonbn' => $instance->get_instance_id()
+                ]),
+                'bbb-recording-description' => $data['description'] ?? '',
+                'bbb-recording-name' => $data['name'] ?? '',
+                'bbb-recording-tags' => $data['tags'] ?? '',
+            ],
+        ]);
+
+        $result = $this->send_mock_request('backoffice/createRecording', [], $mockdata);
+        $recording->recordingid = (string) $result->recordID;
+
         recording::create($recording);
         return $recording;
     }
@@ -218,23 +231,22 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * @return stdClass
      */
     public function create_meeting(array $data): stdClass {
-        $data = (object) $data;
-        $instance = instance::get_from_instanceid($data->instanceid);
+        $instance = instance::get_from_instanceid($data['instanceid']);
 
-        if (property_exists($data, 'groupid')) {
-            $instance->set_group_id($data->groupid);
+        if (array_key_exists('groupid', $data)) {
+            $instance = instance::get_group_instance_from_instance($instance, $data['groupid']);
         }
 
         $meetingid = $instance->get_meeting_id();
 
         // Default room configuration.
-        $roomconfig = (object) [
+        $roomconfig = array_merge($data, [
             'meetingID' => $meetingid,
             'meetingName' => $instance->get_meeting_name(),
             'attendeePW' => $instance->get_viewer_password(),
             'moderatorPW' => $instance->get_moderator_password(),
             'voiceBridge' => $instance->get_voice_bridge(),
-            'metadata' => (object) [
+            'meta' => [
                 'bbb-context' => $instance->get_course()->fullname,
                 'bbb-context-id' => $instance->get_course()->id,
                 'bbb-context-label' => $instance->get_course()->shortname,
@@ -244,14 +256,11 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 'bbb-recording-description' => $instance->get_meeting_description(),
                 'bbb-recording-name' => $instance->get_meeting_name(),
             ],
-        ];
+        ]);
 
-        foreach ((array) $data as $key => $value) {
-            $roomconfig->{$key} = $value;
-        }
+        $this->send_mock_request('backoffice/createMeeting', [], $roomconfig);
 
-        $servermock = $this->get_mocked_server();
-        return $servermock->add_meeting($meetingid, $roomconfig);
+        return (object) $roomconfig;
     }
 
     /**
@@ -262,6 +271,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      */
     public function create_log($record = null, array $options = null) {
         global $DB;
+
         $record = (array) $record;
         $bigbluebuttonbnid = $record['bigbluebuttonbnid'];
         $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid));
@@ -270,5 +280,40 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         ];
         $record = array_merge($default, $record);
         logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $record);
+    }
+
+    /**
+     * Get a URL for a mocked BBB server endpoint.
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @return moodle_url
+     */
+    protected function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
+        return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
+    }
+
+    protected function send_mock_request(string $endpoint, array $params = [], array $mockdata = []): SimpleXMLElement {
+        $url = $this->get_mocked_server_url($endpoint, $params);
+
+        foreach ($mockdata as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $subkey => $subvalue) {
+                    $paramname = "{$key}_{$subkey}";
+                    $url->param($paramname, $subvalue);
+                }
+            } else {
+                $url->param($key, $value);
+            }
+        }
+
+        $curl = new \curl();
+        $result = $curl->get($url->out_omit_querystring(), $url->params());
+
+        return simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+    }
+
+    public function reset_mock(): void {
+        $this->send_mock_request('backoffice/reset');
     }
 }

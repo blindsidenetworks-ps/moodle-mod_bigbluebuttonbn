@@ -44,16 +44,25 @@ class behat_mod_bigbluebuttonbn_generator extends behat_generator_base {
     protected function get_creatable_entities(): array {
         return [
             'recordings' => [
+                'singular' => 'recording',
                 'datagenerator' => 'recording',
-                'required' => ['bigbluebuttonbn', 'meta_bbb-recording-name'],
-                'switchids' => ['bigbluebuttonbn' => 'bigbluebuttonbnid'],
+                'required' => ['bigbluebuttonbn', 'name'],
+                'switchids' => [
+                    'bigbluebuttonbn' => 'bigbluebuttonbnid',
+                    'group' => 'groupid',
+                ],
             ],
-            'log' => [
+            'logs' => [
+                'singular' => 'log',
                 'datagenerator' => 'override',
                 'required' => ['bigbluebuttonbn', 'user'],
-                'switchids' => ['bigbluebuttonbn' => 'bigbluebuttonbnid', 'user' => 'userid'],
+                'switchids' => [
+                    'bigbluebuttonbn' => 'bigbluebuttonbnid',
+                    'user' => 'userid',
+                ],
             ],
-            'meeting' => [
+            'meetings' => [
+                'singular' => 'meeting',
                 'datagenerator' => 'meeting',
                 'required' => [
                     'activity',

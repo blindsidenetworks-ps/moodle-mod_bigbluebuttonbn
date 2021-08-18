@@ -124,4 +124,29 @@ class instance_test extends \advanced_testcase {
             'record' => $record,
         ];
     }
+
+    public function test_get_meeting_id_with_groups(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'course' => $course,
+        ] = $this->get_test_instance();
+
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        $instance = instance::get_from_instanceid($record->id);
+
+        // No group.
+        $this->assertEquals(
+            sprintf("%s-%s-%s[0]", $record->meetingid, $record->course, $record->id),
+            $instance->get_meeting_id(0)
+        );
+
+        // Specified group
+        $this->assertEquals(
+            sprintf("%s-%s-%s[%d]", $record->meetingid, $record->course, $record->id, $group->id),
+            $instance->get_meeting_id($group->id)
+        );
+    }
 }

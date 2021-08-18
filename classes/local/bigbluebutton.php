@@ -79,13 +79,8 @@ class bigbluebutton {
      */
     public static function sanitized_url() {
         $serverurl = trim(config::get('server_url'));
-        if (defined('BEHAT_SITE_RUNNING')) {
-            // TODO Make this a setting.
-            $serverurl = (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/mockedserver.php'))->out(false);
-        }
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
-            // In this case we just return the interesting part of the URL.
-            $serverurl = '';
+        if (defined('BEHAT_SITE_RUNNING') || PHPUNIT_TEST) {
+            $serverurl = TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER;
         }
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
@@ -209,18 +204,6 @@ class bigbluebutton {
      * @return object
      */
     public static function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
-            global $CFG;
-            // TODO: We would need to have an base instance of the the bigbluebutton class then an instance
-            // per type of test (behat, phpunit), this would greatly improve the code here.
-
-            // Here we force import this as it is not through namespace/autoloading.
-            require_once(__DIR__ . '/../../tests/generator/mockedserver.php');
-            $server = new \mod_bigbluebuttonbn\testing\generator\mockedserver();
-            $returnedvalue = $server->query_server($url);
-            $xml = simplexml_load_string($returnedvalue, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-            return $xml;
-        }
         if (extension_loaded('curl')) {
             $response =
                 self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);

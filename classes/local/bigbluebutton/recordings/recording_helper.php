@@ -176,10 +176,10 @@ class recording_helper {
         $recordingsids = array_map(function($r) {
             return $r->recordingid;
         }, $recs);
+
         $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings($recordingsids);
-        /* Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
-        * the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
-        */
+        // Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
+        // the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
         $recordings = array();
         foreach ($recs as $id => $rec) {
             $recordingid = $rec->recordingid;

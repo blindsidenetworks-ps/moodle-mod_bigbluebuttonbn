@@ -33,11 +33,19 @@ Feature: Test the module in group mode.
     And the following "activities" exist:
       | activity        | name           | intro                           | course | idnumber         | type | recordings_imported |
       | bigbluebuttonbn | RoomRecordings | Test Room Recording description | C1     | bigbluebuttonbn1 | 0    | 0                   |
+    And the following "mod_bigbluebuttonbn > meeting" exists:
+      | activity       | RoomRecordings |
+    And the following "mod_bigbluebuttonbn > meetings" exist:
+      | activity       | group |
+      | RoomRecordings | G1    |
+      | RoomRecordings | G2    |
     And the following "mod_bigbluebuttonbn > recordings" exist:
-      | bigbluebuttonbn | meta_bbb-recording-name | Group |
-      | RoomRecordings  | Recording G1            | G1    |
-      | RoomRecordings  | Recording G2            | G2    |
-      | RoomRecordings  | Recording No group      |       |
+      | bigbluebuttonbn | name               | group |
+      | RoomRecordings  | Recording G1       | G1    |
+      | RoomRecordings  | Recording G2       | G2    |
+    And the following "mod_bigbluebuttonbn > recordings" exist:
+      | bigbluebuttonbn | name               |
+      | RoomRecordings  | Recording No group |
 
   @javascript
   Scenario: When I create a BBB activity as a teacher who cannot access all groups,
