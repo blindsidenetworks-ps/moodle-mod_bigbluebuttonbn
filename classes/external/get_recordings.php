@@ -35,9 +35,9 @@ use invalid_parameter_exception;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\plugin;
 
 /**
@@ -126,7 +126,7 @@ class get_recordings extends external_api {
         }
 
         $enabledfeatures = $instance->get_enabled_features();
-        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
+        $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
 
         $tools = explode(',', $tools);
 
@@ -166,9 +166,9 @@ class get_recordings extends external_api {
             }
         }
         $tabledata = [
-            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance),
+            'activity' => bigbluebutton_proxy::view_get_activity_status($instance),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
-            'locale' => plugin::bigbluebuttonbn_get_localcode(),
+            'locale' => plugin::get_localcode(),
             'profile_features' => $typeprofiles[0]['features'],
             'columns' => [],
             'data' => '',

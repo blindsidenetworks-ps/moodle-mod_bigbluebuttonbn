@@ -76,7 +76,7 @@ class import_view implements renderable, templatable {
      * @return object
      */
     public function export_for_template(renderer_base $output) {
-        $courses = roles::bigbluebuttonbn_import_get_courses_for_select($this->destinationinstance);
+        $courses = roles::import_get_courses_for_select($this->destinationinstance);
 
         $context = (object) [
             'bbboriginid' => $this->destinationinstance->get_instance_id(),

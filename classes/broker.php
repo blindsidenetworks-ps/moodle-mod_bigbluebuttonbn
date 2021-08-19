@@ -23,130 +23,123 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\local;
+namespace mod_bigbluebuttonbn;
 
-use coding_exception;
 use Exception;
+use coding_exception;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
-/**
- * The broker routines
- *
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class broker {
 
+    /** @var array List of required params */
+    protected $requiredparams = [
+        'server_ping' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The meetingID must be specified.'
+        ],
+        'meeting_info' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The meetingID must be specified.'
+        ],
+        'meeting_end' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The meetingID must be specified.'
+        ],
+        'recording_play' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_info' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_links' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_publish' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_unpublish' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_delete' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_protect' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_unprotect' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_edit' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.',
+            'meta' => 'A meta parameter should be included'
+        ],
+        'recording_import' => [
+            'callback' => 'This request must include a javascript callback.',
+            'id' => 'The recordingID must be specified.'
+        ],
+        'recording_ready' => [
+            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
+            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
+        ],
+        'recording_list_table' => [
+            'id' => 'The Bigbluebutton activity id must be specified.',
+            'callback' => 'This request must include a javascript callback.',
+        ],
+        'meeting_events' => [
+            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
+        ],
+        'completion_validate' => [
+            'callback' => 'This request must include a javascript callback.',
+            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
+        ],
+    ];
+
     /**
-     * Helper for validating the parameters received.
+     * Validate the supplied list of parameters, providing feedback about any missing or incorrect values.
      *
      * @param array $params
-     *
-     * @return string
+     * @return null|string
      */
-    public static function validate_parameters($params) {
-        $action = strtolower($params['action']);
-        $requiredparams = self::required_parameters();
-        if (!array_key_exists($action, $requiredparams)) {
-            return 'Action ' . $params['action'] . ' can not be performed.';
+    public function validate_parameters(array $params): ?string {
+        if (!array_key_exists('action', $params)) {
+            return 'No action specified';
         }
-        return self::validate_parameters_message($params, $requiredparams[$action]);
+
+        $action = strtolower($params['action']);
+        if (!array_key_exists($action, $this->requiredparams)) {
+            return "Action {$params['action']} can not be performed.";
+        }
+        return $this->validate_parameters_message($params, $this->requiredparams[$action]);
     }
 
     /**
-     * Helper for responding after the parameters received are validated.
+     * Check whether the specified parameter is valid.
      *
      * @param array $params
      * @param array $requiredparams
-     *
-     * @return string
+     * @return null|string
      */
-    protected static function validate_parameters_message($params, $requiredparams) {
+    protected static function validate_parameters_message(array $params, array $requiredparams): ?string {
         foreach ($requiredparams as $param => $message) {
             if (!array_key_exists($param, $params) || $params[$param] == '') {
                 return $message;
             }
         }
-    }
 
-    /**
-     * Helper for definig rules for validating required parameters.
-     */
-    protected static function required_parameters() {
-        $params['server_ping'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The meetingID must be specified.'
-        ];
-        $params['meeting_info'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The meetingID must be specified.'
-        ];
-        $params['meeting_end'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The meetingID must be specified.'
-        ];
-        $params['recording_play'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_info'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_links'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_publish'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_unpublish'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_delete'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_protect'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_unprotect'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_edit'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.',
-            'meta' => 'A meta parameter should be included'
-        ];
-        $params['recording_import'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'id' => 'The recordingID must be specified.'
-        ];
-        $params['recording_ready'] = [
-            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
-            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
-        ];
-        $params['recording_list_table'] = [
-            'id' => 'The Bigbluebutton activity id must be specified.',
-            'callback' => 'This request must include a javascript callback.',
-        ];
-        $params['meeting_events'] = [
-            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
-        ];
-        $params['completion_validate'] = [
-            'callback' => 'This request must include a javascript callback.',
-            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
-        ];
-        return $params;
+        // Everything is valid.
+        return null;
     }
 
     /**
@@ -163,7 +156,7 @@ class broker {
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         foreach ($users as $user) {
             // Enqueue a task for processing the completion.
-            bigbluebutton::bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $user->id);
+            bigbluebutton_proxy::enqueue_completion_update($bigbluebuttonbn, $user->id);
         }
     }
 }

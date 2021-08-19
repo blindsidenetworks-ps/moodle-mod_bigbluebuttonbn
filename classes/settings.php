@@ -35,7 +35,6 @@ use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
 use lang_string;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
@@ -158,7 +157,7 @@ class settings {
                 'bigbluebuttonbn_server_url',
                 get_string('config_server_url', 'bigbluebuttonbn'),
                 get_string('config_server_url_description', 'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
+                config::DEFAULT_SERVER_URL,
                 PARAM_RAW
             );
             $this->add_conditional_element(
@@ -170,7 +169,7 @@ class settings {
                 'bigbluebuttonbn_shared_secret',
                 get_string('config_shared_secret', 'bigbluebuttonbn'),
                 get_string('config_shared_secret_description', 'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+                config::DEFAULT_SHARED_SECRET,
                 PARAM_RAW
             );
             $this->add_conditional_element(
@@ -705,7 +704,7 @@ class settings {
             $participantsettings->add($item);
 
             // UI for 'participants' feature.
-            $roles = roles::bigbluebuttonbn_get_roles(null, false);
+            $roles = roles::get_roles(null, false);
             $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
             $item = new admin_setting_configmultiselect(
                 'bigbluebuttonbn_participant_moderator_default',

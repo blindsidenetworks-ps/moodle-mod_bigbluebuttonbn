@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * BigBlueButtonBN internal API for completion
+ * BigBlueButtonBN internal API for meeting
  *
  * @package   mod_bigbluebuttonbn
  * @category  external
@@ -25,23 +25,28 @@
 
 namespace mod_bigbluebuttonbn\external;
 
+use core\notification;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
+use restricted_context_exception;
 
 /**
- * External service to validate completion.
+ * External service to end a meeting.
  *
  * @package   mod_bigbluebuttonbn
  * @category  external
  * @copyright 2018 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class completion_validate extends external_api {
+class can_join extends external_api {
     /**
      * Returns description of method parameters
      *
@@ -49,52 +54,46 @@ class completion_validate extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED)
         ]);
     }
 
     /**
-     * Mark activity as complete
+     * Updates a recording
      *
      * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
+     * @param int $groupid the groupid (either 0 or the groupid)
      * @return array (empty array for now)
+     * @throws \restricted_context_exception
      */
     public static function execute(
-        int $bigbluebuttonbnid
+        int $bigbluebuttonbnid,
+        int $groupid
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
+            'cmid' => $cmid,
         ] = self::validate_parameters(self::execute_parameters(), [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
+            'cmid' => $cmid,
         ]);
 
-        // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        $context = $instance->get_context();
+        $canjoin = bigbluebutton_proxy::can_join_meeting($cmid);
+        $canjoin['cmid'] = $cmid;
 
-        // Validate that the user has access to this activity and to manage recordings.
-        self::validate_context($context);
-
-        // Get list with all the users enrolled in the course.
-        list($sort, $sqlparams) = users_order_by_sql('u');
-        // TODO : check for access / role here.
-        $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
-        foreach ($users as $user) {
-            // Enqueue a task for processing the completion.
-            bigbluebutton_proxy::enqueue_completion_event( $instance->get_instance_data(), $user->id);
-        }
-        // We might want to return a status here or some warnings.
-        return [];
+        return $canjoin;
     }
 
     /**
      * Describe the return structure of the external service.
      *
      * @return external_single_structure
-     * @since Moodle 3.0
+     * @since Moodle 3.3
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure([]);
+        return new external_single_structure([
+            'can_join' => new external_value(PARAM_BOOL, 'Can join session'),
+            'message' => new external_value(PARAM_RAW, 'Message if we cannot join', VALUE_OPTIONAL),
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+        ]);
     }
 }

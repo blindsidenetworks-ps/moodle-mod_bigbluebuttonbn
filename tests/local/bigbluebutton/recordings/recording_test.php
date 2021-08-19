@@ -26,9 +26,6 @@
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bbb_constants;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy provider tests class.
@@ -52,17 +49,17 @@ class recording_test extends \advanced_testcase {
         $model = [
             [
                 'courseindex' => 0,
-                'type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
+                'type' => instance::TYPE_ALL,
                 'recordingcount' => 2,
             ],
             [
                 'courseindex' => 0,
-                'type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
+                'type' => instance::TYPE_ALL,
                 'recordingcount' => 3,
             ],
             [
                 'courseindex' => 1,
-                'type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
+                'type' => instance::TYPE_RECORDING_ONLY,
                 'recordingcount' => 3,
             ],
         ];
@@ -143,7 +140,7 @@ class recording_test extends \advanced_testcase {
 
         $activity = $plugingenerator->create_instance([
             'course' => $testcourse->id,
-            'type' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
+            'type' => instance::TYPE_ALL,
             'name' => 'Example',
         ]);
         $plugingenerator->create_meeting([
@@ -185,14 +182,14 @@ class recording_test extends \advanced_testcase {
         $instance1->set_group_id($group1->id);
         $recordings = recording_helper::get_recordings_for_instance($instance1);
         $this->assertCount(1, $recordings);
-        $this->assertEquals($recordings[$recording1->recordingid]->recording['meta_bbb-recording-name'], 'Group 1 Recording 1');
+        $this->assertEquals('Group 1 Recording 1', $recordings[$recording1->recordingid]->recording['meta_bbb-recording-name']);
 
         $this->setUser($student2);
         $instance2 = instance::get_from_instanceid($activity->id);
         $instance2->set_group_id($group2->id);
         $recordings = recording_helper::get_recordings_for_instance($instance2);
         $this->assertCount(1, $recordings);
-        $this->assertEquals($recordings[$recording2->recordingid]->recording['meta_bbb-recording-name'], 'Group 2 Recording 1');
+        $this->assertEquals('Group 2 Recording 1', $recordings[$recording2->recordingid]->recording['meta_bbb-recording-name']);
 
         $this->setUser($student3);
         $instance3 = instance::get_from_instanceid($activity->id);

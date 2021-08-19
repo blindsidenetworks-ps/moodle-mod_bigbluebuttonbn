@@ -24,8 +24,8 @@
  */
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
-defined('MOODLE_INTERNAL') || die();
 
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use stdClass;
 
 /**
@@ -100,7 +100,7 @@ class recording {
             $rec->recording = json_decode($rec->recording, true);
         } else {
             if ($fetchremote) {
-                $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
+                $bbbrecordings = recording_proxy::fetch_recordings([$rec->recordingid]);
                 $rec->recording = $bbbrecordings[$rec->recordingid] ?? $rec->recording;
             }
         }
@@ -134,7 +134,7 @@ class recording {
                 $rec->recording = json_decode($rec->recording, true);
             } else {
                 if ($fetchremote) {
-                    $bbbrecording = recording_proxy::bigbluebutton_fetch_recordings([$rec->recordingid]);
+                    $bbbrecording = recording_proxy::fetch_recordings([$rec->recordingid]);
                     $recording->recording = $bbbrecording[$rec->recordingid] ?? $recording->recording;
                 }
             }
@@ -173,9 +173,7 @@ class recording {
             // (No need to update imported links as the update only affects the actual recording).
             // Execute update on actual recording.
             $meta = is_string($recordingdata->recording) ? json_decode($recordingdata->recording) : $recordingdata->recording;
-            recording_proxy::bigbluebutton_update_recording(
-                $recordingdata->recordingid,
-                $meta);
+            recording_proxy::update_recording($recordingdata->recordingid, (array) $meta);
         }
         return true;
     }

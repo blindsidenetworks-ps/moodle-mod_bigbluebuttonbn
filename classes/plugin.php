@@ -53,7 +53,7 @@ abstract class plugin {
      * @param  string   $key        Key to be created/updated
      * @param  variable $value      Default value to be set
      */
-    public static function bigbluebuttonbn_cache_set($name, $key, $value) {
+    public static function cache_set($name, $key, $value) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
         $cache->set($key, $value);
     }
@@ -67,7 +67,7 @@ abstract class plugin {
      *
      * @return mixed key value
      */
-    public static function bigbluebuttonbn_cache_get($name, $key, $default = null) {
+    public static function cache_get($name, $key, $default = null) {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
         $result = $cache->get($key);
         if (!empty($result)) {
@@ -81,8 +81,8 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_localcode() {
-        $locale = self::bigbluebuttonbn_get_locale();
+    public static function get_localcode() {
+        $locale = self::get_locale();
         return substr($locale, 0, strpos($locale, '_'));
     }
 
@@ -91,7 +91,7 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_locale() {
+    public static function get_locale() {
         $lang = get_string('locale', 'core_langconfig');
         return substr($lang, 0, strpos($lang, '.'));
     }
@@ -104,7 +104,7 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_html2text($html, $len = 0) {
+    public static function html2text($html, $len = 0) {
         $text = strip_tags($html);
         $text = str_replace('&nbsp;', ' ', $text);
         $textlen = strlen($text);
@@ -120,7 +120,7 @@ abstract class plugin {
      *
      * @return boolean
      */
-    public static function bigbluebuttonbn_is_bn_server() {
+    public static function is_bn_server() {
         if (config::get('bn_server')) {
             return true;
         }
@@ -139,7 +139,7 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_generate_nonce() {
+    public static function generate_nonce() {
         $mt = microtime();
         $rand = mt_rand();
         return md5($mt . $rand);
@@ -153,7 +153,7 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_random_password($length = 8, $unique = "") {
+    public static function random_password($length = 8, $unique = "") {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         do {
             $password = substr(str_shuffle($chars), 0, $length);
@@ -169,7 +169,7 @@ abstract class plugin {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_error_key($messagekey, $defaultkey = null) {
+    public static function get_error_key($messagekey, $defaultkey = null) {
         if ($messagekey == 'checksumError') {
             return 'index_error_checksum';
         }
@@ -186,7 +186,7 @@ abstract class plugin {
      *
      * @return string containing the tags separated by commas
      */
-    public static function bigbluebuttonbn_get_tags($id) {
+    public static function get_tags($id) {
         if (class_exists('core_tag_tag')) {
             return implode(',', core_tag_tag::get_item_tags_array('core', 'course_modules', $id));
         }

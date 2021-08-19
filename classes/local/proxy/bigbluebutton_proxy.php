@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn local/bigbluebutton.
+ * The bigbluebutton proxy class.
+ *
+ * This class acts as a proxy between Moodle and the BigBlueButton API server,
+ * and handles all requests relating to the server and meetings.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -23,12 +26,11 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\local;
+namespace mod_bigbluebuttonbn\local\proxy;
 
+use Exception;
 use cache;
 use completion_info;
-use curl;
-use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
@@ -39,80 +41,7 @@ use moodle_exception;
 use moodle_url;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Wrapper for executing http requests on a BigBlueButton server.
- *
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class bigbluebutton {
-
-    /**
-     * Returns the right URL for the action specified.
-     *
-     * @param string $action
-     * @param array $data
-     * @param array $metadata
-     * @return string
-     */
-    public static function action_url($action = '', $data = array(), $metadata = array()) {
-        $baseurl = self::sanitized_url() . $action . '?';
-        $metadata = array_combine(
-            array_map(
-                function($k) {
-                    return 'meta_' . $k;
-                }
-                , array_keys($metadata)
-            ),
-            $metadata
-        );
-        $params = http_build_query($data + $metadata, '', '&');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
-    }
-
-    /**
-     * Makes sure the url used doesn't is in the format required.
-     *
-     * @return string
-     */
-    public static function sanitized_url() {
-        $serverurl = trim(config::get('server_url'));
-        if (defined('BEHAT_SITE_RUNNING') || PHPUNIT_TEST) {
-            $serverurl = TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER;
-        }
-        if (substr($serverurl, -1) == '/') {
-            $serverurl = rtrim($serverurl, '/');
-        }
-        if (substr($serverurl, -4) == '/api') {
-            $serverurl = rtrim($serverurl, '/api');
-        }
-        return $serverurl . '/api/';
-    }
-
-    /**
-     * Makes sure the shared_secret used doesn't have trailing white characters.
-     *
-     * @return string
-     */
-    public static function sanitized_secret() {
-        return trim(config::get('shared_secret'));
-    }
-
-    /**
-     * Returns the BigBlueButton server root URL.
-     *
-     * @return string
-     */
-    public static function root() {
-        $pserverurl = parse_url(trim(config::get('server_url')));
-        $pserverurlport = "";
-        if (isset($pserverurl['port'])) {
-            $pserverurlport = ":" . $pserverurl['port'];
-        }
-        return $pserverurl['scheme'] . "://" . $pserverurl['host'] . $pserverurlport . "/";
-    }
+class bigbluebutton_proxy extends proxy_base {
 
     /**
      * Can join meeting.
@@ -121,15 +50,14 @@ class bigbluebutton {
      * @return array|bool[]
      */
     public static function can_join_meeting($cmid) {
-        $canjoin = array('can_join' => false, 'message' => '');
-
-        $viewinstance = view::validator($cmid, null);
-        if ($viewinstance) {
-            $instance = instance::get_from_cmid($cmid);
-            $info = meeting::get_meeting_info_for_instance($instance);
-            $canjoin = $info->canjoin;
+        if ($instance = instance::get_from_cmid($cmid)) {
+            return meeting::get_meeting_info_for_instance($instance)->can_join();;
         }
-        return $canjoin;
+
+        return [
+            'can_join' => false,
+            'message' => '',
+        ];
     }
 
     /**
@@ -145,155 +73,88 @@ class bigbluebutton {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_join_url(
-        $meetingid,
-        $username,
-        $pw,
-        $logouturl,
-        $configtoken = null,
-        $userid = null,
-        $createtime = null
-    ) {
-        $data = ['meetingID' => $meetingid,
+    public static function get_join_url(
+        string $meetingid,
+        string $username,
+        string $pw,
+        string $logouturl,
+        string $configtoken = null,
+        string $userid = null,
+        string $createtime = null
+    ): ?string {
+        $data = [
+            'meetingID' => $meetingid,
             'fullName' => $username,
             'password' => $pw,
             'logoutURL' => $logouturl,
         ];
+
         if (!is_null($configtoken)) {
             $data['configToken'] = $configtoken;
         }
+
         if (!is_null($userid)) {
             $data['userID'] = $userid;
         }
+
         if (!is_null($createtime)) {
             $data['createTime'] = $createtime;
         }
-        return static::action_url('join', $data);
+
+        return self::action_url('join', $data);
     }
 
     /**
      * Perform api request on BBB.
      *
-     * @return string
+     * @return null|string
      */
-    public static function bigbluebuttonbn_get_server_version() {
+    public static function get_server_version(): ?string {
         $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
         $serverversion = $cache->get('serverversion');
+
         if (!$serverversion) {
-            $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-                self::action_url()
-            );
-            if ($xml && $xml->returncode == 'SUCCESS') {
-                $cache->set('serverversion', (string) $xml->version);
-                return (double) $xml->version;
-            }
-        } else {
-            return (double) $serverversion;
-        }
-        return null;
-    }
-
-    /**
-     * Perform api request on BBB and wraps the response in an XML object
-     *
-     * @param string $url
-     * @param string $method
-     * @param string $data
-     * @param string $contenttype
-     *
-     * @return object
-     */
-    public static function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
-        if (extension_loaded('curl')) {
-            $response =
-                self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
-            if (!$response) {
-                debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
+            $xml = self::fetch_endpoint_xml('');
+            if (!$xml || $xml->returncode != 'SUCCESS') {
                 return null;
             }
-            $previous = libxml_use_internal_errors(true);
-            try {
-                $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-                return $xml;
-            } catch (Exception $e) {
-                libxml_use_internal_errors($previous);
-                $error = 'Caught exception: ' . $e->getMessage();
-                debugging($error, DEBUG_DEVELOPER);
+
+            if (!isset($xml->version)) {
                 return null;
             }
-        }
-        // Alternative request non CURL based.
-        $previous = libxml_use_internal_errors(true);
-        try {
-            $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-            return $response;
-        } catch (Exception $e) {
-            $error = 'Caught exception: ' . $e->getMessage();
-            debugging($error, DEBUG_DEVELOPER);
-            libxml_use_internal_errors($previous);
-            return null;
-        }
-    }
 
-    /**
-     * Perform api request on BBB using CURL and wraps the response in an XML object
-     *
-     * @param string $url
-     * @param string $method
-     * @param string $data
-     * @param string $contenttype
-     *
-     * @return object|bool|string
-     */
-    public static function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null,
-        $contenttype = 'text/xml') {
-        global $CFG;
-        require_once($CFG->libdir . '/filelib.php');
-        $c = new curl();
-        $c->setopt(array('SSL_VERIFYPEER' => true));
-        if ($method == 'POST') {
-            if (is_null($data) || is_array($data)) {
-                return $c->post($url);
-            }
-            $options = array();
-            $options['CURLOPT_HTTPHEADER'] = array(
-                'Content-Type: ' . $contenttype,
-                'Content-Length: ' . strlen($data),
-                'Content-Language: en-US',
-            );
+            $serverversion = (string) $xml->version;
+            $cache->set('serverversion', $serverversion);
+        }
 
-            return $c->post($url, $data, $options);
-        }
-        if ($method == 'HEAD') {
-            $c->head($url, array('followlocation' => true, 'timeout' => 1));
-            return $c->get_info();
-        }
-        return $c->get($url);
+        return (double) $serverversion;
     }
 
     /**
      * Helper for getting the owner userid of a bigbluebuttonbn instance.
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
-     *
      * @return integer ownerid (a valid user id or null if not registered/found)
      */
-    public static function bigbluebuttonbn_instance_ownerid($bigbluebuttonbn) {
+    public static function get_instance_ownerid($bigbluebuttonbn) {
         global $DB;
-        $filters = array('bigbluebuttonbnid' => $bigbluebuttonbn->id, 'log' => 'Add');
-        $ownerid = (integer) $DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
-        return $ownerid;
+
+        $filters = [
+            'bigbluebuttonbnid' => $bigbluebuttonbn->id,
+            'log' => 'Add',
+        ];
+
+        return (integer) $DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
     }
 
     /**
      * Helper evaluates if a voicebridge number is unique.
      *
-     * @param integer $instance
-     * @param integer $voicebridge
-     *
+     * @param int $instance
+     * @param int $voicebridge
      * @return string
      */
-    public static function bigbluebuttonbn_voicebridge_unique($instance, $voicebridge) {
+    public static function is_voicebridge_number_unique(int $instance, int $voicebridge): bool {
         global $DB;
         if ($voicebridge == 0) {
             return true;
@@ -312,10 +173,9 @@ class bigbluebutton {
      * Helper function validates a remote resource.
      *
      * @param string $url
-     *
      * @return boolean
      */
-    public static function bigbluebuttonbn_is_valid_resource($url) {
+    public static function is_remote_resource_valid(string $url): bool {
         $urlhost = parse_url($url, PHP_URL_HOST);
         $serverurlhost = parse_url(\mod_bigbluebuttonbn\local\config::get('server_url'), PHP_URL_HOST);
         // Skip validation when the recording URL host is the same as the configured BBB server.
@@ -323,19 +183,19 @@ class bigbluebutton {
             return true;
         }
         // Skip validation when the recording URL was already validated.
-        $validatedurls = plugin::bigbluebuttonbn_cache_get('recordings_cache', 'validated_urls', array());
+        $validatedurls = plugin::cache_get('recordings_cache', 'validated_urls', array());
         if (array_key_exists($urlhost, $validatedurls)) {
             return $validatedurls[$urlhost];
         }
         // Validate the recording URL.
         $validatedurls[$urlhost] = true;
-        $curlinfo = self::bigbluebuttonbn_wrap_xml_load_file_curl_request($url, 'HEAD');
+        $curlinfo = self::wrap_xml_load_file_curl_request($url, 'HEAD');
         if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
             $error = "Resources hosted by " . $urlhost . " are unreachable. Server responded with code " . $curlinfo['http_code'];
             debugging($error, DEBUG_DEVELOPER);
             $validatedurls[$urlhost] = false;
         }
-        plugin::bigbluebuttonbn_cache_set('recordings_cache', 'validated_urls', $validatedurls);
+        plugin::cache_set('recordings_cache', 'validated_urls', $validatedurls);
         return $validatedurls[$urlhost];
     }
 
@@ -344,10 +204,9 @@ class bigbluebutton {
      *
      * @param object $bigbluebuttonbn
      * @param string $userid
-     *
      * @return void
      */
-    public static function bigbluebuttonbn_enqueue_completion_update($bigbluebuttonbn, $userid) {
+    public static function enqueue_completion_event($bigbluebuttonbn, $userid): void {
         try {
             // Create the instance of completion_update_state task.
             $task = new \mod_bigbluebuttonbn\task\completion_update_state();
@@ -371,10 +230,9 @@ class bigbluebutton {
      *
      * @param object $bigbluebuttonbn
      * @param string $userid
-     *
      * @return void
      */
-    public static function bigbluebuttonbn_completion_update_state($bigbluebuttonbn, $userid) {
+    public static function update_completion_state($bigbluebuttonbn, $userid) {
         global $CFG;
         require_once($CFG->libdir . '/completionlib.php');
         list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
@@ -399,18 +257,18 @@ class bigbluebutton {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_instance_type_profiles() {
+    public static function get_instance_type_profiles() {
         $instanceprofiles = array(
-            bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL,
+            instance::TYPE_ALL => array('id' => instance::TYPE_ALL,
                 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
                 'features' => array('all')),
-            bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY,
+            instance::TYPE_ROOM_ONLY => array('id' => instance::TYPE_ROOM_ONLY,
                 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
                 'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                     'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                     'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
                     'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
-            bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY => array('id' => bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY,
+            instance::TYPE_RECORDING_ONLY => array('id' => instance::TYPE_RECORDING_ONLY,
                 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
                 'features' => array('showrecordings', 'importrecordings', 'availabilityconditionsheader')),
         );
@@ -426,15 +284,15 @@ class bigbluebutton {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_instance_type_profiles_create_allowed($room, $recording) {
-        $profiles = self::bigbluebuttonbn_get_instance_type_profiles();
+    public static function get_instance_type_profiles_create_allowed($room, $recording) {
+        $profiles = self::get_instance_type_profiles();
         if (!$room) {
-            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]);
-            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL]);
+            unset($profiles[instance::TYPE_ROOM_ONLY]);
+            unset($profiles[instance::TYPE_ALL]);
         }
         if (!$recording) {
-            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]);
-            unset($profiles[bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL]);
+            unset($profiles[instance::TYPE_RECORDING_ONLY]);
+            unset($profiles[instance::TYPE_ALL]);
         }
         return $profiles;
     }
@@ -447,7 +305,7 @@ class bigbluebutton {
      *
      * @return array
      */
-    public static function bigbluebuttonbn_get_instance_profiles_array($profiles = []) {
+    public static function get_instance_profiles_array($profiles = []) {
         $profilesarray = array();
         foreach ($profiles as $key => $profile) {
             $profilesarray[$profile['id']] = $profile['name'];
@@ -461,7 +319,7 @@ class bigbluebutton {
      * @param instance $instance
      * @return string
      */
-    public static function bigbluebuttonbn_view_get_activity_status($instance) {
+    public static function view_get_activity_status($instance) {
         $now = time();
         if (!empty($instance->get_instance_var('openingtime')) && $now < $instance->get_instance_var('openingtime')) {
             // The activity has not been opened.
@@ -482,7 +340,7 @@ class bigbluebutton {
      */
     public static function require_working_server(instance $instance): void {
         try {
-            self::bigbluebuttonbn_get_server_version();
+            self::get_server_version();
         } catch (server_not_available_exception $e) {
             self::handle_server_not_available($instance);
         }
@@ -544,7 +402,12 @@ class bigbluebutton {
      * @throws bigbluebutton_exception
      * @throws server_not_available_exception
      */
-    public static function create_meeting(array $data, array $metadata, $presentationname = null, $presentationurl = null) {
+    public static function create_meeting(
+        array $data,
+        array $metadata,
+        ?string $presentationname = null,
+        ?string $presentationurl = null
+    ): array {
         $createmeetingurl = self::action_url('create', $data, $metadata);
         $method = 'GET';
         $payload = null;
@@ -554,20 +417,23 @@ class bigbluebutton {
                 $presentationurl . "' /></module></modules>";
         }
 
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file($createmeetingurl, $method, $payload);
+        $xml = self::wrap_xml_load_file($createmeetingurl, $method, $payload);
         self::assert_returned_xml($xml);
+
         if (empty($xml->meetingID)) {
             throw new bigbluebutton_exception('general_error_cannot_create_meeting', plugin::COMPONENT);
         }
+
         if ($xml->hasBeenForciblyEnded === 'true') {
             throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
         }
-        return array(
+
+        return [
             'meetingID' => (string) $xml->meetingID,
             'internalMeetingID' => (string) $xml->internalMeetingID,
             'attendeePW' => (string) $xml->attendeePW,
             'moderatorPW' => (string) $xml->moderatorPW
-        );
+        ];
     }
 
     /**
@@ -575,12 +441,9 @@ class bigbluebutton {
      *
      * @param string $meetingid
      * @return array
-     * @throws bigbluebutton_exception
      */
-    public static function get_meeting_info(string $meetingid) {
-        $xmlinfo = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url('getMeetingInfo', ['meetingID' => $meetingid])
-        );
+    public static function get_meeting_info(string $meetingid): array {
+        $xmlinfo = self::fetch_endpoint_xml('getMeetingInfo', ['meetingID' => $meetingid]);
         self::assert_returned_xml($xmlinfo, $meetingid);
         return (array) $xmlinfo;
     }
@@ -590,12 +453,9 @@ class bigbluebutton {
      *
      * @param string $meetingid
      * @param string $modpw
-     * @throws bigbluebutton_exception
      */
-    public static function end_meeting($meetingid, $modpw) {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url('end', ['meetingID' => $meetingid, 'password' => $modpw])
-        );
+    public static function end_meeting(string $meetingid, string $modpw): void {
+        $xml = self::fetch_endpoint_xml('end', ['meetingID' => $meetingid, 'password' => $modpw]);
         self::assert_returned_xml($xml, $meetingid);
     }
 
@@ -603,16 +463,24 @@ class bigbluebutton {
      * Get recordings from BBB.
      *
      * @param array $meetingsids
+     * @return array
      * @throws bigbluebutton_exception
      */
-    public static function get_recordings_from_meetings($meetingsids) {
-        $url = self::action_url('getRecordings', ['meetingID' => implode(',', $meetingsids)]);
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
-        self::assert_returned_xml($xml, join(',', $meetingsids));
+    public static function get_recordings_from_meetings(array $meetingsids): array {
+        $ids = implode(',', $meetingsids);
+        $xml = self::fetch_endpoint_xml('getRecordings', ['meetingID' => $ids]);
+        self::assert_returned_xml($xml, $ids);
+
         if (!isset($xml->recordings)) {
-            throw new bigbluebutton_exception('general_error_cannot_get_recordings',
-                plugin::COMPONENT, '', null, var_dump($meetingsids));
+            throw new bigbluebutton_exception(
+                'general_error_cannot_get_recordings',
+                plugin::COMPONENT,
+                '',
+                null,
+                var_export($meetingsids, true)
+            );
         }
+
         return iterator_to_array($xml->recordings->children(), false);
     }
 
@@ -620,16 +488,24 @@ class bigbluebutton {
      * Get recordings from BBB.
      *
      * @param array $recordingsids
+     * @return array
      * @throws bigbluebutton_exception
      */
-    public static function get_recordings($recordingsids) {
-        $url = self::action_url('getRecordings', ['recordID' => implode(',', $recordingsids)]);
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file($url);
-        self::assert_returned_xml($xml, join(',', $recordingsids));
+    public static function get_recordings($recordingsids): array {
+        $ids = implode(',', $recordingsids);
+        $url = self::fetch_endpoint_xml('getRecordings', ['recordID' => $ids]);
+        self::assert_returned_xml($xml, $ids);
+
         if (!isset($xml->recordings)) {
-            throw new bigbluebutton_exception('general_error_cannot_get_recordings',
-                plugin::COMPONENT, '', null, var_dump($recordingsids));
+            throw new bigbluebutton_exception(
+                'general_error_cannot_get_recordings',
+                plugin::COMPONENT,
+                '',
+                null,
+                var_export($recordingsids, true)
+            );
         }
+
         return iterator_to_array($xml->recordings->children(), false);
     }
 
@@ -640,63 +516,22 @@ class bigbluebutton {
      * @param bool $publish
      * @throws moodle_exception
      */
-    public static function publish_recording($recordingid, $publish) {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url('publishRecordings',
-                ['recordID' => $recordingid, 'publish' => $publish])
-        );
+    public static function publish_recording(int $recordingid, bool $publish): void {
+        $xml = self::fetch_endpoint_xml('publishRecordings', [
+            'recordID' => $recordingid,
+            'publish' => $publish,
+        ]);
         self::assert_returned_xml($xml);
     }
 
     /**
-     * Delete recording
+     * Delete the specified recording by recordingid.
      *
      * @param int $recordingid
-     * @throws bigbluebutton_exception
      */
-    public static function delete_recording($recordingid) {
-        $xml = self::bigbluebuttonbn_wrap_xml_load_file(
-            self::action_url('deleteRecordings',
-                ['recordID' => $recordingid])
-        );
+    public static function delete_recording($recordingid): void {
+        $xml = self::fetch_endpoint_xml('deleteRecordings', ['recordID' => $recordingid]);
         self::assert_returned_xml($xml);
-    }
-
-    /**
-     * Sometimes the server sends back some error and errorKeys that
-     * can be converted to Moodle error messages
-     */
-    const MEETING_ERROR = [
-        'checksumError' => 'index_error_checksum',
-        'notFound' => 'general_error_not_found',
-        'maxConcurrent' => 'view_error_max_concurrent',
-    ];
-
-    /**
-     * Throw an exception if there is a problem in the returned XML value
-     *
-     * @param \SimpleXMLElement $xml
-     * @param string $additionaldetails
-     * @throws bigbluebutton_exception
-     * @throws server_not_available_exception
-     */
-    protected static function assert_returned_xml($xml, $additionaldetails = '') {
-        if (empty($xml)) {
-            global $CFG;
-            throw new server_not_available_exception('general_error_no_answer', plugin::COMPONENT,
-                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
-        }
-        if ((string) $xml->returncode === 'FAILED') {
-            $messagekey = (string) $xml->messageKey ?? '';
-            $messagedetails = (string) $xml->message ?? '';
-            $messagedetails .= $additionaldetails ? " ($additionaldetails) " : '';
-            throw new bigbluebutton_exception(
-                (empty($messagekey) || empty(self::MEETING_ERROR[$messagekey])) ?
-                    'general_error_unable_connect' : $messagekey,
-                plugin::COMPONENT,
-                '',
-                $messagedetails);
-        }
     }
 
 }

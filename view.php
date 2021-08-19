@@ -26,9 +26,9 @@
  */
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\output\view_page;
 use mod_bigbluebuttonbn\plugin;
 
@@ -60,13 +60,10 @@ if ($groupid) {
     $instance->set_group_id($groupid);
 }
 
-// In locallib.
-// TODO Move to \mod_bigbluebuttonbn\log::log_event().
-logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
-// END TODO.
+logger::log_instance_viewed($instance);
 
 // Require a working server.
-bigbluebutton::require_working_server($instance);
+bigbluebutton_proxy::require_working_server($instance);
 
 // Mark viewed by user (if required).
 $completion = new completion_info($course);

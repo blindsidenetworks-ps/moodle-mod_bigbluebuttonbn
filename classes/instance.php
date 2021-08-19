@@ -26,11 +26,10 @@ namespace mod_bigbluebuttonbn;
 
 use cm_info;
 use context_module;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use moodle_url;
 use stdClass;
 
@@ -42,6 +41,16 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class instance {
+
+    /** @var int Defines an instance type that includes room and recordings */
+    public const TYPE_ALL = 0;
+
+    /** @var int Defines an instance type that inclueds only room */
+    public const TYPE_ROOM_ONLY = 1;
+
+    /** @var int Defines an instance type that inclueds only recordings */
+    public const TYPE_RECORDING_ONLY = 2;
+
     /** @var cm_info The cm_info object relating to the instance */
     protected $cm;
 
@@ -83,9 +92,9 @@ class instance {
      *
      * @param self $originalinstance
      * @param int $groupid
-     * @return self
+     * @return null|self
      */
-    public static function get_group_instance_from_instance(self $originalinstance, int $groupid): self {
+    public static function get_group_instance_from_instance(self $originalinstance, int $groupid): ?self {
         return new self(
             $originalinstance->get_cm(),
             $originalinstance->get_course(),
@@ -98,9 +107,9 @@ class instance {
      * Get the instance information from an instance id.
      *
      * @param int $instanceid The id from the bigbluebuttonbn table
-     * @return self
+     * @return null|self
      */
-    public static function get_from_instanceid(int $instanceid): self {
+    public static function get_from_instanceid(int $instanceid): ?self {
         global $DB;
 
         $coursetable = new \core\dml\table('course', 'c', 'c');
@@ -128,6 +137,10 @@ EOF;
             'instanceid' => $instanceid,
         ]);
 
+        if (empty($result)) {
+            return null;
+        }
+
         $course = $coursetable->extract_from_result($result);
         $instancedata = $bbbtable->extract_from_result($result);
         $cm = get_fast_modinfo($course)->instances['bigbluebuttonbn'][$instancedata->id];
@@ -139,9 +152,9 @@ EOF;
      * Get the instance information from a cmid.
      *
      * @param int $cmid
-     * @return self
+     * @return null|self
      */
-    public static function get_from_cmid(int $cmid): self {
+    public static function get_from_cmid(int $cmid): ?self {
         global $DB;
 
         $coursetable = new \core\dml\table('course', 'c', 'c');
@@ -169,6 +182,10 @@ EOF;
             'cmid' => $cmid,
         ]);
 
+        if (empty($result)) {
+            return null;
+        }
+
         $course = $coursetable->extract_from_result($result);
         $instancedata = $bbbtable->extract_from_result($result);
         $cm = get_fast_modinfo($course)->get_cm($cmid);
@@ -182,9 +199,9 @@ EOF;
      * If a group is specified in the meetingid then this will also be set.
      *
      * @param string $meetingid
-     * @return self
+     * @return null|self
      */
-    public static function get_from_meetingid(string $meetingid): self {
+    public static function get_from_meetingid(string $meetingid): ?self {
         $result = preg_match(
             '@(?P<meetingid>[^-]*)-(?P<courseid>[^-]*)-(?P<instanceid>\d+)(\[(?P<groupid>\d*)\])?@',
             $meetingid,
@@ -192,7 +209,7 @@ EOF;
         );
 
         if ($result !== 1) {
-            throw new \moodle_exception("Meeting with id '{$meetingid}' not found.");
+            throw new \moodle_exception("The supplied meeting id '{$meetingid}' is invalid found.");
         }
 
         $instance = self::get_from_instanceid($matches['instanceid']);
@@ -469,7 +486,7 @@ EOF;
      * @return bool
      */
     public function is_type_room_and_recordings(): bool {
-        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_ALL;
+        return $this->get_type() == self::TYPE_ALL;
     }
 
     /**
@@ -478,7 +495,7 @@ EOF;
      * @return bool
      */
     public function is_type_room_only(): bool {
-        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_ROOM_ONLY;
+        return $this->get_type() == self::TYPE_ROOM_ONLY;
     }
 
     /**
@@ -487,7 +504,7 @@ EOF;
      * @return bool
      */
     public function is_type_recordings_only(): bool {
-        return $this->get_type() == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY;
+        return $this->get_type() == self::TYPE_RECORDING_ONLY;
     }
 
     /**
@@ -497,7 +514,7 @@ EOF;
      */
     public function get_participant_list(): array {
         if ($this->participantlist === null) {
-            $this->participantlist = roles::bigbluebuttonbn_get_participant_list(
+            $this->participantlist = roles::get_participant_list(
                 $this->get_instance_data(),
                 $this->get_context()
             );
@@ -556,7 +573,7 @@ EOF;
      * @return bool
      */
     public function is_moderator(): bool {
-        return roles::bigbluebuttonbn_is_moderator(
+        return roles::is_moderator(
             $this->get_context(),
             $this->get_participant_list()
         );
@@ -900,7 +917,7 @@ EOF;
      * @return bool
      */
     public function is_blindside_network_server(): bool {
-        return plugin::bigbluebuttonbn_is_bn_server();
+        return plugin::is_bn_server();
     }
 
     /**
@@ -989,8 +1006,8 @@ EOF;
      * @return array
      */
     public function get_enabled_features(): array {
-        return config::bigbluebuttonbn_get_enabled_features(
-            bigbluebutton::bigbluebuttonbn_get_instance_type_profiles(),
+        return config::get_enabled_features(
+            bigbluebutton_proxy::get_instance_type_profiles(),
             $this->get_instance_var('type') ?? null
         );
     }

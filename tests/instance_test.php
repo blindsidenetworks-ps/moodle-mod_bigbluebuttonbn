@@ -66,6 +66,39 @@ class instance_test extends \advanced_testcase {
     }
 
     /**
+     * Get an instance from a cmid.
+     */
+    public function test_get_from_cmid(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'cm' => $cm,
+        ] = $this->get_test_instance();
+
+        $instance = instance::get_from_cmid($cm->id);
+
+        $this->assertInstanceOf(instance::class, $instance);
+        $this->assertEquals($record->id, $instance->get_instance_id());
+        $this->assertEquals($cm->id, $instance->get_cm()->id);
+    }
+
+    /**
+     * If the instance was not found, and exception should be thrown.
+     */
+    public function test_get_from_cmid_not_found(): void {
+        $this->assertNull(instance::get_from_cmid(100));
+    }
+
+    /**
+     * If the instance was not found, and exception should be thrown.
+     */
+    public function test_get_from_instnace_not_found(): void {
+        $this->assertNull(instance::get_from_instanceid(100));
+    }
+
+
+    /**
      * Get from meeting id
      */
     public function test_get_from_meetingid(): void {
@@ -87,6 +120,26 @@ class instance_test extends \advanced_testcase {
         $this->assertEquals($record->id, $instance->get_instance_id());
         $this->assertEquals($record->cmid, $instance->get_cm_id());
         $this->assertEquals($record->cmid, $instance->get_cm()->id);
+    }
+
+    /**
+     * Ensure that invalid meetingids throw an appropriate exception.
+     *
+     * @dataProvider invalid_meetingid_provider
+     * @param string $meetingid
+     */
+    public function test_get_from_meetingid_invalid(string $meetingid): void {
+        $this->expectException(\moodle_exception::class);
+        instance::get_from_meetingid($meetingid);
+    }
+
+    public function invalid_meetingid_provider(): array {
+        // Meeting IDs are in the formats:
+        //      <meetingid[string]>-<courseid[number]>-<instanceid[number]>
+        //      <meetingid[string]>-<courseid[number]>-<instanceid[number]>[<groupid[number]>]
+        return [
+            'Non-numeric instanceid' => ['aaa-123-aaa'],
+        ];
     }
 
     public function test_get_all_instances_in_course(): void {
@@ -118,10 +171,12 @@ class instance_test extends \advanced_testcase {
         $record = $this->getDataGenerator()->create_module('bigbluebuttonbn', array_merge([
             'course' => $course->id,
         ], $data));
+        $cm = get_fast_modinfo($course)->instances['bigbluebuttonbn'][$record->id];
 
         return [
             'course' => $course,
             'record' => $record,
+            'cm' => $cm,
         ];
     }
 

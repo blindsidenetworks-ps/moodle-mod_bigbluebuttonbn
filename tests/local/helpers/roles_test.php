@@ -54,19 +54,19 @@ class roles_test extends testcase_helper {
         // Prevent access all groups.
         role_change_permission($roleids['teacher'], $context, 'moodle/site:accessallgroups', CAP_PREVENT);
         $this->setUser($teachers[0]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount(($numstudents + $numteachers) / $groupsnum, $users);
         $this->setUser($teachers[1]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount(($numstudents + $numteachers) / $groupsnum, $users);
         $this->setUser($teachers[2]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount(($numstudents + $numteachers) / $groupsnum, $users);
         $course->groupmode = strval(SEPARATEGROUPS);
         $course->groupmodeforce = "0";
         update_course($course);
         $this->setUser($teachers[2]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
 
     }
@@ -87,17 +87,15 @@ class roles_test extends testcase_helper {
 
         $context = context_course::instance($course->id);
         $this->setUser($teachers[0]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
         $this->setUser($teachers[1]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
         $this->setUser($teachers[1]);
-        $users = roles::bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $users = roles::get_users_select($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
     }
 
 
 }
-
-

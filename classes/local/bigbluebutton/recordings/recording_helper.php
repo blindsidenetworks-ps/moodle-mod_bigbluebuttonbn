@@ -28,12 +28,10 @@ namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 use context;
 use Exception;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\notifier;
 use mod_bigbluebuttonbn\local\helpers\logs;
-
-defined('MOODLE_INTERNAL') || die();
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 
 /**
  * Collection of helper methods for handling recordings in Moodle.
@@ -177,9 +175,10 @@ class recording_helper {
             return $r->recordingid;
         }, $recs);
 
-        $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings($recordingsids);
+        $bbbrecordings = recording_proxy::fetch_recordings($recordingsids);
         // Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
         // the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
+
         $recordings = array();
         foreach ($recs as $id => $rec) {
             $recordingid = $rec->recordingid;
@@ -233,8 +232,8 @@ class recording_helper {
             $selects[] = "imported = " . recording::RECORDING_IMPORTED;
         }
         // Now get only recordings that have been validated by recording ready callback.
-        $selects[] = "state =:state";
-        $params['state'] = recording::RECORDING_STATE_NOTIFIED;
+        $selects[] = "status = :status";
+        $params['status'] = recording::RECORDING_STATE_NOTIFIED;
         return array($selects, $params);
     }
 

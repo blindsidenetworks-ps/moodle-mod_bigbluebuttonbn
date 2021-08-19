@@ -25,8 +25,7 @@
 namespace mod_bigbluebuttonbn;
 use calendar_event;
 use context_module;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper;
 use mod_bigbluebuttonbn_mod_form;
 use MoodleQuickForm;
@@ -82,15 +81,17 @@ class lib_test extends testcase_helper {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
         $this->setUser($user);
+
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+
         $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
         $this->assertEquals('', $result);
 
         // Now create a couple of logs.
-        $overrides = array('meetingid' => $bbactivity->meetingid);
-        $meta = '{"origin":0}';
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_recording_played_event($instance, 1);
+
         $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
         $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
     }
@@ -100,10 +101,12 @@ class lib_test extends testcase_helper {
         $user = $this->generator->create_user();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $this->setUser($user);
-        $overrides = array('meetingid' => $bbactivity->meetingid);
-        $meta = '{"origin":0}';
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
+
+        // Now create a couple of logs.
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_recording_played_event($instance, 1);
+
         $result = bigbluebuttonbn_user_complete($this->course, $user, $bbactivity);
         $this->assertEquals(2, $result);
     }
@@ -203,19 +206,19 @@ class lib_test extends testcase_helper {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
         // Standard use case, the meeting start and we want add an action event to join the meeting.
-        $event = $this->create_action_event($this->course, $bbactivity, bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START);
+        $event = $this->create_action_event($this->course, $bbactivity, logger::EVENT_MEETING_START);
         $factory = new \core_calendar\action_factory();
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertEquals("Join session", $actionevent->get_name());
 
-        // User has already joined the meeting (there is log event BIGBLUEBUTTONBN_LOG_EVENT_JOIN already for this user).
-        $overrides = array('meetingid' => $bbactivity->meetingid);
-        $meta = '{"origin":0}';
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
+        // User has already joined the meeting (there is log event EVENT_JOIN already for this user).
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        logger::log_meeting_joined_event($instance, 0);
+
         $bbactivity->closingtime = time() - 1000;
         $bbactivity->openingtime = time() - 2000;
         $DB->update_record('bigbluebuttonbn', $bbactivity);
-        $event = $this->create_action_event($this->course, $bbactivity, bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START);
+        $event = $this->create_action_event($this->course, $bbactivity, logger::EVENT_MEETING_START);
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertNull($actionevent);
     }

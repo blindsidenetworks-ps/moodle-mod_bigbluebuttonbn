@@ -27,14 +27,12 @@ use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\plugin;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
@@ -100,7 +98,7 @@ switch (strtolower($action)) {
             break;
         }
         // Moodle event logger: Create an event for meeting left.
-        logs::log_meeting_left_event($instance);
+        logger::log_meeting_left_event($instance);
 
         // Update the cache.
         $meeting = new meeting($instance);
@@ -110,13 +108,13 @@ switch (strtolower($action)) {
         $select = "userid = ? AND log = ?";
         $params = [
             'userid' => $USER->id,
-            'log' => bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN,
+            'log' => logger::EVENT_JOIN,
         ];
         $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id ASC', 'id, meta', 1);
         $lastaccess = end($accesses);
         $lastaccess = json_decode($lastaccess->meta);
         // If the user acceded from Timeline it should be redirected to the Dashboard.
-        if (isset($lastaccess->origin) && $lastaccess->origin == bbb_constants::BIGBLUEBUTTON_ORIGIN_TIMELINE) {
+        if (isset($lastaccess->origin) && $lastaccess->origin == logger::ORIGIN_TIMELINE) {
             redirect($CFG->wwwroot . '/my/');
         }
         // Close the tab or window where BBB was opened.
@@ -128,18 +126,18 @@ switch (strtolower($action)) {
             break;
         }
         // Check the origin page.
-        $origin = bbb_constants::BIGBLUEBUTTON_ORIGIN_BASE;
+        $origin = logger::ORIGIN_BASE;
         if ($timeline) {
-            $origin = bbb_constants::BIGBLUEBUTTON_ORIGIN_TIMELINE;
+            $origin = logger::ORIGIN_TIMELINE;
         } else if ($index) {
-            $origin = bbb_constants::BIGBLUEBUTTON_ORIGIN_INDEX;
+            $origin = logger::ORIGIN_INDEX;
         }
 
         // See if the session is in progress.
         $meeting = new meeting($instance);
         if ($meeting->is_running()) {
             // Since the meeting is already running, we just join the session.
-            bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin);
+            $meeting->join($origin);
             break;
         }
 
@@ -165,17 +163,17 @@ switch (strtolower($action)) {
                 // TODO: We may want to catch if the record was not created.
             }
             // Moodle event logger: Create an event for meeting created.
-            logs::log_meeting_created_event($instance);
+            logger::log_meeting_created_event($instance);
             // Since the meeting is already running, we just join the session.
-            bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin);
+            $meeting->join($origin);
         } catch (server_not_available_exception $e) {
-            bigbluebutton::handle_server_not_available($instance);
+            bigbluebutton_proxy::handle_server_not_available($instance);
         }
         break;
 
     case 'play':
         $href = bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype);
-        logs::log_recording_played_event($instance, $rid);
+        logger::log_recording_played_event($instance, $rid);
 
         // Execute the redirect.
         header('Location: ' . urldecode($href));
@@ -251,7 +249,7 @@ function bigbluebuttonbn_bbb_view_close_window_manually() {
 function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
     $data = [
         'meetingID' => $instance->get_meeting_id(),
-        'name' => plugin::bigbluebuttonbn_html2text($instance->get_meeting_name(), 64),
+        'name' => plugin::html2text($instance->get_meeting_name(), 64),
         'attendeePW' => $instance->get_viewer_password(),
         'moderatorPW' => $instance->get_moderator_password(),
         'logoutURL' => $instance->get_logout_url()->out(false),
@@ -309,47 +307,6 @@ function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
         return 'true';
     }
     return 'false';
-}
-
-/**
- * Helper for preparing metadata used while creating the meeting.
- *
- * @param instance $instance
- * @return array
- */
-function bigbluebuttonbn_bbb_view_create_meeting_metadata(instance $instance) {
-    return meeting_helper::bigbluebuttonbn_create_meeting_metadata($instance);
-}
-
-/**
- * Helper for preparing data used while joining the meeting.
- *
- * TODO Move to local\bigbluebutton
- *
- * @param meeting $meeting
- * @param instance $instance
- * @param int $origin
- */
-function bigbluebuttonbn_bbb_view_join_meeting($meeting, $instance, $origin = 0): void {
-    // Update the cache and retrieve info.
-    $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
-
-    if ($meeting->is_running() && !$meeting->can_join()) {
-        // No more users allowed to join.
-        redirect($instance->get_logout_url());
-        return;
-    }
-
-    $joinurl = $meeting->get_join_url();
-
-    // Moodle event logger: Create an event for meeting joined.
-    logs::log_meeting_joined_event($instance, $origin);
-
-    // Before executing the redirect, increment the number of participants.
-    roles::bigbluebuttonbn_participant_joined($instance->get_meeting_id(), $instance->does_current_user_count_towards_user_limit());
-
-    // Execute the redirect.
-    redirect($joinurl);
 }
 
 /**

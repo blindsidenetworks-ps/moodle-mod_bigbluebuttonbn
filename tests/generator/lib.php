@@ -24,10 +24,10 @@
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\logger;
+use mod_bigbluebuttonbn\testing\generator\mockedserver;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -269,17 +269,24 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * @param null $record
      * @param array|null $options
      */
-    public function create_log($record = null, array $options = null) {
-        global $DB;
+    public function create_log($record, array $options = null) {
+        $instance = instance::get_from_instanceid($record['bigbluebuttonbnid']);
 
-        $record = (array) $record;
-        $bigbluebuttonbnid = $record['bigbluebuttonbnid'];
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $bigbluebuttonbnid));
-        $default = [
-            'meetingid' => $bigbluebuttonbn->meetingid . '-' . $bigbluebuttonbn->course . '-' . $bigbluebuttonbn->id,
-        ];
-        $record = array_merge($default, $record);
-        logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $record);
+        $record = array_merge([
+            'meetingid' => $instance->get_meeting_id(),
+        ], (array) $record);
+
+        $testlogclass = new class extends logger {
+            public static function log_test_event(instance $instance, $record): void {
+                self::log(
+                    $instance,
+                    logger::EVENT_CREATE,
+                    $record
+                );
+            }
+        };
+
+        $testlogclass::log_test_event($instance, $record);
     }
 
     /**

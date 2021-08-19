@@ -27,13 +27,12 @@ defined('MOODLE_INTERNAL') || die;
 
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\mod_helper;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 
@@ -90,19 +89,21 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    mod_helper::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    mod_helper::process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $bigbluebuttonbn->presentation = files::bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    $bigbluebuttonbn->presentation = files::get_media_file($bigbluebuttonbn);
     // Insert a record.
     $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
     $bigbluebuttonbn->meetingid = meeting::get_unique_meetingid_seed();
     // Set the meetingid column in the bigbluebuttonbn table.
     $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn->meetingid, array('id' => $bigbluebuttonbn->id));
+
     // Log insert action.
-    logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_ADD);
+    logger::log_instance_created($bigbluebuttonbn);
+
     // Complete the process.
-    mod_helper::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    mod_helper::process_post_save($bigbluebuttonbn);
     return $bigbluebuttonbn->id;
 }
 
@@ -117,18 +118,20 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
 function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    mod_helper::bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    mod_helper::process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
-    $bigbluebuttonbn->presentation = files::bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    $bigbluebuttonbn->presentation = files::get_media_file($bigbluebuttonbn);
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Get the meetingid column in the bigbluebuttonbn table.
-    $bigbluebuttonbn->meetingid = (string)$DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $bigbluebuttonbn->id));
+    $bigbluebuttonbn->meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $bigbluebuttonbn->id));
+
     // Log update action.
-    logs::bigbluebuttonbn_log($bigbluebuttonbn, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_EDIT);
+    logger::log_instance_updated(instance::get_from_instanceid($bigbluebuttonbn->id));
+
     // Complete the process.
-    mod_helper::bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    mod_helper::process_post_save($bigbluebuttonbn);
     return true;
 }
 
@@ -144,7 +147,8 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
 function bigbluebuttonbn_delete_instance($id) {
     global $DB;
 
-    if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $id))) {
+    $instance = instance::get_from_instanceid($id);
+    if (empty($instance)) {
         return false;
     }
 
@@ -163,7 +167,7 @@ function bigbluebuttonbn_delete_instance($id) {
     }
 
     // Log action performed.
-    logs::bigbluebuttonbn_delete_instance_log($bigbluebuttonbn);
+    logger::log_instance_deleted($instance);
 
     // Mark dependant recordings as headless.
     recording::update_by(['bigbluebuttonbnid' => $id], (object)['headless' => recording::RECORDING_HEADLESS]);
@@ -217,7 +221,7 @@ function bigbluebuttonbn_user_complete($courseorid, $userorid, $bigbluebuttonbn)
     $sql = "SELECT COUNT(*) FROM {bigbluebuttonbn_logs} ";
     $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
     $result = $DB->count_records_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
-        bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_JOIN, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED));
+        logger::EVENT_JOIN, logger::EVENT_PLAYED));
     return $result;
 }
 
@@ -237,7 +241,7 @@ function bigbluebuttonbn_get_extra_capabilities() {
  * @return void
  */
 function bigbluebuttonbn_reset_course_form_definition(&$mform) {
-    $items = reset::bigbluebuttonbn_reset_course_items();
+    $items = reset::reset_course_items();
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
     foreach ($items as $item => $default) {
         $mform->addElement(
@@ -259,7 +263,7 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
  */
 function bigbluebuttonbn_reset_course_form_defaults($course) {
     $formdefaults = array();
-    $items = reset::bigbluebuttonbn_reset_course_items();
+    $items = reset::reset_course_items();
     // All unchecked by default.
     foreach ($items as $item => $default) {
         $formdefaults["reset_bigbluebuttonbn_{$item}"] = $default;
@@ -274,37 +278,35 @@ function bigbluebuttonbn_reset_course_form_defaults($course) {
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
-    $items = reset::bigbluebuttonbn_reset_course_items();
+    $items = reset::reset_course_items();
     $status = array();
+
     // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
     // See MDL-9367.
     if (array_key_exists('recordings', $items) && !empty($data->reset_bigbluebuttonbn_recordings)) {
         // Remove all the recordings from a BBB server that are linked to the room/activities in this course.
-        reset::bigbluebuttonbn_reset_recordings($data->courseid);
+        reset::reset_recordings($data->courseid);
         unset($items['recordings']);
-        $status[] = reset::bigbluebuttonbn_reset_getstatus('recordings');
+        $status[] = reset::reset_getstatus('recordings');
     }
+
     if (!empty($data->reset_bigbluebuttonbn_tags)) {
         // Remove all the tags linked to the room/activities in this course.
-        reset::bigbluebuttonbn_reset_tags($data->courseid);
+        reset::reset_tags($data->courseid);
         unset($items['tags']);
-        $status[] = reset::bigbluebuttonbn_reset_getstatus('tags');
+        $status[] = reset::reset_getstatus('tags');
     }
+
     // TODO : seems to be duplicated code unless we just want to force reset tags.
     foreach ($items as $item => $default) {
         // Remove instances or elements linked to this course, others than recordings or tags.
         if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
             call_user_func("bigbluebuttonbn_reset_{$item}", $data->courseid);
-            $status[] = reset::bigbluebuttonbn_reset_getstatus($item);
+            $status[] = reset::reset_getstatus($item);
         }
     }
     return $status;
 }
-
-// Removed bigbluebuttonbn_get_view_actions as deprecated and used for legacy logs.
-// Removed bigbluebuttonbn_get_post_actions as deprecated and used for legacy logs.
-// Removed bigbluebuttonbn_print_overview as deprecated since 3.2.
-// Removed bigbluebuttonbn_print_overview_element as deprecated since 3.2.
 
 /**
  * Given a course_module object, this function returns any
@@ -355,10 +357,10 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * @return false|null false if file not found, does not return if found - justsend the file
  */
 function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-    if (!files::bigbluebuttonbn_pluginfile_valid($context, $filearea)) {
+    if (!files::pluginfile_valid($context, $filearea)) {
         return false;
     }
-    $file = files::bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args);
+    $file = files::pluginfile_file($course, $cm, $context, $filearea, $args);
     if (empty($file)) {
         return false;
     }
@@ -491,7 +493,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
  */
 function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $event) {
     $instance = instance::get_from_cmid($event->instance);
-    $activitystatus = mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
+    $activitystatus = mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy::view_get_activity_status($instance);
     return $activitystatus != 'ended';
 }
 

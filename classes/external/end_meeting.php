@@ -30,11 +30,10 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
@@ -94,15 +93,7 @@ class end_meeting extends external_api {
         // Execute the end command.
         $meeting = new meeting($instance);
         $meeting->end_meeting();
-
-        // Moodle event logger: Create an event for meeting ended.
-        $instancedata = $instance->get_instance_data();
-        if (isset($instancedata)) {
-            \mod_bigbluebuttonbn\local\helpers\logs::bigbluebuttonbn_event_log(
-                events::$events['meeting_end'],
-                $instancedata
-            );
-        }
+        logger::log_meeting_ended_event($instance);
 
         // Update the cache.
         $meeting->update_cache();

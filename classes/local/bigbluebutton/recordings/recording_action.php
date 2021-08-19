@@ -26,8 +26,7 @@
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use mod_bigbluebuttonbn\instance;
-
-defined('MOODLE_INTERNAL') || die();
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 
 /**
  * Collection of helper methods for handling recordings actions in Moodle.
@@ -87,7 +86,7 @@ class recording_action {
         );
         // Step 2, perform the actual delete by sending the corresponding request to BBB.
         return array(
-            'status' => recording_proxy::bigbluebutton_delete_recordings($params['id'])
+            'status' => recording_proxy::delete_recording($params['id'])
         );
     }
 
@@ -105,7 +104,7 @@ class recording_action {
             // TODO: not implemented yet. We should extract the relevant metadata and update
             // the record.
             return array(
-                'status' => recording_proxy::bigbluebutton_update_recording_imported(
+                'status' => recording_proxy::update_recording_imported(
                     $recordings[$params['id']],
                     json_decode($params['meta'], true)
                 )
@@ -114,7 +113,7 @@ class recording_action {
 
         // As the recordingid was not identified as imported recording link, execute update on a real recording.
         return array(
-            'status' => recording_proxy::bigbluebutton_update_recording(
+            'status' => recording_proxy::update_recording(
                 $params['id'],
                 json_decode($params['meta'])
             )
@@ -138,7 +137,7 @@ class recording_action {
         }
         // As the recordingid was not identified as imported recording link, execute unprotect on a real recording.
         return array(
-            'status' => recording_proxy::bigbluebutton_update_recording(
+            'status' => recording_proxy::update_recording(
                 $params['id'],
                 array('protect' => 'false')
             )
@@ -162,7 +161,7 @@ class recording_action {
         }
         // As the recordingid was not identified as imported recording link, execute protect on a real recording.
         return array(
-            'status' => recording_proxy::bigbluebutton_update_recording(
+            'status' => recording_proxy::update_recording(
                 $params['id'],
                 array('protect' => 'true')
             )
@@ -186,7 +185,7 @@ class recording_action {
         }
         // As the recordingid was not identified as imported recording link, execute unpublish on a real recording.
         return array(
-            'status' => recording_proxy::bigbluebutton_publish_recordings(
+            'status' => recording_proxy::publish_recordings(
                 $params['id'],
                 'false'
             )
@@ -210,7 +209,7 @@ class recording_action {
         }
         // As the recordingid was not identified as imported recording link, execute publish on a real recording.
         return array(
-            'status' => recording_proxy::bigbluebutton_publish_recordings(
+            'status' => recording_proxy::publish_recordings(
                 $params['id'],
                 'true'
             )

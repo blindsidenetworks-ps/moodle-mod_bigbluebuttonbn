@@ -13,8 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * The mod_bigbluebuttonbn instance (module) helper
+ * Utility class for all instance (module) routines helper.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
@@ -24,64 +25,49 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
-use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\notifier;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\plugin;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Utility class for all instance (module) routines helper
- *
- * @package mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class mod_helper {
 
     /**
      * Runs any processes that must run before a bigbluebuttonbn insert/update.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
-        static::bigbluebuttonbn_process_pre_save_instance($bigbluebuttonbn);
-        static::bigbluebuttonbn_process_pre_save_checkboxes($bigbluebuttonbn);
-        static::bigbluebuttonbn_process_pre_save_common($bigbluebuttonbn);
+    public static function process_pre_save(stdClass $bigbluebuttonbn): void {
+        self::process_pre_save_instance($bigbluebuttonbn);
+        self::process_pre_save_checkboxes($bigbluebuttonbn);
+        self::process_pre_save_common($bigbluebuttonbn);
         $bigbluebuttonbn->participants = htmlspecialchars_decode($bigbluebuttonbn->participants);
     }
 
     /**
      * Runs process for defining the instance (insert/update).
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
+    public static function process_pre_save_instance(stdClass $bigbluebuttonbn): void {
         $bigbluebuttonbn->timemodified = time();
         if ((integer) $bigbluebuttonbn->instance == 0) {
             $bigbluebuttonbn->meetingid = 0;
             $bigbluebuttonbn->timecreated = time();
             $bigbluebuttonbn->timemodified = 0;
             // As it is a new activity, assign passwords.
-            $bigbluebuttonbn->moderatorpass = plugin::bigbluebuttonbn_random_password(12);
-            $bigbluebuttonbn->viewerpass =
-                plugin::bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+            $bigbluebuttonbn->moderatorpass = plugin::random_password(12);
+            $bigbluebuttonbn->viewerpass = plugin::random_password(12, $bigbluebuttonbn->moderatorpass);
         }
     }
 
     /**
      * Runs process for assigning default value to checkboxes.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
+    public static function process_pre_save_checkboxes($bigbluebuttonbn) {
         if (!isset($bigbluebuttonbn->wait)) {
             $bigbluebuttonbn->wait = 0;
         }
@@ -144,13 +130,11 @@ class mod_helper {
     /**
      * Runs process for wipping common settings when 'recordings only'.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_pre_save_common(&$bigbluebuttonbn) {
+    public static function process_pre_save_common(stdClass $bigbluebuttonbn): void {
         // Make sure common settings are removed when 'recordings only'.
-        if ($bigbluebuttonbn->type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
+        if ($bigbluebuttonbn->type == instance::TYPE_RECORDING_ONLY) {
             $bigbluebuttonbn->groupmode = 0;
             $bigbluebuttonbn->groupingid = 0;
         }
@@ -159,26 +143,22 @@ class mod_helper {
     /**
      * Runs any processes that must be run after a bigbluebuttonbn insert/update.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
+    public static function process_post_save(stdClass $bigbluebuttonbn): void {
         if (isset($bigbluebuttonbn->notification) && $bigbluebuttonbn->notification) {
-            static::bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
+            self::process_post_save_notification($bigbluebuttonbn);
         }
-        static::bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
-        static::bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn);
+        self::process_post_save_event($bigbluebuttonbn);
+        self::process_post_save_completion($bigbluebuttonbn);
     }
 
     /**
      * Generates a message on insert/update which is sent to all users enrolled.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
+    public static function process_post_save_notification(stdClass $bigbluebuttonbn): void {
         $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
         if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
             $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
@@ -189,15 +169,17 @@ class mod_helper {
     /**
      * Generates an event after a bigbluebuttonbn insert/update.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
+    public static function process_post_save_event(stdClass $bigbluebuttonbn): void {
         global $CFG, $DB;
+
         require_once($CFG->dirroot . '/calendar/lib.php');
-        $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
-            'instance' => $bigbluebuttonbn->id));
+        $eventid = $DB->get_field('event', 'id', [
+            'modulename' => 'bigbluebuttonbn',
+            'instance' => $bigbluebuttonbn->id,
+        ]);
+
         // Delete the event from calendar when/if openingtime is NOT set.
         if (!isset($bigbluebuttonbn->openingtime) || !$bigbluebuttonbn->openingtime) {
             if ($eventid) {
@@ -206,23 +188,26 @@ class mod_helper {
             }
             return;
         }
-        // Add evento to the calendar as openingtime is set.
-        $event = new stdClass();
-        $event->eventtype = bbb_constants::BIGBLUEBUTTON_EVENT_MEETING_START;
-        $event->type = CALENDAR_EVENT_TYPE_ACTION;
-        $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
-        $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule, false);
-        $event->format = FORMAT_HTML;
-        $event->courseid = $bigbluebuttonbn->course;
-        $event->groupid = 0;
-        $event->userid = 0;
-        $event->modulename = 'bigbluebuttonbn';
-        $event->instance = $bigbluebuttonbn->id;
-        $event->timestart = $bigbluebuttonbn->openingtime;
-        $event->timeduration = 0;
-        $event->timesort = $event->timestart;
-        $event->visible = instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn);
-        $event->priority = null;
+
+        // Add event to the calendar as openingtime is set.
+        $event = (object) [
+            'eventtype' => logger::EVENT_MEETING_START,
+            'type' => CALENDAR_EVENT_TYPE_ACTION,
+            'name' => get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name),
+            'description' => format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule, false),
+            'format' => FORMAT_HTML,
+            'courseid' => $bigbluebuttonbn->course,
+            'groupid' => 0,
+            'userid' => 0,
+            'modulename' => 'bigbluebuttonbn',
+            'instance' => $bigbluebuttonbn->id,
+            'timestart' => $bigbluebuttonbn->openingtime,
+            'timeduration' => 0,
+            'timesort' => $event->timestart,
+            'visible' => instance_is_visible('bigbluebuttonbn', $bigbluebuttonbn),
+            'priority' => null,
+        ];
+
         // Update the event in calendar when/if eventid was found.
         if ($eventid) {
             $event->id = $eventid;
@@ -236,18 +221,18 @@ class mod_helper {
     /**
      * Generates an event after a bigbluebuttonbn activity is completed.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN form data
-     *
-     * @return void
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
-        if (!empty($bigbluebuttonbn->completionexpected)) {
-            \core_completion\api::update_completion_date_event(
-                $bigbluebuttonbn->coursemodule,
-                'bigbluebuttonbn',
-                $bigbluebuttonbn->id,
-                $bigbluebuttonbn->completionexpected
-            );
+    public static function process_post_save_completion(stdClass $bigbluebuttonbn): void {
+        if (empty($bigbluebuttonbn->completionexpected)) {
+            return;
         }
+
+        \core_completion\api::update_completion_date_event(
+            $bigbluebuttonbn->coursemodule,
+            'bigbluebuttonbn',
+            $bigbluebuttonbn->id,
+            $bigbluebuttonbn->completionexpected
+        );
     }
 }

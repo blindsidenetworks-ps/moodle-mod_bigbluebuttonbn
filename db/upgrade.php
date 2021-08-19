@@ -124,8 +124,8 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
             $sql .= "WHERE moderatorpass = ? OR viewerpass = ?";
             $instances = $DB->get_records_sql($sql, array('', ''));
             foreach ($instances as $instance) {
-                $instance->moderatorpass = plugin::bigbluebuttonbn_random_password(12);
-                $instance->viewerpass = plugin::bigbluebuttonbn_random_password(12, $instance->moderatorpass);
+                $instance->moderatorpass = plugin::random_password(12);
+                $instance->viewerpass = plugin::random_password(12, $instance->moderatorpass);
                 // Store passwords in the database.
                 $DB->update_record('bigbluebuttonbn', $instance);
             }

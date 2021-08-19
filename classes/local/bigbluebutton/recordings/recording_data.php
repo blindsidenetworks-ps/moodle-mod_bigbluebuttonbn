@@ -29,13 +29,12 @@ namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 use html_writer;
 use mod_bigbluebuttonbn\instance;
 use stdClass;
-use mod_bigbluebuttonbn\local\bigbluebutton;
-use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\plugin;
-
-defined('MOODLE_INTERNAL') || die();
+use pix_icon;
 
 /**
  * Utility class for preparing recordings as data for being consumed by renderers.
@@ -113,7 +112,7 @@ class recording_data {
      * @return boolean
      */
     public static function preview_enabled($instance) {
-        return (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0
+        return (bigbluebutton_proxy::get_server_version() >= 1.0
             && $instance->get_instance_var('recordings_preview') == '1');
     }
 
@@ -182,7 +181,7 @@ class recording_data {
             if (!$rec->imported && ($tool == 'delete' || $tool == 'publish') ) {
                 $buttonpayload['requireconfirmation'] = true;
             }
-            $actionbar .= view::actionbar_render_button($rec, $buttonpayload);
+            $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
         }
         $head = html_writer::start_tag('div', array(
             'id' => 'recording-actionbar-' . $rec->recording['recordID'],
@@ -282,7 +281,7 @@ class recording_data {
         $recordingpreview .= html_writer::start_tag('div', array('class' => 'row'));
         foreach ($playback['preview'] as $image) {
             if ($CFG->bigbluebuttonbn_recordings_validate_url &&
-                !bigbluebutton::bigbluebuttonbn_is_valid_resource(trim($image['url']))) {
+                !bigbluebutton_proxy::is_remote_resource_valid(trim($image['url']))) {
                 return '';
             }
             $recordingpreview .= html_writer::start_tag('div', array('class' => ''));
@@ -366,8 +365,8 @@ class recording_data {
             'data-target' => $playback['type'],
             'data-href' => $href,
         );
-        if ($CFG->bigbluebuttonbn_recordings_validate_url && !plugin::bigbluebuttonbn_is_bn_server()
-            && !bigbluebutton::bigbluebuttonbn_is_valid_resource(trim($playback['url']))) {
+        if ($CFG->bigbluebuttonbn_recordings_validate_url && !plugin::is_bn_server()
+            && !bigbluebutton_proxy::is_remote_resource_valid(trim($playback['url']))) {
             $linkattributes['class'] = 'btn btn-sm btn-warning';
             $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
             unset($linkattributes['data-href']);
@@ -482,7 +481,7 @@ class recording_data {
     public static function row_editable($instance) {
         // Since the request to BBB are cached, it is safe to use the wrapper to check the server version.
         return $instance->can_manage_recordings()
-            && (bigbluebutton::bigbluebuttonbn_get_server_version() >= 1.0 || $instance->is_blindside_network_server());
+            && (bigbluebutton_proxy::get_server_version() >= 1.0 || $instance->is_blindside_network_server());
     }
 
     /**
@@ -540,5 +539,56 @@ class recording_data {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Helper function render a button for the recording action bar
+     *
+     * @param recording $rec a bigbluebuttonbn_recordings row
+     * @param array $data
+     *
+     * @return string
+     */
+    protected static function actionbar_render_button($rec, $data) {
+        global $PAGE;
+        if (empty($data)) {
+            return '';
+        }
+        $target = $data['action'];
+        if (isset($data['target'])) {
+            $target .= '-' . $data['target'];
+        }
+        $id = 'recording-' . $target . '-' . $rec->recording['recordID'];
+        if ((boolean) config::get('recording_icons_enabled')) {
+            // With icon for $manageaction.
+            $iconattributes = array('id' => $id, 'class' => 'iconsmall');
+            $linkattributes = array(
+                'id' => $id,
+                'data-action' => $data['action'],
+                'data-require-confirmation' => !empty($data['requireconfirmation']),
+            );
+            if (!$rec->imported) {
+                $linkattributes['data-links'] = recording::count_by(
+                    [
+                        'recordingid' => $rec->recording['recordID'],
+                        'imported' => true,
+                    ]
+                );
+            }
+            if (isset($data['disabled'])) {
+                $iconattributes['class'] .= ' fa-' . $data['disabled'];
+                $linkattributes['class'] = 'disabled';
+            }
+            $icon = new pix_icon(
+                'i/' . $data['tag'],
+                get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
+                'moodle',
+                $iconattributes
+            );
+            return $PAGE->get_renderer('core')->action_icon('#', $icon, null, $linkattributes, false);
+        }
+        // With text for $manageaction.
+        $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger');
+        return $PAGE->get_renderer('core')->action_link('#', get_string($data['action']), null, $linkattributes);
     }
 }
