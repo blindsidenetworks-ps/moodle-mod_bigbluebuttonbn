@@ -1,3 +1,7 @@
+2.4.4 (2019101011)
+Bug: Fix for users and roles should be sorted alphabetically (CONTRIB-8113).
+Bug: Fix for compatibility with protected recordings when BBB implements that.
+
 2.4.3 (2019101010)
 Bug: Fix default welcome message (CONTRIB-8573).
 Bug: Fix for issue with Imported recordings (CONTRIB-8580).
