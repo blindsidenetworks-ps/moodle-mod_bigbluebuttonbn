@@ -115,7 +115,12 @@ abstract class proxy_base {
             $previous = libxml_use_internal_errors(true);
             try {
                 $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-                return $xml;
+                if ($xml instanceof SimpleXMLElement) {
+                    return $xml;
+                }
+                $error = 'Issue retrieving information from the server: ' . $response;
+                debugging($error, DEBUG_DEVELOPER);
+                return null; // Return null of the return value is false.
             } catch (Exception $e) {
                 libxml_use_internal_errors($previous);
                 $error = 'Caught exception: ' . $e->getMessage();
@@ -210,7 +215,6 @@ abstract class proxy_base {
      * @param string $action
      * @param array $data
      * @param array $metadata
-     * @param bool $assertresult
      * @return null|SimpleXMLElement
      */
     protected static function fetch_endpoint_xml(

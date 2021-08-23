@@ -23,6 +23,9 @@
 
 namespace mod_bigbluebuttonbn;
 
+use advanced_testcase;
+use moodle_exception;
+
 /**
  * Tests for the Big Blue Button Instance.
  *
@@ -30,10 +33,11 @@ namespace mod_bigbluebuttonbn;
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class instance_test extends \advanced_testcase {
+class instance_test extends advanced_testcase {
 
     /**
      * Test get from
+     *
      * @param string $function
      * @param string $field
      * @dataProvider get_from_location_provider
@@ -56,7 +60,7 @@ class instance_test extends \advanced_testcase {
     /**
      * Get from location provider
      *
-     * @return \string[][]
+     * @return string[][]
      */
     public function get_from_location_provider(): array {
         return [
@@ -97,7 +101,6 @@ class instance_test extends \advanced_testcase {
         $this->assertNull(instance::get_from_instanceid(100));
     }
 
-
     /**
      * Get from meeting id
      */
@@ -129,14 +132,15 @@ class instance_test extends \advanced_testcase {
      * @param string $meetingid
      */
     public function test_get_from_meetingid_invalid(string $meetingid): void {
-        $this->expectException(\moodle_exception::class);
+        $this->expectException(moodle_exception::class);
         instance::get_from_meetingid($meetingid);
     }
 
     public function invalid_meetingid_provider(): array {
         // Meeting IDs are in the formats:
-        //      <meetingid[string]>-<courseid[number]>-<instanceid[number]>
-        //      <meetingid[string]>-<courseid[number]>-<instanceid[number]>[<groupid[number]>]
+        // - <meetingid[string]>-<courseid[number]>-<instanceid[number]>
+        // - <meetingid[string]>-<courseid[number]>-<instanceid[number]>[<groupid[number]>]
+        // Note: deducing the group from meeting id will soon be deprecated.
         return [
             'Non-numeric instanceid' => ['aaa-123-aaa'],
         ];
@@ -198,7 +202,7 @@ class instance_test extends \advanced_testcase {
             $instance->get_meeting_id(0)
         );
 
-        // Specified group
+        // Specified group.
         $this->assertEquals(
             sprintf("%s-%s-%s[%d]", $record->meetingid, $record->course, $record->id, $group->id),
             $instance->get_meeting_id($group->id)

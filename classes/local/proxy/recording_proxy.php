@@ -49,7 +49,7 @@ class recording_proxy extends proxy_base {
     /**
      * Perform publishRecordings on BBB.
      *
-     * @param string $recordids
+     * @param string $recordid
      * @param string $publish
      * @return boolean
      */

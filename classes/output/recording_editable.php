@@ -139,7 +139,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
      *
      * @return boolean
      */
-    protected static function row_editable() {
+    protected function row_editable() {
         // Since the request to BBB are cached, it is safe to use the wrapper to check the server version.
         return $this->instance->can_manage_recordings()
             && (bigbluebutton_proxy::get_server_version() >= 1.0 || $this->instance->is_blindside_network_server());
