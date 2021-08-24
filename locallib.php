@@ -1536,10 +1536,12 @@ function bigbluebuttonbn_get_recording_data_row_actionbar($recording, $tools) {
         }
         $actionbar .= bigbluebuttonbn_actionbar_render_button($recording, $buttonpayload);
     }
-    $head = html_writer::start_tag('div', array(
-        'id' => 'recording-actionbar-' . $recording['recordID'],
-        'data-recordingid' => $recording['recordID'],
-        'data-meetingid' => $recording['meetingID']));
+    $head = html_writer::start_tag('div',
+        array(
+            'id' => 'recording-actionbar-' . $recording['recordID'],
+            'data-recordingid' => $recording['recordID'],
+        )
+    );
     $tail = html_writer::end_tag('div');
     return $head . $actionbar . $tail;
 }
@@ -1674,9 +1676,14 @@ function bigbluebuttonbn_get_recording_data_row_types($recording, $bbbsession) {
         $visibility = 'hidden ';
     }
     $id = 'playbacks-' . $recording['recordID'];
-    $recordingtypes = html_writer::start_tag('div', array('id' => $id, 'data-imported' => $dataimported,
-        'data-meetingid' => $recording['meetingID'], 'data-recordingid' => $recording['recordID'],
-        'title' => $title, $visibility => $visibility));
+    $recordingtypes = html_writer::start_tag('div',
+        array('id' => $id,
+            'data-imported' => $dataimported,
+            'data-recordingid' => $recording['recordID'],
+            'title' => $title,
+            $visibility => $visibility
+        )
+    );
     foreach ($recording['playbacks'] as $playback) {
         $recordingtypes .= bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $playback);
     }
@@ -1700,10 +1707,7 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     }
     $text = bigbluebuttonbn_get_recording_type_text($playback['type']);
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
-        '&mid=' . $recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
-    if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
-        $href .= '&href=' . urlencode(trim($playback['url']));
-    }
+        '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
     $linkattributes = array(
         'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
         'class' => 'btn btn-sm btn-default',
@@ -1859,9 +1863,12 @@ function bigbluebuttonbn_get_recording_data_row_text($recording, $text, $source,
     }
     $target = $data['action'] . '-' . $data['target'];
     $id = 'recording-' . $target . '-' . $data['recordingid'];
-    $attributes = array('id' => $id, 'class' => 'quickeditlink col-md-20',
-        'data-recordingid' => $data['recordingid'], 'data-meetingid' => $data['meetingid'],
-        'data-target' => $data['target'], 'data-source' => $source);
+    $attributes = array('id' => $id,
+        'class' => 'quickeditlink col-md-20',
+        'data-recordingid' => $data['recordingid'],
+        'data-target' => $data['target'],
+        'data-source' => $source
+    );
     $head = html_writer::start_tag('div', $attributes);
     $tail = html_writer::end_tag('div');
     $payload = array('action' => $data['action'], 'tag' => $data['tag'], 'target' => $data['target']);
