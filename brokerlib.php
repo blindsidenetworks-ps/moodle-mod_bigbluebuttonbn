@@ -188,7 +188,7 @@ function bigbluebuttonbn_broker_recording_info($bbbsession, $params, $showroom) 
         return "{$params['callback']}({$callbackresponsedata});";
     }
     // As the recordingid was not identified as imported recording link, look up for a real recording.
-    $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+    $recordings = bigbluebuttonbn_get_recordings_array([], $params['id']);
     if (array_key_exists($params['id'], $recordings)) {
         // The recording was found.
         $callbackresponse = bigbluebuttonbn_broker_recording_info_current($recordings[$params['id']], $params);
@@ -231,7 +231,7 @@ function bigbluebuttonbn_broker_recording_info_current($recording, $params) {
  */
 function bigbluebuttonbn_broker_recording_play($params) {
     $callbackresponse = array('status' => true, 'found' => false);
-    $recordings = bigbluebuttonbn_get_recordings_array($params['idx'], $params['id']);
+    $recordings = bigbluebuttonbn_get_recordings_array([], $params['id']);
     if (array_key_exists($params['id'], $recordings)) {
         // The recording was found.
         $callbackresponse = bigbluebuttonbn_broker_recording_info_current($recordings[$params['id']], $params);
@@ -325,7 +325,7 @@ function bigbluebuttonbn_broker_recording_action_publish($params, $recordings) {
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute publish on imported recording link, if the real recording is published.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
-            $recordings[$params['id']]['meetingID'],
+            [],
             $recordings[$params['id']]['recordID']
         );
         // Only if the physical recording exist and it is published, execute publish on imported recording link.
@@ -369,7 +369,7 @@ function bigbluebuttonbn_broker_recording_action_unprotect($params, $recordings)
     if (bigbluebuttonbn_broker_recording_is_imported($recordings, $params['id'])) {
         // Execute unprotect on imported recording link, if the real recording is unprotected.
         $realrecordings = bigbluebuttonbn_get_recordings_array(
-            $recordings[$params['id']]['meetingID'],
+            [],
             $recordings[$params['id']]['recordID']
         );
         // Only if the physical recording exist and it is published, execute unprotect on imported recording link.

@@ -2423,7 +2423,8 @@ function bigbluebuttonbn_get_recordings($courseid = 0, $bigbluebuttonbnid = null
     // Execute select for loading records based on existent bigbluebuttonbns.
     $records = $DB->get_records_sql_menu($sql, array(BIGBLUEBUTTONBN_LOG_EVENT_CREATE, '%record%', '%true%'));
     // Get actual recordings.
-    return bigbluebuttonbn_get_recordings_array(array_keys($records));
+    $meetingids = array_keys($records);
+    return bigbluebuttonbn_get_recordings_array($meetingids);
 }
 
 /**
