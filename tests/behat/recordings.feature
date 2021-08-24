@@ -14,21 +14,20 @@ Feature: The recording can be managed through the room page
       | activity        | name           | intro                           | course | idnumber         | type | recordings_imported |
       | bigbluebuttonbn | RoomRecordings | Test Room Recording description | C1     | bigbluebuttonbn1 | 0    | 0                   |
     And the following "mod_bigbluebuttonbn > meeting" exists:
-      | activity         | RoomRecordings |
+      | activity | RoomRecordings |
     And the following "mod_bigbluebuttonbn > recordings" exist:
       | bigbluebuttonbn | name        | description   | status |
-      | RoomRecordings  | Recording 1 | Description 1 | 0      |
-      | RoomRecordings  | Recording 2 | Description 2 | 0      |
+      | RoomRecordings  | Recording 1 | Description 1 | 2      |
+      | RoomRecordings  | Recording 2 | Description 2 | 3      |
+      | RoomRecordings  | Recording 3 | Description 3 | 0      |
 
-    @javascript
-    Scenario: Recordings are not listed until the server informs that they are available
+  @javascript
+  Scenario: Recordings are not listed until the server informs that they are available
     Given I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin
-    And I should not see "Recording 1"
-    And I should not see "Recording 2"
+    And I should not see "Recording 3"
     When the BigBlueButtonBN server has sent recording ready notifications
     And I reload the page
-    Then I should see "Recording 1"
-    And I should see "Recording 2"
+    And I should not see "Recording 3"
 
   @javascript
   Scenario: I can see the recordings related to an activity
@@ -59,7 +58,7 @@ Feature: The recording can be managed through the room page
     And I should see "This is a new recording description 1" in the "Recording 1" "table_row"
     And I should see "Description 2" in the "Recording 2" "table_row"
 
-  @javascript
+  @javascript @current
   Scenario: I can delete a recording
     Given the BigBlueButtonBN server has sent recording ready notifications
     And I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin

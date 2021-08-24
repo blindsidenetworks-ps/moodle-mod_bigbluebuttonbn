@@ -151,28 +151,17 @@ class recording_data {
      * @param array $tools
      * @return string
      */
-    public static function row_actionbar(recording $rec, $tools): string {
+    protected static function row_actionbar(recording $rec, $tools): string {
         $actionbar = '';
         foreach ($tools as $tool) {
-            $buttonpayload =
-                self::row_actionbar_payload($rec, $tool);
-            if ($tool == 'protect') {
-                if ($rec->get('imported')) {
-                    $buttonpayload['disabled'] = 'disabled';
-                }
-                if (!is_null($rec->get('protected'))) {
-                    $buttonpayload['disabled'] = 'invisible';
-                }
+            if (!empty(self::TOOL_ACTION_DEFINITIONS[$tool])) {
+                $buttonpayload = self::TOOL_ACTION_DEFINITIONS[$tool];
+                $conditionalhiding = $buttonpayload['hidewhen'] ?? null;
+                $disabledwhen = $buttonpayload['disablewhen'] ?? null;
+                self::actionbar_set_disabled($buttonpayload, $disabledwhen, $rec, 'disabled');
+                self::actionbar_set_disabled($buttonpayload, $conditionalhiding, $rec);
+                $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
             }
-            if ($tool == 'publish') {
-                if ($rec->get('imported')) {
-                    $buttonpayload['disabled'] = 'disabled';
-                }
-            }
-            if (!$rec->get('imported') && ($tool == 'delete' || $tool == 'publish')) {
-                $buttonpayload['requireconfirmation'] = true;
-            }
-            $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
         }
         $head = html_writer::start_tag('div', [
             'id' => 'recording-actionbar-' . $rec->get('id'),
@@ -183,69 +172,61 @@ class recording_data {
     }
 
     /**
-     * Helper function returns the corresponding payload for an actionbar button used in row
-     * for the data used by the recording table.
+     * Read the settings for this action and disable or hide the tool from the toolbar
      *
-     * @param recording $recording
-     * @param string $tool
-     * @return array
+     * @param array $buttonpayload
+     * @param string $condition
+     * @param recording $rec
+     * @param string $value
      */
-    public static function row_actionbar_payload(recording $recording, string $tool): array {
-        if ($tool == 'protect') {
-            $protected = 'false';
-            if (!is_null($recording->get('protected'))) {
-                $protected = $recording->get('protected');
+    private static function actionbar_set_disabled(&$buttonpayload, $condition, $rec, $value = 'invisible') {
+        if ($condition) {
+            $negates = $condition[0] === '!';
+            $conditionalvariable = ltrim($condition, '!');
+            if ($rec->get($conditionalvariable) xor $negates) {
+                $buttonpayload['disabled'] = $value;
             }
-            return self::row_action_protect($protected);
         }
-        if ($tool == 'publish') {
-            return self::row_action_publish($recording->get('published'));
-        }
-        return [
-            'action' => $tool,
-            'tag' => $tool,
-        ];
     }
 
     /**
-     * Helper function returns the payload for protect action button used in row
-     * for the data used by the recording table.
-     *
-     * @param string $protected
-     * @return array
+     * @var array TOOLS_DEFINITION a list of definition for the the specific tools
      */
-    public static function row_action_protect(string $protected): array {
-        if ($protected == 'true') {
-            return [
-                'action' => 'unprotect',
-                'tag' => 'lock',
-            ];
-        }
-        return [
+    const TOOL_ACTION_DEFINITIONS = [
+        'protect' => [
+            'action' => 'unprotect',
+            'icon' => 'lock',
+            'hidewhen' => 'protected',
+            'disablewhen' => 'imported'
+        ],
+        'unprotect' => [
             'action' => 'protect',
-            'tag' => 'unlock',
-        ];
-    }
-
-    /**
-     * Helper function returns the payload for publish action button used in row
-     * for the data used by the recording table.
-     *
-     * @param string $published
-     * @return array
-     */
-    public static function row_action_publish(string $published): array {
-        if ($published == 'true') {
-            return [
-                'action' => 'unpublish',
-                'tag' => 'hide',
-            ];
-        }
-        return [
+            'icon' => 'unlock',
+            'hidewhen' => '!protected',
+        ],
+        'publish' => [
             'action' => 'publish',
-            'tag' => 'show',
-        ];
-    }
+            'icon' => 'show',
+            'hidewhen' => 'published',
+            'requireconfirmation' => true,
+            'disablewhen' => 'imported'
+        ],
+        'unpublish' => [
+            'action' => 'unpublish',
+            'icon' => 'hide',
+            'hidewhen' => '!published',
+            'requireconfirmation' => true,
+        ],
+        'delete' => [
+            'action' => 'delete',
+            'icon' => 'trash',
+            'requireconfirmation' => true
+        ],
+        'import'  => [
+            'action' => 'import',
+            'icon' => 'import',
+        ]
+    ];
 
     /**
      * Helper function builds recording preview used in row for the data used by the recording table.
@@ -257,7 +238,7 @@ class recording_data {
         $options = [
             'id' => 'preview-' . $recording->get('id'),
         ];
-        if ($recording->get('published') === 'false') {
+        if (!$recording->get('published')) {
             $options['hidden'] = 'hidden';
         }
         $recordingpreview = html_writer::start_tag('div', $options);
@@ -326,7 +307,7 @@ class recording_data {
             $title = get_string('view_recording_link_warning', 'bigbluebuttonbn');
         }
         $visibility = '';
-        if ($rec->get('published') === 'false') {
+        if (!$rec->get('published')) {
             $visibility = 'hidden ';
         }
         $id = 'playbacks-' . $rec->get('id');
@@ -367,7 +348,7 @@ class recording_data {
         // A parameter href with the URL to the recording is added only when the BBB server doesn't implement "protected recording".
         // This is equivalent to use an a tag with href and target="_blank". The vulnerability is in BBB and not Moodle.
         // Using of a proxy that protects the recordings such as Scalelite (v1.2 or later by Blindside Networks) is encouraged.
-        if (!is_null($rec->get('protected') || $rec->get('protected') === 'false')) {
+        if (!$rec->get('protected')) {
             $href .= '&href=' . urlencode(trim($playback['url']));
         }
         $linkattributes = [
@@ -412,7 +393,7 @@ class recording_data {
      */
     public static function include_recording_table_row(instance $instance, recording $rec): bool {
         // Exclude unpublished recordings, only if user has no rights to manage them.
-        if ($rec->get('published') != 'true' && !$instance->can_manage_recordings()) {
+        if (!$rec->get('published') && !$instance->can_manage_recordings()) {
             return false;
         }
         // Imported recordings are always shown as long as they are published.
@@ -502,7 +483,7 @@ class recording_data {
                 $linkattributes['class'] = 'disabled';
             }
             $icon = new pix_icon(
-                'i/' . $data['tag'],
+                'i/' . $data['icon'],
                 get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
                 'moodle',
                 $iconattributes

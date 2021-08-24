@@ -35,6 +35,7 @@ use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
 use lang_string;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
@@ -227,6 +228,19 @@ class settings {
             );
             $this->add_conditional_element(
                 'recording_default',
+                $item,
+                $recordingsetting
+            );
+            $recordingsetting->add($item);
+            $item = new admin_setting_configtext(
+                'bigbluebuttonbn_recording_refresh_period',
+                get_string('config_recording_refresh_period', 'bigbluebuttonbn'),
+                get_string('config_recording_refresh_period_description', 'bigbluebuttonbn'),
+                recording::RECORDING_REFRESH_DEFAULT_PERIOD,
+                PARAM_INT
+            );
+            $this->add_conditional_element(
+                'recording_refresh_period',
                 $item,
                 $recordingsetting
             );

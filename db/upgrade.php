@@ -368,6 +368,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021072906, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2021072907) {
+        // Define field id to be dropped from bigbluebuttonbn_recordings.
+        $table = new xmldb_table('bigbluebuttonbn_recordings');
+        $remotedatatstamp = new xmldb_field('remotedatatstamp');
+        $remotedata = new xmldb_field('remotedata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'status');
+        // Conditionally launch drop field remotedatatstamp.
+        if ($dbman->field_exists($table, $remotedatatstamp)) {
+            $dbman->drop_field($table, $remotedatatstamp);
+        }
+        // Launch rename field importeddata.
+        $dbman->rename_field($table, $remotedata, 'importeddata');
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021072907, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 

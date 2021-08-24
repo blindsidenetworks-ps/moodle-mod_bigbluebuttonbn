@@ -86,7 +86,7 @@ class get_recordings extends external_api {
         $warnings = [];
 
         if ($tools === null) {
-            $tools = 'protect,publish,delete';
+            $tools = 'protect,unprotect,publish,unpublish,delete,unprotect,';
         }
 
         // Validate the bigbluebuttonbnid ID.

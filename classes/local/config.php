@@ -26,6 +26,7 @@
 namespace mod_bigbluebuttonbn\local;
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 
 class config {
 
@@ -83,6 +84,7 @@ class config {
             'recordings_validate_url' => true,
             'recording_default' => true,
             'recording_editable' => true,
+            'recording_refresh_period' => recording::RECORDING_REFRESH_DEFAULT_PERIOD,
             'recording_icons_enabled' => true,
             'recording_all_from_start_default' => false,
             'recording_all_from_start_editable' => false,
@@ -197,6 +199,7 @@ class config {
                'recordings_validate_url' => self::get('recordings_validate_url'),
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
+               'recording_refresh_period' => self::get('recording_refresh_period'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
                'recording_all_from_start_default' => self::get('recording_all_from_start_default'),
                'recording_all_from_start_editable' => self::get('recording_all_from_start_editable'),

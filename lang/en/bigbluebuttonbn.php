@@ -130,7 +130,9 @@ $string['config_recording_hide_button_default'] = 'Hide recording button';
 $string['config_recording_hide_button_default_description'] = 'If checked the button for record will be hide';
 $string['config_recording_hide_button_editable'] = 'Hide recording button can be edited';
 $string['config_recording_hide_button_editable_description'] = 'If checked the interface includes an option for enable and disable the hide recording button feature.';
-
+$string['config_recording_refresh_period'] = 'Recording refresh period (in seconds)';
+$string['config_recording_refresh_period_description'] = 'To avoid querying the Bigbluebutton server too often we cache information
+ for recording. This is the refresh period in seconds which will decide how often we can/would refresh remote information for a given recording. Defaults to 300s (5mins).';
 $string['config_recordings'] = 'Configuration for "Show recordings" feature';
 $string['config_recordings_description'] = 'These settings are feature specific';
 $string['config_recordings_general'] = 'Show recording settings';

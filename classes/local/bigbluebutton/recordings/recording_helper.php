@@ -233,8 +233,9 @@ class recording_helper {
             $selects[] = "imported = " . recording::RECORDING_IMPORTED;
         }
         // Now get only recordings that have been validated by recording ready callback.
-        $selects[] = "status =:status";
-        $params['status'] = recording::RECORDING_STATUS_NOTIFIED;
+        $selects[] = "status = :status1 OR status = :status2";
+        $params['status1'] = recording::RECORDING_STATUS_PROCESSED;
+        $params['status2'] = recording::RECORDING_STATUS_NOTIFIED;
         return array($selects, $params);
     }
 

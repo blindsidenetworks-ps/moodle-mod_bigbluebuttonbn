@@ -54,15 +54,31 @@ class recording_proxy extends proxy_base {
      * @return boolean
      */
     public static function publish_recording(string $recordid, string $publish = 'true'): bool {
-        $ids = explode(',', $recordids);
-        foreach ($ids as $id) {
-            $result = self::fetch_endpoint_xml('publishRecordings', [
-                'recordID' => $recordid,
-                'publish' => $publish,
-            ]);
-            if (!$result || $result->returncode != 'SUCCESS') {
-                return false;
-            }
+        $result = self::fetch_endpoint_xml('publishRecordings', [
+            'recordID' => $recordid,
+            'publish' => $publish,
+        ]);
+        if (!$result || $result->returncode != 'SUCCESS') {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Perform publishRecordings on BBB.
+     *
+     * @param string $recordid
+     * @param string $protected
+     * @return boolean
+     */
+    public static function protect_recording(string $recordid, string $protected = 'true'): bool {
+        $result = self::fetch_endpoint_xml('updateRecordings', [
+            'recordID' => $recordid,
+            ['protect' => $protected],
+        ]);
+        if (!$result || $result->returncode != 'SUCCESS') {
+            return false;
         }
         return true;
     }

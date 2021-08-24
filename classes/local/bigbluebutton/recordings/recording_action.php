@@ -44,7 +44,7 @@ class recording_action {
      * @param instance $instance
      */
     public static function import(recording $recording, instance $instance) {
-        recording::create_imported_recording_from_recording($instance, $recording);
+        $recording->create_imported_recording($instance);
     }
 
     /**
