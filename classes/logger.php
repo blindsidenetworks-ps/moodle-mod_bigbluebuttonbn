@@ -143,8 +143,8 @@ class logger {
      * @return int The new count of callback events
      */
     public static function log_event_callback(instance $instance, array $overrides, array $meta): int {
-        self::log_event_callback(
-            $instance->get_instance_data(),
+        self::log(
+            $instance,
             self::EVENT_CALLBACK,
             $overrides,
             json_encode($meta)
