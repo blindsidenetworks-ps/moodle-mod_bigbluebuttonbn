@@ -35,6 +35,7 @@ global $PAGE, $USER, $CFG, $SESSION, $DB;
 $params['action'] = optional_param('action', '', PARAM_TEXT);
 $params['callback'] = optional_param('callback', '', PARAM_TEXT);
 $params['id'] = optional_param('id', '', PARAM_TEXT);
+$params['idx'] = optional_param('idx', '', PARAM_TEXT);
 $params['bigbluebuttonbn'] = optional_param('bigbluebuttonbn', 0, PARAM_INT);
 $params['signed_parameters'] = optional_param('signed_parameters', '', PARAM_TEXT);
 $params['updatecache'] = optional_param('updatecache', 'false', PARAM_TEXT);
