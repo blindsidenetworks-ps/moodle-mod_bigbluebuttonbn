@@ -220,19 +220,20 @@ class recording extends persistent {
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public function create_imported_recording(instance $instance) {
-        $recordingrec = $this->to_record();
-        if ($this->must_sync()) {
-            $this->sync_remote_recording(); // Make sure we have the right metadata.
+    public static function create_imported_recording_from_recording(instance $instance, self $recording) {
+        $recordingrec = $recording->to_record();
+        if ($recording->must_sync()) {
+            $recording->sync_remote_recording(); // Make sure we have the right metadata.
         }
         unset($recordingrec->id);
         $recordingrec->bigbluebuttonbnid = $instance->get_instance_id();
         $recordingrec->courseid = $instance->get_course_id();
         $recordingrec->groupid = 0; // The recording is available to everyone.
-        $recordingrec->remotedata = $this->raw_get('remotedata');
+        $recordingrec->remotedata = $recording->raw_get('remotedata');
         $recordingrec->imported = true;
         $importedrecording = new recording(0, $recordingrec);
         $importedrecording->create();
+
         return $importedrecording;
     }
 

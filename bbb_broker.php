@@ -48,16 +48,18 @@ if (!empty($error)) {
     return;
 }
 
-$instance = instance::get_from_instance($params['bigbluebuttonbn']);
+$instance = instance::get_from_instanceid($params['bigbluebuttonbn']);
+if (empty($instance)) {
+    header('HTTP/1.0 410 Gone. The activity may have been deleted');
+    return;
+}
 
-// TODO Make recording_ready::recording_ready and meeting::meeting_events take the instance.
-$bigbluebuttonbn = $instance->get_instance_data();
 $PAGE->set_context($instance->get_context());
 
 try {
     switch(strtolower($params['action'])) {
         case 'recording_ready':
-            recording_helper::recording_ready($params, $bigbluebuttonbn);
+            recording_helper::recording_ready($instance, $params);
             return;
         case 'meeting_events':
             // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request

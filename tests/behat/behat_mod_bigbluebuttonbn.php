@@ -49,14 +49,18 @@ class behat_mod_bigbluebuttonbn extends behat_base {
             );
         }
 
-        $reseturl = self::get_mocked_server_url('backoffice/reset');
-
-        $curl = new \curl();
-        $curl->get($reseturl->out_omit_querystring(), $reseturl->params());
+        $this->send_mock_request('backoffice/reset');
     }
 
     public static function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
         return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
+    }
+
+    protected function send_mock_request(string $endpoint): void {
+        $url = $this->get_mocked_server_url($endpoint);
+
+        $curl = new \curl();
+        $curl->get($url->out_omit_querystring(), $url->params());
     }
 
     /**
@@ -146,4 +150,12 @@ class behat_mod_bigbluebuttonbn extends behat_base {
             MUST_EXIST
         );
     }
+
+    /**
+     * @Given the BigBlueButtonBN server has sent recording ready notifications
+     */
+    public function trigger_recording_ready_notification(): void {
+        $this->send_mock_request('backoffice/sendNotifications');
+    }
+
 }

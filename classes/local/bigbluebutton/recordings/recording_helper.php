@@ -330,12 +330,10 @@ class recording_helper {
     /**
      * Helper for responding when recording ready is performed.
      *
+     * @param instance $instance
      * @param array $params
-     * @param object $bigbluebuttonbn
-     *
-     * @return void
      */
-    public static function recording_ready(array $params, object $bigbluebuttonbn) {
+    public static function recording_ready(instance $instance, array $params): void {
         // Decodes the received JWT string.
         try {
             $decodedparameters = \Firebase\JWT\JWT::decode(
@@ -348,26 +346,24 @@ class recording_helper {
             header('HTTP/1.0 400 Bad Request. ' . $error);
             return;
         }
+
         // Validations.
         if (!isset($decodedparameters->record_id)) {
             header('HTTP/1.0 400 Bad request. Missing record_id parameter');
             return;
         }
+
         $recording = recording::get_record(['recordingid' => $decodedparameters->record_id]);
         if (!isset($recording)) {
             header('HTTP/1.0 400 Bad request. Invalid record_id');
             return;
         }
-        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
-        if (!isset($instance)) {
-            header('HTTP/1.0 410 Gone. The activity may have been deleted');
-            return;
-        }
+
         // Sends the messages.
         try {
             // We make sure messages are sent only once.
             if ($recording->get('status') != recording::RECORDING_STATUS_NOTIFIED) {
-                notifier::notify_recording_ready($bigbluebuttonbn);
+                notifier::notify_recording_ready($instance->get_instance_data());
                 $recording->set('status', recording::RECORDING_STATUS_NOTIFIED);
                 $recording->update();
             }
