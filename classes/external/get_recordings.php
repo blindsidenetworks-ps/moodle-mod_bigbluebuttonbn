@@ -85,10 +85,6 @@ class get_recordings extends external_api {
 
         $warnings = [];
 
-        if ($tools === null) {
-            $tools = 'protect,unprotect,publish,unpublish,delete,unprotect,';
-        }
-
         // Validate the bigbluebuttonbnid ID.
         [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
@@ -130,6 +126,9 @@ class get_recordings extends external_api {
         $enabledfeatures = $instance->get_enabled_features();
         $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
 
+        if ($tools === null) {
+            $tools = 'protect,unprotect,publish,unpublish,delete';
+        }
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
