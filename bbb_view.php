@@ -33,7 +33,6 @@ global $SESSION;
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
-$href = optional_param('href', '', PARAM_TEXT);
 $mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
@@ -221,7 +220,7 @@ switch (strtolower($action)) {
         bigbluebuttonbn_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
         break;
     case 'play':
-        $href = bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype);
+        $href = bigbluebuttonbn_bbb_view_playback_href($mid, $rid, $rtype);
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn,
             ['other' => $rid]);
@@ -238,16 +237,12 @@ switch (strtolower($action)) {
 /**
  * Helper for getting the playback url that corresponds to an specific type.
  *
- * @param  string   $href
  * @param  string   $mid
  * @param  string   $rid
  * @param  string   $rtype
  * @return string
  */
-function bigbluebuttonbn_bbb_view_playback_href($href, $mid, $rid, $rtype) {
-    if ($href != '' || $mid == '' || $rid == '') {
-        return $href;
-    }
+function bigbluebuttonbn_bbb_view_playback_href($mid, $rid, $rtype) {
     $recordings = bigbluebuttonbn_get_recordings_array($mid, $rid);
     if (empty($recordings)) {
         return '';

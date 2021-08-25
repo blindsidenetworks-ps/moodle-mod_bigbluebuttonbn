@@ -1701,9 +1701,6 @@ function bigbluebuttonbn_get_recording_data_row_type($recording, $bbbsession, $p
     $text = bigbluebuttonbn_get_recording_type_text($playback['type']);
     $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $bbbsession['bigbluebuttonbn']->id .
         '&mid=' . $recording['meetingID'] . '&rid=' . $recording['recordID'] . '&rtype=' . $playback['type'];
-    if (!isset($recording['imported']) || !isset($recording['protected']) || $recording['protected'] === 'false') {
-        $href .= '&href=' . urlencode(trim($playback['url']));
-    }
     $linkattributes = array(
         'id' => 'recording-play-' . $playback['type'] . '-' . $recording['recordID'],
         'class' => 'btn btn-sm btn-default',
