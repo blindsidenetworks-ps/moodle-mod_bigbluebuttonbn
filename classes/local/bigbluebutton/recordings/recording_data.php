@@ -54,7 +54,7 @@ class recording_data {
             $tools = ['protect', 'publish', 'delete'];
         }
         $context = context_course::instance($instance->get_course_id());
-        foreach($tools as $key => $tool) {
+        foreach ($tools as $key => $tool) {
             if (!$instance->can_perform_on_recordings($tool)) {
                 unset($tools[$key]);
             }
