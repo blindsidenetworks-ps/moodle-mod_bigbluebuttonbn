@@ -42,7 +42,6 @@ global $SESSION, $PAGE, $CFG, $DB, $USER;
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
-$href = optional_param('href', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
@@ -172,7 +171,7 @@ switch (strtolower($action)) {
         break;
 
     case 'play':
-        $href = bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype);
+        $href = bigbluebuttonbn_bbb_view_playback_href($rid, $rtype);
         logger::log_recording_played_event($instance, $rid);
 
         // Execute the redirect.
@@ -185,15 +184,11 @@ switch (strtolower($action)) {
 /**
  * Helper for getting the playback url that corresponds to an specific type.
  *
- * @param string $href
  * @param string $rid
  * @param string $rtype
  * @return string
  */
-function bigbluebuttonbn_bbb_view_playback_href($href, $rid, $rtype) {
-    if ($href != '') {
-        return $href;
-    }
+function bigbluebuttonbn_bbb_view_playback_href($rid, $rtype) {
     $recording = recording::get_record(['recordingid' => $rid]);
     if (empty($recording)) {
         return '';
