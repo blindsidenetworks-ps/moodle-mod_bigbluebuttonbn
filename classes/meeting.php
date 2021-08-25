@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Instance record for mod_bigbluebuttonbn.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_bigbluebuttonbn;
 
 use cache;
@@ -36,7 +28,7 @@ use mod_bigbluebuttonbn\logger;
 use stdClass;
 
 /**
- * Class meeting
+ * Class to describe a BBB Meeting.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>

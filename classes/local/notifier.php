@@ -14,23 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The mod_bigbluebuttonbn locallib/notifier.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2017 - present, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local;
 
 use html_writer;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\plugin;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Helper class for sending notifications.

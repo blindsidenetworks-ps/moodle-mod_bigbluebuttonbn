@@ -14,16 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The recordings_data.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use html_writer;
@@ -36,6 +26,15 @@ use mod_bigbluebuttonbn\plugin;
 use pix_icon;
 use stdClass;
 
+/**
+ * The recordings_data.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
 class recording_data {
 
     /**

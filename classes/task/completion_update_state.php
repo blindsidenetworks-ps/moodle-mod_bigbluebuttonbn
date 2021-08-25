@@ -14,19 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Internal library of functions for module BigBlueButtonBN.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2019 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class containing the scheduled task for lti module.
@@ -53,6 +43,7 @@ class completion_update_state extends adhoc_task {
         // Get the custom data.
         $data = $this->get_custom_data();
         mtrace("Task completion_update_state running for user {$data->userid}");
+
         // Process the completion.
         \mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy::update_completion_state($data->bigbluebuttonbn, $data->userid);
     }

@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn;
+
+use context_module;
+use mod_bigbluebuttonbn\event\events;
+use mod_bigbluebuttonbn\instance;
+use stdClass;
+
 /**
  * Utility class for all logs routines helper.
  *
@@ -22,13 +29,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
-namespace mod_bigbluebuttonbn;
-
-use context_module;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\instance;
-use stdClass;
-
 class logger {
 
     /** @var string The bigbluebuttonbn Add event */

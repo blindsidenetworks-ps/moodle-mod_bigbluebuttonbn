@@ -13,24 +13,12 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * The mod_bigbluebuttonbn custom_completion event.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David (laurent@call-learning.fr)
- */
-
 namespace mod_bigbluebuttonbn\completion;
 
 use core_completion\activity_custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\logger;
 use moodle_exception;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class custom_completion

@@ -13,14 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-/**
- * Tests for Big Blue Button Completion.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 - present, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David (laurent@call-learning.fr)
- */
+
 namespace mod_bigbluebuttonbn;
 
 use completion_info;

@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * BigBlueButtonBN internal API for meeting
- *
- * @package   mod_bigbluebuttonbn
- * @category  external
- * @copyright 2018 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_bigbluebuttonbn\external;
 
 use core\notification;
@@ -39,7 +30,7 @@ use moodle_exception;
 use restricted_context_exception;
 
 /**
- * External service to end a meeting.
+ * External service to check whether a usr can join a meeting.
  *
  * @package   mod_bigbluebuttonbn
  * @category  external

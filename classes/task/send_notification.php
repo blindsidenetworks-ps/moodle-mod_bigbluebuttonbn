@@ -14,20 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Internal library of functions for module BigBlueButtonBN.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2019 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
 use mod_bigbluebuttonbn\local\notifier;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class containing the scheduled task for lti module.
@@ -36,8 +26,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2019 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class send_notification extends adhoc_task
-{
+class send_notification extends adhoc_task {
 
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -55,6 +44,7 @@ class send_notification extends adhoc_task
         // Get the custom data.
         $data = $this->get_custom_data();
         mtrace("Execute send_notification task: Sending notification to user {$data->receiver->id}");
+
         // Process the completion.
         notifier::send_notification($data->sender, $data->receiver, $data->htmlmsg);
     }

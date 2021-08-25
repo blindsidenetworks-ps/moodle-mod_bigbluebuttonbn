@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The recording entity.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use cache;
@@ -32,9 +23,10 @@ use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use stdClass;
 
 /**
- * Utility class that defines a recording and provides methods for handlinging locally in Moodle and externally in BBB.
+ * The recording entity.
  *
- * Utility class for recording helper
+ * This is utility class that defines a single recording, and provides methods for their local handling locally, and
+ * communication with the bigbluebutton server.
  *
  * @package mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
