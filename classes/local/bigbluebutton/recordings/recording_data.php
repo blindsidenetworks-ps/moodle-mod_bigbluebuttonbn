@@ -352,12 +352,6 @@ class recording_data {
             'data-target' => $playback['type'],
             'data-href' => $href,
         ];
-        if ($CFG->bigbluebuttonbn_recordings_validate_url && !plugin::is_bn_server()
-            && !bigbluebutton_proxy::is_remote_resource_valid(trim($playback['url']))) {
-            $linkattributes['class'] = 'btn btn-sm btn-warning';
-            $linkattributes['title'] = get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn');
-            unset($linkattributes['data-href']);
-        }
         return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
     }
 
