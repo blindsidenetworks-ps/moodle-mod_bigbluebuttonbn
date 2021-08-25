@@ -58,6 +58,7 @@ class mobile {
 
         $args = (object) $args;
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
+        $versionname = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
         if (!$viewinstance) {
             $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
             return(self::mobile_print_error($error));
@@ -222,7 +223,7 @@ class mobile {
             'templates' => array(
                 array(
                     'id' => 'main',
-                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_page', $data),
+                    'html' => $OUTPUT->render_from_template("mod_bigbluebuttonbn/mobile_view_page_$versionname", $data),
                 ),
             ),
             'javascript' => $jstimecreatedmeeting,
