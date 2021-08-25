@@ -206,13 +206,14 @@ class recording_data {
         'protect' => [
             'action' => 'unprotect',
             'icon' => 'lock',
-            'hidewhen' => 'protected',
+            'hidewhen' => '!protected',
             'disablewhen' => 'imported'
         ],
         'unprotect' => [
             'action' => 'protect',
             'icon' => 'unlock',
             'hidewhen' => '!protected',
+            'disablewhen' => 'imported'
         ],
         'publish' => [
             'action' => 'publish',
@@ -226,6 +227,7 @@ class recording_data {
             'icon' => 'hide',
             'hidewhen' => '!published',
             'requireconfirmation' => true,
+            'disablewhen' => 'imported'
         ],
         'delete' => [
             'action' => 'delete',
