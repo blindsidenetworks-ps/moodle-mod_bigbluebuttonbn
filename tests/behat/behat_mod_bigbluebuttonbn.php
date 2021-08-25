@@ -52,10 +52,24 @@ class behat_mod_bigbluebuttonbn extends behat_base {
         $this->send_mock_request('backoffice/reset');
     }
 
+    /**
+     * Retrieve the mock server URL from the TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER definition
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @return moodle_url
+     * @throws moodle_exception
+     */
     public static function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
         return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
     }
 
+    /**
+     * Send a query to the mock server
+     *
+     * @param string $endpoint
+     * @throws coding_exception
+     */
     protected function send_mock_request(string $endpoint): void {
         $url = $this->get_mocked_server_url($endpoint);
 

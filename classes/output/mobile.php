@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-
 namespace mod_bigbluebuttonbn\output;
 
 defined('MOODLE_INTERNAL') || die();

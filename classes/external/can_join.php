@@ -30,7 +30,9 @@ use moodle_exception;
 use restricted_context_exception;
 
 /**
- * External service to check whether a usr can join a meeting.
+ * External service to check whether a user can join a meeting.
+ *
+ * This is mainly used by the mobile application.
  *
  * @package   mod_bigbluebuttonbn
  * @category  external
@@ -52,22 +54,26 @@ class can_join extends external_api {
     /**
      * Updates a recording
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param int $groupid the groupid (either 0 or the groupid)
+     * @param int $cmid the bigbluebuttonbn course module id
      * @return array (empty array for now)
      * @throws \restricted_context_exception
      */
     public static function execute(
-        int $bigbluebuttonbnid,
+        int $cmid,
         int $groupid
     ): array {
-        // Validate the bigbluebuttonbnid ID.
+        // Validate the cmid ID.
+        // TODO: we should maybe pass the bbbid + groupid instead of the cmid.
         [
             'cmid' => $cmid,
         ] = self::validate_parameters(self::execute_parameters(), [
             'cmid' => $cmid,
         ]);
 
+        $instance = instance::get_from_cmid($cmid);
+        $context = $instance->get_context();
+        self::validate_context($context);
+        
         $canjoin = bigbluebutton_proxy::can_join_meeting($cmid);
         $canjoin['cmid'] = $cmid;
 

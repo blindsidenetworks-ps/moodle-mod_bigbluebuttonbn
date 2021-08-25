@@ -114,7 +114,7 @@ class roles {
     /**
      * Returns an array containing all the roles in a context.
      *
-     * @param context $context
+     * @param context|null $context $context
      * @param bool $onlyviewableroles
      *
      * @return array $roles
@@ -140,7 +140,7 @@ class roles {
     /**
      * Returns an array containing all the roles in a context wrapped for html select element.
      *
-     * @param context $context
+     * @param context|null $context $context
      * @param bool $onlyviewableroles
      *
      * @return array $users

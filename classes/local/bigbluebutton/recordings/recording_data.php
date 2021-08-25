@@ -40,6 +40,8 @@ class recording_data {
     /**
      * Helper function builds a row for the data used by the recording table.
      *
+     * TODO: replace this with templates whenever possible.
+     *
      * @param instance $instance
      * @param recording $rec a recording row
      * @param null|array $tools

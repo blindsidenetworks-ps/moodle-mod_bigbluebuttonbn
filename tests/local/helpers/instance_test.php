@@ -62,7 +62,7 @@ class instance_test extends testcase_helper {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->instance = 0;
         $bbformdata->timemodified = time();
-        mod_helper::process_pre_save_instance($bbformdata);
+        mod_helper::process_pre_save($bbformdata);
         $this->assertTrue($bbformdata->timemodified == 0);
     }
 
@@ -76,7 +76,7 @@ class instance_test extends testcase_helper {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         unset($bbformdata->wait);
         unset($bbformdata->recordallfromstart);
-        mod_helper::process_pre_save_checkboxes($bbformdata);
+        mod_helper::process_pre_save($bbformdata);
         $this->assertTrue(isset($bbformdata->wait));
         $this->assertTrue(isset($bbformdata->recordallfromstart));
     }
@@ -94,7 +94,7 @@ class instance_test extends testcase_helper {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         $bbformdata->groupmode = '1';
-        mod_helper::process_pre_save_common($bbformdata);
+        mod_helper::process_pre_save($bbformdata);
         $this->assertEquals(0, $bbformdata->groupmode);
     }
 
@@ -140,8 +140,8 @@ class instance_test extends testcase_helper {
         // Enrol users in a course so he will receive the message.
         $teacher = $this->generator->create_user(['role' => 'editingteacher']);
         $this->generator->enrol_user($teacher->id, $this->course->id);
-
-        mod_helper::process_post_save_notification($bbformdata);
+        $bbformdata->notification = true;
+        mod_helper::process_post_save($bbformdata);
         // Now run cron.
         ob_start();
         $this->runAdhocTasks();
@@ -160,7 +160,7 @@ class instance_test extends testcase_helper {
         $eventsink = $this->redirectEvents();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->openingtime = time();
-        mod_helper::process_post_save_event($bbformdata);
+        mod_helper::process_post_save($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 
@@ -175,7 +175,7 @@ class instance_test extends testcase_helper {
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $eventsink = $this->redirectEvents();
         $bbformdata->completionexpected = 1;
-        mod_helper::process_post_save_completion($bbformdata);
+        mod_helper::process_post_save($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
 

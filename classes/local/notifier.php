@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\local;
 
 use html_writer;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\output\notifier_instance_updated;
 use mod_bigbluebuttonbn\plugin;
 use moodle_url;
 
@@ -30,39 +31,6 @@ use moodle_url;
 class notifier
 {
     /**
-     * Prepares html message body for instance updated notification.
-     *
-     * @param object $msg
-     * @return string
-     */
-    public static function htmlmsg_instance_updated($msg) {
-        $messagetext = '<p>'.get_string('pluginname', 'bigbluebuttonbn').
-            ' <b>'.$msg->activity_url.'</b> '.
-            get_string('email_body_notification_meeting_has_been', 'bigbluebuttonbn').' '.$msg->action.'.</p>'."\n";
-        $messagetext .= '<p>'.get_string('email_body_notification_meeting_details', 'bigbluebuttonbn').':'."\n";
-        $messagetext .= '<table border="0" style="margin: 5px 0 0 20px"><tbody>'."\n";
-        $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-            get_string('email_body_notification_meeting_title', 'bigbluebuttonbn').': </td><td>'."\n";
-        $messagetext .= $msg->activity_title.'</td></tr>'."\n";
-        $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-            get_string('email_body_notification_meeting_description', 'bigbluebuttonbn').': </td><td>'."\n";
-        $messagetext .= $msg->activity_description.'</td></tr>'."\n";
-        $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-            get_string('email_body_notification_meeting_start_date', 'bigbluebuttonbn').': </td><td>'."\n";
-        $messagetext .= $msg->activity_openingtime.'</td></tr>'."\n";
-        $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.
-            get_string('email_body_notification_meeting_end_date', 'bigbluebuttonbn').': </td><td>'."\n";
-        $messagetext .= $msg->activity_closingtime.'</td></tr>'."\n";
-        $messagetext .= '<tr><td style="font-weight:bold;color:#555;">'.$msg->action.' '.
-            get_string('email_body_notification_meeting_by', 'bigbluebuttonbn').': </td><td>'."\n";
-        $messagetext .= $msg->activity_owner.'</td></tr></tbody></table></p>'."\n";
-        $messagetext .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
-            $msg->user_name.' ';
-        $messagetext .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-        return $messagetext;
-    }
-
-    /**
      * Starts the notification process.
      *
      * @param object $bigbluebuttonbn
@@ -70,35 +38,10 @@ class notifier
      * @return void
      */
     public static function notify_instance_updated($bigbluebuttonbn, $action) {
-        global $USER;
-        $coursemodinfo = \course_modinfo::instance($bigbluebuttonbn->course);
-        $course = $coursemodinfo->get_course($bigbluebuttonbn->course);
-        $sender = $USER;
-        // Prepare message.
-        $msg = (object) array();
-        // Build the message_body.
-        $msg->action = $action;
-        $msg->activity_url = html_writer::link(
-            new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bigbluebuttonbn->coursemodule]),
-            format_string($bigbluebuttonbn->name)
-        );
-        $msg->activity_title = format_string($bigbluebuttonbn->name);
-        // Add the meeting details to the message_body.
-        $msg->action = ucfirst($action);
-        $msg->activity_description = '';
-        if (!empty($bigbluebuttonbn->intro)) {
-            $msg->activity_description = format_string(trim($bigbluebuttonbn->intro));
-        }
-        $msg->activity_openingtime = self::format_activity_time($bigbluebuttonbn->openingtime);
-        $msg->activity_closingtime = self::format_activity_time($bigbluebuttonbn->closingtime);
-        $msg->activity_owner = fullname($sender);
-
-        $msg->user_name = fullname($sender);
-        $msg->user_email = $sender->email;
-        $msg->course_name = $course->fullname;
-
+        global $USER, $OUTPUT;
+        $notifierouput = new notifier_instance_updated($bigbluebuttonbn, $USER, $action);
         // Send notification to all users enrolled.
-        self::enqueue_notifications($bigbluebuttonbn, $sender, self::htmlmsg_instance_updated($msg));
+        self::enqueue_notifications($bigbluebuttonbn, $USER, $OUTPUT->render($notifierouput));
     }
 
     /**

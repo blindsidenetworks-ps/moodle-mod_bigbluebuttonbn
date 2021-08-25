@@ -200,6 +200,15 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         return $precording->to_record();
     }
 
+    /**
+     * Add a recording in the mock server
+     *
+     * @param instance $instance
+     * @param stdClass $recording
+     * @param array $data
+     * @return string
+     * @throws moodle_exception
+     */
     protected function add_recording(instance $instance, stdClass $recording, array $data): string {
         $mockdata = array_merge((array) $recording, [
             'meetingID' => $instance->get_meeting_id(),
@@ -297,6 +306,15 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
     }
 
+    /**
+     * Utility to send a request to the mock server
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @param array $mockdata
+     * @return SimpleXMLElement
+     * @throws coding_exception
+     */
     protected function send_mock_request(string $endpoint, array $params = [], array $mockdata = []): SimpleXMLElement {
         $url = $this->get_mocked_server_url($endpoint, $params);
 
@@ -317,6 +335,9 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         return simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
     }
 
+    /**
+     * Reset the mock server
+     */
     public function reset_mock(): void {
         $this->send_mock_request('backoffice/reset');
     }
