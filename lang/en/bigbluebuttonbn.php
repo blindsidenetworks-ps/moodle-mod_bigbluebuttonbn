@@ -41,6 +41,7 @@ $string['bigbluebuttonbn:unpublishrecordings'] = 'Unpublish recordings';
 $string['bigbluebuttonbn:protectrecordings'] = 'Protect recordings';
 $string['bigbluebuttonbn:unprotectrecordings'] = 'Unprotect recordings';
 $string['bigbluebuttonbn:deleterecordings'] = 'Delete recordings';
+$string['bigbluebuttonbn:importrecordings'] = 'Import recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 $string['cannotperformaction'] = 'Cannot perform action {$a} on this recording';
 $string['indicator:cognitivedepth'] = 'BigBlueButton cognitive';
