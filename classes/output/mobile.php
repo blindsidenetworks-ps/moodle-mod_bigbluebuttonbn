@@ -28,13 +28,13 @@ namespace mod_bigbluebuttonbn\output;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
 use mod_bigbluebuttonbn\local\mobileview;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 
@@ -57,22 +57,19 @@ class mobile {
      * @param mixed $args
      * @return array HTML, javascript and other data.
      */
-    public static function mobile_course_view($args) {
-
+    public static function mobile_course_view($args): array {
         global $OUTPUT;
 
         $args = (object) $args;
         $versionname = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
-        $viewinstance = view::validator($args->cmid, null);
-        if (!$viewinstance) {
-            $error = get_string('view_error_url_missing_parameters', 'bigbluebuttonbn');
-            return self::mobile_print_error($error);
-        }
 
         $instance = instance::get_from_cmid($args->cmid);
+        if (!$instance) {
+            return self::mobile_print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
+        }
+
         $cm = $instance->get_cm();
         $course = $instance->get_course();
-        $bigbluebuttonbn = $instance->get_instance_data();
 
         // Check activity status.
         if ($instance->before_start_time()) {
@@ -82,19 +79,19 @@ class mobile {
                 'starts_at' => '',
                 'ends_at' => '',
             ];
-            if (!empty($bigbluebuttonbn->openingtime)) {
+            if (!empty($instance->get_instance_var('openingtime'))) {
                 $notstarted['starts_at'] = sprintf(
                     '%s: %s',
                     get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
-                    userdate($bigbluebuttonbn->openingtime)
+                    userdate($instance->get_instance_var('openingtime'))
                 );
             }
 
-            if (!empty($bigbluebuttonbn->closingtime)) {
+            if (!empty($instance->get_instance_var('closingtime'))) {
                 $notstarted['ends_at'] = sprintf(
                     '%s: %s',
                     get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
-                    userdate($bigbluebuttonbn->closingtime)
+                    userdate($instance->get_instance_var('closingtime'))
                 );
             }
 
@@ -107,9 +104,9 @@ class mobile {
         }
 
         // Check if the BBB server is working.
-        $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
+        $serverversion = bigbluebutton_proxy::get_server_version();
         if ($serverversion === null) {
-            return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
+            return self::mobile_print_error(bigbluebutton_proxy::get_server_not_available_message($instance));
         }
 
         // Mark viewed by user (if required).
@@ -139,11 +136,11 @@ class mobile {
             try {
                 $meeting->create_meeting();
                 // Event meeting created.
-                logs::log_meeting_created_event($instance);
+                logger::log_meeting_created_event($instance);
             } catch (bigbluebutton_exception $e) {
                 return self::mobile_print_error($e->getMessage());
             } catch (server_not_available_exception $e) {
-                return self::mobile_print_error(bigbluebutton::get_server_not_available_message($instance));
+                return self::mobile_print_error(bigbluebutton_proxy::get_server_not_available_message($instance));
             }
         }
 
@@ -162,20 +159,19 @@ class mobile {
         $urltojoin = $meeting->get_join_url();
 
         // Check groups access and show message.
-        $msjgroup = array();
+        $msjgroup = [];
         $groupmode = groups_get_activity_groupmode($instance->get_cm());
         if ($groupmode != NOGROUPS) {
-            $msjgroup = array("message" => get_string('view_mobile_message_groups_not_supported',
-                'bigbluebuttonbn'));
+            $msjgroup['message'] = get_string('view_mobile_message_groups_not_supported', 'bigbluebuttonbn');
         }
 
-        $data = array(
-            'bigbluebuttonbn' => $bigbluebuttonbn,
+        $data = [
+            'bigbluebuttonbn' => $instance->get_instance_data(),
             'msjgroup' => $msjgroup,
             'urltojoin' => $urltojoin,
             'cmid' => $cm->id,
-            'courseid' => $course->id
-        );
+            'courseid' => $course->id,
+        ];
 
         // We want to show a notification when user excedded 45 seconds without click button.
         $jstimecreatedmeeting = 'setTimeout(function(){
@@ -184,44 +180,41 @@ class mobile {
         document.getElementById("bigbluebuttonbn-mobile-meetingready").style.display = "none";
         }, 45000);';
 
-        return array(
-            'templates' => array(
-                array(
+        return [
+            'templates' => [
+                [
                     'id' => 'main',
                     'html' => $OUTPUT->render_from_template("mod_bigbluebuttonbn/mobile_view_page_$versionname", $data),
-                ),
-            ),
+                ],
+            ],
             'javascript' => $jstimecreatedmeeting,
             'otherdata' => '',
-            'files' => ''
-        );
+            'files' => '',
+        ];
     }
 
     /**
      * Returns the view for errors.
      *
      * @param string $error Error to display.
-     *
-     * @return array       HTML, javascript and otherdata
+     * @return array HTML, javascript and otherdata
      */
-    protected static function mobile_print_error($error) {
+    protected static function mobile_print_error($error): array {
         global $OUTPUT;
 
-        $data = array(
-            'error' => $error
-        );
-
-        return array(
-            'templates' => array(
-                array(
+        return [
+            'templates' => [
+                [
                     'id' => 'main',
-                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_error', $data),
-                ),
-            ),
+                    'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_error', [
+                        'error' => $error,
+                    ]),
+                ],
+            ],
             'javascript' => '',
             'otherdata' => '',
-            'files' => ''
-        );
+            'files' => '',
+        ];
     }
 
     /**
@@ -232,26 +225,26 @@ class mobile {
      * @param array $notstarted Extra messages for not started session.
      * @return array HTML, javascript and otherdata
      */
-    protected static function mobile_print_notification(instance $instance, $message, $notstarted = array()) {
+    protected static function mobile_print_notification(instance $instance, $message, $notstarted = []): array {
         global $OUTPUT, $CFG;
 
-        $data = array(
+        $data = [
             'bigbluebuttonbn' => $instance->get_instance_data(),
             'cmid' => $instance->get_cm_id(),
             'message' => $message,
-            'not_started' => $notstarted
-        );
+            'not_started' => $notstarted,
+        ];
 
-        return array(
-            'templates' => array(
-                array(
+        return [
+            'templates' => [
+                [
                     'id' => 'main',
                     'html' => $OUTPUT->render_from_template('mod_bigbluebuttonbn/mobile_view_notification', $data),
-                ),
-            ),
+                ],
+            ],
             'javascript' => file_get_contents($CFG->dirroot . '/mod/bigbluebuttonbn/mobileapp/mobile.notification.js'),
             'otherdata' => '',
             'files' => ''
-        );
+        ];
     }
 }

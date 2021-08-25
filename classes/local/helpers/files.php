@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * The mod_bigbluebuttonbn files helper
  *
@@ -33,8 +34,6 @@ use mod_bigbluebuttonbn\plugin;
 use moodle_url;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Utility class for all files routines helper
  *
@@ -52,14 +51,14 @@ class files {
      *
      * @return false|null false if file not valid
      */
-    public static function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
+    public static function pluginfile_valid($context, $filearea) {
 
         // Can be in context module or in context_system (if is the presentation by default).
         if (!in_array($context->contextlevel, array(CONTEXT_MODULE, CONTEXT_SYSTEM))) {
             return false;
         }
 
-        if (!array_key_exists($filearea, static::bigbluebuttonbn_get_file_areas())) {
+        if (!array_key_exists($filearea, self::get_file_areas())) {
             return false;
         }
 
@@ -77,8 +76,8 @@ class files {
      *
      * @return object|bool
      */
-    public static function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $args) {
-        $filename = static::bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args);
+    public static function pluginfile_file($course, $cm, $context, $filearea, $args) {
+        $filename = self::pluginfile_filename($course, $cm, $context, $args);
         if (!$filename) {
             return false;
         }
@@ -101,7 +100,7 @@ class files {
      *
      * @return array|string|null
      */
-    public static function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args) {
+    public static function default_presentation_get_file($course, $cm, $context, $args) {
 
         // The difference with the standard bigbluebuttonbn_pluginfile_filename() are.
         // - Context is system, so we don't need to check the cmid in this case.
@@ -146,12 +145,12 @@ class files {
      *
      * @return string|array|null
      */
-    public static function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
+    public static function pluginfile_filename($course, $cm, $context, $args) {
         global $DB;
 
         if ($context->contextlevel == CONTEXT_SYSTEM) {
             // Plugin has a file to use as default in general setting.
-            return (static::bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args));
+            return (self::default_presentation_get_file($course, $cm, $context, $args));
         }
 
         if (count($args) > 1) {
@@ -194,7 +193,7 @@ class files {
      * @category files
      *
      */
-    public static function bigbluebuttonbn_get_file_areas() {
+    public static function get_file_areas() {
         $areas = array();
         $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
         $areas['presentationdefault'] = get_string('mod_form_block_presentation_default', 'bigbluebuttonbn');
@@ -209,7 +208,7 @@ class files {
      *
      * @return string
      */
-    public static function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
+    public static function get_media_file(&$bigbluebuttonbn) {
         if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
             return '';
         }
@@ -281,7 +280,7 @@ class files {
                     $pnoncekey = sha1(context_system::instance()->id);
                     /* The item id was adapted for granting public access to the presentation once in order
                      * to allow BigBlueButton to gather the file. */
-                    $pnoncevalue = plugin::bigbluebuttonbn_generate_nonce();
+                    $pnoncevalue = plugin::generate_nonce();
                     $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
                 }
 
@@ -328,7 +327,7 @@ class files {
             $pnoncekey = sha1($id);
             /* The item id was adapted for granting public access to the presentation once in order
              * to allow BigBlueButton to gather the file. */
-            $pnoncevalue = plugin::bigbluebuttonbn_generate_nonce();
+            $pnoncevalue = plugin::generate_nonce();
             $cache->set($pnoncekey, array('value' => $pnoncevalue, 'counter' => 0));
         }
         $url = moodle_url::make_pluginfile_url(

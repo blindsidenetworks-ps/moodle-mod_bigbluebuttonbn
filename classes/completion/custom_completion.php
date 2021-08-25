@@ -26,8 +26,9 @@
 namespace mod_bigbluebuttonbn\completion;
 
 use core_completion\activity_custom_completion;
-use Exception;
-use mod_bigbluebuttonbn\local\bbb_constants;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\logger;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,26 +49,21 @@ class custom_completion extends activity_custom_completion {
      * @return int
      */
     public function get_state(string $rule): int {
-        global $DB;
+        // Get instance details.
+        $instance = instance::get_from_cmid($this->cm->id);
 
-        // Get bigbluebuttonbn details.
-        $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->cm->instance), '*',
-            MUST_EXIST);
-        if (!$bigbluebuttonbn) {
-            throw new Exception("Can't find bigbluebuttonbn {$this->cm->instance}");
+        if (empty($instance)) {
+            throw new moodle_exception("Can't find bigbluebuttonbn instance {$this->cm->instance}");
         }
 
         // Default return value.
         $value = false;
 
-        $sql = "SELECT * FROM {bigbluebuttonbn_logs} ";
-        $sql .= "WHERE bigbluebuttonbnid = ? AND userid = ? AND log = ?";
-        $logs =
-            $DB->get_records_sql($sql, array($bigbluebuttonbn->id, $this->userid, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY));
+        $logs = logger::get_user_summary_logs($instance, $this->userid);
 
         switch ($rule) {
             case 'completionattendance':
-                $value = $this->compute_state($logs, $rule, $bigbluebuttonbn, function($summary) {
+                $value = $this->compute_state($logs, $rule, $instance, function($summary) {
                     return $summary->data->duration;
                 });
                 break;
@@ -77,7 +73,7 @@ class custom_completion extends activity_custom_completion {
             case 'completionengagementpollvotes':
             case 'completionengagementemojis':
                 $shortname = str_replace('completionengagement', '', $rule);
-                $value = $this->compute_state($logs, $rule, $bigbluebuttonbn, function($summary) use ($shortname) {
+                $value = $this->compute_state($logs, $rule, $instance, function($summary) use ($shortname) {
                     return $summary->data->engagement->$shortname;
                 });
                 break;
@@ -95,18 +91,21 @@ class custom_completion extends activity_custom_completion {
      * @param callable $summaryvaluegetter
      * @return bool
      */
-    protected function compute_state($logs, $rulename, $bigbluebuttonbn, $summaryvaluegetter) {
-        if (!$logs) {
+    protected function compute_state(array $logs, string $rulename, instance $instance, $summaryvaluegetter) {
+        if (empty($logs)) {
             // As completion by engagement with $rulename hand was required, the activity hasn't been completed.
             return false;
         }
+
         $valuecount = 0;
         foreach ($logs as $log) {
             $summary = json_decode($log->meta);
             $valuecount += $summaryvaluegetter($summary);
         }
-        $value = isset($bigbluebuttonbn->$rulename) &&
-            $bigbluebuttonbn->$rulename <= $valuecount;
+
+        $value = isset($bigbluebuttonbn->$rulename);
+        $value = $value && ($instance->get_instance_var($rulename) <= $valuecount);
+
         return $value;
     }
 

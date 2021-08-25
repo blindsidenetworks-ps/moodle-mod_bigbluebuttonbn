@@ -38,6 +38,10 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+      mockserver:
+        image: andrewnicols/bigbluebutton_mock:latest
+        ports:
+          - 8001:80
 
     steps:
       - name: Checkout
@@ -70,6 +74,9 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+
+      - name: Set additional config
+        run: moodle-plugin-ci add-config 'define("TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER", "http://localhost:8001");'
 
       - name: phplint
         if: ${{ always() }}
@@ -107,6 +114,6 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit
 
-      #- name: behat
-      #  if: ${{ always() }}
-      #  run: moodle-plugin-ci behat --profile chrome
+      - name: behat
+        if: ${{ always() }}
+        run: moodle-plugin-ci behat --profile chrome

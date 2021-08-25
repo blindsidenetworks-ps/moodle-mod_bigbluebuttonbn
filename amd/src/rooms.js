@@ -35,10 +35,8 @@ export const init = (bigbluebuttonbnid) => {
         if (!actionButton) {
             return;
         }
-
         if (actionButton.dataset.action === "join") {
             roomUpdater.poll();
-            return;
         }
     });
 

@@ -100,8 +100,8 @@ class notifier
         if (!empty($bigbluebuttonbn->intro)) {
             $msg->activity_description = format_string(trim($bigbluebuttonbn->intro));
         }
-        $msg->activity_openingtime = view::format_activity_time($bigbluebuttonbn->openingtime);
-        $msg->activity_closingtime = view::format_activity_time($bigbluebuttonbn->closingtime);
+        $msg->activity_openingtime = self::format_activity_time($bigbluebuttonbn->openingtime);
+        $msg->activity_closingtime = self::format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($sender);
 
         $msg->user_name = fullname($sender);
@@ -201,4 +201,27 @@ class notifier
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', null, 0, 0, true);
         return $users;
     }
+
+    /**
+     * Helper function returns time in a formatted string.
+     *
+     * @param int $time
+     * @return string
+     */
+    protected static function format_activity_time(int $time): string {
+        global $CFG;
+        require_once($CFG->dirroot . '/calendar/lib.php');
+
+        if ($time) {
+            $activitytime = [
+                calendar_day_representation($time),
+                get_string('mod_form_field_notification_msg_at', 'bigbluebuttonbn'),
+                calendar_time_representation($time),
+            ];
+
+            return implode(' ', $activitytime);
+        }
+        return '';
+    }
+
 }

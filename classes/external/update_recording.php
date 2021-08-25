@@ -25,14 +25,15 @@
 
 namespace mod_bigbluebuttonbn\external;
 
+use coding_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\local\broker;
 
 /**
  * External service to update the details of one recording.
@@ -44,36 +45,20 @@ use mod_bigbluebuttonbn\local\broker;
  */
 class update_recording extends external_api {
     /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'recordingid' => new external_value(PARAM_ALPHANUMEXT, 'The bigbluebutton recording ID'),
-            'action' => new external_value(PARAM_ALPHANUMEXT, 'The action to perform'),
-            'recid' => new external_value(PARAM_RAW, 'The bigbluebuttonbn_recordings row id', VALUE_OPTIONAL),
-            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_OPTIONAL),
-        ]);
-    }
-
-    /**
      * Updates a recording
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
-     * @param string $recordingid
+     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id, either the same as the one set in the recording or a new
+     * instance to import the recording into.
+     * @param int $recordingid
      * @param string $action
-     * @param string|null $recid
      * @param string|null $additionaloptions
      * @return array (empty array for now)
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function execute(
         int $bigbluebuttonbnid,
-        string $recordingid,
+        int $recordingid,
         string $action,
-        string $recid = null,
         string $additionaloptions = null
     ): array {
         // Validate the bigbluebuttonbnid ID.
@@ -81,13 +66,11 @@ class update_recording extends external_api {
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
-            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ] = self::validate_parameters(self::execute_parameters(), [
             'bigbluebuttonbnid' => $bigbluebuttonbnid,
             'recordingid' => $recordingid,
             'action' => $action,
-            'recid' => $recid,
             'additionaloptions' => $additionaloptions,
         ]);
 
@@ -101,44 +84,50 @@ class update_recording extends external_api {
             case 'import':
                 break;
             default:
-                throw new \coding_exception("Unknown action '{$action}'");
+                throw new coding_exception("Unknown action '{$action}'");
         }
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        $context = $instance->get_context();
-        $enabledfeatures = $instance->get_enabled_features();
+        $recording = new recording($recordingid);
 
+        // Check both the recording instance context and the bbb context.
+        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
+        $recordingcontext = $instance->get_context();
         // Validate that the user has access to this activity and to manage recordings.
-        self::validate_context($context);
-        require_capability('mod/bigbluebuttonbn:managerecordings', $context);
+        self::validate_context($recordingcontext);
+        require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
 
-        // Fetch the list of recordings.
-        $recordings = recording_helper::get_recordings(
-            $instance->get_course_id(),
-            $instance->get_instance_id(),
-            $enabledfeatures['showroom'],
-            $instance->get_instance_var('recordings_deleted'),
-            $enabledfeatures['importrecordings']
-        );
-
-        // Specific action for import
-        // TODO: refactor this so we do all the operation in the recording table instead of the broker.
-        if ($action != 'import') {
-            // Perform the action.
-            broker::recording_action_perform("recording_{$action}", ['id' => $recordingid], $recordings);
-        } else {
-            $recording = recording::read($recid);
-            $recording->bigbluebuttonbnid = $instance->get_instance_id();
-            $recording->courseid = $instance->get_course_id();
-            if (!$recording->imported) {
-                $recording->imported = true;
-                $recording->recording = json_encode($recording->recording);
-            }
-            recording::create($recording);
+        if ($bigbluebuttonbnid) {
+            $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+            $recordingcontext = $instance->get_context();
+            self::validate_context($recordingcontext);
+            require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
         }
-
+        // Specific action such as import, delete, publish, unpublish, edit,....
+        if (method_exists(recording_action::class, "$action")) {
+            forward_static_call(
+                array('\mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action',
+                    "$action"),
+                $recording,
+                $instance
+            );
+        }
         return [];
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id, this might be a different one
+            from the one set in recordingid in case of importing', VALUE_OPTIONAL),
+            'recordingid' => new external_value(PARAM_INT, 'The moodle internal recording ID'),
+            'action' => new external_value(PARAM_ALPHANUMEXT, 'The action to perform'),
+            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_OPTIONAL),
+        ]);
     }
 
     /**

@@ -26,11 +26,13 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use cache_store;
-use mod_bigbluebuttonbn\local\bigbluebutton;
+use Exception;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
+use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\logger;
 use stdClass;
 
 /**
@@ -90,7 +92,7 @@ class meeting {
     public static function get_unique_meetingid_seed() {
         global $DB;
         do {
-            $encodedseed = sha1(plugin::bigbluebuttonbn_random_password(12));
+            $encodedseed = sha1(plugin::random_password(12));
             $meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('meetingid' => $encodedseed));
         } while ($meetingid == $encodedseed);
         return $encodedseed;
@@ -151,14 +153,14 @@ class meeting {
         $metadata = $this->create_meeting_metadata();
         $presentationname = $this->instance->get_presentation()['name'] ?? null;
         $presentationurl = $this->instance->get_presentation()['url'] ?? null;
-        return bigbluebutton::create_meeting($data, $metadata, $presentationname, $presentationurl);
+        return bigbluebutton_proxy::create_meeting($data, $metadata, $presentationname, $presentationurl);
     }
 
     /**
      * Send an end meeting message to BBB server
      */
     public function end_meeting() {
-        bigbluebutton::end_meeting($this->instance->get_meeting_id(), $this->instance->get_moderator_password());
+        bigbluebutton_proxy::end_meeting($this->instance->get_meeting_id(), $this->instance->get_moderator_password());
     }
 
     /**
@@ -168,7 +170,7 @@ class meeting {
      * @throws \coding_exception
      */
     public function get_join_url() {
-        return bigbluebutton::bigbluebuttonbn_get_join_url(
+        return bigbluebutton_proxy::get_join_url(
             $this->instance->get_meeting_id(),
             $this->instance->get_user_fullname(),
             $this->instance->get_current_user_password(),
@@ -188,7 +190,7 @@ class meeting {
     protected function do_get_meeting_info(bool $updatecache = false): stdClass {
         $instance = $this->instance;
         $meetinginfo = $instance->get_instance_info();
-        $activitystatus = bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance);
+        $activitystatus = bigbluebutton_proxy::view_get_activity_status($instance);
         // This might raise an exception if info cannot be retrieved.
         // But this might be totally fine as the meeting is maybe not yet created on BBB side.
         $participantcount = 0;
@@ -267,7 +269,7 @@ class meeting {
         }
         $cache->delete($meetingid); // Make sure we purges the cache before checking info.
         // Ping again and refresh the cache.
-        $meetinginfo = bigbluebutton::get_meeting_info($meetingid);
+        $meetinginfo = bigbluebutton_proxy::get_meeting_info($meetingid);
 
         $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
         return $meetinginfo;
@@ -280,7 +282,7 @@ class meeting {
      */
     protected function create_meeting_data() {
         $data = ['meetingID' => $this->instance->get_meeting_id(),
-            'name' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_name(), 64),
+            'name' => \mod_bigbluebuttonbn\plugin::html2text($this->instance->get_meeting_name(), 64),
             'attendeePW' => $this->instance->get_viewer_password(),
             'moderatorPW' => $this->instance->get_moderator_password(),
             'logoutURL' => $this->instance->get_logout_url()->out(false),
@@ -328,10 +330,10 @@ class meeting {
             'bbb-context-id' => $this->instance->get_course_id(),
             'bbb-context-name' => trim(html_to_text($this->instance->get_course()->fullname, 0)),
             'bbb-context-label' => trim(html_to_text($this->instance->get_course()->shortname, 0)),
-            'bbb-recording-name' => plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_name(), 64),
-            'bbb-recording-description' => plugin::bigbluebuttonbn_html2text($this->instance->get_meeting_description(),
+            'bbb-recording-name' => plugin::html2text($this->instance->get_meeting_name(), 64),
+            'bbb-recording-description' => plugin::html2text($this->instance->get_meeting_description(),
                 64),
-            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::bigbluebuttonbn_get_tags($this->instance->get_cm_id()),
+            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::get_tags($this->instance->get_cm_id()),
             // Same as $id.
         ];
         // Special metadata for recording processing.
@@ -350,5 +352,123 @@ class meeting {
             $metadata['analytics-callback-url'] = $this->instance->get_meeting_event_notification_url()->out(false);
         }
         return $metadata;
+    }
+
+    /**
+     * Helper for responding when storing live meeting events is requested.
+     *
+     * The callback with a POST request includes:
+     *  - Authentication: Bearer <A JWT token containing {"exp":<TIMESTAMP>} encoded with HS512>
+     *  - Content Type: application/json
+     *  - Body: <A JSON Object>
+     *
+     * @param instance $instance
+     * @return void
+     */
+    public static function meeting_events(instance $instance) {
+        $bigbluebuttonbn = $instance->get_instance_data();
+        // Decodes the received JWT string.
+        try {
+            // Get the HTTP headers (getallheaders is a PHP function that may only work with Apache).
+            $headers = getallheaders();
+
+            // Pull the Bearer from the headers.
+            if (!array_key_exists('Authorization', $headers)) {
+                $msg = 'Authorization failed';
+                header('HTTP/1.0 400 Bad Request. ' . $msg);
+                return;
+            }
+            $authorization = explode(" ", $headers['Authorization']);
+
+            // Verify the authenticity of the request.
+            $token = \Firebase\JWT\JWT::decode(
+                $authorization[1],
+                config::get('shared_secret'),
+                array('HS512')
+            );
+
+            // Get JSON string from the body.
+            $jsonstr = file_get_contents('php://input');
+
+            // Convert JSON string to a JSON object.
+            $jsonobj = json_decode($jsonstr);
+        } catch (Exception $e) {
+            $msg = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $msg);
+            return;
+        }
+
+        // Validate that the bigbluebuttonbn activity corresponds to the meeting_id received.
+        $meetingidelements = explode('[', $jsonobj->{'meeting_id'});
+        $meetingidelements = explode('-', $meetingidelements[0]);
+        if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
+            $msg = 'The activity may have been deleted';
+            header('HTTP/1.0 410 Gone. ' . $msg);
+            return;
+        }
+
+        // We make sure events are processed only once.
+        $overrides = ['meetingid' => $jsonobj->{'meeting_id'}];
+        $meta['recordid'] = $jsonobj->{'internal_meeting_id'};
+        $meta['callback'] = 'meeting_events';
+
+        $eventcount = logger::log_event_callback($instance, $overrides, $meta);
+        if ($eventcount === 1) {
+            // Process the events.
+            self::process_meeting_events($instance, $jsonobj);
+            header('HTTP/1.0 200 Accepted. Enqueued.');
+        } else {
+            header('HTTP/1.0 202 Accepted. Already processed.');
+        }
+    }
+
+    /**
+     * Helper function enqueues list of meeting events to be stored and processed as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param object $jsonobj
+     *
+     * @return void
+     */
+    protected static function process_meeting_events(instance $instance, $jsonobj) {
+        $meetingid = $jsonobj->{'meeting_id'};
+        $recordid = $jsonobj->{'internal_meeting_id'};
+        $attendees = $jsonobj->{'data'}->{'attendees'};
+        foreach ($attendees as $attendee) {
+            $userid = $attendee->{'ext_user_id'};
+            $overrides['meetingid'] = $meetingid;
+            $overrides['userid'] = $userid;
+            $meta['recordid'] = $recordid;
+            $meta['data'] = $attendee;
+
+            // Stores the log.
+            logger::log_event_summary($instance, $overrides, $meta);
+
+            // Enqueue a task for processing the completion.
+            bigbluebutton_proxy::enqueue_completion_event($instance->get_instance_data(), $userid);
+        }
+    }
+
+    /**
+     * Join the meeting.
+     *
+     * @param int $origin The spec
+     */
+    public function join(int $origin): void {
+        $this->do_get_meeting_info(true);
+
+        if ($this->is_running() && !$this->can_join()) {
+            // No more users allowed to join.
+            redirect($this->instance->get_logout_url());
+        }
+
+        // Moodle event logger: Create an event for meeting joined.
+        logger::log_meeting_joined_event($this->instance, $origin);
+
+        // Before executing the redirect, increment the number of participants.
+        roles::participant_joined($this->instance->get_meeting_id(), $this->instance->does_current_user_count_towards_user_limit());
+
+        // Execute the redirect.
+        redirect($this->get_join_url());
     }
 }

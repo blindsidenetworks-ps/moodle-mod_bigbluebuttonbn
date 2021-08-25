@@ -25,6 +25,9 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Moodle\BehatExtension\Exception\SkippedException;
+
 /**
  * Behat custom steps and configuration for mod_bigbluebuttonbn.
  *
@@ -35,6 +38,32 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 class behat_mod_bigbluebuttonbn extends behat_base {
 
     /**
+     * BeforeScenario hook to reset the remote testpoint.
+     *
+     * @BeforeScenario @mod_bigbluebuttonbn
+     */
+    public function before_scenario(BeforeScenarioScope $scope) {
+        if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            throw new SkippedException(
+                'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
+            );
+        }
+
+        $this->send_mock_request('backoffice/reset');
+    }
+
+    public static function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
+        return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
+    }
+
+    protected function send_mock_request(string $endpoint): void {
+        $url = $this->get_mocked_server_url($endpoint);
+
+        $curl = new \curl();
+        $curl->get($url->out_omit_querystring(), $url->params());
+    }
+
+    /**
      * Return the list of partial named selectors.
      *
      * @return array
@@ -42,6 +71,19 @@ class behat_mod_bigbluebuttonbn extends behat_base {
     public static function get_partial_named_selectors(): array {
         return [
             new behat_component_named_selector('Meeting identifier', [".//*[@data-identifier=%locator%]"]),
+        ];
+    }
+
+    /**
+     * Return the list of exact named selectors.
+     *
+     * @return array
+     */
+    public static function get_exact_named_selectors(): array {
+        return [
+            new behat_component_named_selector('Recording row',
+                ["//*[@class='mod_bigbluebuttonbn_recordings_table']//tbody[@class='yui3-datatable-data']/tr[position()=%locator%]"]
+            )
         ];
     }
 
@@ -108,4 +150,12 @@ class behat_mod_bigbluebuttonbn extends behat_base {
             MUST_EXIST
         );
     }
+
+    /**
+     * @Given the BigBlueButtonBN server has sent recording ready notifications
+     */
+    public function trigger_recording_ready_notification(): void {
+        $this->send_mock_request('backoffice/sendNotifications');
+    }
+
 }

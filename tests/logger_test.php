@@ -22,31 +22,36 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-namespace mod_bigbluebuttonbn\local\helpers;
-defined('MOODLE_INTERNAL') || die();
-use mod_bigbluebuttonbn\local\bbb_constants;
+namespace mod_bigbluebuttonbn;
+
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\test\testcase_helper;
 
 /**
- * BBB Library tests class.
+ * Tests for the logger class.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class logs_test extends testcase_helper {
+class logger_test extends testcase_helper {
     /**
      * Test delete instance logs
      *
      */
-    public function test_bigbluebuttonbn_delete_instance_log() {
+    public function test_log_instance_deleted() {
         global $DB;
+
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        logs::bigbluebuttonbn_delete_instance_log($bbactivity);
-        $this->assertTrue($DB->record_exists('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bbactivity->id,
-            'log' => bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_DELETE)));
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        logger::log_instance_deleted($instance);
+
+        $this->assertTrue($DB->record_exists('bigbluebuttonbn_logs', [
+            'bigbluebuttonbnid' => $bbactivity->id,
+            'log' => logger::EVENT_DELETE,
+        ]));
     }
 
     /**
@@ -54,13 +59,12 @@ class logs_test extends testcase_helper {
      */
     public function test_bigbluebuttonbn_log() {
         global $DB;
+
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTONBN_LOG_EVENT_PLAYED);
-        $this->assertTrue($DB->record_exists('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bbactivity->id)));
+        $instance = instance::get_from_instanceid($bbactivity->id);
+
+        logger::log_recording_played_event($instance, 1);
+        $this->assertTrue($DB->record_exists('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => $instance->get_instance_id()]));
     }
-
-
 }
-
-

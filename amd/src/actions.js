@@ -35,16 +35,16 @@ const registerEventListeners = () => {
         e.preventDefault();
 
         const bbbId = actionButton.dataset.bbbId;
-        const meetingId = actionButton.dataset.meetingId;
+        const groupId = actionButton.dataset.groupId;
 
         confirmedPromise(
             getString('end_session_confirm_title', 'mod_bigbluebuttonbn'),
             getString('end_session_confirm', 'mod_bigbluebuttonbn'),
             getString('yes', 'moodle')
         )
-        .then(() => requestEndMeeting(bbbId, meetingId))
+        .then(() => requestEndMeeting(bbbId, groupId))
         .then(() => {
-            notifySessionEnded(bbbId, meetingId);
+            notifySessionEnded(bbbId, groupId);
 
             return;
         })

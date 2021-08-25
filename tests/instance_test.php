@@ -23,6 +23,9 @@
 
 namespace mod_bigbluebuttonbn;
 
+use advanced_testcase;
+use moodle_exception;
+
 /**
  * Tests for the Big Blue Button Instance.
  *
@@ -30,10 +33,11 @@ namespace mod_bigbluebuttonbn;
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class instance_test extends \advanced_testcase {
+class instance_test extends advanced_testcase {
 
     /**
      * Test get from
+     *
      * @param string $function
      * @param string $field
      * @dataProvider get_from_location_provider
@@ -56,13 +60,45 @@ class instance_test extends \advanced_testcase {
     /**
      * Get from location provider
      *
-     * @return \string[][]
+     * @return string[][]
      */
     public function get_from_location_provider(): array {
         return [
             ['get_from_instanceid', 'id'],
             ['get_from_cmid', 'cmid'],
         ];
+    }
+
+    /**
+     * Get an instance from a cmid.
+     */
+    public function test_get_from_cmid(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'cm' => $cm,
+        ] = $this->get_test_instance();
+
+        $instance = instance::get_from_cmid($cm->id);
+
+        $this->assertInstanceOf(instance::class, $instance);
+        $this->assertEquals($record->id, $instance->get_instance_id());
+        $this->assertEquals($cm->id, $instance->get_cm()->id);
+    }
+
+    /**
+     * If the instance was not found, and exception should be thrown.
+     */
+    public function test_get_from_cmid_not_found(): void {
+        $this->assertNull(instance::get_from_cmid(100));
+    }
+
+    /**
+     * If the instance was not found, and exception should be thrown.
+     */
+    public function test_get_from_instnace_not_found(): void {
+        $this->assertNull(instance::get_from_instanceid(100));
     }
 
     /**
@@ -87,6 +123,27 @@ class instance_test extends \advanced_testcase {
         $this->assertEquals($record->id, $instance->get_instance_id());
         $this->assertEquals($record->cmid, $instance->get_cm_id());
         $this->assertEquals($record->cmid, $instance->get_cm()->id);
+    }
+
+    /**
+     * Ensure that invalid meetingids throw an appropriate exception.
+     *
+     * @dataProvider invalid_meetingid_provider
+     * @param string $meetingid
+     */
+    public function test_get_from_meetingid_invalid(string $meetingid): void {
+        $this->expectException(moodle_exception::class);
+        instance::get_from_meetingid($meetingid);
+    }
+
+    public function invalid_meetingid_provider(): array {
+        // Meeting IDs are in the formats:
+        // - <meetingid[string]>-<courseid[number]>-<instanceid[number]>
+        // - <meetingid[string]>-<courseid[number]>-<instanceid[number]>[<groupid[number]>]
+        // Note: deducing the group from meeting id will soon be deprecated.
+        return [
+            'Non-numeric instanceid' => ['aaa-123-aaa'],
+        ];
     }
 
     public function test_get_all_instances_in_course(): void {
@@ -118,10 +175,37 @@ class instance_test extends \advanced_testcase {
         $record = $this->getDataGenerator()->create_module('bigbluebuttonbn', array_merge([
             'course' => $course->id,
         ], $data));
+        $cm = get_fast_modinfo($course)->instances['bigbluebuttonbn'][$record->id];
 
         return [
             'course' => $course,
             'record' => $record,
+            'cm' => $cm,
         ];
+    }
+
+    public function test_get_meeting_id_with_groups(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'course' => $course,
+        ] = $this->get_test_instance();
+
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        $instance = instance::get_from_instanceid($record->id);
+
+        // No group.
+        $this->assertEquals(
+            sprintf("%s-%s-%s[0]", $record->meetingid, $record->course, $record->id),
+            $instance->get_meeting_id(0)
+        );
+
+        // Specified group.
+        $this->assertEquals(
+            sprintf("%s-%s-%s[%d]", $record->meetingid, $record->course, $record->id, $group->id),
+            $instance->get_meeting_id($group->id)
+        );
     }
 }

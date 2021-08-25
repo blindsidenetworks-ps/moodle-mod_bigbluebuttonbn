@@ -23,7 +23,6 @@
  * @author    Laurent David (laurent@call-learning.fr)
  */
 namespace mod_bigbluebuttonbn\local\helpers;
-defined('MOODLE_INTERNAL') || die();
 
 use cache;
 use cache_store;
@@ -49,9 +48,9 @@ class files_test extends testcase_helper {
      */
     public function test_bigbluebuttonbn_pluginfile_valid() {
         $this->resetAfterTest();
-        $this->assertFalse(files::bigbluebuttonbn_pluginfile_valid(context_course::instance($this->course->id), 'presentation'));
-        $this->assertTrue(files::bigbluebuttonbn_pluginfile_valid(context_system::instance(), 'presentation'));
-        $this->assertFalse(files::bigbluebuttonbn_pluginfile_valid(context_system::instance(), 'otherfilearea'));
+        $this->assertFalse(files::pluginfile_valid(context_course::instance($this->course->id), 'presentation'));
+        $this->assertTrue(files::pluginfile_valid(context_system::instance(), 'presentation'));
+        $this->assertFalse(files::pluginfile_valid(context_system::instance(), 'otherfilearea'));
     }
 
     /**
@@ -86,7 +85,7 @@ class files_test extends testcase_helper {
         list($course, $bbactivitycmuser) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
         /** @var stored_file $mediafile */
         $mediafile =
-            files::bigbluebuttonbn_pluginfile_file($this->course, $bbactivitycmuser, $context, 'presentation', ['bbfile.pptx']);
+            files::pluginfile_file($this->course, $bbactivitycmuser, $context, 'presentation', ['bbfile.pptx']);
         $this->assertEquals('bbfile.pptx', $mediafile->get_filename());
     }
 
@@ -106,7 +105,7 @@ class files_test extends testcase_helper {
         $context = context_module::instance($bbformdata->coursemodule);
         list($course, $bbactivitycmuser) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
         $mediafile =
-            files::bigbluebuttonbn_default_presentation_get_file($this->course, $bbactivitycmuser, $context, ['presentation'],
+            files::default_presentation_get_file($this->course, $bbactivitycmuser, $context, ['presentation'],
                 '/bbfile.pptx');
         $this->assertEquals('presentation', $mediafile);
     }
@@ -124,7 +123,7 @@ class files_test extends testcase_helper {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bbactivity->id);
         $presentationnonce = $cache->get($noncekey);
-        $filename = files::bigbluebuttonbn_pluginfile_filename($this->course, $bbactivitycm, $bbactivitycontext,
+        $filename = files::pluginfile_filename($this->course, $bbactivitycm, $bbactivitycontext,
             [$presentationnonce, 'bbfile.pptx']);
         $this->assertEquals('bbfile.pptx', $filename);
     }
@@ -138,7 +137,7 @@ class files_test extends testcase_helper {
         $this->assertEquals(array(
                 'presentation' => 'Presentation content',
                 'presentationdefault' => 'Presentation default content',
-        ), files::bigbluebuttonbn_get_file_areas());
+        ), files::get_file_areas());
     }
 
     /**
@@ -151,7 +150,7 @@ class files_test extends testcase_helper {
         $this->setUser($user);
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
-        $mediafilepath = files::bigbluebuttonbn_get_media_file($bbformdata);
+        $mediafilepath = files::get_media_file($bbformdata);
         $this->assertEmpty($mediafilepath);
 
         // From test_delete_original_file_from_draft (lib/test/filelib_test.php)
@@ -171,10 +170,8 @@ class files_test extends testcase_helper {
             'mod_bigbluebuttonbn',
             'presentation', 0);
 
-        $mediafilepath = files::bigbluebuttonbn_get_media_file($bbformdata);
+        $mediafilepath = files::get_media_file($bbformdata);
         $this->assertEquals('/bbfile.pptx', $mediafilepath);
     }
 
 }
-
-

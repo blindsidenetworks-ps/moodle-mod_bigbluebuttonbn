@@ -25,9 +25,9 @@ namespace mod_bigbluebuttonbn;
 
 use completion_info;
 use context_module;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\completion\custom_completion;
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper;
 
 /**
@@ -39,38 +39,63 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @author    Laurent David (laurent@call-learning.fr)
  */
 class completion_test extends testcase_helper {
-    /**
-     * Test completion state
-     *
-     * TODO: split this test into bits and put in a local class
-     * TODO: Make sure we test with an instance having completionattendance set to something > 0
-     */
-    public function test_bigbluebuttonbn_get_completion_state() {
+    public function test_bigbluebuttonbn_get_completion_state_no_rules() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+
         $user = $this->generator->create_user();
         $this->setUser($user);
+
         $completion = new custom_completion($bbactivitycm, $user->id);
         $result = $completion->get_overall_completion_state();
         // No custom rules so complete.
         $this->assertEquals(COMPLETION_COMPLETE, $result);
+    }
 
-        // Now with a custom rule.
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) =
-            $this->create_instance(null);
+    public function test_bigbluebuttonbn_get_completion_state_incomplete() {
+        $this->resetAfterTest();
+
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+
         $bbactivitycm->override_customdata('customcompletionrules', [
             'completionengagementchats' => '1',
             'completionattendance' => '1'
         ]);
+
+        $user = $this->generator->create_user();
+        $this->setUser($user);
+
         $completion = new custom_completion($bbactivitycm, $user->id);
         $result = $completion->get_overall_completion_state();
         $this->assertEquals(COMPLETION_INCOMPLETE, $result);
+    }
+
+    public function test_bigbluebuttonbn_get_completion_state_complete() {
+        $this->resetAfterTest();
+
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        $instance = instance::get_from_instanceid($bbactivity->id);
+
+        $user = $this->generator->create_user();
+        $this->setUser($user);
+
         // Add a couple of fake logs.
-        $overrides = array('meetingid' => $bbactivity->meetingid);
-        $meta = '{"origin":0, "data": {"duration": 120, "engagement": {"chats": 2, "talks":2} }}';
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
-        logs::bigbluebuttonbn_log($bbactivity, bbb_constants::BIGBLUEBUTTON_LOG_EVENT_SUMMARY, $overrides, $meta);
+        $overrides = ['meetingid' => $bbactivity->meetingid];
+        $meta = [
+            'origin' => 0,
+            'data' => [
+                'duration' => 120,
+                'engagement' => [
+                    'chats' => 2,
+                    'talks' => 2,
+                ],
+            ],
+        ];
+        logger::log_event_summary($instance, $overrides, $meta);
+        logger::log_event_summary($instance, $overrides, $meta);
+
         // Now 2 x 120 mins of duration.
+        $completion = new custom_completion($bbactivitycm, $user->id);
         $result = $completion->get_overall_completion_state();
         $this->assertEquals(COMPLETION_COMPLETE, $result);
     }

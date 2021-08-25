@@ -24,9 +24,8 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
-use mod_bigbluebuttonbn\local\bbb_constants;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
 
 defined('MOODLE_INTERNAL') || die();
@@ -52,7 +51,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform = &$this->_form;
 
         // Validates if the BigBlueButton server is running.
-        $serverversion = bigbluebutton::bigbluebuttonbn_get_server_version();
+        $serverversion = bigbluebutton_proxy::get_server_version();
         if (is_null($serverversion)) {
             throw new moodle_exception('general_error_unable_connect', 'bigbluebuttonbn',
                 $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
@@ -72,7 +71,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $instancetyperofiles = $this->get_instance_type_profiles();
         $this->bigbluebuttonbn_mform_add_block_profiles($mform, $instancetyperofiles);
         // Data for participant selection.
-        $participantlist = roles::bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $context);
+        $participantlist = roles::get_participant_list($bigbluebuttonbn, $context);
         // Add block 'General'.
         $this->bigbluebuttonbn_mform_add_block_general($mform, $cfg);
         // Add block 'Room'.
@@ -97,7 +96,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Now add the instance type profiles to the form as a html hidden field.
         $mform->addElement('html', html_writer::div('', 'd-none', [
             'data-profile-types' => json_encode($instancetyperofiles),
-            'data-participant-data' => json_encode(roles::bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn)),
+            'data-participant-data' => json_encode(roles::get_participant_data($context, $bigbluebuttonbn)),
         ]));
 
         $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/modform', 'init', [$jsvars]);
@@ -112,7 +111,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     protected function get_instance_type_profiles() {
         // Add profile data here instead of passing it by parameters.
         $context = context_course::instance($this->_course->id);
-        $instancetyperofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+        $instancetyperofiles = bigbluebutton_proxy::get_instance_type_profiles_create_allowed(
             has_capability('mod/bigbluebuttonbn:meeting', $context),
             has_capability('mod/bigbluebuttonbn:recording', $context)
         );
@@ -121,7 +120,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             global $CFG;
             // Also check module context for those that are allowed.
             $contextm = context_module::instance($this->_cm->id);
-            $instancetyperofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles_create_allowed(
+            $instancetyperofiles = bigbluebutton_proxy::get_instance_type_profiles_create_allowed(
                 has_capability('mod/bigbluebuttonbn:meeting', $contextm),
                 has_capability('mod/bigbluebuttonbn:recording', $contextm)
             );
@@ -185,7 +184,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             }
         }
         if (isset($data['voicebridge'])) {
-            if (!bigbluebutton::bigbluebuttonbn_voicebridge_unique($data['instance'], $data['voicebridge'])) {
+            if (!bigbluebutton_proxy::is_voicebridge_number_unique($data['instance'], $data['voicebridge'])) {
                 $errors['voicebridge'] = get_string('mod_form_field_voicebridge_notunique_error', 'bigbluebuttonbn');
             }
         }
@@ -278,7 +277,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     private function bigbluebuttonbn_mform_add_block_profiles(&$mform, $profiles) {
         if ((boolean) \mod_bigbluebuttonbn\local\config::recordings_enabled()) {
             $mform->addElement('select', 'type', get_string('mod_form_field_instanceprofiles', 'bigbluebuttonbn'),
-                bigbluebutton::bigbluebuttonbn_get_instance_profiles_array($profiles));
+                bigbluebutton_proxy::get_instance_profiles_array($profiles));
             $mform->addHelpButton('type', 'mod_form_field_instanceprofiles', 'bigbluebuttonbn');
         }
     }
@@ -598,7 +597,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     private function bigbluebuttonbn_mform_add_block_user_role_mapping(&$mform, $participantlist) {
         global $OUTPUT;
-        $participantselection = roles::bigbluebuttonbn_get_participant_selection_data();
+        $participantselection = roles::get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');
         $mform->addElement('hidden', 'participants', json_encode($participantlist));

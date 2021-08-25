@@ -46,16 +46,6 @@ class provider_test extends \core_privacy\tests\provider_testcase {
      * Setup Course
      */
 
-
-    /**
-     * Clean the temporary mocked up recordings
-     *
-     */
-    public function tearDown(): void {
-        parent::tearDown();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->bigbluebuttonbn_clean_recordings_array_fetch();
-    }
-
     /**
      * Test for provider::get_metadata().
      */

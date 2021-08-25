@@ -24,12 +24,20 @@
  */
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
-defined('MOODLE_INTERNAL') || die();
+
+use context;
+use Exception;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\notifier;
+use mod_bigbluebuttonbn\local\helpers\logs;
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 
 /**
  * Collection of helper methods for handling recordings in Moodle.
  *
  * Utility class for meeting helper
+ *
  * @package mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,34 +45,141 @@ defined('MOODLE_INTERNAL') || die();
 class recording_helper {
 
     /**
-     * Helper function to retrieve recordings from the BigBlueButton. The references are stored as events
-     * in bigbluebuttonbn_logs.
+     * Helper function to retrieve recordings from the BigBlueButton.
      *
-     * @param string $courseid
-     * @param string $bigbluebuttonbnid
-     * @param bool   $onlyfrominstance
-     * @param bool   $includedeleted
-     * @param bool   $includeimported
-     * @param bool   $onlyimported
+     * @param instance $instance
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
      *
      * @return array containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
-    public static function get_recordings($courseid = 0, $bigbluebuttonbnid = null, $onlyfrominstance = true,
-        $includedeleted = false, $includeimported = false, $onlyimported = false) {
-        global $DB;
-        // Retrieve DB recordings.
-        // TODO: These DB queries should be performed with the recording:::read helper method to guarantee consistency.
-        $select = self::sql_select_for_recordings(
-            $courseid, $bigbluebuttonbnid, $onlyfrominstance, $includedeleted, $includeimported, $onlyimported);
-        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
-        // Fetch BBB recordings.
-        $recordingsids = $DB->get_records_select_menu('bigbluebuttonbn_recordings', $select, null, 'id', 'id, recordingid');
-        $bbbrecordings = recording_proxy::bigbluebutton_fetch_recordings(array_values($recordingsids));
+    public static function get_recordings_for_instance(instance $instance, bool $includedeleted = false,
+        bool $includeimported = false,
+        bool $onlyimported = false) {
+        list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        $selects[] = "bigbluebuttonbnid = :bbbid";
+        $params['bbbid'] = $instance->get_instance_id();
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
+        $context = $instance->get_context();
+        if ($groupmode) {
+            list($groupselects, $groupparams) =
+                self::get_select_for_group($groupmode, $context, $instance->get_course_id(),
+                    $instance->get_group_id(), $instance->get_cm()->groupingid);
+            if ($groupselects) {
+                $selects[] = $groupselects;
+                $params = array_merge_recursive($params, $groupparams);
+            }
+        }
+        return recording::get_records_select(implode(" AND ", $selects), $params);
+    }
 
-        /* Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
-         * the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
-         */
+    /**
+     * Helper function to retrieve recordings from a given course.
+     *
+     * @param object $course dataobject as a course record
+     * @param array $excludedinstanceid exclude recordings from instance ids
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
+     *
+     * @return array containing the recordings indexed by recordID, each recording is also a
+     * non sequential associative array itself that corresponds to the actual recording in BBB
+     */
+    public static function get_recordings_for_course(object $course, array $excludedinstanceid = [],
+        bool $includedeleted = false, bool $includeimported = false, bool $onlyimported = false): array {
+        list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        $selects[] = "courseid = :courseid";
+        $params['courseid'] = $course->id;
+        $groupmode = groups_get_course_groupmode($course);
+        $context = \context_course::instance($course->id);
+        if ($groupmode) {
+            list($groupselects, $groupparams) = self::get_select_for_group($groupmode, $context, $course->id);
+            if ($groupselects) {
+                $selects[] = $groupselects;
+                $params = array_merge_recursive($params, $groupparams);
+            }
+        }
+        if ($excludedinstanceid) {
+            global $DB;
+            list($sqlexcluded, $paramexcluded) = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, false);
+            $selects[] = 'bigbluebuttonbnid ' . $sqlexcluded;
+            $params = array_merge_recursive($params, $paramexcluded);
+        }
+        return recording::get_records_select(implode(" AND ", $selects), $params);
+    }
+
+    /**
+     * Get select for given group mode and context
+     *
+     * @param int $groupmode
+     * @param context $context
+     * @param int $courseid
+     * @param int $groupid
+     * @param int $groupingid
+     * @return array
+     */
+    protected static function get_select_for_group($groupmode, $context, $courseid, $groupid = 0, $groupingid = 0): array {
+        $selects = [];
+        $params = [];
+        if ($groupmode) {
+            global $DB;
+            $accessallgroups = has_capability('moodle/site:accessallgroups', $context)
+                || $groupmode == VISIBLEGROUPS;
+            if ($accessallgroups) {
+                if ($context instanceof \context_module) {
+                    $allowedgroups = groups_get_all_groups($courseid, 0, $groupingid);
+                } else {
+                    $allowedgroups = groups_get_all_groups($courseid);
+                }
+            } else {
+                global $USER;
+                if ($context instanceof \context_module) {
+                    $allowedgroups = groups_get_all_groups($courseid, $USER->id, $groupingid);
+                } else {
+                    $allowedgroups = groups_get_all_groups($courseid, $USER->id);
+                }
+            }
+            $allowedgroupsid = array_map(function($g) {
+                return $g->id;
+            }, $allowedgroups);
+            if ($groupid || empty($allowedgroups)) {
+                $selects[] = "groupid = :groupid";
+                $params['groupid'] = ($groupid && in_array($groupid, $allowedgroupsid)) ?
+                    $groupid : 0;
+            } else {
+                if ($accessallgroups) {
+                    $allowedgroupsid[] = 0;
+                }
+                list($groupselects, $groupparams) = $DB->get_in_or_equal($allowedgroupsid, SQL_PARAMS_NAMED);
+                $selects[] = 'groupid ' . $groupselects;
+                $params = array_merge_recursive($params, $groupparams);
+            }
+        }
+        return array(implode(" AND ", $selects), $params);
+    }
+
+    /**
+     * Retrieve recordings from db then fetch them from BBB and return the result
+     *
+     * @param string $sql
+     * @param array $params
+     * @return array
+     * @throws \dml_exception
+     */
+    protected static function do_fetch_recordings(string $sql, array $params): array {
+        global $DB;
+        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $sql, $params, 'id, recordingid');
+
+        $recordingsids = array_map(function($r) {
+            return $r->recordingid;
+        }, $recs);
+
+        $bbbrecordings = recording_proxy::fetch_recordings($recordingsids);
+        // Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
+        // the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
+
         $recordings = array();
         foreach ($recs as $id => $rec) {
             $recordingid = $rec->recordingid;
@@ -80,7 +195,7 @@ class recording_helper {
                 $rec->recording = json_decode($rec->recording, true);
                 foreach ($rec->recording as $varname => $value) {
                     $varnames = explode('_', $varname);
-                    if ($varnames[0] == 'meta' ) {
+                    if ($varnames[0] == 'meta') {
                         $bbbrecordings[$recordingid][$varname] = $value;
                     }
                 }
@@ -94,110 +209,54 @@ class recording_helper {
     }
 
     /**
-     * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
-     * in the getRecordings request
+     * Get basic sql select from given parameters
      *
-     * @param string    $courseid
-     * @param string    $bigbluebuttonbnid
-     * @param bool      $onlyfrominstance
-     * @param bool      $includedeleted
-     * @param bool      $includeimported
-     * @param bool      $onlyimported
-     *
-     * @return string containing the sql used for getting the target bigbluebuttonbn instances
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
+     * @return array
      */
-    public static function sql_select_for_recordings($courseid, $bigbluebuttonbnid = null, $onlyfrominstance = true,
-        $includedeleted = false, $includeimported =  false, $onlyimported = false) {
-        if (empty($courseid)) {
-            $courseid = 0;
-        }
-        $select = "";
+    protected static function get_basic_select_from_parameters(bool $includedeleted = false, bool $includeimported = false,
+        bool $onlyimported = false): array {
+        $selects = [];
+        $params = [];
         // Start with the filters.
         if (!$includedeleted) {
             // Exclude headless recordings unless includedeleted.
-            $select .= "headless = false AND ";
+            $selects[] = "headless != " . recording::RECORDING_HEADLESS;
         }
         if (!$includeimported) {
             // Exclude imported recordings unless includedeleted.
-            $select .= "imported = false AND ";
+            $selects[] = "imported != " . recording::RECORDING_IMPORTED;
         } else if ($onlyimported) {
             // Exclude non-imported recordings.
-            $select .= "imported = true AND ";
+            $selects[] = "imported = " . recording::RECORDING_IMPORTED;
         }
-        // Add the main criteria for the search.
-        if (empty($bigbluebuttonbnid)) {
-            // Include all recordings in given course if bigbluebuttonbnid is not included.
-            return $select . "courseid = '{$courseid}'";
-        }
-        if ($onlyfrominstance) {
-            // Include only one bigbluebutton instance if subset filter is included.
-            return $select . "bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
-        }
-        // Include only from one course and instance is used for imported recordings.
-        return $select . "bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND courseid = '{$courseid}'";
+        // Now get only recordings that have been validated by recording ready callback.
+        $selects[] = "status = :status1 OR status = :status2";
+        $params['status1'] = recording::RECORDING_STATUS_PROCESSED;
+        $params['status2'] = recording::RECORDING_STATUS_NOTIFIED;
+        return array($selects, $params);
     }
 
     /**
-     * Helper function to define the sql used for gattering the bigbluebuttonbnids whose meetingids should be included
-     * in the getRecordings request
+     *  Helper function to sort an array of recordings. It compares the startTime in two recording objects.
      *
-     * @param string $courseid
-     * @param string $bigbluebuttonbnid
-     * @param bool $subset
-     * @param bool $includedeleted
-     *
-     * @return string containing the sql used for getting the target bigbluebuttonbn instances
+     * @param array $recordings
      */
-    public static function sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid = null, $subset = true,
-        $includedeleted = false) {
-        if (empty($courseid)) {
-            $courseid = 0;
-        }
-        $select = "imported = true AND ";
-        // Start with the filters.
-        if (!$includedeleted) {
-            // Exclude headless recordings unless includedeleted.
-            $select .= "headless = false AND ";
-        }
-        // Add the meain criteria for the search.
-        if (empty($bigbluebuttonbnid)) {
-            // Include all recordings in given course if bigbluebuttonbnid is not included.
-            return $select . "courseid = '{$courseid}'";
-        }
-        if ($subset) {
-            // Include only one bigbluebutton instance if subset filter is included.
-            return $select . "bigbluebuttonbnid = '{$bigbluebuttonbnid}'";
-        }
-        // Include only from one course and instance is used for imported recordings.
-        return $select . "bigbluebuttonbnid <> '{$bigbluebuttonbnid}' AND course = '{$courseid}'";
-    }
-
-    /**
-     * Helper function iterates an array with recordings and unset those already imported.
-     *
-     * @param array $recordings the source recordings.
-     * @param integer $courseid
-     * @param integer $bigbluebuttonbnid
-     *
-     * @return array
-     */
-    public static function unset_existent_imported_recordings($recordings, $courseid, $bigbluebuttonbnid) {
-        global $DB;
-        // Retrieve DB imported recordings.
-        $select = self::sql_select_for_imported_recordings($courseid, $bigbluebuttonbnid, true);
-        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $select, null, 'id');
-        // Index the $importedrecordings for the response.
-        $importedrecordings = array();
-        foreach ($recs as $id => $rec) {
-            $importedrecordings[$rec->recordingid] = $rec;
-        }
-        // Unset from $recordings if recording is already imported.
-        foreach ($recordings as $recordingid => $recording) {
-            if (isset($importedrecordings[$recordingid])) {
-                unset($recordings[$recordingid]);
+    public static function sort_recordings(array &$recordings) {
+        uasort($recordings, function($a, $b) {
+            global $CFG;
+            $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+            $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+            if ($a['startTime'] < $b['startTime']) {
+                return $resultless;
             }
-        }
-        return $recordings;
+            if ($a['startTime'] == $b['startTime']) {
+                return 0;
+            }
+            return $resultmore;
+        });
     }
 
     /**
@@ -207,7 +266,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_recording($recording) {
+    public static function parse_recording(object $recording) {
         // Add formats.
         $playbackarray = array();
         foreach ($recording->playback->format as $format) {
@@ -239,7 +298,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_recording_meta($metadata) {
+    public static function parse_recording_meta(array $metadata) {
         $metadataarray = array();
         foreach ($metadata as $key => $value) {
             if (is_object($value)) {
@@ -257,7 +316,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_preview_images($preview) {
+    public static function parse_preview_images(object $preview) {
         $imagesarray = array();
         foreach ($preview->images->image as $image) {
             $imagearray = array('url' => trim((string) $image));
@@ -267,5 +326,52 @@ class recording_helper {
             array_push($imagesarray, $imagearray);
         }
         return $imagesarray;
+    }
+
+    /**
+     * Helper for responding when recording ready is performed.
+     *
+     * @param instance $instance
+     * @param array $params
+     */
+    public static function recording_ready(instance $instance, array $params): void {
+        // Decodes the received JWT string.
+        try {
+            $decodedparameters = \Firebase\JWT\JWT::decode(
+                $params['signed_parameters'],
+                config::get('shared_secret'),
+                array('HS256')
+            );
+        } catch (Exception $e) {
+            $error = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 400 Bad Request. ' . $error);
+            return;
+        }
+
+        // Validations.
+        if (!isset($decodedparameters->record_id)) {
+            header('HTTP/1.0 400 Bad request. Missing record_id parameter');
+            return;
+        }
+
+        $recording = recording::get_record(['recordingid' => $decodedparameters->record_id]);
+        if (!isset($recording)) {
+            header('HTTP/1.0 400 Bad request. Invalid record_id');
+            return;
+        }
+
+        // Sends the messages.
+        try {
+            // We make sure messages are sent only once.
+            if ($recording->get('status') != recording::RECORDING_STATUS_NOTIFIED) {
+                notifier::notify_recording_ready($instance->get_instance_data());
+                $recording->set('status', recording::RECORDING_STATUS_NOTIFIED);
+                $recording->update();
+            }
+            header('HTTP/1.0 202 Accepted');
+        } catch (Exception $e) {
+            $error = 'Caught exception: ' . $e->getMessage();
+            header('HTTP/1.0 503 Service Unavailable. ' . $error);
+        }
     }
 }

@@ -55,15 +55,15 @@ export const updateRecording = args => fetchMany([
  * End the Meeting
  *
  * @param {number} bigbluebuttonbnid
- * @param {string} meetingid
+ * @param {number} groupid
  * @returns {Promise}
  */
-export const endMeeting = (bigbluebuttonbnid, meetingid) => fetchMany([
+export const endMeeting = (bigbluebuttonbnid, groupid) => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_end',
         args: {
             bigbluebuttonbnid,
-            meetingid,
+            groupid
         },
     }
 ])[0];
@@ -86,16 +86,16 @@ export const completionValidate = args => fetchMany([
  * Fetch meeting info for the specified meeting.
  *
  * @param {number} bigbluebuttonbnid
- * @param {string} meetingid
+ * @param {number} groupid
  * @param {boolean} [updatecache=false]
  * @returns {Promise}
  */
-export const getMeetingInfo = (bigbluebuttonbnid, meetingid, updatecache = false) => fetchMany([
+export const getMeetingInfo = (bigbluebuttonbnid, groupid, updatecache = false) => fetchMany([
     {
         methodname: 'mod_bigbluebutton_meeting_info',
         args: {
             bigbluebuttonbnid,
-            meetingid,
+            groupid,
             updatecache,
         },
     }

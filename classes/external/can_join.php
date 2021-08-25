@@ -30,10 +30,10 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
-use mod_bigbluebuttonbn\logger;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
@@ -46,7 +46,7 @@ use restricted_context_exception;
  * @copyright 2018 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class end_meeting extends external_api {
+class can_join extends external_api {
     /**
      * Returns description of method parameters
      *
@@ -54,8 +54,7 @@ class end_meeting extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_OPTIONAL, 0),
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED)
         ]);
     }
 
@@ -73,44 +72,28 @@ class end_meeting extends external_api {
     ): array {
         // Validate the bigbluebuttonbnid ID.
         [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'groupid' => $groupid,
+            'cmid' => $cmid,
         ] = self::validate_parameters(self::execute_parameters(), [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
-            'groupid' => $groupid,
+            'cmid' => $cmid,
         ]);
 
-        // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        $instance->set_group_id($groupid);
-        $context = $instance->get_context();
+        $canjoin = bigbluebutton_proxy::can_join_meeting($cmid);
+        $canjoin['cmid'] = $cmid;
 
-        // Validate that the user has access to this activity and to manage recordings.
-        self::validate_context($context);
-
-        if (!$instance->user_can_end_meeting()) {
-            throw new restricted_context_exception();
-        }
-        // Execute the end command.
-        $meeting = new meeting($instance);
-        $meeting->end_meeting();
-        logger::log_meeting_ended_event($instance);
-
-        // Update the cache.
-        $meeting->update_cache();
-
-        notification::add(get_string('end_session_notification', 'mod_bigbluebuttonbn'), notification::INFO);
-
-        return [];
+        return $canjoin;
     }
 
     /**
      * Describe the return structure of the external service.
      *
      * @return external_single_structure
-     * @since Moodle 3.0
+     * @since Moodle 3.3
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure([]);
+        return new external_single_structure([
+            'can_join' => new external_value(PARAM_BOOL, 'Can join session'),
+            'message' => new external_value(PARAM_RAW, 'Message if we cannot join', VALUE_OPTIONAL),
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+        ]);
     }
 }

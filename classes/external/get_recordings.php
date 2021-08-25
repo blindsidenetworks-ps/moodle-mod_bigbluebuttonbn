@@ -35,9 +35,9 @@ use invalid_parameter_exception;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\recording;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\plugin;
 
 /**
@@ -57,7 +57,9 @@ class get_recordings extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
-            'removeimportedid' => new external_value(PARAM_INT, 'Id of the other BBB already imported recordings', VALUE_OPTIONAL),
+            'removeimportedid' => new external_value(PARAM_INT,
+                'Id of the other BBB we target for importing recordings into.'
+                . 'The idea here is to remove already imported recordings', VALUE_OPTIONAL),
             'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_OPTIONAL),
             'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
         ]);
@@ -84,7 +86,7 @@ class get_recordings extends external_api {
         $warnings = [];
 
         if ($tools === null) {
-            $tools = 'protect,publish,delete';
+            $tools = 'protect,unprotect,publish,unpublish,delete,unprotect,';
         }
 
         // Validate the bigbluebuttonbnid ID.
@@ -107,54 +109,72 @@ class get_recordings extends external_api {
         // Validate that the user has access to this activity.
         self::validate_context($context);
 
+        // Then validate group.
         $groupmode = groups_get_activity_groupmode($cm);
         if ($groupmode && $groupid) {
             $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
-
             if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
                 $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
             } else {
                 $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
             }
-
             if (!array_key_exists($groupid, $allowedgroups)) {
                 // Import exception and lib.
                 global $CFG;
                 require_once($CFG->dirroot . '/webservice/lib.php');
                 throw new \webservice_access_exception('No access to this group');
             }
-
             $instance->set_group_id($groupid);
         }
 
         $enabledfeatures = $instance->get_enabled_features();
-        $typeprofiles = bigbluebutton::bigbluebuttonbn_get_instance_type_profiles();
+        $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
 
         $tools = explode(',', $tools);
 
         // Fetch the list of recordings.
-        $recordings = recording_helper::get_recordings(
-            $instance->get_course_id(),
-            // Include the instanceid only if view fro room is enabled.
-            $enabledfeatures['showroom'] ? $instance->get_instance_id() : false,
-            $enabledfeatures['showroom'],
-            $instance->get_instance_var('recordings_deleted'),
-            $enabledfeatures['importrecordings'],
-            $instance->get_instance_var('recordings_imported')
-        );
-
-        if ($removeimportedid) {
-            $recordings = recording_helper::unset_existent_imported_recordings(
-                $recordings,
-                $instance->get_course_id(),
-                $removeimportedid
+        // TODO: Check if all groups are accessible here. Check if it is possible or not to see
+        // other recordings from other groups. Maybe we will need to add a groupid column to the recording table.
+        if ($enabledfeatures['showroom']) {
+            // Not in the import page.
+            $recordings = recording_helper::get_recordings_for_instance(
+                $instance,
+                $instance->get_instance_var('recordings_deleted'),
+                $enabledfeatures['importrecordings'],
+                $instance->get_instance_var('recordings_imported'),
+            );
+        } else {
+            $recordings = recording_helper::get_recordings_for_course(
+                $instance->get_course(),
+                [$instance->get_instance_id()], // Exclude itself.
+                $instance->get_instance_var('recordings_deleted'),
+                $enabledfeatures['importrecordings'],
+                $instance->get_instance_var('recordings_imported'),
             );
         }
-
+        if ($removeimportedid) {
+            // Remove recording already imported in this specific activity.
+            $destinationinstance = instance::get_from_instanceid($removeimportedid);
+            $importedrecordings = recording_helper::get_recordings_for_instance(
+                $destinationinstance,
+                true,
+                true
+            );
+            // Unset from $recordings if recording is already imported.
+            // Recording $recordings are indexed by $id (moodle table column id).
+            foreach ($recordings as $index => $recording) {
+                $recordingid = $recording->get('recordingid');
+                foreach ($importedrecordings as $irecord) {
+                    if ($irecord->get('recordingid') == $recording->get('recordingid')) {
+                        unset($recordings[$index]);
+                    }
+                }
+            }
+        }
         $tabledata = [
-            'activity' => \mod_bigbluebuttonbn\local\bigbluebutton::bigbluebuttonbn_view_get_activity_status($instance),
+            'activity' => bigbluebutton_proxy::view_get_activity_status($instance),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
-            'locale' => plugin::bigbluebuttonbn_get_localcode(),
+            'locale' => plugin::get_localcode(),
             'profile_features' => $typeprofiles[0]['features'],
             'columns' => [],
             'data' => '',

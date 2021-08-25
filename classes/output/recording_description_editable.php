@@ -25,6 +25,8 @@
 
 namespace mod_bigbluebuttonbn\output;
 
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 
 /**
@@ -36,21 +38,34 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
  * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
 class recording_description_editable extends recording_editable {
+
+    /**
+     * Specific constructor with the right label/hint for this editable
+     *
+     * @param recording $rec
+     * @param instance $instance
+     */
+    public function __construct(recording $rec, instance $instance) {
+        parent::__construct($rec, $instance,
+            get_string('view_recording_description_editlabel', 'mod_bigbluebuttonbn'),
+            get_string('view_recording_description_edithint', 'mod_bigbluebuttonbn'));
+    }
+
     /**
      * Get the value to display
      *
-     * @param stdClass $rec a bigbluebuttonbn_recordings row
+     * @param recording $recording a recording
      * @return string
      */
-    public function get_recording_value($rec) {
-        return recording_data::row_meta_description($rec->recording,
-            $this->instance);
+    public function get_recording_value(recording $recording): string {
+        $metadescription = $recording->get('description');
+        return \html_writer::span($metadescription);
     }
 
     /**
      *  Get the type of editable
      */
     protected static function get_type() {
-        return 'meta_bbb-recording-description';
+        return 'description';
     }
 }

@@ -26,7 +26,6 @@ namespace mod_bigbluebuttonbn\output;
 
 use core\output\notification;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bbb_constants;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\meeting;
@@ -126,7 +125,7 @@ class view_page implements renderable, templatable {
             return false;
         }
 
-        if (bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != config::get('server_url')) {
+        if (config::DEFAULT_SERVER_URL != config::get('server_url')) {
             return false;
         }
 
@@ -144,7 +143,7 @@ class view_page implements renderable, templatable {
         }
 
         $generalwarningroles = explode(',', config::get('general_warning_roles'));
-        $userroles = \mod_bigbluebuttonbn\local\helpers\roles::bigbluebuttonbn_get_user_roles(
+        $userroles = \mod_bigbluebuttonbn\local\helpers\roles::get_user_roles(
             $this->instance->get_context(),
             $this->instance->get_user_id()
         );

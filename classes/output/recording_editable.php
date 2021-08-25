@@ -26,11 +26,14 @@
 namespace mod_bigbluebuttonbn\output;
 
 use lang_string;
+use mod_bigbluebuttonbn\local\bigbluebutton;
 use moodle_exception;
 use core\output\inplace_editable;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_proxy;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use stdClass;
 
 /**
  * Renderer for recording in place editable.
@@ -50,10 +53,13 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Constructor.
      *
-     * @param stdClass $rec
+     * @param recording $rec
      * @param instance $instance
+     * @param string $edithint
+     * @param string $editlabel
+     * @throws moodle_exception
      */
-    public function __construct($rec, instance $instance) {
+    public function __construct(recording $rec, instance $instance, string $edithint, string $editlabel) {
         $this->instance = $instance;
 
         $editable = $this->check_capability();
@@ -69,10 +75,12 @@ abstract class recording_editable extends \core\output\inplace_editable {
         parent::__construct(
             'mod_bigbluebuttonbn',
             static::get_type(),
-            $rec->id . ',' . $rec->recording['meetingID'],
+            $rec->get('id'),
             $editable,
             $displayvalue,
-            $displayvalue
+            $displayvalue,
+            $edithint,
+            $editlabel
         );
     }
 
@@ -102,53 +110,10 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Get the real recording value
      *
-     * @param stdClass $rec
+     * @param recording $rec
      * @return mixed
      */
-    abstract public function get_recording_value($rec);
-
-    /**
-     * Get all necessary info from itemid
-     *
-     * @param string $itemid
-     * @return array
-     */
-    public static function get_info_fromid($itemid) {
-        list($recid, $recordingid) = explode(',', $itemid);
-        return [$recid, $recordingid];
-    }
-
-    /**
-     * Edit recording
-     *
-     * @param stdClass $rec
-     * @param string $metainfoname
-     * @param mixed $value
-     * @return array
-     */
-    public static function edit_recording($rec, $metainfoname, $value) {
-        // Here we use something similar to the broker.
-        // TODO: remove the broker and use some sort of interface.
-        $meta = [$metainfoname => $value];
-        if ($rec->imported) {
-            // Execute update on imported recording link.
-            $rec->recording[$metainfoname] = $value;
-            recording::update($rec->id, (object)['recording' => json_encode($rec->recording)]);
-            return array(
-                'status' => 'done'
-            );
-        }
-
-        // As the recordingid was not identified as imported recording link, execute update on a real recording.
-        // (No need to update imported links as the update only affects the actual recording).
-        // Execute update on actual recording.
-        return array(
-            'status' => recording_proxy::bigbluebutton_update_recordings(
-                $rec->recording['recordID'],
-                $meta
-            )
-        );
-    }
+    abstract public function get_recording_value(recording $rec): string;
 
     /**
      * Update the recording with the new value
@@ -158,34 +123,25 @@ abstract class recording_editable extends \core\output\inplace_editable {
      * @return recording_editable
      */
     public static function update($itemid, $value) {
-        list($recid, $recordingid) = static::get_info_fromid($itemid);
-        $rec = recording::read($recid);
-        $instance = instance::get_from_instanceid($rec->bigbluebuttonbnid);
+        $recording = recording::get_record(['id' => $itemid]);
+        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
 
         require_login($instance->get_course());
 
-        $success = static::edit_recording($rec, static::get_type(), $value);
-        // Refresh recording.
-        // TODO: we need to reduce the number of calls to the server.
-        $rec = recording::read($recid);
-        return new static($rec, $instance);
+        $recording->set(static::get_type(), $value);
+        $recording->update();
+
+        return new static($recording, $instance);
     }
 
     /**
-     * Get editable from type
+     * Helper function evaluates if a row for the data used by the recording table is editable.
      *
-     * @param string $type
-     * @return string
+     * @return boolean
      */
-    public static function get_editable_class($type) {
-        switch ($type) {
-            case recording_name_editable::get_type():
-                return \mod_bigbluebuttonbn\output\recording_name_editable::class;
-                break;
-            case recording_description_editable::get_type():
-                return \mod_bigbluebuttonbn\output\recording_description_editable::class;
-                break;
-        }
-        return '';
+    protected function row_editable() {
+        // Since the request to BBB are cached, it is safe to use the wrapper to check the server version.
+        return $this->instance->can_manage_recordings()
+            && (bigbluebutton_proxy::get_server_version() >= 1.0 || $this->instance->is_blindside_network_server());
     }
 }

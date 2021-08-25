@@ -30,5 +30,8 @@ $definitions = [
     // version  (double) => server version.
     'serverinfo' => [
         'mode' => cache_store::MODE_APPLICATION,
+    ],
+    'recordings' => [
+        'mode' => cache_store::MODE_APPLICATION,
     ]
 ];
