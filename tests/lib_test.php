@@ -175,13 +175,6 @@ class lib_test extends testcase_helper {
         $this->assertEquals($info->name, $bbactivity->name);
     }
 
-    public function test_bigbluebuttonbn_pluginfile() {
-        $this->resetAfterTest();
-        $this->markTestSkipped(
-            'For now this test on send file and it should be mocked to avoid the real API CALL.'
-        );
-    }
-
     public function test_bigbluebuttonbn_check_updates_since() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();

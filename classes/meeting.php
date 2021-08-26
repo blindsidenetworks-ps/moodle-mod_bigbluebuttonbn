@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use cache_store;
+use core_tag_tag;
 use Exception;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
@@ -181,7 +182,22 @@ class meeting {
      */
     protected function do_get_meeting_info(bool $updatecache = false): stdClass {
         $instance = $this->instance;
-        $meetinginfo = $instance->get_instance_info();
+        $meetinginfo = (object) [
+            'instanceid' => $instance->get_instance_id(),
+            'bigbluebuttonbnid' => $instance->get_instance_id(),
+            'groupid' => $instance->get_group_id(),
+            'meetingid' => $instance->get_meeting_id(),
+            'cmid' => $instance->get_cm_id(),
+            'ismoderator' => $instance->is_moderator(),
+
+            'joinurl' => $instance->get_join_url()->out(),
+            'openingtime' => $instance->get_instance_var('openingtime'),
+            'closingtime' => $instance->get_instance_var('closingtime'),
+
+            'userlimit' => $instance->get_user_limit(),
+            'group' => $instance->get_group_id(),
+            'presentations' => [],
+        ];
         $activitystatus = bigbluebutton_proxy::view_get_activity_status($instance);
         // This might raise an exception if info cannot be retrieved.
         // But this might be totally fine as the meeting is maybe not yet created on BBB side.
@@ -201,7 +217,7 @@ class meeting {
         $meetinginfo->participantcount = $participantcount;
         $meetinginfo->canjoin = false;
 
-        if ($meetinginfo->statusrunning || !$instance->user_must_wait_to_join() ) {
+        if ($meetinginfo->statusrunning || !$instance->user_must_wait_to_join()) {
             if (!$instance->has_user_limit_been_reached($participantcount)
                 || !$instance->does_current_user_count_towards_user_limit()
             ) {
@@ -325,7 +341,9 @@ class meeting {
             'bbb-recording-name' => plugin::html2text($this->instance->get_meeting_name(), 64),
             'bbb-recording-description' => plugin::html2text($this->instance->get_meeting_description(),
                 64),
-            'bbb-recording-tags' => \mod_bigbluebuttonbn\plugin::get_tags($this->instance->get_cm_id()),
+            'bbb-recording-tags' =>
+                implode(',', core_tag_tag::get_item_tags_array('core',
+                    'course_modules', $this->instance->get_cm_id()))
             // Same as $id.
         ];
         // Special metadata for recording processing.

@@ -30,11 +30,9 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\mod_helper;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\plugin;
 
 global $CFG;
 

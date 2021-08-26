@@ -39,56 +39,6 @@ abstract class plugin {
     const COMPONENT = 'mod_bigbluebuttonbn';
 
     /**
-     * Helper for setting a value in a bigbluebuttonbn cache.
-     *
-     * @param  string   $name       BigBlueButtonBN cache
-     * @param  string   $key        Key to be created/updated
-     * @param  variable $value      Default value to be set
-     */
-    public static function cache_set($name, $key, $value) {
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
-        $cache->set($key, $value);
-    }
-
-    /**
-     * Helper for getting a value from a bigbluebuttonbn cache.
-     *
-     * @param  string   $name       BigBlueButtonBN cache
-     * @param  string   $key        Key to be retrieved
-     * @param  integer  $default    Default value in case key is not found or it is empty
-     *
-     * @return mixed key value
-     */
-    public static function cache_get($name, $key, $default = null) {
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', $name);
-        $result = $cache->get($key);
-        if (!empty($result)) {
-            return $result;
-        }
-        return $default;
-    }
-
-    /**
-     * Helper function returns the locale code based on the locale set by moodle.
-     *
-     * @return string
-     */
-    public static function get_localcode() {
-        $locale = self::get_locale();
-        return substr($locale, 0, strpos($locale, '_'));
-    }
-
-    /**
-     * Helper function returns the locale set by moodle.
-     *
-     * @return string
-     */
-    public static function get_locale() {
-        $lang = get_string('locale', 'core_langconfig');
-        return substr($lang, 0, strpos($lang, '.'));
-    }
-
-    /**
      * Helper function to convert an html string to plain text.
      *
      * @param string $html
@@ -105,25 +55,6 @@ abstract class plugin {
             $text .= '...';
         }
         return $text;
-    }
-
-    /**
-     * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
-     *
-     * @return boolean
-     */
-    public static function is_bn_server() {
-        if (config::get('bn_server')) {
-            return true;
-        }
-        $parsedurl = parse_url(config::get('server_url'));
-        if (!isset($parsedurl['host'])) {
-            return false;
-        }
-        $h = $parsedurl['host'];
-        $hends = explode('.', $h);
-        $hendslength = count($hends);
-        return ($hends[$hendslength - 1] == 'com' && $hends[$hendslength - 2] == 'blindsidenetworks');
     }
 
     /**
@@ -152,37 +83,4 @@ abstract class plugin {
         } while ($unique == $password);
         return $password;
     }
-
-    /**
-     * Helper returns error message key for the language file that corresponds to a bigbluebutton error key.
-     *
-     * @param string $messagekey
-     * @param string $defaultkey
-     *
-     * @return string
-     */
-    public static function get_error_key($messagekey, $defaultkey = null) {
-        if ($messagekey == 'checksumError') {
-            return 'index_error_checksum';
-        }
-        if ($messagekey == 'maxConcurrent') {
-            return 'view_error_max_concurrent';
-        }
-        return $defaultkey;
-    }
-
-    /**
-     * Helper function to obtain the tags linked to a bigbluebuttonbn activity
-     *
-     * @param string $id
-     *
-     * @return string containing the tags separated by commas
-     */
-    public static function get_tags($id) {
-        if (class_exists('core_tag_tag')) {
-            return implode(',', core_tag_tag::get_item_tags_array('core', 'course_modules', $id));
-        }
-        return implode(',', tag_get_tags('bigbluebuttonbn', $id));
-    }
-
 }

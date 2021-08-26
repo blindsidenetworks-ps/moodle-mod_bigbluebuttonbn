@@ -61,7 +61,7 @@ class notifier_test extends testcase_helper {
         $this->assertNotEmpty($messagesink->get_messages());
         $message = $messagesink->get_messages()[0];
         $this->assertEquals(
-            'BigBlueButton BIGBLUEBUTTON 1 [1] has been Updated
+            "BigBlueButton BIGBLUEBUTTON 1 [1] has been Updated
 
 Details:
 
@@ -82,7 +82,7 @@ Test course 1
 
 Links:
 ------
-[1] https://www.example.com/moodle/mod/bigbluebuttonbn/view.php?id=224000
-', $message->fullmessage);
+[1] https://www.example.com/moodle/mod/bigbluebuttonbn/view.php?id={$bbactivitycm->id}
+", $message->fullmessage);
     }
 }
