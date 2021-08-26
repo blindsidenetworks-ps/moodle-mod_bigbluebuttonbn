@@ -37,7 +37,7 @@ $group = optional_param('group', 0, PARAM_INT);
 
 $viewinstance = bigbluebuttonbn_view_validator($id, $bn); // In locallib.
 if (!$viewinstance) {
-    print_error('view_error_url_missing_parameters', plugin::COMPONENT);
+    throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
 $cm = $viewinstance['cm'];
@@ -70,7 +70,7 @@ if ($serverversion === null) {
     } else if ($bbbsession['moderator']) {
         $errmsg = 'view_error_unable_join_teacher';
     }
-    print_error($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
+    throw new moodle_exception($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
 }
 $bbbsession['serverversion'] = (string) $serverversion;
 

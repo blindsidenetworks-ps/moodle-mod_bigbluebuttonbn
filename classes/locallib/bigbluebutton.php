@@ -310,7 +310,6 @@ class bigbluebutton {
      * @param $course
      * @param $cm
      * @return bool
-     * @throws \coding_exception
      */
     public static function user_can_access_groups($groupid, $user, $course, $cm) {
         $groupmode = groups_get_activity_groupmode($cm);

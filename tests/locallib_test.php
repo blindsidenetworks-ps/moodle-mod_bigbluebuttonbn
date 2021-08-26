@@ -60,6 +60,37 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $this->assertEquals('Whatever It Can Be', bigbluebuttonbn_get_recording_type_text('whatever it can be'));
     }
 
+    public function test_bigbluebuttonbn_get_users_select_ordered() {
+        $this->resetAfterTest();
+        $numstudents = 12;
+        $numteachers = 3;
+        $groupsnum = 3;
+
+        list($course, $groups, $students, $teachers, $bbactivity, $roleids) =
+            $this->setup_course_students_teachers(
+                ['enablecompletion' => true, 'groupmode' => strval(SEPARATEGROUPS), 'groupmodeforce' => 1],
+                $numstudents, $numteachers, $groupsnum);
+        $context = context_course::instance($course->id);
+        // Prevent access all groups.
+        role_change_permission($roleids['teacher'], $context, 'moodle/site:accessallgroups', CAP_PREVENT);
+        $this->setUser($teachers[0]);
+        $users = bigbluebuttonbn_get_users_select($context, $bbactivity);
+        $usernames = array_map(function($u) {
+            return $u['name'];
+        }, $users);
+        $usernamessorted = $usernames;
+        sort($usernamessorted, SORT_NATURAL);
+
+        $this->assertEquals(
+            $usernamessorted,
+            array_values($usernames)
+        );
+        // Then check that the array kept the indexes.
+        foreach ($users as $k => $u) {
+            $this->assertEquals($k, $u['id']);
+        }
+    }
+
     public function test_bigbluebuttonbn_get_users_select_separate_groups_prevent_all() {
         $this->resetAfterTest();
         $numstudents = 12;
@@ -67,9 +98,9 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $groupsnum = 3;
 
         list($course, $groups, $students, $teachers, $bbactivity, $roleids) =
-                $this->setup_course_students_teachers(
-                        ['enablecompletion' => true, 'groupmode' => strval(SEPARATEGROUPS), 'groupmodeforce' => 1],
-                        $numstudents, $numteachers, $groupsnum);
+            $this->setup_course_students_teachers(
+                ['enablecompletion' => true, 'groupmode' => strval(SEPARATEGROUPS), 'groupmodeforce' => 1],
+                $numstudents, $numteachers, $groupsnum);
         $context = context_course::instance($course->id);
         // Prevent access all groups.
         role_change_permission($roleids['teacher'], $context, 'moodle/site:accessallgroups', CAP_PREVENT);
@@ -97,9 +128,9 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $numteachers = 3;
         $groupsnum = 3;
         list($course, $groups, $students, $teachers, $bbactivity, $roleids) =
-                $this->setup_course_students_teachers(
-                        ['enablecompletion' => true, 'groupmode' => strval(VISIBLEGROUPS), 'groupmodeforce' => 1],
-                        $numstudents, $numteachers, $groupsnum);
+            $this->setup_course_students_teachers(
+                ['enablecompletion' => true, 'groupmode' => strval(VISIBLEGROUPS), 'groupmodeforce' => 1],
+                $numstudents, $numteachers, $groupsnum);
 
         $context = context_course::instance($course->id);
         $this->setUser($teachers[0]);
@@ -111,6 +142,28 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $this->setUser($teachers[1]);
         $users = bigbluebuttonbn_get_users_select($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
+    }
+
+    public function test_bigbluebuttonbn_get_role() {
+        $this->resetAfterTest();
+        $numstudents = 12;
+        $numteachers = 3;
+        $groupsnum = 3;
+        list($course, $groups, $students, $teachers, $bbactivity, $roleids) =
+            $this->setup_course_students_teachers(
+                ['enablecompletion' => true,
+                    'groupmode' => strval(VISIBLEGROUPS),
+                    'groupmodeforce' => 1],
+                $numstudents, $numteachers, $groupsnum);
+
+        $context = context_course::instance($course->id);
+        $this->setUser($teachers[0]);
+        $roles = bigbluebuttonbn_get_roles_select($context);
+        $this->assertTrue(count($roles) >= 4);
+        // Then check that the array kept the indexes.
+        foreach ($roles as $k => $r) {
+            $this->assertEquals($k, $r['id']);
+        }
     }
 
     /**
@@ -156,9 +209,9 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
             $teachers[] = $teacher;
         }
         $bbactivity = $generator->create_module(
-                'bigbluebuttonbn',
-                array('course' => $course->id),
-                ['visible' => true]);
+            'bigbluebuttonbn',
+            array('course' => $course->id),
+            ['visible' => true]);
 
         get_fast_modinfo(0, 0, true);
         return array($course, $groups, $students, $teachers, $bbactivity, $roleids);
