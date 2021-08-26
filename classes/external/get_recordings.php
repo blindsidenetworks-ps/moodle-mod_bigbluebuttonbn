@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * BigBlueButtonBN internal API for recordings
- *
- * @package   mod_bigbluebuttonbn
- * @category  external
- * @copyright 2018 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_bigbluebuttonbn\external;
 
 use external_api;
@@ -31,14 +22,11 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use external_warnings;
-use invalid_parameter_exception;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\recording;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\plugin;
 
 /**
  * External service to fetch a list of recordings from the BBB service.
@@ -171,10 +159,12 @@ class get_recordings extends external_api {
                 }
             }
         }
+        $lang = get_string('locale', 'core_langconfig');
+        $locale = substr($lang, 0, strpos($lang, '.'));
         $tabledata = [
             'activity' => bigbluebutton_proxy::view_get_activity_status($instance),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
-            'locale' => plugin::get_localcode(),
+            'locale' => substr($locale, 0, strpos($locale, '_')),
             'profile_features' => $typeprofiles[0]['features'],
             'columns' => [],
             'data' => '',

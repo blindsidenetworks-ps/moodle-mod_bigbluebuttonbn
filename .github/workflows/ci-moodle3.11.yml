@@ -41,9 +41,10 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
       mockserver:
-        image: andrewnicols/bigbluebutton_mock:latest
+        image: calllearning/bigbluebutton_mock:latest
         ports:
           - 8001:80
+        #options: --add-host behattestrunner.local:172.17.0.1  # We set the IP to the runner so server can communicate back.
 
     steps:
       - name: Checkout
@@ -118,4 +119,4 @@ jobs:
 
       - name: behat
         if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome
+        run: moodle-plugin-ci behat --profile chrome -vvv

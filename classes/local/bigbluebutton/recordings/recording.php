@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The recording entity.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use cache;
@@ -32,9 +23,10 @@ use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use stdClass;
 
 /**
- * Utility class that defines a recording and provides methods for handlinging locally in Moodle and externally in BBB.
+ * The recording entity.
  *
- * Utility class for recording helper
+ * This is utility class that defines a single recording, and provides methods for their local handling locally, and
+ * communication with the bigbluebutton server.
  *
  * @package mod_bigbluebuttonbn
  * @copyright 2021 onwards, Blindside Networks Inc
@@ -71,6 +63,8 @@ class recording extends persistent {
     /** @var int A refresh period for recordings, defaults to 300s (5mins) */
     public const RECORDING_REFRESH_DEFAULT_PERIOD = 300;
 
+    protected $metadata = null;
+
     /**
      * Create an instance of this class.
      *
@@ -85,7 +79,7 @@ class recording extends persistent {
             $record->status = $record->status ?? self::RECORDING_STATUS_AWAITING;
         }
         parent::__construct($id, $record);
-        $this->get_latest_metadata();
+        $this->metadata = $this->fetch_latest_metadata();
     }
 
     /**
@@ -152,11 +146,6 @@ class recording extends persistent {
                 'null' => NULL_ALLOWED,
                 'default' => null
             ),
-            'protect' => array(
-                'type' => PARAM_BOOL,
-                'null' => NULL_ALLOWED,
-                'default' => null
-            ),
             'playbacks' => array(
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
@@ -173,11 +162,10 @@ class recording extends persistent {
     protected function before_update() {
         // We update if the remote metadata has been changed locally.
         if ($this->metadatachanged && !$this->get('imported')) {
-            $cacheddata = $this->get_latest_metadata();
-            if ($cacheddata) {
+            if ($this->metadata) {
                 recording_proxy::update_recording(
                     $this->get('recordingid'),
-                    $cacheddata);
+                    $this->metadata);
             }
             $this->metadatachanged = false;
         }
@@ -193,7 +181,7 @@ class recording extends persistent {
      */
     public function create_imported_recording(instance $instance) {
         $recordingrec = $this->to_record();
-        $remotedata = $this->get_latest_metadata();
+        $remotedata = $this->fetch_latest_metadata();
         unset($recordingrec->id);
         $recordingrec->bigbluebuttonbnid = $instance->get_instance_id();
         $recordingrec->courseid = $instance->get_course_id();
@@ -346,14 +334,14 @@ class recording extends persistent {
     }
 
     /**
-     * Is protected
+     * Is protected. Return null if protected is not implemented.
      *
-     * @return mixed|null
+     * @return bool|null
      * @throws \coding_exception
      */
     protected function get_protected() {
         $protectedtext = $this->metadata_get('protected');
-        return $protectedtext === "true";
+        return is_null($protectedtext) ? null : $protectedtext === "true";
     }
 
     /**
@@ -379,7 +367,7 @@ class recording extends persistent {
     /**
      * Is published
      *
-     * @return mixed|null
+     * @return bool
      * @throws \coding_exception
      */
     protected function get_published() {
@@ -398,12 +386,9 @@ class recording extends persistent {
         // Can we can change the metadata on the imported record ?
         if (!$this->get('imported')) {
             $this->metadatachanged = true;
-            $metadata = $this->get_latest_metadata();
-            $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $metadata);
-            $metadata[$possiblesourcename] = $value;
-            $recordid = $this->get('recordingid');
-            // Update the cache.
-            $this->set_cached_metadata($metadata);
+            $this->metadata = $this->fetch_latest_metadata();
+            $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $this->metadata);
+            $this->metadata[$possiblesourcename] = $value;
         }
     }
 
@@ -414,69 +399,28 @@ class recording extends persistent {
      * @return mixed|null
      */
     protected function metadata_get($fieldname) {
-        $remotemetadata = $this->get_latest_metadata();
-        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $remotemetadata);
-        return $remotemetadata[$possiblesourcename] ?? null;
+        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $this->metadata);
+        return $this->metadata[$possiblesourcename] ?? null;
     }
 
     /**
-     * Set cached metadata for this recording
-     *
-     * @param array $metadata metadata associative array
-     * @return boolean
-     * @throws \coding_exception
-     */
-    protected function set_cached_metadata($metadata) {
-        $rid = $this->get('recordingid');
-        // First try to fetch in cache.
-        $cachedrecordings = cache::make('mod_bigbluebuttonbn', 'recordings');
-        $cacheddata = (object) [
-            'metadata' => $metadata,
-            'timestamp' => time()
-        ];
-        return $cachedrecordings->set($rid, $cacheddata);
-    }
-
-    /**
-     * Initialise or refresh the cached value.
+     * Fetch metadata
      *
      * If metadata has changed locally or if it an imported recording, nothing will be done.
      *
-     * @return bool|float|int|mixed|string
+     * @return array
      * @throws \coding_exception
      */
-    protected function get_latest_metadata() {
-        $metadata = null;
-        $metadatatimestamp = null;
-        // First try to fetch in cache.
-        $rid = $this->get('recordingid');
-        // First try to fetch in cache.
-        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
-        if ($cacheddata = $cache->get($rid)) {
-            $metadata = $cacheddata->metadata;
-            $metadatatimestamp = $cacheddata->timestamp;
-        }
-        // Init the metadata from the cache. We make sure we do not overwrite cached data
-        // if data has been changed.
-        if (!$this->metadatachanged) {
-            // Check if we need to refresh the metadata.
-            $now = time();
-            // UI configuration options.
-            $refreshperiod = \mod_bigbluebuttonbn\local\config::get('recording_refresh_period');
-
-            if ($metadatatimestamp + $refreshperiod < $now) {
-                // Time to refresh or to initialise.
-                if (!$this->get('imported')) {
-                    $rid = $this->get('recordingid');
-                    $recordings = recording_proxy::fetch_recordings([$rid]);
-                    if (!empty($recordings[$rid])) {
-                        $metadata = $recordings[$rid];
-                        $this->set_cached_metadata($metadata);
-                    }
-                } else {
-                    $metadata = json_decode($this->get('importeddata'), true);
-                }
+    protected function fetch_latest_metadata() {
+        $metadata = [];
+        if (!$this->get('imported')) {
+            $rid = $this->get('recordingid');
+            $recordings = recording_proxy::fetch_recordings([$rid]);
+            if (!empty($recordings[$rid])) {
+                $metadata = $recordings[$rid];
             }
+        } else {
+            $metadata = json_decode($this->get('importeddata'), true);
         }
         return $metadata;
     }

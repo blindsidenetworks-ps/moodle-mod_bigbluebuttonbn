@@ -14,17 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Instance record for mod_bigbluebuttonbn.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_bigbluebuttonbn;
 
 use cm_info;
+use context;
 use context_module;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -917,7 +910,7 @@ EOF;
      * @return bool
      */
     public function is_blindside_network_server(): bool {
-        return plugin::is_bn_server();
+        return bigbluebutton_proxy::is_bn_server();
     }
 
     /**
@@ -1054,29 +1047,5 @@ EOF;
             return false;
         }
         return true;
-    }
-
-    /**
-     * Get instance info for display
-     *
-     * @return object
-     */
-    public function get_instance_info() {
-        return (object) [
-            'instanceid' => $this->get_instance_id(),
-            'bigbluebuttonbnid' => $this->get_instance_id(),
-            'groupid' => $this->get_group_id(),
-            'meetingid' => $this->get_meeting_id(),
-            'cmid' => $this->get_cm_id(),
-            'ismoderator' => $this->is_moderator(),
-
-            'joinurl' => $this->get_join_url()->out(),
-            'openingtime' => $this->get_instance_var('openingtime'),
-            'closingtime' => $this->get_instance_var('closingtime'),
-
-            'userlimit' => $this->get_user_limit(),
-            'group' => $this->get_group_id(),
-            'presentations' => [],
-        ];
     }
 }

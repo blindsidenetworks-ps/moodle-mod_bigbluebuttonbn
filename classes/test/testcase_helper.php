@@ -14,16 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Basic classes and routine for most of the tests
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2018 - present, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David (laurent@call-learning.fr)
- */
 namespace mod_bigbluebuttonbn\test;
-defined('MOODLE_INTERNAL') || die();
 
 use advanced_testcase;
 use context_module;
@@ -38,17 +29,13 @@ use testing_data_generator;
  * @author    Laurent David (laurent@call-learning.fr)
  */
 class testcase_helper extends advanced_testcase {
-    /**
-     * @var testing_data_generator|null $generator
-     */
+    /** @var testing_data_generator|null */
     protected $generator = null;
-    /**
-     * @var object|null $bbactivity
-     */
+
+    /** @var object|null */
     protected $bbactivity = null;
-    /**
-     * @var object|null $course
-     */
+
+    /** @var object|null */
     protected $course = null;
 
     /**
@@ -70,7 +57,7 @@ class testcase_helper extends advanced_testcase {
         list($course, $cm) = get_course_and_cm_from_instance($instance, 'bigbluebuttonbn');
         $context = context_module::instance($cm->id);
 
-        return array($context, $cm, $instance);
+        return [$context, $cm, $instance];
     }
 
     /**
@@ -82,6 +69,7 @@ class testcase_helper extends advanced_testcase {
      */
     protected function get_form_data_from_instance($bbactivity, $course = null) {
         global $USER;
+
         if (!$course) {
             $course = $this->course;
         }
@@ -91,6 +79,7 @@ class testcase_helper extends advanced_testcase {
         $this->setUser($USER);
         return $data;
     }
+
     /**
      * Setup
      *

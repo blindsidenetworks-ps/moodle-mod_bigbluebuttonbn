@@ -14,16 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The recordings_data.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use html_writer;
@@ -36,10 +26,21 @@ use mod_bigbluebuttonbn\plugin;
 use pix_icon;
 use stdClass;
 
+/**
+ * The recordings_data.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
 class recording_data {
 
     /**
      * Helper function builds a row for the data used by the recording table.
+     *
+     * TODO: replace this with templates whenever possible.
      *
      * @param instance $instance
      * @param recording $rec a recording row
@@ -158,8 +159,8 @@ class recording_data {
                 $buttonpayload = self::TOOL_ACTION_DEFINITIONS[$tool];
                 $conditionalhiding = $buttonpayload['hidewhen'] ?? null;
                 $disabledwhen = $buttonpayload['disablewhen'] ?? null;
-                self::actionbar_set_disabled($buttonpayload, $disabledwhen, $rec, 'disabled');
-                self::actionbar_set_disabled($buttonpayload, $conditionalhiding, $rec);
+                self::actionbar_set_diplay($buttonpayload, $disabledwhen, $rec, 'disabled');
+                self::actionbar_set_diplay($buttonpayload, $conditionalhiding, $rec);
                 $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
             }
         }
@@ -179,7 +180,7 @@ class recording_data {
      * @param recording $rec
      * @param string $value
      */
-    private static function actionbar_set_disabled(&$buttonpayload, $condition, $rec, $value = 'invisible') {
+    private static function actionbar_set_diplay(&$buttonpayload, $condition, $rec, $value = 'invisible') {
         if ($condition) {
             $negates = $condition[0] === '!';
             $conditionalvariable = ltrim($condition, '!');

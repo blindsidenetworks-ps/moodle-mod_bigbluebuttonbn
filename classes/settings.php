@@ -13,14 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-/**
- * The mod_bigbluebuttonbn settings helper
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David  (laurent [at] call-learning [dt] fr)
- */
 
 namespace mod_bigbluebuttonbn;
 
@@ -39,7 +31,6 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_bigbluebuttonbn settings helper
  *

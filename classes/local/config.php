@@ -14,6 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn\local;
+
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
+
 /**
  * Handles the global configuration based on config.php.
  *
@@ -22,12 +27,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-
-namespace mod_bigbluebuttonbn\local;
-
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
-
 class config {
 
     /** @var string Default bigbluebutton server url */

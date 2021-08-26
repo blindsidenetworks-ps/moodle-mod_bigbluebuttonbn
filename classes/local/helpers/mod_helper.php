@@ -50,7 +50,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_pre_save_instance(stdClass $bigbluebuttonbn): void {
+    protected static function process_pre_save_instance(stdClass $bigbluebuttonbn): void {
         $bigbluebuttonbn->timemodified = time();
         if ((integer) $bigbluebuttonbn->instance == 0) {
             $bigbluebuttonbn->meetingid = 0;
@@ -67,7 +67,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_pre_save_checkboxes($bigbluebuttonbn) {
+    protected static function process_pre_save_checkboxes($bigbluebuttonbn) {
         if (!isset($bigbluebuttonbn->wait)) {
             $bigbluebuttonbn->wait = 0;
         }
@@ -132,7 +132,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_pre_save_common(stdClass $bigbluebuttonbn): void {
+    protected static function process_pre_save_common(stdClass $bigbluebuttonbn): void {
         // Make sure common settings are removed when 'recordings only'.
         if ($bigbluebuttonbn->type == instance::TYPE_RECORDING_ONLY) {
             $bigbluebuttonbn->groupmode = 0;
@@ -158,7 +158,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_post_save_notification(stdClass $bigbluebuttonbn): void {
+    protected static function process_post_save_notification(stdClass $bigbluebuttonbn): void {
         $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
         if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
             $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
@@ -171,7 +171,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_post_save_event(stdClass $bigbluebuttonbn): void {
+    protected static function process_post_save_event(stdClass $bigbluebuttonbn): void {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/calendar/lib.php');
@@ -223,7 +223,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_post_save_completion(stdClass $bigbluebuttonbn): void {
+    protected static function process_post_save_completion(stdClass $bigbluebuttonbn): void {
         if (empty($bigbluebuttonbn->completionexpected)) {
             return;
         }

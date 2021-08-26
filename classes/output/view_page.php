@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * View Page tempalte renderable.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_bigbluebuttonbn\output;
 
 use core\output\notification;
@@ -35,7 +27,7 @@ use stdClass;
 use templatable;
 
 /**
- * Class view_page
+ * View Page template renderable.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>

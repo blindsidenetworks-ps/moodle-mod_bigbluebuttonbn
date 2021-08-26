@@ -78,7 +78,7 @@ class reset_test extends testcase_helper {
                 ['openingtime' => time()]
         );
         $formdata = $this->get_form_data_from_instance($bbactivity);
-        \mod_bigbluebuttonbn\local\helpers\mod_helper::process_post_save_event($formdata);
+        \mod_bigbluebuttonbn\local\helpers\mod_helper::process_post_save($formdata);
         $this->assertEquals(1, $DB->count_records(
                 'event',
                 array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->course->id)));
@@ -103,16 +103,5 @@ class reset_test extends testcase_helper {
         reset::reset_tags($this->course->id);
         $alltags = core_tag_tag::get_item_tags('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id);
         $this->assertCount(0, $alltags);
-    }
-
-    /**
-     * Reset get_recordings test
-     */
-    public function test_reset_recordings() {
-        $this->resetAfterTest();
-        // TODO complete this test.
-        $this->markTestSkipped(
-            'For now this test relies on an API call so we need to mock the API CALL.'
-        );
     }
 }

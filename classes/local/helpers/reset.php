@@ -59,7 +59,7 @@ class reset {
 
         // Remove all the recordings.
         $recordingid = implode(",", array_keys($recordings));
-        $recordingtodelete = recording::get_record( ['id' => $recordingid]);
+        $recordingtodelete = recording::get_record(['id' => $recordingid]);
         $recordingtodelete->delete();
     }
 
@@ -102,9 +102,9 @@ class reset {
      * @return array status array
      */
     public static function reset_getstatus($item) {
-        return array('component' => get_string('modulenameplural', 'bigbluebuttonbn')
-        , 'item' => get_string("removed{$item}", 'bigbluebuttonbn')
-        , 'error' => false);
+        return array('component' => get_string('modulenameplural', 'bigbluebuttonbn'),
+            'item' => get_string("removed{$item}", 'bigbluebuttonbn'),
+            'error' => false);
     }
 
     /**

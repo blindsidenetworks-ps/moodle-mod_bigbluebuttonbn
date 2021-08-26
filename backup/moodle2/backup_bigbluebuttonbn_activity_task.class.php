@@ -25,7 +25,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-
+global $CFG;
 require_once($CFG->dirroot.'/mod/bigbluebuttonbn/backup/moodle2/backup_bigbluebuttonbn_stepslib.php');
 
 /**

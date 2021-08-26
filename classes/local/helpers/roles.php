@@ -73,7 +73,7 @@ class roles {
      *
      * @return array
      */
-    public static function get_guest_role() {
+    protected static function get_guest_role() {
         $guestrole = get_guest_role();
         return array($guestrole->id => $guestrole);
     }
@@ -85,7 +85,7 @@ class roles {
      * @param null $bbactivity
      * @return array $users
      */
-    public static function get_users_select(context_course $context, $bbactivity = null) {
+    public static function get_users_array(context_course $context, $bbactivity = null) {
         // CONTRIB-7972, check the group of current user and course group mode.
         $groups = null;
         $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
@@ -114,7 +114,7 @@ class roles {
     /**
      * Returns an array containing all the roles in a context.
      *
-     * @param context $context
+     * @param context|null $context $context
      * @param bool $onlyviewableroles
      *
      * @return array $roles
@@ -140,12 +140,12 @@ class roles {
     /**
      * Returns an array containing all the roles in a context wrapped for html select element.
      *
-     * @param context $context
+     * @param context|null $context $context
      * @param bool $onlyviewableroles
      *
      * @return array $users
      */
-    public static function get_roles_select(context $context = null, bool $onlyviewableroles = true) {
+    protected static function get_roles_select(context $context = null, bool $onlyviewableroles = true) {
         global $CFG;
 
         if ($onlyviewableroles == true && $CFG->branch >= 35) {
@@ -170,7 +170,7 @@ class roles {
      *
      * @return object $role
      */
-    public static function get_role($id) {
+    protected static function get_role($id) {
         $roles = (array) role_get_names();
         if (is_numeric($id) && isset($roles[$id])) {
             return (object) $roles[$id];
@@ -202,7 +202,7 @@ class roles {
         );
         $data['user'] = array(
             'name' => get_string('mod_form_field_participant_list_type_user', 'bigbluebuttonbn'),
-            'children' => self::get_users_select($context, $bbactivity),
+            'children' => self::get_users_array($context, $bbactivity),
         );
         return $data;
     }
@@ -241,7 +241,7 @@ class roles {
      *
      * @return array
      */
-    public static function get_participant_list_default($context, $ownerid = null) {
+    protected static function get_participant_list_default($context, $ownerid = null) {
         $participantlist = array();
         $participantlist[] = array(
             'selectiontype' => 'all',
@@ -274,7 +274,7 @@ class roles {
      *
      * @return array
      */
-    public static function get_participant_rules_encoded($rules) {
+    protected static function get_participant_rules_encoded($rules) {
         foreach ($rules as $key => $rule) {
             if ($rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid'])) {
                 continue;
@@ -345,7 +345,7 @@ class roles {
      *
      * @return boolean
      */
-    public static function is_moderator_validator($participantlist, $userid, $userroles) {
+    protected static function is_moderator_validator($participantlist, $userid, $userroles) {
         // Iterate participant rules.
         foreach ($participantlist as $participant) {
             if (self::is_moderator_validate_rule($participant, $userid, $userroles)) {
@@ -364,7 +364,7 @@ class roles {
      *
      * @return boolean
      */
-    public static function is_moderator_validate_rule($participant, $userid, $userroles) {
+    protected static function is_moderator_validate_rule($participant, $userid, $userroles) {
         if ($participant['role'] == self::ROLE_VIEWER) {
             return false;
         }

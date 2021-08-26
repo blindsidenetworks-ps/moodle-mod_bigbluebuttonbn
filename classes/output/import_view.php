@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Renderer.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\output;
 
 use mod_bigbluebuttonbn\instance;
@@ -32,7 +23,7 @@ use renderer_base;
 use templatable;
 
 /**
- * Class import_view
+ * Renderable for the import page.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc

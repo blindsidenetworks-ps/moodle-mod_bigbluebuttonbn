@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The mod_bigbluebuttonbn/bigbluebutton/recordings/helper.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use context;
@@ -57,7 +48,7 @@ class recording_helper {
      */
     public static function get_recordings_for_instance(instance $instance, bool $includedeleted = false,
         bool $includeimported = false,
-        bool $onlyimported = false) {
+        bool $onlyimported = false): array {
         list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
         $selects[] = "bigbluebuttonbnid = :bbbid";
         $params['bbbid'] = $instance->get_instance_id();
@@ -266,7 +257,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_recording(object $recording) {
+    public static function parse_recording(object $recording): array {
         // Add formats.
         $playbackarray = array();
         foreach ($recording->playback->format as $format) {
@@ -298,7 +289,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_recording_meta(array $metadata) {
+    public static function parse_recording_meta(array $metadata): array {
         $metadataarray = array();
         foreach ($metadata as $key => $value) {
             if (is_object($value)) {
@@ -316,7 +307,7 @@ class recording_helper {
      *
      * @return array
      */
-    public static function parse_preview_images(object $preview) {
+    public static function parse_preview_images(object $preview): array {
         $imagesarray = array();
         foreach ($preview->images->image as $image) {
             $imagearray = array('url' => trim((string) $image));
