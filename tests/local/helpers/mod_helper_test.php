@@ -35,7 +35,7 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class instance_test extends testcase_helper {
+class mod_helper_test extends testcase_helper {
 
     /**
      * Presave test

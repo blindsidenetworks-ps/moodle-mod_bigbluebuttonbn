@@ -8,6 +8,8 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: 'ubuntu-latest'
+    env:
+      MOODLE_BEHAT_WWWROOT: "http://behattestrunner:8000"  # This is in order for the mock server to send back messages.
     strategy:
       fail-fast: false
       matrix:
@@ -15,9 +17,9 @@ jobs:
           - php: '7.4'
             moodle-branch: 'MOODLE_311_STABLE'
             database: 'mariadb'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_311_STABLE'
-            database: 'pgsql'
+#          - php: '7.4'
+#            moodle-branch: 'MOODLE_311_STABLE'
+#            database: 'pgsql'
     services:
       postgres:
         image: postgres
@@ -41,11 +43,15 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
       mockserver:
-        image: andrewnicols/bigbluebutton_mock:latest
+        image: calllearning/bigbluebutton_mock:latest
         ports:
           - 8001:80
+        options: --add-host behattestrunner:172.17.0.1  # We set the IP to the runner so server can communicate back.
 
     steps:
+      - name: Setup behat custom host
+        run: echo "127.0.0.1 behattestrunner" | sudo tee -a /etc/hosts  # This is so the server can communicate back.
+
       - name: Checkout
         uses: actions/checkout@v2
         with:

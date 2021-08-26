@@ -73,7 +73,6 @@ class can_join extends external_api {
         $instance = instance::get_from_cmid($cmid);
         $context = $instance->get_context();
         self::validate_context($context);
-        
         $canjoin = bigbluebutton_proxy::can_join_meeting($cmid);
         $canjoin['cmid'] = $cmid;
 

@@ -24,7 +24,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-
+global $CFG;
 $addons = array(
     "mod_bigbluebuttonbn" => array(
         "handlers" => array( // Different places where the add-on will display content.

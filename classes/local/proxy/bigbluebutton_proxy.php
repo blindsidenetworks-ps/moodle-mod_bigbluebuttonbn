@@ -28,15 +28,18 @@
 
 namespace mod_bigbluebuttonbn\local\proxy;
 
+use cache_store;
 use Exception;
 use cache;
 use completion_info;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\variable;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -183,7 +186,9 @@ class bigbluebutton_proxy extends proxy_base {
             return true;
         }
         // Skip validation when the recording URL was already validated.
-        $validatedurls = plugin::cache_get('recordings_cache', 'validated_urls', array());
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'recordings_cache');
+        $result = $cache->get('validated_urls');
+        $validatedurls = $result ?? array();
         if (array_key_exists($urlhost, $validatedurls)) {
             return $validatedurls[$urlhost];
         }
@@ -195,7 +200,7 @@ class bigbluebutton_proxy extends proxy_base {
             debugging($error, DEBUG_DEVELOPER);
             $validatedurls[$urlhost] = false;
         }
-        plugin::cache_set('recordings_cache', 'validated_urls', $validatedurls);
+        $cache->set('validated_urls', $validatedurls);
         return $validatedurls[$urlhost];
     }
 
@@ -460,27 +465,21 @@ class bigbluebutton_proxy extends proxy_base {
     }
 
     /**
-     * Get recordings from BBB.
+     * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
      *
-     * @param array $meetingsids
-     * @return array
-     * @throws bigbluebutton_exception
+     * @return boolean
      */
-    public static function get_recordings_from_meetings(array $meetingsids): array {
-        $ids = implode(',', $meetingsids);
-        $xml = self::fetch_endpoint_xml('getRecordings', ['meetingID' => $ids]);
-        self::assert_returned_xml($xml, $ids);
-
-        if (!isset($xml->recordings)) {
-            throw new bigbluebutton_exception(
-                'general_error_cannot_get_recordings',
-                plugin::COMPONENT,
-                '',
-                null,
-                var_export($meetingsids, true)
-            );
+    public static function is_bn_server() {
+        if (config::get('bn_server')) {
+            return true;
         }
-
-        return iterator_to_array($xml->recordings->children(), false);
+        $parsedurl = parse_url(config::get('server_url'));
+        if (!isset($parsedurl['host'])) {
+            return false;
+        }
+        $h = $parsedurl['host'];
+        $hends = explode('.', $h);
+        $hendslength = count($hends);
+        return ($hends[$hendslength - 1] == 'com' && $hends[$hendslength - 2] == 'blindsidenetworks');
     }
 }

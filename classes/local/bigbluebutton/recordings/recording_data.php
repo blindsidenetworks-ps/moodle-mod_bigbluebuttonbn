@@ -159,8 +159,8 @@ class recording_data {
                 $buttonpayload = self::TOOL_ACTION_DEFINITIONS[$tool];
                 $conditionalhiding = $buttonpayload['hidewhen'] ?? null;
                 $disabledwhen = $buttonpayload['disablewhen'] ?? null;
-                self::actionbar_set_disabled($buttonpayload, $disabledwhen, $rec, 'disabled');
-                self::actionbar_set_disabled($buttonpayload, $conditionalhiding, $rec);
+                self::actionbar_set_diplay($buttonpayload, $disabledwhen, $rec, 'disabled');
+                self::actionbar_set_diplay($buttonpayload, $conditionalhiding, $rec);
                 $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
             }
         }
@@ -180,7 +180,7 @@ class recording_data {
      * @param recording $rec
      * @param string $value
      */
-    private static function actionbar_set_disabled(&$buttonpayload, $condition, $rec, $value = 'invisible') {
+    private static function actionbar_set_diplay(&$buttonpayload, $condition, $rec, $value = 'invisible') {
         if ($condition) {
             $negates = $condition[0] === '!';
             $conditionalvariable = ltrim($condition, '!');

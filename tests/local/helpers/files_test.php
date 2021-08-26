@@ -105,7 +105,7 @@ class files_test extends testcase_helper {
         $context = context_module::instance($bbformdata->coursemodule);
         list($course, $bbactivitycmuser) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
         $mediafile =
-            files::default_presentation_get_file($this->course, $bbactivitycmuser, $context, ['presentation'],
+            files::pluginfile_filename($this->course, $bbactivitycmuser, $context, ['presentation'],
                 '/bbfile.pptx');
         $this->assertEquals('presentation', $mediafile);
     }
@@ -126,18 +126,6 @@ class files_test extends testcase_helper {
         $filename = files::pluginfile_filename($this->course, $bbactivitycm, $bbactivitycontext,
             [$presentationnonce, 'bbfile.pptx']);
         $this->assertEquals('bbfile.pptx', $filename);
-    }
-
-    /**
-     * Get file area
-     *
-     */
-    public function test_bigbluebuttonbn_get_file_areas() {
-        $this->resetAfterTest();
-        $this->assertEquals(array(
-                'presentation' => 'Presentation content',
-                'presentationdefault' => 'Presentation default content',
-        ), files::get_file_areas());
     }
 
     /**

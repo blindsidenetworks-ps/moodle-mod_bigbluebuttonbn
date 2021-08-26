@@ -29,13 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\local\helpers\meeting_helper as meeting_helper;
-use mod_bigbluebuttonbn\local\mobileview;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\plugin;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/grouplib.php');

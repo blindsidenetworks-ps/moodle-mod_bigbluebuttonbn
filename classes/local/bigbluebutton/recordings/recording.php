@@ -338,14 +338,14 @@ class recording extends persistent {
     }
 
     /**
-     * Is protected
+     * Is protected. Return null if protected is not implemented.
      *
-     * @return mixed|null
+     * @return bool|null
      * @throws \coding_exception
      */
     protected function get_protected() {
         $protectedtext = $this->metadata_get('protected');
-        return $protectedtext === "true";
+        return is_null($protectedtext) ? null : $protectedtext === "true";
     }
 
     /**
@@ -371,7 +371,7 @@ class recording extends persistent {
     /**
      * Is published
      *
-     * @return mixed|null
+     * @return bool
      * @throws \coding_exception
      */
     protected function get_published() {
