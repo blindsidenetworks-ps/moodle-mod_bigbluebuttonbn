@@ -16,15 +16,16 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
+use context_course;
 use html_writer;
+use pix_icon;
+use stdClass;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\plugin;
-use pix_icon;
-use stdClass;
 
 /**
  * The recordings_data.
@@ -53,7 +54,12 @@ class recording_data {
         if ($tools === null) {
             $tools = ['protect', 'publish', 'delete'];
         }
-
+        $context = context_course::instance($instance->get_course_id());
+        foreach ($tools as $key => $tool) {
+            if (!$instance->can_perform_on_recordings($tool)) {
+                unset($tools[$key]);
+            }
+        }
         if (!self::include_recording_table_row($instance, $rec)) {
             return null;
         }
@@ -117,7 +123,11 @@ class recording_data {
      * @return int
      */
     public static function row_duration(recording $recording): int {
-        foreach (array_values($recording->get('playbacks')) as $playback) {
+        $playbacks = $recording->get('playbacks');
+        if ($playbacks === null) {
+            return 0;
+        }
+        foreach (array_values($playbacks) as $playback) {
             // Ignore restricted playbacks.
             if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'true') {
                 continue;
@@ -197,13 +207,14 @@ class recording_data {
         'protect' => [
             'action' => 'unprotect',
             'icon' => 'lock',
-            'hidewhen' => 'protected',
+            'hidewhen' => '!protected',
             'disablewhen' => 'imported'
         ],
         'unprotect' => [
             'action' => 'protect',
             'icon' => 'unlock',
             'hidewhen' => '!protected',
+            'disablewhen' => 'imported'
         ],
         'publish' => [
             'action' => 'publish',
@@ -217,6 +228,7 @@ class recording_data {
             'icon' => 'hide',
             'hidewhen' => '!published',
             'requireconfirmation' => true,
+            'disablewhen' => 'imported'
         ],
         'delete' => [
             'action' => 'delete',
@@ -236,6 +248,10 @@ class recording_data {
      * @return string
      */
     public static function row_preview(recording $recording): string {
+        $playbacks = $recording->get('playbacks');
+        if ($playbacks === null) {
+            return '';
+        }
         $options = [
             'id' => 'preview-' . $recording->get('id'),
         ];
@@ -243,7 +259,7 @@ class recording_data {
             $options['hidden'] = 'hidden';
         }
         $recordingpreview = html_writer::start_tag('div', $options);
-        foreach ($recording->get('playbacks') as $playback) {
+        foreach ($playbacks as $playback) {
             if (isset($playback['preview'])) {
                 $recordingpreview .= self::row_preview_images($playback);
                 break;

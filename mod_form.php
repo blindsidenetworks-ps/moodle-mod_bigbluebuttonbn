@@ -112,8 +112,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add profile data here instead of passing it by parameters.
         $context = context_course::instance($this->_course->id);
         $instancetyperofiles = bigbluebutton_proxy::get_instance_type_profiles_create_allowed(
-            has_capability('mod/bigbluebuttonbn:meeting', $context),
-            has_capability('mod/bigbluebuttonbn:recording', $context)
+            has_capability('mod/bigbluebuttonbn:addinstancewithmeeting', $context),
+            has_capability('mod/bigbluebuttonbn:addinstancewithrecording', $context)
         );
         // If none is allowed, fail and return.
         if (empty($instancetyperofiles)) {
@@ -121,8 +121,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             // Also check module context for those that are allowed.
             $contextm = context_module::instance($this->_cm->id);
             $instancetyperofiles = bigbluebutton_proxy::get_instance_type_profiles_create_allowed(
-                has_capability('mod/bigbluebuttonbn:meeting', $contextm),
-                has_capability('mod/bigbluebuttonbn:recording', $contextm)
+                has_capability('mod/bigbluebuttonbn:addinstancewithmeeting', $contextm),
+                has_capability('mod/bigbluebuttonbn:addinstancewithrecording', $contextm)
             );
             // If still none is allowed, fail and return.
             if (empty($instancetyperofiles)) {

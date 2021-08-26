@@ -41,6 +41,28 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities',
     ),
 
+    // Ability to create instances with live meeting capabilities.
+    'mod/bigbluebuttonbn:addinstancewithmeeting' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
+
+    // Ability to create instances with recording capabilities.
+    'mod/bigbluebuttonbn:addinstancewithrecording' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
+
     // Ability to join a meeting.
     'mod/bigbluebuttonbn:join' => array(
         'captype' => 'read',
@@ -51,17 +73,6 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'guest' => CAP_ALLOW,
-        ),
-    ),
-
-    // Ability to manage recordings.
-    'mod/bigbluebuttonbn:managerecordings' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
         ),
     ),
 
@@ -77,9 +88,9 @@ $capabilities = array(
         )
     ),
 
-    // Ability to create instances with live meeting capabilities.
-    'mod/bigbluebuttonbn:meeting' => array(
-        'captype' => 'write',
+    // Ability to manage recordings.
+    'mod/bigbluebuttonbn:managerecordings' => array(
+        'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
@@ -87,9 +98,59 @@ $capabilities = array(
         ),
     ),
 
-    // Ability to create instances with recording capabilities.
-    'mod/bigbluebuttonbn:recording' => array(
-        'captype' => 'write',
+    // Ability to publish recordings.
+    'mod/bigbluebuttonbn:publishrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to unpublish recordings.
+    'mod/bigbluebuttonbn:unpublishrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to protect recordings.
+    'mod/bigbluebuttonbn:protectrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to unprotect recordings.
+    'mod/bigbluebuttonbn:unprotectrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to delete recordings.
+    'mod/bigbluebuttonbn:deleterecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to import recordings.
+    'mod/bigbluebuttonbn:importrecordings' => array(
+        'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'manager' => CAP_ALLOW,

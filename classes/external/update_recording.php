@@ -87,12 +87,14 @@ class update_recording extends external_api {
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($recordingcontext);
         require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
+        require_capability("mod/bigbluebuttonbn:{$action}recordings", $recordingcontext);
 
         if ($bigbluebuttonbnid) {
             $instance = instance::get_from_instanceid($bigbluebuttonbnid);
             $recordingcontext = $instance->get_context();
             self::validate_context($recordingcontext);
             require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
+            require_capability("mod/bigbluebuttonbn:{$action}recordings", $recordingcontext);
         }
         // Specific action such as import, delete, publish, unpublish, edit,....
         if (method_exists(recording_action::class, "$action")) {
