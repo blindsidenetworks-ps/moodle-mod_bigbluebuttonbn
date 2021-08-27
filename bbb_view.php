@@ -189,7 +189,7 @@ switch (strtolower($action)) {
  * @return string
  */
 function bigbluebuttonbn_bbb_view_playback_href($rid, $rtype) {
-    $recording = recording::get_record(['recordingid' => $rid]);
+    $recording = recording::get_record(['id' => $rid]);
     if (empty($recording)) {
         return '';
     }
