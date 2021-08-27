@@ -277,7 +277,7 @@ class recording extends persistent {
         'starttime' => array('startTime'),
         'endtime' => array('endTime'),
         'published' => array('published'),
-        'protected' => array('protect'),
+        'protected' => array('protected'),
         'tags' => array('meta_bbb-recording-tags')
     ];
 

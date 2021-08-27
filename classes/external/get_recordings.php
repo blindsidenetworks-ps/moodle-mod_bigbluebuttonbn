@@ -173,7 +173,11 @@ class get_recordings extends external_api {
 
         // Build table content.
         foreach ($recordings as $recording) {
-            $rowdata = recording_data::row($instance, $recording, $tools);
+            $rowtools = $tools;
+            if (in_array('protect', $rowtools) && $recording->get('protected') === null) {
+                $rowtools = array_diff($rowtools, array('protect', 'unprotect'));
+            }
+            $rowdata = recording_data::row($instance, $recording, $rowtools);
             if (!empty($rowdata)) {
                 $data[] = $rowdata;
             }

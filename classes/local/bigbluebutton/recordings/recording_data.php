@@ -51,9 +51,6 @@ class recording_data {
     public static function row(instance $instance, recording $rec, ?array $tools = null): ?stdClass {
         global $OUTPUT, $PAGE;
 
-        if ($tools === null) {
-            $tools = ['protect', 'publish', 'delete'];
-        }
         $context = context_course::instance($instance->get_course_id());
         foreach ($tools as $key => $tool) {
             if (!$instance->can_perform_on_recordings($tool)) {
@@ -213,7 +210,7 @@ class recording_data {
         'unprotect' => [
             'action' => 'protect',
             'icon' => 'unlock',
-            'hidewhen' => '!protected',
+            'hidewhen' => 'protected',
             'disablewhen' => 'imported'
         ],
         'publish' => [
