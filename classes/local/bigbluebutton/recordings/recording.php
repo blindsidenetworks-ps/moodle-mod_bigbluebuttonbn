@@ -424,5 +424,18 @@ class recording extends persistent {
         }
         return $metadata;
     }
+
+    /**
+     * Update status for instance id
+     *
+     * This will soon be replaced by a cron job. For now this is called only when we get the recordings for a given bigbluebutton
+     * instance.
+     */
+    public function refresh_status() {
+        if (!empty($this->metadata)) {
+            $this->raw_set('status', self::RECORDING_STATUS_PROCESSED);
+            $this->update();
+        }
+    }
 }
 

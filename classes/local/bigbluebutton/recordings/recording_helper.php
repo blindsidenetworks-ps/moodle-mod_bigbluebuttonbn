@@ -17,7 +17,11 @@
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use context;
+use context_course;
+use context_module;
+use dml_exception;
 use Exception;
+use Firebase\JWT\JWT;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\notifier;
@@ -63,7 +67,7 @@ class recording_helper {
                 $params = array_merge_recursive($params, $groupparams);
             }
         }
-        return recording::get_records_select(implode(" AND ", $selects), $params);
+        return self::filter_refresh_awaiting_recordings(recording::get_records_select(implode(" AND ", $selects), $params));
     }
 
     /**
@@ -84,7 +88,7 @@ class recording_helper {
         $selects[] = "courseid = :courseid";
         $params['courseid'] = $course->id;
         $groupmode = groups_get_course_groupmode($course);
-        $context = \context_course::instance($course->id);
+        $context = context_course::instance($course->id);
         if ($groupmode) {
             list($groupselects, $groupparams) = self::get_select_for_group($groupmode, $context, $course->id);
             if ($groupselects) {
@@ -98,7 +102,33 @@ class recording_helper {
             $selects[] = 'bigbluebuttonbnid ' . $sqlexcluded;
             $params = array_merge_recursive($params, $paramexcluded);
         }
-        return recording::get_records_select(implode(" AND ", $selects), $params);
+        return self::filter_refresh_awaiting_recordings(recording::get_records_select(implode(" AND ", $selects), $params));
+    }
+
+    /**
+     * From a list of recording, filter out the recordings that are still AWAITING and refresh their status
+     *
+     * This is for CONTRIB-8665. Later on we need to devise a CRON job to do it. But it has to be sized correctly in term
+     * of number of API CALLS
+     *
+     * @param array $recordings
+     * @return array
+     */
+    protected static function filter_refresh_awaiting_recordings(array $recordings) {
+        // CONTRIB-8665: change status on read if needed.
+        foreach ($recordings as $index => $r) {
+            $status = $r->get('status');
+            if ($status == recording::RECORDING_STATUS_AWAITING) {
+                $r->refresh_status();
+                if ($r->get('status') == recording::RECORDING_STATUS_AWAITING) {
+                    unset($recordings[$index]);
+                }
+            }
+            if ($status == recording::RECORDING_STATUS_DISMISSED) {
+                unset($recordings[$index]);
+            }
+        }
+        return $recordings;
     }
 
     /**
@@ -119,14 +149,14 @@ class recording_helper {
             $accessallgroups = has_capability('moodle/site:accessallgroups', $context)
                 || $groupmode == VISIBLEGROUPS;
             if ($accessallgroups) {
-                if ($context instanceof \context_module) {
+                if ($context instanceof context_module) {
                     $allowedgroups = groups_get_all_groups($courseid, 0, $groupingid);
                 } else {
                     $allowedgroups = groups_get_all_groups($courseid);
                 }
             } else {
                 global $USER;
-                if ($context instanceof \context_module) {
+                if ($context instanceof context_module) {
                     $allowedgroups = groups_get_all_groups($courseid, $USER->id, $groupingid);
                 } else {
                     $allowedgroups = groups_get_all_groups($courseid, $USER->id);
@@ -157,7 +187,7 @@ class recording_helper {
      * @param string $sql
      * @param array $params
      * @return array
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     protected static function do_fetch_recordings(string $sql, array $params): array {
         global $DB;
@@ -224,9 +254,10 @@ class recording_helper {
             $selects[] = "imported = " . recording::RECORDING_IMPORTED;
         }
         // Now get only recordings that have been validated by recording ready callback.
-        $selects[] = "status = :status1 OR status = :status2";
+        $selects[] = "(status = :status1 OR status = :status2 OR status = :status3)";
         $params['status1'] = recording::RECORDING_STATUS_PROCESSED;
         $params['status2'] = recording::RECORDING_STATUS_NOTIFIED;
+        $params['status3'] = recording::RECORDING_STATUS_AWAITING; // CONTRIB-8665, change on read.
         return array($selects, $params);
     }
 
@@ -328,7 +359,7 @@ class recording_helper {
     public static function recording_ready(instance $instance, array $params): void {
         // Decodes the received JWT string.
         try {
-            $decodedparameters = \Firebase\JWT\JWT::decode(
+            $decodedparameters = JWT::decode(
                 $params['signed_parameters'],
                 config::get('shared_secret'),
                 array('HS256')

@@ -115,6 +115,37 @@ class recording_test extends \advanced_testcase {
     }
 
     /**
+     * Test for bigbluebuttonbn_get_allrecordings status refresh.
+     */
+    public function test_bigbluebuttonbn_get_allrecordings_status_refresh() {
+        [
+            'activities' => $activities,
+        ] = $this->setup_activities();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+        $recording1 = $generator->create_recording([
+            'bigbluebuttonbnid' => $activities[0]->id,
+            'name' => "Pre-Recording should be refreshed",
+            'status' => recording::RECORDING_STATUS_AWAITING
+        ]);
+        $recording2 = $generator->create_recording([
+            'bigbluebuttonbnid' => $activities[0]->id,
+            'name' => "Pre-Recording should be visible",
+            'status' => recording::RECORDING_STATUS_DISMISSED
+        ]);
+        $this->assertEquals(recording::RECORDING_STATUS_AWAITING,
+            (new recording($recording1->id))->get('status'));
+        $this->assertEquals(recording::RECORDING_STATUS_DISMISSED,
+            (new recording($recording2->id))->get('status'));
+        $recordings = recording_helper::get_recordings_for_instance(instance::get_from_instanceid($activities[0]->id));
+        $this->assertCount(3, $recordings);
+
+        $this->assertEquals(recording::RECORDING_STATUS_PROCESSED,
+            (new recording($recording1->id))->get('status'));
+        $this->assertEquals(recording::RECORDING_STATUS_DISMISSED,
+            (new recording($recording2->id))->get('status'));
+    }
+
+    /**
      * Test for bigbluebuttonbn_get_allrecordings().
      *
      * TODO: rewrite this with @dataProvider
