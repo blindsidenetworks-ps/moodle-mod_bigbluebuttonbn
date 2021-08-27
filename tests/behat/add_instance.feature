@@ -1,4 +1,4 @@
-@mod @mod_bigbluebuttonbn @core_form
+@mod @mod_bigbluebuttonbn @javascript
 Feature: bigbluebuttonbn instance
   In order to create a room activity with recordings
   As a user
@@ -6,61 +6,58 @@ Feature: bigbluebuttonbn instance
 
   Background:  Make sure that a course is created
     Given the following "courses" exist:
-      | fullname    | shortname  | category |
-      | Test Course | testcourse | 0        |
+      | fullname    | shortname   | category |
+      | Test course | Test course | 0        |
 
-  @javascript
-  Scenario: Add three room activities to an existent course
-    When I log in as "admin"
-    And I am on "Test Course" course homepage
-    And I turn editing mode on
-    And I add a "BigBlueButton" to section "1" and I fill the form with:
+  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+    Given I am on the "Test course" "course" page logged in as "admin"
+    And I am on "Test course" course homepage with editing mode on
+    When I add a "BigBlueButton" to section "1" and I fill the form with:
+      | name                   | BBB Instance name             |
       | Instance type          | Room/Activity with recordings |
-      | Virtual classroom name | RoomRecordings                |
-    Then I should see "RoomRecordings"
-    When I follow "RoomRecordings"
-    And I wait until the page is ready
-    Then I should see "RoomRecordings"
+      | Virtual classroom name | BBB Instance name             |
+    And I am on the "Test course" course page
+    Then I should see "BBB Instance name"
+    And I am on the "BBB Instance name" "bigbluebuttonbn activity" page
     And I should see "This conference room is ready. You can join the session now."
-    # The button is now a link.
     And I should see "Join session"
     And I should see "Recordings"
-    When I follow "testcourse"
-    And I add a "BigBlueButton" to section "1" and I fill the form with:
+
+  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+    Given I am on the "Test course" "course" page logged in as "admin"
+    And I am on "Test course" course homepage with editing mode on
+    When I add a "BigBlueButton" to section "1" and I fill the form with:
       | Instance type          | Room/Activity only |
-      | Virtual classroom name | RoomOnly           |
-    Then I should see "RoomOnly"
-    When I follow "RoomOnly"
-    Then I should see "RoomOnly"
-    And I wait until the page is ready
+      | Virtual classroom name | BBB Instance name  |
+    And I am on the "Test course" course page
+    Then I should see "BBB Instance name"
+    And I am on the "BBB Instance name" "bigbluebuttonbn activity" page
     And I should see "This conference room is ready. You can join the session now."
     And I should see "Join session"
-    And I should see "Recordings"
-    When I follow "testcourse"
-    And I add a "BigBlueButton" to section "1" and I fill the form with:
-      | Instance type          | Recordings only |
-      | Virtual classroom name | RecordingsOnly  |
-    Then I should see "RecordingsOnly"
-    When I follow "RecordingsOnly"
-    Then I should see "RecordingsOnly"
-    And I wait until the page is ready
+    And I should not see "Recordings"
+
+  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+    Given I am on the "Test course" "course" page logged in as "admin"
+    And I am on "Test course" course homepage with editing mode on
+    When I add a "BigBlueButton" to section "1" and I fill the form with:
+      | Instance type          | Recordings only   |
+      | Virtual classroom name | BBB Instance name |
+    And I am on the "Test course" course page
+    Then I should see "BBB Instance name"
+    And I am on the "BBB Instance name" "bigbluebuttonbn activity" page
     And I should not see "This conference room is ready. You can join the session now."
     And I should not see "Join session"
     And I should see "Recordings"
 
-  @javascript
-  Scenario: Add an activity and check that required settings are available for the three
-  types of instance types
-    When I log in as "admin"
-    And I am on "Test Course" course homepage
-    And I turn editing mode on
+  Scenario Outline: Add an activity and check that required settings are available for the three types of instance types
+    Given I am on the "Test course" "course" page logged in as "admin"
+    And I am on "Test course" course homepage with editing mode on
     And I add a "BigBlueButton" to section "1"
-    And I wait until the page is ready
-    When  I select "Room/Activity with recordings" from the "Instance type" singleselect
+    When  I select "<type>" from the "Instance type" singleselect
     Then I should see "Restrict access"
-    When  I select "Room/Activity only" from the "Instance type" singleselect
-    Then I wait until the page is ready
-    Then I should see "Restrict access"
-    When  I select "Recordings only" from the "Instance type" singleselect
-    Then I wait until the page is ready
-    Then I should see "Restrict access"
+
+    Examples:
+      | type                          |
+      | Room/Activity with recordings |
+      | Room/Activity only            |
+      | Recordings only               |
