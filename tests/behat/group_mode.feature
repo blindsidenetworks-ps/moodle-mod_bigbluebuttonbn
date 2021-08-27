@@ -53,39 +53,24 @@ Feature: Test the module in group mode.
     Given the following "permission overrides" exist:
       | capability                  | permission | role           | contextlevel | reference |
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
-    And I log in as "teacher1"
-    And I am on "Test Course 1" course homepage
-    Then I follow "RoomRecordings"
-    And I should see "Separate groups: Group 1"
+    When I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as "teacher1"
+    Then I should see "Separate groups: Group 1"
 
   @javascript
-  Scenario: When I create a BBB activity as a teacher, I should only be able to specify individual "User" participants
-  with whom I share a group with (or can view on the course participants screen).
-    And I log in as "teacher1"
-    And I am on "Test Course 1" course homepage
-    Then I follow "RoomRecordings"
-    And I should see "Group 1" in the "select[name='group']" "css_element"
+  Scenario: When I create a BBB activity as a teacher, I should only be able to specify individual "User" participants with whom I share a group with (or can view on the course participants screen).
+    When I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as "teacher1"
+    Then I should see "Group 1" in the "select[name='group']" "css_element"
     And I should see "Group 2" in the "select[name='group']" "css_element"
 
   @javascript
-  Scenario: When I view a BBB activity as a student, I should only be able to see Recordings from my group
-    And I log in as "user1"
-    And I am on "Test Course 1" course homepage
-    Then I follow "RoomRecordings"
-    Then I should see "Recording G1"
-    And I should not see "Recording G2"
-    And I should not see "Recording No group"
-    And I log out
-    And I log in as "user2"
-    And I am on "Test Course 1" course homepage
-    Then I follow "RoomRecordings"
-    Then I should see "Recording G2"
-    And I should not see "Recording G1"
-    And I should not see "Recording No group"
-    And I log out
-    And I log in as "user3"
-    And I am on "Test Course 1" course homepage
-    Then I follow "RoomRecordings"
-    Then I should see "Recording No group"
-    And I should not see "Recording G1"
-    And I should not see "Recording G2"
+  Scenario Outline: When I view a BBB activity as a student, I should only be able to see Recordings from my group
+    When I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as "<user>"
+    Then I <G1> "Recording G1"
+    And I <G2> "Recording G2"
+    And I <NO> "Recording No group"
+
+    Examples:
+      | user  | G1             | G2             | NO             |
+      | user1 | should see     | should not see | should not see |
+      | user2 | should not see | should see     | should not see |
+      | user3 | should not see | should not see | should see     |
