@@ -75,7 +75,7 @@ class recording_proxy extends proxy_base {
     public static function protect_recording(string $recordid, string $protected = 'true'): bool {
         $result = self::fetch_endpoint_xml('updateRecordings', [
             'recordID' => $recordid,
-            ['protect' => $protected],
+            'protect' => $protected,
         ]);
         if (!$result || $result->returncode != 'SUCCESS') {
             return false;
