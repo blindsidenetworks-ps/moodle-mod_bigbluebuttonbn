@@ -24,12 +24,10 @@
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-defined('MOODLE_INTERNAL') || die();
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\logger;
+use mod_bigbluebuttonbn\recording;
 use mod_bigbluebuttonbn\testing\generator\mockedserver;
-global $CFG;
 
 
 /**

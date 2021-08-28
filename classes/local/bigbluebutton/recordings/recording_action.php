@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * Collection of helper methods for handling recordings actions in Moodle.

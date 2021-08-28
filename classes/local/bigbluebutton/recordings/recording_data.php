@@ -26,6 +26,7 @@ use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * The recordings_data.

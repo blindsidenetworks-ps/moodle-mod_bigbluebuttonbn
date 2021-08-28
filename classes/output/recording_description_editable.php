@@ -16,8 +16,8 @@
 namespace mod_bigbluebuttonbn\output;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * Renderer for recording name in place editable.

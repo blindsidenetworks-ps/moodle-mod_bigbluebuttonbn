@@ -27,6 +27,7 @@ use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\notifier;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * Collection of helper methods for handling recordings in Moodle.

@@ -27,9 +27,9 @@ use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
 use lang_string;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * The mod_bigbluebuttonbn settings helper
