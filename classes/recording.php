@@ -91,7 +91,7 @@ class recording extends persistent {
      * @param bool $includeimported
      * @param bool $onlyimported
      *
-     * @return array containing the recordings indexed by recordID, each recording is also a
+     * @return recording[] containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
     public static function get_recordings_for_instance(
@@ -126,7 +126,7 @@ class recording extends persistent {
      * @param bool $includeimported
      * @param bool $onlyimported
      *
-     * @return array containing the recordings indexed by recordID, each recording is also a
+     * @return recording[] containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
     public static function get_recordings_for_course(
@@ -167,8 +167,8 @@ class recording extends persistent {
      * This is for CONTRIB-8665. Later on we need to devise a CRON job to do it. But it has to be sized correctly in term
      * of number of API CALLS
      *
-     * @param recordings[] $recordings
-     * @return recordings[]
+     * @param recording[] $recordings
+     * @return recording[]
      */
     protected static function filter_refresh_awaiting_recordings(array $recordings) {
         // CONTRIB-8665: change status on read if needed.
@@ -238,54 +238,6 @@ class recording extends persistent {
             implode(" AND ", $selects),
             $params,
         ];
-    }
-
-    /**
-     * Retrieve recordings from db then fetch them from BBB and return the result
-     *
-     * @param string $sql
-     * @param array $params
-     * @return array
-     * @throws dml_exception
-     */
-    protected static function do_fetch_recordings(string $sql, array $params): array {
-        global $DB;
-        $recs = $DB->get_records_select('bigbluebuttonbn_recordings', $sql, $params, 'id, recordingid');
-
-        $recordingsids = array_map(function($r) {
-            return $r->recordingid;
-        }, $recs);
-
-        $bbbrecordings = recording_proxy::fetch_recordings($recordingsids);
-        // Activities set to be recorded insert a bigbluebuttonbn_recording row on create, but it does not mean that
-        // the meeting was recorded. We are responding only with the ones that have a processed recording in BBB.
-
-        $recordings = array();
-        foreach ($recs as $id => $rec) {
-            $recordingid = $rec->recordingid;
-            // If there is not a BBB recording assiciated skip the record.
-            // NOTE: This verifies that the recording exists, even imported recordings.
-            // If the recording doesn't exist, the imported link will no longer be shown in the list.
-            if (!isset($bbbrecordings[$recordingid])) {
-                continue;
-            }
-            // If the recording was imported, override the metadata with the value stored in the database.
-            if ($rec->imported) {
-                // We must convert rec->recording to array because the records directly pulled from the database.
-                $rec->recording = json_decode($rec->recording, true);
-                foreach ($rec->recording as $varname => $value) {
-                    $varnames = explode('_', $varname);
-                    if ($varnames[0] == 'meta') {
-                        $bbbrecordings[$recordingid][$varname] = $value;
-                    }
-                }
-            }
-            // Always assign the recording value fetched from BBB.
-            $rec->recording = $bbbrecordings[$recordingid];
-            // Finally, add the rec to the indexed array to be returned.
-            $recordings[$recordingid] = $rec;
-        }
-        return $recordings;
     }
 
     /**
