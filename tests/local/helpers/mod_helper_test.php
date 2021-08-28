@@ -34,12 +34,13 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @covers \mod_bigbluebuttonbn\local\helpers\mod_helper
+ * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\mod_helper
  */
 class mod_helper_test extends testcase_helper {
 
     /**
      * Presave test
-     *
      */
     public function test_bigbluebuttonbn_process_pre_save() {
         $this->resetAfterTest();
@@ -54,7 +55,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Presave instance
-     *
      */
     public function test_bigbluebuttonbn_process_pre_save_instance() {
         $this->resetAfterTest();
@@ -68,7 +68,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Presave checkboxes
-     *
      */
     public function test_bigbluebuttonbn_process_pre_save_checkboxes() {
         $this->resetAfterTest();
@@ -83,7 +82,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Presave common
-     *
      */
     public function test_bigbluebuttonbn_process_pre_save_common() {
         global $CFG;
@@ -100,7 +98,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Post save
-     *
      */
     public function test_bigbluebuttonbn_process_post_save() {
         global $CFG;
@@ -127,7 +124,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Post save notification
-     *
      */
     public function test_bigbluebuttonbn_process_post_save_notification() {
         $this->resetAfterTest();
@@ -151,7 +147,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Post save event
-     *
      */
     public function test_bigbluebuttonbn_process_post_save_event() {
         $this->resetAfterTest();
@@ -166,7 +161,6 @@ class mod_helper_test extends testcase_helper {
 
     /**
      * Post save completion
-     *
      */
     public function test_bigbluebuttonbn_process_post_save_completion() {
         $this->resetAfterTest();
@@ -178,5 +172,4 @@ class mod_helper_test extends testcase_helper {
         mod_helper::process_post_save($bbformdata);
         $this->assertNotEmpty($eventsink->get_events());
     }
-
 }

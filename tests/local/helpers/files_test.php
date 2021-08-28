@@ -39,12 +39,13 @@ use stored_file;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @covers \mod_bigbluebuttonbn\local\helpers\files
+ * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\files
  */
 class files_test extends testcase_helper {
 
     /**
      * Plugin valid test case
-     *
      */
     public function test_bigbluebuttonbn_pluginfile_valid() {
         $this->resetAfterTest();
@@ -55,7 +56,6 @@ class files_test extends testcase_helper {
 
     /**
      * Plugin file test case
-     *
      */
     public function test_bigbluebuttonbn_pluginfile_file() {
         $this->resetAfterTest();
@@ -91,7 +91,6 @@ class files_test extends testcase_helper {
 
     /**
      * Get presentation file
-     *
      */
     public function test_bigbluebuttonbn_default_presentation_get_file() {
         $this->resetAfterTest();
@@ -112,7 +111,6 @@ class files_test extends testcase_helper {
 
     /**
      * Get filename test
-     *
      */
     public function test_bigbluebuttonbn_pluginfile_filename() {
         $this->resetAfterTest();
@@ -130,7 +128,6 @@ class files_test extends testcase_helper {
 
     /**
      * Get media files
-     *
      */
     public function test_bigbluebuttonbn_get_media_file() {
         $this->resetAfterTest();

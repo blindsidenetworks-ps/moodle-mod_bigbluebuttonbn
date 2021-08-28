@@ -37,11 +37,13 @@ defined('MOODLE_INTERNAL') || die();
 class bbb_coverage extends phpunit_coverage_info {
     /** @var array The list of folders relative to the plugin root to whitelist in coverage generation. */
     protected $whitelistfolders = [
-            'classes',
+        'classes',
     ];
 
     /** @var array The list of files relative to the plugin root to whitelist in coverage generation. */
-    protected $whitelistfiles = ['lib.php'];
+    protected $whitelistfiles = [
+        'lib.php',
+    ];
 
     /** @var array The list of folders relative to the plugin root to excludelist in coverage generation. */
     protected $excludelistfolders = [];

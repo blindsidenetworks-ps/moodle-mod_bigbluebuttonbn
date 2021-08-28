@@ -24,9 +24,6 @@
  */
 namespace mod_bigbluebuttonbn\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
 use context_module;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -40,11 +37,9 @@ use core_privacy\local\request\userlist;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @covers \mod_bigbluebuttonbn\privacy\provider
  */
 class provider_test extends \core_privacy\tests\provider_testcase {
-    /**
-     * Setup Course
-     */
 
     /**
      * Test for provider::get_metadata().

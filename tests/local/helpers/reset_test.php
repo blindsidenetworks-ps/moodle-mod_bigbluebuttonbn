@@ -36,6 +36,8 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\reset
+ * @covers \mod_bigbluebuttonbn\local\helpers\reset
  */
 class reset_test extends testcase_helper {
 
