@@ -36,10 +36,10 @@ use mod_bigbluebuttonbn\instance;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class recording_test extends \advanced_testcase {
-
     public function setUp(): void {
         parent::setUp();
 
+        $this->require_mock_server();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
     }
 
@@ -243,5 +243,13 @@ class recording_test extends \advanced_testcase {
         $this->assertEquals('Videos', recording_data::type_text('videos'));
         $this->assertEquals('Whatever', recording_data::type_text('whatever'));
         $this->assertEquals('Whatever It Can Be', recording_data::type_text('whatever it can be'));
+    }
+
+    protected function require_mock_server(): void {
+        if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            $this->markTestSkipped(
+                'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
+            );
+        }
     }
 }

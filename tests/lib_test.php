@@ -118,6 +118,8 @@ class lib_test extends testcase_helper {
 
     public function test_bigbluebuttonbn_reset_course_form_definition() {
         global $CFG, $PAGE;
+        $this->require_mock_server();
+
         $PAGE->set_course($this->course);
         $this->setAdminUser();
         $this->resetAfterTest();
@@ -194,6 +196,8 @@ class lib_test extends testcase_helper {
 
     public function test_mod_bigbluebuttonbn_core_calendar_provide_event_action() {
         global $DB;
+
+        $this->require_mock_server();
         $this->resetAfterTest();
         $this->setAdminUser();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
