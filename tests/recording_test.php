@@ -23,7 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
+namespace mod_bigbluebuttonbn;
 
 use mod_bigbluebuttonbn\instance;
 
@@ -34,10 +34,10 @@ use mod_bigbluebuttonbn\instance;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @coversDefaultClass \mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper
- * @covers \mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper
+ * @covers \mod_bigbluebuttonbn\recording
+ * @coversDefaultClass \mod_bigbluebuttonbn\recording
  */
-class recording_helper_test extends \advanced_testcase {
+class recording_test extends \advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();
@@ -46,7 +46,7 @@ class recording_helper_test extends \advanced_testcase {
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
     }
 
-    protected function create_activity_with_recordings(int $type, int $recordingcount): array {
+    protected function create_activity_with_recordings(int $type, array $recordingdata): array {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
@@ -62,17 +62,58 @@ class recording_helper_test extends \advanced_testcase {
         ]);
 
         $recordings = [];
-        for ($i = 0; $i < $recordingcount; $i++) {
-            $recordings[] = $generator->create_recording([
+        $i = 0;
+        foreach ($recordingdata as $data) {
+            $recordings[] = $generator->create_recording(array_merge([
                 'bigbluebuttonbnid' => $activity->id,
                 'name' => "Pre-Recording $i",
-            ]);
+            ], $data));
+            $i++;
         }
 
         return [
             'course' => $course,
             'activity' => $activity,
             'recordings' => $recordings,
+        ];
+    }
+
+    /**
+     * Test for bigbluebuttonbn_get_allrecordings status refresh.
+     *
+     * @dataProvider get_status_provider
+     * @covers ::get
+     */
+    public function test_get_allrecordings_status_refresh(int $status) {
+        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [['status' => $status]]);
+
+        $this->assertEquals($status, (new recording($recordings[0]->id))->get('status'));
+    }
+
+    /**
+     * @covers ::get_name
+     */
+    public function test_get_name(): void {
+        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [['name' => 'Example name']]);
+
+        $this->assertEquals('Example name', (new recording($recordings[0]->id))->get('name'));
+    }
+
+    /**
+     * @covers ::get_description
+     */
+    public function test_get_description(): void {
+        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [[
+            'description' => 'Example description',
+        ]]);
+
+        $this->assertEquals('Example description', (new recording($recordings[0]->id))->get('description'));
+    }
+
+    public function get_status_provider(): array {
+        return [
+            [recording::RECORDING_STATUS_PROCESSED],
+            [recording::RECORDING_STATUS_DISMISSED],
         ];
     }
 
@@ -90,11 +131,11 @@ class recording_helper_test extends \advanced_testcase {
         [
             'activity' => $activity,
             'course' => $course,
-        ] = $this->create_activity_with_recordings($type, $recordingcount);
+        ] = $this->create_activity_with_recordings($type, array_pad([], $recordingcount, []));
 
         // Fetch the recordings for the instance.
         // The count shoudl match the input count.
-        $recordings = recording_helper::get_recordings_for_instance(instance::get_from_instanceid($activity->id));
+        $recordings = recording::get_recordings_for_instance(instance::get_from_instanceid($activity->id));
         $this->assertCount($recordingcount, $recordings);
     }
 
@@ -181,20 +222,20 @@ class recording_helper_test extends \advanced_testcase {
         $this->setUser($student1);
         $instance1 = instance::get_from_instanceid($activity->id);
         $instance1->set_group_id($group1->id);
-        $recordings = recording_helper::get_recordings_for_instance($instance1);
+        $recordings = recording::get_recordings_for_instance($instance1);
         $this->assertCount(1, $recordings);
         $this->assertEquals('Group 1 Recording 1', $recordings[$recording1->id]->get('name'));
 
         $this->setUser($student2);
         $instance2 = instance::get_from_instanceid($activity->id);
         $instance2->set_group_id($group2->id);
-        $recordings = recording_helper::get_recordings_for_instance($instance2);
+        $recordings = recording::get_recordings_for_instance($instance2);
         $this->assertCount(1, $recordings);
         $this->assertEquals('Group 2 Recording 1', $recordings[$recording2->id]->get('name'));
 
         $this->setUser($student3);
         $instance3 = instance::get_from_instanceid($activity->id);
-        $recordings = recording_helper::get_recordings_for_instance($instance3);
+        $recordings = recording::get_recordings_for_instance($instance3);
         $this->assertIsArray($recordings);
         $recordingnames = array_map(function($r) {
             return $r->get('name');

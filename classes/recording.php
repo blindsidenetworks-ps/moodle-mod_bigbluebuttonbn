@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn;
 
 use cache;
+use context_course;
 use core\persistent;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
@@ -113,7 +114,7 @@ class recording extends persistent {
                 $params = array_merge_recursive($params, $groupparams);
             }
         }
-        return self::filter_refresh_awaiting_recordings(recording::get_records_select(implode(" AND ", $selects), $params));
+        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
     }
 
     /**
@@ -128,27 +129,36 @@ class recording extends persistent {
      * @return array containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
-    public static function get_recordings_for_course(object $course, array $excludedinstanceid = [],
-        bool $includedeleted = false, bool $includeimported = false, bool $onlyimported = false): array {
-        list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+    public static function get_recordings_for_course(
+        object $course,
+        array $excludedinstanceid = [],
+        bool $includedeleted = false,
+        bool $includeimported = false,
+        bool $onlyimported = false
+    ): array {
+        global $DB;
+
+        [$selects, $params] = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
         $selects[] = "courseid = :courseid";
         $params['courseid'] = $course->id;
         $groupmode = groups_get_course_groupmode($course);
         $context = context_course::instance($course->id);
+
         if ($groupmode) {
-            list($groupselects, $groupparams) = self::get_select_for_group($groupmode, $context, $course->id);
+            [$groupselects, $groupparams] = self::get_select_for_group($groupmode, $context, $course->id);
             if ($groupselects) {
                 $selects[] = $groupselects;
-                $params = array_merge_recursive($params, $groupparams);
+                $params = array_merge($params, $groupparams);
             }
         }
+
         if ($excludedinstanceid) {
-            global $DB;
-            list($sqlexcluded, $paramexcluded) = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, false);
-            $selects[] = 'bigbluebuttonbnid ' . $sqlexcluded;
-            $params = array_merge_recursive($params, $paramexcluded);
+            [$sqlexcluded, $paramexcluded] = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, false);
+            $selects[] = "bigbluebuttonbnid {$sqlexcluded}";
+            $params = array_merge($params, $paramexcluded);
         }
-        return self::filter_refresh_awaiting_recordings(recording::get_records_select(implode(" AND ", $selects), $params));
+
+        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
     }
 
     /**
@@ -157,20 +167,21 @@ class recording extends persistent {
      * This is for CONTRIB-8665. Later on we need to devise a CRON job to do it. But it has to be sized correctly in term
      * of number of API CALLS
      *
-     * @param array $recordings
-     * @return array
+     * @param recordings[] $recordings
+     * @return recordings[]
      */
     protected static function filter_refresh_awaiting_recordings(array $recordings) {
         // CONTRIB-8665: change status on read if needed.
-        foreach ($recordings as $index => $r) {
-            $status = $r->get('status');
-            if ($status == recording::RECORDING_STATUS_AWAITING) {
-                $r->refresh_status();
-                if ($r->get('status') == recording::RECORDING_STATUS_AWAITING) {
+        foreach ($recordings as $index => $recording) {
+            $status = $recording->get('status');
+            if ($status == self::RECORDING_STATUS_AWAITING) {
+                $recording->refresh_status();
+                if ($recording->get('status') == self::RECORDING_STATUS_AWAITING) {
                     unset($recordings[$index]);
+                    continue;
                 }
             }
-            if ($status == recording::RECORDING_STATUS_DISMISSED) {
+            if ($status == self::RECORDING_STATUS_DISMISSED) {
                 unset($recordings[$index]);
             }
         }
@@ -188,12 +199,12 @@ class recording extends persistent {
      * @return array
      */
     protected static function get_select_for_group($groupmode, $context, $courseid, $groupid = 0, $groupingid = 0): array {
+        global $DB, $USER;
+
         $selects = [];
         $params = [];
         if ($groupmode) {
-            global $DB;
-            $accessallgroups = has_capability('moodle/site:accessallgroups', $context)
-                || $groupmode == VISIBLEGROUPS;
+            $accessallgroups = has_capability('moodle/site:accessallgroups', $context) || $groupmode == VISIBLEGROUPS;
             if ($accessallgroups) {
                 if ($context instanceof context_module) {
                     $allowedgroups = groups_get_all_groups($courseid, 0, $groupingid);
@@ -201,7 +212,6 @@ class recording extends persistent {
                     $allowedgroups = groups_get_all_groups($courseid);
                 }
             } else {
-                global $USER;
                 if ($context instanceof context_module) {
                     $allowedgroups = groups_get_all_groups($courseid, $USER->id, $groupingid);
                 } else {
@@ -224,7 +234,10 @@ class recording extends persistent {
                 $params = array_merge_recursive($params, $groupparams);
             }
         }
-        return array(implode(" AND ", $selects), $params);
+        return [
+            implode(" AND ", $selects),
+            $params,
+        ];
     }
 
     /**
@@ -290,23 +303,29 @@ class recording extends persistent {
     ): array {
         $selects = [];
         $params = [];
+
         // Start with the filters.
         if (!$includedeleted) {
             // Exclude headless recordings unless includedeleted.
-            $selects[] = "headless != " . recording::RECORDING_HEADLESS;
+            $selects[] = "headless != :headless";
+            $params['headless'] = self::RECORDING_HEADLESS;
         }
+
         if (!$includeimported) {
             // Exclude imported recordings unless includedeleted.
-            $selects[] = "imported != " . recording::RECORDING_IMPORTED;
+            $selects[] = "imported != :imported";
+            $params['imported'] = self::RECORDING_IMPORTED;
         } else if ($onlyimported) {
             // Exclude non-imported recordings.
-            $selects[] = "imported = " . recording::RECORDING_IMPORTED;
+            $selects[] = "imported = :imported";
+            $params['imported'] = self::RECORDING_IMPORTED;
         }
+
         // Now get only recordings that have been validated by recording ready callback.
         $selects[] = "(status = :status1 OR status = :status2 OR status = :status3)";
-        $params['status1'] = recording::RECORDING_STATUS_PROCESSED;
-        $params['status2'] = recording::RECORDING_STATUS_NOTIFIED;
-        $params['status3'] = recording::RECORDING_STATUS_AWAITING; // CONTRIB-8665, change on read.
+        $params['status1'] = self::RECORDING_STATUS_PROCESSED;
+        $params['status2'] = self::RECORDING_STATUS_NOTIFIED;
+        $params['status3'] = self::RECORDING_STATUS_AWAITING; // CONTRIB-8665, change on read.
         return [$selects, $params];
     }
 
@@ -416,7 +435,7 @@ class recording extends persistent {
         $recordingrec->groupid = 0; // The recording is available to everyone.
         $recordingrec->importeddata = json_encode($remotedata);
         $recordingrec->imported = true;
-        $importedrecording = new recording(0, $recordingrec);
+        $importedrecording = new self(0, $recordingrec);
         $importedrecording->create();
         return $importedrecording;
     }

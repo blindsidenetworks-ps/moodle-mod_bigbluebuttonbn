@@ -124,14 +124,14 @@ class get_recordings extends external_api {
         // other recordings from other groups. Maybe we will need to add a groupid column to the recording table.
         if ($enabledfeatures['showroom']) {
             // Not in the import page.
-            $recordings = recording_helper::get_recordings_for_instance(
+            $recordings = recording::get_recordings_for_instance(
                 $instance,
                 $instance->get_instance_var('recordings_deleted'),
                 $enabledfeatures['importrecordings'],
                 $instance->get_instance_var('recordings_imported'),
             );
         } else {
-            $recordings = recording_helper::get_recordings_for_course(
+            $recordings = recording::get_recordings_for_course(
                 $instance->get_course(),
                 [$instance->get_instance_id()], // Exclude itself.
                 $instance->get_instance_var('recordings_deleted'),
@@ -142,7 +142,7 @@ class get_recordings extends external_api {
         if ($removeimportedid) {
             // Remove recording already imported in this specific activity.
             $destinationinstance = instance::get_from_instanceid($removeimportedid);
-            $importedrecordings = recording_helper::get_recordings_for_instance(
+            $importedrecordings = recording::get_recordings_for_instance(
                 $destinationinstance,
                 true,
                 true
