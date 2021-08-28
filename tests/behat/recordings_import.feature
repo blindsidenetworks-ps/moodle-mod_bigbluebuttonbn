@@ -38,12 +38,12 @@ Feature: Manage and list recordings
     And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
     And I select "RoomRecordings" from the "frombn" singleselect
     # add the first recording
-    And I click on "a.action-icon" "css_element" in the "1" "mod_bigbluebuttonbn > Recording row"
+    And I click on "a.action-icon" "css_element" in the "Recording 1" "table_row"
     # add the second recording
-    And I click on "a.action-icon" "css_element" in the "1" "mod_bigbluebuttonbn > Recording row"
+    And I click on "a.action-icon" "css_element" in the "Recording 2" "table_row"
     And I click on "Go back" "button"
-    Then I should see "Recording 1" in the "1" "mod_bigbluebuttonbn > Recording row"
-    And I should see "Recording 2" in the "2" "mod_bigbluebuttonbn > Recording row"
+    Then "Recording 1" "table_row" should exist
+    And "Recording 2" "table_row" should exist
 
   @javascript
   Scenario: I check that I can import recordings into the Recording Only activity and then if I delete them
@@ -53,15 +53,15 @@ Feature: Manage and list recordings
     And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
     And I select "RoomRecordings" from the "frombn" singleselect
     # add the first recording
-    And I click on "a.action-icon" "css_element" in the "1" "mod_bigbluebuttonbn > Recording row"
+    And I click on "a.action-icon" "css_element" in the "Recording 1" "table_row"
     # add the second recording
-    And I click on "a.action-icon" "css_element" in the "1" "mod_bigbluebuttonbn > Recording row"
+    And I click on "a.action-icon" "css_element" in the "Recording 2" "table_row"
     And I wait until the page is ready
     And I click on "Go back" "button"
     # This should be refactored with the right classes for the table element
     # We use javascript here to create the table so we don't get the same structure.
-    And I should see "Recording 1" in the "1" "mod_bigbluebuttonbn > Recording row"
-    And I click on "a[data-action='delete']" "css_element" in the "1" "mod_bigbluebuttonbn > Recording row"
+    Then "Recording 1" "table_row" should exist
+    And I click on "a[data-action='delete']" "css_element" in the "Recording 1" "table_row"
     And I click on "OK" "button" in the "Confirm" "dialogue"
     # There is no confirmation dialog when deleting an imported record.
     And I wait until the page is ready

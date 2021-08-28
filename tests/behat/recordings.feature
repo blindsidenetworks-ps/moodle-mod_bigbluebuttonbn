@@ -46,8 +46,8 @@ Feature: The recording can be managed through the room page
   Scenario: I can see the recordings related to an activity
     Given the BigBlueButtonBN server has sent recording ready notifications
     When I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin
-    Then I should see "Recording 1" in the "1" "mod_bigbluebuttonbn > Recording row"
-    And I should see "Recording 2" in the "2" "mod_bigbluebuttonbn > Recording row"
+    Then "Recording 1" "table_row" should exist
+    And "Recording 2" "table_row" should exist
 
   @javascript
   Scenario: I can rename the recording
