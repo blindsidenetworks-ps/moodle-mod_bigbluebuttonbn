@@ -49,14 +49,11 @@ export const init = (bigbluebuttonbnid) => {
 
 /**
  * Auto close window ?
- * TODO Remove??
  */
 export const setupWindowAutoClose = () => {
     // Not sure what this does here. Will need to have a closer look into the process.
-    window.onunload = function() {
-        opener.setTimeout(function() {
-            roomUpdater.updateRoom();
-        }, 5000);
+    window.onunload = function () {
+        opener.setTimeout(() => roomUpdater.updateRoom(true), 5000);
         window.close();
     };
     window.close(); // This does not work as scripts can only close windows that are

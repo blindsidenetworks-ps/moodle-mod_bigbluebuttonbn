@@ -35,7 +35,7 @@ const registerEventListeners = () => {
         e.preventDefault();
 
         const bbbId = actionButton.dataset.bbbId;
-        const groupId = actionButton.dataset.groupId;
+        const groupId = actionButton.dataset.groupId ? actionButton.dataset.groupId : 0;
 
         confirmedPromise(
             getString('end_session_confirm_title', 'mod_bigbluebuttonbn'),

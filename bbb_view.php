@@ -111,11 +111,14 @@ switch (strtolower($action)) {
         ];
         $accesses = $DB->get_records_select('bigbluebuttonbn_logs', $select, $params, 'id ASC', 'id, meta', 1);
         $lastaccess = end($accesses);
-        $lastaccess = json_decode($lastaccess->meta);
-        // If the user acceded from Timeline it should be redirected to the Dashboard.
-        if (isset($lastaccess->origin) && $lastaccess->origin == logger::ORIGIN_TIMELINE) {
-            redirect($CFG->wwwroot . '/my/');
+        if (!empty($lastaccess->meta)) {
+            $lastaccess = json_decode($lastaccess->meta);
+            // If the user acceded from Timeline it should be redirected to the Dashboard.
+            if (isset($lastaccess->origin) && $lastaccess->origin == logger::ORIGIN_TIMELINE) {
+                redirect($CFG->wwwroot . '/my/');
+            }
         }
+
         // Close the tab or window where BBB was opened.
         bigbluebuttonbn_bbb_view_close_window();
         break;
@@ -220,9 +223,11 @@ function bigbluebuttonbn_bbb_view_playback_href_lookup($playbacks, $type) {
 function bigbluebuttonbn_bbb_view_close_window() {
     global $OUTPUT, $PAGE;
     echo $OUTPUT->header();
-    // This will not work for now. The intent is to close the BBB windows
-    // to go back to the main page.
-    $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
+    // Behat does not like when we close the Windows as it is expecting to locate
+    // on click part of the pages (bug with selenium raising an exception). So this is a workaround.
+    if (!defined('BEHAT_SITE_RUNNING')) {
+        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
+    }
     echo $OUTPUT->footer();
 }
 

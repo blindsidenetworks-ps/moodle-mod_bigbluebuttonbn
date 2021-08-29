@@ -26,6 +26,7 @@ use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\logger;
+use moodle_url;
 use stdClass;
 
 /**
@@ -163,6 +164,10 @@ class meeting {
      * @throws \coding_exception
      */
     public function get_join_url() {
+        if (defined('BEHAT_SITE_RUNNING') || PHPUNIT_TEST) {
+            return (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/bbb_meeting.php',
+                array('bbbid' => $this->instance->get_instance_id())))->out(false);
+        }
         return bigbluebutton_proxy::get_join_url(
             $this->instance->get_meeting_id(),
             $this->instance->get_user_fullname(),
@@ -189,15 +194,17 @@ class meeting {
             'meetingid' => $instance->get_meeting_id(),
             'cmid' => $instance->get_cm_id(),
             'ismoderator' => $instance->is_moderator(),
-
             'joinurl' => $instance->get_join_url()->out(),
-            'openingtime' => $instance->get_instance_var('openingtime'),
-            'closingtime' => $instance->get_instance_var('closingtime'),
-
             'userlimit' => $instance->get_user_limit(),
             'group' => $instance->get_group_id(),
             'presentations' => [],
         ];
+        if ($instance->get_instance_var('openingtime')) {
+            $meetinginfo->openingtime = $instance->get_instance_var('openingtime');
+        }
+        if ($instance->get_instance_var('closingtime')) {
+            $meetinginfo->closingtime = $instance->get_instance_var('closingtime');
+        }
         $activitystatus = bigbluebutton_proxy::view_get_activity_status($instance);
         // This might raise an exception if info cannot be retrieved.
         // But this might be totally fine as the meeting is maybe not yet created on BBB side.
