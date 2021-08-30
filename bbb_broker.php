@@ -59,7 +59,7 @@ $PAGE->set_context($instance->get_context());
 try {
     switch(strtolower($params['action'])) {
         case 'recording_ready':
-            recording_helper::recording_ready($instance, $params);
+            broker::recording_ready($instance, $params);
             return;
         case 'meeting_events':
             // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request

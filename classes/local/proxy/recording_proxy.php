@@ -125,8 +125,9 @@ class recording_proxy extends proxy_base {
             $rids = array_slice($recordingids, ($page - 1) * $pagecount, $pagecount);
             $recordings += self::fetch_recordings_page($rids);
         }
+
         // Sort recordings.
-        recording_helper::sort_recordings($recordings);
+        self::sort_recordings($recordings);
         return $recordings;
     }
 
@@ -155,7 +156,7 @@ class recording_proxy extends proxy_base {
         $recordings = [];
         // If there were meetings already created.
         foreach ($xml->recordings->recording as $recordingxml) {
-            $recording = recording_helper::parse_recording($recordingxml);
+            $recording = self::parse_recording($recordingxml);
             $recordings[$recording['recordID']] = $recording;
 
             // Check if there is childs.
@@ -168,7 +169,7 @@ class recording_proxy extends proxy_base {
 
                     // If there were meetings already created.
                     foreach ($xml->recordings->recording as $recordingxml) {
-                        $recording = recording_helper::parse_recording($recordingxml);
+                        $recording = self::parse_recording($recordingxml);
                         $recordings[$recording['recordID']] = $recording;
                     }
                 }
@@ -176,5 +177,94 @@ class recording_proxy extends proxy_base {
         }
 
         return $recordings;
+    }
+
+    /**
+     *  Helper function to sort an array of recordings. It compares the startTime in two recording objects.
+     *
+     * @param array $recordings
+     */
+    public static function sort_recordings(array &$recordings) {
+        uasort($recordings, function($a, $b) {
+            global $CFG;
+            $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+            $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+            if ($a['startTime'] < $b['startTime']) {
+                return $resultless;
+            }
+            if ($a['startTime'] == $b['startTime']) {
+                return 0;
+            }
+            return $resultmore;
+        });
+    }
+
+    /**
+     * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
+     *
+     * @param object $recording
+     *
+     * @return array
+     */
+    public static function parse_recording(object $recording): array {
+        // Add formats.
+        $playbackarray = array();
+        foreach ($recording->playback->format as $format) {
+            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
+                'url' => trim((string) $format->url), 'length' => (string) $format->length);
+            // Add preview per format when existing.
+            if ($format->preview) {
+                $playbackarray[(string) $format->type]['preview'] =
+                    self::parse_preview_images($format->preview);
+            }
+        }
+        // Add the metadata to the recordings array.
+        $metadataarray =
+            self::parse_recording_meta(get_object_vars($recording->metadata));
+        $recordingarray = array('recordID' => (string) $recording->recordID,
+            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
+            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
+            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
+        if (isset($recording->protected)) {
+            $recordingarray['protected'] = (string) $recording->protected;
+        }
+        return $recordingarray + $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording metadata object to an array in the format used by the plugin.
+     *
+     * @param array $metadata
+     *
+     * @return array
+     */
+    public static function parse_recording_meta(array $metadata): array {
+        $metadataarray = array();
+        foreach ($metadata as $key => $value) {
+            if (is_object($value)) {
+                $value = '';
+            }
+            $metadataarray['meta_' . $key] = $value;
+        }
+        return $metadataarray;
+    }
+
+    /**
+     * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
+     *
+     * @param object $preview
+     *
+     * @return array
+     */
+    public static function parse_preview_images(object $preview): array {
+        $imagesarray = array();
+        foreach ($preview->images->image as $image) {
+            $imagearray = array('url' => trim((string) $image));
+            foreach ($image->attributes() as $attkey => $attvalue) {
+                $imagearray[$attkey] = (string) $attvalue;
+            }
+            array_push($imagesarray, $imagearray);
+        }
+        return $imagesarray;
     }
 }

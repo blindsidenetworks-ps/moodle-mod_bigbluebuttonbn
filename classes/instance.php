@@ -277,6 +277,10 @@ EOF;
         return empty($this->groupid) ? 0 : $this->groupid;
     }
 
+    public function get_recordings(bool $includedeleted, bool $includeimported, bool $onlyimported): array {
+        return recordings::get_recordings_for_instance($instance, $includedeleted, $includeimported, $onlyimported);
+    }
+
     /**
      * Check whether this instance is configured to use a group.
      *

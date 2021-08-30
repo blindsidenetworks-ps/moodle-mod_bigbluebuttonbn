@@ -26,7 +26,6 @@
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
@@ -34,6 +33,7 @@ use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\recording;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 

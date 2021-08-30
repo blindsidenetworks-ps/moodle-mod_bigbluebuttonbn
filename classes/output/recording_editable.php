@@ -20,9 +20,9 @@ use mod_bigbluebuttonbn\local\bigbluebutton;
 use moodle_exception;
 use core\output\inplace_editable;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use mod_bigbluebuttonbn\recording;
 use stdClass;
 
 /**

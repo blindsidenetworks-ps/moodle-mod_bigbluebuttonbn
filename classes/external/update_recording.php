@@ -22,9 +22,9 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\recording;
 
 /**
  * External service to update the details of one recording.

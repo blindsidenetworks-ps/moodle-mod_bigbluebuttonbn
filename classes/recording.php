@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
+namespace mod_bigbluebuttonbn;
 
 use cache;
+use context_course;
 use core\persistent;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
@@ -80,6 +81,204 @@ class recording extends persistent {
         }
         parent::__construct($id, $record);
         $this->metadata = $this->fetch_latest_metadata();
+    }
+
+    /**
+     * Helper function to retrieve recordings from the BigBlueButton.
+     *
+     * @param instance $instance
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
+     *
+     * @return recording[] containing the recordings indexed by recordID, each recording is also a
+     * non sequential associative array itself that corresponds to the actual recording in BBB
+     */
+    public static function get_recordings_for_instance(
+        instance $instance,
+        bool $includedeleted = false,
+        bool $includeimported = false,
+        bool $onlyimported = false
+    ): array {
+        list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        $selects[] = "bigbluebuttonbnid = :bbbid";
+        $params['bbbid'] = $instance->get_instance_id();
+        $groupmode = groups_get_activity_groupmode($instance->get_cm());
+        $context = $instance->get_context();
+        if ($groupmode) {
+            list($groupselects, $groupparams) =
+                self::get_select_for_group($groupmode, $context, $instance->get_course_id(),
+                    $instance->get_group_id(), $instance->get_cm()->groupingid);
+            if ($groupselects) {
+                $selects[] = $groupselects;
+                $params = array_merge_recursive($params, $groupparams);
+            }
+        }
+        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
+    }
+
+    /**
+     * Helper function to retrieve recordings from a given course.
+     *
+     * @param object $course dataobject as a course record
+     * @param array $excludedinstanceid exclude recordings from instance ids
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
+     *
+     * @return recording[] containing the recordings indexed by recordID, each recording is also a
+     * non sequential associative array itself that corresponds to the actual recording in BBB
+     */
+    public static function get_recordings_for_course(
+        object $course,
+        array $excludedinstanceid = [],
+        bool $includedeleted = false,
+        bool $includeimported = false,
+        bool $onlyimported = false
+    ): array {
+        global $DB;
+
+        [$selects, $params] = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        $selects[] = "courseid = :courseid";
+        $params['courseid'] = $course->id;
+        $groupmode = groups_get_course_groupmode($course);
+        $context = context_course::instance($course->id);
+
+        if ($groupmode) {
+            [$groupselects, $groupparams] = self::get_select_for_group($groupmode, $context, $course->id);
+            if ($groupselects) {
+                $selects[] = $groupselects;
+                $params = array_merge($params, $groupparams);
+            }
+        }
+
+        if ($excludedinstanceid) {
+            [$sqlexcluded, $paramexcluded] = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, false);
+            $selects[] = "bigbluebuttonbnid {$sqlexcluded}";
+            $params = array_merge($params, $paramexcluded);
+        }
+
+        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
+    }
+
+    /**
+     * From a list of recording, filter out the recordings that are still AWAITING and refresh their status
+     *
+     * This is for CONTRIB-8665. Later on we need to devise a CRON job to do it. But it has to be sized correctly in term
+     * of number of API CALLS
+     *
+     * @param recording[] $recordings
+     * @return recording[]
+     */
+    protected static function filter_refresh_awaiting_recordings(array $recordings) {
+        // CONTRIB-8665: change status on read if needed.
+        foreach ($recordings as $index => $recording) {
+            $status = $recording->get('status');
+            if ($status == self::RECORDING_STATUS_AWAITING) {
+                $recording->refresh_status();
+                if ($recording->get('status') == self::RECORDING_STATUS_AWAITING) {
+                    unset($recordings[$index]);
+                    continue;
+                }
+            }
+            if ($status == self::RECORDING_STATUS_DISMISSED) {
+                unset($recordings[$index]);
+            }
+        }
+        return $recordings;
+    }
+
+    /**
+     * Get select for given group mode and context
+     *
+     * @param int $groupmode
+     * @param context $context
+     * @param int $courseid
+     * @param int $groupid
+     * @param int $groupingid
+     * @return array
+     */
+    protected static function get_select_for_group($groupmode, $context, $courseid, $groupid = 0, $groupingid = 0): array {
+        global $DB, $USER;
+
+        $selects = [];
+        $params = [];
+        if ($groupmode) {
+            $accessallgroups = has_capability('moodle/site:accessallgroups', $context) || $groupmode == VISIBLEGROUPS;
+            if ($accessallgroups) {
+                if ($context instanceof context_module) {
+                    $allowedgroups = groups_get_all_groups($courseid, 0, $groupingid);
+                } else {
+                    $allowedgroups = groups_get_all_groups($courseid);
+                }
+            } else {
+                if ($context instanceof context_module) {
+                    $allowedgroups = groups_get_all_groups($courseid, $USER->id, $groupingid);
+                } else {
+                    $allowedgroups = groups_get_all_groups($courseid, $USER->id);
+                }
+            }
+            $allowedgroupsid = array_map(function($g) {
+                return $g->id;
+            }, $allowedgroups);
+            if ($groupid || empty($allowedgroups)) {
+                $selects[] = "groupid = :groupid";
+                $params['groupid'] = ($groupid && in_array($groupid, $allowedgroupsid)) ?
+                    $groupid : 0;
+            } else {
+                if ($accessallgroups) {
+                    $allowedgroupsid[] = 0;
+                }
+                list($groupselects, $groupparams) = $DB->get_in_or_equal($allowedgroupsid, SQL_PARAMS_NAMED);
+                $selects[] = 'groupid ' . $groupselects;
+                $params = array_merge_recursive($params, $groupparams);
+            }
+        }
+        return [
+            implode(" AND ", $selects),
+            $params,
+        ];
+    }
+
+    /**
+     * Get basic sql select from given parameters
+     *
+     * @param bool $includedeleted
+     * @param bool $includeimported
+     * @param bool $onlyimported
+     * @return array
+     */
+    protected static function get_basic_select_from_parameters(
+        bool $includedeleted = false,
+        bool $includeimported = false,
+        bool $onlyimported = false
+    ): array {
+        $selects = [];
+        $params = [];
+
+        // Start with the filters.
+        if (!$includedeleted) {
+            // Exclude headless recordings unless includedeleted.
+            $selects[] = "headless != :headless";
+            $params['headless'] = self::RECORDING_HEADLESS;
+        }
+
+        if (!$includeimported) {
+            // Exclude imported recordings unless includedeleted.
+            $selects[] = "imported != :imported";
+            $params['imported'] = self::RECORDING_IMPORTED;
+        } else if ($onlyimported) {
+            // Exclude non-imported recordings.
+            $selects[] = "imported = :imported";
+            $params['imported'] = self::RECORDING_IMPORTED;
+        }
+
+        // Now get only recordings that have been validated by recording ready callback.
+        $selects[] = "(status = :status1 OR status = :status2 OR status = :status3)";
+        $params['status1'] = self::RECORDING_STATUS_PROCESSED;
+        $params['status2'] = self::RECORDING_STATUS_NOTIFIED;
+        $params['status3'] = self::RECORDING_STATUS_AWAITING; // CONTRIB-8665, change on read.
+        return [$selects, $params];
     }
 
     /**
@@ -188,7 +387,7 @@ class recording extends persistent {
         $recordingrec->groupid = 0; // The recording is available to everyone.
         $recordingrec->importeddata = json_encode($remotedata);
         $recordingrec->imported = true;
-        $importedrecording = new recording(0, $recordingrec);
+        $importedrecording = new self(0, $recordingrec);
         $importedrecording->create();
         return $importedrecording;
     }
@@ -438,4 +637,3 @@ class recording extends persistent {
         }
     }
 }
-
