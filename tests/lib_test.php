@@ -47,6 +47,9 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  */
 class lib_test extends testcase_helper {
 
+    /**
+     * @covers ::bigbluebuttonbn_supports
+     */
     public function test_bigbluebuttonbn_supports() {
         $this->resetAfterTest();
         $this->assertTrue(bigbluebuttonbn_supports(FEATURE_IDNUMBER));
@@ -54,6 +57,9 @@ class lib_test extends testcase_helper {
         $this->assertFalse(bigbluebuttonbn_supports(FEATURE_GRADE_HAS_GRADE));
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_add_instance
+     */
     public function test_bigbluebuttonbn_add_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -62,6 +68,9 @@ class lib_test extends testcase_helper {
         $this->assertNotNull($id);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_update_instance
+     */
     public function test_bigbluebuttonbn_update_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -70,6 +79,9 @@ class lib_test extends testcase_helper {
         $this->assertTrue($result);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_delete_instance
+     */
     public function test_bigbluebuttonbn_delete_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -77,6 +89,9 @@ class lib_test extends testcase_helper {
         $this->assertTrue($result);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_user_outline
+     */
     public function test_bigbluebuttonbn_user_outline() {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
@@ -96,6 +111,9 @@ class lib_test extends testcase_helper {
         $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_user_complete
+     */
     public function test_bigbluebuttonbn_user_complete() {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
@@ -111,13 +129,21 @@ class lib_test extends testcase_helper {
         $this->assertEquals(2, $result);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_get_extra_capabilities
+     */
     public function test_bigbluebuttonbn_get_extra_capabilities() {
         $this->resetAfterTest();
         $this->assertEquals(array('moodle/site:accessallgroups'), bigbluebuttonbn_get_extra_capabilities());
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_reset_course_form_definition
+     */
     public function test_bigbluebuttonbn_reset_course_form_definition() {
         global $CFG, $PAGE;
+        $this->require_mock_server();
+
         $PAGE->set_course($this->course);
         $this->setAdminUser();
         $this->resetAfterTest();
@@ -139,6 +165,9 @@ class lib_test extends testcase_helper {
         $this->assertNotNull($mform->getElement('bigbluebuttonbnheader'));
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_reset_course_form_defaults
+     */
     public function test_bigbluebuttonbn_reset_course_form_defaults() {
         global $CFG;
         $this->resetAfterTest();
@@ -151,6 +180,9 @@ class lib_test extends testcase_helper {
         ), $results);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_reset_userdata
+     */
     public function test_bigbluebuttonbn_reset_userdata() {
         global $CFG;
         $this->resetAfterTest();
@@ -168,6 +200,9 @@ class lib_test extends testcase_helper {
         ), $results[0]);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_get_coursemodule_info
+     */
     public function test_bigbluebuttonbn_get_coursemodule_info() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -175,6 +210,9 @@ class lib_test extends testcase_helper {
         $this->assertEquals($info->name, $bbactivity->name);
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_check_updates_since
+     */
     public function test_bigbluebuttonbn_check_updates_since() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -186,14 +224,22 @@ class lib_test extends testcase_helper {
         );
     }
 
+    /**
+     * @covers ::mod_bigbluebuttonbn_get_fontawesome_icon_map
+     */
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
         $this->resetAfterTest();
         $this->assertEquals(array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'),
             mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 
+    /**
+     * @covers ::mod_bigbluebuttonbn_core_calendar_provide_event_action
+     */
     public function test_mod_bigbluebuttonbn_core_calendar_provide_event_action() {
         global $DB;
+
+        $this->require_mock_server();
         $this->resetAfterTest();
         $this->setAdminUser();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -240,6 +286,8 @@ class lib_test extends testcase_helper {
 
     /**
      * Test setting navigation admin menu
+     *
+     * @covers ::bigbluebuttonbn_extend_settings_navigation
      */
     public function test_bigbluebuttonbn_extend_settings_navigation_admin() {
         global $PAGE, $CFG;
@@ -258,6 +306,9 @@ class lib_test extends testcase_helper {
         $this->assertCount(1, $node->get_children_key_list());
     }
 
+    /**
+     * @covers ::bigbluebuttonbn_extend_settings_navigation
+     */
     public function test_bigbluebuttonbn_extend_settings_navigation_user() {
         global $PAGE, $CFG;
         $this->resetAfterTest();

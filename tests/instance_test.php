@@ -32,6 +32,7 @@ use moodle_exception;
  * @package   mod_bigbluebuttonbn
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \mod_bigbluebuttonbn\instance
  */
 class instance_test extends advanced_testcase {
 
@@ -41,6 +42,8 @@ class instance_test extends advanced_testcase {
      * @param string $function
      * @param string $field
      * @dataProvider get_from_location_provider
+     * @covers ::get_from_instanceid
+     * @covers ::get_from_cmid
      */
     public function test_get_from(string $function, string $field): void {
         $this->resetAfterTest();
@@ -71,6 +74,7 @@ class instance_test extends advanced_testcase {
 
     /**
      * Get an instance from a cmid.
+     * @covers ::get_from_cmid
      */
     public function test_get_from_cmid(): void {
         $this->resetAfterTest();
@@ -89,6 +93,7 @@ class instance_test extends advanced_testcase {
 
     /**
      * If the instance was not found, and exception should be thrown.
+     * @covers ::get_from_cmid
      */
     public function test_get_from_cmid_not_found(): void {
         $this->assertNull(instance::get_from_cmid(100));
@@ -97,12 +102,14 @@ class instance_test extends advanced_testcase {
     /**
      * If the instance was not found, and exception should be thrown.
      */
-    public function test_get_from_instnace_not_found(): void {
+    public function test_get_from_instance_not_found(): void {
         $this->assertNull(instance::get_from_instanceid(100));
     }
 
     /**
      * Get from meeting id
+     *
+     * @covers ::get_from_meetingid
      */
     public function test_get_from_meetingid(): void {
         $this->resetAfterTest();
@@ -126,10 +133,35 @@ class instance_test extends advanced_testcase {
     }
 
     /**
+     * Get the get_from_meetingid() function where the meetingid includes a groupid.
+     *
+     * @covers ::get_from_meetingid
+     */
+    public function test_get_from_meetingid_group(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'course' => $course,
+            'cm' => $cm,
+        ] = $this->get_test_instance();
+
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        $instance = instance::get_from_meetingid(
+            sprintf("%s-%s-%s[0]", $record->meetingid, $record->course, $record->id)
+        );
+
+        $this->assertEquals($cm->instance, $instance->get_instance_id());
+        $this->assertEquals($cm->id, $instance->get_cm_id());
+    }
+
+    /**
      * Ensure that invalid meetingids throw an appropriate exception.
      *
      * @dataProvider invalid_meetingid_provider
      * @param string $meetingid
+     * @covers ::get_from_meetingid
      */
     public function test_get_from_meetingid_invalid(string $meetingid): void {
         $this->expectException(moodle_exception::class);
@@ -146,6 +178,11 @@ class instance_test extends advanced_testcase {
         ];
     }
 
+    /**
+     * Test the get_all_instances_in_course function.
+     *
+     * @covers ::get_all_instances_in_course
+     */
     public function test_get_all_instances_in_course(): void {
         $this->resetAfterTest();
 
@@ -184,6 +221,11 @@ class instance_test extends advanced_testcase {
         ];
     }
 
+    /**
+     * Test the get_meeting_id function for a meeting configured for a group.
+     *
+     * @covers ::get_meeting_id
+     */
     public function test_get_meeting_id_with_groups(): void {
         $this->resetAfterTest();
 

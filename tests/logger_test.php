@@ -34,11 +34,12 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @covers \mod_bigbluebuttonbn\logger
+ * @coversDefaultClass \mod_bigbluebuttonbn\logger
  */
 class logger_test extends testcase_helper {
     /**
      * Test delete instance logs
-     *
      */
     public function test_log_instance_deleted() {
         global $DB;
@@ -57,7 +58,7 @@ class logger_test extends testcase_helper {
     /**
      * Test log method
      */
-    public function test_bigbluebuttonbn_log() {
+    public function test_log_recording_played_event() {
         global $DB;
 
         $this->resetAfterTest();

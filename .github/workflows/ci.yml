@@ -44,7 +44,7 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
       mockserver:
-        image: calllearning/bigbluebutton_mock:latest
+        image: andrewnicols/bigbluebutton_mock:latest
         ports:
           - 8001:80
 
@@ -79,10 +79,12 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
-          BEHATWWWROOT: "http://172.17.0.1"
+          MOODLE_BEHAT_WWWROOT: "http://172.17.0.1:8000"
 
+      # We use a hash of the behat_wwwroot to give a per-parallel run identifier for the mock server.
+      # The moodle-plugin-ci config always sets a behat_wwwroot so there is no need to put this in an empty tests.
       - name: Set additional config
-        run: moodle-plugin-ci add-config 'define("TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER", "http://localhost:8001");'
+        run: moodle-plugin-ci add-config 'define("TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER", "http://localhost:8001/hash" . sha1($CFG->behat_wwwroot));'
 
       - name: phplint
         if: ${{ always() }}
@@ -119,6 +121,11 @@ jobs:
       - name: phpunit
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit
+
+      - name: Behat server for docker
+        if: ${{ always() }}
+        run: |
+          php -S 172.17.0.1:8000 -t moodle &
 
       - name: behat
         if: ${{ always() }}

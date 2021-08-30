@@ -140,4 +140,12 @@ class testcase_helper extends advanced_testcase {
         get_fast_modinfo(0, 0, true);
         return array($course, $groups, $students, $teachers, $bbactivity, $roleids);
     }
+
+    protected function require_mock_server(): void {
+        if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            $this->markTestSkipped(
+                'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
+            );
+        }
+    }
 }

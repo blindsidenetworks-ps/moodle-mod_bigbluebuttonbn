@@ -30,8 +30,10 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @copyright 2021 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
+ * @covers mod_bigbluebuttonbn\completion\custom_completion
  */
 class completion_test extends testcase_helper {
+
     public function test_bigbluebuttonbn_get_completion_state_no_rules() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();

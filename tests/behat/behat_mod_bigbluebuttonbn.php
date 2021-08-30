@@ -78,30 +78,6 @@ class behat_mod_bigbluebuttonbn extends behat_base {
     }
 
     /**
-     * Return the list of partial named selectors.
-     *
-     * @return array
-     */
-    public static function get_partial_named_selectors(): array {
-        return [
-            new behat_component_named_selector('Meeting identifier', [".//*[@data-identifier=%locator%]"]),
-        ];
-    }
-
-    /**
-     * Return the list of exact named selectors.
-     *
-     * @return array
-     */
-    public static function get_exact_named_selectors(): array {
-        return [
-            new behat_component_named_selector('Recording row',
-                ["//*[@class='mod_bigbluebuttonbn_recordings_table']//tbody[@class='yui3-datatable-data']/tr[position()=%locator%]"]
-            )
-        ];
-    }
-
-    /**
      * Convert page names to URLs for steps like 'When I am on the "[page name]" page'.
      *
      * Recognised page names are:
