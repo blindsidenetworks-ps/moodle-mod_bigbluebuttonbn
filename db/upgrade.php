@@ -384,6 +384,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021072907, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2021083100) {
+        // Update the legacy notifications to use the legacy class which will be removed as per the deprecation policy.
+        $DB->set_field('task_adhoc', 'classname', '\mod_bigbluebuttonbn\task\send_legacy_notification', [
+            'component' => 'mod_bigbluebuttonbn',
+            'classname' => '\mod_bigbluebuttonbn\task\send_notification',
+        ]);
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 

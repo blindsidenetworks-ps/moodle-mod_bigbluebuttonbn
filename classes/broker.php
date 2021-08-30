@@ -116,7 +116,11 @@ class broker {
         try {
             // We make sure messages are sent only once.
             if ($recording->get('status') != recording::RECORDING_STATUS_NOTIFIED) {
-                notifier::notify_recording_ready($instance->get_instance_data());
+                $task = new \mod_bigbluebuttonbn\task\send_recording_ready_notification();
+                $task->set_instance_id($instance->id);
+
+                \core\task\manager::queue_adhoc_task($task);
+
                 $recording->set('status', recording::RECORDING_STATUS_NOTIFIED);
                 $recording->update();
             }

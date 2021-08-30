@@ -17,7 +17,7 @@
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
-use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\local\notifier;
 
 /**
  * Class containing the scheduled task for lti module.
@@ -25,17 +25,18 @@ use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
  * @package   mod_bigbluebuttonbn
  * @copyright 2019 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @deprecated Since Moodle 4.0
  */
-class completion_update_state extends adhoc_task {
+class send_legacy_notification extends adhoc_task {
     /**
      * Run bigbluebuttonbn cron.
      */
     public function execute() {
         // Get the custom data.
         $data = $this->get_custom_data();
-        mtrace("Task completion_update_state running for user {$data->userid}");
+        mtrace("Execute send_notification task: Sending notification to user {$data->receiver->id}");
 
         // Process the completion.
-        bigbluebutton_proxy::update_completion_state($data->bigbluebuttonbn, $data->userid);
+        message_post_message($data->sender, $data->receiver, $data->htmlmsg, FORMAT_HTML);
     }
 }

@@ -26,9 +26,9 @@ namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\notifier;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\task\send_instance_update_notification;
 use stdClass;
 
 class mod_helper {
@@ -159,11 +159,16 @@ class mod_helper {
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
     protected static function process_post_save_notification(stdClass $bigbluebuttonbn): void {
-        $action = get_string('mod_form_field_notification_msg_modified', 'bigbluebuttonbn');
+        $task = new send_instance_update_notification();
+        $task->set_instance_id($bigbluebuttonbn->id);
+
         if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
-            $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
+            $task->set_update_type(send_instance_update_notification::TYPE_CREATED);
+        } else {
+            $task->set_update_type(send_instance_update_notification::TYPE_UPDATED);
         }
-        notifier::notify_instance_updated($bigbluebuttonbn, $action);
+
+        \core\task\manager::queue_adhoc_task($task);
     }
 
     /**
