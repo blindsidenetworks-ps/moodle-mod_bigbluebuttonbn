@@ -1,0 +1,57 @@
+# Credit for this script to Tim Hunt
+# https://github.com/moodlehq/moodle-plugin-ci/issues/48
+# https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
+
+name: CI Tests (Linting)
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '7.3'
+          - php: '8.0'
+          - php: '8.1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: plugin
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pgsql, mysqli
+
+      - name: Deploy moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+          # Add dirs to $PATH
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          # PHPUnit depends on en_AU.UTF-8 locale
+          sudo locale-gen en_AU.UTF-8
+
+      - name: phplint
+        if: ${{ always() }}
+        run: moodle-plugin-ci phplint plugin
+
+      - name: phpcpd
+        if: ${{ always() }}
+        run: moodle-plugin-ci phpcpd plugin || true
+
+      - name: phpmd
+        if: ${{ always() }}
+        run: moodle-plugin-ci phpmd plugin
+
+      - name: codechecker
+        if: ${{ always() }}
+        run: moodle-plugin-ci codechecker plugin
+
+      - name: savepoints
+        if: ${{ always() }}
+        run: moodle-plugin-ci savepoints plugin
