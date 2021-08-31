@@ -2,7 +2,7 @@
 # https://github.com/moodlehq/moodle-plugin-ci/issues/48
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
-name: CI Tests
+name: CI Tests (Testing)
 on: [push, pull_request]
 
 jobs:
@@ -86,29 +86,9 @@ jobs:
       - name: Set additional config
         run: moodle-plugin-ci add-config 'define("TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER", "http://localhost:8001/hash" . sha1($CFG->behat_wwwroot));'
 
-      - name: phplint
-        if: ${{ always() }}
-        run: moodle-plugin-ci phplint
-
-      - name: phpcpd
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpcpd || true
-
-      - name: phpmd
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpmd
-
-      - name: codechecker
-        if: ${{ always() }}
-        run: moodle-plugin-ci codechecker
-
       - name: validate
         if: ${{ always() }}
         run: moodle-plugin-ci validate
-
-      - name: savepoints
-        if: ${{ always() }}
-        run: moodle-plugin-ci savepoints
 
       # - name: mustache
       #   if: ${{ always() }}
