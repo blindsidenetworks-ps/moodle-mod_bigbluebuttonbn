@@ -25,8 +25,6 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
-use mod_bigbluebuttonbn\instance;
-
 /**
  * Privacy provider tests class.
  *

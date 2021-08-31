@@ -27,7 +27,7 @@ namespace mod_bigbluebuttonbn\local\helpers;
 use core_tag_tag;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\logger;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
  * BBB Library tests class.
@@ -39,8 +39,15 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\reset
  * @covers \mod_bigbluebuttonbn\local\helpers\reset
  */
-class reset_test extends testcase_helper {
-
+class reset_test extends \advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
     /**
      * Reset course item test
      */
@@ -83,11 +90,11 @@ class reset_test extends testcase_helper {
         \mod_bigbluebuttonbn\local\helpers\mod_helper::process_post_save($formdata);
         $this->assertEquals(1, $DB->count_records(
                 'event',
-                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->course->id)));
-        reset::reset_events($this->course->id);
+                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id)));
+        reset::reset_events($this->get_course()->id);
         $this->assertEquals(0, $DB->count_records(
                 'event',
-                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->course->id)));
+                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id)));
     }
 
     /**
@@ -96,13 +103,13 @@ class reset_test extends testcase_helper {
     public function test_reset_tags() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(null,
-                array('course' => $this->course->id),
+                array('course' => $this->get_course()->id),
                 ['visible' => true]
         );
         core_tag_tag::add_item_tag('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id, $bbactivitycontext, 'newtag');
         $alltags = core_tag_tag::get_item_tags('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id);
         $this->assertCount(1, $alltags);
-        reset::reset_tags($this->course->id);
+        reset::reset_tags($this->get_course()->id);
         $alltags = core_tag_tag::get_item_tags('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id);
         $this->assertCount(0, $alltags);
     }

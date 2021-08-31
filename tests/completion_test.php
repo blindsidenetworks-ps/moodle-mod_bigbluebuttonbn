@@ -21,7 +21,7 @@ use context_module;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\logger;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
  * Tests for Big Blue Button Completion.
@@ -32,8 +32,19 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @author    Laurent David (laurent@call-learning.fr)
  * @covers mod_bigbluebuttonbn\completion\custom_completion
  */
-class completion_test extends testcase_helper {
+class completion_test extends \advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
 
+    /**
+     *
+     */
     public function test_bigbluebuttonbn_get_completion_state_no_rules() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -47,6 +58,9 @@ class completion_test extends testcase_helper {
         $this->assertEquals(COMPLETION_COMPLETE, $result);
     }
 
+    /**
+     *
+     */
     public function test_bigbluebuttonbn_get_completion_state_incomplete() {
         $this->resetAfterTest();
 
@@ -101,9 +115,9 @@ class completion_test extends testcase_helper {
         $this->setUser($user);
         // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
         // Inspired from the same test in forum.
-        list($bbactivitycontext, $cm1, $bbactivity) = $this->create_instance($this->course,
+        list($bbactivitycontext, $cm1, $bbactivity) = $this->create_instance($this->get_course(),
             ['completion' => '2', 'completionattendance' => '1']);
-        list($bbactivitycontext, $cm2, $bbactivity) = $this->create_instance($this->course,
+        list($bbactivitycontext, $cm2, $bbactivity) = $this->create_instance($this->get_course(),
             ['completion' => '2', 'completionattendance' => '0']);
 
         // Data for the stdClass input type.
@@ -163,7 +177,7 @@ class completion_test extends testcase_helper {
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
 
-        bigbluebuttonbn_view($bbactivity, $this->course, $bbactivitycm, context_module::instance($bbactivitycm->id));
+        bigbluebuttonbn_view($bbactivity, $this->get_course(), $bbactivitycm, context_module::instance($bbactivitycm->id));
 
         $events = $sink->get_events();
         $this->assertCount(3, $events);
@@ -178,7 +192,7 @@ class completion_test extends testcase_helper {
         $this->assertNotEmpty($event->get_name());
 
         // Check completion status.
-        $completion = new completion_info($this->course);
+        $completion = new completion_info($this->get_course());
         $completiondata = $completion->get_data($bbactivitycm);
         $this->assertEquals(1, $completiondata->completionstate);
     }

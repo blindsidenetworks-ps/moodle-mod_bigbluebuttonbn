@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
  * Tests for the logger class.
@@ -37,7 +37,15 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @covers \mod_bigbluebuttonbn\logger
  * @coversDefaultClass \mod_bigbluebuttonbn\logger
  */
-class logger_test extends testcase_helper {
+class logger_test extends \advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
     /**
      * Test delete instance logs
      */

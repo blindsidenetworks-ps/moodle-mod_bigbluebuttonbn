@@ -16,19 +16,21 @@
 
 namespace mod_bigbluebuttonbn\test;
 
-use advanced_testcase;
 use context_module;
+use PHPUnit\Framework\SkippedTestError;
+use PHPUnit\Framework\SyntheticSkippedError;
+use stdClass;
 use testing_data_generator;
 
 /**
- * BBB Library tests class.
+ * BBB Library tests class trait.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2018 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class testcase_helper extends advanced_testcase {
+trait testcase_helper_trait {
     /** @var testing_data_generator|null */
     protected $generator = null;
 
@@ -49,7 +51,7 @@ class testcase_helper extends advanced_testcase {
      */
     protected function create_instance($course = null, $params = [], $options = []) {
         if (!$course) {
-            $course = $this->course;
+            $course = $this->get_course();
         }
         $params['course'] = $course->id;
         $options['visible'] = 1;
@@ -64,14 +66,14 @@ class testcase_helper extends advanced_testcase {
      * Get the matching form data
      *
      * @param object $bbactivity the current bigbluebutton activity
-     * @param object|null $course the course or null (taken from $this->course if null)
+     * @param object|null $course the course or null (taken from $this->get_course() if null)
      * @return mixed
      */
     protected function get_form_data_from_instance($bbactivity, $course = null) {
         global $USER;
 
         if (!$course) {
-            $course = $this->course;
+            $course = $this->get_course();
         }
         $this->setAdminUser();
         $bbactivitycm = get_coursemodule_from_instance('bigbluebuttonbn', $bbactivity->id);
@@ -81,16 +83,24 @@ class testcase_helper extends advanced_testcase {
     }
 
     /**
+     * Get or create course if it does not exist
+     *
+     * @return object|stdClass|null
+     */
+    protected function get_course() {
+        if (!$this->course) {
+            $this->course = $this->generator->create_course(['enablecompletion' => 1]);
+        }
+        return $this->course;
+    }
+    /**
      * Setup
      *
      * Enable completion and create a course
      */
-    public function setUp(): void {
-        global $CFG;
-        parent::setUp();
+    public function basic_setup(): void {
         set_config('enablecompletion', true); // Enable completion for all tests.
         $this->generator = $this->getDataGenerator();
-        $this->course = $this->generator->create_course(['enablecompletion' => 1]);
     }
 
     /**
@@ -104,7 +114,7 @@ class testcase_helper extends advanced_testcase {
      */
     protected function setup_course_students_teachers($courserecord, $numstudents, $numteachers, $groupsnum) {
         global $DB;
-        $generator = $this->getDataGenerator();
+        $generator = $this->generator;
         $course = $generator->create_course($courserecord);
         $groups = [];
         for ($i = 0; $i < $groupsnum; $i++) {
@@ -148,4 +158,33 @@ class testcase_helper extends advanced_testcase {
             );
         }
     }
+    // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseFunction
+    /**
+     * Set current $USER to admin account, reset access cache.
+     * @static
+     * @return void
+     */
+    abstract public static function setAdminUser();
+    /**
+     * Mark the test as skipped.
+     *
+     * @throws SkippedTestError
+     * @throws SyntheticSkippedError
+     *
+     * @psalm-return never-return
+     */
+    abstract public static function markTestSkipped(string $message = ''): void;
+    /**
+     * Get data generator
+     * @static
+     * @return testing_data_generator
+     */
+    abstract public static function getDataGenerator();
+    /**
+     * Set current $USER, reset access cache.
+     * @static
+     * @param null|int|stdClass $user user record, null or 0 means non-logged-in, positive integer means userid
+     * @return void
+     */
+    abstract public static function setUser();
 }
