@@ -25,16 +25,8 @@
 
 namespace mod_bigbluebuttonbn;
 
-use calendar_event;
-use context_module;
-use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
-use mod_bigbluebuttonbn_mod_form;
-use MoodleQuickForm;
-use navigation_node;
-use ReflectionClass;
 use restore_date_testcase;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -50,25 +42,17 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
  */
 class backup_restore_test extends restore_date_testcase {
     use testcase_helper_trait;
-
-    /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
-
     /**
      * @dataProvider type_provider
      */
-    public function test_backup_restore($type) {
+    public function test_backup_restore($type): void {
         global $DB;
         $this->resetAfterTest();
-        $bbactivity = $this->generator->create_module(
+        $bbactivity = $this->getDataGenerator()->create_module(
             'bigbluebuttonbn',
-            array('course' => $this->get_course()->id, 'type' => $type),
-            ['visible' => true]);
+            ['course' => $this->get_course()->id, 'type' => $type],
+            ['visible' => true]
+        );
 
         $newcourseid = $this->backup_and_restore($this->get_course());
         $newbbb = $DB->get_record('bigbluebuttonbn', ['course' => $newcourseid], '*', MUST_EXIST); // One record.
@@ -88,47 +72,39 @@ class backup_restore_test extends restore_date_testcase {
      * @return array
      */
     public function type_provider(): array {
-        return array(
-            'Instance Type ALL' => array(instance::TYPE_ALL),
-            'Instance Type Recording Only' => array(instance::TYPE_RECORDING_ONLY),
-            'Instance  Room Only' => array(instance::TYPE_ROOM_ONLY)
-        );
+        return [
+            'Instance Type ALL' => [instance::TYPE_ALL],
+            'Instance Type Recording Only' => [instance::TYPE_RECORDING_ONLY],
+            'Instance  Room Only' => [instance::TYPE_ROOM_ONLY]
+        ];
     }
 
     /**
-     * Instance type provider
-     *
-     * @return array
+     * @dataProvider type_provider
      */
-    public function type_provider_with_recording(): array {
-        return array(
-            'Instance Type ALL' => array(instance::TYPE_ALL, 2),
-            'Instance Type Recording Only' => array(instance::TYPE_RECORDING_ONLY, 2),
-            'Instance  Room Only' => array(instance::TYPE_ROOM_ONLY, 2)
-        );
-    }
-
-    /**
-     * @dataProvider type_provider_with_recording
-     */
-    public function test_backup_restore_with_recordings($type, $nbrecordings) {
+    public function test_backup_restore_with_recordings($type): void {
         global $DB;
         $this->resetAfterTest();
+        $nbrecordings = 2; // Two recordings for now.
         // This is for imported recording.
-        $othercourse = $this->generator->create_course();
-        $bbactivityothercourse = $this->generator->create_module(
+        $generator = $this->getDataGenerator();
+        $othercourse = $generator->create_course();
+        $bbactivityothercourse = $generator->create_module(
             'bigbluebuttonbn',
-            array('course' => $this->get_course()->id, 'type' => instance::TYPE_ALL),
-            ['visible' => true]);
-        $bbactivitysamecourse = $this->generator->create_module(
+            ['course' => $this->get_course()->id, 'type' => instance::TYPE_ALL],
+            ['visible' => true]
+        );
+        $bbactivitysamecourse = $generator->create_module(
             'bigbluebuttonbn',
-            array('course' => $this->get_course()->id, 'type' => instance::TYPE_ALL),
-            ['visible' => true]);
+            ['course' => $this->get_course()->id, 'type' => instance::TYPE_ALL],
+            ['visible' => true]
+        );
 
-        $bbactivity = $this->generator->create_module(
+        $bbactivity = $generator->create_module(
             'bigbluebuttonbn',
-            array('course' => $this->get_course()->id, 'type' => $type, 'name' => 'BBB Activity'),
-            ['visible' => true]);
+            ['course' => $this->get_course()->id, 'type' => $type, 'name' => 'BBB Activity'],
+            ['visible' => true]
+        );
 
         $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         $i = 0;

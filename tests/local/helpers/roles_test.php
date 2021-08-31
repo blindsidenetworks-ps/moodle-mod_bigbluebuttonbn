@@ -40,13 +40,6 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
 class roles_test extends \advanced_testcase {
     use testcase_helper_trait;
     /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
-    /**
      * Test select separate group prevent all
      *
      */

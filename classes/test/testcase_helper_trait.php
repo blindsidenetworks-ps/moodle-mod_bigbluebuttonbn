@@ -17,8 +17,6 @@
 namespace mod_bigbluebuttonbn\test;
 
 use context_module;
-use PHPUnit\Framework\SkippedTestError;
-use PHPUnit\Framework\SyntheticSkippedError;
 use stdClass;
 use testing_data_generator;
 
@@ -33,9 +31,6 @@ use testing_data_generator;
 trait testcase_helper_trait {
     /** @var testing_data_generator|null */
     protected $generator = null;
-
-    /** @var object|null */
-    protected $bbactivity = null;
 
     /** @var object|null */
     protected $course = null;
@@ -55,7 +50,7 @@ trait testcase_helper_trait {
         }
         $params['course'] = $course->id;
         $options['visible'] = 1;
-        $instance = $this->generator->create_module('bigbluebuttonbn', $params, $options);
+        $instance = $this->getDataGenerator()->create_module('bigbluebuttonbn', $params, $options);
         list($course, $cm) = get_course_and_cm_from_instance($instance, 'bigbluebuttonbn');
         $context = context_module::instance($cm->id);
 
@@ -89,18 +84,9 @@ trait testcase_helper_trait {
      */
     protected function get_course() {
         if (!$this->course) {
-            $this->course = $this->generator->create_course(['enablecompletion' => 1]);
+            $this->course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         }
         return $this->course;
-    }
-    /**
-     * Setup
-     *
-     * Enable completion and create a course
-     */
-    public function basic_setup(): void {
-        set_config('enablecompletion', true); // Enable completion for all tests.
-        $this->generator = $this->getDataGenerator();
     }
 
     /**
@@ -114,7 +100,7 @@ trait testcase_helper_trait {
      */
     protected function setup_course_students_teachers($courserecord, $numstudents, $numteachers, $groupsnum) {
         global $DB;
-        $generator = $this->generator;
+        $generator = $this->getDataGenerator();
         $course = $generator->create_course($courserecord);
         $groups = [];
         for ($i = 0; $i < $groupsnum; $i++) {
@@ -158,33 +144,4 @@ trait testcase_helper_trait {
             );
         }
     }
-    // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseFunction
-    /**
-     * Set current $USER to admin account, reset access cache.
-     * @static
-     * @return void
-     */
-    abstract public static function setAdminUser();
-    /**
-     * Mark the test as skipped.
-     *
-     * @throws SkippedTestError
-     * @throws SyntheticSkippedError
-     *
-     * @psalm-return never-return
-     */
-    abstract public static function markTestSkipped(string $message = ''): void;
-    /**
-     * Get data generator
-     * @static
-     * @return testing_data_generator
-     */
-    abstract public static function getDataGenerator();
-    /**
-     * Set current $USER, reset access cache.
-     * @static
-     * @param null|int|stdClass $user user record, null or 0 means non-logged-in, positive integer means userid
-     * @return void
-     */
-    abstract public static function setUser();
 }

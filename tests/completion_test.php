@@ -18,9 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use completion_info;
 use context_module;
-use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\completion\custom_completion;
-use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
@@ -39,7 +37,7 @@ class completion_test extends \advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->basic_setup();
+        set_config('enablecompletion', true); // Enable completion for all tests.
     }
 
     /**
@@ -49,7 +47,7 @@ class completion_test extends \advanced_testcase {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
-        $user = $this->generator->create_user();
+        $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
         $completion = new custom_completion($bbactivitycm, $user->id);
@@ -71,7 +69,7 @@ class completion_test extends \advanced_testcase {
             'completionattendance' => '1'
         ]);
 
-        $user = $this->generator->create_user();
+        $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
         $completion = new custom_completion($bbactivitycm, $user->id);
@@ -85,7 +83,7 @@ class completion_test extends \advanced_testcase {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $instance = instance::get_from_instanceid($bbactivity->id);
 
-        $user = $this->generator->create_user();
+        $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
         // Add a couple of fake logs.
