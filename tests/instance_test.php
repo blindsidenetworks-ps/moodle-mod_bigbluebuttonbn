@@ -250,4 +250,242 @@ class instance_test extends advanced_testcase {
             $instance->get_meeting_id($group->id)
         );
     }
+
+    /**
+     * Test the get_meeting_id function for a meeting configured for a group.
+     *
+     * @covers ::get_meeting_id
+     */
+    public function test_get_meeting_id_without_groups(): void {
+        $this->resetAfterTest();
+
+        [
+            'record' => $record,
+            'course' => $course,
+        ] = $this->get_test_instance();
+
+        $instance = instance::get_from_instanceid($record->id);
+
+        // No group.
+        $this->assertEquals(
+            sprintf("%s-%s-%s[0]", $record->meetingid, $record->course, $record->id),
+            $instance->get_meeting_id(null)
+        );
+    }
+
+    /**
+     * Data provider to check the various room_available scenarios'
+     *
+     * @return array
+     */
+    public function is_currently_open_provider(): array {
+        return [
+            'No opening or closing time set: Is open' => [null, null, true],
+            'Opening time set in the past, no closing: Is open' => [-DAYSECS, null, true],
+            'Opening time set in the future, no closing: Is closed' => [+DAYSECS, null, false],
+            'Closing time set in the past, no opening: Is closed' => [null, -DAYSECS, false],
+            'Closing time set in the future, no opening: Is open' => [null, +DAYSECS, true],
+            'Opening and closing in the past: Is closed' => [-WEEKSECS, -DAYSECS, false],
+            'Opening and closing in the future: Is closed' => [+DAYSECS, +WEEKSECS, false],
+            'Opening in the past, Closing in the future: Is open' => [-DAYSECS, +DAYSECS, true],
+        ];
+    }
+
+    /**
+     * @dataProvider is_currently_open_provider
+     * @param null|int $openingtime
+     * @param null|int $closingtime
+     * @param bool $expected
+     */
+    public function test_is_currently_open(?int $openingtime, ?int $closingtime, bool $expected): void {
+        $stub = $this->getMockBuilder(instance::class)
+            ->setMethods(['get_instance_var'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        if ($openingtime) {
+            $openingtime = $openingtime + time();
+        }
+
+        if ($closingtime) {
+            $closingtime = $closingtime + time();
+        }
+
+        $stub->method('get_instance_var')
+            ->willReturnCallback(function($var) use ($openingtime, $closingtime) {
+                if ($var === 'openingtime') {
+                    return $openingtime;
+                }
+
+                return $closingtime;
+            });
+        $this->assertEquals($expected, $stub->is_currently_open());
+    }
+
+    /**
+     * Ensure that the user_must_wait_to_join function works as expectd.
+     *
+     * @dataProvider user_must_wait_to_join_provider
+     * @param bool $isadmin
+     * @param bool $ismoderator
+     * @param bool $haswaitingroom
+     * @param bool $expected
+     */
+    public function test_user_must_wait_to_join(bool $isadmin, bool $ismoderator, bool $haswaitingroom, bool $expected): void {
+        $stub = $this->getMockBuilder(instance::class)
+            ->setMethods([
+                'get_instance_var',
+                'is_admin',
+                'is_moderator',
+            ])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stub->method('is_admin')->willReturn($isadmin);
+        $stub->method('is_moderator')->willReturn($ismoderator);
+        $stub->method('get_instance_var')->willReturn($haswaitingroom);
+
+        $this->assertEquals($expected, $stub->user_must_wait_to_join());
+    }
+
+    /**
+     * Data provider for the user_must_wait_to_join function.
+     *
+     * @return array
+     */
+    public function user_must_wait_to_join_provider(): array {
+        return [
+            'Admins must never wait to join (waiting disabled)' => [true, false, false, false],
+            'Admins must never wait to join (waiting enabled)' => [true, false, true, false],
+            'Moderators must never wait to join (waiting disabled)' => [false, true, false, false],
+            'Moderators must never wait to join (waiting enabled)' => [false, true, true, false],
+            'Other users must wait to join if waiting enabled' => [false, false, true, true],
+            'Other users cannot wait to join if waiting disabled' => [false, false, false, false],
+        ];
+    }
+
+    /**
+     * Ensure that the does_current_user_count_towards_user_limit function works as expectd.
+     *
+     * @dataProvider does_current_user_count_towards_user_limit_provider
+     * @param bool $isadmin
+     * @param bool $ismoderator
+     * @param bool $expected
+     */
+    public function test_does_current_user_count_towards_user_limit(
+        bool $isadmin,
+        bool $ismoderator,
+        bool $expected
+    ): void {
+        $stub = $this->getMockBuilder(instance::class)
+            ->setMethods([
+                'is_admin',
+                'is_moderator',
+            ])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stub->method('is_admin')->willReturn($isadmin);
+        $stub->method('is_moderator')->willReturn($ismoderator);
+
+        $this->assertEquals($expected, $stub->does_current_user_count_towards_user_limit());
+    }
+
+    /**
+     * Data provider for the does_current_user_count_towards_user_limit function.
+     *
+     * @return array
+     */
+    public function does_current_user_count_towards_user_limit_provider(): array {
+        return [
+            'Admin does not count' => [true, false, false],
+            'Moderator does not count' => [false, true, false],
+            'Other users do count' => [false, false, true],
+        ];
+    }
+
+    /**
+     * Ensure that the does_current_user_count_towards_user_limit function works as expectd.
+     *
+     * @dataProvider get_current_user_password_provider
+     * @param bool $isadmin
+     * @param bool $ismoderator
+     * @param bool $expected
+     */
+    public function test_get_current_user_password(bool $isadmin, bool $ismoderator, bool $expectedmodpassword): void {
+        $stub = $this->getMockBuilder(instance::class)
+            ->setMethods([
+                'is_admin',
+                'is_moderator',
+                'get_moderator_password',
+                'get_viewer_password',
+            ])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stub->method('is_admin')->willReturn($isadmin);
+        $stub->method('is_moderator')->willReturn($ismoderator);
+        $stub->method('get_moderator_password')->willReturn('Moderator Password');
+        $stub->method('get_viewer_password')->willReturn('Viewer Password');
+
+        if ($expectedmodpassword) {
+            $this->assertEquals('Moderator Password', $stub->get_current_user_password());
+        } else {
+            $this->assertEquals('Viewer Password', $stub->get_current_user_password());
+        }
+    }
+
+    /**
+     * Data provider for the get_current_user_password function.
+     *
+     * @return array
+     */
+    public function get_current_user_password_provider(): array {
+        return [
+            'Admin is a moderator' => [true, false, true],
+            'Moderator is a moderator' => [false, true, true],
+            'Others are a viewer' => [false, false, false],
+        ];
+    }
+
+    /**
+     * Tests for the allow_recording_start_stop function.
+     *
+     * @dataProvider allow_recording_start_stop_provider
+     * @param bool $isrecorded
+     * @param bool $showbuttons
+     * @param bool $expected
+     */
+    public function test_allow_recording_start_stop(
+        bool $isrecorded,
+        bool $showbuttons,
+        bool $expected
+    ): void {
+        $stub = $this->getMockBuilder(instance::class)
+            ->setMethods([
+                'is_recorded',
+                'should_show_recording_button',
+            ])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stub->method('is_recorded')->willReturn($isrecorded);
+        $stub->method('should_show_recording_button')->willReturn($showbuttons);
+
+        $this->assertEquals($expected, $stub->allow_recording_start_stop());
+    }
+
+    /**
+     * Data provider for the allow_recording_start_stop function.
+     *
+     * @return array
+     */
+    public function allow_recording_start_stop_provider(): array {
+        return [
+            'Meeting is not recorded: No start/stop' => [false, false, false],
+            'Meeting recorded, Buttons shown: Allow' => [true, true, true],
+            'Meeting recorded, Buttons not shown: Deny' => [true, false, false],
+        ];
+    }
+
 }
