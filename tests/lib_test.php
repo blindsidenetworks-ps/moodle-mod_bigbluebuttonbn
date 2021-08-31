@@ -26,7 +26,7 @@ namespace mod_bigbluebuttonbn;
 use calendar_event;
 use context_module;
 use mod_bigbluebuttonbn\logger;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use mod_bigbluebuttonbn_mod_form;
 use MoodleQuickForm;
 use navigation_node;
@@ -45,7 +45,16 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class lib_test extends testcase_helper {
+class lib_test extends \advanced_testcase {
+    use testcase_helper_trait;
+
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
 
     /**
      * @covers ::bigbluebuttonbn_supports
@@ -99,7 +108,7 @@ class lib_test extends testcase_helper {
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
-        $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
+        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, null, $bbactivity);
         $this->assertEquals('', $result);
 
         // Now create a couple of logs.
@@ -107,7 +116,7 @@ class lib_test extends testcase_helper {
         logger::log_meeting_joined_event($instance, 0);
         logger::log_recording_played_event($instance, 1);
 
-        $result = bigbluebuttonbn_user_outline($this->course, $user, null, $bbactivity);
+        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, null, $bbactivity);
         $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
     }
 
@@ -125,7 +134,7 @@ class lib_test extends testcase_helper {
         logger::log_meeting_joined_event($instance, 0);
         logger::log_recording_played_event($instance, 1);
 
-        $result = bigbluebuttonbn_user_complete($this->course, $user, $bbactivity);
+        $result = bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivity);
         $this->assertEquals(2, $result);
     }
 
@@ -144,7 +153,7 @@ class lib_test extends testcase_helper {
         global $CFG, $PAGE;
         $this->require_mock_server();
 
-        $PAGE->set_course($this->course);
+        $PAGE->set_course($this->get_course());
         $this->setAdminUser();
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -154,7 +163,7 @@ class lib_test extends testcase_helper {
         $data->id = $bbactivity->id;
         $data->course = $bbactivity->course;
 
-        $form = new mod_bigbluebuttonbn_mod_form($data, 1, $bbactivitycm, $this->course);
+        $form = new mod_bigbluebuttonbn_mod_form($data, 1, $bbactivitycm, $this->get_course());
         $refclass = new ReflectionClass("mod_bigbluebuttonbn_mod_form");
         $formprop = $refclass->getProperty('_form');
         $formprop->setAccessible(true);
@@ -171,7 +180,7 @@ class lib_test extends testcase_helper {
     public function test_bigbluebuttonbn_reset_course_form_defaults() {
         global $CFG;
         $this->resetAfterTest();
-        $results = bigbluebuttonbn_reset_course_form_defaults($this->course);
+        $results = bigbluebuttonbn_reset_course_form_defaults($this->get_course());
         $this->assertEquals(array(
             'reset_bigbluebuttonbn_events' => 0,
             'reset_bigbluebuttonbn_tags' => 0,
@@ -188,7 +197,7 @@ class lib_test extends testcase_helper {
         $this->resetAfterTest();
         $data = new stdClass();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $data->courseid = $this->course->id;
+        $data->courseid = $this->get_course()->id;
         $data->reset_bigbluebuttonbn_tags = true;
         $data->reset_bigbluebuttonbn_tags = true;
         $data->course = $bbactivity->course;
@@ -245,7 +254,7 @@ class lib_test extends testcase_helper {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
         // Standard use case, the meeting start and we want add an action event to join the meeting.
-        $event = $this->create_action_event($this->course, $bbactivity, logger::EVENT_MEETING_START);
+        $event = $this->create_action_event($this->get_course(), $bbactivity, logger::EVENT_MEETING_START);
         $factory = new \core_calendar\action_factory();
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertEquals("Join session", $actionevent->get_name());
@@ -257,7 +266,7 @@ class lib_test extends testcase_helper {
         $bbactivity->closingtime = time() - 1000;
         $bbactivity->openingtime = time() - 2000;
         $DB->update_record('bigbluebuttonbn', $bbactivity);
-        $event = $this->create_action_event($this->course, $bbactivity, logger::EVENT_MEETING_START);
+        $event = $this->create_action_event($this->get_course(), $bbactivity, logger::EVENT_MEETING_START);
         $actionevent = mod_bigbluebuttonbn_core_calendar_provide_event_action($event, $factory);
         $this->assertNull($actionevent);
     }

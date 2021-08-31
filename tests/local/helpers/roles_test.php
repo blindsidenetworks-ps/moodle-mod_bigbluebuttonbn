@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 defined('MOODLE_INTERNAL') || die();
 use context_course;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
  * BBB Library tests class.
@@ -37,7 +37,15 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @covers \mod_bigbluebuttonbn\local\helpers\roles
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\roles
  */
-class roles_test extends testcase_helper {
+class roles_test extends \advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
     /**
      * Test select separate group prevent all
      *

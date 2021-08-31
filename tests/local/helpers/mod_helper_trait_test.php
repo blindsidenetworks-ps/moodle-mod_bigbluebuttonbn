@@ -25,7 +25,7 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\test\testcase_helper;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
  * BBB Library tests class.
@@ -37,8 +37,15 @@ use mod_bigbluebuttonbn\test\testcase_helper;
  * @covers \mod_bigbluebuttonbn\local\helpers\mod_helper
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\mod_helper
  */
-class mod_helper_test extends testcase_helper {
-
+class mod_helper_trait_test extends \advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup basic
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->basic_setup();
+    }
     /**
      * Presave test
      */
@@ -109,7 +116,7 @@ class mod_helper_test extends testcase_helper {
 
         // Enrol users in a course so he will receive the message.
         $teacher = $this->generator->create_user(['role' => 'editingteacher']);
-        $this->generator->enrol_user($teacher->id, $this->course->id);
+        $this->generator->enrol_user($teacher->id, $this->get_course()->id);
 
         // Mark the form to trigger notification.
         $bbformdata->notification = true;
@@ -135,7 +142,7 @@ class mod_helper_test extends testcase_helper {
         $messagesink = $this->redirectMessages();
         // Enrol users in a course so he will receive the message.
         $teacher = $this->generator->create_user(['role' => 'editingteacher']);
-        $this->generator->enrol_user($teacher->id, $this->course->id);
+        $this->generator->enrol_user($teacher->id, $this->get_course()->id);
         $bbformdata->notification = true;
         mod_helper::process_post_save($bbformdata);
         // Now run cron.
