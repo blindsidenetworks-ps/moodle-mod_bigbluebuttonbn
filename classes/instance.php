@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use cm_info;
 use context;
+use context_course;
 use context_module;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -365,6 +366,15 @@ EOF;
      */
     public function get_context_id(): int {
         return $this->get_context()->id;
+    }
+
+    /**
+     * Get the course context.
+     *
+     * @return context_course
+     */
+    public function get_course_context(): context_course {
+        return $this->get_context()->get_course_context();
     }
 
     /**

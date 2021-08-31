@@ -15,20 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version for BigBlueButtonBN Moodle Activity Module.
+ * Defines message providers (types of messages being sent)
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version = 2021083100;
-$plugin->requires = 2020061500;
-$plugin->cron = 0;
-$plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '2.5-alpha.1';
+$messageproviders = [
+    // Recording ready notification posts.
+    'recording_ready' => [
+        'defaults' => [
+        ],
+    ],
+
+    // The instance was created or updated.
+    'instance_updated' => [
+        'defaults' => [
+        ],
+    ],
+];
