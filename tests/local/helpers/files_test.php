@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
+
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use cache;
@@ -32,6 +33,7 @@ use context_system;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use stdClass;
 use stored_file;
+
 /**
  * BBB Library tests class.
  *
@@ -43,15 +45,8 @@ use stored_file;
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\files
  */
 class files_test extends \advanced_testcase {
-
     use testcase_helper_trait;
-    /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
+
     /**
      * Plugin valid test case
      */
@@ -67,10 +62,10 @@ class files_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_pluginfile_file() {
         $this->resetAfterTest();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $user = $this->generator->create_user();
+
+        list($user, $bbactivity) = $this->create_user_and_activity();
         $this->setUser($user);
-        $this->generator->enrol_user($user->id, $this->get_course()->id, 'editingteacher');
+
         // From test_delete_original_file_from_draft (lib/test/filelib_test.php)
         // Create a bbb private file.
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
@@ -87,9 +82,9 @@ class files_test extends \advanced_testcase {
         $fs = get_file_storage();
         $bbbfile = $fs->create_file_from_string($bbbfilerecord, 'Presentation file content');
         file_prepare_draft_area($bbformdata->presentation,
-                context_module::instance($bbformdata->coursemodule)->id,
-                'mod_bigbluebuttonbn',
-                'presentation', 0);
+            context_module::instance($bbformdata->coursemodule)->id,
+            'mod_bigbluebuttonbn',
+            'presentation', 0);
         list($course, $bbactivitycmuser) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
         /** @var stored_file $mediafile */
         $mediafile =
@@ -102,10 +97,10 @@ class files_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_default_presentation_get_file() {
         $this->resetAfterTest();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $user = $this->generator->create_user();
+
+        list($user, $bbactivity) = $this->create_user_and_activity();
         $this->setUser($user);
-        $this->generator->enrol_user($user->id, $this->get_course()->id, 'editingteacher');
+
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         // From test_delete_original_file_from_draft (lib/test/filelib_test.php)
         // Create a bbb private file.
@@ -122,10 +117,10 @@ class files_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_pluginfile_filename() {
         $this->resetAfterTest();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $user = $this->generator->create_user();
+
+        list($user, $bbactivity, $bbactivitycm, $bbactivitycontext) = $this->create_user_and_activity();
         $this->setUser($user);
-        $this->generator->enrol_user($user->id, $this->get_course()->id, 'editingteacher');
+
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'presentation_cache');
         $noncekey = sha1($bbactivity->id);
         $presentationnonce = $cache->get($noncekey);
@@ -139,9 +134,10 @@ class files_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_get_media_file() {
         $this->resetAfterTest();
-        $user = $this->generator->create_user();
+
+        list($user, $bbactivity) = $this->create_user_and_activity();
         $this->setUser($user);
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $mediafilepath = files::get_media_file($bbformdata);
         $this->assertEmpty($mediafilepath);
@@ -167,4 +163,11 @@ class files_test extends \advanced_testcase {
         $this->assertEquals('/bbfile.pptx', $mediafilepath);
     }
 
+    protected function create_user_and_activity(): array {
+        $generator = $this->getDataGenerator();
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        $user = $generator->create_user();
+        $generator->enrol_user($user->id, $this->get_course()->id, 'editingteacher');
+        return [$user, $bbactivity, $bbactivitycm, $bbactivitycontext];
+    }
 }

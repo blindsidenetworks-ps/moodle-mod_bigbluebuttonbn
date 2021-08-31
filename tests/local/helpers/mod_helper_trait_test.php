@@ -40,13 +40,6 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
 class mod_helper_trait_test extends \advanced_testcase {
     use testcase_helper_trait;
     /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
-    /**
      * Presave test
      */
     public function test_bigbluebuttonbn_process_pre_save() {
@@ -107,16 +100,16 @@ class mod_helper_trait_test extends \advanced_testcase {
      * Post save
      */
     public function test_bigbluebuttonbn_process_post_save() {
-        global $CFG;
         $this->resetAfterTest();
 
+        $generator = $this->getDataGenerator();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
             $this->create_instance(null, ['type' => instance::TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
 
         // Enrol users in a course so he will receive the message.
-        $teacher = $this->generator->create_user(['role' => 'editingteacher']);
-        $this->generator->enrol_user($teacher->id, $this->get_course()->id);
+        $teacher = $generator->create_user(['role' => 'editingteacher']);
+        $generator->enrol_user($teacher->id, $this->get_course()->id);
 
         // Mark the form to trigger notification.
         $bbformdata->notification = true;
@@ -135,14 +128,15 @@ class mod_helper_trait_test extends \advanced_testcase {
     public function test_bigbluebuttonbn_process_post_save_notification() {
         $this->resetAfterTest();
 
+        $generator = $this->getDataGenerator();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
             $this->create_instance(null, ['type' => instance::TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
         $bbformdata->add = "1";
         $messagesink = $this->redirectMessages();
         // Enrol users in a course so he will receive the message.
-        $teacher = $this->generator->create_user(['role' => 'editingteacher']);
-        $this->generator->enrol_user($teacher->id, $this->get_course()->id);
+        $teacher = $generator->create_user(['role' => 'editingteacher']);
+        $generator->enrol_user($teacher->id, $this->get_course()->id);
         $bbformdata->notification = true;
         mod_helper::process_post_save($bbformdata);
         // Now run cron.

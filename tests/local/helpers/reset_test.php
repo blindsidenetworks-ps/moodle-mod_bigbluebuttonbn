@@ -25,8 +25,6 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use core_tag_tag;
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
@@ -41,13 +39,6 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  */
 class reset_test extends \advanced_testcase {
     use testcase_helper_trait;
-    /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
     /**
      * Reset course item test
      */

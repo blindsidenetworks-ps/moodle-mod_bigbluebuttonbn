@@ -22,10 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
+
 namespace mod_bigbluebuttonbn;
+
 use calendar_event;
 use context_module;
-use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use mod_bigbluebuttonbn_mod_form;
 use MoodleQuickForm;
@@ -47,14 +48,6 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  */
 class lib_test extends \advanced_testcase {
     use testcase_helper_trait;
-
-    /**
-     * Setup basic
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->basic_setup();
-    }
 
     /**
      * @covers ::bigbluebuttonbn_supports
@@ -103,7 +96,9 @@ class lib_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_user_outline() {
         $this->resetAfterTest();
-        $user = $this->generator->create_user();
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
         $this->setUser($user);
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -125,7 +120,9 @@ class lib_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_user_complete() {
         $this->resetAfterTest();
-        $user = $this->generator->create_user();
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $this->setUser($user);
 
@@ -143,7 +140,7 @@ class lib_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_get_extra_capabilities() {
         $this->resetAfterTest();
-        $this->assertEquals(array('moodle/site:accessallgroups'), bigbluebuttonbn_get_extra_capabilities());
+        $this->assertEquals(['moodle/site:accessallgroups'], bigbluebuttonbn_get_extra_capabilities());
     }
 
     /**
@@ -202,11 +199,13 @@ class lib_test extends \advanced_testcase {
         $data->reset_bigbluebuttonbn_tags = true;
         $data->course = $bbactivity->course;
         $results = bigbluebuttonbn_reset_userdata($data);
-        $this->assertEquals(array(
+        $this->assertEquals([
             'component' => 'BigBlueButton',
             'item' => 'Deleted tags',
-            'error' => false,
-        ), $results[0]);
+            'error' => false
+        ],
+            $results[0]
+        );
     }
 
     /**
@@ -238,7 +237,7 @@ class lib_test extends \advanced_testcase {
      */
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
         $this->resetAfterTest();
-        $this->assertEquals(array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'),
+        $this->assertEquals(['mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'],
             mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 
@@ -321,8 +320,10 @@ class lib_test extends \advanced_testcase {
     public function test_bigbluebuttonbn_extend_settings_navigation_user() {
         global $PAGE, $CFG;
         $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $user = $this->generator->create_user();
+        $user = $generator->create_user();
         $this->setUser($user);
         list($course, $bbactivitycmuser) = get_course_and_cm_from_instance($bbactivity->id, 'bigbluebuttonbn');
 
