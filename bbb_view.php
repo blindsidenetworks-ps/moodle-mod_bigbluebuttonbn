@@ -139,7 +139,8 @@ switch (strtolower($action)) {
         $meeting = new meeting($instance);
         if ($meeting->is_running()) {
             // Since the meeting is already running, we just join the session.
-            $meeting->join($origin);
+            $redirecturl = $meeting->join($origin);
+            redirect($redirecturl);
             break;
         }
 
@@ -167,7 +168,8 @@ switch (strtolower($action)) {
             // Moodle event logger: Create an event for meeting created.
             logger::log_meeting_created_event($instance);
             // Since the meeting is already running, we just join the session.
-            $meeting->join($origin);
+            $redirecturl = $meeting->join($origin);
+            redirect($redirecturl);
         } catch (server_not_available_exception $e) {
             bigbluebutton_proxy::handle_server_not_available($instance);
         }

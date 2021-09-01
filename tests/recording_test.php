@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider tests.
+ * Recording tests.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2018 - present, Blindside Networks Inc
@@ -28,7 +28,7 @@ namespace mod_bigbluebuttonbn;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
- * Privacy provider tests class.
+ * Recording test class.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2018 - present, Blindside Networks Inc
