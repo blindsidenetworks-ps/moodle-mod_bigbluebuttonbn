@@ -30,7 +30,6 @@ namespace mod_bigbluebuttonbn\local\proxy;
 
 use Exception;
 use SimpleXMLElement;
-use curl;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
@@ -96,88 +95,6 @@ abstract class proxy_base {
     }
 
     /**
-     * Perform api request on BBB and wraps the response in an XML object
-     *
-     * @param string $url
-     * @param string $method
-     * @param string $data
-     * @param string $contenttype
-     *
-     * @return object
-     */
-    public static function wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
-        if (extension_loaded('curl')) {
-            $response = self::wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
-            if (!$response) {
-                debugging('No response on wrap_simplexml_load_file', DEBUG_DEVELOPER);
-                return null;
-            }
-            $previous = libxml_use_internal_errors(true);
-            try {
-                $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-                if ($xml instanceof SimpleXMLElement) {
-                    return $xml;
-                }
-                $error = 'Issue retrieving information from the server: ' . $response;
-                debugging($error, DEBUG_DEVELOPER);
-                return null; // Return null of the return value is false.
-            } catch (Exception $e) {
-                libxml_use_internal_errors($previous);
-                $error = 'Caught exception: ' . $e->getMessage();
-                debugging($error, DEBUG_DEVELOPER);
-                return null;
-            }
-        }
-        // Alternative request non CURL based.
-        $previous = libxml_use_internal_errors(true);
-        try {
-            $response = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-            return $response;
-        } catch (Exception $e) {
-            $error = 'Caught exception: ' . $e->getMessage();
-            debugging($error, DEBUG_DEVELOPER);
-            libxml_use_internal_errors($previous);
-            return null;
-        }
-    }
-
-    /**
-     * Perform api request on BBB using CURL and wraps the response in an XML object
-     *
-     * @param string $url
-     * @param string $method
-     * @param string $data
-     * @param string $contenttype
-     *
-     * @return object|bool|string
-     */
-    public static function wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null,
-        $contenttype = 'text/xml') {
-        global $CFG;
-        require_once($CFG->libdir . '/filelib.php');
-        $c = new curl();
-        $c->setopt(array('SSL_VERIFYPEER' => true));
-        if ($method == 'POST') {
-            if (is_null($data) || is_array($data)) {
-                return $c->post($url);
-            }
-            $options = array();
-            $options['CURLOPT_HTTPHEADER'] = array(
-                'Content-Type: ' . $contenttype,
-                'Content-Length: ' . strlen($data),
-                'Content-Language: en-US',
-            );
-
-            return $c->post($url, $data, $options);
-        }
-        if ($method == 'HEAD') {
-            $c->head($url, array('followlocation' => true, 'timeout' => 1));
-            return $c->get_info();
-        }
-        return $c->get($url);
-    }
-
-    /**
      * Throw an exception if there is a problem in the returned XML value
      *
      * @param null|SimpleXMLElement $xml
@@ -222,6 +139,8 @@ abstract class proxy_base {
         array $data = [],
         array $metadata = []
     ): ?SimpleXMLElement {
-        return self::wrap_xml_load_file(self::action_url($action, $data, $metadata));
+        $curl = new curl();
+
+        return $curl->get(self::action_url($action, $data, $metadata));
     }
 }
