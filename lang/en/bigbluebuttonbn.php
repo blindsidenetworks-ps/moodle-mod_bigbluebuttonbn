@@ -82,6 +82,8 @@ $string['privacy:metadata:bigbluebuttonbn_logs:meta'] = 'May include extra infor
 $string['privacy:metadata:bigbluebutton'] = 'In order to create and join BigBlueButton sessions, user data needs to be exchanged with the server.';
 $string['privacy:metadata:bigbluebutton:userid'] = 'The userid of the user accessing the BigBlueButton server.';
 $string['privacy:metadata:bigbluebutton:fullname'] = 'The fullname of the user accessing the BigBlueButton server.';
+$string['privacy:metadata:bigbluebuttonbn_recordings'] = 'Stores metadata about recordings.';
+$string['privacy:metadata:bigbluebuttonbn_recordings:userid'] = 'The user ID of the user who last changed a recording.';
 
 $string['completionattendance'] = 'Student must attend the meeting for:';
 $string['completionattendancedesc'] = 'Student must attend the meeting and remain in the session for at least {$a} minute(s)';

@@ -50,13 +50,16 @@ class provider_test extends \core_privacy\tests\provider_testcase {
         $collection = new collection('mod_bigbluebuttonbn');
         $newcollection = provider::get_metadata($collection);
         $itemcollection = $newcollection->get_collection();
-        $this->assertCount(3, $itemcollection);
+        $this->assertCount(4, $itemcollection);
 
         $instancetable = array_shift($itemcollection);
         $this->assertEquals('bigbluebuttonbn', $instancetable->get_name());
 
         $instancelogstable = array_shift($itemcollection);
         $this->assertEquals('bigbluebuttonbn_logs', $instancelogstable->get_name());
+
+        $recordings = array_shift($itemcollection);
+        $this->assertEquals('bigbluebuttonbn_recordings', $recordings->get_name());
 
         $bigbluebuttonserver = array_shift($itemcollection);
         $this->assertEquals('bigbluebutton', $bigbluebuttonserver->get_name());
