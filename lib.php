@@ -462,7 +462,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
     $instance = instance::get_from_instanceid($bigbluebuttonbn->id);
     // Get if the room is available.
-    $roomavailable = $instance->is_room_available();
+    $roomavailable = $instance->is_currently_open();
     // Get if the user can join.
     $meetinginfo = meeting::get_meeting_info_for_instance($instance);
     $usercanjoin = $meetinginfo->canjoin;

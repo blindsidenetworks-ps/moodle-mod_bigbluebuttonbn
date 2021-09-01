@@ -231,7 +231,7 @@ class meeting {
                 $meetinginfo->canjoin = true;
             }
         }
-        if ($instance->is_room_available() && $instance->user_can_force_join()) {
+        if ($instance->is_currently_open() && $instance->user_can_force_join()) {
             $meetinginfo->canjoin = true;
         }
         // Double check that the user has the capabilities to join.

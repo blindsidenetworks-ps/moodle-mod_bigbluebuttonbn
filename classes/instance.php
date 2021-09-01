@@ -428,11 +428,7 @@ EOF;
             $groupid = $this->get_group_id();
         }
 
-        if ($groupid === null) {
-            return $baseid;
-        } else {
-            return sprintf('%s[%s]', $baseid, $groupid);
-        }
+        return sprintf('%s[%s]', $baseid, $groupid);
     }
 
     /**
@@ -775,18 +771,11 @@ EOF;
      */
     public function allow_recording_start_stop(): bool {
         if (!$this->is_recorded()) {
+            // If the meeting is not configured for recordings, do not allow it to be recorded.
             return false;
         }
 
-        if (!$this->should_record_from_start()) {
-            return true;
-        }
-
-        if ($this->should_show_recording_button()) {
-            return true;
-        }
-
-        return false;
+        return $this->should_show_recording_button();
     }
 
     /**
@@ -860,7 +849,7 @@ EOF;
             return false;
         }
 
-        return $closingtime <= time();
+        return $closingtime < time();
     }
 
     /**
@@ -1050,28 +1039,5 @@ EOF;
      */
     public function should_record() {
         return (boolean) config::recordings_enabled() && $this->is_recorded();
-    }
-
-
-    /**
-     * Check if room is available
-     *
-     */
-    public function is_room_available() {
-        $open = true;
-        $closed = false;
-        $timenow = time();
-        $timeopen = $this->get_instance_var('openingtime');
-        $timeclose = $this->get_instance_var('closingtime');
-        if (!empty($timeopen) && $timeopen > $timenow) {
-            $open = false;
-        }
-        if (!empty($timeclose) && $timenow > $timeclose) {
-            $closed = true;
-        }
-        if (!$open || $closed) {
-            return false;
-        }
-        return true;
     }
 }
