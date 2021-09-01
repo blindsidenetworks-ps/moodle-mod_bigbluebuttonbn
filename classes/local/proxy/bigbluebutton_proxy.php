@@ -205,58 +205,6 @@ class bigbluebutton_proxy extends proxy_base {
     }
 
     /**
-     * Helper function enqueues one user for being validated as for completion.
-     *
-     * @param object $bigbluebuttonbn
-     * @param string $userid
-     * @return void
-     */
-    public static function enqueue_completion_event($bigbluebuttonbn, $userid): void {
-        try {
-            // Create the instance of completion_update_state task.
-            $task = new \mod_bigbluebuttonbn\task\completion_update_state();
-            // Add custom data.
-            $data = array(
-                'bigbluebuttonbn' => $bigbluebuttonbn,
-                'userid' => $userid,
-            );
-            $task->set_custom_data($data);
-            // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for overriding.
-            // $ task -> set_userid ( $ user -> id );.
-            // Enqueue it.
-            \core\task\manager::queue_adhoc_task($task);
-        } catch (Exception $e) {
-            mtrace("Error while enqueuing completion_update_state task. " . (string) $e);
-        }
-    }
-
-    /**
-     * Helper function enqueues completion trigger.
-     *
-     * @param object $bigbluebuttonbn
-     * @param string $userid
-     * @return void
-     */
-    public static function update_completion_state($bigbluebuttonbn, $userid) {
-        global $CFG;
-        require_once($CFG->libdir . '/completionlib.php');
-        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
-        $completion = new completion_info($course);
-        if (!$completion->is_enabled($cm)) {
-            mtrace("Completion not enabled");
-            return;
-        }
-
-        $bbbcompletion = new custom_completion($cm, $userid);
-        if ($bbbcompletion->get_overall_completion_state()) {
-            mtrace("Completion succeeded for user $userid");
-            $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
-        } else {
-            mtrace("Completion did not succeed for user $userid");
-        }
-    }
-
-    /**
      * Helper function returns an array with the profiles (with features per profile) for the different types
      * of bigbluebuttonbn instances.
      *

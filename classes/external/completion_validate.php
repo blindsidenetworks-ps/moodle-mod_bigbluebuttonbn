@@ -20,8 +20,8 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use moodle_exception;
 
 /**
@@ -73,7 +73,7 @@ class completion_validate extends external_api {
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         foreach ($users as $user) {
             // Enqueue a task for processing the completion.
-            bigbluebutton_proxy::enqueue_completion_event( $instance->get_instance_data(), $user->id);
+            custom_completion::enqueue_completion_event( $instance->get_instance_data(), $user->id);
         }
         // We might want to return a status here or some warnings.
         return [];

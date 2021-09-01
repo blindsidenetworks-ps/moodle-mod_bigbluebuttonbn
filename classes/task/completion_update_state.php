@@ -17,7 +17,7 @@
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
-use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\completion\custom_completion;
 
 /**
  * Class containing the scheduled task for lti module.
@@ -31,11 +31,13 @@ class completion_update_state extends adhoc_task {
      * Run bigbluebuttonbn cron.
      */
     public function execute() {
+        global $USER;
+
         // Get the custom data.
         $data = $this->get_custom_data();
-        mtrace("Task completion_update_state running for user {$data->userid}");
+        mtrace("Task completion_update_state running for user {$USER->id}");
 
         // Process the completion.
-        bigbluebutton_proxy::update_completion_state($data->bigbluebuttonbn, $data->userid);
+        custom_completion::update_completion_state($data->bigbluebuttonbn);
     }
 }

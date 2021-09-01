@@ -20,6 +20,7 @@ use cache;
 use cache_store;
 use core_tag_tag;
 use Exception;
+use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
@@ -462,7 +463,7 @@ class meeting {
             logger::log_event_summary($instance, $overrides, $meta);
 
             // Enqueue a task for processing the completion.
-            bigbluebutton_proxy::enqueue_completion_event($instance->get_instance_data(), $userid);
+            custom_completion::enqueue_completion_event($instance->get_instance_data(), $userid);
         }
     }
 

@@ -150,4 +150,56 @@ class custom_completion extends activity_custom_completion {
             'completionattendance',
         ];
     }
+
+    /**
+     * Helper function enqueues one user for being validated as for completion.
+     *
+     * @param object $bigbluebuttonbn
+     * @param string $userid
+     * @return void
+     */
+    public static function enqueue_completion_event($bigbluebuttonbn, $userid): void {
+        try {
+            // Create the instance of completion_update_state task.
+            $task = new \mod_bigbluebuttonbn\task\completion_update_state();
+            $task->set_userid($userid);
+
+            // Add custom data.
+            $task->set_custom_data([
+                'bigbluebuttonbn' => $bigbluebuttonbn,
+            ]);
+
+            // Queue it.
+            \core\task\manager::queue_adhoc_task($task);
+        } catch (Exception $e) {
+            mtrace("Error while queuing completion_update_state task. " . (string) $e);
+        }
+    }
+
+    /**
+     * Helper function enqueues completion trigger.
+     *
+     * @param object $bigbluebuttonbn
+     * @param string $userid
+     * @return void
+     */
+    public static function update_completion_state($bigbluebuttonbn, $userid) {
+        global $CFG;
+        require_once($CFG->libdir . '/completionlib.php');
+        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
+        $completion = new completion_info($course);
+        if (!$completion->is_enabled($cm)) {
+            mtrace("Completion not enabled");
+            return;
+        }
+
+        $bbbcompletion = new custom_completion($cm, $userid);
+        if ($bbbcompletion->get_overall_completion_state()) {
+            mtrace("Completion succeeded for user $userid");
+            $completion->update_state($cm, COMPLETION_COMPLETE, $userid, true);
+        } else {
+            mtrace("Completion did not succeed for user $userid");
+        }
+    }
+
 }

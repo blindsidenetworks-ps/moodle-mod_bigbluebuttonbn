@@ -395,6 +395,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2021090100) {
+        $rs = $DB->get_recordset('task_adhoc', 'classname', '\mod_bigbluebuttonbn\task\custom_completion');
+        foreach ($rs as $row) {
+            $customdata = json_decode($row->customdata);
+            if (property_exists($customdata, 'userid')) {
+                $DB->set_field('task_adhoc', 'userid', $customdata->userid, ['id' => $row->id]);
+            } else {
+                $DB->delete_records('task_adhoc', ['id' => $row->id]);
+            }
+        }
+        $rs->close();
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021090100, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 
