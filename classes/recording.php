@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use context_course;
+use context_module;
 use core\persistent;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
@@ -153,7 +154,7 @@ class recording extends persistent {
         }
 
         if ($excludedinstanceid) {
-            [$sqlexcluded, $paramexcluded] = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, false);
+            [$sqlexcluded, $paramexcluded] = $DB->get_in_or_equal($excludedinstanceid, SQL_PARAMS_NAMED, 'param', false);
             $selects[] = "bigbluebuttonbnid {$sqlexcluded}";
             $params = array_merge($params, $paramexcluded);
         }

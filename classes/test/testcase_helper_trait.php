@@ -17,6 +17,8 @@
 namespace mod_bigbluebuttonbn\test;
 
 use context_module;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\meeting;
 use stdClass;
 use testing_data_generator;
 
@@ -137,11 +139,65 @@ trait testcase_helper_trait {
         return array($course, $groups, $students, $teachers, $bbactivity, $roleids);
     }
 
+    /**
+     * This test requires mock server to be present.
+     */
     protected function require_mock_server(): void {
         if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
             $this->markTestSkipped(
                 'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
             );
         }
+    }
+
+    /**
+     * Create an return an array of recordings
+     *
+     * @param instance $instance
+     * @param array $recordingdata array of recording information
+     * @return array
+     * @throws \coding_exception
+     */
+    protected function create_recordings_for_instance($instance, $recordingdata = []) {
+        $recordings = [];
+        $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+        // Create the meetings on the mock server, so like this we can find the recordings.
+        $bbbgenerator->create_meeting([
+            'instanceid' => $instance->get_instance_id(),
+            'groupid' => $instance->get_group_id()
+
+        ]);
+        if (!is_array($recordingdata) && is_int($recordingdata)) {
+            $recordingdata = array_pad([], (int) $recordingdata, []);
+        }
+        foreach ($recordingdata as $rindex => $data) {
+            $recordings[] = $bbbgenerator->create_recording(
+                array_merge([
+                    'bigbluebuttonbnid' => $instance->get_instance_id(),
+                    'groupid' => $instance->get_group_id()
+                ], $data)
+            );
+        }
+        return $recordings;
+    }
+
+    protected function create_activity_with_recordings($course, int $type, array $recordingdata, $groupid = 0): array {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+
+        $activity = $generator->create_instance([
+            'course' => $course->id,
+            'type' => $type
+        ]);
+
+        $instance = instance::get_from_instanceid($activity->id);
+        $instance->set_group_id($groupid);
+        $recordings = $this->create_recordings_for_instance($instance, $recordingdata);
+        return [
+            'course' => $course,
+            'activity' => $activity,
+            'recordings' => $recordings,
+        ];
     }
 }

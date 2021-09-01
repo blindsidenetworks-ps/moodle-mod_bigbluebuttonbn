@@ -278,10 +278,6 @@ EOF;
         return empty($this->groupid) ? 0 : $this->groupid;
     }
 
-    public function get_recordings(bool $includedeleted, bool $includeimported, bool $onlyimported): array {
-        return recordings::get_recordings_for_instance($instance, $includedeleted, $includeimported, $onlyimported);
-    }
-
     /**
      * Check whether this instance is configured to use a group.
      *
@@ -1039,5 +1035,29 @@ EOF;
      */
     public function should_record() {
         return (boolean) config::recordings_enabled() && $this->is_recorded();
+    }
+
+    /**
+     * Get recordings for this instance
+     */
+    public function get_recordings($excludedid = []) {
+        // Fetch the list of recordings depending on the status of the instance.
+        // show room is enabled for TYPE_ALL and TYPE_ROOM_ONLY.
+        if ($this->is_feature_enabled('showroom')) {
+            // Not in the import page.
+            return recording::get_recordings_for_instance(
+                $this,
+                $this->get_instance_var('recordings_deleted'),
+                $this->is_feature_enabled('importrecordings'),
+                $this->get_instance_var('recordings_imported'),
+            );
+        }
+        // We show all recording from this course as this is TYPE_RECORDING.
+        return recording::get_recordings_for_course(
+            $this->get_course(),
+            $excludedid,
+            $this->get_instance_var('recordings_deleted'),
+            $this->is_feature_enabled('importrecordings')
+        );
     }
 }
