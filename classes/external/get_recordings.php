@@ -113,8 +113,6 @@ class get_recordings extends external_api {
             }
             $instance->set_group_id($groupid);
         }
-
-        $enabledfeatures = $instance->get_enabled_features();
         $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
 
         if ($tools === null) {
@@ -122,26 +120,8 @@ class get_recordings extends external_api {
         }
         $tools = explode(',', $tools);
 
-        // Fetch the list of recordings.
-        // TODO: Check if all groups are accessible here. Check if it is possible or not to see
-        // other recordings from other groups. Maybe we will need to add a groupid column to the recording table.
-        if ($enabledfeatures['showroom']) {
-            // Not in the import page.
-            $recordings = recording::get_recordings_for_instance(
-                $instance,
-                $instance->get_instance_var('recordings_deleted'),
-                $enabledfeatures['importrecordings'],
-                $instance->get_instance_var('recordings_imported'),
-            );
-        } else {
-            $recordings = recording::get_recordings_for_course(
-                $instance->get_course(),
-                [$instance->get_instance_id()], // Exclude itself.
-                $instance->get_instance_var('recordings_deleted'),
-                $enabledfeatures['importrecordings'],
-                $instance->get_instance_var('recordings_imported'),
-            );
-        }
+        // Exclude itself from the list if in import mode.
+        $recordings = $instance->get_recordings($removeimportedid ? [$instance->get_instance_id()] : []);
         if ($removeimportedid) {
             // Remove recording already imported in this specific activity.
             $destinationinstance = instance::get_from_instanceid($removeimportedid);

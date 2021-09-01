@@ -15,25 +15,26 @@ Feature: Manage and list recordings
     And the following "activities" exist:
       | activity        | name            | intro                              | course | idnumber         | type | recordings_imported |
       | bigbluebuttonbn | RoomRecordings  | Test Room Recording description    | C1     | bigbluebuttonbn1 | 0    | 0                   |
-      | bigbluebuttonbn | RecordingsOnly1 | Test Recordings only description 1 | C2     | bigbluebuttonbn3 | 2    | 1                   |
+      | bigbluebuttonbn | RoomRecordings1 | Test Recordings description 1      | C2     | bigbluebuttonbn2 | 0    | 1                   |
+      | bigbluebuttonbn | RecordingOnly   | Test Recordings only description 1 | C2     | bigbluebuttonbn3 | 2    | 1                   |
     And the following "mod_bigbluebuttonbn > meeting" exists:
-      | activity         | RoomRecordings |
+      | activity | RoomRecordings |
     And the following "mod_bigbluebuttonbn > recordings" exist:
-      | bigbluebuttonbn | name        |
-      | RoomRecordings  | Recording 1 |
-      | RoomRecordings  | Recording 2 |
+      | bigbluebuttonbn | name        | status |
+      | RoomRecordings  | Recording 1 | 3      |
+      | RoomRecordings  | Recording 2 | 3      |
 
   @javascript
   Scenario: I check we display the right information (Recording Name as name and Description)
-    When I am on the "RecordingsOnly1" "bigbluebuttonbn activity" page logged in as "admin"
+    When I am on the "RoomRecordings1" "bigbluebuttonbn activity" page logged in as "admin"
     # We check column names regarding changes made in CONTRIB-7703.
     Then I should not see "Recording" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
     And I should not see "Meeting" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
     And I should see "Name" in the ".mod_bigbluebuttonbn_recordings_table thead" "css_element"
 
   @javascript
-  Scenario: I check that I can import recordings into the Recording Only activity from other activities
-    When I am on the "RecordingsOnly1" "bigbluebuttonbn activity" page logged in as "admin"
+  Scenario Outline: I check that I can import recordings into the Recording activity from other activities
+    When I am on the "<recordingname>" "bigbluebuttonbn activity" page logged in as "admin"
     And I click on "Import recording links" "button"
     And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
     And I select "RoomRecordings" from the "frombn" singleselect
@@ -42,13 +43,18 @@ Feature: Manage and list recordings
     # add the second recording
     And I click on "a.action-icon" "css_element" in the "Recording 2" "table_row"
     And I click on "Go back" "button"
-    Then "Recording 1" "table_row" should exist
-    And "Recording 2" "table_row" should exist
+    Then "Recording 1" "table_row" <existence>
+    And "Recording 2" "table_row" <existence>
+    Examples:
+      | recordingname   | existence    |
+      | RecordingOnly | should exist |
+      | RoomRecordings1   | should exist |
+
 
   @javascript
-  Scenario: I check that I can import recordings into the Recording Only activity and then if I delete them
+  Scenario: I check that I can import recordings into the Recording activity and then if I delete them
   they are back into the pool to be imported again
-    When I am on the "RecordingsOnly1" "bigbluebuttonbn activity" page logged in as "admin"
+    When I am on the "RoomRecordings1" "bigbluebuttonbn activity" page logged in as "admin"
     And I click on "Import recording links" "button"
     And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
     And I select "RoomRecordings" from the "frombn" singleselect

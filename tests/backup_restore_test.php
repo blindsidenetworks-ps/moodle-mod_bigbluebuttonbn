@@ -46,122 +46,144 @@ class backup_restore_test extends restore_date_testcase {
     public function setUp(): void {
         parent::setUp();
 
+        $this->require_mock_server();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
     }
 
     /**
-     * @dataProvider type_provider
+     * All instance types
      */
-    public function test_backup_restore($type): void {
+    const ALL_TYPES = [
+        'Instance Type ALL' => instance::TYPE_ALL,
+        'Instance Type Recording Only' => instance::TYPE_RECORDING_ONLY,
+        'Instance Room Only' => instance::TYPE_ROOM_ONLY
+    ];
+
+    /**
+     * Test backup restore (basic)
+     */
+    public function test_backup_restore(): void {
         global $DB;
         $this->resetAfterTest();
-        $bbactivity = $this->getDataGenerator()->create_module(
-            'bigbluebuttonbn',
-            ['course' => $this->get_course()->id, 'type' => $type],
-            ['visible' => true]
-        );
+        $bbactivity = [];
+        foreach (self::ALL_TYPES as $key => $type) {
+            list($bbactivitycontext, $bbactivitycm, $bbactivity[$type])
+                = $this->create_instance($this->get_course(), ['type' => $type]);
+        }
 
         $newcourseid = $this->backup_and_restore($this->get_course());
-        $newbbb = $DB->get_record('bigbluebuttonbn', ['course' => $newcourseid], '*', MUST_EXIST); // One record.
-        $this->assertNotFalse($newbbb);
-        $filterfunction = function($key) {
-            return !in_array($key, ['course', 'cmid', 'id', 'course']);
-        };
-        $this->assertEquals(
-            array_filter((array) $bbactivity, $filterfunction, ARRAY_FILTER_USE_KEY),
-            array_filter((array) $newbbb, $filterfunction, ARRAY_FILTER_USE_KEY)
-        );
+
+        foreach (self::ALL_TYPES as $key => $type) {
+            $newbbb =
+                $DB->get_record('bigbluebuttonbn', ['course' => $newcourseid, 'type' => $type], '*', MUST_EXIST);
+            // One record.
+            $this->assert_bbb_activities_same($bbactivity[$type], $newbbb);
+        }
     }
 
     /**
-     * Instance type provider
+     * @var $RECORDINGS_DATA array fake recording data.
+     */
+    const RECORDINGS_DATA = [
+        ['name' => 'Recording 1'],
+        ['name' => 'Recording 2'],
+    ];
+
+    /**
+     * Check backup restore with recordings
      *
-     * @return array
      */
-    public function type_provider(): array {
-        return [
-            'Instance Type ALL' => [instance::TYPE_ALL],
-            'Instance Type Recording Only' => [instance::TYPE_RECORDING_ONLY],
-            'Instance  Room Only' => [instance::TYPE_ROOM_ONLY]
-        ];
-    }
-
-    /**
-     * @dataProvider type_provider
-     */
-    public function test_backup_restore_with_recordings($type): void {
+    public function test_backup_restore_with_recordings(): void {
         global $DB;
         $this->resetAfterTest();
-
-        $this->require_mock_server();
-
-        $nbrecordings = 2; // Two recordings for now.
+        set_config('bigbluebuttonbn_importrecordings_enabled', 1);
         // This is for imported recording.
         $generator = $this->getDataGenerator();
         $othercourse = $generator->create_course();
-        $bbactivityothercourse = $generator->create_module(
-            'bigbluebuttonbn',
-            ['course' => $this->get_course()->id, 'type' => instance::TYPE_ALL],
-            ['visible' => true]
-        );
-        $bbactivitysamecourse = $generator->create_module(
-            'bigbluebuttonbn',
-            ['course' => $this->get_course()->id, 'type' => instance::TYPE_ALL],
-            ['visible' => true]
-        );
+        $otherbbbactivities = [];
+        // Other course.
+        $recordingstoimport = [];
 
-        $bbactivity = $generator->create_module(
-            'bigbluebuttonbn',
-            ['course' => $this->get_course()->id, 'type' => $type, 'name' => 'BBB Activity'],
-            ['visible' => true]
-        );
-
-        $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-        $i = 0;
-        $recordingactivitylist = [
-            $bbactivityothercourse->id,
-            $bbactivitysamecourse->id
-        ];
-        if ($type === instance::TYPE_ALL) {
-            $recordingactivitylist[] = $bbactivity->id;
-        }
-        foreach ($recordingactivitylist as $bbbactivityid) {
-            foreach (range(1, $nbrecordings) as $rindex) {
-                $recordings[] = $bbbgenerator->create_recording(array_merge([
-                    'bigbluebuttonbnid' => $bbbactivityid,
-                    'name' => "PR Recording {$rindex}.{$i}"
-                ]));
-                $i++;
+        list('activity' => $otherbbbactivities[], 'recordings' => $recordings) =
+            $this->create_activity_with_recordings($othercourse,
+                instance::TYPE_ALL, self::RECORDINGS_DATA
+            );
+        $recordingstoimport = array_merge($recordingstoimport, $recordings);
+        list('activity' => $otherbbbactivities[], 'recordings' => $recordings) =
+            $this->create_activity_with_recordings($this->get_course(),
+                instance::TYPE_ALL, self::RECORDINGS_DATA
+            );
+        $recordingstoimport = array_merge($recordingstoimport, $recordings);
+        // Create a set of recordings and imported recordings.
+        // We have nbrecording per bb activity, except for roomonly recordings which have the imported recordings.
+        $bbactivity = [];
+        foreach (self::ALL_TYPES as $key => $type) {
+            $bbactivity[$type] = $this->getDataGenerator()->create_module(
+                'bigbluebuttonbn',
+                ['course' => $this->get_course()->id, 'type' => $type, 'name' => 'BBB Activity:' . $key],
+                ['visible' => true]
+            );
+            $instance = instance::get_from_instanceid($bbactivity[$type]->id);
+            // Create recording except for TYPE_RECORDING_ONLY Only.
+            if ($instance->is_feature_enabled('showroom')) {
+                $this->create_recordings_for_instance(instance::get_from_instanceid($bbactivity[$type]->id),
+                    self::RECORDINGS_DATA);
+            }
+            // Then import the recordings into the instance.
+            if ($instance->is_feature_enabled('importrecordings')) {
+                foreach ($recordingstoimport as $rec) {
+                    $rentity = recording::get_record(['id' => $rec->id]);
+                    if ($rentity->get('bigbluebuttonbnid') != $instance->get_instance_id()) {
+                        $rentity->create_imported_recording($instance);
+                    }
+                }
             }
         }
-        // Then import the recordings into the instance.
-        $instance = instance::get_from_instanceid($bbactivity->id);
-        foreach ($recordings as $rec) {
-            $rentity = recording::get_record(['id' => $rec->id]);
-            if ($rentity->get('bigbluebuttonbnid') != $instance->get_instance_id()) {
-                $rentity->create_imported_recording($instance);
-            }
-        }
+
+        // Backup and restore steps.
+        $nbrecordings = count(self::RECORDINGS_DATA);
         $newcourseid = $this->backup_and_restore($this->get_course());
-        $newbbb = $DB->get_record('bigbluebuttonbn', ['course' => $newcourseid, 'name' => 'BBB Activity'], '*',
-            MUST_EXIST); // One record.
-        $this->assertNotFalse($newbbb);
+
+        // Now checks.
+        foreach (self::ALL_TYPES as $key => $type) {
+            $newbbb =
+                $DB->get_record('bigbluebuttonbn',
+                    ['course' => $newcourseid, 'type' => $type, 'name' => 'BBB Activity:' . $key],
+                    '*',
+                    MUST_EXIST); // One record.
+            $this->assert_bbb_activities_same($bbactivity[$type], $newbbb);
+            $newinstance = instance::get_from_instanceid($newbbb->id);
+
+            $instancerecordings = $newinstance->get_recordings();
+            // Type ROOM_ONLY & TYPE_ALL : all assigned recordings (NB_RECORDINGS).
+            // Type TYPE_RECORDING_ONLY: all recordings from this course (i.e.
+            // existing recording (NB_RECORDING) + ROOM_ONLY(NB_RECORDING)  + TYPE_ALL (NB_RECORDING)).
+            $expectedcount = $type == instance::TYPE_RECORDING_ONLY ? $nbrecordings * 3 : $nbrecordings;
+            // Type ROOM_ONLY & TYPE_ALL : The imported recording (NB_RECORDING*2 here)
+            // Type TYPE_RECORDING_ONLY: imported recordings we add the imported recording from the other activity (TYPE_ALL).
+            $expectedcount += $type == instance::TYPE_RECORDING_ONLY ? count($recordingstoimport) : 0;
+            // We managed to import recording in this activity, so let's add them.
+            $expectedcount += $newinstance->is_feature_enabled('importrecordings') ? count($recordingstoimport) : 0;
+            $this->assertCount($expectedcount,
+                $instancerecordings, 'Wrong count for instance Type:' . $key);
+            // Then check imported recordings.
+            foreach ($instancerecordings as $rec) {
+                if ($rec->get('imported')) {
+                    $importeddata = json_decode($rec->get('importeddata'));
+                    $this->assertNotEmpty($importeddata);
+                }
+            }
+        }
+    }
+
+    protected function assert_bbb_activities_same($bbboriginal, $bbbdest) {
+        $this->assertNotFalse($bbbdest);
         $filterfunction = function($key) {
             return !in_array($key, ['course', 'cmid', 'id', 'course']);
         };
         $this->assertEquals(
-            array_filter((array) $bbactivity, $filterfunction, ARRAY_FILTER_USE_KEY),
-            array_filter((array) $newbbb, $filterfunction, ARRAY_FILTER_USE_KEY)
+            array_filter((array) $bbboriginal, $filterfunction, ARRAY_FILTER_USE_KEY),
+            array_filter((array) $bbbdest, $filterfunction, ARRAY_FILTER_USE_KEY)
         );
-        $newinstance = instance::get_from_instanceid($newbbb->id);
-        if ($type === instance::TYPE_ALL) {
-            $this->assertCount($nbrecordings, recording::get_recordings_for_instance($newinstance));
-        } else {
-            // This type of recording has not got it own recordings.
-            $this->assertCount(0, recording::get_recordings_for_instance($newinstance));
-        }
-        $this->assertCount($nbrecordings * ($type === instance::TYPE_ALL ? 3 : 2),
-            recording::get_recordings_for_instance($newinstance, false, true, false));
     }
-
 }
