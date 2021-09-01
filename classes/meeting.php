@@ -25,7 +25,6 @@ use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\logger;
 use moodle_url;
 use stdClass;
 
@@ -470,13 +469,14 @@ class meeting {
      * Join the meeting.
      *
      * @param int $origin The spec
+     * @return moodle_url redirecturl
      */
-    public function join(int $origin): void {
+    public function join(int $origin): moodle_url {
         $this->do_get_meeting_info(true);
 
         if ($this->is_running() && !$this->can_join()) {
             // No more users allowed to join.
-            redirect($this->instance->get_logout_url());
+            return $this->instance->get_logout_url();
         }
 
         // Moodle event logger: Create an event for meeting joined.
@@ -484,8 +484,6 @@ class meeting {
 
         // Before executing the redirect, increment the number of participants.
         roles::participant_joined($this->instance->get_meeting_id(), $this->instance->does_current_user_count_towards_user_limit());
-
-        // Execute the redirect.
-        redirect($this->get_join_url());
+        return new moodle_url($this->get_join_url());
     }
 }
