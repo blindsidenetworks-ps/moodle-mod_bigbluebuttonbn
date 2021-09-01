@@ -585,3 +585,5 @@ $string['view_mobile_message_groups_not_supported'] = 'This instance is enable t
 $string['end_session_confirm_title'] = 'Really end session?';
 $string['end_session_confirm'] = 'Are you sure you want to end the virtual classroom session?';
 $string['end_session_notification'] = 'The session has now been closed.';
+$string['cachedef_serverinfo'] = 'Remote server information';
+$string['cachedef_recordings'] = 'Recording metadata';
