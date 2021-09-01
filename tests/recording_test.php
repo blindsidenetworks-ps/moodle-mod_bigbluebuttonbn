@@ -25,6 +25,8 @@
 
 namespace mod_bigbluebuttonbn;
 
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
+
 /**
  * Privacy provider tests class.
  *
@@ -36,44 +38,13 @@ namespace mod_bigbluebuttonbn;
  * @coversDefaultClass \mod_bigbluebuttonbn\recording
  */
 class recording_test extends \advanced_testcase {
+    use testcase_helper_trait;
 
     public function setUp(): void {
         parent::setUp();
 
         $this->require_mock_server();
         $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
-    }
-
-    protected function create_activity_with_recordings(int $type, array $recordingdata): array {
-        $this->resetAfterTest();
-
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-
-        $course = $this->getDataGenerator()->create_course(['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS]);
-
-        $activity = $generator->create_instance([
-            'course' => $course->id,
-            'type' => $type,
-        ]);
-        $generator->create_meeting([
-            'instanceid' => $activity->id,
-        ]);
-
-        $recordings = [];
-        $i = 0;
-        foreach ($recordingdata as $data) {
-            $recordings[] = $generator->create_recording(array_merge([
-                'bigbluebuttonbnid' => $activity->id,
-                'name' => "Pre-Recording $i",
-            ], $data));
-            $i++;
-        }
-
-        return [
-            'course' => $course,
-            'activity' => $activity,
-            'recordings' => $recordings,
-        ];
     }
 
     /**
@@ -83,7 +54,8 @@ class recording_test extends \advanced_testcase {
      * @covers ::get
      */
     public function test_get_allrecordings_status_refresh(int $status) {
-        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [['status' => $status]]);
+        ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
+            instance::TYPE_ALL, [['status' => $status]]);
 
         $this->assertEquals($status, (new recording($recordings[0]->id))->get('status'));
     }
@@ -92,7 +64,8 @@ class recording_test extends \advanced_testcase {
      * @covers ::get_name
      */
     public function test_get_name(): void {
-        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [['name' => 'Example name']]);
+        ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
+            instance::TYPE_ALL, [['name' => 'Example name']]);
 
         $this->assertEquals('Example name', (new recording($recordings[0]->id))->get('name'));
     }
@@ -101,7 +74,8 @@ class recording_test extends \advanced_testcase {
      * @covers ::get_description
      */
     public function test_get_description(): void {
-        ['recordings' => $recordings] = $this->create_activity_with_recordings(instance::TYPE_ALL, [[
+        ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
+            instance::TYPE_ALL, [[
             'description' => 'Example description',
         ]]);
 
@@ -119,17 +93,15 @@ class recording_test extends \advanced_testcase {
      * Test for bigbluebuttonbn_get_allrecordings()
      *
      * @param int $type The activity type
-     * @param int $recordingcount The amount of recordings to create
-     * @dataProvider get_allrecordings_provider
+     * @dataProvider get_allrecordings_types_provider
      * @covers ::get_recordings_for_instance
      */
-    public function test_get_allrecordings(int $type, int $recordingcount): void {
+    public function test_get_allrecordings(int $type): void {
         $this->resetAfterTest();
-
-        [
-            'activity' => $activity,
-            'course' => $course,
-        ] = $this->create_activity_with_recordings($type, array_pad([], $recordingcount, []));
+        $recordingcount = 2; // Two recordings only.
+        list('activity' => $activity) =
+            $this->create_activity_with_recordings($this->get_course(),
+                $type, array_pad([], $recordingcount, []));
 
         // Fetch the recordings for the instance.
         // The count shoudl match the input count.
@@ -137,19 +109,16 @@ class recording_test extends \advanced_testcase {
         $this->assertCount($recordingcount, $recordings);
     }
 
-    public function get_allrecordings_provider(): array {
+    public function get_allrecordings_types_provider(): array {
         return [
-            [
-                'type' => instance::TYPE_ALL,
-                'recordingcount' => 2,
+            'Instance Type ALL' => [
+                'type' => instance::TYPE_ALL
             ],
-            [
-                'type' => instance::TYPE_ALL,
-                'recordingcount' => 3,
+            'Instance Type ROOM Only' => [
+                'type' => instance::TYPE_ROOM_ONLY,
             ],
-            [
-                'type' => instance::TYPE_RECORDING_ONLY,
-                'recordingcount' => 3,
+            'Instance Type Recording only' => [
+                'type' => instance::TYPE_RECORDING_ONLY
             ],
         ];
     }
@@ -157,9 +126,9 @@ class recording_test extends \advanced_testcase {
     /**
      * Test for bigbluebuttonbn_get_allrecordings().
      *
-     * TODO: rewrite this with @dataProvider
+     * @dataProvider get_allrecordings_types_provider
      */
-    public function test_get_recording_for_group() {
+    public function test_get_recording_for_group($type) {
         $this->resetAfterTest(true);
 
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
@@ -180,74 +149,52 @@ class recording_test extends \advanced_testcase {
 
         $activity = $plugingenerator->create_instance([
             'course' => $testcourse->id,
-            'type' => instance::TYPE_ALL,
-            'name' => 'Example',
+            'type' => $type,
+            'name' => 'Example'
         ]);
-        $plugingenerator->create_meeting([
-            'instanceid' => $activity->id,
-        ]);
-
-        // Create two recordings for all groups.
-        $plugingenerator->create_recording([
-            'bigbluebuttonbnid' => $activity->id,
-            'name' => "Pre-Recording 1",
-        ]);
-        $plugingenerator->create_recording([
-            'bigbluebuttonbnid' => $activity->id,
-            'name' => "Pre-Recording 2",
-        ]);
-
-        $plugingenerator->create_meeting([
-            'instanceid' => $activity->id,
-            'groupid' => $group1->id,
-        ]);
-        $recording1 = $plugingenerator->create_recording([
-            'bigbluebuttonbnid' => $activity->id,
-            'groupid' => $group1->id,
-            'name' => 'Group 1 Recording 1',
-        ]);
-
-        $plugingenerator->create_meeting([
-            'instanceid' => $activity->id,
-            'groupid' => $group2->id,
-        ]);
-        $recording2 = $plugingenerator->create_recording([
-            'bigbluebuttonbnid' => $activity->id,
-            'groupid' => $group2->id,
-            'name' => 'Group 2 Recording 1',
-        ]);
+        $instance = instance::get_from_instanceid($activity->id);
+        $instance->set_group_id(0);
+        $this->create_recordings_for_instance($instance,  [['name' => "Pre-Recording 1"], ['name' => "Pre-Recording 2"]]);
+        $instance->set_group_id($group1->id);
+        $this->create_recordings_for_instance($instance,  [['name' => "Group 1 Recording 1"]]);
+        $instance->set_group_id($group2->id);
+        $this->create_recordings_for_instance($instance,  [['name' => "Group 2 Recording 1"]]);
 
         $this->setUser($student1);
         $instance1 = instance::get_from_instanceid($activity->id);
         $instance1->set_group_id($group1->id);
         $recordings = recording::get_recordings_for_instance($instance1);
         $this->assertCount(1, $recordings);
-        $this->assertEquals('Group 1 Recording 1', $recordings[$recording1->id]->get('name'));
+        $this->assert_has_recording_by_name('Group 1 Recording 1', $recordings);
 
         $this->setUser($student2);
         $instance2 = instance::get_from_instanceid($activity->id);
         $instance2->set_group_id($group2->id);
         $recordings = recording::get_recordings_for_instance($instance2);
         $this->assertCount(1, $recordings);
-        $this->assertEquals('Group 2 Recording 1', $recordings[$recording2->id]->get('name'));
+        $this->assert_has_recording_by_name('Group 2 Recording 1', $recordings);
 
         $this->setUser($student3);
         $instance3 = instance::get_from_instanceid($activity->id);
         $recordings = recording::get_recordings_for_instance($instance3);
         $this->assertIsArray($recordings);
+        $this->assertCount(4, $recordings);
+        $this->assert_has_recording_by_name('Pre-Recording 1', $recordings);
+        $this->assert_has_recording_by_name('Pre-Recording 2', $recordings);
+
+    }
+
+    /**
+     * Check that a recording exist in the list of recordings
+     *
+     * @param $recordingname
+     * @param $recordings
+     */
+    public function assert_has_recording_by_name($recordingname, $recordings) {
         $recordingnames = array_map(function($r) {
             return $r->get('name');
         }, $recordings);
-        $this->assertCount(4, $recordingnames);
-        $this->assertContains('Pre-Recording 1', $recordingnames);
-        $this->assertContains('Pre-Recording 2', $recordingnames);
+        $this->assertContains($recordingname, $recordingnames);
     }
 
-    protected function require_mock_server(): void {
-        if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
-            $this->markTestSkipped(
-                'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
-            );
-        }
-    }
 }
