@@ -42,6 +42,13 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
  */
 class backup_restore_test extends restore_date_testcase {
     use testcase_helper_trait;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
+    }
+
     /**
      * @dataProvider type_provider
      */
@@ -85,6 +92,9 @@ class backup_restore_test extends restore_date_testcase {
     public function test_backup_restore_with_recordings($type): void {
         global $DB;
         $this->resetAfterTest();
+
+        $this->require_mock_server();
+
         $nbrecordings = 2; // Two recordings for now.
         // This is for imported recording.
         $generator = $this->getDataGenerator();
