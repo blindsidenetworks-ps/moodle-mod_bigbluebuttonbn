@@ -54,7 +54,7 @@ class bigbluebutton_proxy extends proxy_base {
      */
     public static function can_join_meeting($cmid) {
         if ($instance = instance::get_from_cmid($cmid)) {
-            return meeting::get_meeting_info_for_instance($instance)->can_join();;
+            return meeting::get_meeting_info_for_instance($instance)->can_join();
         }
 
         return [
@@ -194,7 +194,9 @@ class bigbluebutton_proxy extends proxy_base {
         }
         // Validate the recording URL.
         $validatedurls[$urlhost] = true;
-        $curlinfo = self::wrap_xml_load_file_curl_request($url, 'HEAD');
+
+        $curl = new curl();
+        $curlinfo = $curl->head($url);
         if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
             $error = "Resources hosted by " . $urlhost . " are unreachable. Server responded with code " . $curlinfo['http_code'];
             debugging($error, DEBUG_DEVELOPER);
@@ -414,15 +416,17 @@ class bigbluebutton_proxy extends proxy_base {
         ?string $presentationurl = null
     ): array {
         $createmeetingurl = self::action_url('create', $data, $metadata);
-        $method = 'GET';
-        $payload = null;
+
+        $curl = new curl();
         if (!is_null($presentationname) && !is_null($presentationurl)) {
-            $method = 'POST';
             $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'><document url='" .
                 $presentationurl . "' /></module></modules>";
+
+            $xml = $curl->post($createmeetingurl, $payload);
+        } else {
+            $xml = $curl->get($createmeetingurl);
         }
 
-        $xml = self::wrap_xml_load_file($createmeetingurl, $method, $payload);
         self::assert_returned_xml($xml);
 
         if (empty($xml->meetingID)) {
