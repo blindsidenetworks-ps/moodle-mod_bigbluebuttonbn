@@ -337,6 +337,8 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * Reset the mock server
      */
     public function reset_mock(): void {
-        $this->send_mock_request('backoffice/reset');
+        if (defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            $this->send_mock_request('backoffice/reset');
+        }
     }
 }

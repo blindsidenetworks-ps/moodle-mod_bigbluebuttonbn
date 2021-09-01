@@ -44,12 +44,15 @@ class get_recordings extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id', VALUE_OPTIONAL),
-            'removeimportedid' => new external_value(PARAM_INT,
-                'Id of the other BBB we target for importing recordings into.'
-                . 'The idea here is to remove already imported recordings', VALUE_OPTIONAL),
-            'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_OPTIONAL),
-            'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_OPTIONAL),
+            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
+            'removeimportedid' => new external_value(
+                PARAM_INT,
+                'Id of the other BBB we target for importing recordings into. The idea here is to remove already imported recordings.',
+                VALUE_DEFAULT,
+                0
+            ),
+            'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_DEFAULT, null),
+            'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_DEFAULT, null),
         ]);
     }
 

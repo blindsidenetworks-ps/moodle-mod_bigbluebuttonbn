@@ -29,6 +29,11 @@ use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * External service to check whether a user can join a meeting.
  *
@@ -60,7 +65,7 @@ class can_join extends external_api {
      */
     public static function execute(
         int $cmid,
-        int $groupid
+        ?int $groupid = null
     ): array {
         // Validate the cmid ID.
         // TODO: we should maybe pass the bbbid + groupid instead of the cmid.
@@ -70,13 +75,24 @@ class can_join extends external_api {
             'cmid' => $cmid,
         ]);
 
-        $instance = instance::get_from_cmid($cmid);
-        $context = $instance->get_context();
-        self::validate_context($context);
-        $canjoin = bigbluebutton_proxy::can_join_meeting($cmid);
-        $canjoin['cmid'] = $cmid;
+        $result = [
+            'can_join' => false,
+            'message' => '',
+            'cmid' => $cmid,
+        ];
 
-        return $canjoin;
+        $instance = instance::get_from_cmid($cmid);
+        if (empty($instance)) {
+            return $result;
+        }
+
+        self::validate_context($instance->get_context());
+
+        $meeting = new meeting($instance);
+
+        $result['can_join'] = $meeting->can_join();
+
+        return $result;
     }
 
     /**

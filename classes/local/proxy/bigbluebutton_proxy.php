@@ -47,23 +47,6 @@ use stdClass;
 class bigbluebutton_proxy extends proxy_base {
 
     /**
-     * Can join meeting.
-     *
-     * @param int $cmid
-     * @return array|bool[]
-     */
-    public static function can_join_meeting($cmid) {
-        if ($instance = instance::get_from_cmid($cmid)) {
-            return meeting::get_meeting_info_for_instance($instance)->can_join();
-        }
-
-        return [
-            'can_join' => false,
-            'message' => '',
-        ];
-    }
-
-    /**
      * Builds and retunrs a url for joining a bigbluebutton meeting.
      *
      * @param string $meetingid

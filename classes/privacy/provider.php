@@ -70,6 +70,10 @@ class provider implements
             'meta' => 'privacy:metadata:bigbluebuttonbn_logs:meta',
         ], 'privacy:metadata:bigbluebuttonbn_logs');
 
+        $collection->add_database_table('bigbluebuttonbn_recordings', [
+            'userid' => 'privacy:metadata:bigbluebuttonbn_logs:userid',
+        ], 'privacy:metadata:bigbluebuttonbn_recordings');
+
         // Personal information has to be passed to BigBlueButton.
         // This includes the user ID and fullname.
         $collection->add_external_location_link('bigbluebutton', [

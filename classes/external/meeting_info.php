@@ -41,7 +41,7 @@ class meeting_info extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_OPTIONAL, 0),
+            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_DEFAULT, 0),
             'updatecache' => new external_value(PARAM_BOOL, 'update cache ?', VALUE_DEFAULT, false),
         ]);
     }

@@ -38,6 +38,7 @@ class bbb_coverage extends phpunit_coverage_info {
     /** @var array The list of folders relative to the plugin root to includelist in coverage generation. */
     protected $includelistfolders = [
         'classes',
+        'backup',
     ];
 
     /** @var array The list of files relative to the plugin root to includelist in coverage generation. */

@@ -115,11 +115,13 @@ class update_recording extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id, this might be a different one
-            from the one set in recordingid in case of importing', VALUE_OPTIONAL),
+            'bigbluebuttonbnid' => new external_value(
+                PARAM_INT,
+                'bigbluebuttonbn instance id, this might be a different one from the one set in recordingid in case of importing'
+            ),
             'recordingid' => new external_value(PARAM_INT, 'The moodle internal recording ID'),
             'action' => new external_value(PARAM_ALPHANUMEXT, 'The action to perform'),
-            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_OPTIONAL),
+            'additionaloptions' => new external_value(PARAM_RAW, 'Additional options', VALUE_REQUIRED, null),
         ]);
     }
 

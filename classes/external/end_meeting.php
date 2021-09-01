@@ -29,6 +29,11 @@ use mod_bigbluebuttonbn\meeting;
 use moodle_exception;
 use restricted_context_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * External service to end a meeting.
  *
@@ -46,7 +51,7 @@ class end_meeting extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
-            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_OPTIONAL, 0),
+            'groupid' => new external_value(PARAM_INT, 'bigbluebuttonbn group id', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -73,6 +78,10 @@ class end_meeting extends external_api {
 
         // Fetch the session, features, and profile.
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
+        if (empty($instance)) {
+            throw new \moodle_exception('Unknown Instance');
+        }
+
         $instance->set_group_id($groupid);
         $context = $instance->get_context();
 
