@@ -57,7 +57,7 @@ class upgrade_recordings extends adhoc_task {
         $logs = $DB->get_records_sql($sql);
 
         // Get meetingids from the fetched logs.
-        foreach($logs as $log) {
+        foreach ($logs as $log) {
             $recs[$log->meetingid] = (array)$log;
         }
         $meetingids = array_keys($recs);
@@ -66,7 +66,7 @@ class upgrade_recordings extends adhoc_task {
         $recordings = recording_proxy::fetch_recordings($meetingids, 'meetingID');
 
         // Create an instance of bigbluebuttonbn_recording per valid recording.
-        foreach($recordings as $recordingid => $recording) {
+        foreach ($recordings as $recordingid => $recording) {
             $rec = $recs[$recording['meetingID']];
             $newrecording = array(
                 'courseid' => $rec['courseid'],
@@ -83,7 +83,7 @@ class upgrade_recordings extends adhoc_task {
         }
 
         // Delete processed logs.
-        foreach($logs as $log) {
+        foreach ($logs as $log) {
             $DB->delete_records('bigbluebuttonbn_logs', array('id' => $log->id));
             $recordscount++;
         }
