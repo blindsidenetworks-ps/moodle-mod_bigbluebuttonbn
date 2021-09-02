@@ -39,7 +39,7 @@ class upgrade_recordings extends adhoc_task {
     protected function process_bigbluebuttonbn_logs(): bool {
         global $DB;
 
-        mtrace("Executing upgrade_recordings");
+        mtrace("Executing upgrade_recordings...");
 
         // Magic number should be increased before release.
         $chunksize = 10;
@@ -68,16 +68,15 @@ class upgrade_recordings extends adhoc_task {
             $recsbyinstanceid[$log->bigbluebuttonbnid] = (array)$log;
         }
         $instanceids = array_keys($recsbyinstanceid);
-        mtrace(json_encode($instanceids));
 
         // Fetch instances that correspnd to instanceids selected.
         $instances = $DB->get_records_list('bigbluebuttonbn', 'id', $instanceids);
-        mtrace(json_encode($instances));
 
         // Retrieve recordings from the meetingids with paginated requests.
         $recordings = recording_proxy::fetch_recordings($meetingids, 'meetingID');
 
         // Create an instance of bigbluebuttonbn_recording per valid recording.
+        mtrace("Creating new recording records...");
         foreach ($recordings as $recordingid => $recording) {
             $rec = $recsbymeetingid[$recording['meetingID']];
             $newrecording = array(
@@ -92,10 +91,12 @@ class upgrade_recordings extends adhoc_task {
                 $newrecording = $DB->insert_record('bigbluebuttonbn_recordings', $newrecording);
                 $newrecording['timecreated'] = $rec['timecreated'];
                 $newrecording = $DB->update_record('bigbluebuttonbn_recordings', $newrecording);
+                mtrace(json_encode($newrecording));
             }
         }
 
         // Delete processed logs.
+        mtrace("Deleting migrated log records...");
         foreach ($logs as $log) {
             mtrace(json_encode($DB->get_records('bigbluebuttonbn_logs', array('id' => $log->id))));
             $DB->delete_records('bigbluebuttonbn_logs', array('id' => $log->id));
