@@ -162,13 +162,13 @@ trait testcase_helper_trait {
         $recordings = [];
         $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         // Create the meetings on the mock server, so like this we can find the recordings.
-        $bbbgenerator->create_meeting([
-            'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
+        $meeting = new meeting($instance);
+        if (!$meeting->is_running()) {
+            $bbbgenerator->create_meeting([
+                'instanceid' => $instance->get_instance_id(),
+                'groupid' => $instance->get_group_id()
 
-        ]);
-        if (!is_array($recordingdata) && is_int($recordingdata)) {
-            $recordingdata = array_pad([], (int) $recordingdata, []);
+            ]);
         }
         foreach ($recordingdata as $rindex => $data) {
             $recordings[] = $bbbgenerator->create_recording(
@@ -199,5 +199,48 @@ trait testcase_helper_trait {
             'activity' => $activity,
             'recordings' => $recordings,
         ];
+    }
+
+    /**
+     * Create a course, users and recording from dataset given in an array form
+     *
+     * @param array $dataset
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    protected function create_from_dataset($dataset) {
+        list('type' => $type, 'recordingsdata' => $recordingsdata, 'groups' => $groups, 'users' => $users) = $dataset;
+        $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+
+        $coursedata = empty($groups) ? [] : ['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS];
+        $this->course = $this->getDataGenerator()->create_course($coursedata);
+
+        foreach ($users as $userdata) {
+            $this->getDataGenerator()->create_and_enrol($this->course, $userdata['role'], ['username' => $userdata['username']]);
+        }
+
+        if ($groups) {
+            foreach ($groups as $groupname => $students) {
+                $group = $this->getDataGenerator()->create_group(['name' => $groupname, 'courseid' => $this->course->id]);
+                foreach ($students as $username) {
+                    $user = \core_user::get_user_by_username($username);
+                    $this->getDataGenerator()->create_group_member(['userid' => $user->id, 'groupid' => $group->id]);
+                }
+            }
+        }
+        $activity = $plugingenerator->create_instance([
+            'course' => $this->course->id,
+            'type' => $type,
+            'name' => 'Example'
+        ]);
+        $instance = instance::get_from_instanceid($activity->id);
+        foreach ($recordingsdata as $groupname => $recordings) {
+            if ($groups) {
+                $groupid = groups_get_group_by_name($this->course->id, $groupname);
+                $instance->set_group_id($groupid);
+            }
+            $this->create_recordings_for_instance($instance, $recordings);
+        }
+        return $activity->id;
     }
 }

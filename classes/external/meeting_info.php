@@ -23,6 +23,11 @@ use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\meeting;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * External service to fetch meeting information.
  *

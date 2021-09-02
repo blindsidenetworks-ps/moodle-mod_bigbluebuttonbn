@@ -28,6 +28,11 @@ use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\recording;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * External service to fetch a list of recordings from the BBB service.
  *
@@ -47,7 +52,8 @@ class get_recordings extends external_api {
             'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
             'removeimportedid' => new external_value(
                 PARAM_INT,
-                'Id of the other BBB we target for importing recordings into. The idea here is to remove already imported recordings.',
+                'Id of the other BBB we target for importing recordings into.
+                The idea here is to remove already imported recordings.',
                 VALUE_DEFAULT,
                 0
             ),
@@ -74,7 +80,10 @@ class get_recordings extends external_api {
     ): array {
         global $USER;
 
-        $warnings = [];
+        $returnval = [
+            'status' => false,
+            'warnings' => [],
+        ];
 
         // Validate the bigbluebuttonbnid ID.
         [
@@ -91,152 +100,157 @@ class get_recordings extends external_api {
 
         // Fetch the session, features, and profile.
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        $context = $instance->get_context();
-        $cm = $instance->get_cm();
-        // Validate that the user has access to this activity.
-        self::validate_context($context);
+        if (!$instance) {
+            $returnval['warnings'][] = [
+                'item' => $bigbluebuttonbnid,
+                'warningcode' => 'nosuchinstance',
+                'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
+                    (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn'])
+                ];
+        } else {
+            $context = $instance->get_context();
+            $cm = $instance->get_cm();
+            // Validate that the user has access to this activity.
+            self::validate_context($context);
 
-        // Then validate group.
-        $groupmode = groups_get_activity_groupmode($cm);
-        if ($groupmode && $groupid) {
-            $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
-            if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
-                $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
-            } else {
-                $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
+            // Then validate group.
+            $groupmode = groups_get_activity_groupmode($cm);
+            if ($groupmode && $groupid) {
+                $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
+                if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
+                    $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
+                } else {
+                    $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
+                }
+                if (!array_key_exists($groupid, $allowedgroups)) {
+                    // Import exception and lib.
+                    global $CFG;
+                    require_once($CFG->dirroot . '/webservice/lib.php');
+                    throw new \webservice_access_exception('No access to this group');
+                }
+                $instance->set_group_id($groupid);
             }
-            if (!array_key_exists($groupid, $allowedgroups)) {
-                // Import exception and lib.
-                global $CFG;
-                require_once($CFG->dirroot . '/webservice/lib.php');
-                throw new \webservice_access_exception('No access to this group');
+            $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
+
+            if ($tools === null) {
+                $tools = 'protect,unprotect,publish,unpublish,delete';
             }
-            $instance->set_group_id($groupid);
-        }
-        $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
+            $tools = explode(',', $tools);
 
-        if ($tools === null) {
-            $tools = 'protect,unprotect,publish,unpublish,delete';
-        }
-        $tools = explode(',', $tools);
-
-        // Exclude itself from the list if in import mode.
-        $recordings = $instance->get_recordings($removeimportedid ? [$instance->get_instance_id()] : []);
-        if ($removeimportedid) {
-            // Remove recording already imported in this specific activity.
-            $destinationinstance = instance::get_from_instanceid($removeimportedid);
-            $importedrecordings = recording::get_recordings_for_instance(
-                $destinationinstance,
-                true,
-                true
-            );
-            // Unset from $recordings if recording is already imported.
-            // Recording $recordings are indexed by $id (moodle table column id).
-            foreach ($recordings as $index => $recording) {
-                $recordingid = $recording->get('recordingid');
-                foreach ($importedrecordings as $irecord) {
-                    if ($irecord->get('recordingid') == $recording->get('recordingid')) {
-                        unset($recordings[$index]);
+            // Exclude itself from the list if in import mode.
+            $recordings = $instance->get_recordings($removeimportedid ? [$instance->get_instance_id()] : []);
+            if ($removeimportedid) {
+                // Remove recording already imported in this specific activity.
+                $destinationinstance = instance::get_from_instanceid($removeimportedid);
+                $importedrecordings = recording::get_recordings_for_instance(
+                    $destinationinstance,
+                    true,
+                    true
+                );
+                // Unset from $recordings if recording is already imported.
+                // Recording $recordings are indexed by $id (moodle table column id).
+                foreach ($recordings as $index => $recording) {
+                    $recordingid = $recording->get('recordingid');
+                    foreach ($importedrecordings as $irecord) {
+                        if ($irecord->get('recordingid') == $recording->get('recordingid')) {
+                            unset($recordings[$index]);
+                        }
                     }
                 }
             }
-        }
-        $lang = get_string('locale', 'core_langconfig');
-        $locale = substr($lang, 0, strpos($lang, '.'));
-        $tabledata = [
-            'activity' => bigbluebutton_proxy::view_get_activity_status($instance),
-            'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
-            'locale' => substr($locale, 0, strpos($locale, '_')),
-            'profile_features' => $typeprofiles[0]['features'],
-            'columns' => [],
-            'data' => '',
-        ];
+            $lang = get_string('locale', 'core_langconfig');
+            $locale = substr($lang, 0, strpos($lang, '.'));
+            $tabledata = [
+                'activity' => bigbluebutton_proxy::view_get_activity_status($instance),
+                'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
+                'locale' => substr($locale, 0, strpos($locale, '_')),
+                'profile_features' => $typeprofiles[0]['features'],
+                'columns' => [],
+                'data' => '',
+            ];
 
-        $data = [];
+            $data = [];
 
-        // Build table content.
-        foreach ($recordings as $recording) {
-            // Protected recordings is not a standard feature, remove actions when protected flag is not present.
-            $rowtools = $tools;
-            if (in_array('protect', $rowtools) && $recording->get('protected') === null) {
-                $rowtools = array_diff($rowtools, array('protect', 'unprotect'));
+            // Build table content.
+            foreach ($recordings as $recording) {
+                // Protected recordings is not a standard feature, remove actions when protected flag is not present.
+                $rowtools = $tools;
+                if (in_array('protect', $rowtools) && $recording->get('protected') === null) {
+                    $rowtools = array_diff($rowtools, array('protect', 'unprotect'));
+                }
+                $rowdata = recording_data::row($instance, $recording, $rowtools);
+                if (!empty($rowdata)) {
+                    $data[] = $rowdata;
+                }
             }
-            $rowdata = recording_data::row($instance, $recording, $rowtools);
-            if (!empty($rowdata)) {
-                $data[] = $rowdata;
-            }
-        }
 
-        $columns = [
-            [
-                'key' => 'playback',
-                'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
-                'width' => '125px',
-                'type' => 'html',
-                'allowHTML' => true,
-            ],
-            [
-                'key' => 'recording',
-                'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
-                'width' => '125px',
-                'type' => 'html',
-                'allowHTML' => true,
-            ],
-            [
-                'key' => 'description',
-                'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
+            $columns = [
+                [
+                    'key' => 'playback',
+                    'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
+                    'width' => '125px',
+                    'type' => 'html',
+                    'allowHTML' => true,
+                ],
+                [
+                    'key' => 'recording',
+                    'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
+                    'width' => '125px',
+                    'type' => 'html',
+                    'allowHTML' => true,
+                ],
+                [
+                    'key' => 'description',
+                    'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
+                    'sortable' => true,
+                    'width' => '250px',
+                    'type' => 'html',
+                    'allowHTML' => true,
+                ],
+            ];
+
+            // Initialize table headers.
+            if (recording_data::preview_enabled($instance)) {
+                $columns[] = [
+                    'key' => 'preview',
+                    'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
+                    'width' => '250px',
+                    'type' => 'html',
+                    'allowHTML' => true,
+                ];
+            }
+
+            $columns[] = [
+                'key' => 'date',
+                'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
                 'sortable' => true,
-                'width' => '250px',
-                'type' => 'html',
-                'allowHTML' => true,
-            ],
-        ];
-
-        // Initialize table headers.
-        if (recording_data::preview_enabled($instance)) {
-            $columns[] = [
-                'key' => 'preview',
-                'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
-                'width' => '250px',
+                'width' => '225px',
                 'type' => 'html',
                 'allowHTML' => true,
             ];
-        }
-
-        $columns[] = [
-            'key' => 'date',
-            'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
-            'sortable' => true,
-            'width' => '225px',
-            'type' => 'html',
-            'allowHTML' => true,
-        ];
-        $columns[] = [
-            'key' => 'duration',
-            'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
-            'width' => '50px',
-            'allowHTML' => false,
-            'sortable' => true,
-        ];
-        if ($instance->can_manage_recordings()) {
             $columns[] = [
-                'key' => 'actionbar',
-                'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
-                'width' => '120px',
-                'type' => 'html',
-                'allowHTML' => true,
+                'key' => 'duration',
+                'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
+                'width' => '50px',
+                'allowHTML' => false,
+                'sortable' => true,
             ];
+            if ($instance->can_manage_recordings()) {
+                $columns[] = [
+                    'key' => 'actionbar',
+                    'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
+                    'width' => '120px',
+                    'type' => 'html',
+                    'allowHTML' => true,
+                ];
+            }
+
+            $tabledata['columns'] = $columns;
+            $tabledata['data'] = json_encode($data);
+
+            $returnval['tabledata'] = $tabledata;
+            $returnval['status'] = true;
         }
-
-        $tabledata['columns'] = $columns;
-        $tabledata['data'] = json_encode($data);
-
-        $returnval = [
-            'status' => true,
-            'tabledata' => $tabledata,
-            'warnings' => $warnings,
-        ];
-
         return $returnval;
     }
 
@@ -264,7 +278,7 @@ class get_recordings extends external_api {
                     'allowHTML' => new external_value(PARAM_BOOL, 'Whether this column contains HTML', VALUE_OPTIONAL, false),
                 ])),
                 'data' => new external_value(PARAM_RAW), // For now it will be json encoded.
-            ]),
+            ], '', VALUE_OPTIONAL),
             'warnings' => new external_warnings()
         ]);
     }
