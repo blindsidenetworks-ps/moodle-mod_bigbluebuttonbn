@@ -82,7 +82,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      */
     protected function get_participants_from_record(array $record): array {
         $roles = [];
-        if (array_key_exists('moderators', $record)) {
+        if (array_key_exists('moderators', $record) && !empty($record['moderators'])) {
             $roles = array_merge(
                 $roles,
                 $this->get_participant_configuration($record['moderators'], 'moderator')
@@ -90,7 +90,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
             unset($record['moderators']);
         }
 
-        if (array_key_exists('viewers', $record)) {
+        if (array_key_exists('viewers', $record) && !empty($record['viewers'])) {
             $roles = array_merge(
                 $roles,
                 $this->get_participant_configuration($record['viewers'], 'viewer')

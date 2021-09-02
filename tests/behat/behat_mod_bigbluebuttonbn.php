@@ -53,6 +53,21 @@ class behat_mod_bigbluebuttonbn extends behat_base {
     }
 
     /**
+     * Return the list of exact named selectors.
+     *
+     * @return array
+     */
+    public static function get_exact_named_selectors(): array {
+        return [
+            new behat_component_named_selector('Meeting field', [
+                <<<XPATH
+    .//*[@data-identifier=%locator%]
+XPATH
+            ], false),
+        ];
+    }
+
+    /**
      * Retrieve the mock server URL from the TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER definition
      *
      * @param string $endpoint
