@@ -20,7 +20,7 @@ use core\task\adhoc_task;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 
 /**
- * Class containing the scheduled task for lti module.
+ * Class containing the scheduled task for updating the completion state.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2019 onwards, Blindside Networks Inc

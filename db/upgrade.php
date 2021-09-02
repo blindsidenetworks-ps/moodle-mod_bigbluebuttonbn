@@ -395,6 +395,21 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2021083101) {
+        // Create adhoc task for upgrading of existing bigbluebuttonbn_logs related to recordings.
+        $task = new \stdClass();
+        $task->classname = '\mod_bigbluebuttonbn\task\upgrade_recordings';
+        $task->component = 'mod_bigbluebuttonbn';
+
+        // Next run time based from nextruntime computation in \core\task\manager::queue_adhoc_task().
+        $nextruntime = time() - 1;
+        $task->nextruntime = $nextruntime;
+        $DB->insert_record('task_adhoc', $task);
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021083101, 'bigbluebuttonbn');
+    }
+
     return true;
 }
 
