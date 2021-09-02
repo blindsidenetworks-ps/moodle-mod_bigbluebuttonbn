@@ -349,7 +349,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Rename field recording on table bigbluebuttonbn_recordings to remotedata, add new remotedatatstamp and status.
         $table = new xmldb_table('bigbluebuttonbn_recordings');
 
-        $field = new xmldb_field('recording', XMLDB_TYPE_TEXT, null, null, null, null, null, 'status');
+        $field = new xmldb_field('recording', XMLDB_TYPE_TEXT, null, null, null, null, null, 'state');
         // Launch rename field recording to remotedata.
         $dbman->rename_field($table, $field, 'remotedata');
 

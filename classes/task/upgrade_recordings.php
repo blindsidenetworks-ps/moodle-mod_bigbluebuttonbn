@@ -17,7 +17,6 @@
 namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
-use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 
 /**
@@ -52,27 +51,41 @@ class upgrade_recordings extends adhoc_task {
         $sql = "SELECT *
                 FROM {bigbluebuttonbn_logs}
                 WHERE log = 'Create' AND meta LIKE '%true%'
-                ORDER BY meetingid,courseid,bigbluebuttonbnid,timecreated
+                ORDER BY courseid,bigbluebuttonbnid,meetingid,timecreated
                 LIMIT {$chunksize};";
         $logs = $DB->get_records_sql($sql);
 
         // Get meetingids from the fetched logs.
+        $recsbymeetingid = [];
         foreach ($logs as $log) {
-            $recs[$log->meetingid] = (array)$log;
+            $recsbymeetingid[$log->meetingid] = (array)$log;
         }
-        $meetingids = array_keys($recs);
+        $meetingids = array_keys($recsbymeetingid);
+
+        // Get instanceids from the fetched logs.
+        $recsbyinstanceid = [];
+        foreach ($logs as $log) {
+            $recsbyinstanceid[$log->bigbluebuttonbnid] = (array)$log;
+        }
+        $instanceids = array_keys($recsbyinstanceid);
+        mtrace(json_encode($instanceids));
+
+        // Fetch instances that correspnd to instanceids selected.
+        $instances = $DB->get_records_list('bigbluebuttonbn', 'id', $instanceids);
+        mtrace(json_encode($instances));
 
         // Retrieve recordings from the meetingids with paginated requests.
         $recordings = recording_proxy::fetch_recordings($meetingids, 'meetingID');
 
         // Create an instance of bigbluebuttonbn_recording per valid recording.
         foreach ($recordings as $recordingid => $recording) {
-            $rec = $recs[$recording['meetingID']];
+            $rec = $recsbymeetingid[$recording['meetingID']];
             $newrecording = array(
                 'courseid' => $rec['courseid'],
                 'bigbluebuttonbnid' => $rec['bigbluebuttonbnid'],
                 'recordingid' => $recordingid,
-                'headless' => 0, // If activity does not exist, the flag should be set to 1.
+                // Set headless flag to 1 if activity does not exist.
+                'headless' => !in_array((array)$instances, $rec['bigbluebuttonbnid']),
                 'status' => 2,
             );
             if ($DB->count_records('bigbluebuttonbn_recordings', $newrecording) == 0) {
@@ -84,6 +97,7 @@ class upgrade_recordings extends adhoc_task {
 
         // Delete processed logs.
         foreach ($logs as $log) {
+            mtrace(json_encode($DB->get_records('bigbluebuttonbn_logs', array('id' => $log->id))));
             $DB->delete_records('bigbluebuttonbn_logs', array('id' => $log->id));
             $recordscount++;
         }
