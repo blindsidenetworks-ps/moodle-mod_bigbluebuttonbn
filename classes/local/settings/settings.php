@@ -28,6 +28,7 @@ use admin_category;
 use admin_setting;
 use admin_setting_configcheckbox;
 use admin_setting_configmultiselect;
+use admin_setting_configpasswordunmask;
 use admin_setting_configselect;
 use admin_setting_configstoredfile;
 use admin_setting_configtext;
@@ -139,10 +140,10 @@ class settings {
                 $item,
                 $settingsgeneral
             );
-            $item = new admin_setting_configtext('bigbluebuttonbn_shared_secret',
+            $item = new admin_setting_configpasswordunmask('bigbluebuttonbn_shared_secret',
                 get_string('config_shared_secret', 'bigbluebuttonbn'),
                 get_string('config_shared_secret_description', 'bigbluebuttonbn'),
-                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET, PARAM_RAW);
+                bbb_constants::BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET);
             $this->add_conditional_element(
                 'shared_secret',
                 $item,
