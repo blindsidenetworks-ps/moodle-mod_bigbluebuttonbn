@@ -349,7 +349,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Rename field recording on table bigbluebuttonbn_recordings to remotedata, add new remotedatatstamp and status.
         $table = new xmldb_table('bigbluebuttonbn_recordings');
 
-        $field = new xmldb_field('recording', XMLDB_TYPE_TEXT, null, null, null, null, null, 'status');
+        $field = new xmldb_field('recording', XMLDB_TYPE_TEXT, null, null, null, null, null, 'state');
         // Launch rename field recording to remotedata.
         $dbman->rename_field($table, $field, 'remotedata');
 
@@ -393,6 +393,31 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 
         // Bigbluebuttonbn savepoint reached.
         upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
+    }
+
+    if ($oldversion < 2021083101) {
+        // Create adhoc task for upgrading of existing bigbluebuttonbn_logs related to recordings.
+        $task = new \stdClass();
+        $task->classname = '\mod_bigbluebuttonbn\task\upgrade_recordings';
+        $task->component = 'mod_bigbluebuttonbn';
+
+        // Next run time based from nextruntime computation in \core\task\manager::queue_adhoc_task().
+        $nextruntime = time() - 1;
+        $task->nextruntime = $nextruntime;
+        $DB->insert_record('task_adhoc', $task);
+
+        // Create adhoc task for upgrading of existing bigbluebuttonbn_logs related to imported recordings.
+        $task = new \stdClass();
+        $task->classname = '\mod_bigbluebuttonbn\task\upgrade_imported_recordings';
+        $task->component = 'mod_bigbluebuttonbn';
+
+        // Next run time based from nextruntime computation in \core\task\manager::queue_adhoc_task().
+        $nextruntime = time() - 1;
+        $task->nextruntime = $nextruntime;
+        $DB->insert_record('task_adhoc', $task);
+
+        // Bigbluebuttonbn savepoint reached.
+        upgrade_mod_savepoint(true, 2021083101, 'bigbluebuttonbn');
     }
 
     return true;

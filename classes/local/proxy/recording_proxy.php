@@ -100,30 +100,31 @@ class recording_proxy extends proxy_base {
     /**
      * Helper function to fetch recordings from a BigBlueButton server.
      *
-     * @param array $recordingids list of $recordingids
+     * @param array $keyids list of meetingids or recordingids
+     * @param string $key, the param name used for the BBB request (<recordID>|meetingID)
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
-    public static function fetch_recordings(array $recordingids = []): array {
-        // Normalize recordingids to array.
-        if (!is_array($recordingids)) {
-            $recordingids = explode(',', $recordingids);
+    public static function fetch_recordings(array $keyids = [], string $key = 'recordID'): array {
+        // Normalize ids to array.
+        if (!is_array($keyids)) {
+            $keyids = explode(',', $keyids);
         }
 
-        // If $recordingids is empty return array() to prevent a getRecordings with meetingID and recordID set to ''.
-        if (empty($recordingids)) {
+        // If $ids is empty return array() to prevent a getRecordings with meetingID and recordID set to ''.
+        if (empty($keyids)) {
             return array();
         }
 
         $recordings = array();
         // Execute a paginated getRecordings request. The page size is arbitrarily hardcoded to 25.
         $pagecount = 25;
-        $pages = floor(count($recordingids) / $pagecount) + 1;
-        if (count($recordingids) > 0 && count($recordingids) % $pagecount == 0) {
+        $pages = floor(count($keyids) / $pagecount) + 1;
+        if (count($keyids) > 0 && count($keyids) % $pagecount == 0) {
             $pages--;
         }
         for ($page = 1; $page <= $pages; ++$page) {
-            $rids = array_slice($recordingids, ($page - 1) * $pagecount, $pagecount);
-            $recordings += self::fetch_recordings_page($rids);
+            $ids = array_slice($keyids, ($page - 1) * $pagecount, $pagecount);
+            $recordings += self::fetch_recordings_page($ids, $key);
         }
 
         // Sort recordings.
@@ -134,12 +135,13 @@ class recording_proxy extends proxy_base {
     /**
      * Helper function to fetch one page of upto 25 recordings from a BigBlueButton server.
      *
-     * @param array $rids
+     * @param array $ids
+     * @param string $key
      * @return array
      */
-    private static function fetch_recordings_page(array $rids): array {
+    private static function fetch_recordings_page(array $ids, $key = 'recordID'): array {
         // The getRecordings call is executed using a method GET (supported by all versions of BBB).
-        $xml = self::fetch_endpoint_xml('getRecordings', ['meetingID' => '', 'recordID' => implode(',', $rids)]);
+        $xml = self::fetch_endpoint_xml('getRecordings', [$key => implode(',', $ids)]);
 
         if (!$xml) {
             return [];
