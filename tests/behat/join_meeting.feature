@@ -24,8 +24,7 @@ Feature: Test the ability to run the full meeting lifecycle (start to end)
     Then "Join session" "link" should exist
     When I click on "Join session" "link"
     And I switch to "bigbluebutton_conference" window
-    Then I should see "End BBB Meeting"
-    And I click on "End BBB Meeting" "button"
+    And I click on "End Meeting" "link"
     # Selenium driver does not like the click action to be done before we
     # automatically close the window so we need to make sure that the window
     # is closed before.

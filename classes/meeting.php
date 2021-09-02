@@ -163,10 +163,6 @@ class meeting {
      * @throws \coding_exception
      */
     public function get_join_url() {
-        if (defined('BEHAT_SITE_RUNNING') || PHPUNIT_TEST) {
-            return (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/bbb_meeting.php',
-                array('bbbid' => $this->instance->get_instance_id())))->out(false);
-        }
         return bigbluebutton_proxy::get_join_url(
             $this->instance->get_meeting_id(),
             $this->instance->get_user_fullname(),
