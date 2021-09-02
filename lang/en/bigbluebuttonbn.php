@@ -54,6 +54,7 @@ $string['modulename_help'] = 'BigBlueButton lets you create from within Moodle l
 
 Using BigBlueButton you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.';
 $string['modulename_link'] = 'BigBlueButton/view';
+$string['nosuchinstance'] = 'No such an instance {$a->entity} with id: {$a->id} ';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButton';
 
