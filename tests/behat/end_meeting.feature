@@ -25,17 +25,17 @@ Feature: Test the ability to end a meeting
     When I am on the "Room recordings" Activity page logged in as traverst
     Then "End session" "link" <existence> exist
 
-  Examples:
-    # Note: If the teacher is not listed as a moderator in the activity roles, then will not have permission to end the
-    # session.
-    | moderators    | role           | existence  |
-    |               | editingteacher | should not |
-    |               | teacher        | should not |
-    |               | student        | should not |
-    | role:teacher  | student        | should not |
-    | role:teacher  | teacher        | should     |
-    | role:student  | student        | should     |
-    | user:traverst | student        | should     |
+    Examples:
+      # Note: If the teacher is not listed as a moderator in the activity roles, then will not have permission to end the
+      # session.
+      | moderators    | role           | existence  |
+      |               | editingteacher | should not |
+      |               | teacher        | should not |
+      |               | student        | should not |
+      | role:teacher  | student        | should not |
+      | role:teacher  | teacher        | should     |
+      | role:student  | student        | should     |
+      | user:traverst | student        | should     |
 
   Scenario: An administrator can always end a meeting
     Given the following course exists:
@@ -72,17 +72,17 @@ Feature: Test the ability to end a meeting
     When I am on the C1 "mod_bigbluebuttonbn > Index" page logged in as traverst
     Then "End session" "link" <existence> exist
 
-  Examples:
-    # Note: If the teacher is not listed as a moderator in the activity roles, then will not have permission to end the
-    # session.
-    | moderators    | role           | existence  |
-    |               | editingteacher | should not |
-    |               | teacher        | should not |
-    |               | student        | should not |
-    | role:teacher  | student        | should not |
-    | role:teacher  | teacher        | should     |
-    | role:student  | student        | should     |
-    | user:traverst | student        | should     |
+    Examples:
+      # Note: If the teacher is not listed as a moderator in the activity roles, then will not have permission to end the
+      # session.
+      | moderators    | role           | existence  |
+      |               | editingteacher | should not |
+      |               | teacher        | should not |
+      |               | student        | should not |
+      | role:teacher  | student        | should not |
+      | role:teacher  | teacher        | should     |
+      | role:student  | student        | should     |
+      | user:traverst | student        | should     |
 
   Scenario: An administrator can always end a meeting
     Given the following course exists:

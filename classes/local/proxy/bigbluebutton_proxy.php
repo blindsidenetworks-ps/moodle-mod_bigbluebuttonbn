@@ -14,18 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * The bigbluebutton proxy class.
- *
- * This class acts as a proxy between Moodle and the BigBlueButton API server,
- * and handles all requests relating to the server and meetings.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- */
-
 namespace mod_bigbluebuttonbn\local\proxy;
 
 use cache_store;
@@ -44,6 +32,17 @@ use moodle_exception;
 use moodle_url;
 use stdClass;
 
+/**
+ * The bigbluebutton proxy class.
+ *
+ * This class acts as a proxy between Moodle and the BigBlueButton API server,
+ * and handles all requests relating to the server and meetings.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
 class bigbluebutton_proxy extends proxy_base {
 
     /**

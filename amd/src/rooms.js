@@ -52,7 +52,7 @@ export const init = (bigbluebuttonbnid) => {
  */
 export const setupWindowAutoClose = () => {
     // Not sure what this does here. Will need to have a closer look into the process.
-    window.onunload = function () {
+    window.onunload = function() {
         opener.setTimeout(() => roomUpdater.updateRoom(true), 5000);
         window.close();
     };

@@ -47,9 +47,8 @@ class instance_updated_message implements renderable, templatable {
     /**
      * Instance updated constructor
      *
-     * @param object $bigbluebuttonbn
-     * @param object $sender the user object for sender
-     * @param string $action
+     * @param instance $instance
+     * @param int $type
      */
     public function __construct(instance $instance, int $type) {
         $this->instance = $instance;

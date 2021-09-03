@@ -44,6 +44,11 @@ abstract class send_notification extends adhoc_task {
         $this->send_all_notifications();
     }
 
+    /**
+     * Append additional elements of custom data
+     *
+     * @param array $newdata
+     */
     protected function append_custom_data(array $newdata): void {
         if ($currentdata = (array) $this->get_custom_data()) {
             $newdata = array_merge($currentdata, $newdata);

@@ -19,6 +19,7 @@ namespace mod_bigbluebuttonbn\event;
 /**
  * The mod_bigbluebuttonbn class for event name definition.
  *
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

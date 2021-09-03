@@ -259,7 +259,7 @@ class logger {
     /**
      * Register a bigbluebuttonbn event from an instance.
      *
-     * @param instance $instanec
+     * @param instance $instance
      * @param string $event
      * @param array $overrides
      * @param string $meta

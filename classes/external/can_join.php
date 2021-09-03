@@ -60,6 +60,7 @@ class can_join extends external_api {
      * Updates a recording
      *
      * @param int $cmid the bigbluebuttonbn course module id
+     * @param null|int $groupid
      * @return array (empty array for now)
      * @throws \restricted_context_exception
      */

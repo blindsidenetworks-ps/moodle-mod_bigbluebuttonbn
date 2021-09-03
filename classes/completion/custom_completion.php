@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_bigbluebuttonbn\completion;
 
 use core_completion\activity_custom_completion;
@@ -75,7 +76,7 @@ class custom_completion extends activity_custom_completion {
      *
      * @param array $logs
      * @param string $rulename
-     * @param object $bigbluebuttonbn
+     * @param instance $instance
      * @param callable $summaryvaluegetter
      * @return bool
      */

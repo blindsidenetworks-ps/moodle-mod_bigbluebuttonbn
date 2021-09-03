@@ -437,10 +437,8 @@ class meeting {
     /**
      * Helper function enqueues list of meeting events to be stored and processed as for completion.
      *
-     * @param object $bigbluebuttonbn
+     * @param instance $instance
      * @param object $jsonobj
-     *
-     * @return void
      */
     protected static function process_meeting_events(instance $instance, $jsonobj) {
         $meetingid = $jsonobj->{'meeting_id'};

@@ -67,6 +67,11 @@ class send_recording_ready_notification extends send_notification {
         );
     }
 
+    /**
+     * Get variables to make available to strings.
+     *
+     * @return array
+     */
     protected function get_string_vars(): array {
         return [
             'course_fullname' => $this->instance->get_course()->fullname,

@@ -50,7 +50,6 @@ Feature: Manage and list recordings
       | RecordingOnly | should exist |
       | RoomRecordings1   | should exist |
 
-
   @javascript
   Scenario: I check that I can import recordings into the Recording activity and then if I delete them
   they are back into the pool to be imported again

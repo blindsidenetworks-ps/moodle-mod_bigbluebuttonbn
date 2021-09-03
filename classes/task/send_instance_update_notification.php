@@ -43,6 +43,11 @@ class send_instance_update_notification extends send_notification {
         $this->append_custom_data(['type' => $type]);
     }
 
+    /**
+     * Get the type of update.
+     *
+     * @return null|int
+     */
     protected function get_update_type(): ?int {
         $data = (object) $this->get_custom_data();
         if (property_exists($data, 'type')) {
@@ -103,6 +108,11 @@ class send_instance_update_notification extends send_notification {
         return get_string($key, 'mod_bigbluebuttonbn', $this->get_string_vars());
     }
 
+    /**
+     * Get variables to make available to strings.
+     *
+     * @return array
+     */
     protected function get_string_vars(): array {
         return [
             'course_fullname' => $this->instance->get_course()->fullname,

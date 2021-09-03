@@ -25,6 +25,7 @@ use templatable;
 /**
  * Renderer for recording section.
  *
+ * @pacakage  mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
