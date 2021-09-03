@@ -17,7 +17,12 @@
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
 use context_course;
+use core_calendar\local\event\value_objects\action;
 use html_writer;
+use mod_bigbluebuttonbn\output\recording_row_actionbar;
+use mod_bigbluebuttonbn\output\recording_row_playback;
+use mod_bigbluebuttonbn\output\recording_row_preview;
+use mod_bigbluebuttonbn\output\recordings_row_playback;
 use pix_icon;
 use stdClass;
 use mod_bigbluebuttonbn\instance;
@@ -27,6 +32,8 @@ use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\recording;
+use function floatval;
+use function is_null;
 
 /**
  * The recordings_data.
@@ -42,7 +49,8 @@ class recording_data {
     /**
      * Helper function builds a row for the data used by the recording table.
      *
-     * TODO: replace this with templates whenever possible.
+     * TODO: replace this with templates whenever possible so we just
+     * return the data via the API.
      *
      * @param instance $instance
      * @param recording $rec a recording row
@@ -50,9 +58,9 @@ class recording_data {
      * @return stdClass
      */
     public static function row(instance $instance, recording $rec, ?array $tools = null): ?stdClass {
-        global $OUTPUT, $PAGE;
+        global $PAGE;
 
-        $context = context_course::instance($instance->get_course_id());
+        $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
         foreach ($tools as $key => $tool) {
             if (!$instance->can_perform_on_recordings($tool)) {
                 unset($tools[$key]);
@@ -63,32 +71,36 @@ class recording_data {
         }
         $rowdata = new stdClass();
 
-        // Set recording_types.
-        $rowdata->playback = self::row_types($rec, $instance);
+        // Set recording_playback.
+
+        $recordingplayback = new recording_row_playback($rec, $instance);
+        $rowdata->playback = $renderer->render($recordingplayback);
 
         // Set activity name.
         $recordingname = new recording_name_editable($rec, $instance);
-        $rowdata->recording = $PAGE->get_renderer('core')
-            ->render_from_template('core/inplace_editable', $recordingname->export_for_template($OUTPUT));
+        $rowdata->recording = $renderer->render_inplace_editable($recordingname);
 
         // Set activity description.
         $recordingdescription = new recording_description_editable($rec, $instance);
-        $rowdata->description = $PAGE->get_renderer('core')
-            ->render_from_template('core/inplace_editable', $recordingdescription->export_for_template($OUTPUT));
+        $rowdata->description = $renderer->render_inplace_editable($recordingdescription);
 
         if (self::preview_enabled($instance)) {
             // Set recording_preview.
-            $rowdata->preview = self::row_preview($rec);
+            $rowdata->preview = '';
+            if ($rec->get('playbacks')) {
+                $rowpreview = new recording_row_preview($rec);
+                $rowdata->preview = $renderer->render($rowpreview);
+            }
         }
         // Set date.
-        $rowdata->date = self::row_date($rec);
-        // Set formatted date.
-        $rowdata->date_formatted = self::row_date_formatted($rowdata->date);
-        // Set formatted duration.
-        $rowdata->duration_formatted = $rowdata->duration = self::row_duration($rec);
+        $starttime = $rec->get('starttime');
+        $rowdata->date = !is_null($starttime) ? floatval($starttime) : 0;
+        // Set duration.
+        $rowdata->duration = self::row_duration($rec);
         // Set actionbar, if user is allowed to manage recordings.
         if ($instance->can_manage_recordings()) {
-            $rowdata->actionbar = self::row_actionbar($rec, $tools);
+            $actionbar = new recording_row_actionbar($rec, $tools);
+            $rowdata->actionbar = $renderer->render($actionbar);
         }
         return $rowdata;
     }
@@ -99,10 +111,6 @@ class recording_data {
      * @param recording $recording
      * @return int
      */
-    public static function row_date(recording $recording): int {
-        $starttime = $recording->get('starttime');
-        return !is_null($starttime) ? floatval($starttime) : 0;
-    }
 
     /**
      * Helper function evaluates if recording preview should be included.
@@ -120,7 +128,7 @@ class recording_data {
      * @param recording $recording
      * @return int
      */
-    public static function row_duration(recording $recording): int {
+    protected static function row_duration(recording $recording): int {
         $playbacks = $recording->get('playbacks');
         if ($playbacks === null) {
             return 0;
@@ -136,238 +144,6 @@ class recording_data {
             }
         }
         return 0;
-    }
-
-    /**
-     * Helper function format recording date used in row for the data used by the recording table.
-     *
-     * @param int $starttime
-     * @return string
-     */
-    public static function row_date_formatted(int $starttime): string {
-        global $USER;
-
-        $starttime = $starttime - ($starttime % 1000);
-        // Set formatted date.
-        $dateformat = get_string('strftimerecentfull', 'langconfig') . ' %Z';
-        return userdate($starttime / 1000, $dateformat, usertimezone($USER->timezone));
-    }
-
-    /**
-     * Helper function builds recording actionbar used in row for the data used by the recording table.
-     *
-     * @param recording $rec a recording
-     * @param array $tools
-     * @return string
-     */
-    protected static function row_actionbar(recording $rec, $tools): string {
-        $actionbar = '';
-        foreach ($tools as $tool) {
-            if (!empty(self::TOOL_ACTION_DEFINITIONS[$tool])) {
-                $buttonpayload = self::TOOL_ACTION_DEFINITIONS[$tool];
-                $conditionalhiding = $buttonpayload['hidewhen'] ?? null;
-                $disabledwhen = $buttonpayload['disablewhen'] ?? null;
-                self::actionbar_set_diplay($buttonpayload, $disabledwhen, $rec, 'disabled');
-                self::actionbar_set_diplay($buttonpayload, $conditionalhiding, $rec);
-                $actionbar .= self::actionbar_render_button($rec, $buttonpayload);
-            }
-        }
-        $head = html_writer::start_tag('div', [
-            'id' => 'recording-actionbar-' . $rec->get('id'),
-            'data-recordingid' => $rec->get('id'),
-        ]);
-        $tail = html_writer::end_tag('div');
-        return $head . $actionbar . $tail;
-    }
-
-    /**
-     * Read the settings for this action and disable or hide the tool from the toolbar
-     *
-     * @param array $buttonpayload
-     * @param string $condition
-     * @param recording $rec
-     * @param string $value
-     */
-    private static function actionbar_set_diplay(&$buttonpayload, $condition, $rec, $value = 'invisible') {
-        if ($condition) {
-            $negates = $condition[0] === '!';
-            $conditionalvariable = ltrim($condition, '!');
-            if ($rec->get($conditionalvariable) xor $negates) {
-                $buttonpayload['disabled'] = $value;
-            }
-        }
-    }
-
-    /**
-     * @var array TOOLS_DEFINITION a list of definition for the the specific tools
-     */
-    const TOOL_ACTION_DEFINITIONS = [
-        'protect' => [
-            'action' => 'unprotect',
-            'icon' => 'lock',
-            'hidewhen' => '!protected',
-            'disablewhen' => 'imported'
-        ],
-        'unprotect' => [
-            'action' => 'protect',
-            'icon' => 'unlock',
-            'hidewhen' => 'protected',
-            'disablewhen' => 'imported'
-        ],
-        'publish' => [
-            'action' => 'publish',
-            'icon' => 'show',
-            'hidewhen' => 'published',
-            'requireconfirmation' => true,
-            'disablewhen' => 'imported'
-        ],
-        'unpublish' => [
-            'action' => 'unpublish',
-            'icon' => 'hide',
-            'hidewhen' => '!published',
-            'requireconfirmation' => true,
-            'disablewhen' => 'imported'
-        ],
-        'delete' => [
-            'action' => 'delete',
-            'icon' => 'trash',
-            'requireconfirmation' => true
-        ],
-        'import'  => [
-            'action' => 'import',
-            'icon' => 'import',
-        ]
-    ];
-
-    /**
-     * Helper function builds recording preview used in row for the data used by the recording table.
-     *
-     * @param recording $recording
-     * @return string
-     */
-    public static function row_preview(recording $recording): string {
-        $playbacks = $recording->get('playbacks');
-        if ($playbacks === null) {
-            return '';
-        }
-        $options = [
-            'id' => 'preview-' . $recording->get('id'),
-        ];
-        if (!$recording->get('published')) {
-            $options['hidden'] = 'hidden';
-        }
-        $recordingpreview = html_writer::start_tag('div', $options);
-        foreach ($playbacks as $playback) {
-            if (isset($playback['preview'])) {
-                $recordingpreview .= self::row_preview_images($playback);
-                break;
-            }
-        }
-        $recordingpreview .= html_writer::end_tag('div');
-        return $recordingpreview;
-    }
-
-    /**
-     * Helper function builds element with actual images used in recording preview row based on a selected playback.
-     *
-     * @param array $playback
-     * @return string
-     */
-    public static function row_preview_images(array $playback): string {
-        global $CFG;
-        $recordingpreview = html_writer::start_tag('div', [
-            'class' => 'container-fluid',
-        ]);
-        $recordingpreview .= html_writer::start_tag('div', [
-            'class' => 'row',
-        ]);
-        foreach ($playback['preview'] as $image) {
-            if ($CFG->bigbluebuttonbn_recordings_validate_url &&
-                !bigbluebutton_proxy::is_remote_resource_valid(trim($image['url']))) {
-                return '';
-            }
-            $recordingpreview .= html_writer::start_tag('div', [
-                'class' => '',
-            ]);
-            $recordingpreview .= html_writer::empty_tag('img', [
-                'src' => trim($image['url']) . '?' . time(),
-                'class' => 'recording-thumbnail pull-left',
-            ]);
-            $recordingpreview .= html_writer::end_tag('div');
-        }
-        $recordingpreview .= html_writer::end_tag('div');
-        $recordingpreview .= html_writer::start_tag('div', [
-            'class' => 'row',
-        ]);
-        $recordingpreview .= html_writer::tag('div', get_string('view_recording_preview_help', 'bigbluebuttonbn'), [
-            'class' => 'text-center text-muted small',
-        ]);
-        $recordingpreview .= html_writer::end_tag('div');
-        $recordingpreview .= html_writer::end_tag('div');
-        return $recordingpreview;
-    }
-
-    /**
-     * Helper function renders recording types to be used in row for the data used by the recording table.
-     *
-     * @param recording $rec a recording row
-     * @param instance $instance
-     * @return string
-     */
-    public static function row_types(recording $rec, instance $instance): string {
-        $dataimported = 'false';
-        $title = '';
-        if ($rec->get('imported')) {
-            $dataimported = 'true';
-            $title = get_string('view_recording_link_warning', 'bigbluebuttonbn');
-        }
-        $visibility = '';
-        if (!$rec->get('published')) {
-            $visibility = 'hidden ';
-        }
-        $id = 'playbacks-' . $rec->get('id');
-        $recordingtypes = html_writer::start_tag('div', [
-            'id' => $id,
-            'data-imported' => $dataimported,
-            'data-recordingid' => $rec->get('id'),
-            'data-additionaloptions' => '',
-            'title' => $title,
-            $visibility => $visibility,
-        ]);
-        if ($rec->get('playbacks')) {
-            foreach ($rec->get('playbacks') as $playback) {
-                $recordingtypes .= self::row_type($rec, $instance, $playback);
-            }
-        }
-        $recordingtypes .= html_writer::end_tag('div');
-        return $recordingtypes;
-    }
-
-    /**
-     * Helper function renders the link used for recording type in row for the data used by the recording table.
-     *
-     * @param recording $rec a recording row
-     * @param instance $instance
-     * @param array $playback
-     * @return string
-     */
-    public static function row_type(recording $rec, instance $instance, array $playback): string {
-        global $CFG, $OUTPUT;
-        if (!self::include_recording_data_row_type($rec, $instance, $playback)) {
-            return '';
-        }
-        $text = self::type_text($playback['type']);
-        $href = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $instance->get_instance_id() .
-            '&rid=' . $rec->get('id') . '&rtype=' . $playback['type'];
-        $linkattributes = [
-            'id' => 'recording-play-' . $playback['type'] . '-' . $rec->get('id'),
-            'class' => 'btn btn-sm btn-default',
-            'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
-            'data-action' => 'play',
-            'data-target' => $playback['type'],
-            'data-href' => $href,
-        ];
-        return $OUTPUT->action_link('#', $text, null, $linkattributes) . '&#32;';
     }
 
     /**
@@ -393,7 +169,7 @@ class recording_data {
      * @param recording $rec a bigbluebuttonbn_recordings row
      * @return boolean
      */
-    public static function include_recording_table_row(instance $instance, recording $rec): bool {
+    protected static function include_recording_table_row(instance $instance, recording $rec): bool {
         // Exclude unpublished recordings, only if user has no rights to manage them.
         if (!$rec->get('published') && !$instance->can_manage_recordings()) {
             return false;
@@ -411,92 +187,5 @@ class recording_data {
             return intval($rec->get('groupid')) === intval($instance->get_group_id());
         }
         return true;
-    }
-
-    /**
-     * Helper function renders the link used for recording type in row for the data used by the recording table.
-     *
-     * @param recording $rec a recording row
-     * @param instance $instance
-     * @param array $playback
-     * @return boolean
-     */
-    public static function include_recording_data_row_type(recording $rec, $instance, array $playback): bool {
-        // All types that are not restricted are included.
-        if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'false') {
-            return true;
-        }
-        // All types that are not statistics are included.
-        if ($playback['type'] != 'statistics') {
-            return true;
-        }
-
-        // Exclude imported recordings.
-        if ($rec->get('imported')) {
-            return false;
-        }
-
-        // Exclude non moderators.
-        if (!$instance->is_admin() && !$instance->is_moderator()) {
-            return false;
-        }
-        return true;
-
-    }
-
-    /**
-     * Helper function render a button for the recording action bar
-     *
-     * @param recording $rec a bigbluebuttonbn_recordings row
-     * @param array $data
-     * @return string
-     */
-    protected static function actionbar_render_button(recording $rec, array $data): string {
-        global $PAGE;
-        if (empty($data)) {
-            return '';
-        }
-        $target = $data['action'];
-        if (isset($data['target'])) {
-            $target .= '-' . $data['target'];
-        }
-        $id = 'recording-' . $target . '-' . $rec->get('recordingid');
-        if ((boolean) config::get('recording_icons_enabled')) {
-            // With icon for $manageaction.
-            $iconattributes = [
-                'id' => $id,
-                'class' => 'iconsmall',
-            ];
-            $linkattributes = [
-                'id' => $id,
-                'data-action' => $data['action'],
-                'data-require-confirmation' => !empty($data['requireconfirmation']),
-            ];
-            if ($rec->get('imported')) {
-                $linkattributes['data-links'] = recording::count_records(
-                    [
-                        'recordingid' => $rec->get('recordingid'),
-                        'imported' => true,
-                    ]
-                );
-            }
-            if (isset($data['disabled'])) {
-                $iconattributes['class'] .= ' fa-' . $data['disabled'];
-                $linkattributes['class'] = 'disabled';
-            }
-            $icon = new pix_icon(
-                'i/' . $data['icon'],
-                get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
-                'moodle',
-                $iconattributes
-            );
-            return $PAGE->get_renderer('core')->action_icon('#', $icon, null, $linkattributes, false);
-        }
-        // With text for $manageaction.
-        $linkattributes = [
-            'title' => get_string($data['tag']),
-            'class' => 'btn btn-xs btn-danger',
-        ];
-        return $PAGE->get_renderer('core')->action_link('#', get_string($data['action']), null, $linkattributes);
     }
 }
