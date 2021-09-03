@@ -18,6 +18,22 @@
     @template mod_bigbluebuttonbn/view_page
 
     This template renders the /view.php page.
+
+    Example context (json):
+    {
+        "serverwarning": true,
+        "sitenotification": {
+            "message": "Unlock premium feature",
+            "actions": [
+                {
+                    "url": "https://example.com/",
+                    "name": "action",
+                    "value": "buy",
+                    "title": "Upgrade now"
+                }
+            ]
+        }
+    }
 }}
 {{{groupselector}}}
 

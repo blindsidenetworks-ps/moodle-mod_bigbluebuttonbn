@@ -40,6 +40,9 @@ class curl extends \curl {
     /** @var string */
     protected $contenttype;
 
+    /**
+     * Constructor for the class.
+     */
     public function __construct() {
         parent::__construct();
 
@@ -66,6 +69,13 @@ class curl extends \curl {
         return $this;
     }
 
+    /**
+     * Fetch the specified URL via a POST request.
+     *
+     * @param string $url
+     * @param string $params
+     * @param array $options
+     */
     public function post($url, $params = '', $options = []) {
         if (!is_string($params)) {
             debugging('Only string paramaters are supported', DEBUG_DEVELOPER);
@@ -83,6 +93,13 @@ class curl extends \curl {
         return $this->handle_response(parent::post($url, $params, $options));
     }
 
+    /**
+     * Fetch the specified URL via a HEAD request.
+     *
+     * @param string $url
+     * @param string $params
+     * @param array $options
+     */
     public function head($url, $options = []) {
         $options['followlocation'] = true;
         $options['timeout'] = 1;
@@ -92,6 +109,13 @@ class curl extends \curl {
         return $this->get_info();
     }
 
+    /**
+     * Fetch the specified URL via a GET request.
+     *
+     * @param string $url
+     * @param string $params
+     * @param array $options
+     */
     public function get($url, $params = [], $options = []) {
         return $this->handle_response(parent::get($url, $params, $options));
     }

@@ -27,10 +27,10 @@ Feature: Test that meeting roles are sent to the server
     And I switch to "bigbluebutton_conference" window
     Then I should see "<meetingrole>" in the "attendeeRole" "mod_bigbluebuttonbn > Meeting field"
 
-  Examples:
-    | moderators          | viewers | moodlerole     | meetingrole |
-    |                     |         | student        | VIEWER      |
-    | role:editingteacher |         | editingteacher | MODERATOR   |
-    | role:student        |         | editingteacher | VIEWER      |
-    | role:student        |         | student        | MODERATOR   |
-    | user:traverst       |         | student        | MODERATOR   |
+    Examples:
+      | moderators          | viewers | moodlerole     | meetingrole |
+      |                     |         | student        | VIEWER      |
+      | role:editingteacher |         | editingteacher | MODERATOR   |
+      | role:student        |         | editingteacher | VIEWER      |
+      | role:student        |         | student        | MODERATOR   |
+      | user:traverst       |         | student        | MODERATOR   |

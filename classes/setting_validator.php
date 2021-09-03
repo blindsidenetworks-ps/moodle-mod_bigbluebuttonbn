@@ -23,6 +23,7 @@ require_once($CFG->libdir.'/adminlib.php');
 /**
  * Helper class for validating settings used HTML for settings.php.
  *
+ * @package mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

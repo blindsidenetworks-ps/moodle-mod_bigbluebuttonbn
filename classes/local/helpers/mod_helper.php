@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Utility class for all instance (module) routines helper.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2021 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David  (laurent [at] call-learning [dt] fr)
- */
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use calendar_event;
@@ -31,6 +23,14 @@ use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\task\send_instance_update_notification;
 use stdClass;
 
+/**
+ * Utility class for all instance (module) routines helper.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2021 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David  (laurent [at] call-learning [dt] fr)
+ */
 class mod_helper {
 
     /**

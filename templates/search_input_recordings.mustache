@@ -40,11 +40,12 @@
 }}
 <div id="searchform-auto-{{uniqid}}" class="form-inline simplesearchform">
     <div class="input-group searchbar" role="search">
-        <label for="searchinput">
+        <label for="mod_bigbluebutton_search-{{uniqid}}">
             <span class="sr-only">{{$label}}{{#str}} search, core {{/str}}{{/label}}</span>
         </label>
         <input
            type="text"
+           id="mod_bigbluebutton_search-{{uniqid}}"
            data-region="input"
            data-action="search"
            class="form-control withclear"

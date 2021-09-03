@@ -1039,8 +1039,11 @@ EOF;
 
     /**
      * Get recordings for this instance
+     *
+     * @param string[] $excludedid
+     * @return recording[]
      */
-    public function get_recordings($excludedid = []) {
+    public function get_recordings(array $excludedid = []): array {
         // Fetch the list of recordings depending on the status of the instance.
         // show room is enabled for TYPE_ALL and TYPE_ROOM_ONLY.
         if ($this->is_feature_enabled('showroom')) {

@@ -36,6 +36,9 @@ class upgrade_imported_recordings extends adhoc_task {
         }
     }
 
+    /**
+     * Process all bigbluebuttonbn logs looking for entries which should be converted to meetings.
+     */
     protected function process_bigbluebuttonbn_logs(): bool {
         global $DB;
 

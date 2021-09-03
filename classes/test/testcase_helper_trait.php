@@ -181,6 +181,15 @@ trait testcase_helper_trait {
         return $recordings;
     }
 
+    /**
+     * Create an activity which includes a set of recordings.
+     *
+     * @param stdClass $course
+     * @param int $type
+     * @param array $recordingdata array of recording information
+     * @param int $groupid
+     * @return array
+     */
     protected function create_activity_with_recordings($course, int $type, array $recordingdata, $groupid = 0): array {
         $this->resetAfterTest();
 

@@ -24,14 +24,14 @@ Feature: Test the ability to start a meeting
     When I am on the "Room recordings" Activity page logged in as traverst
     Then "Join session" "link" <existence> exist
 
-  Examples:
-    | wait | role           | existence  |
-    | 0    | student        | should     |
-    | 0    | teacher        | should     |
-    | 0    | editingteacher | should     |
-    | 1    | student        | should not |
-    | 1    | teacher        | should not |
-    | 1    | editingteacher | should     |
+    Examples:
+      | wait | role           | existence  |
+      | 0    | student        | should     |
+      | 0    | teacher        | should     |
+      | 0    | editingteacher | should     |
+      | 1    | student        | should not |
+      | 1    | teacher        | should not |
+      | 1    | editingteacher | should     |
 
   Scenario Outline: Users should be able to join a session if a moderator has already joined
     Given the following course exists:
@@ -56,12 +56,12 @@ Feature: Test the ability to start a meeting
     When I am on the "Room recordings" Activity page logged in as traverst
     Then "Join session" "link" should exist
 
-  Examples:
-    | wait | role           |
-    | 0    | student        |
-    | 0    | editingteacher |
-    | 1    | student        |
-    | 1    | editingteacher |
+    Examples:
+      | wait | role           |
+      | 0    | student        |
+      | 0    | editingteacher |
+      | 1    | student        |
+      | 1    | editingteacher |
 
   Scenario Outline: An administrator should always be allowed to join a meeting
     Given the following course exists:
@@ -77,10 +77,10 @@ Feature: Test the ability to start a meeting
     When I am on the "Room recordings" Activity page logged in as admin
     Then "Join session" "link" should exist
 
-  Examples:
-    | wait |
-    | 0    |
-    | 1    |
+    Examples:
+      | wait |
+      | 0    |
+      | 1    |
 
   Scenario Outline: A student moderator should be able to start a meeting
     Given the following course exists:
@@ -102,9 +102,9 @@ Feature: Test the ability to start a meeting
     When I am on the "Room recordings" Activity page logged in as traverst
     Then "Join session" "link" should exist
 
-  Examples:
-    | wait | moderators    |
-    | 0    | user:traverst |
-    | 1    | user:traverst |
-    | 0    | role:student  |
-    | 1    | role:student  |
+    Examples:
+      | wait | moderators    |
+      | 0    | user:traverst |
+      | 1    | user:traverst |
+      | 0    | role:student  |
+      | 1    | role:student  |

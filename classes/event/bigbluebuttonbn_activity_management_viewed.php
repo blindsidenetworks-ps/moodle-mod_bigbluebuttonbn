@@ -13,16 +13,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_bigbluebuttonbn\event;
 
 /**
  * The mod_bigbluebuttonbn activity management viewed event.
  *
+ * @package   mod_bigbluebuttonbn
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class bigbluebuttonbn_activity_management_viewed extends base
-{
+class bigbluebuttonbn_activity_management_viewed extends base {
     /**
      * Init method.
      * @param string $crud

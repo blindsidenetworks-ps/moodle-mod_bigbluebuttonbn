@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn\local\proxy;
+
+use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
+
 /**
  * The recording proxy.
  *
@@ -26,11 +30,6 @@
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-
-namespace mod_bigbluebuttonbn\local\proxy;
-
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
-
 class recording_proxy extends proxy_base {
     /**
      * Perform deleteRecordings on BBB.
@@ -101,7 +100,7 @@ class recording_proxy extends proxy_base {
      * Helper function to fetch recordings from a BigBlueButton server.
      *
      * @param array $keyids list of meetingids or recordingids
-     * @param string $key, the param name used for the BBB request (<recordID>|meetingID)
+     * @param string $key the param name used for the BBB request (<recordID>|meetingID)
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
     public static function fetch_recordings(array $keyids = [], string $key = 'recordID'): array {
