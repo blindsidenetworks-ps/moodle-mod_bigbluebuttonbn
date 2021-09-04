@@ -2,6 +2,9 @@
 Feature: Test the ability to run the full meeting lifecycle (start to end)
   I can start a meeting then end it
 
+  Background:
+    Given a BigBlueButton mock server is configured
+
   Scenario: Users should be able to join a meeting then end the meeting for themselves and
     return to the meeting page to join again.
     Given the following course exists:

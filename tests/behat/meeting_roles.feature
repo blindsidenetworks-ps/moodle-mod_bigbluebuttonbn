@@ -4,6 +4,9 @@ Feature: Test that meeting roles are sent to the server
   As a teacher
   I need meeting roles to be sent to the meeting
 
+  Background:
+    Given a BigBlueButton mock server is configured
+
   @javascript
   Scenario Outline: Users should receive the appropriate role when joining the meeting
     Given the following course exists:

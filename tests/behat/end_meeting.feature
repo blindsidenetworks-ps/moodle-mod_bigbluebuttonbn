@@ -4,6 +4,9 @@ Feature: Test the ability to end a meeting
   As a teacher
   I need to control who can end a meeting
 
+  Background:
+    Given a BigBlueButton mock server is configured
+
   Scenario Outline: Only a BigBlueButton moderator can end a session
     Given the following course exists:
       | name      | Test course |

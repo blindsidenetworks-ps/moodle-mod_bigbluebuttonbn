@@ -73,7 +73,7 @@ abstract class proxy_base {
      */
     protected static function sanitized_url() {
         $serverurl = trim(config::get('server_url'));
-        if (defined('BEHAT_SITE_RUNNING') || PHPUNIT_TEST) {
+        if (PHPUNIT_TEST) {
             $serverurl = (new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER))->out(false);
         }
         if (substr($serverurl, -1) == '/') {
