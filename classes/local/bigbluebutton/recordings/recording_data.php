@@ -16,21 +16,14 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
-use context_course;
-use core_calendar\local\event\value_objects\action;
-use html_writer;
 use mod_bigbluebuttonbn\output\recording_row_actionbar;
 use mod_bigbluebuttonbn\output\recording_row_playback;
 use mod_bigbluebuttonbn\output\recording_row_preview;
-use mod_bigbluebuttonbn\output\recordings_row_playback;
-use pix_icon;
 use stdClass;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\output\recording_description_editable;
 use mod_bigbluebuttonbn\output\recording_name_editable;
-use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\recording;
 use function floatval;
 use function is_null;
@@ -119,7 +112,7 @@ class recording_data {
      * @return boolean
      */
     public static function preview_enabled(instance $instance): bool {
-        return (bigbluebutton_proxy::get_server_version() >= 1.0 && $instance->get_instance_var('recordings_preview') == '1');
+        return $instance->get_instance_var('recordings_preview') == '1';
     }
 
     /**

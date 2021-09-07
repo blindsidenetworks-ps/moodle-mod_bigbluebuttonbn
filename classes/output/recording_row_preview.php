@@ -63,6 +63,7 @@ class recording_row_preview implements renderable, templatable {
         $context->recordingpreviews = [];
 
         foreach ($playbacks as $playback) {
+            $recordingpreview = new stdClass();
             if (isset($playback['preview'])) {
                 $recordingpreview = new stdClass();
                 $recordingpreview->thumbnails = [];

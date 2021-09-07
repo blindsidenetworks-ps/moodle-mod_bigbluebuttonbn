@@ -139,6 +139,36 @@ class get_recordings_test extends \externallib_advanced_testcase {
     }
 
     /**
+     * Check preview is present and displayed
+     */
+    public function test_get_recordings_preview() {
+        $this->resetAfterTest();
+        $dataset = [
+            'type' => instance::TYPE_ALL,
+            'additionalsettings' => [
+                'recordings_preview' => 1
+            ],
+            'groups' => null,
+            'users' => [['username' => 't1', 'role' => 'editingteacher'], ['username' => 's1', 'role' => 'student']],
+            'recordingsdata' => [
+                [['name' => 'Recording1']],
+                [['name' => 'Recording2']]
+            ],
+        ];
+        $activityid = $this->create_from_dataset($dataset);
+        $instance = instance::get_from_instanceid($activityid);
+
+        $context = \context_course::instance($instance->get_course_id());
+        foreach ($dataset['users'] as $userdef) {
+            $user = \core_user::get_user_by_username($userdef['username']);
+            $this->setUser($user);
+            $getrecordings = $this->get_recordings($instance->get_instance_id());
+            $this->assertNotEmpty($getrecordings['tabledata']['columns']['3']);
+            $this->assertEquals('preview', $getrecordings['tabledata']['columns']['3']['key']);
+        }
+    }
+
+    /**
      * Check we can see all recording from a cours in a room only instance
      */
     public function test_get_recordings_room_only() {
