@@ -61,7 +61,9 @@ abstract class proxy_base {
             return 'meta_' . $k;
         }, array_keys($metadata)), $metadata);
 
-        $params = http_build_query($data + $metadata, '', '&');
+        $paramlist = array_map('rawurlencode', array_merge($data, $metadata));
+
+        $params = http_build_query($paramlist, '', '&');
         return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
     }
 
@@ -72,7 +74,7 @@ abstract class proxy_base {
      */
     protected static function sanitized_url() {
         $serverurl = trim(config::get('server_url'));
-        if (PHPUNIT_TEST) {
+        if (PHPUNIT_TEST && defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
             $serverurl = (new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER))->out(false);
         }
         if (substr($serverurl, -1) == '/') {
