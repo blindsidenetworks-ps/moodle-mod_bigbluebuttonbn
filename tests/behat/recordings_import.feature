@@ -3,7 +3,8 @@ Feature: Manage and list recordings
   As a user I am able to import existing recording into another bigbluebutton activity
 
   Background:  Make sure that import recording is enabled and course, activities and recording exists
-    Given the following config values are set as admin:
+    Given a BigBlueButton mock server is configured
+    And the following config values are set as admin:
       | bigbluebuttonbn_importrecordings_enabled | 1 |
     And the following "courses" exist:
       | fullname      | shortname | category |

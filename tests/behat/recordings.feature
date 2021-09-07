@@ -3,7 +3,8 @@ Feature: The recording can be managed through the room page
   As a user I am able to see the relevant recording for a given bigbluebutton activity and modify its parameters
 
   Background:  Make sure that import recording is enabled and course, activities and recording exists
-    Given the following "courses" exist:
+    Given a BigBlueButton mock server is configured
+    And the following "courses" exist:
       | fullname      | shortname | category |
       | Test Course 1 | C1        | 0        |
       | Test Course 2 | C2        | 0        |

@@ -43,13 +43,24 @@ class behat_mod_bigbluebuttonbn extends behat_base {
      * @BeforeScenario @mod_bigbluebuttonbn
      */
     public function before_scenario(BeforeScenarioScope $scope) {
+        if (defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            $this->send_mock_request('backoffice/reset');
+        }
+    }
+
+    /**
+     * Ensure that it is possible to connect to a bbb mock server.
+     *
+     * @Given /^a BigBlueButton mock server is configured$/
+     */
+    public function mock_is_configured(): void {
         if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
             throw new SkippedException(
                 'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
             );
         }
 
-        $this->send_mock_request('backoffice/reset');
+        set_config('bigbluebuttonbn_server_url', TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER);
     }
 
     /**

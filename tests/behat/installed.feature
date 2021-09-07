@@ -4,6 +4,9 @@ Feature: Installation succeeds
   As a user
   I need the installation to work
 
+  Background:
+    Given a BigBlueButton mock server is configured
+
   Scenario: Check the Plugins overview for the name of this plugin
     When I log in as "admin"
     And I navigate to "Plugins > Plugins overview" in site administration

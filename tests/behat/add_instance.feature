@@ -5,7 +5,8 @@ Feature: bigbluebuttonbn instance
   I need to add three room activities to an existent course
 
   Background:  Make sure that a course is created
-    Given the following "courses" exist:
+    Given a BigBlueButton mock server is configured
+    And the following "courses" exist:
       | fullname    | shortname   | category |
       | Test course | Test course | 0        |
 

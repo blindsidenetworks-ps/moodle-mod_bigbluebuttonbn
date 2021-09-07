@@ -4,6 +4,9 @@ Feature: Test the ability to start a meeting
   As a teacher
   I need to control who can start a meeting
 
+  Background:
+    Given a BigBlueButton mock server is configured
+
   Scenario Outline: Users should be able to join a session depending on the Wait for moderator to join setting
     Given the following course exists:
       | name      | Test course |

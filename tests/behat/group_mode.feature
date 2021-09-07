@@ -3,7 +3,8 @@ Feature: Test the module in group mode.
 
   Background:
     # 1 = separate groups, we force the group
-    Given the following "courses" exist:
+    Given a BigBlueButton mock server is configured
+    And the following "courses" exist:
       | fullname      | shortname | category | groupmode | groupmodeforce |
       | Test Course 1 | C1        | 0        | 1         | 1              |
     And the following "groups" exist:
