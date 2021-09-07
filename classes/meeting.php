@@ -463,9 +463,9 @@ class meeting {
      * Join the meeting.
      *
      * @param int $origin The spec
-     * @return moodle_url redirecturl
+     * @return string The URL to redirect to
      */
-    public function join(int $origin): moodle_url {
+    public function join(int $origin): string {
         $this->do_get_meeting_info(true);
 
         if ($this->is_running() && !$this->can_join()) {
@@ -478,6 +478,6 @@ class meeting {
 
         // Before executing the redirect, increment the number of participants.
         roles::participant_joined($this->instance->get_meeting_id(), $this->instance->does_current_user_count_towards_user_limit());
-        return new moodle_url($this->get_join_url());
+        return $this->get_join_url();
     }
 }
