@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn\output;
 
 use core\notification;
+use core\output\inplace_editable;
 use html_table;
 use html_writer;
 use mod_bigbluebuttonbn\instance;
@@ -95,5 +96,15 @@ class renderer extends plugin_renderer_base {
             'mod_bigbluebuttonbn/view_page',
             $page->export_for_template($this)
         );
+    }
+
+    /**
+     * Render inplace editable
+     *
+     * @param inplace_editable $e
+     * @return bool|string
+     */
+    public function render_inplace_editable(inplace_editable $e) {
+        return $this->render_from_template('core/inplace_editable', $e->export_for_template($this));
     }
 }
