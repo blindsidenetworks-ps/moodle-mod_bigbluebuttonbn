@@ -191,7 +191,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         if (isset($options['imported']) && $options['imported']) {
             $precording = $recording->create_imported_recording($instance);
         } else {
-            $recording->recordingid = $this->add_recording($instance, $recording, $data);
+            $recording->recordingid = $this->create_mockserver_recording($instance, $recording, $data);
             $precording = new recording(0, $recording);
             $precording->create();
         }
@@ -202,13 +202,13 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
      * Add a recording in the mock server
      *
      * @param instance $instance
-     * @param stdClass $recording
+     * @param stdClass $recordingdata
      * @param array $data
      * @return string
      * @throws moodle_exception
      */
-    protected function add_recording(instance $instance, stdClass $recording, array $data): string {
-        $mockdata = array_merge((array) $recording, [
+    protected function create_mockserver_recording(instance $instance, stdClass $recordingdata, array $data): string {
+        $mockdata = array_merge((array) $recordingdata, [
             'meetingID' => $instance->get_meeting_id(),
             'meta' => [
                 'isBreakout' => 'false',
