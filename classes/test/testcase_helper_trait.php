@@ -218,7 +218,8 @@ trait testcase_helper_trait {
      * @throws \dml_exception
      */
     protected function create_from_dataset($dataset) {
-        list('type' => $type, 'recordingsdata' => $recordingsdata, 'groups' => $groups, 'users' => $users) = $dataset;
+        list('type' => $type, 'recordingsdata' => $recordingsdata, 'groups' => $groups,
+            'users' => $users) = $dataset;
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
 
         $coursedata = empty($groups) ? [] : ['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS];
@@ -237,11 +238,15 @@ trait testcase_helper_trait {
                 }
             }
         }
-        $activity = $plugingenerator->create_instance([
+        $instancesettings = [
             'course' => $this->course->id,
             'type' => $type,
-            'name' => 'Example'
-        ]);
+            'name' => 'Example',
+        ];
+        if (!empty($dataset['additionalsettings'])) {
+            $instancesettings = array_merge($instancesettings, $dataset['additionalsettings']);
+        }
+        $activity = $plugingenerator->create_instance($instancesettings);
         $instance = instance::get_from_instanceid($activity->id);
         foreach ($recordingsdata as $groupname => $recordings) {
             if ($groups) {
