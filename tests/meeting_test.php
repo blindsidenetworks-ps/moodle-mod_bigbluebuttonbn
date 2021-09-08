@@ -40,6 +40,9 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
 class meeting_test extends \advanced_testcase {
     use testcase_helper_trait;
 
+    /**
+     * Setup Test
+     */
     public function setUp(): void {
         parent::setUp();
 
@@ -50,6 +53,8 @@ class meeting_test extends \advanced_testcase {
     }
 
     /**
+     * Get a list of possible test (dataprovider)
+     *
      * @return array[]
      */
     public function get_instance_types_meeting_info(): array {
@@ -77,6 +82,8 @@ class meeting_test extends \advanced_testcase {
      * Test for bigbluebuttonbn_get_allrecordings status refresh.
      *
      * @dataProvider get_instance_types_meeting_info
+     * @param int $type
+     * @param string $groupname
      * @covers ::create_meeting
      * @covers ::create_meeting_data
      * @covers ::create_meeting_metadata
@@ -109,6 +116,8 @@ class meeting_test extends \advanced_testcase {
     /**
      * Test for get meeting info
      *
+     * @param int $type
+     * @param string $groupname
      * @dataProvider get_instance_types_meeting_info
      * @covers ::get_meeting_info
      * @covers ::do_get_meeting_info

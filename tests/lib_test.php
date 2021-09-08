@@ -50,6 +50,8 @@ class lib_test extends \advanced_testcase {
     use testcase_helper_trait;
 
     /**
+     * Check support
+     *
      * @covers ::bigbluebuttonbn_supports
      */
     public function test_bigbluebuttonbn_supports() {
@@ -60,6 +62,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check add instance
+     *
      * @covers ::bigbluebuttonbn_add_instance
      */
     public function test_bigbluebuttonbn_add_instance() {
@@ -71,6 +75,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check update instance
+     *
      * @covers ::bigbluebuttonbn_update_instance
      */
     public function test_bigbluebuttonbn_update_instance() {
@@ -82,6 +88,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check delete instance
+     *
      * @covers ::bigbluebuttonbn_delete_instance
      */
     public function test_bigbluebuttonbn_delete_instance() {
@@ -92,6 +100,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check user outline page
+     *
      * @covers ::bigbluebuttonbn_user_outline
      */
     public function test_bigbluebuttonbn_user_outline() {
@@ -116,6 +126,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check user completion
+     *
      * @covers ::bigbluebuttonbn_user_complete
      */
     public function test_bigbluebuttonbn_user_complete() {
@@ -136,6 +148,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check extra capabilities return value
+     *
      * @covers ::bigbluebuttonbn_get_extra_capabilities
      */
     public function test_bigbluebuttonbn_get_extra_capabilities() {
@@ -144,6 +158,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check form definition
+     *
      * @covers ::bigbluebuttonbn_reset_course_form_definition
      */
     public function test_bigbluebuttonbn_reset_course_form_definition() {
@@ -172,6 +188,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check defaults for form
+     *
      * @covers ::bigbluebuttonbn_reset_course_form_defaults
      */
     public function test_bigbluebuttonbn_reset_course_form_defaults() {
@@ -187,6 +205,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check user data
+     *
      * @covers ::bigbluebuttonbn_reset_userdata
      */
     public function test_bigbluebuttonbn_reset_userdata() {
@@ -209,6 +229,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check course module
+     *
      * @covers ::bigbluebuttonbn_get_coursemodule_info
      */
     public function test_bigbluebuttonbn_get_coursemodule_info() {
@@ -219,6 +241,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check update since
+     *
      * @covers ::bigbluebuttonbn_check_updates_since
      */
     public function test_bigbluebuttonbn_check_updates_since() {
@@ -233,6 +257,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check font awesome icon map
+     *
      * @covers ::mod_bigbluebuttonbn_get_fontawesome_icon_map
      */
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
@@ -242,6 +268,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check event action (calendar)
+     *
      * @covers ::mod_bigbluebuttonbn_core_calendar_provide_event_action
      */
     public function test_mod_bigbluebuttonbn_core_calendar_provide_event_action() {
@@ -315,6 +343,8 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Check additional setting menu
+     *
      * @covers ::bigbluebuttonbn_extend_settings_navigation
      */
     public function test_bigbluebuttonbn_extend_settings_navigation_user() {

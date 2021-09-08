@@ -168,6 +168,11 @@ class instance_test extends advanced_testcase {
         instance::get_from_meetingid($meetingid);
     }
 
+    /**
+     * Provide invalid meeting examples
+     *
+     * @return \string[][]
+     */
     public function invalid_meetingid_provider(): array {
         // Meeting IDs are in the formats:
         // - <meetingid[string]>-<courseid[number]>-<instanceid[number]>
@@ -292,6 +297,8 @@ class instance_test extends advanced_testcase {
     }
 
     /**
+     * Check instance currently open
+     *
      * @dataProvider is_currently_open_provider
      * @param null|int $openingtime
      * @param null|int $closingtime
@@ -410,7 +417,7 @@ class instance_test extends advanced_testcase {
      * @dataProvider get_current_user_password_provider
      * @param bool $isadmin
      * @param bool $ismoderator
-     * @param bool $expected
+     * @param bool $expectedmodpassword
      */
     public function test_get_current_user_password(bool $isadmin, bool $ismoderator, bool $expectedmodpassword): void {
         $stub = $this->getMockBuilder(instance::class)

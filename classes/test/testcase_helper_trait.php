@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_bigbluebuttonbn\test;
-
-use context_module;
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\meeting;
-use stdClass;
-use testing_data_generator;
-
 /**
  * BBB Library tests class trait.
  *
@@ -30,6 +22,14 @@ use testing_data_generator;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
+namespace mod_bigbluebuttonbn\test;
+
+use context_module;
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\meeting;
+use stdClass;
+use testing_data_generator;
+
 trait testcase_helper_trait {
     /** @var testing_data_generator|null */
     protected $generator = null;
@@ -38,13 +38,12 @@ trait testcase_helper_trait {
     protected $course = null;
 
     /**
-     * Convenience function to create a instance of an bigbluebuttonactivty.
+     * Convenience function to create an instance of a bigbluebuttonactivty.
      *
      * @param object|null $course course to add the module to
      * @param array $params Array of parameters to pass to the generator
      * @param array $options Array of options to pass to the generator
      * @return array($context, $cm, $instance) Testable wrapper around the assign class.
-     * @throws \moodle_exception
      */
     protected function create_instance($course = null, $params = [], $options = []) {
         if (!$course) {

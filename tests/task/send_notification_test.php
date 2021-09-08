@@ -32,6 +32,10 @@ use stdClass;
  * @coversDefaultClass \mod_bigbluebuttonbn\task\send_notification
  */
 class send_notification_test extends advanced_testcase {
+    /**
+     * Check if set instance ID works correctly
+     *
+     */
     public function test_set_instance_id(): void {
         $this->resetAfterTest();
         $stub = $this->getMockForAbstractClass(

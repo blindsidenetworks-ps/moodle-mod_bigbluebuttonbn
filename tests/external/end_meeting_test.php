@@ -30,24 +30,35 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 /**
  * Tests for the update_course class.
  *
- * @package    core_course
- * @category   test
+ * @package   mod_bigbluebuttonbn
  * @copyright  2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_bigbluebuttonbn\external\end_meeting
  */
 class end_meeting_test extends \externallib_advanced_testcase {
+    /**
+     * Helper
+     *
+     * @param mixed $params
+     * @return array|bool|mixed
+     */
     protected function end_meeting(...$params) {
         $canjoin = end_meeting::execute(...$params);
 
         return external_api::clean_returnvalue(end_meeting::execute_returns(), $canjoin);
     }
 
+    /**
+     * Test execute API CALL with no instance
+     */
     public function test_execute_no_instance() {
         $this->expectException(moodle_exception::class);
         $endmeeting = $this->end_meeting(1234, 5678);
     }
 
+    /**
+     * Test execute API CALL without login
+     */
     public function test_execute_without_login() {
         $this->resetAfterTest();
 
@@ -59,6 +70,9 @@ class end_meeting_test extends \externallib_advanced_testcase {
         $this->end_meeting($instance->get_instance_id(), 0);
     }
 
+    /**
+     * Test execute API CALL with invalid login
+     */
     public function test_execute_with_invalid_login() {
         $this->resetAfterTest();
 
@@ -74,6 +88,9 @@ class end_meeting_test extends \externallib_advanced_testcase {
         $this->end_meeting($instance->get_instance_id(), 0);
     }
 
+    /**
+     * When login as a student
+     */
     public function test_execute_with_student_login() {
         $this->resetAfterTest();
 
@@ -89,6 +106,9 @@ class end_meeting_test extends \externallib_advanced_testcase {
         $this->end_meeting($instance->get_instance_id(), 0);
     }
 
+    /**
+     * Test execute admin logic
+     */
     public function test_execute_with_admin_login() {
         $this->resetAfterTest();
 

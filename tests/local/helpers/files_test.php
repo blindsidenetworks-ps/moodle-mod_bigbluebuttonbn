@@ -163,6 +163,11 @@ class files_test extends \advanced_testcase {
         $this->assertEquals('/bbfile.pptx', $mediafilepath);
     }
 
+    /**
+     * Create a user and an activity
+     *
+     * @return array
+     */
     protected function create_user_and_activity(): array {
         $generator = $this->getDataGenerator();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();

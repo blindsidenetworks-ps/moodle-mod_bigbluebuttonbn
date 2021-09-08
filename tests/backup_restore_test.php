@@ -43,6 +43,9 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 class backup_restore_test extends restore_date_testcase {
     use testcase_helper_trait;
 
+    /**
+     * Setup
+     */
     public function setUp(): void {
         parent::setUp();
 
@@ -176,6 +179,12 @@ class backup_restore_test extends restore_date_testcase {
         }
     }
 
+    /**
+     * Check two bbb activities are the same
+     *
+     * @param object $bbboriginal
+     * @param object $bbbdest
+     */
     protected function assert_bbb_activities_same($bbboriginal, $bbbdest) {
         $this->assertNotFalse($bbbdest);
         $filterfunction = function($key) {

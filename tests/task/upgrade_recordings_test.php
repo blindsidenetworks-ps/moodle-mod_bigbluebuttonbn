@@ -45,6 +45,9 @@ class upgrade_recordings_test extends advanced_testcase {
      */
     protected $logs = [];
 
+    /**
+     * Setup
+     */
     public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
@@ -54,6 +57,9 @@ class upgrade_recordings_test extends advanced_testcase {
         $DB->delete_records(recording::TABLE);
     }
 
+    /**
+     * Test Upgrade recordings
+     */
     public function test_upgrade_recordings(): void {
         global $DB;
         $upgraderecording = new upgrade_recordings();

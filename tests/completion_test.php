@@ -28,7 +28,7 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  * @copyright 2021 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
- * @covers mod_bigbluebuttonbn\completion\custom_completion
+ * @covers \mod_bigbluebuttonbn\completion\custom_completion
  */
 class completion_test extends \advanced_testcase {
     use testcase_helper_trait;
@@ -41,7 +41,7 @@ class completion_test extends \advanced_testcase {
     }
 
     /**
-     *
+     * Completion with no rules
      */
     public function test_bigbluebuttonbn_get_completion_state_no_rules() {
         $this->resetAfterTest();
@@ -57,7 +57,7 @@ class completion_test extends \advanced_testcase {
     }
 
     /**
-     *
+     * With state incomplete
      */
     public function test_bigbluebuttonbn_get_completion_state_incomplete() {
         $this->resetAfterTest();
@@ -77,6 +77,9 @@ class completion_test extends \advanced_testcase {
         $this->assertEquals(COMPLETION_INCOMPLETE, $result);
     }
 
+    /**
+     * With state complete
+     */
     public function test_bigbluebuttonbn_get_completion_state_complete() {
         $this->resetAfterTest();
 
@@ -107,6 +110,9 @@ class completion_test extends \advanced_testcase {
         $this->assertEquals(COMPLETION_COMPLETE, $result);
     }
 
+    /**
+     * No rule description but active
+     */
     public function test_mod_bigbluebuttonbn_get_completion_active_rule_descriptions() {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
@@ -166,6 +172,9 @@ class completion_test extends \advanced_testcase {
             ], $completioncm2->get_custom_rule_descriptions());
     }
 
+    /**
+     * Completion View
+     */
     public function test_bigbluebuttonbn_view() {
         $this->resetAfterTest();
         $this->setAdminUser();

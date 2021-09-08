@@ -65,7 +65,7 @@ class recording extends persistent {
     /** @var int A refresh period for recordings, defaults to 300s (5mins) */
     public const RECORDING_REFRESH_DEFAULT_PERIOD = 300;
 
-    /** var object */
+    /** @var array $metadata */
     protected $metadata = null;
 
     /**
