@@ -21,27 +21,26 @@
 
     Example context (json):
     {
-        'id': '1',
-        'dataimported': true,
-        'title' : 'Title for this row',
-        'playbacks': [
-            {
-                "disabled": false,
-                "url": "#",
-                "id": "test-id",
-                "classes": "btn btn-link",
-                "attributes": [
+       "id":"1",
+       "recordingid":"1",
+       "tools":[
+          {
+             "disabled":false,
+             "url":"#",
+             "id":"test-id",
+             "classes":"btn btn-link",
+             "attributes":[
                 {
-                    "name": "title",
-                    "value": "Action link's title",
-                    "class": "'btn btn-sm btn-default",
-                    "onclick": "M.mod_bigbluebuttonbn.recordings.recordingPlay(this);",
-                    "data-action": "play"
+                   "name":"title",
+                   "value":"Action link's title",
+                   "class":"'btn btn-sm btn-default",
+                   "onclick":"M.mod_bigbluebuttonbn.recordings.recordingPlay(this);",
+                   "data-action":"play"
                 }
-                ],
-                "text": "This is an action link"
-            }
-        ]
+             ],
+             "text":"This is an action link"
+          }
+       ]
     }
 }}
 <div id="{{id}}" data-imported="{{dataimported}}" data-recordingid="{{recordingid}}" data-additionaloptions="{{additionaloptions}}"
