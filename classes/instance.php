@@ -805,12 +805,12 @@ EOF;
      */
     public function get_presentation(): ?array {
         if ($this->has_ended()) {
-            return files::get_presentation_array(
+            return files::get_presentation(
                 $this->get_context(),
                 $this->get_instance_var('presentation')
             );
         } else if ($this->is_currently_open()) {
-            return files::get_presentation_array(
+            return files::get_presentation(
                 $this->get_context(),
                 $this->get_instance_var('presentation'),
                 $this->get_instance_id()
