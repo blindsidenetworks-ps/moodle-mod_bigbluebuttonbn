@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\external;
 
 use external_api;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use moodle_exception;
 use require_login_exception;
 use restricted_context_exception;
@@ -36,10 +37,19 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @coversDefaultClass \mod_bigbluebuttonbn\external\end_meeting
  */
 class end_meeting_test extends \externallib_advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup for test
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->require_mock_server();
+    }
+
     /**
      * Helper
      *
-     * @param mixed $params
+     * @param mixed $params,...
      * @return array|bool|mixed
      */
     protected function end_meeting(...$params) {

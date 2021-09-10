@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\external;
 
 use external_api;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,10 +36,18 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @coversDefaultClass \mod_bigbluebuttonbn\external\can_join
  */
 class can_join_test extends \externallib_advanced_testcase {
+    use testcase_helper_trait;
+    /**
+     * Setup for test
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->require_mock_server();
+    }
     /**
      * Helper
      *
-     * @param mixed $params
+     * @param mixed $params,...
      * @return array|bool|mixed
      * @throws \invalid_response_exception
      * @throws \restricted_context_exception
