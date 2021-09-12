@@ -37,13 +37,34 @@ use stdClass;
 class upgrade_recordings_imported_test extends advanced_testcase {
     use testcase_helper_trait;
 
+    /**
+     * @var object $course
+     */
     protected $course;
+    /**
+     * @var object $bbbinstance
+     */
     protected $bbbinstance;
+    /**
+     * @var array $groups
+     */
     protected $groups;
+    /**
+     * @var array $teachers
+     */
     protected $teachers;
+    /**
+     * @var array $students
+     */
     protected $students;
+    /**
+     * @var array $logs
+     */
     protected $logs = [];
 
+    /**
+     * Setup
+     */
     public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
@@ -84,6 +105,9 @@ class upgrade_recordings_imported_test extends advanced_testcase {
         }
     }
 
+    /**
+     * Upgrade task test
+     */
     public function test_upgrade_recordings(): void {
         global $DB;
         $upgraderecording = new upgrade_imported_recordings();

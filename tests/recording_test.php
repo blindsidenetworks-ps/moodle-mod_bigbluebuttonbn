@@ -40,6 +40,9 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
 class recording_test extends \advanced_testcase {
     use testcase_helper_trait;
 
+    /**
+     * Setup for test
+     */
     public function setUp(): void {
         parent::setUp();
 
@@ -50,6 +53,7 @@ class recording_test extends \advanced_testcase {
     /**
      * Test for bigbluebuttonbn_get_allrecordings status refresh.
      *
+     * @param int $status
      * @dataProvider get_status_provider
      * @covers ::get
      */
@@ -61,6 +65,8 @@ class recording_test extends \advanced_testcase {
     }
 
     /**
+     * Get name
+     *
      * @covers ::get_name
      */
     public function test_get_name(): void {
@@ -71,6 +77,8 @@ class recording_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description
+     *
      * @covers ::get_description
      */
     public function test_get_description(): void {
@@ -82,6 +90,11 @@ class recording_test extends \advanced_testcase {
         $this->assertEquals('Example description', (new recording($recordings[0]->id))->get('description'));
     }
 
+    /**
+     * Get possible status
+     *
+     * @return array[]
+     */
     public function get_status_provider(): array {
         return [
             [recording::RECORDING_STATUS_PROCESSED],
@@ -109,6 +122,11 @@ class recording_test extends \advanced_testcase {
         $this->assertCount($recordingcount, $recordings);
     }
 
+    /**
+     * Get possible type for recording / tests
+     *
+     * @return array[]
+     */
     public function get_allrecordings_types_provider(): array {
         return [
             'Instance Type ALL' => [
@@ -126,6 +144,7 @@ class recording_test extends \advanced_testcase {
     /**
      * Test for bigbluebuttonbn_get_allrecordings().
      *
+     * @param int $type
      * @dataProvider get_allrecordings_types_provider
      */
     public function test_get_recording_for_group($type) {
@@ -187,8 +206,8 @@ class recording_test extends \advanced_testcase {
     /**
      * Check that a recording exist in the list of recordings
      *
-     * @param $recordingname
-     * @param $recordings
+     * @param string $recordingname
+     * @param array $recordings
      */
     public function assert_has_recording_by_name($recordingname, $recordings) {
         $recordingnames = array_map(function($r) {

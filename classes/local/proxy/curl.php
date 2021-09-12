@@ -97,7 +97,6 @@ class curl extends \curl {
      * Fetch the specified URL via a HEAD request.
      *
      * @param string $url
-     * @param string $params
      * @param array $options
      */
     public function head($url, $options = []) {

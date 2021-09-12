@@ -271,7 +271,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
     /**
      * Create a log record
      *
-     * @param null $record
+     * @param mixed $record
      * @param array|null $options
      */
     public function create_log($record, array $options = null) {
@@ -282,6 +282,12 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         ], (array) $record);
 
         $testlogclass = new class extends logger {
+            /**
+             * Log test event
+             *
+             * @param instance $instance
+             * @param object $record
+             */
             public static function log_test_event(instance $instance, $record): void {
                 self::log(
                     $instance,

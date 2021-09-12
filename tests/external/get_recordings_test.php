@@ -39,13 +39,28 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  */
 class get_recordings_test extends \externallib_advanced_testcase {
     use testcase_helper_trait;
-
+    /**
+     * Setup for test
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->require_mock_server();
+    }
+    /**
+     * Helper
+     *
+     * @param mixed $params,...
+     * @return array|bool|mixed
+     */
     protected function get_recordings(...$params) {
         $recordings = get_recordings::execute(...$params);
 
         return external_api::clean_returnvalue(get_recordings::execute_returns(), $recordings);
     }
 
+    /**
+     * Test execute API CALL with no instance
+     */
     public function test_execute_wrong_instance() {
         $getrecordings = $this->get_recordings(1234);
 
@@ -55,6 +70,9 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $this->assertStringContainsString('nosuchinstance', $getrecordings['warnings'][0]['warningcode']);
     }
 
+    /**
+     * Test execute API CALL without login
+     */
     public function test_execute_without_login() {
         $this->resetAfterTest();
 
@@ -66,6 +84,9 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $this->get_recordings($instance->get_instance_id());
     }
 
+    /**
+     * Test execute API CALL with invalid login
+     */
     public function test_execute_with_invalid_login() {
         $this->resetAfterTest();
 
@@ -81,6 +102,9 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $this->get_recordings($instance->get_instance_id());
     }
 
+    /**
+     * When login as a student
+     */
     public function test_execute_with_valid_login() {
         $this->resetAfterTest();
 

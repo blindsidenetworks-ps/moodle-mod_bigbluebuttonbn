@@ -41,6 +41,8 @@ class behat_mod_bigbluebuttonbn extends behat_base {
      * BeforeScenario hook to reset the remote testpoint.
      *
      * @BeforeScenario @mod_bigbluebuttonbn
+     *
+     * @param BeforeScenarioScope $scope
      */
     public function before_scenario(BeforeScenarioScope $scope) {
         if (defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
@@ -147,6 +149,7 @@ XPATH
 
     /**
      * Get course id from its identifier (shortname or fullname or idnumber)
+     *
      * @param string $identifier
      * @return int
      * @throws dml_exception
@@ -168,6 +171,8 @@ XPATH
     }
 
     /**
+     * Trigger a recording ready notification on BBB side
+     *
      * @Given the BigBlueButtonBN server has sent recording ready notifications
      */
     public function trigger_recording_ready_notification(): void {

@@ -48,6 +48,11 @@ class recording_data_test extends \advanced_testcase {
         $this->assertEquals($name, recording_data::type_text($type));
     }
 
+    /**
+     * Type of recordings (dataprovider)
+     *
+     * @return \string[][]
+     */
     public function type_text_provider(): array {
         return [
             ['Presentation', 'presentation'],

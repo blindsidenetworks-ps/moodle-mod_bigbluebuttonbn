@@ -96,6 +96,7 @@ class behat_mod_bigbluebuttonbn_generator extends behat_generator_base {
      *
      * @param string $activityname
      * @return int
+     * @throws Exception
      */
     protected function get_activity_id(string $activityname): int {
         global $DB;
