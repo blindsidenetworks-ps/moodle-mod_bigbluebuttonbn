@@ -799,21 +799,48 @@ EOF;
     }
 
     /**
-     * Get the presentation data.
+     * Get the presentation data for internal use.
+     *
+     * The URL returned for the presentation will be accessible through moodle with checks about user being logged in.
      *
      * @return array|null
      */
     public function get_presentation(): ?array {
+        return $this->do_get_presentation_with_nonce(false);
+    }
+
+    /**
+     * Get the presentation data for external API url.
+     *
+     * The URL returned for the presentation will be accessible publicly but once and with a specific URL.
+     *
+     * @param bool $withnonce return url with a nonce value to be accessible through bigbluebuttonbn
+     * @return array|null
+     */
+    public function get_presentation_for_bigbluebutton_upload(): ?array {
+        return $this->do_get_presentation_with_nonce(true);
+    }
+
+    /**
+     * Generate Presentation URL
+     *
+     * @param boolean $withnonce The generated url will have a nonce included
+     * @return array|null
+     */
+    protected function do_get_presentation_with_nonce(bool $withnonce): ?array {
         if ($this->has_ended()) {
             return files::get_presentation(
                 $this->get_context(),
-                $this->get_instance_var('presentation')
+                $this->get_instance_var('presentation'),
+                null,
+                $withnonce
             );
         } else if ($this->is_currently_open()) {
             return files::get_presentation(
                 $this->get_context(),
                 $this->get_instance_var('presentation'),
-                $this->get_instance_id()
+                $this->get_instance_id(),
+                $withnonce
             );
         } else {
             return [];

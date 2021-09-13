@@ -94,7 +94,7 @@ class files_test extends \advanced_testcase {
 
         $instance = instance::get_from_instanceid($bbactivity->id);
         $mediafilename =
-            files::pluginfile_filename($this->get_course(), $instance->get_cm(), $instance->get_context(), ['presentation.pptx']);
+            files::get_plugin_filename($this->get_course(), $instance->get_cm(), $instance->get_context(), ['presentation.pptx']);
         $this->assertEquals('presentation.pptx', $mediafilename);
     }
 
@@ -109,7 +109,7 @@ class files_test extends \advanced_testcase {
         $this->setUser($user);
 
         $instance = instance::get_from_instanceid($bbactivity->id);
-        $presentation = $instance->get_presentation();
+        $presentation = $instance->get_presentation_for_bigbluebutton_upload();
         $fulldirset = explode('/', $presentation['url']);
         $filename = array_pop($fulldirset);;
         $nonce = array_pop($fulldirset);
@@ -123,6 +123,32 @@ class files_test extends \advanced_testcase {
                 [$nonce, $filename]);
         $this->assertFalse($mediafile);
     }
+    /**
+     * Test that file is accessible only once.
+     */
+    public function test_presentation_file_not_accessible_externally() {
+        global $CFG;
+        $this->resetAfterTest();
+
+        list($user, $bbactivity) = $this->create_user_and_activity($CFG->dirroot . self::PRESENTATION_FILEPATH);
+        $this->setUser($user);
+
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        $presentation = $instance->get_presentation();
+        $fulldirset = explode('/', $presentation['url']);
+        $filename = array_pop($fulldirset);;
+        $this->setGuestUser();
+        $this->expectException(\require_login_exception::class);
+        files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
+                [$filename]);
+
+        $this->setUser($user);
+        $mediafile =
+            files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
+                [$filename]);
+        $this->assertNotNull($mediafile);
+    }
+
 
     /**
      * Get filename test
@@ -133,11 +159,11 @@ class files_test extends \advanced_testcase {
         list($user, $bbactivity, $bbactivitycm, $bbactivitycontext) = $this->create_user_and_activity();
         $this->setUser($user);
         $this->create_sample_file(self::PRESENTATION_FILENAME, $bbactivitycontext->id);
-        $presentationdef = files::get_presentation($bbactivitycontext, self::PRESENTATION_FILENAME, $bbactivity->id);
+        $presentationdef = files::get_presentation($bbactivitycontext, self::PRESENTATION_FILENAME, $bbactivity->id, true);
         $pathparts = explode('/', $presentationdef['url']);
         $filename = array_pop($pathparts);
         $salt = array_pop($pathparts);
-        $filename = files::pluginfile_filename($this->get_course(), $bbactivitycm, $bbactivitycontext,
+        $filename = files::get_plugin_filename($this->get_course(), $bbactivitycm, $bbactivitycontext,
             [$salt, $filename]);
         $this->assertEquals(self::PRESENTATION_FILENAME, $filename);
     }
