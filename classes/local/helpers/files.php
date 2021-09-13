@@ -253,10 +253,13 @@ class files {
     protected static function get_nonce_for_instance(instance $instance) {
         $cache = static::get_nonce_cache();
         $pnoncekey = sha1($instance->get_instance_id());
-        $existingnonce = $cache->get($pnoncekey);
-        if ($existingnonce) {
-            $cache->delete($pnoncekey); // It has been used so now destroy it.
-            return $existingnonce;
+        $existingnoncedata = $cache->get($pnoncekey);
+        if ($existingnoncedata) {
+            if ($existingnoncedata->counter > 0) {
+                $existingnoncedata->counter--;
+                $cache->set($pnoncekey, $existingnoncedata);
+                return $existingnoncedata->nonce;
+            }
         }
         // The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather
         // the file once.
@@ -275,7 +278,7 @@ class files {
         // The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather
         // the file once.
         $pnoncevalue = ((int) microtime()) + mt_rand();
-        $cache->set($pnoncekey, $pnoncevalue);
+        $cache->set($pnoncekey, (object) ['nonce' => $pnoncevalue, 'counter' => 2]);
         return $pnoncevalue;
     }
 

@@ -101,7 +101,7 @@ class files_test extends \advanced_testcase {
     /**
      * Test that file is accessible only once.
      */
-    public function test_presentation_file_accessible_once() {
+    public function test_presentation_file_accessible_twice() {
         global $CFG;
         $this->resetAfterTest();
 
@@ -113,16 +113,20 @@ class files_test extends \advanced_testcase {
         $fulldirset = explode('/', $presentation['url']);
         $filename = array_pop($fulldirset);;
         $nonce = array_pop($fulldirset);
-        $mediafile =
-            files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
-                [$nonce, $filename]);
-        $this->assertEquals($filename, $mediafile->get_filename());
-        // Now a second time, this should be false.
+        // The link should be valid twice.
+        for ($i = 0; $i < 2; $i++) {
+            $mediafile =
+                files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
+                    [$nonce, $filename]);
+            $this->assertEquals($filename, $mediafile->get_filename());
+        }
+        // Third time is a charm, this should be false.
         $mediafile =
             files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
                 [$nonce, $filename]);
         $this->assertFalse($mediafile);
     }
+
     /**
      * Test that file is accessible only once.
      */
@@ -140,7 +144,7 @@ class files_test extends \advanced_testcase {
         $this->setGuestUser();
         $this->expectException(\require_login_exception::class);
         files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',
-                [$filename]);
+            [$filename]);
 
         $this->setUser($user);
         $mediafile =
@@ -148,7 +152,6 @@ class files_test extends \advanced_testcase {
                 [$filename]);
         $this->assertNotNull($mediafile);
     }
-
 
     /**
      * Get filename test
