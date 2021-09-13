@@ -31,7 +31,12 @@ $definitions = [
     'serverinfo' => [
         'mode' => cache_store::MODE_APPLICATION,
     ],
-    'recordings' => [
+
+    // The validatedurls cache stores a list of URLs which are either valid, or invalid.
+    // Keys are a URL
+    // Values are an integer.
+    'validatedurls' => [
         'mode' => cache_store::MODE_APPLICATION,
-    ]
+        'simpledata' => true,
+    ],
 ];

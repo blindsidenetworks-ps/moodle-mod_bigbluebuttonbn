@@ -163,29 +163,40 @@ class bigbluebutton_proxy extends proxy_base {
     public static function is_remote_resource_valid(string $url): bool {
         $urlhost = parse_url($url, PHP_URL_HOST);
         $serverurlhost = parse_url(\mod_bigbluebuttonbn\local\config::get('server_url'), PHP_URL_HOST);
-        // Skip validation when the recording URL host is the same as the configured BBB server.
+
         if ($urlhost == $serverurlhost) {
+            // Skip validation when the recording URL host is the same as the configured BBB server.
             return true;
         }
-        // Skip validation when the recording URL was already validated.
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'recordings_cache');
-        $result = $cache->get('validated_urls');
-        $validatedurls = $result ?? array();
-        if (array_key_exists($urlhost, $validatedurls)) {
-            return $validatedurls[$urlhost];
+
+        $cache = cache::make('mod_bigbluebuttonbn', 'validatedurls');
+
+        if ($cachevalue = $cache->get($urlhost)) {
+            // Skip validation when the recording URL was already validated.
+            return $cachevalue == 1;
         }
-        // Validate the recording URL.
-        $validatedurls[$urlhost] = true;
 
         $curl = new curl();
-        $curlinfo = $curl->head($url);
-        if (!isset($curlinfo['http_code']) || $curlinfo['http_code'] != 200) {
-            $error = "Resources hosted by " . $urlhost . " are unreachable. Server responded with code " . $curlinfo['http_code'];
-            debugging($error, DEBUG_DEVELOPER);
-            $validatedurls[$urlhost] = false;
+        $curl->head($url);
+
+        $isvalid = false;
+        if ($info = $curl->get_info()) {
+            if ($info['http_code'] == 200) {
+                $isvalid = true;
+            } else {
+                debugging(
+                    "Resources hosted by {$urlhost} are unreachable. Server responded with {$info['http_code']}",
+                    DEBUG_DEVELOPER
+                );
+                $isvalid = false;
+            }
+
+            // Note: When a cache key is not found, it returns false.
+            // We need to distinguish between a result not found, and an invalid result.
+            $cache->set($urlhost, $isvalid ? 1 : 0);
         }
-        $cache->set('validated_urls', $validatedurls);
-        return $validatedurls[$urlhost];
+
+        return $isvalid;
     }
 
     /**
