@@ -363,7 +363,7 @@ const setupDatatable = (tableId, searchFormId, response) => {
                 width: "1195px",
                 columns: recordingData.columns,
                 data: tableData,
-                rowsPerPage: 3,
+                rowsPerPage: 10,
                 paginatorLocation: ['header', 'footer']
             });
             dataTable.set('currentData', dataTable.get('data'));
