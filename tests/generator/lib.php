@@ -192,7 +192,15 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         if (isset($options['imported']) && $options['imported']) {
             $precording = $recording->create_imported_recording($instance);
         } else {
-            $recording->recordingid = $this->create_mockserver_recording($instance, $recording, $data);
+            if ($recording->status == recording::RECORDING_STATUS_DISMISSED) {
+                $recording->recordingid = sprintf(
+                    "%s-%s",
+                    md5($instance->get_meeting_id()),
+                    time() + rand(1, 100000)
+                );
+            } else {
+                $recording->recordingid = $this->create_mockserver_recording($instance, $recording, $data);
+            }
             $precording = new recording(0, $recording);
             $precording->create();
         }
