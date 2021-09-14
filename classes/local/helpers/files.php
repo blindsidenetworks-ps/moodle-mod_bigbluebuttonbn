@@ -152,6 +152,8 @@ class files {
                     "filename",
                     false
                 );
+                $id = null; // This is the general presentation/default so we will generate
+                // an id as if the activity was null.
             }
         } else {
             $files = $fs->get_area_files(
@@ -169,9 +171,13 @@ class files {
         }
 
         $pnoncevalue = 0;
-        if (!is_null($id) && $withnonce) {
-            $instance = instance::get_from_instanceid($id);
-            $pnoncevalue = self::generate_nonce_for_instance($instance);
+        if ($withnonce) {
+            $nonceid = 0;
+            if (!is_null($id)) {
+                $instance = instance::get_from_instanceid($id);
+                $nonceid = $instance->get_instance_id();
+            }
+            $pnoncevalue = self::generate_nonce($nonceid);
         }
 
         $file = null;
@@ -216,7 +222,6 @@ class files {
      */
     public static function get_plugin_filename($course, $cm, $context, $args) {
         global $DB;
-
         if ($context->contextlevel != CONTEXT_SYSTEM) {
             // Plugin has a file to use as default in general setting.
             // The difference with the standard bigbluebuttonbn_pluginfile_filename() are.
@@ -231,8 +236,12 @@ class files {
         // - Context is system, so we don't need to check the cmid in this case.
         // - The area is "presentationdefault_cache".
         if (count($args) > 1) {
-            $instance = instance::get_from_cmid($cm->id);
-            $actualnonce = self::get_nonce_for_instance($instance);
+            $id = 0;
+            if ($cm) {
+                $instance = instance::get_from_cmid($cm->id);
+                $id = $instance->get_instance_id();
+            }
+            $actualnonce = self::get_nonce($id);
             return ($args['0'] == $actualnonce) ? $args['1'] : null;
 
         }
@@ -246,13 +255,13 @@ class files {
     /**
      * Helper generates a salt used for the preuploaded presentation callback url.
      *
-     * @param instance $instance
+     * @param int $id
      * @return int
      * @throws \coding_exception
      */
-    protected static function get_nonce_for_instance(instance $instance) {
+    protected static function get_nonce($id) {
         $cache = static::get_nonce_cache();
-        $pnoncekey = sha1($instance->get_instance_id());
+        $pnoncekey = sha1($id);
         $existingnoncedata = $cache->get($pnoncekey);
         if ($existingnoncedata) {
             if ($existingnoncedata->counter > 0) {
@@ -263,18 +272,18 @@ class files {
         }
         // The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather
         // the file once.
-        return static::generate_nonce_for_instance($instance);
+        return static::generate_nonce($id);
     }
 
     /**
      * Generate a nonce and store it in the cache
      *
-     * @param instance $instance
+     * @param int $id
      * @return int
      */
-    protected static function generate_nonce_for_instance($instance) {
+    protected static function generate_nonce($id) {
         $cache = static::get_nonce_cache();
-        $pnoncekey = sha1($instance->get_instance_id());
+        $pnoncekey = sha1($id);
         // The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather
         // the file once.
         $pnoncevalue = ((int) microtime()) + mt_rand();
