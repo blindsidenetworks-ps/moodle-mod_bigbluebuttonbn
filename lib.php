@@ -89,7 +89,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     // Excecute preprocess.
     mod_helper::process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $bigbluebuttonbn->presentation = files::get_media_file($bigbluebuttonbn);
+    $bigbluebuttonbn->presentation = files::save_media_file($bigbluebuttonbn);
     // Insert a record.
     $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
@@ -120,7 +120,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
 
     // Pre-set initial values.
     $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
-    $bigbluebuttonbn->presentation = files::get_media_file($bigbluebuttonbn);
+    $bigbluebuttonbn->presentation = files::save_media_file($bigbluebuttonbn);
 
     // Update a record.
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
@@ -349,8 +349,8 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * Serves the bigbluebuttonbn attachments. Implements needed access control ;-).
  *
  * @param stdClass $course course object
- * @param stdClass $cm course module object
- * @param stdClass $context context object
+ * @param cm_info $cm course module object
+ * @param context $context context object
  * @param string $filearea file area
  * @param array $args extra arguments
  * @param bool $forcedownload whether or not force download

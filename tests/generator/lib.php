@@ -29,7 +29,6 @@ use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\recording;
 use mod_bigbluebuttonbn\testing\generator\mockedserver;
 
-
 /**
  * bigbluebuttonbn module data generator
  *
@@ -71,6 +70,22 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
             if (!isset($record[$key])) {
                 $record[$key] = $value;
             }
+        }
+        if ($record['presentation']) {
+            global $USER;
+            // Here we replace the original presentation file with a draft area in which we store this file.
+            $draftareaid = file_get_unused_draft_itemid();
+            $bbbfilerecord['contextid'] = context_user::instance($USER->id)->id;
+            $bbbfilerecord['component'] = 'user';
+            $bbbfilerecord['filearea'] = 'draft';
+            $bbbfilerecord['itemid'] = $draftareaid;
+            $bbbfilerecord['filepath'] = '/';
+            $bbbfilerecord['filename'] = basename($record['presentation']);
+            $fs = get_file_storage();
+
+            $fs->create_file_from_pathname($bbbfilerecord, $record['presentation']);
+            // Now the $record['presentation'] must contain the draftareaid.
+            $record['presentation'] = $draftareaid;
         }
         return parent::create_instance((object) $record, (array) $options);
     }
