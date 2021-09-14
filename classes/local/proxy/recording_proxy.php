@@ -16,6 +16,8 @@
 
 namespace mod_bigbluebuttonbn\local\proxy;
 
+use cache;
+use cache_helper;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 
 /**
@@ -31,6 +33,16 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class recording_proxy extends proxy_base {
+
+    /**
+     * Invalidate the MUC cache for the specified recording.
+     *
+     * @param string $recordid
+     */
+    protected static function invalidate_cache_for_recording(string $recordid): void {
+        cache_helper::invalidate_by_event('mod_bigbluebuttonbn/recordingchanged', [$recordid]);
+    }
+
     /**
      * Perform deleteRecordings on BBB.
      *
@@ -57,9 +69,13 @@ class recording_proxy extends proxy_base {
             'recordID' => $recordid,
             'publish' => $publish,
         ]);
+
+        self::invalidate_cache_for_recording($recordid);
+
         if (!$result || $result->returncode != 'SUCCESS') {
             return false;
         }
+
         return true;
     }
 
@@ -76,9 +92,13 @@ class recording_proxy extends proxy_base {
             'recordID' => $recordid,
             'protect' => $protected,
         ]);
+
+        self::invalidate_cache_for_recording($recordid);
+
         if (!$result || $result->returncode != 'SUCCESS') {
             return false;
         }
+
         return true;
     }
 
@@ -93,7 +113,25 @@ class recording_proxy extends proxy_base {
             'recordID' => $recordid
         ], $params));
 
+        self::invalidate_cache_for_recording($recordid);
+
         return $result ? $result->returncode == 'SUCCESS' : false;
+    }
+
+    /**
+     * Helper function to fetch a single recording from a BigBlueButton server.
+     *
+     * @param string $recordingid
+     * @return null|array
+     */
+    public static function fetch_recording(string $recordingid): ?array {
+        $data = self::fetch_recordings([$recordingid]);
+
+        if (array_key_exists($recordingid, $data)) {
+            return $data[$recordingid];
+        }
+
+        return null;
     }
 
     /**
@@ -104,35 +142,31 @@ class recording_proxy extends proxy_base {
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
     public static function fetch_recordings(array $keyids = [], string $key = 'recordID'): array {
-        // Normalize ids to array.
-        if (!is_array($keyids)) {
-            $keyids = explode(',', $keyids);
-        }
+        $recordings = [];
 
         // If $ids is empty return array() to prevent a getRecordings with meetingID and recordID set to ''.
         if (empty($keyids)) {
-            return array();
+            return $recordings;
         }
 
-        $recordings = array();
-        // Execute a paginated getRecordings request. The page size is arbitrarily hardcoded to 25.
-        $pagecount = 25;
-        $pages = floor(count($keyids) / $pagecount) + 1;
-        if (count($keyids) > 0 && count($keyids) % $pagecount == 0) {
-            $pages--;
-        }
-        for ($page = 1; $page <= $pages; ++$page) {
-            $ids = array_slice($keyids, ($page - 1) * $pagecount, $pagecount);
-            $recordings += self::fetch_recordings_page($ids, $key);
+        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
+        $recordings = array_filter($cache->get_many($keyids));
+        $missingkeys = array_diff(array_values($keyids), array_keys($recordings));
+
+        $pagesize = 25;
+        while ($ids = array_splice($missingkeys, 0, $pagesize)) {
+            $fetchrecordings = self::fetch_recordings_page($ids, $key);
+            $cache->set_many($fetchrecordings);
+
+            $recordings += $fetchrecordings;
         }
 
         // Sort recordings.
-        self::sort_recordings($recordings);
-        return $recordings;
+        return self::sort_recordings($recordings);
     }
 
     /**
-     * Helper function to fetch one page of upto 25 recordings from a BigBlueButton server.
+     * Helper function to fetch a page of recordings from the remote server.
      *
      * @param array $ids
      * @param string $key
@@ -184,12 +218,15 @@ class recording_proxy extends proxy_base {
      *  Helper function to sort an array of recordings. It compares the startTime in two recording objects.
      *
      * @param array $recordings
+     * @return array
      */
-    public static function sort_recordings(array &$recordings) {
-        uasort($recordings, function($a, $b) {
-            global $CFG;
-            $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
-            $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+    public static function sort_recordings(array $recordings): array {
+        global $CFG;
+
+        $resultless = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? -1 : 1;
+        $resultmore = !empty($CFG->bigbluebuttonbn_recordings_sortorder) ? 1 : -1;
+
+        uasort($recordings, function($a, $b) use ($resultless, $resultmore) {
             if ($a['startTime'] < $b['startTime']) {
                 return $resultless;
             }
@@ -198,6 +235,8 @@ class recording_proxy extends proxy_base {
             }
             return $resultmore;
         });
+
+        return $recordings;
     }
 
     /**

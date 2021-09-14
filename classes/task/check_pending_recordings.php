@@ -14,22 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn\task;
+
+use core\task\scheduled_task;
+use mod_bigbluebuttonbn\recording;
+
 /**
- * Version for BigBlueButtonBN Moodle Activity Module.
+ * Synchronise pending recordings from the server.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
+class check_pending_recordings extends scheduled_task {
+    /**
+     * Run the migration task.
+     */
+    public function execute() {
+        recording::sync_pending_recordings_from_server();
+    }
 
-defined('MOODLE_INTERNAL') || die;
-
-
-$plugin->version = 2021091400;
-$plugin->requires = 2020061500;
-$plugin->cron = 0;
-$plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '2.5-alpha.1';
+    /**
+     * Get the name of the task for use in the interface.
+     *
+     * @return string
+     */
+    public function get_name(): string {
+        return get_string('taskname:check_pending_recordings', 'mod_bigbluebuttonbn');
+    }
+}

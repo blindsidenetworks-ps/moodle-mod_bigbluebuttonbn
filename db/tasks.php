@@ -15,37 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Caches for Bigbluebuttonbn
+ * Definition of scheduled tasks for mod_bigbluebuttonbn.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
+ * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$definitions = [
-    // Server information
-    // version  (double) => server version.
-    'serverinfo' => [
-        'mode' => cache_store::MODE_APPLICATION,
-    ],
-
-    // The validatedurls cache stores a list of URLs which are either valid, or invalid.
-    // Keys are a URL
-    // Values are an integer.
-    'validatedurls' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simpledata' => true,
-    ],
-
-    // The 'recordings' cache stores a cache of recording data.
-    'recordings' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'invalidationevents' => [
-            'mod_bigbluebuttonbn/recordingchanged',
-        ],
-        'ttl' => HOURSECS,
+$tasks = [
+    [
+        'classname' => 'mod_bigbluebuttonbn\task\check_pending_recordings',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
     ],
 ];

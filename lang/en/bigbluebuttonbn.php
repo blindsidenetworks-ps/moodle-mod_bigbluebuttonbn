@@ -590,3 +590,4 @@ $string['end_session_confirm'] = 'Are you sure you want to end the virtual class
 $string['end_session_notification'] = 'The session has now been closed.';
 $string['cachedef_serverinfo'] = 'Remote server information';
 $string['cachedef_recordings'] = 'Recording metadata';
+$string['taskname:check_pending_recordings'] = 'Fetch pending recordings';

@@ -74,7 +74,7 @@ class recording extends persistent {
      * @param int $id If set, this is the id of an existing record, used to load the data.
      * @param stdClass|null $record If set will be passed to from_record
      */
-    public function __construct($id = 0, stdClass $record = null) {
+    public function __construct($id = 0, stdClass $record = null, ?array $metadata = null) {
         if ($record) {
             $record->headless = $record->headless ?? false;
             $record->imported = $record->imported ?? false;
@@ -82,7 +82,10 @@ class recording extends persistent {
             $record->status = $record->status ?? self::RECORDING_STATUS_AWAITING;
         }
         parent::__construct($id, $record);
-        $this->metadata = $this->fetch_latest_metadata();
+
+        if ($metadata) {
+            $this->metadata = $metadata;
+        }
     }
 
     /**
@@ -102,21 +105,28 @@ class recording extends persistent {
         bool $includeimported = false,
         bool $onlyimported = false
     ): array {
-        list($selects, $params) = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        global $DB;
+
+        [$selects, $params] = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
         $selects[] = "bigbluebuttonbnid = :bbbid";
         $params['bbbid'] = $instance->get_instance_id();
         $groupmode = groups_get_activity_groupmode($instance->get_cm());
         $context = $instance->get_context();
         if ($groupmode) {
-            list($groupselects, $groupparams) =
-                self::get_select_for_group($groupmode, $context, $instance->get_course_id(),
-                    $instance->get_group_id(), $instance->get_cm()->groupingid);
+            [$groupselects, $groupparams] = self::get_select_for_group(
+                $groupmode,
+                $context,
+                $instance->get_course_id(),
+                $instance->get_group_id(),
+                $instance->get_cm()->groupingid
+            );
             if ($groupselects) {
                 $selects[] = $groupselects;
                 $params = array_merge_recursive($params, $groupparams);
             }
         }
-        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
+
+        return self::fetch_records($selects, $params);
     }
 
     /**
@@ -160,34 +170,7 @@ class recording extends persistent {
             $params = array_merge($params, $paramexcluded);
         }
 
-        return self::filter_refresh_awaiting_recordings(self::get_records_select(implode(" AND ", $selects), $params));
-    }
-
-    /**
-     * From a list of recording, filter out the recordings that are still AWAITING and refresh their status
-     *
-     * This is for CONTRIB-8665. Later on we need to devise a CRON job to do it. But it has to be sized correctly in term
-     * of number of API CALLS
-     *
-     * @param recording[] $recordings
-     * @return recording[]
-     */
-    protected static function filter_refresh_awaiting_recordings(array $recordings) {
-        // CONTRIB-8665: change status on read if needed.
-        foreach ($recordings as $index => $recording) {
-            $status = $recording->get('status');
-            if ($status == self::RECORDING_STATUS_AWAITING) {
-                $recording->refresh_status();
-                if ($recording->get('status') == self::RECORDING_STATUS_AWAITING) {
-                    unset($recordings[$index]);
-                    continue;
-                }
-            }
-            if ($status == self::RECORDING_STATUS_DISMISSED) {
-                unset($recordings[$index]);
-            }
-        }
-        return $recordings;
+        return self::fetch_records($selects, $params);
     }
 
     /**
@@ -276,10 +259,9 @@ class recording extends persistent {
         }
 
         // Now get only recordings that have been validated by recording ready callback.
-        $selects[] = "(status = :status1 OR status = :status2 OR status = :status3)";
-        $params['status1'] = self::RECORDING_STATUS_PROCESSED;
-        $params['status2'] = self::RECORDING_STATUS_NOTIFIED;
-        $params['status3'] = self::RECORDING_STATUS_AWAITING; // CONTRIB-8665, change on read.
+        $selects[] = "status IN (:status_processed, :status_notified)";
+        $params['status_processed'] = self::RECORDING_STATUS_PROCESSED;
+        $params['status_notified'] = self::RECORDING_STATUS_NOTIFIED;
         return [$selects, $params];
     }
 
@@ -363,10 +345,12 @@ class recording extends persistent {
     protected function before_update() {
         // We update if the remote metadata has been changed locally.
         if ($this->metadatachanged && !$this->get('imported')) {
-            if ($this->metadata) {
+            $metadata = $this->fetch_metadata();
+            if ($metadata) {
                 recording_proxy::update_recording(
                     $this->get('recordingid'),
-                    $this->metadata);
+                    $metadata
+                );
             }
             $this->metadatachanged = false;
         }
@@ -382,13 +366,14 @@ class recording extends persistent {
      */
     public function create_imported_recording(instance $instance) {
         $recordingrec = $this->to_record();
-        $remotedata = $this->fetch_latest_metadata();
+        $remotedata = $this->fetch_metadata();
         unset($recordingrec->id);
         $recordingrec->bigbluebuttonbnid = $instance->get_instance_id();
         $recordingrec->courseid = $instance->get_course_id();
         $recordingrec->groupid = 0; // The recording is available to everyone.
         $recordingrec->importeddata = json_encode($remotedata);
         $recordingrec->imported = true;
+
         $importedrecording = new self(0, $recordingrec);
         $importedrecording->create();
         return $importedrecording;
@@ -585,12 +570,17 @@ class recording extends persistent {
      */
     protected function metadata_set($fieldname, $value) {
         // Can we can change the metadata on the imported record ?
-        if (!$this->get('imported')) {
-            $this->metadatachanged = true;
-            $this->metadata = $this->fetch_latest_metadata();
-            $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $this->metadata);
-            $this->metadata[$possiblesourcename] = $value;
+        if ($this->get('imported')) {
+            return;
         }
+
+        $this->metadatachanged = true;
+
+        $metadata = $this->fetch_metadata();
+        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $metadata);
+        $metadata[$possiblesourcename] = $value;
+
+        $this->metadata = $metadata;
     }
 
     /**
@@ -600,8 +590,42 @@ class recording extends persistent {
      * @return mixed|null
      */
     protected function metadata_get($fieldname) {
-        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $this->metadata);
-        return $this->metadata[$possiblesourcename] ?? null;
+        $metadata = $this->fetch_metadata();
+
+        $possiblesourcename = $this->get_possible_meta_name_for_source($fieldname, $metadata);
+        return $metadata[$possiblesourcename] ?? null;
+    }
+
+    /**
+     * Fetch all records which match the specified parameters, including all metadata that relates to them.
+     *
+     * @param arary $selecst
+     * @param array $params
+     * @return recording[]
+     */
+    protected static function fetch_records(array $selects, array $params): array {
+        global $DB;
+
+        // Fetch the local data.
+        $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params);
+
+        // Grab the recording IDs.
+        $recordingids = array_filter(array_map(function($recording) {
+            return $recording->recordingid;
+        }, $recordings));
+
+        // Fetch all metadata for these recordings.
+        $metadatas = recording_proxy::fetch_recordings($recordingids);
+
+        // Return the instances.
+        return array_map(function($recording) use ($metadatas) {
+            $metadata = null;
+            if (array_key_exists($recording->recordingid, $metadatas)) {
+                $metadata = $metadatas[$recording->recordingid];
+            }
+
+            return new self(0, $recording, $metadata);
+        }, $recordings);
     }
 
     /**
@@ -609,33 +633,65 @@ class recording extends persistent {
      *
      * If metadata has changed locally or if it an imported recording, nothing will be done.
      *
+     * @param bool $force
      * @return array
-     * @throws \coding_exception
      */
-    protected function fetch_latest_metadata() {
-        $metadata = [];
-        if (!$this->get('imported')) {
-            $rid = $this->get('recordingid');
-            $recordings = recording_proxy::fetch_recordings([$rid]);
-            if (!empty($recordings[$rid])) {
-                $metadata = $recordings[$rid];
-            }
-        } else {
-            $metadata = json_decode($this->get('importeddata'), true);
+    protected function fetch_metadata(bool $force = false): ?array {
+        if ($this->metadata !== null && !$force) {
+            // Metadat is already up-to-date.
+            return $this->metadata;
         }
-        return $metadata;
+
+        if ($this->get('imported')) {
+            $this->metadata = json_decode($this->get('importeddata'), true);
+        } else {
+            $this->metadata = recording_proxy::fetch_recording($this->get('recordingid'));
+        }
+
+        return $this->metadata;
     }
 
     /**
-     * Update status for instance id
+     * Synchronise pending recordings from the server.
      *
-     * This will soon be replaced by a cron job. For now this is called only when we get the recordings for a given bigbluebutton
-     * instance.
+     * This function should be called by the check_pending_recordings scheduled task.
      */
-    public function refresh_status() {
-        if (!empty($this->metadata)) {
-            $this->raw_set('status', self::RECORDING_STATUS_PROCESSED);
-            $this->update();
+    public static function sync_pending_recordings_from_server(): void {
+        global $DB;
+
+        $timelimitdays = 10;
+
+        // Fetch the local data.
+        mtrace("=> Looking for any recording awaiting processing from the past {$timelimitdays} days.");
+        $select = 'status = :status_awaiting AND timecreated > :withindays';
+        $recordings = $DB->get_records_select(static::TABLE, $select, [
+            'status_awaiting' => self::RECORDING_STATUS_AWAITING,
+            'withindays' => time() - ($timelimitdays * DAYSECS),
+        ]);
+
+        $recordingcount = count($recordings);
+        mtrace("=> Found {$recordingcount} recordings to query");
+
+        // Grab the recording IDs.
+        $recordingids = array_map(function($recording) {
+            return $recording->recordingid;
+        }, $recordings);
+
+        // Fetch all metadata for these recordings.
+        mtrace("=> Fetching recording metadata from server");
+        $metadatas = recording_proxy::fetch_recordings($recordingids);
+
+        $foundcount = 0;
+        foreach ($metadatas as $recordingid => $metadata) {
+            mtrace("==> Found updated metadata for {$recordingid}. Updating local cache.");
+            $id = array_search($recordingid, $recordingids);
+
+            $recording = new self(0, $recordings[$id], $metadata);
+            $recording->raw_set('status', self::RECORDING_STATUS_PROCESSED);
+            $recording->update();
+            $foundcount++;
         }
+
+        mtrace("=> Finished processing recordings. Updated status for {$foundcount} / {$recordingcount} recordings.");
     }
 }

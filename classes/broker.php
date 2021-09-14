@@ -17,9 +17,11 @@
 namespace mod_bigbluebuttonbn;
 
 use Exception;
+use Firebase\JWT\JWT;
 use coding_exception;
 use mod_bigbluebuttonbn\event\events;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 
@@ -117,7 +119,7 @@ class broker {
             // We make sure messages are sent only once.
             if ($recording->get('status') != recording::RECORDING_STATUS_NOTIFIED) {
                 $task = new \mod_bigbluebuttonbn\task\send_recording_ready_notification();
-                $task->set_instance_id($instance->id);
+                $task->set_instance_id($instance->get_instance_id());
 
                 \core\task\manager::queue_adhoc_task($task);
 
