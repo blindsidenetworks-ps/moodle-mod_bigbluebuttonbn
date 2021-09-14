@@ -25,7 +25,6 @@ use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use moodle_url;
 use stdClass;
 
 /**
@@ -144,8 +143,9 @@ class meeting {
     public function create_meeting() {
         $data = $this->create_meeting_data();
         $metadata = $this->create_meeting_metadata();
-        $presentationname = $this->instance->get_presentation()['name'] ?? null;
-        $presentationurl = $this->instance->get_presentation()['url'] ?? null;
+        $presentation = $this->instance->get_presentation_for_bigbluebutton_upload(); // The URL must contain nonce.
+        $presentationname = $presentation['name'] ?? null;
+        $presentationurl = $presentation['url'] ?? null;
         return bigbluebutton_proxy::create_meeting($data, $metadata, $presentationname, $presentationurl);
     }
 
@@ -248,7 +248,7 @@ class meeting {
             }
         }
 
-        $presentation = $instance->get_presentation();
+        $presentation = $instance->get_presentation(); // This is for internal use.
         if (!empty($presentation)) {
             $meetinginfo->presentations[] = $presentation;
         }

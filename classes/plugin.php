@@ -16,13 +16,6 @@
 
 namespace mod_bigbluebuttonbn;
 
-use cache;
-use cache_store;
-use core_tag_tag;
-use mod_bigbluebuttonbn\local\config;
-use moodle_url;
-use stdClass;
-
 /**
  * Class plugin.
  *
@@ -55,17 +48,6 @@ abstract class plugin {
             $text .= '...';
         }
         return $text;
-    }
-
-    /**
-     * Helper generates a nonce used for the preuploaded presentation callback url.
-     *
-     * @return string
-     */
-    public static function generate_nonce() {
-        $mt = microtime();
-        $rand = mt_rand();
-        return md5($mt . $rand);
     }
 
     /**
