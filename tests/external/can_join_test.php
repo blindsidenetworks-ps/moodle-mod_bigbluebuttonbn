@@ -44,13 +44,12 @@ class can_join_test extends \externallib_advanced_testcase {
         parent::setUp();
         $this->require_mock_server();
     }
+
     /**
      * Helper
      *
-     * @param mixed $params,...
-     * @return array|bool|mixed
-     * @throws \invalid_response_exception
-     * @throws \restricted_context_exception
+     * @param array $params
+     * @return mixed
      */
     protected function can_join(...$params) {
         $canjoin = can_join::execute(...$params);

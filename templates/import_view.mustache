@@ -22,9 +22,19 @@
     Example context (json):
     {
         "bbbid": 3,
-        "has_records": true,
-        "search_input": {},
-        "back_button": {}
+        "has_selected_course": 0,
+        "back_button": {
+            "method" : "get",
+            "url" : "#",
+            "primary" : 1,
+            "tooltip" : "This is a tooltip",
+            "label" : "This is a the button text",
+            "id": "thisismybutton",
+            "attributes": [{
+                "name": "data-attribute",
+                "value": "yeah"
+            }]
+        }
     }
 }}
 

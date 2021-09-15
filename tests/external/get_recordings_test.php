@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  */
 class get_recordings_test extends \externallib_advanced_testcase {
     use testcase_helper_trait;
+
     /**
      * Setup for test
      */
@@ -46,10 +47,11 @@ class get_recordings_test extends \externallib_advanced_testcase {
         parent::setUp();
         $this->require_mock_server();
     }
+
     /**
      * Helper
      *
-     * @param mixed $params,...
+     * @param mixed $params
      * @return array|bool|mixed
      */
     protected function get_recordings(...$params) {
