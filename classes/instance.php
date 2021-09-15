@@ -196,6 +196,25 @@ EOF;
      * @return null|self
      */
     public static function get_from_meetingid(string $meetingid): ?self {
+        $matches = self::parse_meetingid($meetingid);
+
+        $instance = self::get_from_instanceid($matches['instanceid']);
+
+        if ($instance && array_key_exists('groupid', $matches)) {
+            $instance->set_group_id($matches['groupid']);
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Parse a meetingID for key data.
+     *
+     * @param string $meetingid
+     * @return array
+     * @throws \moodle_exception
+     */
+    public static function parse_meetingid(string $meetingid): array {
         $result = preg_match(
             '@(?P<meetingid>[^-]*)-(?P<courseid>[^-]*)-(?P<instanceid>\d+)(\[(?P<groupid>\d*)\])?@',
             $meetingid,
@@ -206,13 +225,7 @@ EOF;
             throw new \moodle_exception("The supplied meeting id '{$meetingid}' is invalid found.");
         }
 
-        $instance = self::get_from_instanceid($matches['instanceid']);
-
-        if (array_key_exists('groupid', $matches)) {
-            $instance->set_group_id($matches['groupid']);
-        }
-
-        return $instance;
+        return $matches;
     }
 
     /**

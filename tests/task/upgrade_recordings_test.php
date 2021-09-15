@@ -17,12 +17,10 @@
 namespace mod_bigbluebuttonbn\task;
 
 use advanced_testcase;
-use core\message\message;
-use core\task\adhoc_task;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use mod_bigbluebuttonbn\recording;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
-use stdClass;
 
 /**
  * Class containing the scheduled task for lti module.
@@ -31,50 +29,145 @@ use stdClass;
  * @copyright 2019 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \mod_bigbluebuttonbn\task\upgrade_recordings
- * @coversDefaultClass \mod_bigbluebuttonbn\task\upgrade_recordings
+ * @covers \mod_bigbluebuttonbn\task\upgrade_recording_base_task
  */
 class upgrade_recordings_test extends advanced_testcase {
     use testcase_helper_trait;
 
     /**
-     * @var array $groups created groups
-     */
-    protected $groups = [];
-    /**
-     * @var array $logs created logs
-     */
-    protected $logs = [];
-
-    /**
-     * Setup
-     */
-    public function setUp(): void {
-        global $DB;
-        $this->resetAfterTest();
-        $this->require_mock_server();
-        list('logs' => $this->logs, 'course' => $this->course, 'groups' => $this->groups) = $this->prepare_recordings_with_logs();
-        // Now delete the recordings in the database. They should be recreated by the import routine.
-        $DB->delete_records(recording::TABLE);
-    }
-
-    /**
-     * Test Upgrade recordings
+     * Upgrade task test
      */
     public function test_upgrade_recordings(): void {
         global $DB;
+        $this->resetAfterTest();
+        $this->require_mock_server();
+
+        $generator = $this->getDataGenerator();
+
+        // Create a course with student and teacher, and two groups.
+        $course = $generator->create_course();
+        $groupa = $generator->create_group(['courseid' => $course->id]);
+        $groupb = $generator->create_group(['courseid' => $course->id]);
+
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $generator->create_and_enrol($course, 'student');
+
+        // Create an ungrouped activity.
+        $activity = $generator->create_module('bigbluebuttonbn', [
+            'course' => $course->id,
+        ]);
+        $instance = instance::get_from_instanceid($activity->id);
+        $this->create_legacy_log_entries($instance, $teacher->id, 30);
+
+        // Create an grouped activity.
+        $activity = $generator->create_module('bigbluebuttonbn', [
+            'course' => $course->id,
+            'groupmode' => SEPARATEGROUPS,
+        ]);
+        $groupedinstance = instance::get_from_instanceid($activity->id);
+
+        $groupainstance = instance::get_group_instance_from_instance($groupedinstance, $groupa->id);
+        $this->create_legacy_log_entries($groupainstance, $teacher->id, 15);
+
+        $groupbinstance = instance::get_group_instance_from_instance($groupedinstance, $groupb->id);
+        $this->create_legacy_log_entries($groupbinstance, $teacher->id, 15);
+
+        // Create logs for an activity which no longer exists (because we deleted it).
+        $activity = $generator->create_module('bigbluebuttonbn', [
+            'course' => $course->id,
+        ]);
+        $oldinstance = instance::get_from_instanceid($activity->id);
+        $this->create_legacy_log_entries($oldinstance, $teacher->id, 15);
+        course_delete_module($oldinstance->get_cm_id());
+
+        // Truncate the recordings table to reflect what it would have looked like before this version.
+        $DB->delete_records('bigbluebuttonbn_recordings');
+
         $upgraderecording = new upgrade_recordings();
         $rc = new \ReflectionClass(upgrade_recordings::class);
         $rcm = $rc->getMethod('process_bigbluebuttonbn_logs');
         $rcm->setAccessible(true);
-        ob_start();
-        $returnvalue = $rcm->invoke($upgraderecording);
-        ob_end_clean();
-        $this->assertTrue($returnvalue);
-        $this->assertEmpty($DB->get_records('bigbluebuttonbn_logs', array('log' => 'Create')));
 
-        $this->assertEquals(3, recording::count_records());
-        $this->assertEquals(1, recording::count_records(['groupid' => $this->groups[0]->id]));
-        $this->assertEquals(1, recording::count_records(['groupid' => $this->groups[1]->id]));
-        $this->assertEquals(1, recording::count_records(['groupid' => 0]));
+        // The first run will lead to all of them being processed, and none left over.
+        // A new job is always queued on a successful run.
+        $returnvalue = $rcm->invoke($upgraderecording);
+        $this->assertTrue($returnvalue);
+
+        $this->assertEquals(0, $DB->count_records('bigbluebuttonbn_logs', ['log' => 'Create']));
+        $this->assertEquals(75, recording::count_records(['imported' => '0']));
+
+        $this->assertEquals(15, recording::count_records(['groupid' => $groupa->id, 'imported' => '0']));
+        $this->assertEquals(15, recording::count_records(['groupid' => $groupb->id, 'imported' => '0']));
+        $this->assertEquals(45, recording::count_records(['groupid' => 0, 'imported' => '0']));
+
+        // The second run will lead to no change in the number of logs, but no further jobs will be queued.
+        $returnvalue = $rcm->invoke($upgraderecording);
+        $this->assertFalse($returnvalue);
+
+        // Ensure that logs match.
+        $matches = [
+            'Fetching logs for conversion',
+            "Creating new recording records",
+            "Unable to find an activity for .*. This recording is headless",
+            'Migrated 75 recordings',
+            'Deleting migrated log records',
+            'Fetching logs for conversion',
+            'No logs were found',
+        ];
+        $this->expectOutputRegex('/' . implode('.*', $matches) . '/s');
+    }
+
+    /**
+     * Create the legacy log entries for this task.
+     *
+     * @param instance $instance
+     * @param int $userid
+     * @param int $count
+     * @return array
+     */
+    protected function create_legacy_log_entries(instance $instance, int $userid, int $count = 30): array {
+        $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+        $plugingenerator->create_meeting([
+            'instanceid' => $instance->get_instance_id(),
+            'groupid' => $instance->get_group_id(),
+        ]);
+
+        // Create log entries for each (30 for the ungrouped, 30 for the grouped).
+        $baselogdata = [
+            'courseid' => $instance->get_course_id(),
+            'userid' => $userid,
+            'log' => 'Create',
+            'meta' => json_encode(['record' => true]),
+            'imported' => false,
+        ];
+
+        for ($i = 0; $i < $count; $i++) {
+            // Create a recording.
+            $recording = $plugingenerator->create_recording([
+                'bigbluebuttonbnid' => $instance->get_instance_id(),
+                'groupid' => $instance->get_group_id()
+            ]);
+
+            // Fetch the data.
+            $data = recording_proxy::fetch_recordings([$recording->recordingid]);
+            $data = end($data);
+
+            $metaonly = array_filter($data, function($key) {
+                return strstr($key, 'meta_');
+            }, ARRAY_FILTER_USE_KEY);
+
+            $baselogdata['meetingid'] = $instance->get_meeting_id();
+            $baselogdata['meta'] = json_encode(array_merge([
+                'recording' => array_diff_key($data, $metaonly),
+            ], $metaonly));
+
+            // Insert the legacy log entry.
+            $logs[] = $plugingenerator->create_log(array_merge($baselogdata, [
+                'bigbluebuttonbnid' => $instance->get_instance_id(),
+                'timecreated' => time() - WEEKSECS + (HOURSECS * $i),
+            ]));
+        }
+
+        return $logs;
     }
 }
