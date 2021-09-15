@@ -814,7 +814,6 @@ EOF;
      *
      * The URL returned for the presentation will be accessible publicly but once and with a specific URL.
      *
-     * @param bool $withnonce return url with a nonce value to be accessible through bigbluebuttonbn
      * @return array|null
      */
     public function get_presentation_for_bigbluebutton_upload(): ?array {
@@ -822,9 +821,9 @@ EOF;
     }
 
     /**
-     * Generate Presentation URL
+     * Generate Presentation URL.
      *
-     * @param boolean $withnonce The generated url will have a nonce included
+     * @param bool $withnonce The generated url will have a nonce included
      * @return array|null
      */
     protected function do_get_presentation_with_nonce(bool $withnonce): ?array {

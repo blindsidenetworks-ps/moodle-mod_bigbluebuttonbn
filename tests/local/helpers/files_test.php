@@ -46,14 +46,10 @@ use stored_file;
 class files_test extends \advanced_testcase {
     use testcase_helper_trait;
 
-    /**
-     * Filename used for the presentation
-     */
+    /** @var string Filename used for the presentation */
     const PRESENTATION_FILENAME = 'bbpresentation.pptx';
 
-    /**
-     * Filename used for the presentation
-     */
+    /** @var string Filename used for the presentation */
     const PRESENTATION_FILEPATH = '/mod/bigbluebuttonbn/tests/fixtures/bbpresentation.pptx';
 
     /**
@@ -199,11 +195,8 @@ class files_test extends \advanced_testcase {
     /**
      * Create a user and an activity
      *
-     * @return array
-     */
-    /**
      * @param null $presentationfilename
-     * @param false $closed
+     * @param bool $closed
      * @return array
      */
     protected function create_user_and_activity($presentationpath = null, $closed = false): array {
@@ -226,8 +219,6 @@ class files_test extends \advanced_testcase {
      * @param string $filename
      * @param int $contextid
      * @return stored_file
-     * @throws \file_exception
-     * @throws \stored_file_creation_exception
      */
     protected function create_sample_file($filename, $contextid) {
         $bbbfilerecord = new stdClass;

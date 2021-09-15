@@ -73,6 +73,7 @@ class recording extends persistent {
      *
      * @param int $id If set, this is the id of an existing record, used to load the data.
      * @param stdClass|null $record If set will be passed to from_record
+     * @param null|array $metadata
      */
     public function __construct($id = 0, stdClass $record = null, ?array $metadata = null) {
         if ($record) {
@@ -599,7 +600,7 @@ class recording extends persistent {
     /**
      * Fetch all records which match the specified parameters, including all metadata that relates to them.
      *
-     * @param arary $selecst
+     * @param arary $selects
      * @param array $params
      * @return recording[]
      */
