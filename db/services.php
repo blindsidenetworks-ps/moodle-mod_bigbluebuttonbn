@@ -75,4 +75,21 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
     ],
+    'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => array(
+        'classname'     => 'mod_bigbluebuttonbn\external\get_bigbluebuttons_by_courses',
+        'methodname'    => 'execute',
+        'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided
+                            all bigbluebuttonbns that the user can view will be returned.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'mod_bigbluebuttonbn_view_bigbluebuttonbn' => array(
+        'classname'     => 'mod_bigbluebuttonbn\external\view_bigbluebuttonbn',
+        'methodname'    => 'execute',
+        'description'   => 'Trigger the course module viewed event and update the module completion status.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
 ];

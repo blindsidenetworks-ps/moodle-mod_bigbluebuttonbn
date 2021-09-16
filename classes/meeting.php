@@ -52,6 +52,60 @@ class meeting {
     }
 
     /**
+     * Helper to create and join a meeting
+     *
+     * @param instance $instance
+     * @param int $origin
+     * @return object|void
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws bigbluebutton_exception
+     */
+    public static function create_and_join_meeting(instance $instance, $origin = logger::ORIGIN_INDEX): array {
+        // See if the session is in progress.
+        $meeting = new meeting($instance);
+        $meeting->update_cache();
+        if ($meeting->is_running()) {
+            if ($instance->has_user_limit_been_reached($meeting->get_participant_count())) {
+                return ['url' => $instance->get_logout_url(),
+                    'warningcode' => 'userlimitreached'];
+            }
+            // Since the meeting is already running, we just join the session.
+            return ['url' => $meeting->join($origin), 'error' => false];
+        }
+
+        // If user is not administrator nor moderator (user is student) and waiting is required.
+        if ($instance->user_must_wait_to_join()) {
+            return ['url' => $instance->get_logout_url(),
+                'warningcode' => 'waitformoderator'];;
+        }
+
+        // As the meeting doesn't exist, try to create it.
+        try {
+            $meeting = new meeting($instance);
+            $response = $meeting->create_meeting();
+            // New recording management: Insert a recordingID that corresponds to the meeting created.
+            if ($instance->is_recorded()) {
+                $recording = new recording(0, (object) array(
+                    'courseid' => $instance->get_course_id(),
+                    'bigbluebuttonbnid' => $instance->get_instance_id(),
+                    'recordingid' => $response['internalMeetingID'],
+                    'groupid' => $instance->get_group_id())
+                );
+                $recording->create();
+                // TODO: We may want to catch if the record was not created.
+            }
+            // Moodle event logger: Create an event for meeting created.
+            logger::log_meeting_created_event($instance);
+            // Since the meeting is already running, we just join the session.
+            return ['url' => $meeting->join($origin), 'error' => false];
+        } catch (server_not_available_exception $e) {
+            bigbluebutton_proxy::handle_server_not_available($instance);
+            return ['url' => null, 'errorcode' => 'view_error_unable_join'];
+        }
+    }
+
+    /**
      * Get currently stored meeting info
      *
      * @return mixed|stdClass

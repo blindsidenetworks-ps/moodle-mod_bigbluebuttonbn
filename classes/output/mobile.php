@@ -109,7 +109,7 @@ class mobile {
         $completion->set_module_viewed($cm);
 
         // Validate if the user is in a role allowed to join.
-        if (!$instance->has_join()) {
+        if (!$instance->can_join()) {
             return self::mobile_print_error(get_string('view_nojoin', 'bigbluebuttonbn'));
         }
 

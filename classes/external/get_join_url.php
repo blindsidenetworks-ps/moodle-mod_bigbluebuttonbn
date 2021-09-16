@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_bigbluebuttonbn\external;
+
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -28,7 +29,7 @@ global $CFG;
 require_once($CFG->libdir . '/externallib.php');
 
 /**
- * External service to check whether a user can join a meeting.
+ * External service to create the meeting (if needed), check user limit, and return the join URL when we can join.
  *
  * This is mainly used by the mobile application.
  *
@@ -37,7 +38,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright 2018 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class can_join extends external_api {
+class get_join_url extends external_api {
     /**
      * Returns description of method parameters
      *
@@ -71,25 +72,33 @@ class can_join extends external_api {
             'cmid' => $cmid,
             'groupid' => $groupid,
         ]);
-
-        $result = [
-            'can_join' => false,
-            'message' => '',
-            'cmid' => $cmid,
-        ];
+        $result['warnings'] = [];
 
         $instance = instance::get_from_cmid($cmid);
         if (empty($instance)) {
-            return $result;
+            throw new \moodle_exception('nosuchinstance', 'mod_bigbluebuttonbn', null,
+                ['entity' => get_string('module', 'course'), 'id' => $cmid]);
         }
         $instance->set_group_id($groupid);
 
         self::validate_context($instance->get_context());
 
-        $meeting = new meeting($instance);
-
-        $result['can_join'] = $meeting->can_join();
-
+        $returnvalue =
+            meeting::create_and_join_meeting($instance);
+        if (!empty($returnvalue['url']) && empty($returnvalue['warningcode'])) {
+            $result['join_url'] = $returnvalue['url']; // We only return the joinURL if there is no warning or error.
+        }
+        if (!empty($returnvalue['warningcode'])) {
+            $result['warnings'][] = [
+                'item' => 'mod_bigbluebuttonbn',
+                'itemid' => $instance->get_instance_id(),
+                'warningcode' => $returnvalue['warningcode'],
+                'message' => get_string($returnvalue['warningcode'], 'mod_bigbluebuttonbn')
+            ];
+        }
+        if (!empty($returnvalue['errorcode'])) {
+            throw new \moodle_exception($returnvalue['errorcode'], get_string($returnvalue['errorcode'], 'mod_bigbluebuttonbn'));
+        }
         return $result;
     }
 
@@ -101,9 +110,8 @@ class can_join extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'can_join' => new external_value(PARAM_BOOL, 'Can join session'),
-            'message' => new external_value(PARAM_RAW, 'Message if we cannot join', VALUE_OPTIONAL),
-            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'join_url' => new external_value(PARAM_RAW, 'Can join session', VALUE_OPTIONAL),
+            'warnings' => new \external_warnings()
         ]);
     }
 }

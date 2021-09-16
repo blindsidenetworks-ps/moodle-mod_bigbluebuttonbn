@@ -136,43 +136,9 @@ switch (strtolower($action)) {
             $origin = logger::ORIGIN_INDEX;
         }
 
-        // See if the session is in progress.
-        $meeting = new meeting($instance);
-        if ($meeting->is_running()) {
-            // Since the meeting is already running, we just join the session.
-            $redirecturl = $meeting->join($origin);
-            redirect($redirecturl);
-            break;
-        }
-
-        // If user is not administrator nor moderator (user is student) and waiting is required.
-        if ($instance->user_must_wait_to_join()) {
-            redirect($instance->get_logout_url());
-            break;
-        }
-
-        // As the meeting doesn't exist, try to create it.
-        try {
-            $meeting = new meeting($instance);
-            $response = $meeting->create_meeting();
-            // New recording management: Insert a recordingID that corresponds to the meeting created.
-            if ($instance->is_recorded()) {
-                $recording = new recording(0, (object) array(
-                    'courseid' => $instance->get_course_id(),
-                    'bigbluebuttonbnid' => $instance->get_instance_id(),
-                    'recordingid' => $response['internalMeetingID'],
-                    'groupid' => $instance->get_group_id())
-                    );
-                $recording->create();
-                // TODO: We may want to catch if the record was not created.
-            }
-            // Moodle event logger: Create an event for meeting created.
-            logger::log_meeting_created_event($instance);
-            // Since the meeting is already running, we just join the session.
-            $redirecturl = $meeting->join($origin);
-            redirect($redirecturl);
-        } catch (server_not_available_exception $e) {
-            bigbluebutton_proxy::handle_server_not_available($instance);
+        $returnvalue = meeting::create_and_join_meeting($instance, $origin);
+        if (!empty($returnvalue['url'])) {
+            redirect($returnvalue['url']);
         }
         break;
 
