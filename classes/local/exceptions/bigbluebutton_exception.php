@@ -38,4 +38,5 @@ defined('MOODLE_INTERNAL') || die();
  */
 class bigbluebutton_exception extends \moodle_exception {
 
+
 }

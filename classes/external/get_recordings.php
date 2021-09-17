@@ -27,6 +27,7 @@ use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\recording;
+use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -127,6 +128,9 @@ class get_recordings extends external_api {
                     global $CFG;
                     require_once($CFG->dirroot . '/webservice/lib.php');
                     throw new \webservice_access_exception('No access to this group');
+                }
+                if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
+                    throw new restricted_context_exception();
                 }
                 $instance->set_group_id($groupid);
             }

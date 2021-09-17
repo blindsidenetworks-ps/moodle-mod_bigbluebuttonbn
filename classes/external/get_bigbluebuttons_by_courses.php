@@ -49,7 +49,7 @@ class get_bigbluebuttons_by_courses extends external_api {
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function get_bigbluebuttonbns_by_courses_parameters() {
+    public static function execute_parameters() {
         return new external_function_parameters (
             array(
                 'courseids' => new external_multiple_structure(
@@ -77,22 +77,23 @@ class get_bigbluebuttons_by_courses extends external_api {
         $params = array(
             'courseids' => $courseids,
         );
-        $params = self::validate_parameters(self::get_bigbluebuttonbns_by_courses_parameters(), $params);
+        $params = self::validate_parameters(self::execute_parameters($courseids), $params);
 
+        $courseids = $params['courseids'] ?? null;
         $mycourses = array();
-        if (empty($params['courseids'])) {
+        if (empty($courseids)) {
             $mycourses = enrol_get_my_courses();
-            $params['courseids'] = array_keys($mycourses);
+            $courseids = array_keys($mycourses);
         }
 
         // Ensure there are courseids to loop through.
-        if (!empty($params['courseids'])) {
-
-            list($courses, $warnings) = external_util::validate_courses($params['courseids'], $mycourses);
+        if (!empty($courseids)) {
+            global $USER;
+            list($courses, $warnings) = external_util::validate_courses($courseids, $mycourses);
 
             // Get the bigbluebuttonbns in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
-            $bigbluebuttonbns = get_all_instances_in_courses("bigbluebuttonbn", $courses);
+            $bigbluebuttonbns = get_all_instances_in_courses("bigbluebuttonbn", $courses, $USER->id);
             foreach ($bigbluebuttonbns as $bigbluebuttonbn) {
                 $context = context_module::instance($bigbluebuttonbn->coursemodule);
                 // Entry to return.
@@ -120,7 +121,7 @@ class get_bigbluebuttons_by_courses extends external_api {
      * @return external_single_structure
      * @since Moodle 3.3
      */
-    public static function get_bigbluebuttonbns_by_courses_returns() {
+    public static function execute_returns() {
         return new external_single_structure(
             array(
                 'bigbluebuttonbns' => new external_multiple_structure(

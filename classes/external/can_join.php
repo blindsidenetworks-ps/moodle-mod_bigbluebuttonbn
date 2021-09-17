@@ -21,6 +21,7 @@ use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\meeting;
+use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -81,6 +82,9 @@ class can_join extends external_api {
         $instance = instance::get_from_cmid($cmid);
         if (empty($instance)) {
             return $result;
+        }
+        if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
+            throw new restricted_context_exception();
         }
         $instance->set_group_id($groupid);
 

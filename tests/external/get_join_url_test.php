@@ -28,7 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
- * Tests for the update_course class.
+ * Tests for the get_join_url class.
  *
  * @package    mod_bigbluebuttonbn
  * @category   test
