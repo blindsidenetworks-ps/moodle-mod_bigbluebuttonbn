@@ -81,7 +81,10 @@ class recording_row_playback implements renderable, templatable {
                     $linkattributes = [
                         'id' => 'recording-play-' . $playback['type'] . '-' . $recordingid,
                         'class' => 'btn btn-sm btn-default',
-                        'onclick' => 'M.mod_bigbluebuttonbn.recordings.recordingPlay(this);',
+                        // TODO :For now there is no onclick action but we can imagine that we could log an action when
+                        // playing recording.
+                        // 'onclick' => 'xxx.recordingPlay(this);'
+                        // as an example.
                         'data-action' => 'play',
                         'data-target' => $playback['type'],
                         'data-href' => $href,
