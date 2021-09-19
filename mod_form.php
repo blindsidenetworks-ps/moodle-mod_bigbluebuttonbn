@@ -51,7 +51,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if (is_null($serverversion)) {
             throw new moodle_exception('general_error_unable_connect', plugin::COMPONENT,
                 $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
-            return;
         }
         $bigbluebuttonbn = null;
         if ($this->current->id) {
@@ -81,7 +80,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             if (empty($jsvars['instanceTypeProfiles'])) {
                 throw new moodle_exception('general_error_not_allowed_to_create_instances)', plugin::COMPONENT,
                     $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
-                return;
             }
         }
         $jsvars['instanceTypeDefault'] = array_keys($jsvars['instanceTypeProfiles'])[0];
