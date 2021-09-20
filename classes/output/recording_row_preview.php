@@ -79,7 +79,7 @@ class recording_row_preview implements renderable, templatable {
                     }
                 }
             }
-            $context->recordingpreviews [] = $recordingpreview;
+            $context->recordingpreviews[] = $recordingpreview;
         }
 
         return $context;

@@ -22,6 +22,7 @@ use context_module;
 use core\persistent;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use moodle_url;
 use stdClass;
 
 /**
@@ -59,14 +60,17 @@ class recording extends persistent {
     /** @var int A meeting set to be recorded received notification callback from BBB */
     public const RECORDING_STATUS_NOTIFIED = 3;
 
-    /** @var bool $metadatachanged has metadata been changed so the remote information needs to be updated ? */
+    /** @var bool Whether metadata been changed so the remote information needs to be updated ? */
     protected $metadatachanged = false;
 
     /** @var int A refresh period for recordings, defaults to 300s (5mins) */
     public const RECORDING_REFRESH_DEFAULT_PERIOD = 300;
 
-    /** @var array $metadata */
+    /** @var array A cached copy of the metadata */
     protected $metadata = null;
+
+    /** @var instance A cached copy of the instance */
+    protected $instance;
 
     /**
      * Create an instance of this class.
@@ -127,7 +131,12 @@ class recording extends persistent {
             }
         }
 
-        return self::fetch_records($selects, $params);
+        $recordings = self::fetch_records($selects, $params);
+        foreach ($recordings as $recording) {
+            $recording->instsance = $instance;
+        }
+
+        return $recordings;
     }
 
     /**
@@ -339,6 +348,19 @@ class recording extends persistent {
     }
 
     /**
+     * Get the instance that this recording relates to.
+     *
+     * @return instance
+     */
+    public function get_instance(): instance {
+        if ($this->instance === null) {
+            $instance = instance::get_from_instanceid($this->get('bigbluebuttonbnid'));
+        }
+
+        return $instance;
+    }
+
+    /**
      * Before doing the database update, let's check if we need to update metadata
      *
      * @return void
@@ -511,13 +533,45 @@ class recording extends persistent {
     }
 
     /**
-     * List of playbacks for this recording
+     * List of playbacks for this recording.
      *
-     * @return mixed|null
-     * @throws \coding_exception
+     * @return array[]
      */
     protected function get_playbacks() {
-        return $this->metadata_get('playbacks');
+        if ($playbacks = $this->metadata_get('playbacks')) {
+            return array_map(function(array $playback): array {
+                $clone = array_merge([], $playback);
+                $clone['url'] = new moodle_url('/mod/bigbluebuttonbn/bbb_view.php', [
+                    'action' => 'play',
+                    'bn' => $this->get_instance()->get_instance_id(),
+                    'rid' => $this->get('id'),
+                    'rtype' => $clone['type'],
+                ]);
+
+                return $clone;
+            }, $playbacks);
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the playback URL for the specified type.
+     *
+     * @param string $type
+     * @return null|string
+     */
+    public function get_remote_playback_url(string $type): ?string {
+        $this->refresh_metadata_if_required();
+
+        $playbacks = $this->metadata_get('playbacks');
+        foreach ($playbacks as $playback) {
+            if ($playback['type'] == $type) {
+                return $playback['url'];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -639,7 +693,7 @@ class recording extends persistent {
      */
     protected function fetch_metadata(bool $force = false): ?array {
         if ($this->metadata !== null && !$force) {
-            // Metadat is already up-to-date.
+            // Metadata is already up-to-date.
             return $this->metadata;
         }
 
@@ -650,6 +704,17 @@ class recording extends persistent {
         }
 
         return $this->metadata;
+    }
+
+    /**
+     * Refresh metadata if required.
+     *
+     * If this is a protected recording which whose data was not fetched in the current request, then the metadata will
+     * be purged and refetched. This ensures that the url is safe for use with a protected recording.
+     */
+    protected function refresh_metadata_if_required() {
+        recording_proxy::purge_protected_recording($this->get('recordingid'));
+        $this->fetch_metadata(true);
     }
 
     /**

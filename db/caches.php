@@ -48,4 +48,8 @@ $definitions = [
         ],
         'ttl' => HOURSECS,
     ],
+
+    'currentfetch' => [
+        'mode' => cache_store::MODE_REQUEST,
+    ],
 ];

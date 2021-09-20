@@ -263,13 +263,13 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
      * @param   {Event} e
      */
     const processAction = e => {
-        const popoutLink = e.target.closest('a[data-href]');
+        const popoutLink = e.target.closest('[data-action="play"]');
         if (popoutLink) {
             e.preventDefault();
 
             const videoPlayer = window.open('', '_blank');
             videoPlayer.opener = null;
-            videoPlayer.location.href = popoutLink.dataset.href;
+            videoPlayer.location.href = popoutLink.href;
 
             // TODO repository.viewRecording(args); .
 

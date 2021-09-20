@@ -64,33 +64,26 @@ class recording_row_playback implements renderable, templatable {
     public function export_for_template(renderer_base $output): stdClass {
         $ispublished = $this->recording->get('published');
         $recordingid = $this->recording->get('id');
-        $context = new stdClass();
-        $context->dataimported = $this->recording->get('imported');
-        $context->id = 'playbacks-' . $this->recording->get('id');
-        $context->recordingid = $recordingid;
-        $context->additionaloptions = '';
-        $context->playbacks = [];
+        $context = (object) [
+            'dataimported' => $this->recording->get('imported'),
+            'id' => 'playbacks-' . $this->recording->get('id'),
+            'recordingid' => $recordingid,
+            'additionaloptions' => '',
+            'playbacks' => [],
+        ];
+
         $playbacks = $this->recording->get('playbacks');
         if ($ispublished && $playbacks) {
-            global $CFG;
             foreach ($playbacks as $playback) {
                 if ($this->should_be_included($playback)) {
-                    $href =
-                        $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=play&bn=' . $this->instance->get_instance_id() .
-                        '&rid=' . $this->recording->get('id') . '&rtype=' . $playback['type'];
                     $linkattributes = [
-                        'id' => 'recording-play-' . $playback['type'] . '-' . $recordingid,
+                        'id' => "recording-play-{$playback['type']}-{$recordingid}",
                         'class' => 'btn btn-sm btn-default',
-                        // TODO :For now there is no onclick action but we can imagine that we could log an action when
-                        // playing recording.
-                        // 'onclick' => 'xxx.recordingPlay(this);'
-                        // as an example.
                         'data-action' => 'play',
                         'data-target' => $playback['type'],
-                        'data-href' => $href,
                     ];
                     $actionlink = new \action_link(
-                        new \moodle_url('#'),
+                        $playback['url'],
                         recording_data::type_text($playback['type']),
                         null,
                         $linkattributes
