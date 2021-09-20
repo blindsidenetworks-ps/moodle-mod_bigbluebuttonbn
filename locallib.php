@@ -3650,6 +3650,8 @@ function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
         'bbb-recording-name' => bigbluebuttonbn_html2text($bbbsession['meetingname'], 64),
         'bbb-recording-description' => bigbluebuttonbn_html2text($bbbsession['meetingdescription'], 64),
         'bbb-recording-tags' => bigbluebuttonbn_get_tags($bbbsession['cm']->id), // Same as $id.
+        'bbb-meeting-size-hint' => count_enrolled_users(
+                context_course::instance($bbbsession['course']->id), '', $bbbsession['group']),
     ];
     // Special metadata for recording processing.
     if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recordingstatus_enabled')) {
