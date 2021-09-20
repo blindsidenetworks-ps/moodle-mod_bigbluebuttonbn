@@ -33,14 +33,20 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  */
 class upgrade_recordings_imported_test extends advanced_testcase {
     use testcase_helper_trait;
-
+    /**
+     * Setup for test
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->require_mock_server();
+        $this->resetAfterTest();
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
+    }
     /**
      * Upgrade task test
      */
     public function test_upgrade_recordings(): void {
         global $DB;
-        $this->resetAfterTest();
-        $this->require_mock_server();
 
         $generator = $this->getDataGenerator();
 
