@@ -1020,7 +1020,7 @@ function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $
         // The nonce value is actually used twice because BigBlueButton reads the file two times.
         $noncecounter += 1;
         $cache->set($noncekey, array('value' => $noncevalue, 'counter' => $noncecounter));
-        if ($noncecounter == 2) {
+        if ($noncecounter > 1) {
             $cache->delete($noncekey);
         }
         return($args['1']);
