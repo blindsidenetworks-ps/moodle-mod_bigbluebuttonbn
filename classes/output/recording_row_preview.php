@@ -56,30 +56,35 @@ class recording_row_preview implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): stdClass {
         global $CFG;
-        $context = new stdClass();
+
+        $context = (object) [
+            'id' => 'preview-' . $this->recording->get('id'),
+            'hidden' => !$this->recording->get('published'),
+            'recordingpreviews' => [],
+        ];
 
         $playbacks = $this->recording->get('playbacks');
-        $context->id = 'preview-' . $this->recording->get('id');
-        $context->hidden = !$this->recording->get('published');
-        $context->recordingpreviews = [];
-
         foreach ($playbacks as $playback) {
-            $recordingpreview = new stdClass();
-            if (isset($playback['preview'])) {
-                $recordingpreview = new stdClass();
-                $recordingpreview->thumbnails = [];
+            $thumbnails = [];
 
+            if (isset($playback['preview'])) {
                 foreach ($playback['preview'] as $image) {
                     $validated = true;
+                    $url = trim($image['url']);
                     if ($CFG->bigbluebuttonbn_recordings_validate_url) {
-                        $validated = bigbluebutton_proxy::is_remote_resource_valid(trim($image['url']));
+                        $validated = bigbluebutton_proxy::is_remote_resource_valid($url);
                     }
                     if ($validated) {
-                        $recordingpreview->thumbnails[] = trim($image['url']) . '?' . time();
+                        $thumbnails[] = $url . '?' . time();
                     }
                 }
+
+                if (!empty($thumbnails)) {
+                    $context->recordingpreviews[] = (object) [
+                        'thumbnails' => $thumbnails,
+                    ];
+                }
             }
-            $context->recordingpreviews[] = $recordingpreview;
         }
 
         return $context;
