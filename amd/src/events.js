@@ -20,6 +20,7 @@ import {dispatchEvent} from './event_dispatcher';
 export const eventTypes = {
     /**
      * Fired when a session has been ended.
+     *
      * @event mod_bigbluebuttonbn/sessionEnded
      * @type CustomEvent
      * @property {object} detail
@@ -27,6 +28,15 @@ export const eventTypes = {
      * @property {number} detail.groupId
      */
     sessionEnded: 'mod_bigbluebuttonbn/sessionEnded',
+
+    /**
+     * Fired when the current session has been ended.
+     *
+     * @event mod_bigbluebuttonbn/currentSessionEnded
+     * @type CustomEvent
+     * @property {object} detail
+     */
+    currentSessionEnded: 'mod_bigbluebuttonbn/currentSessionEnded',
 };
 
 /**
@@ -41,3 +51,16 @@ export const notifySessionEnded = (bbbId, groupId) => dispatchEvent(eventTypes.s
     bbbId,
     groupId,
 });
+
+/**
+ * Trigger the currentSessionEnded event.
+ *
+ * @param {Element} container
+ * @returns {CustomEvent}
+ * @fires event:mod_bigbluebuttonbn/currentSessionEnded
+ */
+export const notifyCurrentSessionEnded = container => dispatchEvent(
+    eventTypes.currentSessionEnded,
+    {},
+    container
+);

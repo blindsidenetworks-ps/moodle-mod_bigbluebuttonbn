@@ -20,7 +20,8 @@ import {
     exception as displayException,
     fetchNotifications,
 } from 'core/notification';
-import {eventTypes} from './events';
+
+import {eventTypes, notifyCurrentSessionEnded} from './events';
 
 export const init = (bigbluebuttonbnid) => {
     const completionElement = document.querySelector('a[href*=completion_validate]');
@@ -45,17 +46,30 @@ export const init = (bigbluebuttonbnid) => {
         roomUpdater.updateRoom();
         fetchNotifications();
     });
+
+    window.addEventListener(eventTypes.currentSessionEnded, () => {
+        roomUpdater.stop();
+        roomUpdater.updateRoom();
+        fetchNotifications();
+    });
 };
 
 /**
- * Auto close window ?
+ * Handle autoclosing of the window.
+ */
+const autoclose = () => {
+    window.opener.setTimeout(() => {
+        roomUpdater.updateRoom(true);
+    }, 5000);
+    window.removeEventListener('onbeforeunload', autoclose);
+};
+
+/**
+ * Auto close child windows when clicking the End meeting button.
  */
 export const setupWindowAutoClose = () => {
-    // Not sure what this does here. Will need to have a closer look into the process.
-    window.onunload = function() {
-        opener.setTimeout(() => roomUpdater.updateRoom(true), 5000);
-        window.close();
-    };
-    window.close(); // This does not work as scripts can only close windows that are
-    // opened by themselves.
+    notifyCurrentSessionEnded(window.opener);
+    window.addEventListener('onbeforeunload', autoclose);
+
+    window.close(); // This does not work as scripts can only close windows that are opened by themselves.
 };
