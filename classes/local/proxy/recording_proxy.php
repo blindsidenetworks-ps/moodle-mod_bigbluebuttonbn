@@ -135,6 +135,33 @@ class recording_proxy extends proxy_base {
     }
 
     /**
+     * Check whether the current recording is a protected recording and purge the cache if necessary.
+     *
+     * @param string $recordingid
+     */
+    public static function purge_protected_recording(string $recordingid): void {
+        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
+
+        $recording = $cache->get($recordingid);
+        if (empty($recording)) {
+            // This value was not cached to begin with.
+            return;
+        }
+
+        $currentfetchcache = cache::make('mod_bigbluebuttonbn', 'currentfetch');
+        if ($currentfetchcache->has($recordingid)) {
+            // This item was fetched in the current request.
+            return;
+        }
+
+        if (array_key_exists('protected', $recording) && $recording['protected'] === 'true') {
+            // This item is protected. Purge it from the cache.
+            $cache->delete($recordingid);
+            return;
+        }
+    }
+
+    /**
      * Helper function to fetch recordings from a BigBlueButton server.
      *
      * @param array $keyids list of meetingids or recordingids
@@ -150,6 +177,7 @@ class recording_proxy extends proxy_base {
         }
 
         $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
+        $currentfetchcache = cache::make('mod_bigbluebuttonbn', 'currentfetch');
         $recordings = array_filter($cache->get_many($keyids));
         $missingkeys = array_diff(array_values($keyids), array_keys($recordings));
 
@@ -157,6 +185,7 @@ class recording_proxy extends proxy_base {
         while ($ids = array_splice($missingkeys, 0, $pagesize)) {
             $fetchrecordings = self::fetch_recordings_page($ids, $key);
             $cache->set_many($fetchrecordings);
+            $currentfetchcache->set_many(array_flip(array_keys($fetchrecordings)));
 
             $recordings += $fetchrecordings;
         }

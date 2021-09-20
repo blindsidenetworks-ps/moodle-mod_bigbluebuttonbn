@@ -23,6 +23,7 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use core\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\meeting;
@@ -176,45 +177,17 @@ switch (strtolower($action)) {
         break;
 
     case 'play':
-        $href = bigbluebuttonbn_bbb_view_playback_href($rid, $rtype);
-        logger::log_recording_played_event($instance, $rid);
-
-        // Execute the redirect.
-        header('Location: ' . urldecode($href));
+        $recording = recording::get_record(['id' => $rid]);
+        if ($href = $recording->get_remote_playback_url($rtype)) {
+            logger::log_recording_played_event($instance, $rid);
+            redirect(urldecode($href));
+        } else {
+            notification::add(get_string('recordingurlnotfound', 'mod_bigbluebuttonbn'), notification::ERROR);
+            redirect($instance->get_view_url());
+        }
         break;
     default:
         bigbluebuttonbn_bbb_view_close_window();
-}
-
-/**
- * Helper for getting the playback url that corresponds to an specific type.
- *
- * @param string $rid
- * @param string $rtype
- * @return string
- */
-function bigbluebuttonbn_bbb_view_playback_href($rid, $rtype) {
-    $recording = recording::get_record(['id' => $rid]);
-    if (empty($recording)) {
-        return '';
-    }
-    return bigbluebuttonbn_bbb_view_playback_href_lookup($recording->get('playbacks'), $rtype);
-}
-
-/**
- * Helper for looking up playback url in the recording playback array.
- *
- * @param array $playbacks
- * @param string $type
- * @return string
- */
-function bigbluebuttonbn_bbb_view_playback_href_lookup($playbacks, $type) {
-    foreach ($playbacks as $playback) {
-        if ($playback['type'] == $type) {
-            return $playback['url'];
-        }
-    }
-    return '';
 }
 
 /**

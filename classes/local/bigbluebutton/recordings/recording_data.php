@@ -121,15 +121,16 @@ class recording_data {
      */
     protected static function row_duration(recording $recording): int {
         $playbacks = $recording->get('playbacks');
-        if ($playbacks === null) {
+        if (empty($playbacks)) {
             return 0;
         }
-        foreach (array_values($playbacks) as $playback) {
+        foreach ($playbacks as $playback) {
             // Ignore restricted playbacks.
             if (array_key_exists('restricted', $playback) && strtolower($playback['restricted']) == 'true') {
                 continue;
             }
-            // Take the lenght form the fist playback with an actual value.
+
+            // Take the length form the fist playback with an actual value.
             if (!empty($playback['length'])) {
                 return intval($playback['length']);
             }
