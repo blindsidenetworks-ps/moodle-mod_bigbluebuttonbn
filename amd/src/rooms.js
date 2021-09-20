@@ -31,12 +31,12 @@ export const init = (bigbluebuttonbnid) => {
     }
 
     document.addEventListener('click', e => {
-        const actionButton = e.target.closest('.bbb-btn-action');
-        if (!actionButton) {
-            return;
-        }
-        if (actionButton.dataset.action === "join") {
-            roomUpdater.poll();
+        const joinButton = e.target.closest('[data-action="join"]');
+        if (joinButton) {
+            roomUpdater.start();
+            window.open(joinButton.href, 'bigbluebutton_conference');
+
+            e.preventDefault();
         }
     });
 
