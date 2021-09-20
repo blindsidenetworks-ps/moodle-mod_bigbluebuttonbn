@@ -661,8 +661,8 @@ class recording extends persistent {
     protected static function fetch_records(array $selects, array $params): array {
         global $DB;
 
-        // Fetch the local data.
-        $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params);
+        // Fetch the local data. Arbitrary sort by id, so we get the same result on different db engines.
+        $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params, 'id ASC');
 
         // Grab the recording IDs.
         $recordingids = array_filter(array_map(function($recording) {
@@ -733,7 +733,7 @@ class recording extends persistent {
         $recordings = $DB->get_records_select(static::TABLE, $select, [
             'status_awaiting' => self::RECORDING_STATUS_AWAITING,
             'withindays' => time() - ($timelimitdays * DAYSECS),
-        ]);
+        ], 'id ASC'); // Arbitrary sort by id, so we get the same result on different db engines.
 
         $recordingcount = count($recordings);
         mtrace("=> Found {$recordingcount} recordings to query");
