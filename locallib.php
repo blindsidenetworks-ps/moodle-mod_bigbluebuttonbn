@@ -2695,7 +2695,7 @@ function bigbluebuttonbn_settings_general(&$renderer) {
         );
         $renderer->render_group_element(
             'shared_secret',
-            $renderer->render_group_element_text('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
+            $renderer->render_group_element_password('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
         );
     }
 }
