@@ -57,8 +57,6 @@ class meeting {
      * @param instance $instance
      * @param int $origin
      * @return object|void
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
      * @throws bigbluebutton_exception
      */
     public static function create_and_join_meeting(instance $instance, $origin = logger::ORIGIN_INDEX): array {
@@ -82,7 +80,6 @@ class meeting {
 
         // As the meeting doesn't exist, try to create it.
         try {
-            $meeting = new meeting($instance);
             $response = $meeting->create_meeting();
             // New recording management: Insert a recordingID that corresponds to the meeting created.
             if ($instance->is_recorded()) {
@@ -101,7 +98,8 @@ class meeting {
             return ['url' => $meeting->join($origin), 'error' => false];
         } catch (server_not_available_exception $e) {
             bigbluebutton_proxy::handle_server_not_available($instance);
-            return ['url' => null, 'errorcode' => 'view_error_unable_join'];
+            throw new bigbluebutton_exception('view_error_unable_join',
+                get_string(['view_error_unable_join'], 'mod_bigbluebuttonbn'));
         }
     }
 

@@ -266,9 +266,9 @@ class get_recordings_test extends \externallib_advanced_testcase {
         ]); // We need to have a meeting created in order to import recordings.
         $newinstance = instance::get_from_instanceid($newactivity->id);
         $recordings = $instance->get_recordings();
-        foreach ($recordings as $rec) {
-            if ($rec->get('name') == 'Recording1') {
-                $rec->create_imported_recording($newinstance);
+        foreach ($recordings as $recording) {
+            if ($recording->get('name') == 'Recording1') {
+                $recording->create_imported_recording($newinstance);
             }
         }
 

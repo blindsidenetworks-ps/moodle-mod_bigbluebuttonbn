@@ -42,7 +42,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright 2018 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_bigbluebuttons_by_courses extends external_api {
+class get_bigbluebuttonbns_by_courses extends external_api {
     /**
      * Describes the parameters for get_bigbluebuttonbns_by_courses.
      *
@@ -51,11 +51,11 @@ class get_bigbluebuttons_by_courses extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters (
-            array(
+            [
                 'courseids' => new external_multiple_structure(
-                    new external_value(PARAM_INT, 'Course id'), 'Array of course ids', VALUE_DEFAULT, array()
+                    new external_value(PARAM_INT, 'Course id'), 'Array of course ids', VALUE_DEFAULT, []
                 ),
-            )
+            ]
         );
     }
 
@@ -65,22 +65,17 @@ class get_bigbluebuttons_by_courses extends external_api {
      *
      * @param array $courseids course ids
      * @return array of warnings and bigbluebuttonbns
-     * @throws \coding_exception
-     * @throws \invalid_parameter_exception
      * @since Moodle 3.3
      */
-    public static function execute($courseids = array()) {
-
-        $warnings = array();
-        $returnedbigbluebuttonbns = array();
+    public static function execute($courseids = []) {
+        $warnings = [];
+        $returnedbigbluebuttonbns = [];
 
         $params = array(
             'courseids' => $courseids,
         );
-        $params = self::validate_parameters(self::execute_parameters($courseids), $params);
-
-        $courseids = $params['courseids'] ?? null;
-        $mycourses = array();
+        ['courseids' => $courseids] = self::validate_parameters(self::execute_parameters($courseids), $params);
+        $mycourses = [];
         if (empty($courseids)) {
             $mycourses = enrol_get_my_courses();
             $courseids = array_keys($mycourses);
@@ -123,10 +118,10 @@ class get_bigbluebuttons_by_courses extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure(
-            array(
+            [
                 'bigbluebuttonbns' => new external_multiple_structure(
                     new external_single_structure(
-                        array(
+                        [
                             'id' => new external_value(PARAM_INT, 'Module id'),
                             'coursemodule' => new external_value(PARAM_INT, 'Course module id'),
                             'course' => new external_value(PARAM_INT, 'Course id'),
@@ -140,11 +135,11 @@ class get_bigbluebuttons_by_courses extends external_api {
                             'visible' => new external_value(PARAM_INT, 'Module visibility'),
                             'groupmode' => new external_value(PARAM_INT, 'Group mode'),
                             'groupingid' => new external_value(PARAM_INT, 'Grouping id'),
-                        )
+                        ]
                     )
                 ),
                 'warnings' => new external_warnings(),
-            )
+            ]
         );
     }
 }

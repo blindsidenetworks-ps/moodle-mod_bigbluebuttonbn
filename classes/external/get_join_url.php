@@ -58,14 +58,12 @@ class get_join_url extends external_api {
      * @param int $cmid the bigbluebuttonbn course module id
      * @param null|int $groupid
      * @return array (empty array for now)
-     * @throws \restricted_context_exception
      */
     public static function execute(
         int $cmid,
         ?int $groupid = 0
     ): array {
         // Validate the cmid ID.
-        // TODO: we should maybe pass the bbbid + groupid instead of the cmid.
         [
             'cmid' => $cmid,
             'groupid' => $groupid,
@@ -80,6 +78,7 @@ class get_join_url extends external_api {
             throw new \moodle_exception('nosuchinstance', 'mod_bigbluebuttonbn', null,
                 ['entity' => get_string('module', 'course'), 'id' => $cmid]);
         }
+        // Validate the groupid.
         if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
             throw new restricted_context_exception();
         }
@@ -99,9 +98,6 @@ class get_join_url extends external_api {
                 'warningcode' => $returnvalue['warningcode'],
                 'message' => get_string($returnvalue['warningcode'], 'mod_bigbluebuttonbn')
             ];
-        }
-        if (!empty($returnvalue['errorcode'])) {
-            throw new \moodle_exception($returnvalue['errorcode'], get_string($returnvalue['errorcode'], 'mod_bigbluebuttonbn'));
         }
         return $result;
     }

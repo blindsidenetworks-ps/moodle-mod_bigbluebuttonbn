@@ -64,7 +64,6 @@ class can_join extends external_api {
         ?int $groupid = 0
     ): array {
         // Validate the cmid ID.
-        // TODO: we should maybe pass the bbbid + groupid instead of the cmid.
         [
             'cmid' => $cmid,
             'groupid' => $groupid,
@@ -83,6 +82,7 @@ class can_join extends external_api {
         if (empty($instance)) {
             return $result;
         }
+        // Validate the groupid.
         if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
             throw new restricted_context_exception();
         }

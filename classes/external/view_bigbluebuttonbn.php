@@ -48,9 +48,9 @@ class view_bigbluebuttonbn extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id')
-            )
+            ]
         );
     }
 
@@ -74,8 +74,8 @@ class view_bigbluebuttonbn extends external_api {
             array(
                 'bigbluebuttonbnid' => $bigbluebuttonbnid
             ));
-        $warnings = array();
-        $result = array();
+        $warnings = [];
+        $result = [];
         try {
             // Request and permission validation.
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbnid']), '*', MUST_EXIST);
@@ -88,7 +88,7 @@ class view_bigbluebuttonbn extends external_api {
 
             // Call the bigbluebuttonbn/lib API.
             bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context);
-            $result = array();
+            $result = [];
             $result['status'] = true;
         } catch (\dml_missing_record_exception $e) {
             $warnings[] = [
@@ -111,10 +111,10 @@ class view_bigbluebuttonbn extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure(
-            array(
+            [
                 'status' => new external_value(PARAM_BOOL, 'status: true if success'),
                 'warnings' => new external_warnings()
-            )
+            ]
         );
     }
 }
