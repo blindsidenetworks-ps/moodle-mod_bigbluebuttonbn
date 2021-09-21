@@ -54,9 +54,9 @@ class get_bigbluebuttons_by_courses_test extends \externallib_advanced_testcase 
      * @return mixed
      */
     protected function get_bigbluebuttons_by_courses(...$params) {
-        $getjoinurl = get_bigbluebuttonbns_by_courses::execute(...$params);
+        $returnvalue = get_bigbluebuttonbns_by_courses::execute(...$params);
 
-        return external_api::clean_returnvalue(get_bigbluebuttonbns_by_courses::execute_returns(), $getjoinurl);
+        return external_api::clean_returnvalue(get_bigbluebuttonbns_by_courses::execute_returns(), $returnvalue);
     }
 
     /**

@@ -35,7 +35,7 @@ $functions = [
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
-    'mod_bigbluebutton_recording_list_table' => [
+    'mod_bigbluebuttonbn_get_recordings' => [
         'classname'     => 'mod_bigbluebuttonbn\external\get_recordings',
         'methodname'    => 'execute',
         'description'   => 'Returns a list of recordings ready to be processed by a datatable.',
@@ -43,7 +43,7 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
     ],
-    'mod_bigbluebutton_recording_update_recording' => [
+    'mod_bigbluebuttonbn_update_recording' => [
         'classname'     => 'mod_bigbluebuttonbn\external\update_recording',
         'methodname'    => 'execute',
         'description'   => 'Update a single recording',
@@ -51,7 +51,7 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:managerecordings',
     ],
-    'mod_bigbluebutton_meeting_end' => [
+    'mod_bigbluebuttonbn_end_meeting' => [
         'classname'     => 'mod_bigbluebuttonbn\external\end_meeting',
         'methodname'    => 'execute',
         'description'   => 'End a meeting',
@@ -59,7 +59,7 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:join',
     ],
-    'mod_bigbluebutton_completion_validate' => [
+    'mod_bigbluebuttonbn_completion_validate' => [
         'classname'     => 'mod_bigbluebuttonbn\external\completion_validate',
         'methodname'    => 'execute',
         'description'   => 'Validate completion',
@@ -67,7 +67,7 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
     ],
-    'mod_bigbluebutton_meeting_info' => [
+    'mod_bigbluebuttonbn_meeting_info' => [
         'classname'     => 'mod_bigbluebuttonbn\external\meeting_info',
         'methodname'    => 'execute',
         'description'   => 'Get displayable information on the meeting',
@@ -82,7 +82,7 @@ $functions = [
                             all bigbluebuttonbns that the user can view will be returned.',
         'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ),
     'mod_bigbluebuttonbn_view_bigbluebuttonbn' => array(
         'classname'     => 'mod_bigbluebuttonbn\external\view_bigbluebuttonbn',
@@ -90,6 +90,14 @@ $functions = [
         'description'   => 'Trigger the course module viewed event and update the module completion status.',
         'type'          => 'write',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE]
     ),
+    'mod_bigbluebuttonbn_get_join_url' => [
+        'classname'     => 'mod_bigbluebuttonbn\external\get_join_url',
+        'methodname'    => 'execute',
+        'description'   => 'Get the join URL for the meeting and create if it does not exist.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/bigbluebuttonbn:join',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];
