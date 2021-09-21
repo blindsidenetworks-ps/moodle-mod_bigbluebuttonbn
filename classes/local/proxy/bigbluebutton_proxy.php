@@ -423,11 +423,11 @@ class bigbluebutton_proxy extends proxy_base {
         self::assert_returned_xml($xml);
 
         if (empty($xml->meetingID)) {
-            throw new bigbluebutton_exception('general_error_cannot_create_meeting', plugin::COMPONENT);
+            throw new bigbluebutton_exception('general_error_cannot_create_meeting');
         }
 
         if ($xml->hasBeenForciblyEnded === 'true') {
-            throw new bigbluebutton_exception('index_error_forciblyended', plugin::COMPONENT);
+            throw new bigbluebutton_exception('index_error_forciblyended');
         }
 
         return [

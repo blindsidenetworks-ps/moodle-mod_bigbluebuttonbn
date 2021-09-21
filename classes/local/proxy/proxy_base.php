@@ -120,7 +120,7 @@ abstract class proxy_base {
                 $messagekey = 'general_error_unable_connect';
             }
 
-            throw new bigbluebutton_exception($messagekey, plugin::COMPONENT, '', $messagedetails);
+            throw new bigbluebutton_exception($messagekey, $additionaldetails);
         }
     }
 

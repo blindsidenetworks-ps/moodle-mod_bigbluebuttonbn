@@ -25,6 +25,7 @@
 
 namespace mod_bigbluebuttonbn\local\exceptions;
 
+use mod_bigbluebuttonbn\plugin;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,6 +38,13 @@ defined('MOODLE_INTERNAL') || die();
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
 class bigbluebutton_exception extends \moodle_exception {
-
+    /**
+     * Constructor
+     *
+     * @param string $errorcode The name of the string from error.php to print
+     */
+    public function __construct($errorcode, $additionalinfo = null) {
+        parent::__construct($errorcode, plugin::COMPONENT, '', $additionalinfo);
+    }
 
 }
