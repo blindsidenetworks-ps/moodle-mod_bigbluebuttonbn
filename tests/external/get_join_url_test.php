@@ -45,7 +45,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->require_mock_server();
+        $this->initialise_mock_server();
     }
 
     /**
@@ -228,7 +228,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
         $this->setUser($user);
         $joinurl = $this->get_join_url($instance->get_cm_id());
         $this->assertNotNull($joinurl['warnings']);
-        $this->assertEquals($joinurl['warnings'][0]['warningcode'], 'userlimitreached');
+        $this->assertEquals('userlimitreached', $joinurl['warnings'][0]['warningcode']);
     }
 }
 

@@ -104,8 +104,7 @@ class meeting_info extends external_api {
      * @since Moodle 3.0
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(
-            [
+        return new external_single_structure([
                 'cmid' => new external_value(PARAM_INT, 'CM id'),
                 'userlimit' => new external_value(PARAM_INT, 'User limit'),
                 'bigbluebuttonbnid' => new external_value(PARAM_RAW, 'bigbluebuttonbn instance id'),

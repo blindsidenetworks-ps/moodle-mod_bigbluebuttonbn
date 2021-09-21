@@ -21,6 +21,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
 use mod_bigbluebuttonbn\meeting;
 use restricted_context_exception;
 
@@ -86,17 +87,14 @@ class get_join_url extends external_api {
 
         self::validate_context($instance->get_context());
 
-        $returnvalue =
-            meeting::create_and_join_meeting($instance);
-        if (!empty($returnvalue['url']) && empty($returnvalue['warningcode'])) {
-            $result['join_url'] = $returnvalue['url']; // We only return the joinURL if there is no warning or error.
-        }
-        if (!empty($returnvalue['warningcode'])) {
+        try {
+            $result['join_url'] = meeting::join_meeting($instance);
+        } catch (meeting_join_exception $e) {
             $result['warnings'][] = [
                 'item' => 'mod_bigbluebuttonbn',
                 'itemid' => $instance->get_instance_id(),
-                'warningcode' => $returnvalue['warningcode'],
-                'message' => get_string($returnvalue['warningcode'], 'mod_bigbluebuttonbn')
+                'warningcode' => $e->errorcode,
+                'message' => $e->getMessage()
             ];
         }
         return $result;

@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\logger;
@@ -125,33 +126,14 @@ class mobile {
         }
 
         // See if the BBB session is already in progress.
-        $meeting = new meeting($instance);
-        if (!$meeting->is_running()) {
-            // The meeting doesnt exist in BBB server, must be created.
-            try {
-                $meeting->create_meeting();
-                // Event meeting created.
-                logger::log_meeting_created_event($instance);
-            } catch (bigbluebutton_exception $e) {
-                return self::mobile_print_error($e->getMessage());
-            } catch (server_not_available_exception $e) {
-                return self::mobile_print_error(bigbluebutton_proxy::get_server_not_available_message($instance));
-            }
+        $urltojoin = '';
+        try {
+            $urltojoin = meeting::join_meeting($instance);
+        } catch (meeting_join_exception $e) {
+            return self::mobile_print_notification($instance, $e->getMessage());
+        } catch (server_not_available_exception $e) {
+            return self::mobile_print_error(bigbluebutton_proxy::get_server_not_available_message($instance));
         }
-
-        // It is part of 'bigbluebuttonbn_bbb_view_join_meeting' in bbb_view.
-        // Update the cache.
-        $meetinginfo = meeting::get_meeting_info_for_instance($instance, true);
-
-        if ($instance->has_user_limit_been_reached($meetinginfo->participantcount)
-            && $instance->does_current_user_count_towards_user_limit()
-        ) {
-            // No more users allowed to join.
-            return self::mobile_print_notification($instance, get_string('view_error_userlimit_reached', 'bigbluebuttonbn'));
-        }
-
-        // Build final url to BBB.
-        $urltojoin = $meeting->get_join_url();
 
         // Check groups access and show message.
         $msjgroup = [];

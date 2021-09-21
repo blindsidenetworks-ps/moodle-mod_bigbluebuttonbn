@@ -23,6 +23,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use external_warnings;
+use mod_bigbluebuttonbn\instance;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,9 +48,8 @@ class view_bigbluebuttonbn extends external_api {
      * @since Moodle 3.0
      */
     public static function execute_parameters() {
-        return new external_function_parameters(
-            [
-                'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id')
+        return new external_function_parameters([
+                'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
             ]
         );
     }
@@ -57,50 +57,45 @@ class view_bigbluebuttonbn extends external_api {
     /**
      * Trigger the course module viewed event and update the module completion status.
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id
+     * @param int $instanceid the bigbluebuttonbn instance id
      * @return array of warnings and status result
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
-     * @throws \restricted_context_exception
      * @since Moodle 3.0
      */
-    public static function execute($bigbluebuttonbnid) {
-        global $DB, $CFG;
+    public static function execute($instanceid) {
+        global $CFG;
         require_once($CFG->dirroot . "/mod/bigbluebuttonbn/lib.php");
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            array(
-                'bigbluebuttonbnid' => $bigbluebuttonbnid
-            ));
-        $warnings = [];
-        $result = [];
-        try {
-            // Request and permission validation.
-            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $params['bigbluebuttonbnid']), '*', MUST_EXIST);
-            list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
+        ['bigbluebuttonbnid' => $instanceid] = self::validate_parameters(
+            self::execute_parameters(),
+            ['bigbluebuttonbnid' => $instanceid]
+        );
 
-            $context = context_module::instance($cm->id);
-            self::validate_context($context);
+        $instance = instance::get_from_instanceid($instanceid);
 
-            require_capability('mod/bigbluebuttonbn:view', $context);
-
-            // Call the bigbluebuttonbn/lib API.
-            bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context);
-            $result = [];
-            $result['status'] = true;
-        } catch (\dml_missing_record_exception $e) {
-            $warnings[] = [
-                'item' => 'bigbluebuttonbn',
-                'itemid' => $bigbluebuttonbnid,
-                'warningcode' => $e->getCode(),
-                'message' => $e->getMessage()
+        if (empty($instance)) {
+            return [
+                'status' => false,
+                'warnings' => [
+                    [
+                        'item' => 'mod_bigbluebuttonbn',
+                        'itemid' => 0,
+                        'warningcode' => 'nosuchinstance',
+                        'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
+                            (object) ['id' => $instanceid, 'entity' => 'bigbluebuttonbn'])
+                    ]
+                ]
             ];
-            $result['status'] = false;
         }
-        $result['warnings'] = $warnings;
-        return $result;
+        $context = context_module::instance($instance->get_cm_id());
+        self::validate_context($context);
+
+        require_capability('mod/bigbluebuttonbn:view', $context);
+        // Call the bigbluebuttonbn/lib API.
+        bigbluebuttonbn_view($instance->get_instance_data(), $instance->get_course(), $instance->get_cm(), $context);
+        return [
+            'status' => true,
+            'warnings' => []
+        ];
     }
 
     /**
@@ -110,8 +105,7 @@ class view_bigbluebuttonbn extends external_api {
      * @since Moodle 3.0
      */
     public static function execute_returns() {
-        return new external_single_structure(
-            [
+        return new external_single_structure([
                 'status' => new external_value(PARAM_BOOL, 'status: true if success'),
                 'warnings' => new external_warnings()
             ]

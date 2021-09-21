@@ -22,6 +22,7 @@ use core_tag_tag;
 use Exception;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
+use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
@@ -52,55 +53,25 @@ class meeting {
     }
 
     /**
-     * Helper to create and join a meeting
+     * Helper to join a meeting.
+     *
+     *
+     * It will create the meeting if not already created.
      *
      * @param instance $instance
      * @param int $origin
-     * @return object|void
-     * @throws bigbluebutton_exception
+     * @return string
+     * @throws meeting_join_exception this is sent if we cannot join (meeting full, user needs to wait...)
+     * @throws server_not_available_exception
      */
-    public static function create_and_join_meeting(instance $instance, $origin = logger::ORIGIN_INDEX): array {
+    public static function join_meeting(instance $instance, $origin = logger::ORIGIN_BASE): string {
         // See if the session is in progress.
         $meeting = new meeting($instance);
-        $meeting->update_cache();
-        if ($meeting->is_running()) {
-            if ($instance->has_user_limit_been_reached($meeting->get_participant_count())) {
-                return ['url' => $instance->get_logout_url(),
-                    'warningcode' => 'userlimitreached'];
-            }
-            // Since the meeting is already running, we just join the session.
-            return ['url' => $meeting->join($origin), 'error' => false];
-        }
-
-        // If user is not administrator nor moderator (user is student) and waiting is required.
-        if ($instance->user_must_wait_to_join()) {
-            return ['url' => $instance->get_logout_url(),
-                'warningcode' => 'waitformoderator'];;
-        }
-
         // As the meeting doesn't exist, try to create it.
-        try {
-            $response = $meeting->create_meeting();
-            // New recording management: Insert a recordingID that corresponds to the meeting created.
-            if ($instance->is_recorded()) {
-                $recording = new recording(0, (object) array(
-                    'courseid' => $instance->get_course_id(),
-                    'bigbluebuttonbnid' => $instance->get_instance_id(),
-                    'recordingid' => $response['internalMeetingID'],
-                    'groupid' => $instance->get_group_id())
-                );
-                $recording->create();
-                // TODO: We may want to catch if the record was not created.
-            }
-            // Moodle event logger: Create an event for meeting created.
-            logger::log_meeting_created_event($instance);
-            // Since the meeting is already running, we just join the session.
-            return ['url' => $meeting->join($origin), 'error' => false];
-        } catch (server_not_available_exception $e) {
-            bigbluebutton_proxy::handle_server_not_available($instance);
-            throw new bigbluebutton_exception('view_error_unable_join',
-                get_string(['view_error_unable_join'], 'mod_bigbluebuttonbn'));
+        if (empty($meeting->get_meeting_info(true)->createtime)) {
+            $meeting->create_meeting();
         }
+        return $meeting->join($origin);
     }
 
     /**
@@ -198,7 +169,20 @@ class meeting {
         $presentation = $this->instance->get_presentation_for_bigbluebutton_upload(); // The URL must contain nonce.
         $presentationname = $presentation['name'] ?? null;
         $presentationurl = $presentation['url'] ?? null;
-        return bigbluebutton_proxy::create_meeting($data, $metadata, $presentationname, $presentationurl);
+        $response = bigbluebutton_proxy::create_meeting($data, $metadata, $presentationname, $presentationurl);
+        // New recording management: Insert a recordingID that corresponds to the meeting created.
+        if ($this->instance->is_recorded()) {
+            $recording = new recording(0, (object) array(
+                'courseid' => $this->instance->get_course_id(),
+                'bigbluebuttonbnid' => $this->instance->get_instance_id(),
+                'recordingid' => $response['internalMeetingID'],
+                'groupid' => $this->instance->get_group_id())
+            );
+            $recording->create();
+        }
+        // Moodle event logger: Create an event for meeting created.
+        logger::log_meeting_created_event($this->instance);
+        return $response;
     }
 
     /**
@@ -512,17 +496,23 @@ class meeting {
     }
 
     /**
-     * Join the meeting.
+     * Join a meeting.
      *
      * @param int $origin The spec
      * @return string The URL to redirect to
+     * @throws meeting_join_exception
      */
     public function join(int $origin): string {
         $this->do_get_meeting_info(true);
-
-        if ($this->is_running() && !$this->can_join()) {
-            // No more users allowed to join.
-            return $this->instance->get_logout_url();
+        if ($this->is_running()) {
+            if ($this->instance->has_user_limit_been_reached($this->get_participant_count())
+                && $this->instance->does_current_user_count_towards_user_limit()) {
+                throw new meeting_join_exception('userlimitreached');
+            }
+        }
+        // If user is not administrator nor moderator (user is student) and waiting is required.
+        if ($this->instance->user_must_wait_to_join()) {
+            throw new meeting_join_exception('waitformoderator');
         }
 
         // Moodle event logger: Create an event for meeting joined.

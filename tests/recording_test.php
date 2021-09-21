@@ -45,9 +45,7 @@ class recording_test extends \advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-
-        $this->require_mock_server();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
+        $this->initialise_mock_server();
     }
 
     /**

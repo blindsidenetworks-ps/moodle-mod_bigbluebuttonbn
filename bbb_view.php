@@ -26,13 +26,10 @@
 use core\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\recording;
 
@@ -136,9 +133,11 @@ switch (strtolower($action)) {
             $origin = logger::ORIGIN_INDEX;
         }
 
-        $returnvalue = meeting::create_and_join_meeting($instance, $origin);
-        if (!empty($returnvalue['url'])) {
-            redirect($returnvalue['url']);
+        try {
+            $url = meeting::join_meeting($instance, $origin);
+            redirect($url);
+        } catch (server_not_available_exception $e) {
+            bigbluebutton_proxy::handle_server_not_available($instance);
         }
         break;
 

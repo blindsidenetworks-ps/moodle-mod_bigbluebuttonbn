@@ -44,7 +44,7 @@ class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->require_mock_server();
+        $this->initialise_mock_server();
     }
 
     /**

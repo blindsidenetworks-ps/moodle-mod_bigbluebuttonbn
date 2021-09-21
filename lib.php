@@ -377,8 +377,8 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
  *
  * @param stdClass $bigbluebuttonbn bigbluebuttonbn object
  * @param stdClass $course course object
- * @param stdClass $cm course module object
- * @param stdClass $context context object
+ * @param cm_info $cm course module object
+ * @param context $context context object
  * @since Moodle 3.0
  */
 function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {

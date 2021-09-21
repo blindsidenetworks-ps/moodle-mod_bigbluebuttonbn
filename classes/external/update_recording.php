@@ -104,8 +104,7 @@ class update_recording extends external_api {
         // Specific action such as import, delete, publish, unpublish, edit,....
         if (method_exists(recording_action::class, "$action")) {
             forward_static_call(
-                array('\mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action',
-                    "$action"),
+                ['\mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action', "$action"],
                 $recording,
                 $instance
             );

@@ -53,8 +53,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebutton_proxy::get_server_version();
         if (is_null($serverversion)) {
-            throw new moodle_exception('general_error_unable_connect', 'bigbluebuttonbn',
-                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn');
+            throw new moodle_exception('general_error_unable_connect',
+                'bigbluebuttonbn',
+                $CFG->wwwroot . '/admin/settings.php?section=modsettingbigbluebuttonbn',
+                \mod_bigbluebuttonbn\local\config::get('server_url')
+            );
         }
         $bigbluebuttonbn = null;
         if ($this->current->id) {

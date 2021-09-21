@@ -651,7 +651,7 @@ class recording extends persistent {
     }
 
     /**
-     * Default sort for recording when fetched from the database.
+     * @var string Default sort for recordings when fetching from the database.
      */
     const DEFAULT_RECORDING_SORT = 'timecreated ASC';
 
@@ -737,8 +737,8 @@ class recording extends persistent {
         $select = 'status = :status_awaiting AND timecreated > :withindays';
         $recordings = $DB->get_records_select(static::TABLE, $select, [
             'status_awaiting' => self::RECORDING_STATUS_AWAITING,
-            'withindays' => time() - ($timelimitdays * DAYSECS),
-        ], self::DEFAULT_RECORDING_SORT); // Arbitrary sort by id, so we get the same result on different db engines.
+            'withindays' => time() - ($timelimitdays * DAYSECS)], self::DEFAULT_RECORDING_SORT);
+        // Sort by DEFAULT_RECORDING_SORT we get the same result on different db engines.
 
         $recordingcount = count($recordings);
         mtrace("=> Found {$recordingcount} recordings to query");

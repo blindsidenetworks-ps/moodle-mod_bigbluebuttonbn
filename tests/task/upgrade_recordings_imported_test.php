@@ -38,16 +38,14 @@ class upgrade_recordings_imported_test extends advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->require_mock_server();
-        $this->resetAfterTest();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
+        $this->initialise_mock_server();
     }
     /**
      * Upgrade task test
      */
     public function test_upgrade_recordings(): void {
         global $DB;
-
+        $this->resetAfterTest();
         $generator = $this->getDataGenerator();
 
         // Create a course with student and teacher, and two groups.
