@@ -16,6 +16,7 @@
 
 namespace mod_bigbluebuttonbn\local\proxy;
 
+use core\files\curl_security_helper;
 use Exception;
 use SimpleXMLElement;
 use mod_bigbluebuttonbn\local\config;
@@ -139,7 +140,6 @@ abstract class proxy_base {
         array $metadata = []
     ): ?SimpleXMLElement {
         $curl = new curl();
-
         return $curl->get(self::action_url($action, $data, $metadata));
     }
 }
