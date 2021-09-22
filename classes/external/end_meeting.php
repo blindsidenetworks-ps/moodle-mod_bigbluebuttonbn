@@ -81,7 +81,9 @@ class end_meeting extends external_api {
         if (empty($instance)) {
             throw new \moodle_exception('Unknown Instance');
         }
-
+        if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
+            throw new restricted_context_exception();
+        }
         $instance->set_group_id($groupid);
         $context = $instance->get_context();
 

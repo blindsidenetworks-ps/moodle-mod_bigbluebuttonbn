@@ -43,7 +43,7 @@ class end_meeting_test extends \externallib_advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->require_mock_server();
+        $this->initialise_mock_server();
     }
 
     /**
@@ -53,9 +53,9 @@ class end_meeting_test extends \externallib_advanced_testcase {
      * @return array|bool|mixed
      */
     protected function end_meeting(...$params) {
-        $canjoin = end_meeting::execute(...$params);
+        $returnvalue = end_meeting::execute(...$params);
 
-        return external_api::clean_returnvalue(end_meeting::execute_returns(), $canjoin);
+        return external_api::clean_returnvalue(end_meeting::execute_returns(), $returnvalue);
     }
 
     /**

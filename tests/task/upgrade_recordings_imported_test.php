@@ -33,15 +33,19 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  */
 class upgrade_recordings_imported_test extends advanced_testcase {
     use testcase_helper_trait;
-
+    /**
+     * Setup for test
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->initialise_mock_server();
+    }
     /**
      * Upgrade task test
      */
     public function test_upgrade_recordings(): void {
         global $DB;
         $this->resetAfterTest();
-        $this->require_mock_server();
-
         $generator = $this->getDataGenerator();
 
         // Create a course with student and teacher, and two groups.

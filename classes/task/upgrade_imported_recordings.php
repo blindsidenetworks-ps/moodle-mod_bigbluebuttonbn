@@ -46,7 +46,7 @@ class upgrade_imported_recordings extends upgrade_recording_base_task {
     /**
      * Fetch the imported data for a recording.
      *
-     * @param array
+     * @param array $recording
      * @return string
      */
     protected function get_imported_data(array $recording): string {

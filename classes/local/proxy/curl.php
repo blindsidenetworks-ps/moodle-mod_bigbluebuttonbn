@@ -44,7 +44,11 @@ class curl extends \curl {
      * Constructor for the class.
      */
     public function __construct() {
-        parent::__construct();
+        $settings = [];
+        if (debugging()) {
+            $settings = ['ignoresecurity' => true];
+        }
+        parent::__construct($settings);
 
         $this->setopt(['SSL_VERIFYPEER' => true]);
         $this->set_content_type('text/xml');

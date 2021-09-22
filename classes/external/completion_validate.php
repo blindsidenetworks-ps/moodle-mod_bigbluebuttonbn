@@ -73,7 +73,7 @@ class completion_validate extends external_api {
         self::validate_context($context);
 
         // Get list with all the users enrolled in the course.
-        list($sort, $sqlparams) = users_order_by_sql('u');
+        [$sort, $sqlparams] = users_order_by_sql('u');
         // TODO : check for access / role here.
         $users = get_enrolled_users($context, 'mod/bigbluebuttonbn:view', 0, 'u.*', $sort);
         foreach ($users as $user) {

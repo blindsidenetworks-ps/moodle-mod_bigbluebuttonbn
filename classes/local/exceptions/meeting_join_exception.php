@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn generic exception.
+ * The mod_bigbluebuttonbn cannot join meeting exception.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -24,6 +24,7 @@
  */
 
 namespace mod_bigbluebuttonbn\local\exceptions;
+
 
 use mod_bigbluebuttonbn\plugin;
 
@@ -37,14 +38,13 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
-class bigbluebutton_exception extends \moodle_exception {
+class meeting_join_exception extends \moodle_exception {
     /**
      * Constructor
      *
      * @param string $errorcode The name of the string from error.php to print
      */
-    public function __construct($errorcode, $additionalinfo = null) {
-        parent::__construct($errorcode, plugin::COMPONENT, '', $additionalinfo);
+    public function __construct($errorcode) {
+        parent::__construct($errorcode, plugin::COMPONENT);
     }
-
 }

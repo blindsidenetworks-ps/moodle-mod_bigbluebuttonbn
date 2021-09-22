@@ -45,9 +45,7 @@ class meeting_test extends \advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-
-        $this->require_mock_server();
-        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
+        $this->initialise_mock_server();
         $this->course = $this->getDataGenerator()->create_course(['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS]);
         $this->getDataGenerator()->create_group(['G1', 'courseid' => $this->course->id]);
     }

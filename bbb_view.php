@@ -26,13 +26,10 @@
 use core\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\local\helpers\files;
-use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
 use mod_bigbluebuttonbn\recording;
 
@@ -136,41 +133,9 @@ switch (strtolower($action)) {
             $origin = logger::ORIGIN_INDEX;
         }
 
-        // See if the session is in progress.
-        $meeting = new meeting($instance);
-        if ($meeting->is_running()) {
-            // Since the meeting is already running, we just join the session.
-            $redirecturl = $meeting->join($origin);
-            redirect($redirecturl);
-            break;
-        }
-
-        // If user is not administrator nor moderator (user is student) and waiting is required.
-        if ($instance->user_must_wait_to_join()) {
-            redirect($instance->get_logout_url());
-            break;
-        }
-
-        // As the meeting doesn't exist, try to create it.
         try {
-            $meeting = new meeting($instance);
-            $response = $meeting->create_meeting();
-            // New recording management: Insert a recordingID that corresponds to the meeting created.
-            if ($instance->is_recorded()) {
-                $recording = new recording(0, (object) array(
-                    'courseid' => $instance->get_course_id(),
-                    'bigbluebuttonbnid' => $instance->get_instance_id(),
-                    'recordingid' => $response['internalMeetingID'],
-                    'groupid' => $instance->get_group_id())
-                    );
-                $recording->create();
-                // TODO: We may want to catch if the record was not created.
-            }
-            // Moodle event logger: Create an event for meeting created.
-            logger::log_meeting_created_event($instance);
-            // Since the meeting is already running, we just join the session.
-            $redirecturl = $meeting->join($origin);
-            redirect($redirecturl);
+            $url = meeting::join_meeting($instance, $origin);
+            redirect($url);
         } catch (server_not_available_exception $e) {
             bigbluebutton_proxy::handle_server_not_available($instance);
         }

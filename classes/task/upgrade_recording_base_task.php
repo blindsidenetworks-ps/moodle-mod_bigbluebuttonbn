@@ -19,6 +19,7 @@ namespace mod_bigbluebuttonbn\task;
 use core\task\adhoc_task;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
+use moodle_exception;
 
 /**
  * Class containing the scheduled task for converting recordings for the BigBlueButton version 2.5 in Moodle 4.0.
@@ -149,7 +150,7 @@ abstract class upgrade_recording_base_task extends adhoc_task {
     /**
      * Fetch the imported data for a recording.
      *
-     * @param array
+     * @param array $recording
      * @return string
      */
     protected function get_imported_data(array $recording): string {

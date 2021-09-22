@@ -141,12 +141,13 @@ trait testcase_helper_trait {
     /**
      * This test requires mock server to be present.
      */
-    protected function require_mock_server(): void {
+    protected function initialise_mock_server(): void {
         if (!defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
             $this->markTestSkipped(
                 'The TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER constant must be defined to run mod_bigbluebuttonbn tests'
             );
         }
+        $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn')->reset_mock();
     }
 
     /**

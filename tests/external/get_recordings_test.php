@@ -19,7 +19,6 @@ namespace mod_bigbluebuttonbn\external;
 use external_api;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
-use moodle_exception;
 use require_login_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -45,7 +44,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->require_mock_server();
+        $this->initialise_mock_server();
     }
 
     /**
@@ -267,7 +266,11 @@ class get_recordings_test extends \externallib_advanced_testcase {
         ]); // We need to have a meeting created in order to import recordings.
         $newinstance = instance::get_from_instanceid($newactivity->id);
         $recordings = $instance->get_recordings();
-        end($recordings)->create_imported_recording($newinstance);
+        foreach ($recordings as $recording) {
+            if ($recording->get('name') == 'Recording1') {
+                $recording->create_imported_recording($newinstance);
+            }
+        }
 
         foreach ($dataset['users'] as $userdef) {
             $user = \core_user::get_user_by_username($userdef['username']);
@@ -283,11 +286,11 @@ class get_recordings_test extends \externallib_advanced_testcase {
                         $this->assertStringNotContainsString('data-action=\"delete\"', $getrecordings['tabledata']['data'],
                             "User $user->username, should not be able to delete the recording {$recording['name']}");
                     }
-                }
-                if ($index === 1) {
-                    $this->assertStringContainsString($recording['name'], $getrecordings['tabledata']['data']);
-                } else {
-                    $this->assertStringNotContainsString($recording['name'], $getrecordings['tabledata']['data']);
+                    if ($index === 0) {
+                        $this->assertStringContainsString($recording['name'], $getrecordings['tabledata']['data']);
+                    } else {
+                        $this->assertStringNotContainsString($recording['name'], $getrecordings['tabledata']['data']);
+                    }
                 }
             }
 

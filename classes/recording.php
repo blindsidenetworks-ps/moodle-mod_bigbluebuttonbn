@@ -20,7 +20,6 @@ use cache;
 use context_course;
 use context_module;
 use core\persistent;
-use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use moodle_url;
 use stdClass;
@@ -652,17 +651,23 @@ class recording extends persistent {
     }
 
     /**
+     * @var string Default sort for recordings when fetching from the database.
+     */
+    const DEFAULT_RECORDING_SORT = 'timecreated ASC';
+
+    /**
      * Fetch all records which match the specified parameters, including all metadata that relates to them.
      *
-     * @param arary $selects
+     * @param array $selects
      * @param array $params
      * @return recording[]
      */
     protected static function fetch_records(array $selects, array $params): array {
         global $DB;
 
-        // Fetch the local data.
-        $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params);
+        // Fetch the local data. Arbitrary sort by id, so we get the same result on different db engines.
+        $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params,
+            self::DEFAULT_RECORDING_SORT);
 
         // Grab the recording IDs.
         $recordingids = array_filter(array_map(function($recording) {
@@ -732,8 +737,8 @@ class recording extends persistent {
         $select = 'status = :status_awaiting AND timecreated > :withindays';
         $recordings = $DB->get_records_select(static::TABLE, $select, [
             'status_awaiting' => self::RECORDING_STATUS_AWAITING,
-            'withindays' => time() - ($timelimitdays * DAYSECS),
-        ]);
+            'withindays' => time() - ($timelimitdays * DAYSECS)], self::DEFAULT_RECORDING_SORT);
+        // Sort by DEFAULT_RECORDING_SORT we get the same result on different db engines.
 
         $recordingcount = count($recordings);
         mtrace("=> Found {$recordingcount} recordings to query");

@@ -27,16 +27,18 @@ global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
- * Tests for the update_course class.
+ * Tests for the view_bigbluebuttonbn class.
  *
  * @package    mod_bigbluebuttonbn
  * @category   test
- * @copyright  2021 Andrew Lyons <andrew@nicols.co.uk>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \mod_bigbluebuttonbn\external\can_join
+ * @copyright  2021 - present, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Laurent David (laurent@call-learning.fr)
+ * @coversDefaultClass \mod_bigbluebuttonbn\external\view_bigbluebuttonbn
  */
-class can_join_test extends \externallib_advanced_testcase {
+class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
     use testcase_helper_trait;
+
     /**
      * Setup for test
      */
@@ -51,21 +53,22 @@ class can_join_test extends \externallib_advanced_testcase {
      * @param array $params
      * @return mixed
      */
-    protected function can_join(...$params) {
-        $canjoin = can_join::execute(...$params);
+    protected function view_bigbluebuttonbn(...$params) {
+        $returnvalue = view_bigbluebuttonbn::execute(...$params);
 
-        return external_api::clean_returnvalue(can_join::execute_returns(), $canjoin);
+        return external_api::clean_returnvalue(view_bigbluebuttonbn::execute_returns(), $returnvalue);
     }
 
     /**
      * Test execute API CALL with no instance
      */
     public function test_execute_no_instance() {
-        $canjoin = $this->can_join(1234, 5678);
+        $bbbactivities = $this->view_bigbluebuttonbn(1234);
 
-        $this->assertIsArray($canjoin);
-        $this->assertArrayHasKey('can_join', $canjoin);
-        $this->assertEquals(false, $canjoin['can_join']);
+        $this->assertIsArray($bbbactivities);
+        $this->assertArrayHasKey('status', $bbbactivities);
+        $this->assertArrayHasKey('warnings', $bbbactivities);
+        $this->assertFalse($bbbactivities['status']);
     }
 
     /**
@@ -78,8 +81,10 @@ class can_join_test extends \externallib_advanced_testcase {
         $record = $this->getDataGenerator()->create_module('bigbluebuttonbn', ['course' => $course->id]);
         $instance = instance::get_from_instanceid($record->id);
 
-        $this->expectException(moodle_exception::class);
-        $this->can_join($instance->get_cm_id());
+        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
+        $this->assertArrayHasKey('status', $returnvalue);
+        $this->assertArrayHasKey('warnings', $returnvalue);
+        $this->assertFalse($returnvalue['status']);
     }
 
     /**
@@ -96,8 +101,10 @@ class can_join_test extends \externallib_advanced_testcase {
         $user = $generator->create_user();
         $this->setUser($user);
 
-        $this->expectException(moodle_exception::class);
-        $this->can_join($instance->get_cm_id());
+        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
+        $this->assertArrayHasKey('status', $returnvalue);
+        $this->assertArrayHasKey('warnings', $returnvalue);
+        $this->assertFalse($returnvalue['status']);
     }
 
     /**
@@ -114,10 +121,11 @@ class can_join_test extends \externallib_advanced_testcase {
         $user = $generator->create_and_enrol($course, 'student');
         $this->setUser($user);
 
-        $canjoin = $this->can_join($instance->get_cm_id());
+        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
 
-        $this->assertIsArray($canjoin);
-        $this->assertArrayHasKey('can_join', $canjoin);
-        $this->assertEquals(true, $canjoin['can_join']);
+        $this->assertArrayHasKey('status', $returnvalue);
+        $this->assertArrayHasKey('warnings', $returnvalue);
+        $this->assertFalse($returnvalue['status']);
     }
 }
+

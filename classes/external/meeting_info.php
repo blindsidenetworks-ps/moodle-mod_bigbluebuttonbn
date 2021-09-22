@@ -21,7 +21,9 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\meeting;
+use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -78,11 +80,20 @@ class meeting_info extends external_api {
         // Fetch the session, features, and profile.
         $instance = instance::get_from_instanceid($bigbluebuttonbnid);
         $instance->set_group_id($groupid);
+        if (!groups_group_visible($groupid, $instance->get_course(), $instance->get_cm())) {
+            throw new restricted_context_exception();
+        }
         $context = $instance->get_context();
 
         // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($context);
 
+        // Check if the BBB server is working.
+        $serverversion = bigbluebutton_proxy::get_server_version();
+        if ($serverversion === null) {
+            throw new \moodle_exception('general_error_no_answer',
+                bigbluebutton_proxy::get_server_not_available_message($instance));
+        }
         return (array) meeting::get_meeting_info_for_instance($instance, $updatecache);
     }
 
@@ -93,8 +104,7 @@ class meeting_info extends external_api {
      * @since Moodle 3.0
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(
-            [
+        return new external_single_structure([
                 'cmid' => new external_value(PARAM_INT, 'CM id'),
                 'userlimit' => new external_value(PARAM_INT, 'User limit'),
                 'bigbluebuttonbnid' => new external_value(PARAM_RAW, 'bigbluebuttonbn instance id'),

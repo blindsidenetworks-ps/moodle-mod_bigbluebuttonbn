@@ -35,7 +35,7 @@ export const fetchRecordings = (bigbluebuttonbnid, groupid, removeimportedid, to
         args.groupid = groupid;
     }
 
-    return fetchMany([{methodname: 'mod_bigbluebutton_recording_list_table', args}])[0];
+    return fetchMany([{methodname: 'mod_bigbluebuttonbn_get_recordings', args}])[0];
 };
 
 /**
@@ -46,7 +46,7 @@ export const fetchRecordings = (bigbluebuttonbnid, groupid, removeimportedid, to
  */
 export const updateRecording = args => fetchMany([
     {
-        methodname: 'mod_bigbluebutton_recording_update_recording',
+        methodname: 'mod_bigbluebuttonbn_update_recording',
         args,
     }
 ])[0];
@@ -60,7 +60,7 @@ export const updateRecording = args => fetchMany([
  */
 export const endMeeting = (bigbluebuttonbnid, groupid) => fetchMany([
     {
-        methodname: 'mod_bigbluebutton_meeting_end',
+        methodname: 'mod_bigbluebuttonbn_end_meeting',
         args: {
             bigbluebuttonbnid,
             groupid
@@ -76,7 +76,7 @@ export const endMeeting = (bigbluebuttonbnid, groupid) => fetchMany([
  */
 export const completionValidate = args => fetchMany([
     {
-        methodname: 'mod_bigbluebutton_completion_validate',
+        methodname: 'mod_bigbluebuttonbn_completion_validate',
         args,
     }
 ])[0];
@@ -92,7 +92,7 @@ export const completionValidate = args => fetchMany([
  */
 export const getMeetingInfo = (bigbluebuttonbnid, groupid, updatecache = false) => fetchMany([
     {
-        methodname: 'mod_bigbluebutton_meeting_info',
+        methodname: 'mod_bigbluebuttonbn_meeting_info',
         args: {
             bigbluebuttonbnid,
             groupid,
