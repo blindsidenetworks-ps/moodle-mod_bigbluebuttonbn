@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use cache_store;
+use context_course;
 use core_tag_tag;
 use Exception;
 use mod_bigbluebuttonbn\local\config;
