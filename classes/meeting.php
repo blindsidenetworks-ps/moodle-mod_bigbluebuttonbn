@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn;
 
 use cache;
 use cache_store;
+use context_course;
 use core_tag_tag;
 use Exception;
 use mod_bigbluebuttonbn\local\config;
@@ -381,8 +382,10 @@ class meeting {
                 64),
             'bbb-recording-tags' =>
                 implode(',', core_tag_tag::get_item_tags_array('core',
-                    'course_modules', $this->instance->get_cm_id()))
-            // Same as $id.
+                    'course_modules', $this->instance->get_cm_id())), // Same as $id.
+            'bbb-meeting-size-hint' =>
+                count_enrolled_users(context_course::instance($this->instance->get_course_id()),
+                    '', $this->instance->get_group_id()),
         ];
         // Special metadata for recording processing.
         if ((boolean) config::get('recordingstatus_enabled')) {
