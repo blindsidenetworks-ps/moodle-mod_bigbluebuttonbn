@@ -595,3 +595,5 @@ $string['cachedef_recordings'] = 'Recording metadata';
 $string['taskname:check_pending_recordings'] = 'Fetch pending recordings';
 $string['userlimitreached'] = 'The number of users allowed in a meeting has been reached.';
 $string['waitformoderator'] = 'Waiting for a moderator to join.';
+
+$string['recordingurlnotfound'] = 'The recording URL is invalid.';

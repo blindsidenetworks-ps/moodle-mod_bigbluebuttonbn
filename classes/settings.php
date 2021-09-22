@@ -27,6 +27,7 @@ use admin_setting_configtext;
 use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
+use cache;
 use lang_string;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
@@ -152,6 +153,16 @@ class settings {
                 get_string('config_server_url_description', 'bigbluebuttonbn'),
                 config::DEFAULT_SERVER_URL,
                 PARAM_RAW
+            );
+            $item->set_updatedcallback(
+                function (){
+                    // Reset recording cache.
+                    $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
+                    $cache->purge();
+                    // Reset serverinfo cache.
+                    $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
+                    $cache->purge();
+                }
             );
             $this->add_conditional_element(
                 'server_url',
