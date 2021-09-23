@@ -181,8 +181,6 @@ class meeting {
             );
             $recording->create();
         }
-        // Moodle event logger: Create an event for meeting created.
-        logger::log_meeting_created_event($this->instance);
         return $response;
     }
 
