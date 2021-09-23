@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\recording;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use moodle_exception;
 
