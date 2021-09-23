@@ -179,26 +179,6 @@ class logger {
     }
 
     /**
-     * Log the relevant events for when a meeting was created.
-     *
-     * @param instance $instance
-     */
-    public static function log_meeting_created_event(instance $instance): void {
-        // Moodle event logger: Create an event for meeting created.
-        self::log_moodle_event($instance, events::$events['meeting_create']);
-
-        // Internal logger: Insert a record with the meeting created.
-        self::log(
-            $instance,
-            self::EVENT_CREATE,
-            ['meetingid' => $instance->get_meeting_id()],
-            json_encode((object) [
-                'record' => $instance->is_recorded() ? 'true' : 'false',
-            ])
-        );
-    }
-
-    /**
      * Log the events for when a meeting was ended.
      *
      * @param instance $instance

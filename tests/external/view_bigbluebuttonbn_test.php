@@ -20,6 +20,7 @@ use external_api;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use moodle_exception;
+use require_login_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -80,11 +81,8 @@ class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $record = $this->getDataGenerator()->create_module('bigbluebuttonbn', ['course' => $course->id]);
         $instance = instance::get_from_instanceid($record->id);
-
-        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
-        $this->assertArrayHasKey('status', $returnvalue);
-        $this->assertArrayHasKey('warnings', $returnvalue);
-        $this->assertFalse($returnvalue['status']);
+        $this->expectException(require_login_exception::class);
+        $this->view_bigbluebuttonbn($instance->get_instance_id());
     }
 
     /**
@@ -98,13 +96,10 @@ class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
         $record = $generator->create_module('bigbluebuttonbn', ['course' => $course->id]);
         $instance = instance::get_from_instanceid($record->id);
 
-        $user = $generator->create_user();
+        $user = $generator->create_user($course);
         $this->setUser($user);
-
-        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
-        $this->assertArrayHasKey('status', $returnvalue);
-        $this->assertArrayHasKey('warnings', $returnvalue);
-        $this->assertFalse($returnvalue['status']);
+        $this->expectException(require_login_exception::class);
+        $this->view_bigbluebuttonbn($instance->get_instance_id());
     }
 
     /**
@@ -121,11 +116,11 @@ class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
         $user = $generator->create_and_enrol($course, 'student');
         $this->setUser($user);
 
-        $returnvalue = $this->view_bigbluebuttonbn($instance->get_cm_id());
+        $returnvalue = $this->view_bigbluebuttonbn($instance->get_instance_id());
 
         $this->assertArrayHasKey('status', $returnvalue);
         $this->assertArrayHasKey('warnings', $returnvalue);
-        $this->assertFalse($returnvalue['status']);
+        $this->assertTrue($returnvalue['status']);
     }
 }
 
