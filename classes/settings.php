@@ -155,13 +155,19 @@ class settings {
                 PARAM_RAW
             );
             $item->set_updatedcallback(
-                function (){
+                function() {
+                    global $DB;
                     // Reset recording cache.
                     $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
                     $cache->purge();
                     // Reset serverinfo cache.
                     $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
                     $cache->purge();
+                    // Reset status of all the recordings.
+                    $DB->execute("UPDATE {bigbluebuttonbn_recordings}
+                        SET status = ?
+                        WHERE status > ?",
+                        [recording::RECORDING_STATUS_AWAITING, recording::RECORDING_STATUS_DISMISSED]);
                 }
             );
             $this->add_conditional_element(
