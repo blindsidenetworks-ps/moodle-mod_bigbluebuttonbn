@@ -59,6 +59,9 @@ class recording extends persistent {
     /** @var int A meeting set to be recorded received notification callback from BBB */
     public const RECORDING_STATUS_NOTIFIED = 3;
 
+    /** @var int A meeting set to be recorded was processed and set back to an awaiting state */
+    public const RECORDING_STATUS_RESET = 4;
+
     /** @var bool Whether metadata been changed so the remote information needs to be updated ? */
     protected $metadatachanged = false;
 
@@ -730,14 +733,16 @@ class recording extends persistent {
     public static function sync_pending_recordings_from_server(): void {
         global $DB;
 
-        $timelimitdays = 10;
+        $timelimitdays = 30;
 
         // Fetch the local data.
         mtrace("=> Looking for any recording awaiting processing from the past {$timelimitdays} days.");
-        $select = 'status = :status_awaiting AND timecreated > :withindays';
+        $select = 'status = :status_awaiting AND timecreated > :withindays OR status = :status_reset';
         $recordings = $DB->get_records_select(static::TABLE, $select, [
-            'status_awaiting' => self::RECORDING_STATUS_AWAITING,
-            'withindays' => time() - ($timelimitdays * DAYSECS)], self::DEFAULT_RECORDING_SORT);
+                'status_awaiting' => self::RECORDING_STATUS_AWAITING,
+                'withindays' => time() - ($timelimitdays * DAYSECS),
+                'status_reset' => self::RECORDING_STATUS_RESET,
+            ], self::DEFAULT_RECORDING_SORT);
         // Sort by DEFAULT_RECORDING_SORT we get the same result on different db engines.
 
         $recordingcount = count($recordings);
