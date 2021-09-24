@@ -202,7 +202,7 @@ class meeting {
      * @return array
      */
     public static function bigbluebuttonbn_create_meeting_metadata(&$bbbsession) {
-        global $USER;
+        global $USER, $COURSE;
         // Create standard metadata.
         $metadata = [
             'bbb-origin' => $bbbsession['origin'],
@@ -234,6 +234,15 @@ class meeting {
         if ((boolean) config::get('meetingevents_enabled')) {
             $metadata['analytics-callback-url'] = $bbbsession['meetingEventsURL'];
         }
+
+        $courseid = $COURSE->id;
+        $opencastid = (string) $DB->get_field('tool_opencast_series', 'series', array('courseid' => $courseid));
+
+        // If block and series id exists, then add needed series id to BBB metadata
+        if (strlen($opencastid)>=1) {
+            $metadata["opencast-dc-isPartOf"] = $opencastid;
+        }
+
         return $metadata;
     }
 
