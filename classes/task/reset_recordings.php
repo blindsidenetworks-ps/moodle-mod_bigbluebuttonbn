@@ -31,55 +31,66 @@ use moodle_exception;
 class reset_recordings extends adhoc_task {
 
     /** @var int Chunk size to use when resetting recordings */
-    protected static $chunksize = 50;
+    protected static $chunksize = 100;
 
     /**
      * Run the migration task.
      */
     public function execute() {
-        $classname = static::class;
-
-        mtrace("Executing {$classname}...");
-
-        $this->process_reset_serverinfo_cache();
-        $this->process_reset_recordings_cache();
-        $this->process_reset_recordings();
-    }
-
-    /**
-     * Process reset key serverinfo from cache.
-     */
-    protected function process_reset_serverinfo_cache() {
-        // Reset serverinfo cache.
-        mtrace("Reset serverinfo key from cache...");
-        $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
-        $cache->purge();
-    }
-
-    /**
-     * Process reset key recordings from cache.
-     */
-    protected function process_reset_recordings_cache() {
-        // Reset recording cache.
-        mtrace("Reset recordings key from cache...");
-        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
-        $cache->purge();
+        if ($this->process_reset_recordings()) {
+            \core\task\manager::queue_adhoc_task(new static());
+        }
     }
 
     /**
      * Process all bigbluebuttonbn_recordings looking for entries which should be reset to be fetched again.
+     *
+     * @return bool Whether any more recodgins are waiting to be processed
      */
-    protected function process_reset_recordings() {
+    protected function process_reset_recordings(): bool {
         global $DB;
 
-        // Reset status of all the recordings.
-        mtrace("Reset status of all the recordings...");
+        $classname = static::class;
+
+        mtrace("Executing {$classname}...");
+
+        // Read a block of recordings to be updated.
+        $recs = $this->get_recordngs_to_reset();
+
+        if (empty($recs)) {
+            mtrace("No recordings were found for reset...");
+            // No more logs. Stop queueing.
+            return false;
+        }
+
+        // Reset status of {chunksize} recordings.
+        mtrace("Reset status of " . self::$chunksize . " recordings...");
         $sql = "UPDATE {bigbluebuttonbn_recordings}
-                SET status = ?
-                WHERE status = ? OR status = ?";
-        mtrace($sql);
+                SET status = :status_reset
+                WHERE id = " . implode(' OR id = ', array_keys($recs));
         $DB->execute($sql,
-            [recording::RECORDING_STATUS_RESET, recording::RECORDING_STATUS_PROCESSED, recording::RECORDING_STATUS_NOTIFIED]
+            ['status_reset' => recording::RECORDING_STATUS_RESET]
+        );
+
+        return true;
+    }
+
+    /**
+     * Get the list of recordings to be reset.
+     *
+     * @return array
+     */
+    protected function get_recordngs_to_reset(): array {
+        global $DB;
+
+        return $DB->get_records_sql(
+            'SELECT * FROM {bigbluebuttonbn_recordings}
+             WHERE status = :status_processed OR status = :status_notified
+             ORDER BY timecreated DESC',
+            ['status_processed' => recording::RECORDING_STATUS_PROCESSED, 'status_notified' => recording::RECORDING_STATUS_NOTIFIED],
+            0,
+            self::$chunksize
         );
     }
+
 }

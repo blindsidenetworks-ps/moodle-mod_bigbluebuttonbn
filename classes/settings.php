@@ -156,6 +156,7 @@ class settings {
             );
             $item->set_updatedcallback(
                 function() {
+                    $this->reset_cache();
                     $task = new \mod_bigbluebuttonbn\task\reset_recordings();
                     \core\task\manager::queue_adhoc_task($task);
                 }
@@ -1272,5 +1273,17 @@ class settings {
             );
         }
         $this->admin->add($this->section, $experimentalfeaturessetting);
+    }
+
+    /**
+     * Process reset cache.
+     */
+    protected function reset_cache() {
+        // Reset serverinfo cache.
+        $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
+        $cache->purge();
+        // Reset recording cache.
+        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
+        $cache->purge();
     }
 }
