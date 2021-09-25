@@ -30,11 +30,11 @@ use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__ . '/../../config.php');
 
-$originbn = required_param('originbn', PARAM_INT);
-$frombn = optional_param('frombn', 0, PARAM_INT);
-$courseidscope = optional_param('courseidscope', 0, PARAM_INT);
+$destbn = required_param('destbn', PARAM_INT);
+$sourcebn = optional_param('sourcebn', -1, PARAM_INT);
+$sourcecourseid = optional_param('sourcecourseid', -1, PARAM_INT);
 
-$destinationinstance = instance::get_from_instanceid($originbn);
+$destinationinstance = instance::get_from_instanceid($destbn);
 if (!$destinationinstance) {
     throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
@@ -58,14 +58,9 @@ $PAGE->set_title($destinationinstance->get_meeting_name());
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
-$sourceinstance = null;
-if ($frombn) {
-    $sourceinstance = instance::get_from_instanceid($frombn);
-}
-
 /** @var \mod_bigbluebuttonbn\renderer $renderer */
 $renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
-echo $renderer->render(new import_view($destinationinstance, $courseidscope, $sourceinstance));
+echo $renderer->render(new import_view($destinationinstance, $sourcecourseid, $sourcebn));
 echo $OUTPUT->footer();

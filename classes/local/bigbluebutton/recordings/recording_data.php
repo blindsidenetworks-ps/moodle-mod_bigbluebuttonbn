@@ -16,15 +16,17 @@
 
 namespace mod_bigbluebuttonbn\local\bigbluebutton\recordings;
 
+use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
+use mod_bigbluebuttonbn\local\helpers\roles;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use mod_bigbluebuttonbn\output\recording_description_editable;
+use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\output\recording_row_actionbar;
 use mod_bigbluebuttonbn\output\recording_row_playback;
 use mod_bigbluebuttonbn\output\recording_row_preview;
-use stdClass;
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\output\recording_description_editable;
-use mod_bigbluebuttonbn\output\recording_name_editable;
 use mod_bigbluebuttonbn\recording;
-
+use stdClass;
 
 /**
  * The recordings_data.
@@ -38,22 +40,138 @@ use mod_bigbluebuttonbn\recording;
 class recording_data {
 
     /**
+     * Get the full recording table
+     *
+     * @param array $recordings
+     * @param array $tools
+     * @param instance $instance
+     * @param int $courseid
+     * @return array
+     * @throws \coding_exception
+     */
+    public static function get_recording_table($recordings, $tools, $instance = null, $courseid = 0) {
+        $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
+        $lang = get_string('locale', 'core_langconfig');
+        $locale = substr($lang, 0, strpos($lang, '.'));
+        $tabledata = [
+            'activity' => empty($instance) ? '' : bigbluebutton_proxy::view_get_activity_status($instance),
+            'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
+            'locale' => substr($locale, 0, strpos($locale, '_')),
+            'profile_features' => $typeprofiles[0]['features'],
+            'columns' => [],
+            'data' => '',
+        ];
+        $hascapabilityincourse = empty($instance) && roles::has_capability_in_course($courseid,
+                'mod/bigbluebuttonbn:managerecordings');
+
+        $data = [];
+
+        // Build table content.
+        foreach ($recordings as $recording) {
+            // Protected recordings is not a standard feature, remove actions when protected flag is not present.
+            $rowtools = $tools;
+            if (in_array('protect', $rowtools) && $recording->get('protected') === null) {
+                $rowtools = array_diff($rowtools, array('protect', 'unprotect'));
+            }
+            $rowdata = self::row($instance, $recording, $rowtools);
+            if (!empty($rowdata)) {
+                $data[] = $rowdata;
+            }
+        }
+
+        $columns = [
+            [
+                'key' => 'playback',
+                'label' => get_string('view_recording_playback', 'bigbluebuttonbn'),
+                'width' => '125px',
+                'type' => 'html',
+                'allowHTML' => true,
+            ],
+            [
+                'key' => 'recording',
+                'label' => get_string('view_recording_name', 'bigbluebuttonbn'),
+                'width' => '125px',
+                'type' => 'html',
+                'allowHTML' => true,
+            ],
+            [
+                'key' => 'description',
+                'label' => get_string('view_recording_description', 'bigbluebuttonbn'),
+                'sortable' => true,
+                'width' => '250px',
+                'type' => 'html',
+                'allowHTML' => true,
+            ],
+        ];
+
+        // Initialize table headers.
+        $ispreviewenabled = !empty($instance) && self::preview_enabled($instance);
+        $ispreviewenabled = $ispreviewenabled || $hascapabilityincourse;
+        if ($ispreviewenabled) {
+            $columns[] = [
+                'key' => 'preview',
+                'label' => get_string('view_recording_preview', 'bigbluebuttonbn'),
+                'width' => '250px',
+                'type' => 'html',
+                'allowHTML' => true,
+            ];
+        }
+
+        $columns[] = [
+            'key' => 'date',
+            'label' => get_string('view_recording_date', 'bigbluebuttonbn'),
+            'sortable' => true,
+            'width' => '225px',
+            'type' => 'html',
+            'allowHTML' => true,
+        ];
+        $columns[] = [
+            'key' => 'duration',
+            'label' => get_string('view_recording_duration', 'bigbluebuttonbn'),
+            'width' => '50px',
+            'allowHTML' => false,
+            'sortable' => true,
+        ];
+        // Either instance is empty and we must show the toolbar (with restricted content) or we check
+        // specific rights related to the instance.
+        $canmanagerecordings = !empty($instance) && $instance->can_manage_recordings();
+        $canmanagerecordings = $canmanagerecordings || $hascapabilityincourse;
+        if ($canmanagerecordings) {
+            $columns[] = [
+                'key' => 'actionbar',
+                'label' => get_string('view_recording_actionbar', 'bigbluebuttonbn'),
+                'width' => '120px',
+                'type' => 'html',
+                'allowHTML' => true,
+            ];
+        }
+
+        $tabledata['columns'] = $columns;
+        $tabledata['data'] = json_encode($data);
+        return $tabledata;
+    }
+
+    /**
      * Helper function builds a row for the data used by the recording table.
      *
      * TODO: replace this with templates whenever possible so we just
      * return the data via the API.
      *
-     * @param instance $instance
+     * @param instance|null $instance $instance
      * @param recording $rec a recording row
-     * @param null|array $tools
+     * @param array|null $tools
+     * @param int|null $courseid
      * @return stdClass
      */
-    public static function row(instance $instance, recording $rec, ?array $tools = null): ?stdClass {
+    public static function row(?instance $instance, recording $rec, ?array $tools = null, ?int $courseid = 0): ?stdClass {
         global $PAGE;
 
+        $hascapabilityincourse = empty($instance) && roles::has_capability_in_course($courseid,
+                'mod/bigbluebuttonbn:managerecordings');
         $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
         foreach ($tools as $key => $tool) {
-            if (!$instance->can_perform_on_recordings($tool)) {
+            if ((!empty($instance) && !$instance->can_perform_on_recordings($tool))
+                || (empty($instance)  && !$hascapabilityincourse)) {
                 unset($tools[$key]);
             }
         }
@@ -63,19 +181,25 @@ class recording_data {
         $rowdata = new stdClass();
 
         // Set recording_playback.
-
         $recordingplayback = new recording_row_playback($rec, $instance);
         $rowdata->playback = $renderer->render($recordingplayback);
 
-        // Set activity name.
-        $recordingname = new recording_name_editable($rec, $instance);
-        $rowdata->recording = $renderer->render_inplace_editable($recordingname);
+        if (empty($instance)) {
+            // Set activity name.
+            $rowdata->recording = $rec->get('name');;
 
-        // Set activity description.
-        $recordingdescription = new recording_description_editable($rec, $instance);
-        $rowdata->description = $renderer->render_inplace_editable($recordingdescription);
+            // Set activity description.
+            $rowdata->description = $rec->get('description');
+        } else {
+            // Set activity name.
+            $recordingname = new recording_name_editable($rec, $instance);
+            $rowdata->recording = $renderer->render_inplace_editable($recordingname);
+            // Set activity description.
+            $recordingdescription = new recording_description_editable($rec, $instance);
+            $rowdata->description = $renderer->render_inplace_editable($recordingdescription);
+        }
 
-        if (self::preview_enabled($instance)) {
+        if ((!empty($instance) && self::preview_enabled($instance)) || $hascapabilityincourse) {
             // Set recording_preview.
             $rowdata->preview = '';
             if ($rec->get('playbacks')) {
@@ -89,7 +213,7 @@ class recording_data {
         // Set duration.
         $rowdata->duration = self::row_duration($rec);
         // Set actionbar, if user is allowed to manage recordings.
-        if ($instance->can_manage_recordings()) {
+        if ((!empty($instance) && $instance->can_manage_recordings()) || $hascapabilityincourse) {
             $actionbar = new recording_row_actionbar($rec, $tools);
             $rowdata->actionbar = $renderer->render($actionbar);
         }
@@ -157,11 +281,14 @@ class recording_data {
     /**
      * Helper function evaluates if recording row should be included in the table.
      *
-     * @param instance $instance
+     * @param instance|null $instance
      * @param recording $rec a bigbluebuttonbn_recordings row
      * @return boolean
      */
-    protected static function include_recording_table_row(instance $instance, recording $rec): bool {
+    protected static function include_recording_table_row(?instance $instance, recording $rec): bool {
+        if (empty($instance)) {
+            return roles::has_capability_in_course($rec->get('courseid'), 'mod/bigbluebuttonbn:managerecordings');
+        }
         // Exclude unpublished recordings, only if user has no rights to manage them.
         if (!$rec->get('published') && !$instance->can_manage_recordings()) {
             return false;

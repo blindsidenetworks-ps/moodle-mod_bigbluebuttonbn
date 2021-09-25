@@ -33,19 +33,19 @@ class recording_action {
      * Import recording
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function import(recording $recording, instance $instance) {
-        $recording->create_imported_recording($instance);
+    public static function import(recording $recording, instance $targetinstance) {
+        $recording->create_imported_recording($targetinstance);
     }
 
     /**
      * Helper for performing delete on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function delete($recording, $instance) {
+    public static function delete($recording, $targetinstance) {
         // As the recordingid was not identified as imported recording link, execute delete on a real recording.
         // Step 1, delete imported links associated to the recording.
         $recordingstodelete = recording::get_records(['recordingid' => $recording->get('recordingid'),
@@ -60,9 +60,9 @@ class recording_action {
      * Helper for performing edit on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function edit($recording, $instance) {
+    public static function edit($recording, $targetinstance) {
         $recording->update();
     }
 
@@ -70,9 +70,9 @@ class recording_action {
      * Helper for performing unprotect on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function unprotect($recording, $instance) {
+    public static function unprotect($recording, $targetinstance) {
         if ($recording->get('imported')) {
             /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
              * unprotected. There is no need to do anything else.
@@ -87,9 +87,9 @@ class recording_action {
      * Helper for performing protect on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function protect($recording, $instance) {
+    public static function protect($recording, $targetinstance) {
         if ($recording->get('imported')) {
             /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
              * protected. There is no need to do anything else.
@@ -104,9 +104,9 @@ class recording_action {
      * Helper for performing unpublish on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function unpublish($recording, $instance) {
+    public static function unpublish($recording, $targetinstance) {
         if ($recording->get('imported')) {
             /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
              * unpublished. There is no need to do anything else.
@@ -121,9 +121,9 @@ class recording_action {
      * Helper for performing publish on recordings.
      *
      * @param recording $recording
-     * @param instance $instance
+     * @param instance $targetinstance
      */
-    public static function publish($recording, $instance) {
+    public static function publish($recording, $targetinstance) {
         if ($recording->get('imported')) {
             /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
              * unpublished. There is no need to do anything else.

@@ -25,12 +25,10 @@ namespace mod_bigbluebuttonbn\local\helpers;
 
 use cache;
 use cache_store;
-use coding_exception;
 use context;
 use context_course;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use moodle_exception;
 
 /**
  * Utility class for all roles routines helper
@@ -109,6 +107,22 @@ class roles {
                 return array('id' => $u->id, 'name' => fullname($u));
             },
             $users);
+    }
+
+    /**
+     * Can do some administration in this course, likely manage recordings
+     *
+     * @param int $courseid
+     * @param string $capability
+     */
+    public static function has_capability_in_course($courseid, $capability) {
+        global $DB;
+        if (empty($courseid) || $DB->record_exists('course', array('id' => $courseid))) {
+            return has_capability('moodle/site:config', \context_system::instance());
+        }
+
+        $coursecontext = context_course::instance($courseid);
+        return has_capability($capability, $coursecontext);
     }
 
     /**

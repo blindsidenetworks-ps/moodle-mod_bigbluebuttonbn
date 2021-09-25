@@ -82,31 +82,31 @@ class update_recording extends external_api {
             default:
                 throw new coding_exception("Unknown action '{$action}'");
         }
-
-        // Fetch the session, features, and profile.
-        $recording = new recording($recordingid);
-
-        // Check both the recording instance context and the bbb context.
-        $instance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
+        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
         $recordingcontext = $instance->get_context();
-        // Validate that the user has access to this activity and to manage recordings.
         self::validate_context($recordingcontext);
         require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
         require_capability("mod/bigbluebuttonbn:{$action}recordings", $recordingcontext);
 
-        if ($bigbluebuttonbnid) {
-            $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-            $recordingcontext = $instance->get_context();
+        // Fetch the session, features, and profile.
+        $recording = new recording($recordingid);
+        // Check both the recording instance context and the bbb context.
+        $relatedinstance = instance::get_from_instanceid($recording->get('bigbluebuttonbnid'));
+        if ($relatedinstance) {
+            $recordingcontext = $relatedinstance->get_context();
+            // Validate that the user has access to this activity and to manage recordings.
             self::validate_context($recordingcontext);
             require_capability('mod/bigbluebuttonbn:managerecordings', $recordingcontext);
             require_capability("mod/bigbluebuttonbn:{$action}recordings", $recordingcontext);
         }
+        $additionaloptionsobject = $additionaloptions ? json_decode($additionaloptions) : null;
         // Specific action such as import, delete, publish, unpublish, edit,....
         if (method_exists(recording_action::class, "$action")) {
             forward_static_call(
                 ['\mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_action', "$action"],
                 $recording,
-                $instance
+                $instance,
+                $additionaloptionsobject
             );
         }
         return [];
