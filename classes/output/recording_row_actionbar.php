@@ -52,12 +52,14 @@ class recording_row_actionbar implements renderable, templatable {
             'action' => 'unprotect',
             'icon' => 'lock',
             'hidewhen' => '!protected',
+            'requireconfirmation' => true,
             'disablewhen' => 'imported'
         ],
         'unprotect' => [
             'action' => 'protect',
             'icon' => 'unlock',
             'hidewhen' => 'protected',
+            'requireconfirmation' => true,
             'disablewhen' => 'imported'
         ],
         'publish' => [
