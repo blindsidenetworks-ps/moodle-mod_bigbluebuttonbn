@@ -6,6 +6,7 @@ Feature: Manage and list recordings
     Given a BigBlueButton mock server is configured
     And the following config values are set as admin:
       | bigbluebuttonbn_importrecordings_enabled | 1 |
+      | bigbluebuttonbn_importrecordings_from_deleted_enabled | 1 |
     And the following "courses" exist:
       | fullname      | shortname | category |
       | Test Course 1 | C1        | 0        |
@@ -35,10 +36,10 @@ Feature: Manage and list recordings
 
   @javascript
   Scenario Outline: I check that I can import recordings into the Recording activity from other activities
-    When I am on the "<recordingname>" "bigbluebuttonbn activity" page logged in as "admin"
+    When I am on the "<instancename>" "bigbluebuttonbn activity" page logged in as "admin"
     And I click on "Import recording links" "button"
-    And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    And I select "RoomRecordings" from the "frombn" singleselect
+    And I select "Test Course 1 (C1)" from the "sourcecourseid" singleselect
+    And I select "RoomRecordings" from the "sourcebn" singleselect
     # add the first recording
     And I click on "a.action-icon" "css_element" in the "Recording 1" "table_row"
     # add the second recording
@@ -47,17 +48,17 @@ Feature: Manage and list recordings
     Then "Recording 1" "table_row" <existence>
     And "Recording 2" "table_row" <existence>
     Examples:
-      | recordingname   | existence    |
-      | RecordingOnly | should exist |
-      | RoomRecordings1   | should exist |
+      | instancename    | existence    |
+      | RecordingOnly   | should exist |
+      | RoomRecordings1 | should exist |
 
   @javascript
   Scenario: I check that I can import recordings into the Recording activity and then if I delete them
   they are back into the pool to be imported again
     When I am on the "RoomRecordings1" "bigbluebuttonbn activity" page logged in as "admin"
     And I click on "Import recording links" "button"
-    And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    And I select "RoomRecordings" from the "frombn" singleselect
+    And I select "Test Course 1 (C1)" from the "sourcecourseid" singleselect
+    And I select "RoomRecordings" from the "sourcebn" singleselect
     # add the first recording
     And I click on "a.action-icon" "css_element" in the "Recording 1" "table_row"
     # add the second recording
@@ -73,6 +74,38 @@ Feature: Manage and list recordings
     And I wait until the page is ready
     Then I should not see "Recording 1"
     And I click on "Import recording links" "button"
-    And I select "Test Course 1 (C1)" from the "courseidscope" singleselect
-    And I select "RoomRecordings" from the "frombn" singleselect
+    And I select "Test Course 1 (C1)" from the "sourcecourseid" singleselect
+    And I select "RoomRecordings" from the "sourcebn" singleselect
     And I should see "Recording 1"
+
+  @javascript  @runonly
+  Scenario: I check that I can import recordings from a deleted instance into the Recording activity and then if I delete them
+  they are back into the pool to be imported again
+    Given I log in as "admin"
+    When I am on "Test Course 1" course homepage with editing mode on
+    And I delete "RoomRecordings" activity
+    # The activity is deleted asynchroneously.
+    And I run all adhoc tasks
+    Then I am on the "RoomRecordings1" "bigbluebuttonbn activity" page logged in as "admin"
+    And I click on "Import recording links" "button"
+    And I select "Recordings from deleted activities" from the "sourcecourseid" singleselect
+    Then I should see "Recording 1"
+    And I should see "Recording 2"
+    # add the first recording
+    Then I click on "a.action-icon" "css_element" in the "Recording 1" "table_row"
+    # add the second recording
+    And I click on "a.action-icon" "css_element" in the "Recording 2" "table_row"
+    And I wait until the page is ready
+    And I click on "Go back" "button"
+    # This should be refactored with the right classes for the table element
+    # We use javascript here to create the table so we don't get the same structure.
+    Then "Recording 1" "table_row" should exist
+    And I click on "a[data-action='delete']" "css_element" in the "Recording 1" "table_row"
+    And I click on "OK" "button" in the "Confirm" "dialogue"
+    # There is no confirmation dialog when deleting an imported record.
+    And I wait until the page is ready
+    Then I should not see "Recording 1"
+    And I click on "Import recording links" "button"
+    And I select "Recordings from deleted activities" from the "sourcecourseid" singleselect
+    And I should see "Recording 1"
+    And I should not see "Recording 2"

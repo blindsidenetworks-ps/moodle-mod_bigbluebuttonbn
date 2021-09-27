@@ -58,7 +58,12 @@
             {{$title}}{{#str}} view_recording_button_import, mod_bigbluebuttonbn {{/str}}{{/title}}
             {{$tools}}import{{/tools}}
             {{$removeimportedid}}{{bbboriginid}}{{/removeimportedid}}
-            {{$otherattributes}}data-bboriginid="{{bbboriginid}}"{{/otherattributes}}
+            {{$otherattributes}} {{!
+            }} id="bigbluebuttonbn-recording-table-{{uniqid}}" {{!
+            }} data-import-mode="1" {{!
+            }} data-bbb-source-course-id="{{sourcecourseid}}" {{!
+            }} data-bbb-source-instance-id="{{bbbsourceid}}" {{!
+            }} {{/otherattributes}}
         {{/mod_bigbluebuttonbn/recordings_table}}
     {{/has_selected_course}}
     {{^has_selected_course}}

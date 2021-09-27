@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\output;
 
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
+use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\recording;
 use renderable;
 use renderer_base;
@@ -50,8 +51,8 @@ class recording_row_playback implements renderable, templatable {
      * @param recording $rec
      * @param instance $instance
      */
-    public function __construct(recording $rec, instance $instance) {
-        $this->instance = $instance;
+    public function __construct(recording $rec, ?instance $instance) {
+        $this->instance = $instance ?? null;
         $this->recording = $rec;
     }
 
@@ -116,8 +117,12 @@ class recording_row_playback implements renderable, templatable {
         }
 
         // Exclude non moderators.
-        if (!$this->instance->is_admin() && !$this->instance->is_moderator()) {
-            return false;
+        if ($this->instance) {
+            if (!$this->instance->is_admin() && !$this->instance->is_moderator()) {
+                return false;
+            }
+        } else {
+            return roles::has_capability_in_course($this->recording->get('courseid'), 'mod/bigbluebuttonbn:managerecordings');
         }
         return true;
 

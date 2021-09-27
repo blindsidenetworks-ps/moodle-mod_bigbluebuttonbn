@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn;
 
 use cache;
+use context;
 use context_course;
 use context_module;
 use core\persistent;
@@ -99,7 +100,6 @@ class recording extends persistent {
      * Helper function to retrieve recordings from the BigBlueButton.
      *
      * @param instance $instance
-     * @param bool $includedeleted
      * @param bool $includeimported
      * @param bool $onlyimported
      *
@@ -108,13 +108,12 @@ class recording extends persistent {
      */
     public static function get_recordings_for_instance(
         instance $instance,
-        bool $includedeleted = false,
         bool $includeimported = false,
         bool $onlyimported = false
     ): array {
         global $DB;
 
-        [$selects, $params] = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
+        [$selects, $params] = self::get_basic_select_from_parameters(false, $includeimported, $onlyimported);
         $selects[] = "bigbluebuttonbnid = :bbbid";
         $params['bbbid'] = $instance->get_instance_id();
         $groupmode = groups_get_activity_groupmode($instance->get_cm());
@@ -135,7 +134,7 @@ class recording extends persistent {
 
         $recordings = self::fetch_records($selects, $params);
         foreach ($recordings as $recording) {
-            $recording->instsance = $instance;
+            $recording->instance = $instance;
         }
 
         return $recordings;
@@ -144,29 +143,39 @@ class recording extends persistent {
     /**
      * Helper function to retrieve recordings from a given course.
      *
-     * @param object $course dataobject as a course record
+     * @param int $courseid id for a course record or null
      * @param array $excludedinstanceid exclude recordings from instance ids
-     * @param bool $includedeleted
      * @param bool $includeimported
      * @param bool $onlyimported
+     * @param bool $includedeleted
+     * @param bool $onlydeleted
      *
      * @return recording[] containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
      */
     public static function get_recordings_for_course(
-        object $course,
+        int $courseid,
         array $excludedinstanceid = [],
-        bool $includedeleted = false,
         bool $includeimported = false,
-        bool $onlyimported = false
+        bool $onlyimported = false,
+        bool $includedeleted = false,
+        bool $onlydeleted = false
     ): array {
         global $DB;
 
-        [$selects, $params] = self::get_basic_select_from_parameters($includedeleted, $includeimported, $onlyimported);
-        $selects[] = "courseid = :courseid";
-        $params['courseid'] = $course->id;
-        $groupmode = groups_get_course_groupmode($course);
-        $context = context_course::instance($course->id);
+        [$selects, $params] = self::get_basic_select_from_parameters(
+            $includedeleted, $includeimported, $onlyimported, $onlydeleted
+        );
+        if ($courseid) {
+            $selects[] = "courseid = :courseid";
+            $params['courseid'] = $courseid;
+            $course = $DB->get_record('course', array('id' => $courseid));
+            $groupmode = groups_get_course_groupmode($course);
+            $context = context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+            $groupmode = NOGROUPS;
+        }
 
         if ($groupmode) {
             [$groupselects, $groupparams] = self::get_select_for_group($groupmode, $context, $course->id);
@@ -243,18 +252,24 @@ class recording extends persistent {
      * @param bool $includedeleted
      * @param bool $includeimported
      * @param bool $onlyimported
+     * @param bool $onlydeleted
      * @return array
      */
     protected static function get_basic_select_from_parameters(
         bool $includedeleted = false,
         bool $includeimported = false,
-        bool $onlyimported = false
+        bool $onlyimported = false,
+        bool $onlydeleted = false
     ): array {
         $selects = [];
         $params = [];
 
         // Start with the filters.
-        if (!$includedeleted) {
+        if ($onlydeleted) {
+            // Only headless recordings when only deleted is set.
+            $selects[] = "headless = :headless";
+            $params['headless'] = self::RECORDING_HEADLESS;
+        } else if (!$includedeleted) {
             // Exclude headless recordings unless includedeleted.
             $selects[] = "headless != :headless";
             $params['headless'] = self::RECORDING_HEADLESS;
@@ -356,10 +371,10 @@ class recording extends persistent {
      */
     public function get_instance(): instance {
         if ($this->instance === null) {
-            $instance = instance::get_from_instanceid($this->get('bigbluebuttonbnid'));
+            $this->instance = instance::get_from_instanceid($this->get('bigbluebuttonbnid'));
         }
 
-        return $instance;
+        return $this->instance;
     }
 
     /**
@@ -384,21 +399,21 @@ class recording extends persistent {
     /**
      * Create a new imported recording from current recording
      *
-     * @param instance $instance
+     * @param instance $targetinstance
      * @return recording
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public function create_imported_recording(instance $instance) {
+    public function create_imported_recording(instance $targetinstance) {
         $recordingrec = $this->to_record();
         $remotedata = $this->fetch_metadata();
         unset($recordingrec->id);
-        $recordingrec->bigbluebuttonbnid = $instance->get_instance_id();
-        $recordingrec->courseid = $instance->get_course_id();
+        $recordingrec->bigbluebuttonbnid = $targetinstance->get_instance_id();
+        $recordingrec->courseid = $targetinstance->get_course_id();
         $recordingrec->groupid = 0; // The recording is available to everyone.
         $recordingrec->importeddata = json_encode($remotedata);
         $recordingrec->imported = true;
-
+        $recordingrec->headless = false;
         $importedrecording = new self(0, $recordingrec);
         $importedrecording->create();
         return $importedrecording;
@@ -545,7 +560,7 @@ class recording extends persistent {
                 $clone = array_merge([], $playback);
                 $clone['url'] = new moodle_url('/mod/bigbluebuttonbn/bbb_view.php', [
                     'action' => 'play',
-                    'bn' => $this->get_instance()->get_instance_id(),
+                    'bn' => $this->raw_get('bigbluebuttonbnid'),
                     'rid' => $this->get('id'),
                     'rtype' => $clone['type'],
                 ]);
