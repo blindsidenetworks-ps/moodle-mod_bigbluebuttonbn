@@ -154,10 +154,25 @@ class get_recordings_test extends \externallib_advanced_testcase {
                     if (has_capability('moodle/course:update', $context)) {
                         $this->assertStringContainsString('data-action=\"delete\"', $getrecordings['tabledata']['data'],
                             "User $user->username, should be able to delete the recording {$recording['name']}");
+                        $this->assertStringContainsString('data-action=\"publish\"', $getrecordings['tabledata']['data'],
+                            "User $user->username, should be able to publish the recording {$recording['name']}");
                     } else {
                         $this->assertStringNotContainsString('data-action=\"delete\"', $getrecordings['tabledata']['data'],
                             "User $user->username, should not be able to delete the recording {$recording['name']}");
                     }
+                }
+            }
+        }
+        // Now without delete.
+        foreach ($dataset['users'] as $userdef) {
+            $user = \core_user::get_user_by_username($userdef['username']);
+            $this->setUser($user);
+            $getrecordings = $this->get_recordings($instance->get_instance_id(), 'protect');
+            // Check users see or do not see recording dependings on their groups.
+            foreach ($dataset['recordingsdata'] as $recordingdata) {
+                foreach ($recordingdata as $recording) {
+                    $this->assertStringNotContainsString('data-action=\"delete\"', $getrecordings['tabledata']['data'],
+                        "User $user->username, should not be able to delete the recording {$recording['name']}");
                 }
             }
         }
@@ -325,7 +340,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
             $mygroup = !empty($groups) ? end($groups) : null;
 
             $getrecordings = $this->get_recordings(
-                $instance->get_instance_id(), 0, null, !empty($mygroup) ? $mygroup->id : null);
+                $instance->get_instance_id(), null, !empty($mygroup) ? $mygroup->id : null);
             // Check users see or do not see recording dependings on their groups.
             foreach ($dataset['recordingsdata'] as $groupname => $recordingdata) {
                 foreach ($recordingdata as $recording) {

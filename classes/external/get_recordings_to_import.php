@@ -24,7 +24,7 @@ use external_value;
 use external_warnings;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
-use restricted_context_exception;
+use mod_bigbluebuttonbn\recording;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,7 +39,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright 2018 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_recordings extends external_api {
+class get_recordings_to_import extends external_api {
     /**
      * Returns description of method parameters
      *
@@ -47,7 +47,20 @@ class get_recordings extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'bigbluebuttonbnid' => new external_value(PARAM_INT, 'bigbluebuttonbn instance id'),
+            'destinationinstanceid' => new external_value(
+                PARAM_INT,
+                'Id of the other BBB we target for importing recordings into.
+                The idea here is to remove already imported recordings.',
+                VALUE_REQUIRED
+            ),
+            'sourcebigbluebuttonbnid' => new external_value(PARAM_INT,
+                'bigbluebuttonbn instance id',
+                VALUE_OPTIONAL,
+                0),
+            'sourcecourseid' => new external_value(PARAM_INT,
+                'source courseid to filter by',
+                VALUE_OPTIONAL,
+                0),
             'tools' => new external_value(PARAM_RAW, 'a set of enabled tools', VALUE_DEFAULT,
                 'protect,unprotect,publish,unpublish,delete'),
             'groupid' => new external_value(PARAM_INT, 'Group ID', VALUE_DEFAULT, null),
@@ -57,60 +70,107 @@ class get_recordings extends external_api {
     /**
      * Get a list of recordings
      *
-     * @param int $bigbluebuttonbnid the bigbluebuttonbn instance id to which the recordings are referred.
+     * @param int $destinationinstanceid the bigbluebuttonbn instance id where recordings have been already imported.
+     * @param int $sourcebigbluebuttonbnid the bigbluebuttonbn instance id to which the recordings are referred.
+     * @param int $sourcecourseid the source courseid to filter by
      * @param string|null $tools
      * @param int|null $groupid
      * @return array of warnings and status result
      * @throws \webservice_access_exception
      */
     public static function execute(
-        int $bigbluebuttonbnid = 0,
+        int $destinationinstanceid,
+        ?int $sourcebigbluebuttonbnid = 0,
+        ?int $sourcecourseid = 0,
         ?string $tools = 'protect,unprotect,publish,unpublish,delete',
         ?int $groupid = null
     ): array {
-        global $USER;
+        global $USER, $DB;
 
         $returnval = [
             'status' => false,
             'warnings' => [],
         ];
 
-        // Validate the bigbluebuttonbnid ID.
+        // Validate the sourcebigbluebuttonbnid ID.
         [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
+            'destinationinstanceid' => $destinationinstanceid,
+            'sourcebigbluebuttonbnid' => $sourcebigbluebuttonbnid,
+            'sourcecourseid' => $sourcecourseid,
             'tools' => $tools,
-            'groupid' => $groupid,
+            'groupid' => $groupid
         ] = self::validate_parameters(self::execute_parameters(), [
-            'bigbluebuttonbnid' => $bigbluebuttonbnid,
+            'destinationinstanceid' => $destinationinstanceid,
+            'sourcebigbluebuttonbnid' => $sourcebigbluebuttonbnid,
+            'sourcecourseid' => $sourcecourseid,
             'tools' => $tools,
-            'groupid' => $groupid,
+            'groupid' => $groupid
         ]);
 
         $tools = explode(',', $tools ?? 'protect,unprotect,publish,unpublish,delete');
 
         // Fetch the session, features, and profile.
-        $instance = instance::get_from_instanceid($bigbluebuttonbnid);
-        if (!$instance) {
-            $returnval['warnings'][] = [
-                'item' => $bigbluebuttonbnid,
-                'warningcode' => 'nosuchinstance',
-                'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
-                    (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn'])
-            ];
-        } else {
-            $context = $instance->get_context();
-            // Validate that the user has access to this activity.
-            self::validate_context($context);
-            $isvalidgroup = $instance->validate_and_set_group($USER, $groupid);
-            if (!$isvalidgroup) {
-                new restricted_context_exception();
-            }
-            $recordings = $instance->get_recordings([], $instance->get_instance_var('recordings_deleted'));
-            $tabledata = recording_data::get_recording_table($recordings, $tools, $instance);
-
-            $returnval['tabledata'] = $tabledata;
-            $returnval['status'] = true;
+        $sourceinstance = null;
+        $sourcecourse = null;
+        if ($sourcecourseid) {
+            $sourcecourse = $DB->get_record('course', array('id' => $sourcecourseid), '*', MUST_EXIST);
         }
+
+        if (!empty($sourcebigbluebuttonbnid)) {
+            $sourceinstance = instance::get_from_instanceid($sourcebigbluebuttonbnid);
+            if (!$sourceinstance) {
+                throw new \invalid_parameter_exception('Source Bigbluebutton Id is invalid');
+            }
+            $sourcecourse = $sourceinstance->get_course();
+            // Validate that the user has access to this activity.
+            self::validate_context($sourceinstance->get_context());
+        }
+        $destinstance = instance::get_from_instanceid($destinationinstanceid);
+        // Validate that the user has access to this activity.
+        self::validate_context($destinstance->get_context());
+        $isvalidgroup = $destinstance->validate_and_set_group($USER, $groupid);
+        if (!$isvalidgroup) {
+            throw new \invalid_parameter_exception('Invalid group for this user ' . $groupid);
+        }
+
+        // Exclude itself from the list if in import mode.
+        $excludedids = [$destinstance->get_instance_id()];
+        if ($sourceinstance) {
+            $recordings = $sourceinstance->get_recordings($excludedids);
+        } else {
+            // There is a course id or a 0, so we fetch all recording including deleted recordings from this course.
+            $recordings = recording::get_recordings_for_course(
+                $sourcecourseid,
+                $excludedids,
+                true,
+                false,
+                ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0),
+                ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0)
+            );
+        }
+
+        if ($destinationinstanceid) {
+            // Remove recording already imported in this specific activity.
+            $destinationinstance = instance::get_from_instanceid($destinationinstanceid);
+            $importedrecordings = recording::get_recordings_for_instance(
+                $destinationinstance,
+                true,
+                true
+            );
+            // Unset from $recordings if recording is already imported.
+            // Recording $recordings are indexed by $id (moodle table column id).
+            foreach ($recordings as $index => $recording) {
+                foreach ($importedrecordings as $irecord) {
+                    if ($irecord->get('recordingid') == $recording->get('recordingid')) {
+                        unset($recordings[$index]);
+                    }
+                }
+            }
+        }
+        $tabledata = recording_data::get_recording_table($recordings, $tools, $sourceinstance, $sourcecourseid);
+        $returnval['tabledata'] = $tabledata;
+        $returnval['status'] = true;
+
         return $returnval;
     }
 

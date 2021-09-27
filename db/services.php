@@ -43,6 +43,14 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
     ],
+    'mod_bigbluebuttonbn_get_recordings_to_import' => [
+        'classname'     => 'mod_bigbluebuttonbn\external\get_recordings_to_import',
+        'methodname'    => 'execute',
+        'description'   => 'Returns a list of recordings ready to import to be processed by a datatable.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'capabilities'  => 'mod/bigbluebuttonbn:importrecordings',
+    ],
     'mod_bigbluebuttonbn_update_recording' => [
         'classname'     => 'mod_bigbluebuttonbn\external\update_recording',
         'methodname'    => 'execute',

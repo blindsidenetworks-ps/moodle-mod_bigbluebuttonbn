@@ -17,6 +17,7 @@
 namespace mod_bigbluebuttonbn\output;
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use renderable;
 use renderer_base;
@@ -31,33 +32,32 @@ use templatable;
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 class import_view implements renderable, templatable {
-
     /**
      * @var instance $destinationinstance
      */
     protected $destinationinstance;
 
     /**
-     * @var instance $sourceinstance
+     * @var int|null $sourceinstanceid the source instance id or null if it is not yet set.
      */
-    protected $sourceinstance;
+    protected $sourceinstanceid;
 
     /**
-     * @var $courseidscope int
+     * @var int|null $sourcecourseid the source instance id or null if it is not yet set.
      */
-    protected $courseidscope;
+    protected $sourcecourseid;
 
     /**
      * import_view constructor.
      *
      * @param instance $destinationinstance
-     * @param int|null $courseidscope
-     * @param instance|null $sourceinstance
+     * @param int $sourcecourseid
+     * @param int $sourceinstanceid
      */
-    public function __construct(instance $destinationinstance, ?int $courseidscope, ?instance $sourceinstance) {
+    public function __construct(instance $destinationinstance, int $sourcecourseid, int $sourceinstanceid) {
         $this->destinationinstance = $destinationinstance;
-        $this->courseidscope = $courseidscope;
-        $this->sourceinstance = $sourceinstance;
+        $this->sourcecourseid = $sourcecourseid >= 0 ? $sourcecourseid : null;
+        $this->sourceinstanceid = $sourceinstanceid >= 0 ? $sourceinstanceid : null;
     }
 
     /**
@@ -68,30 +68,35 @@ class import_view implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         $courses = roles::import_get_courses_for_select($this->destinationinstance);
-
+        if (config::get('importrecordings_from_deleted_enabled')) {
+            $courses[0] = get_string('recordings_from_deleted_activities', 'mod_bigbluebuttonbn');
+            ksort($courses);
+        }
         $context = (object) [
-            'bbboriginid' => $this->destinationinstance->get_instance_id(),
+            'bbbid' => $this->destinationinstance->get_instance_id(),
             'has_recordings' => false,
+            'bbbsourceid' => 0
         ];
 
-        if (!empty($this->sourceinstance)) {
-            $context->bbbid = $this->sourceinstance->get_instance_id();
+        if (!empty($this->sourceinstanceid)) {
+            $context->sourceid = $this->sourceinstanceid;
             $context->search = [
                 'value' => ''
             ];
-
-            if ($this->sourceinstance->is_type_recordings_only()) {
+            $sourceinstance = instance::get_from_instanceid($this->sourceinstanceid);
+            if ($sourceinstance->is_type_recordings_only()) {
                 $context->has_recordings = true;
-            } else if ($this->sourceinstance->is_type_room_and_recordings()) {
+            } else if ($sourceinstance->is_type_room_and_recordings()) {
                 $context->has_recordings = true;
             }
+            $context->bbbsourceid = $sourceinstance->get_instance_id();
         }
 
         // Now the selects.
-        if ($this->courseidscope) {
+        if (!empty($this->sourcecourseid)) {
             $selectrecords = [];
 
-            $cms = get_fast_modinfo($this->courseidscope)->instances['bigbluebuttonbn'];
+            $cms = get_fast_modinfo($this->sourcecourseid)->instances['bigbluebuttonbn'];
             foreach ($cms as $cm) {
                 if ($cm->id == $this->destinationinstance->get_cm_id()) {
                     // Skip the target instance.
@@ -105,26 +110,38 @@ class import_view implements renderable, templatable {
 
                 $selectrecords[$cm->instance] = $cm->name;
             }
+            if (config::get('importrecordings_from_deleted_enabled')) {
+                $selectrecords[0] =
+                    get_string('recordings_from_deleted_activities', 'mod_bigbluebuttonbn');
+            }
             $actionurl = $this->destinationinstance->get_import_url();
-            $actionurl->param('courseidscope', $this->courseidscope);
+            $actionurl->param('sourcecourseid', $this->sourcecourseid);
 
             $select = new \single_select(
                 $actionurl,
-                'frombn',
+                'sourcebn',
                 $selectrecords,
-                empty($this->sourceinstance) ? 0 : $this->sourceinstance->get_instance_id()
+                $this->sourceinstanceid ?? ""
             );
             $context->bbb_select = $select->export_for_template($output);
-            $context->has_selected_course = true;
+        }
+        $context->sourcecourseid = $this->sourcecourseid ?? 0;
+
+        if (empty($this->sourcecourseid) || empty($this->sourceinstanceid)) {
+            $context->has_recordings = true;
         }
 
         // Course selector.
         $context->course_select = (new \single_select(
             $this->destinationinstance->get_import_url(),
-            'courseidscope',
+            'sourcecourseid',
             $courses,
-            empty($this->courseidscope) ? 0 : $this->courseidscope
+            $this->sourcecourseid ?? ""
         ))->export_for_template($output);
+
+        if (!is_null($this->sourcecourseid)) {
+            $context->has_selected_course = true;
+        }
 
         // Back button.
         $context->back_button = (new \single_button(

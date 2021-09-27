@@ -1039,7 +1039,7 @@ EOF;
      */
     public function get_import_url(): moodle_url {
         return new moodle_url('/mod/bigbluebuttonbn/import_view.php', [
-            'originbn' => $this->instancedata->id,
+            'destbn' => $this->instancedata->id,
         ]);
     }
 
@@ -1080,26 +1080,58 @@ EOF;
      * Get recordings for this instance
      *
      * @param string[] $excludedid
+     * @param bool $viewdeleted view deleted recordings ?
      * @return recording[]
      */
-    public function get_recordings(array $excludedid = []): array {
+    public function get_recordings(array $excludedid = [], $viewdeleted = false): array {
         // Fetch the list of recordings depending on the status of the instance.
         // show room is enabled for TYPE_ALL and TYPE_ROOM_ONLY.
         if ($this->is_feature_enabled('showroom')) {
             // Not in the import page.
             return recording::get_recordings_for_instance(
                 $this,
-                $this->get_instance_var('recordings_deleted'),
                 $this->is_feature_enabled('importrecordings'),
                 $this->get_instance_var('recordings_imported'),
             );
         }
         // We show all recording from this course as this is TYPE_RECORDING.
         return recording::get_recordings_for_course(
-            $this->get_course(),
+            $this->get_course_id(),
             $excludedid,
-            $this->get_instance_var('recordings_deleted'),
-            $this->is_feature_enabled('importrecordings')
+            $this->is_feature_enabled('importrecordings'),
+            false,
+            $viewdeleted
         );
+    }
+
+    /**
+     * If this is a valid group for this user/instance, then set this instance to this group
+     *
+     *
+     * @param stdClass $user
+     * @param int $groupid
+     * @return bool
+     */
+    public function validate_and_set_group($user, $groupid) {
+        $cm = $this->get_cm();
+        $context = $this->get_context();
+        // Then validate group.
+        $groupmode = groups_get_activity_groupmode($cm);
+        if ($groupmode && $groupid) {
+            $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
+            if ($accessallgroups || $groupmode == VISIBLEGROUPS) {
+                $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
+            } else {
+                $allowedgroups = groups_get_all_groups($cm->course, $user->id, $cm->groupingid);
+            }
+            if (!array_key_exists($groupid, $allowedgroups)) {
+                return false;
+            }
+            if (!groups_group_visible($groupid, $this->get_course(), $this->get_cm())) {
+                return false;
+            }
+            $this->set_group_id($groupid);
+        }
+        return true;
     }
 }

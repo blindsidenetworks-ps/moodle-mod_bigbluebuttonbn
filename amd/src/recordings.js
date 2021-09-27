@@ -103,12 +103,21 @@ const getTableNode = tableSelector => document.querySelector(tableSelector);
 const fetchRecordingData = tableSelector => {
     const tableNode = getTableNode(tableSelector);
 
-    return repository.fetchRecordings(
-        tableNode.dataset.bbbid,
-        tableNode.dataset.groupId,
-        tableNode.dataset.removeImportedId,
-        tableNode.dataset.tools
-    );
+    if (tableNode.dataset.importMode) {
+        return repository.fetchRecordingsToImport(
+            tableNode.dataset.bbbid,
+            tableNode.dataset.bbbSourceInstanceId,
+            tableNode.dataset.bbbSourceCourseId,
+            tableNode.dataset.tools,
+            tableNode.dataset.groupId
+        );
+    } else {
+        return repository.fetchRecordings(
+            tableNode.dataset.bbbid,
+            tableNode.dataset.tools,
+            tableNode.dataset.groupId
+        );
+    }
 };
 
 /**
@@ -188,10 +197,21 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
             additionaloptions: getDataFromAction(element, 'additionaloptions'),
             action: elementData.action,
         };
-        // Slight change for import, the bigbluebuttonid is the bbb origin id.
-        if (elementData.action === 'import') {
-            payload.bigbluebuttonbnid = getDataFromAction(element, 'bboriginid');
+        // Slight change for import, for additional options.
+        if (!payload.additionaloptions) {
+            payload.additionaloptions = {};
         }
+        if (elementData.action === 'import') {
+            const bbbsourceid = getDataFromAction(element, 'source-instance-id');
+            const bbbcourseid = getDataFromAction(element, 'source-course-id');
+            if (!payload.additionaloptions) {
+                payload.additionaloptions = {};
+            }
+            payload.additionaloptions.sourceid = bbbsourceid ? bbbsourceid : 0;
+            payload.additionaloptions.bbbcourseid = bbbcourseid ? bbbcourseid : 0;
+        }
+        // Now additional options should be a json string.
+        payload.additionaloptions = JSON.stringify(payload.additionaloptions);
         if (element.dataset.requireConfirmation === "1") {
             // Create the confirmation dialogue.
             return new Promise((resolve) =>

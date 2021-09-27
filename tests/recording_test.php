@@ -202,6 +202,42 @@ class recording_test extends \advanced_testcase {
     }
 
     /**
+     * Test that we can get recordings from a deleted activity
+     *
+     * @param int $type
+     * @dataProvider get_allrecordings_types_provider
+     */
+    public function test_get_recordings_from_deleted_activity($type) {
+        $this->resetAfterTest(true);
+        $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+
+        $testcourse = $this->getDataGenerator()->create_course();
+
+        $activity = $plugingenerator->create_instance([
+            'course' => $testcourse->id,
+            'type' => $type,
+            'name' => 'Example'
+        ]);
+        $instance = instance::get_from_instanceid($activity->id);
+        $this->create_recordings_for_instance($instance,  [['name' => "Deleted Recording 1"]]);
+        $activity2 = $plugingenerator->create_instance([
+            'course' => $testcourse->id,
+            'type' => $type,
+            'name' => 'Example'
+        ]);
+        $instance2 = instance::get_from_instanceid($activity2->id);
+        $this->create_recordings_for_instance($instance2,  [['name' => "Recording 1"]]);
+
+        bigbluebuttonbn_delete_instance($activity->id);
+        $recordings = recording::get_recordings_for_course($testcourse->id, [], false, false, true);
+        $this->assertCount(2, $recordings);
+        $this->assert_has_recording_by_name('Deleted Recording 1', $recordings);
+        $this->assert_has_recording_by_name('Recording 1', $recordings);
+        $recordings = recording::get_recordings_for_course($testcourse->id, [], false, false, false);
+        $this->assertCount(1, $recordings);
+    }
+
+    /**
      * Check that a recording exist in the list of recordings
      *
      * @param string $recordingname
@@ -213,5 +249,4 @@ class recording_test extends \advanced_testcase {
         }, $recordings);
         $this->assertContains($recordingname, $recordingnames);
     }
-
 }
