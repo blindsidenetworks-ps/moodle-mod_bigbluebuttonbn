@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\recording;
 use mod_bigbluebuttonbn\local\proxy\recording_proxy;
 use moodle_exception;
 
@@ -94,7 +95,7 @@ abstract class upgrade_recording_base_task extends adhoc_task {
                     'bigbluebuttonbnid' => $instance->get_instance_id(),
                     'groupid' => $instance->get_group_id(), // The groupid should be taken from the meetingID.
                     'recordingid' => $recordingid,
-                    'status' => 2,
+                    'status' => recording::RECORDING_STATUS_PROCESSED,
                     'imported' => empty($importeddata) ? 0 : 1,
                 ];
             } else {
@@ -107,7 +108,7 @@ abstract class upgrade_recording_base_task extends adhoc_task {
                     'bigbluebuttonbnid' => $meetingdata['instanceid'],
                     'groupid' => 0,
                     'recordingid' => $recordingid,
-                    'status' => 2,
+                    'status' => recording::RECORDING_STATUS_PROCESSED,
                     'imported' => empty($importeddata) ? 0 : 1,
                 ];
 

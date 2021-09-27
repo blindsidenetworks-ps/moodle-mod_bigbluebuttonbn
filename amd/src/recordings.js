@@ -298,7 +298,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
 
         // Fetch any clicked anchor.
         const clickedLink = e.target.closest('a[data-action]');
-        if (clickedLink) {
+        if (clickedLink && !clickedLink.classList.contains('disabled')) {
             e.preventDefault();
 
             // Create a spinning icon on the table.
