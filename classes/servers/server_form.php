@@ -45,7 +45,13 @@ class server_form extends persistent
         $mform->addRule('weight', get_string('required'), 'required', null, 'client');
         $mform->setType('weight', PARAM_INT);
 
-        $mform->addElement('selectyesno', 'enabled', get_string('server_enabled', 'bigbluebuttonbn'));
+
+        $enabledoptions = [
+            '0' => 'Disabled',
+            '1' => 'Enabled',
+            '3' => 'Crashed'
+        ];
+        $mform->addElement('select', 'enabled', get_string('server_enabled', 'bigbluebuttonbn'), $enabledoptions);
         $mform->setType('enabled', PARAM_INT);
 
         $this->add_action_buttons();

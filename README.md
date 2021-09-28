@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/blindsidenetworks/moodle-mod_bigbluebuttonbn.svg?branch=master)](https://travis-ci.org/blindsidenetworks/moodle-mod_bigbluebuttonbn)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/blindsidenetworks/moodle-mod_bigbluebuttonbn/?branch=master)
-
 BigBlueButtonBN Activity Module for Moodle
 ==========================================
 BigBlueButton is an open source web conferencing system that enables universities and colleges to deliver a high-quality learning experience to remote students.
@@ -60,6 +57,17 @@ contains the latest source. We recommend to download the latest snapshot from th
 
 Note: Since version 2.2 the use of the RecordingsBN activity module to access recordings is no longer needed. But when running an older version, it is requiered in order to gain access to the recordings.
 
+Multi-server statistics
+====================
+The number of meetings and the number of attendees for each server is monitored every 5 minutes. You can see those by navigating to the Plugin's servers administration following 'Site Administration > Plugins > Activity Modules > BigBlueButton Servers' then clicking on 'See Recent Statistics'.
+
+From there you get access to your server's activity during :
+* The last 5 minutes 
+* Day
+* Week
+* Month
+* Trimester
+* Year
 
 Contact Us
 ==========

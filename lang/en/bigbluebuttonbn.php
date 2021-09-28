@@ -583,6 +583,26 @@ $string['server_new'] = 'New server';
 $string['server_edit'] = 'Edit server';
 $string['server_weight_greater_zero'] = 'Weight must be greater than 0';
 $string['server_confirm_delete'] = 'Are you sure you want to remove the server named : {$a->name}?';
+$string['server_already_exists'] = 'Error : Another server already exists with that url';
 $string['select_server'] = 'Select server';
 $string['no_server_selected'] = 'No server selected by your teacher. Refresh page later.';
 $string['bbb_task'] = 'Execute BBB process';
+
+$string['messageprovider:crashed'] = 'Server crashed';
+$string['crashed'] = 'Server crashed';
+$string['crashmsgcontent'] = 'The meeting server has crashed. Please rejoin the meeting from your course';
+
+$string['getrecordings'] = 'Get all servers recordings';
+
+$string['interrogateservers'] = 'Get meetings from each server';
+$string['seestatisticsnbrmeetings'] = 'Number of meetings';
+$string['seestatisticsnbrattendeess'] = 'Number of attendees';
+$string['seestatisticsrecent'] = 'Recent activities';
+$string['seestatistics'] = 'See Recent Statistics';
+$string['seestatisticslast'] = 'Statistics from : ';
+$string['seestatisticsday'] = 'Last Day Statistics';
+$string['seestatisticsweek'] = 'Last Week Statistics';
+$string['seestatisticsmonth'] = 'Last Month Statistics';
+$string['seestatisticstrimester'] = 'Last Trimester Statistics';
+$string['seestatisticsyear'] = 'Last Year Statistics';
+
