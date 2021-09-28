@@ -25,6 +25,11 @@
 
 namespace mod_bigbluebuttonbn\settings;
 
+use admin_externalpage;
+use admin_category;
+use admin_settingpage;
+use core\plugininfo\mod;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -39,17 +44,27 @@ require_once($CFG->libdir.'/adminlib.php');
 class renderer {
 
     /**
-     * @var $settings stores the settings as they come from settings.php
+     * @var $settings admin_settingpage stores the settings as they come from settings.php
      */
     private $settings;
+    /**
+     * @var $module mod stores the module as it come from settings.php
+     */
+    private $module;
+
+    /**
+     * @var $category string admin category name
+     */
+    private $category = 'modbbbfolder';
 
     /**
      * Constructor.
      *
      * @param object $settings
      */
-    public function __construct(&$settings) {
+    public function __construct(&$settings, &$module) {
         $this->settings = $settings;
+        $this->module = $module;
     }
 
     /**
@@ -236,5 +251,28 @@ class renderer {
 
         $this->settings->add($filemanager);
         return $filemanager;
+    }
+
+    /**
+     * @throws \coding_exception
+     */
+    public function render_admin_category() {
+        global $ADMIN;
+
+        $folder = new admin_category($this->category, get_string('pluginname', 'bigbluebuttonbn'), $this->module->is_enabled() === false);
+        $ADMIN->add('modsettings', $folder);
+        $this->settings->visiblename .= " " . get_string('settings', 'bigbluebuttonbn');
+        $ADMIN->add($this->category, $this->settings);
+    }
+
+    /**
+     * @param $name
+     * @param $url
+     * @throws \coding_exception
+     */
+    public function render_external_page($name, $url) {
+        global $ADMIN;
+
+        $ADMIN->add($this->category, new admin_externalpage($name, get_string('admin_external_page_' . $name, 'bigbluebuttonbn'), $url));
     }
 }

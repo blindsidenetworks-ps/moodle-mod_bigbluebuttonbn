@@ -129,6 +129,9 @@ function bigbluebuttonbn_broker_meeting_end($bbbsession, $params) {
     bigbluebuttonbn_get_meeting_info($params['id'], BIGBLUEBUTTONBN_UPDATE_CACHE);
     $callbackresponse = array('status' => true);
     $callbackresponsedata = json_encode($callbackresponse);
+    if (isset($bbbsession['bigbluebuttonbn'])) {
+        bigbluebuttonbn_end_selected_servers($params['bigbluebuttonbn']);
+    }
     return "{$params['callback']}({$callbackresponsedata});";
 }
 

@@ -40,6 +40,9 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  */
 class bigbluebutton {
 
+    public static $servers = null;
+    public static $selected_server = null;
+
     /**
      * Returns the right URL for the action specified.
      *
@@ -69,7 +72,12 @@ class bigbluebutton {
      * @return string
      */
     public static function sanitized_url() {
-        $serverurl = trim(config::get('server_url'));
+        if (self::$selected_server !== null) {
+            $serverurl = self::$selected_server->get('url');
+        } else {
+            $serverurl = config::get('server_url');
+        }
+        $serverurl = trim($serverurl);
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
         }
@@ -85,7 +93,12 @@ class bigbluebutton {
      * @return string
      */
     public static function sanitized_secret() {
-        return trim(config::get('shared_secret'));
+        if (self::$selected_server !== null) {
+            $secret = self::$selected_server->get('secret');
+        } else {
+            $secret = trim(config::get('shared_secret'));
+        }
+        return trim($secret);
     }
 
     /**
@@ -94,7 +107,13 @@ class bigbluebutton {
      * @return string
      */
     public static function root() {
-        $pserverurl = parse_url(trim(config::get('server_url')));
+        if (self::$selected_server !== null) {
+            $serverurl = self::$selected_server->get('url');
+        } else {
+            $serverurl = config::get('server_url');
+        }
+        $serverurl = trim($serverurl);
+        $pserverurl = parse_url($serverurl);
         $pserverurlport = "";
         if (isset($pserverurl['port'])) {
             $pserverurlport = ":" . $pserverurl['port'];

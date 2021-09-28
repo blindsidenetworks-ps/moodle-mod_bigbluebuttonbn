@@ -56,6 +56,7 @@ if (!empty($error)) {
 }
 
 if ($params['bigbluebuttonbn']) {
+    bigbluebuttonbn_load_selected_server($params['bigbluebuttonbn']);
     $bbbbrokerinstance = bigbluebuttonbn_view_instance_bigbluebuttonbn($params['bigbluebuttonbn']);
     $cm = $bbbbrokerinstance['cm'];
     $bigbluebuttonbn = $bbbbrokerinstance['bigbluebuttonbn'];
@@ -89,6 +90,7 @@ $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
 try {
     header('Content-Type: application/javascript; charset=utf-8');
     $a = strtolower($params['action']);
+
     if ($a == 'meeting_info') {
         $meetinginfo = bigbluebuttonbn_broker_meeting_info($bbbsession, $params, ($params['updatecache'] == 'true'));
         echo $meetinginfo;
@@ -110,6 +112,11 @@ try {
         return;
     }
     if ($a == 'recording_info') {
+        $result = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $params['id']]);
+        $serverdb = $DB->get_record_sql("SELECT * FROM {bigbluebuttonbn_servers} WHERE url LIKE :url", ['url' => $result->hostingserverurl.'%']);
+        $server = new \mod_bigbluebuttonbn\server(0, $serverdb);
+        \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server = $server;
+
         $recordinginfo = bigbluebuttonbn_broker_recording_info($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordinginfo;
         return;
@@ -117,6 +124,50 @@ try {
     if ($a == 'recording_publish' || $a == 'recording_unpublish' ||
         $a == 'recording_delete' || $a == 'recording_edit' ||
         $a == 'recording_protect' || $a == 'recording_unprotect') {
+
+        if ($a == 'recording_edit') {
+            $metaparams = json_decode($params['meta'], true);
+            $recordingname = $metaparams["meta_bbb-recording-name"];
+            $recordingdescription = $metaparams["meta_bbb-recording-description"];
+            if (!empty($recordingname)) {
+                $recordingid = $params['id'];
+                $record = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $recordingid]);
+                $record->recordingname = $recordingname;
+                $DB->update_record('bigbluebuttonbn_recordings', $record);
+            }
+
+            if (!empty($recordingdescription)) {
+                $recordingid = $params['id'];
+                $record = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $recordingid]);
+                $record->recordingdescription = $recordingdescription;
+                $DB->update_record('bigbluebuttonbn_recordings', $record);
+            }
+        }
+
+        if ($a == 'recording_delete') {
+            $recordingid = $params['id'];
+            $DB->delete_records('bigbluebuttonbn_recordings', ['recordingid' => $recordingid]);
+        }
+
+        if ($a == 'recording_publish') {
+            $recordingid = $params['id'];
+            $record = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $recordingid]);
+            $record->published = 'true';
+            $DB->update_record('bigbluebuttonbn_recordings', $record);
+        }
+
+        if ($a == 'recording_unpublish') {
+            $recordingid = $params['id'];
+            $record = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $recordingid]);
+            $record->published = 'false';
+            $DB->update_record('bigbluebuttonbn_recordings', $record);
+        }
+
+        $result = $DB->get_record('bigbluebuttonbn_recordings', ['recordingid' => $params['id']]);
+        $serverdb = $DB->get_record_sql("SELECT * FROM {bigbluebuttonbn_servers} WHERE url LIKE :url", ['url' => $result->hostingserverurl.'%']);
+        $server = new \mod_bigbluebuttonbn\server(0, $serverdb);
+        \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server = $server;
+
         $recordingaction = bigbluebuttonbn_broker_recording_action($bbbsession, $params, $enabledfeatures['showroom']);
         echo $recordingaction;
         return;

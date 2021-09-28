@@ -46,6 +46,12 @@ $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
 
 require_login($course, true, $cm);
 
+// Print the page header.
+$PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
+$PAGE->set_title($bigbluebuttonbn->name);
+$PAGE->set_cacheable(false);
+$PAGE->set_heading($course->fullname);
+
 // In locallib.
 bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
 
@@ -57,32 +63,31 @@ $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 // In locallib.
 mod_bigbluebuttonbn\locallib\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
 
-// Validates if the BigBlueButton server is working.
-$serverversion = bigbluebuttonbn_get_server_version();  // In locallib.
-if ($serverversion === null) {
-    $errmsg = 'view_error_unable_join_student';
-    $errurl = '/course/view.php';
-    $errurlparams = ['id' => $bigbluebuttonbn->course];
-    if ($bbbsession['administrator']) {
-        $errmsg = 'view_error_unable_join';
-        $errurl = '/admin/settings.php';
-        $errurlparams = ['section' => 'modsettingbigbluebuttonbn'];
-    } else if ($bbbsession['moderator']) {
-        $errmsg = 'view_error_unable_join_teacher';
+$serverversion = null;
+bigbluebuttonbn_load_selected_server($bigbluebuttonbn->id);
+$selected_server = bigbluebuttonbn_get_selected_server();
+if ($selected_server) {
+    // Validates if the BigBlueButton server is working.
+    $serverversion = bigbluebuttonbn_get_server_version();  // In locallib.
+    if ($serverversion === null) {
+        $errmsg = 'view_error_unable_join_student';
+        $errurl = '/course/view.php';
+        $errurlparams = ['id' => $bigbluebuttonbn->course];
+        if ($bbbsession['administrator']) {
+            $errmsg = 'view_error_unable_join';
+            $errurl = '/admin/settings.php';
+            $errurlparams = ['section' => 'modsettingbigbluebuttonbn'];
+        } else if ($bbbsession['moderator']) {
+            $errmsg = 'view_error_unable_join_teacher';
+        }
+        throw new moodle_exception($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
     }
-    throw new moodle_exception($errmsg, plugin::COMPONENT, new moodle_url($errurl, $errurlparams));
+    $bbbsession['serverversion'] = (string) $serverversion;
 }
-$bbbsession['serverversion'] = (string) $serverversion;
 
 // Mark viewed by user (if required).
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
-
-// Print the page header.
-$PAGE->set_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
-$PAGE->set_title($bigbluebuttonbn->name);
-$PAGE->set_cacheable(false);
-$PAGE->set_heading($course->fullname);
 
 /** @var core_renderer $OUTPUT */
 $OUTPUT;

@@ -30,9 +30,10 @@ global $CFG;
 
 require_once(__DIR__.'/locallib.php');
 
+
 if ($hassiteconfig) {
     // Configuration for BigBlueButton.
-    $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
+    $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings, $module);
     // Renders general settings.
     bigbluebuttonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.
@@ -61,4 +62,9 @@ if ($hassiteconfig) {
     bigbluebuttonbn_settings_extended($renderer);
     // Renders settings for experimental features.
     bigbluebuttonbn_settings_experimental($renderer);
+    // Renders settings for extended capabilities.
+
+    bigbluebuttonbn_add_admin_category($renderer);
+    bigbluebuttonbn_add_servers_external_page($renderer);
+    $settings = null;
 }
