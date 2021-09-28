@@ -42,7 +42,7 @@ class server extends persistent
             ],
             'enabled' => [
                 'type' => PARAM_INT,
-                'default' => 0,
+                'default' => 1,
             ],
             'participants' => [
                 'type' => PARAM_INT,

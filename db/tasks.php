@@ -25,5 +25,23 @@ $tasks = [
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
+    ],
+    [
+        'classname' => 'mod_bigbluebuttonbn\task\get_recordings',
+        'blocking' => 0,
+        'minute' => 20,
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
+    [
+        'classname' => 'mod_bigbluebuttonbn\task\interrogate_servers',
+        'blocking' => 0,
+        'minute' => 5,
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
     ]
 ];

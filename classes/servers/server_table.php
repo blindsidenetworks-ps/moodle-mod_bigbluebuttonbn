@@ -143,7 +143,14 @@ class server_table extends flexible_table
      */
     protected function col_enabled(server $data): string
     {
-        return empty($data->get('enabled')) ? get_string('no') : get_string('yes');
+        switch ($data->get('enabled')) {
+            case '0' :
+                return get_string('no');
+            case '1' :
+                return get_string('yes');
+            case '3' :
+                return get_string('crashed', 'bigbluebuttonbn');
+        }
     }
 
     /**

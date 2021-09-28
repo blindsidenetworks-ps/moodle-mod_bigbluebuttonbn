@@ -267,7 +267,7 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
 }
 
 /**
- * Helper function to fetch one page of upto 25 recordings from a BigBlueButton server.
+ * Function will fetch records from DB Mdl_bigbluebuttonbn_recordings, and format them to be exploitable by plugin
  *
  * @param array  $mids
  *
@@ -275,39 +275,28 @@ function bigbluebuttonbn_get_recordings_array_fetch($meetingidsarray) {
  */
 function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
     global $DB;
-    $current_server = \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server;
-    $servers = $DB->get_records_sql("SELECT * FROM {bigbluebuttonbn_servers} WHERE enabled = 1");
-    $recordings = array();
-    foreach ($servers as $server) {
-        // Do getRecordings is executed using a method GET (supported by all versions of BBB).
-        \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server = new \mod_bigbluebuttonbn\server(0, $server);
-        $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings', ['meetingID' => implode(',', $mids)]);
-        $xml = bigbluebuttonbn_wrap_xml_load_file($url);
-        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-            // If there were meetings already created.
-            foreach ($xml->recordings->recording as $recordingxml) {
-                $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
-                $recordings[$recording['recordID']] = $recording;
 
-                // Check if there is childs.
-                if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
-                    foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                        $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings',
-                            ['recordID' => implode(',', (array) $breakoutroom)]);
-                        $xml = bigbluebuttonbn_wrap_xml_load_file($url);
-                        if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                            // If there were meetings already created.
-                            foreach ($xml->recordings->recording as $recordingxml) {
-                                $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
-                                $recordings[$recording['recordID']] = $recording;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    $recordings = array();
+    foreach ($mids as $mid) {
+        $results = $DB->get_records("bigbluebuttonbn_recordings", ["meetingid" => $mid]);
     }
-    \mod_bigbluebuttonbn\locallib\bigbluebutton::$selected_server = $current_server;
+
+    foreach ($results as $result) {
+        $recordings[$result->recordingid]['recordID'] = $result->recordingid;
+        $recordings[$result->recordingid]['meetingID'] = $result->meetingid;
+        $recordings[$result->recordingid]['meetingName'] = $result->meetingname;
+        $recordings[$result->recordingid]['published'] = $result->published;
+        $recordings[$result->recordingid]['startTime'] = $result->starttime;
+        $recordings[$result->recordingid]['endTime'] = $result->endtime;
+        $recordings[$result->recordingid]['playbacks']['presentation']['type'] = $result->recordingtype;
+        $recordings[$result->recordingid]['playbacks']['presentation']['url'] = $result->recordinglink;
+        $recordings[$result->recordingid]['playbacks']['presentation']['length'] = $result->recordinglength;
+        $recordings[$result->recordingid]['meta_bbb-recording-name'] = $result->recordingname;
+        $recordings[$result->recordingid]['meta_bbb-recording-description'] = $result->recordingdescription;
+        $recordings[$result->recordingid]['meta_bbb-origin-server-name'] = 'etnic.local73';
+        $recordings[$result->recordingid]['hostserverurl'] = $result->hostingserverurl;
+    }
+
     return $recordings;
 }
 
@@ -591,6 +580,7 @@ function bigbluebuttonbn_chose_server()
         "SELECT * FROM {bigbluebuttonbn_servers} WHERE id = (
             SELECT id
             FROM {bigbluebuttonbn_servers}
+            WHERE enabled = 1
             ORDER BY (1/weight * participants) ASC, weight DESC
             LIMIT 1
         )"
@@ -1591,11 +1581,12 @@ function bigbluebuttonbn_get_recording_data_row($bbbsession, $recording, $tools 
     // Set activity name.
     $rowdata->recording = bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession);
     // Set activity description.
+
     $rowdata->description = bigbluebuttonbn_get_recording_data_row_meta_description($recording, $bbbsession);
-    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        // Set recording_preview.
-        $rowdata->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
-    }
+//    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+//        // Set recording_preview.
+//        $rowdata->preview = bigbluebuttonbn_get_recording_data_row_preview($recording);
+//    }
     // Set date.
     $rowdata->date = bigbluebuttonbn_get_recording_data_row_date($recording);
     // Set formatted date.
@@ -1961,6 +1952,7 @@ function bigbluebuttonbn_get_recording_data_row_meeting($recording, $bbbsession)
  */
 function bigbluebuttonbn_get_recording_data_row_meta_activity($recording, $bbbsession) {
     $payload = array();
+
     if (bigbluebuttonbn_get_recording_data_row_editable($bbbsession)) {
         $payload = array('recordingid' => $recording['recordID'], 'meetingid' => $recording['meetingID'],
             'action' => 'edit', 'tag' => 'edit',
@@ -2103,10 +2095,11 @@ function bigbluebuttonbn_get_recording_table($bbbsession, $recordings, $tools = 
     // Initialize table headers.
     $table->head[] = get_string('view_recording_playback', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_name', 'bigbluebuttonbn');
+
     $table->head[] = get_string('view_recording_description', 'bigbluebuttonbn');
-    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
-    }
+//    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+//        $table->head[] = get_string('view_recording_preview', 'bigbluebuttonbn');
+//    }
     $table->head[] = get_string('view_recording_date', 'bigbluebuttonbn');
     $table->head[] = get_string('view_recording_duration', 'bigbluebuttonbn');
     $table->align = array('left', 'left', 'left', 'left', 'left', 'center');
@@ -2183,10 +2176,11 @@ function bigbluebuttonbn_get_recording_table_row($bbbsession, $recording, $rowda
     $row->cells = array();
     $row->cells[] = $texthead . $rowdata->playback . $texttail;
     $row->cells[] = $texthead . $rowdata->recording . $texttail;
+
     $row->cells[] = $texthead . $rowdata->description . $texttail;
-    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
-        $row->cells[] = $rowdata->preview;
-    }
+//    if (bigbluebuttonbn_get_recording_data_preview_enabled($bbbsession)) {
+//        $row->cells[] = $rowdata->preview;
+//    }
     $row->cells[] = $texthead . $rowdata->date_formatted . $texttail;
     $row->cells[] = $rowdata->duration_formatted;
     if ($bbbsession['managerecordings']) {
