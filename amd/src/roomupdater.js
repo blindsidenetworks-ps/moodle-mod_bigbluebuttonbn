@@ -39,6 +39,7 @@ const resetValues = () => {
 };
 
 /**
+<<<<<<< HEAD
  * Start the information poller.
  */
 export const start = () => {
@@ -47,7 +48,7 @@ export const start = () => {
 };
 
 /**
- * Stop the information poller.
+ * Stop the room updater.
  */
 export const stop = () => {
     timerRunning = false;

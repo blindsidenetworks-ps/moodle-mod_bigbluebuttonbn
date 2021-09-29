@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Repository to perform WS calls for mod_bigbluebuttonbn.
+ *
+ * @module      mod_bigbluebuttonbn/repository
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import {call as fetchMany} from 'core/ajax';
 
 /**
@@ -39,23 +47,25 @@ export const fetchRecordings = (bigbluebuttonbnid, tools, groupid) => {
 /**
  * Fetch the list of recordings from the server that can be imported.
  *
- * @param   {Number} sourcecourseid The destination instance ID
  * @param   {Number} destinationinstanceid The destination instance ID
  * @param   {Number} sourcebigbluebuttonbnid The original instance ID
+ * @param   {Number} sourcecourseid The destination instance ID
  * @param   {String} tools the set of tools to display
  * @param   {number} groupid
  * @returns {Promise}
  */
-export const fetchRecordingsToImport = (destinationinstanceid,
-                                        sourcebigbluebuttonbnid,
-                                        sourcecourseid,
-                                        tools,
-                                        groupid) => {
+export const fetchRecordingsToImport = (
+    destinationinstanceid,
+    sourcebigbluebuttonbnid,
+    sourcecourseid,
+    tools,
+    groupid
+) => {
     const args = {
         destinationinstanceid,
         sourcebigbluebuttonbnid,
         sourcecourseid,
-        tools
+        tools,
     };
 
     if (groupid) {

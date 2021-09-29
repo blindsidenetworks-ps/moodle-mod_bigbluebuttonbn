@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * JS actions for the rooms page for mod_bigbluebuttonbn.
+ *
+ * @module      mod_bigbluebuttonbn/rooms
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import './actions';
 import * as repository from './repository';
 import * as roomUpdater from './roomupdater';

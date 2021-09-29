@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Events for the mod_bigbluebuttonbn plugin.
+ *
+ * @module      mod_bigbluebuttonbn/events
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 // TODO For master this can be changed to `core/event_dispatcher` and the local copy removed.
 // For 3.11 and earlier this line should stay.
 import {dispatchEvent} from './event_dispatcher';
