@@ -42,6 +42,7 @@ $functions = [
         'type'          => 'read',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_get_recordings_to_import' => [
         'classname'     => 'mod_bigbluebuttonbn\external\get_recordings_to_import',
@@ -50,6 +51,7 @@ $functions = [
         'type'          => 'read',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:importrecordings',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_update_recording' => [
         'classname'     => 'mod_bigbluebuttonbn\external\update_recording',
@@ -58,6 +60,7 @@ $functions = [
         'type'          => 'write',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:managerecordings',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_end_meeting' => [
         'classname'     => 'mod_bigbluebuttonbn\external\end_meeting',
@@ -66,6 +69,7 @@ $functions = [
         'type'          => 'write',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:join',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_completion_validate' => [
         'classname'     => 'mod_bigbluebuttonbn\external\completion_validate',
@@ -74,6 +78,7 @@ $functions = [
         'type'          => 'write',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_meeting_info' => [
         'classname'     => 'mod_bigbluebuttonbn\external\meeting_info',
@@ -82,6 +87,7 @@ $functions = [
         'type'          => 'read',
         'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => array(
         'classname'     => 'mod_bigbluebuttonbn\external\get_bigbluebuttonbns_by_courses',
