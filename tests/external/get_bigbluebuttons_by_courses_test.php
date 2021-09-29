@@ -50,7 +50,7 @@ class get_bigbluebuttons_by_courses_test extends \externallib_advanced_testcase 
     /**
      * Helper
      *
-     * @param array $params
+     * @param ... $params
      * @return mixed
      */
     protected function get_bigbluebuttons_by_courses(...$params) {
@@ -161,8 +161,8 @@ class get_bigbluebuttons_by_courses_test extends \externallib_advanced_testcase 
     /**
      * Check if the two arrays containing the activities are the same.
      *
-     * @param $expected
-     * @param $actual
+     * @param mixed $expected
+     * @param mixed $actual
      */
     protected function assert_same_bbb_activities($expected, $actual) {
         $this->assertCount(count($expected), $actual);

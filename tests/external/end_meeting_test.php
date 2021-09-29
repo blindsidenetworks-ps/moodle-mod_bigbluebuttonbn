@@ -49,7 +49,7 @@ class end_meeting_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param mixed $params,...
+     * @param ... $params
      * @return array|bool|mixed
      */
     protected function end_meeting(...$params) {
