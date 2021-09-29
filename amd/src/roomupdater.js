@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * JS room updater.
+ *
+ * @module      mod_bigbluebuttonbn/roomupdater
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import Templates from "core/templates";
 import {exception as displayException} from 'core/notification';
 import {getMeetingInfo} from './repository';
@@ -23,13 +31,26 @@ const maxFactor = 10;
 let updateCount = 0;
 let updateFactor = 1;
 let timerReference = null;
+let timerRunning = false;
 
 const resetValues = () => {
     updateCount = 0;
     updateFactor = 1;
 };
 
+/**
+ * Start the information poller.
+ */
+export const start = () => {
+    timerRunning = true;
+    timerReference = setTimeout(() => poll(), timeout);
+};
+
+/**
+ * Stop the information poller.
+ */
 export const stop = () => {
+    timerRunning = false;
     if (timerReference) {
         clearInterval(timerReference);
         timerReference = null;
@@ -38,7 +59,11 @@ export const stop = () => {
     resetValues();
 };
 
-export const poll = () => {
+const poll = () => {
+    if (!timerRunning) {
+        // The poller has been stopped.
+        return;
+    }
     if ((updateCount % updateFactor) === 0) {
         updateRoom(true)
         .then(() => {
@@ -60,11 +85,18 @@ export const poll = () => {
     }
 };
 
+/**
+ * Update the room informatino.
+ *
+ * @param {Bool} [updatecache=false]
+ * @returns {Promise}
+ */
 export const updateRoom = (updatecache = false) => {
     const bbbRoomViewElement = document.getElementById('bbb-room-view');
     const bbbId = bbbRoomViewElement.dataset.bbbId;
     const groupId = bbbRoomViewElement.dataset.groupId;
 
+    // TODO only update the summary info. Do not replace the buttons, ever.
     return getMeetingInfo(bbbId, groupId, updatecache)
         .then(data => Templates.renderForPromise('mod_bigbluebuttonbn/room_view', data))
         .then(({html, js}) => Templates.replaceNodeContents(bbbRoomViewElement, html, js))
