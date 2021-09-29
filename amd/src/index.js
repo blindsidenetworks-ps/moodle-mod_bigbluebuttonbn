@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Index page for the mod_bigbluebuttonbn plugin.
+ *
+ * @module      mod_bigbluebuttonbn/index
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import './actions';
 import {eventTypes} from './events';
 

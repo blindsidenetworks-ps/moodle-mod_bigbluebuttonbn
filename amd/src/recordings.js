@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * JS for the recordings page on mod_bigbluebuttonbn plugin.
+ *
+ * @module      mod_bigbluebuttonbn/recordings
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import * as repository from './repository';
 import {exception as displayException} from 'core/notification';
 import {get_strings as getStrings} from 'core/str';
