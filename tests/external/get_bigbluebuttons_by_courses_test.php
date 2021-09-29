@@ -50,7 +50,7 @@ class get_bigbluebuttons_by_courses_test extends \externallib_advanced_testcase 
     /**
      * Helper
      *
-     * @param ... $params
+     * @param mixed ...$params
      * @return mixed
      */
     protected function get_bigbluebuttons_by_courses(...$params) {

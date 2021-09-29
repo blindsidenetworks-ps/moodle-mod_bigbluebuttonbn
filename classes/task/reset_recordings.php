@@ -83,14 +83,13 @@ class reset_recordings extends adhoc_task {
     protected function get_recordngs_to_reset(): array {
         global $DB;
 
-        return $DB->get_records_sql(
-            'SELECT * FROM {bigbluebuttonbn_recordings}
+        return $DB->get_records_sql('
+            SELECT * FROM {bigbluebuttonbn_recordings}
              WHERE status = :status_processed OR status = :status_notified
-             ORDER BY timecreated DESC',
-            ['status_processed' => recording::RECORDING_STATUS_PROCESSED, 'status_notified' => recording::RECORDING_STATUS_NOTIFIED],
-            0,
-            self::$chunksize
-        );
+          ORDER BY timecreated DESC', [
+                'status_processed' => recording::RECORDING_STATUS_PROCESSED,
+                'status_notified' => recording::RECORDING_STATUS_NOTIFIED,
+            ], 0, self::$chunksize);
     }
 
 }
