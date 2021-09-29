@@ -495,7 +495,10 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
  * @return bool Returns true if the event is visible to the current user, false otherwise.
  */
 function mod_bigbluebuttonbn_core_calendar_is_event_visible(calendar_event $event) {
-    $instance = instance::get_from_cmid($event->instance);
+    $instance = instance::get_from_instanceid($event->instance);
+    if (!$instance) {
+        return false;
+    }
     $activitystatus = mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy::view_get_activity_status($instance);
     return $activitystatus != 'ended';
 }

@@ -367,4 +367,26 @@ class lib_test extends \advanced_testcase {
         bigbluebuttonbn_extend_settings_navigation($settingnav, $node);
         $this->assertCount(0, $node->get_children_key_list());
     }
+
+    /**
+     * Check the visibility on calendar
+     * @covers ::mod_bigbluebuttonbn_core_calendar_is_event_visible
+     */
+    public function test_mod_bigbluebuttonbn_core_calendar_is_event_visible() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        $bbactivity->closingtime = time() - 1000;
+        $bbactivity->openingtime = time() - 2000;
+        $DB->update_record('bigbluebuttonbn', $bbactivity);
+        $event = $this->create_action_event($this->get_course(), $bbactivity, logger::EVENT_MEETING_START);
+        $this->assertFalse(mod_bigbluebuttonbn_core_calendar_is_event_visible($event));
+        $bbactivity->closingtime = time() + 1000;
+        $DB->update_record('bigbluebuttonbn', $bbactivity);
+        $event = $this->create_action_event($this->get_course(), $bbactivity, logger::EVENT_MEETING_START);
+        $this->assertTrue(mod_bigbluebuttonbn_core_calendar_is_event_visible($event));
+        $event->instance = 0;
+        $this->assertFalse(mod_bigbluebuttonbn_core_calendar_is_event_visible($event));
+    }
 }
