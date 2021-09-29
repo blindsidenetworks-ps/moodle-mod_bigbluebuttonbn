@@ -27,7 +27,7 @@ use admin_setting_configtext;
 use admin_setting_configtextarea;
 use admin_setting_heading;
 use admin_settingpage;
-use cache;
+use cache_helper;
 use lang_string;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
@@ -1280,10 +1280,6 @@ class settings {
      */
     protected function reset_cache() {
         // Reset serverinfo cache.
-        $cache = cache::make('mod_bigbluebuttonbn', 'serverinfo');
-        $cache->purge();
-        // Reset recording cache.
-        $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
-        $cache->purge();
+        cache_helper::purge_by_event('mod_bigbluebuttonbn/serversettingschanged');
     }
 }

@@ -30,6 +30,9 @@ $definitions = [
     // version  (double) => server version.
     'serverinfo' => [
         'mode' => cache_store::MODE_APPLICATION,
+        'invalidationevents' => [
+            'mod_bigbluebuttonbn/serversettingschanged',
+        ],
     ],
 
     // The validatedurls cache stores a list of URLs which are either valid, or invalid.
@@ -45,6 +48,7 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'invalidationevents' => [
             'mod_bigbluebuttonbn/recordingchanged',
+            'mod_bigbluebuttonbn/serversettingschanged',
         ],
         'ttl' => HOURSECS,
     ],
