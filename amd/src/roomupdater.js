@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * JS room updater.
+ *
+ * @module      mod_bigbluebuttonbn/roomupdater
+ * @copyright   2021 Blindside Networks Inc
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import Templates from "core/templates";
 import {exception as displayException} from 'core/notification';
 import {getMeetingInfo} from './repository';
@@ -29,6 +37,9 @@ const resetValues = () => {
     updateFactor = 1;
 };
 
+/**
+ * Stop the room updater.
+ */
 export const stop = () => {
     if (timerReference) {
         clearInterval(timerReference);
