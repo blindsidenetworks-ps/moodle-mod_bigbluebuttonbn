@@ -48,7 +48,7 @@ class can_join_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param array $params
+     * @param ... $params
      * @return mixed
      */
     protected function can_join(...$params) {

@@ -50,7 +50,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param mixed $params
+     * @param ... $params
      * @return array|bool|mixed
      */
     protected function get_recordings(...$params) {
