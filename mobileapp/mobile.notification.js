@@ -28,11 +28,11 @@ var that = this;
 
 var TIMEOUTCHECK = 20000;
 
-that.onCanJoinReturns = function (data) {
+that.onCanJoinReturns = function(data) {
     if (data && data.can_join) {
         that.openContent('', {'cmid': data.cmid}, 'mod_bigbluebuttonbn', 'mobile_course_view');
     } else {
-        setTimeout(function () {
+        setTimeout(function() {
             that.refreshContent(true);
         }, TIMEOUTCHECK);
     }
