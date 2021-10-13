@@ -226,7 +226,6 @@ class meeting {
             'ismoderator' => $instance->is_moderator(),
             'joinurl' => $instance->get_join_url()->out(),
             'userlimit' => $instance->get_user_limit(),
-            'group' => $instance->get_group_id(),
             'presentations' => [],
         ];
         if ($instance->get_instance_var('openingtime')) {

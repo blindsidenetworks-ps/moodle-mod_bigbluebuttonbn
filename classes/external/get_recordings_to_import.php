@@ -128,11 +128,12 @@ class get_recordings_to_import extends external_api {
         $destinstance = instance::get_from_instanceid($destinationinstanceid);
         // Validate that the user has access to this activity.
         self::validate_context($destinstance->get_context());
-        $isvalidgroup = $destinstance->validate_and_set_group($USER, $groupid);
-        if (!$isvalidgroup) {
+        if (!$destinstance->user_has_group_access($USER, $groupid)) {
             throw new \invalid_parameter_exception('Invalid group for this user ' . $groupid);
         }
-
+        if ($groupid) {
+            $destinstance->set_group_id($groupid);
+        }
         // Exclude itself from the list if in import mode.
         $excludedids = [$destinstance->get_instance_id()];
         if ($sourceinstance) {
