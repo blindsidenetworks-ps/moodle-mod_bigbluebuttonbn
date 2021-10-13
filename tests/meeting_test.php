@@ -160,11 +160,13 @@ class meeting_test extends \advanced_testcase {
      *
      * @param int $type
      * @param string $groupname
-     * @param bool $canjoin
+     * @param int $groupmode
+     * @param array $canjoin
+     * @param array $dates
      * @dataProvider get_instance_types_meeting_info
      * @covers ::can_join
      */
-    public function test_can_join(int $type, $groupname, $groupmode, $canjoin) {
+    public function test_can_join(int $type, ?string $groupname, int $groupmode, array $canjoin) {
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname, $groupmode);
         $this->setUser($useringroup);
         $meeting->update_cache();
@@ -180,8 +182,69 @@ class meeting_test extends \advanced_testcase {
         }
     }
 
-    protected function prepare_meeting(int $type, $groupname, $groupmode = SEPARATEGROUPS, $createmeeting = true) {
+    /**
+     * Test for get meeting info
+     *
+     * @param int $type
+     * @param string $groupname
+     * @param int $groupmode
+     * @param array $canjoin
+     * @param array $dates
+     * @throws \coding_exception
+     * @dataProvider get_data_can_join_with_dates
+     * @covers ::can_join
+     */
+    public function test_can_join_with_dates(int $type, ?string $groupname, int $groupmode, array $canjoin, array $dates) {
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
+            $this->prepare_meeting($type, $groupname, $groupmode, true, $dates);
+        $this->setUser($useringroup);
+        $meeting->update_cache();
+        $this->assertEquals($canjoin['useringroup'], $meeting->can_join());
+        if ($groupname) {
+            $this->setUser($usernotingroup);
+            $meeting->update_cache();
+            $this->assertEquals($canjoin['usernotingroup'], $meeting->can_join());
+        }
+    }
+
+    /**
+     * Get a list of possible test (dataprovider)
+     *
+     * @return array[]
+     */
+    public function get_data_can_join_with_dates(): array {
+        return [
+            'Instance Type ALL - No Group - Closed in past' => [
+                'type' => instance::TYPE_ALL,
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
+                'dates' => ['openingtime' => time() - 7200, 'closingtime' => time() - 3600]
+            ],
+            'Instance Type ALL - No Group - Open in future' => [
+                'type' => instance::TYPE_ALL,
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
+                'dates' => ['openingtime' => time() + 3600, 'closingtime' => time() + 7200]
+            ],
+        ];
+    }
+
+    /**
+     * Helper to prepare for a meeting
+     *
+     * @param int $type
+     * @param string $groupname
+     * @param int $groupmode
+     * @param bool $createmeeting
+     * @return array
+     * @throws \coding_exception
+     */
+    protected function prepare_meeting(int $type, ?string $groupname, $groupmode = SEPARATEGROUPS, $createmeeting = true,
+        $dates = []) {
         $this->resetAfterTest();
+        $this->setAdminUser();
         $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         $groupid = 0;
         $useringroup = $this->getDataGenerator()->create_and_enrol($this->get_course());
@@ -194,6 +257,9 @@ class meeting_test extends \advanced_testcase {
             'course' => $this->get_course()->id,
             'type' => $type
         ];
+        if ($dates) {
+            $meetinginfo = array_merge($meetinginfo, $dates);
+        };
         $activity = $bbbgenerator->create_instance($meetinginfo, ['groupmode' => $groupmode]);
         $instance = instance::get_from_instanceid($activity->id);
         if ($groupid) {
