@@ -226,7 +226,6 @@ class meeting {
             'ismoderator' => $instance->is_moderator(),
             'joinurl' => $instance->get_join_url()->out(),
             'userlimit' => $instance->get_user_limit(),
-            'group' => $instance->get_group_id(),
             'presentations' => [],
         ];
         if ($instance->get_instance_var('openingtime')) {
@@ -261,8 +260,8 @@ class meeting {
                 $meetinginfo->canjoin = true;
             }
         }
-        if ($instance->is_currently_open() && $instance->user_can_force_join()) {
-            $meetinginfo->canjoin = true;
+        if (!($instance->is_currently_open() || $instance->user_can_force_join())) {
+            $meetinginfo->canjoin = false;
         }
         // Double check that the user has the capabilities to join.
         $meetinginfo->canjoin = $meetinginfo->canjoin && $instance->can_join();

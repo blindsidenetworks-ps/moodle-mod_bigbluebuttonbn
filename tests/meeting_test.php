@@ -46,8 +46,10 @@ class meeting_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->initialise_mock_server();
-        $this->course = $this->getDataGenerator()->create_course(['groupmodeforce' => true, 'groupmode' => VISIBLEGROUPS]);
-        $this->getDataGenerator()->create_group(['G1', 'courseid' => $this->course->id]);
+        // We do not force the group mode so we can change the activity group mode during test.
+        $this->course = $this->getDataGenerator()->create_course(['groupmode' => SEPARATEGROUPS]);
+        $this->getDataGenerator()->create_group(['name' => 'G1', 'courseid' => $this->course->id]);
+        $this->getDataGenerator()->create_group(['name' => 'G2', 'courseid' => $this->course->id]);
     }
 
     /**
@@ -59,19 +61,51 @@ class meeting_test extends \advanced_testcase {
         return [
             'Instance Type ALL - No Group' => [
                 'type' => instance::TYPE_ALL,
-                'groupname' => null
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => true],
             ],
-            'Instance Type ALL - Group 1' => [
+            'Instance Type ALL - Group 1 - Visible groups' => [
                 'type' => instance::TYPE_ALL,
-                'groupname' => 'G1'
+                'groupname' => 'G1',
+                'groupmode' => VISIBLEGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => true],
+            ],
+            'Instance Type ALL - Group 1 - Separate groups' => [
+                'type' => instance::TYPE_ALL,
+                'groupname' => 'G1',
+                'groupmode' => SEPARATEGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => false],
             ],
             'Instance Type ROOM Only - No Group' => [
                 'type' => instance::TYPE_ROOM_ONLY,
-                'groupname' => null
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => true],
             ],
-            'Instance Type ROOM Only - Group 1' => [
+            'Instance Type ROOM Only - Group 1 - Visible groups' => [
                 'type' => instance::TYPE_ROOM_ONLY,
-                'groupname' => 'G1'
+                'groupname' => 'G1',
+                'groupmode' => VISIBLEGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => true],
+            ],
+            'Instance Type ROOM Only - Group 1 - Separate groups' => [
+                'type' => instance::TYPE_ROOM_ONLY,
+                'groupname' => 'G1',
+                'groupmode' => SEPARATEGROUPS,
+                'canjoin' => ['useringroup' => true, 'usernotingroup' => false],
+            ],
+            'Instance Type Recording Only - No Group' => [
+                'type' => instance::TYPE_RECORDING_ONLY,
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false]
+            ],
+            'Instance Type Recording Only - Group 1' => [
+                'type' => instance::TYPE_RECORDING_ONLY,
+                'groupname' => 'G1',
+                'groupmode' => VISIBLEGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false]
             ]
         ];
     }
@@ -87,20 +121,8 @@ class meeting_test extends \advanced_testcase {
      * @covers ::create_meeting_metadata
      */
     public function test_create_meeting(int $type, $groupname) {
-        $this->resetAfterTest();
-        $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-        // Create the meetings on the mock server, so like this we can find the recordings.
-        $groupid = 0;
-        if ($groupname) {
-            $groupid = groups_get_group_by_name($this->get_course()->id, $groupname);
-        }
-        $activity = $bbbgenerator->create_instance([
-            'course' => $this->get_course()->id,
-            'type' => $type
-        ]);
-
-        $instance = instance::get_from_instanceid($activity->id);
-        $meeting = new meeting($instance);
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
+            $this->prepare_meeting($type, $groupname, SEPARATEGROUPS, false);
         $meeting->create_meeting();
         $meetinginfo = $meeting->get_meeting_info();
         $this->assertNotNull($meetinginfo);
@@ -109,7 +131,6 @@ class meeting_test extends \advanced_testcase {
         $this->assertStringContainsString("is ready", $meetinginfo->statusmessage);
         $this->assertEquals($groupid, $meetinginfo->groupid);
     }
-
 
     /**
      * Test for get meeting info
@@ -121,24 +142,7 @@ class meeting_test extends \advanced_testcase {
      * @covers ::do_get_meeting_info
      */
     public function test_get_meeting_info(int $type, $groupname) {
-        $this->resetAfterTest();
-        $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-        // Create the meetings on the mock server, so like this we can find the recordings.
-        $groupid = 0;
-        if ($groupname) {
-            $groupid = groups_get_group_by_name($this->get_course()->id, $groupname);
-        }
-        $activity = $bbbgenerator->create_instance([
-            'course' => $this->get_course()->id,
-            'type' => $type
-        ]);
-
-        $instance = instance::get_from_instanceid($activity->id);
-        $bbbgenerator->create_meeting([
-            'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
-        ]);
-        $meeting = new meeting($instance);
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname);
         $meetinginfo = $meeting->get_meeting_info();
         $this->assertNotNull($meetinginfo);
         $this->assertEquals($activity->id, $meetinginfo->bigbluebuttonbnid);
@@ -149,8 +153,126 @@ class meeting_test extends \advanced_testcase {
         $meeting->update_cache();
         $meetinginfo = $meeting->get_meeting_info();
         $this->assertFalse($meetinginfo->statusrunning);
-        $this->assertStringContainsString("can join the session", $meetinginfo->statusmessage);
     }
 
+    /**
+     * Test for get meeting info
+     *
+     * @param int $type
+     * @param string $groupname
+     * @param int $groupmode
+     * @param array $canjoin
+     * @param array $dates
+     * @dataProvider get_instance_types_meeting_info
+     * @covers ::can_join
+     */
+    public function test_can_join(int $type, ?string $groupname, int $groupmode, array $canjoin) {
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname, $groupmode);
+        $this->setUser($useringroup);
+        $meeting->update_cache();
+        $this->assertEquals($canjoin['useringroup'], $meeting->can_join());
+        if ($meeting->can_join()) {
+            $meetinginfo = $meeting->get_meeting_info();
+            $this->assertStringContainsString("This conference is in progress", $meetinginfo->statusmessage);
+        }
+        if ($groupname) {
+            $this->setUser($usernotingroup);
+            $meeting->update_cache();
+            $this->assertEquals($canjoin['usernotingroup'], $meeting->can_join());
+        }
+    }
 
+    /**
+     * Test for get meeting info
+     *
+     * @param int $type
+     * @param string $groupname
+     * @param int $groupmode
+     * @param array $canjoin
+     * @param array $dates
+     * @throws \coding_exception
+     * @dataProvider get_data_can_join_with_dates
+     * @covers ::can_join
+     */
+    public function test_can_join_with_dates(int $type, ?string $groupname, int $groupmode, array $canjoin, array $dates) {
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
+            $this->prepare_meeting($type, $groupname, $groupmode, true, $dates);
+        $this->setUser($useringroup);
+        $meeting->update_cache();
+        $this->assertEquals($canjoin['useringroup'], $meeting->can_join());
+        if ($groupname) {
+            $this->setUser($usernotingroup);
+            $meeting->update_cache();
+            $this->assertEquals($canjoin['usernotingroup'], $meeting->can_join());
+        }
+    }
+
+    /**
+     * Get a list of possible test (dataprovider)
+     *
+     * @return array[]
+     */
+    public function get_data_can_join_with_dates(): array {
+        return [
+            'Instance Type ALL - No Group - Closed in past' => [
+                'type' => instance::TYPE_ALL,
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
+                'dates' => ['openingtime' => time() - 7200, 'closingtime' => time() - 3600]
+            ],
+            'Instance Type ALL - No Group - Open in future' => [
+                'type' => instance::TYPE_ALL,
+                'groupname' => null,
+                'groupmode' => NOGROUPS,
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
+                'dates' => ['openingtime' => time() + 3600, 'closingtime' => time() + 7200]
+            ],
+        ];
+    }
+
+    /**
+     * Helper to prepare for a meeting
+     *
+     * @param int $type
+     * @param string $groupname
+     * @param int $groupmode
+     * @param bool $createmeeting
+     * @return array
+     * @throws \coding_exception
+     */
+    protected function prepare_meeting(int $type, ?string $groupname, $groupmode = SEPARATEGROUPS, $createmeeting = true,
+        $dates = []) {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
+        $groupid = 0;
+        $useringroup = $this->getDataGenerator()->create_and_enrol($this->get_course());
+        $usernotingroup = $this->getDataGenerator()->create_and_enrol($this->get_course());
+        if (!empty($groupname)) {
+            $groupid = groups_get_group_by_name($this->get_course()->id, $groupname);
+            $this->getDataGenerator()->create_group_member(array('groupid' => $groupid, 'userid' => $useringroup->id));
+        }
+        $meetinginfo = [
+            'course' => $this->get_course()->id,
+            'type' => $type
+        ];
+        if ($dates) {
+            $meetinginfo = array_merge($meetinginfo, $dates);
+        };
+        $activity = $bbbgenerator->create_instance($meetinginfo, ['groupmode' => $groupmode]);
+        $instance = instance::get_from_instanceid($activity->id);
+        if ($groupid) {
+            $instance->set_group_id($groupid);
+        }
+        if ($createmeeting) {
+            // Create the meetings on the mock server, so we can join it as a simple user.
+            $bbbgenerator->create_meeting([
+                'instanceid' => $instance->get_instance_id(),
+                'groupid' => $instance->get_group_id()
+            ]);
+        }
+        $meeting = new meeting($instance);
+        return [$meeting, $useringroup, $usernotingroup, $groupid, $activity];
+    }
 }

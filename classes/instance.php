@@ -592,12 +592,21 @@ EOF;
     }
 
     /**
-     * Whether this user can jin the conference.
+     * Whether this user can join the conference.
+     *
+     * This checks the user right for access against capabilities and group membership
      *
      * @return bool
      */
     public function can_join(): bool {
-        return has_any_capability(['moodle/category:manage', 'mod/bigbluebuttonbn:join'], $this->get_context());
+        global $USER;
+        $groupid = $this->get_group_id();
+        $context = $this->get_context();
+        $inrightgroup = !$groupid || $this->user_has_group_access($USER, $groupid);
+        $hascapability = has_capability('moodle/category:manage', $context)
+            || (has_capability('mod/bigbluebuttonbn:join', $context) && $inrightgroup);
+        $canjoin = $this->get_type() != self::TYPE_RECORDING_ONLY && $hascapability; // Room only cannot be joined ever.
+        return $canjoin;
     }
 
     /**
@@ -1105,14 +1114,14 @@ EOF;
     }
 
     /**
-     * If this is a valid group for this user/instance, then set this instance to this group
+     * Check if this is a valid group for this user/instance,
      *
      *
      * @param stdClass $user
      * @param int $groupid
      * @return bool
      */
-    public function validate_and_set_group($user, $groupid) {
+    public function user_has_group_access($user, $groupid) {
         $cm = $this->get_cm();
         $context = $this->get_context();
         // Then validate group.
@@ -1130,7 +1139,6 @@ EOF;
             if (!groups_group_visible($groupid, $this->get_course(), $this->get_cm())) {
                 return false;
             }
-            $this->set_group_id($groupid);
         }
         return true;
     }

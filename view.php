@@ -76,7 +76,7 @@ $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
 // Validate if the user is in a role allowed to join.
-if (!$instance->can_join()) {
+if (!$instance->can_join() && $instance->get_type() != instance::TYPE_RECORDING_ONLY) {
     // TODO Consider using \core\notification::add('message', \core\notification::ERROR);
     // Combined with a redirect() to the course homepage.
     echo $OUTPUT->header();

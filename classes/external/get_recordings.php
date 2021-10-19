@@ -101,9 +101,11 @@ class get_recordings extends external_api {
             $context = $instance->get_context();
             // Validate that the user has access to this activity.
             self::validate_context($context);
-            $isvalidgroup = $instance->validate_and_set_group($USER, $groupid);
-            if (!$isvalidgroup) {
+            if (!$instance->user_has_group_access($USER, $groupid)) {
                 new restricted_context_exception();
+            }
+            if ($groupid) {
+                $instance->set_group_id($groupid);
             }
             $recordings = $instance->get_recordings([], $instance->get_instance_var('recordings_deleted'));
             $tabledata = recording_data::get_recording_table($recordings, $tools, $instance);
