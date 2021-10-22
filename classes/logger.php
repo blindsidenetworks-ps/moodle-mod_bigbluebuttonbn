@@ -16,9 +16,7 @@
 
 namespace mod_bigbluebuttonbn;
 
-use context_module;
 use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\instance;
 use stdClass;
 
 /**
@@ -72,22 +70,126 @@ class logger {
 
     /** @var int The user accessed the session from Index */
     public const ORIGIN_INDEX = 2;
+
     /**
-     * Get the user summary logs for the specified user in the named instance.
+     * Get the user event logs related to completion, for the specified user in the named instance.
      *
      * @param instance $instance
-     * @param int $userid
+     * @param int|null $userid
+     * @param array|null $filters
+     * @param int|null $timestart
      * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public static function get_user_summary_logs(instance $instance, int $userid): array {
+    public static function get_user_completion_logs(
+        instance $instance,
+        ?int $userid,
+        ?array $filters,
+        ?int $timestart = 0
+    ): array {
+        global $DB;
+        $filters = $filters ?? [self::EVENT_JOIN, self::EVENT_PLAYED, self::EVENT_SUMMARY];
+        [$wheresql, $params] = static::get_user_completion_sql_params($instance, $userid, $filters, $timestart);
+        return $DB->get_records_select('bigbluebuttonbn_logs', $wheresql, $params);
+    }
+
+    /**
+     * Get the user event logs related to completion, for the specified user in the named instance.
+     *
+     * @param instance $instance
+     * @param int|null $userid
+     * @param array|null $filters
+     * @param int|null $timestart
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_user_completion_logs_with_userfields(
+        instance $instance,
+        ?int $userid,
+        ?array $filters,
+        ?int $timestart = 0
+    ): array {
+        global $DB;
+        $filters = $filters ?? [self::EVENT_JOIN, self::EVENT_PLAYED, self::EVENT_SUMMARY];
+        [$wheresql, $params] = static::get_user_completion_sql_params($instance, $userid, $filters, $timestart, 'l');
+        $userfieldsapi = \core_user\fields::for_userpic();
+        $userfields = $userfieldsapi->get_sql('u', false, '', 'userid', false)->selects;
+        $logtable = new \core\dml\table('bigbluebuttonbn_logs', 'l', '');
+        $logtableselect = $logtable->get_field_select();
+        $logtablefrom = $logtable->get_from_sql();
+        $usertable = new \core\dml\table('user', 'u', '');
+        $usertablefrom = $usertable->get_from_sql();
+        $sql = <<<EOF
+            SELECT {$logtableselect}, {$userfields}
+              FROM {$logtablefrom}
+        INNER JOIN {$usertablefrom} ON u.id = l.userid
+             WHERE $wheresql
+EOF;
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
+     * Get the latest timestamp for any event logs related to completion, for the specified user in the named instance.
+     *
+     * @param instance $instance
+     * @param int|null $userid
+     * @param array|null $filters
+     * @param int|null $timestart
+     * @return int
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_user_completion_logs_max_timestamp(
+        instance $instance,
+        ?int $userid,
+        ?array $filters,
+        ?int $timestart = 0
+    ): int {
         global $DB;
 
-        $wheresql = 'bigbluebuttonbnid = :instanceid AND userid = :userid AND log = :eventtype';
-        return $DB->get_records_select('bigbluebuttonbn_logs', $wheresql, [
-            'instanceid' => $instance->get_instance_id(),
-            'userid' => $userid,
-            'eventtype' => self::EVENT_SUMMARY,
-        ]);
+        [$wheresql, $params] = static::get_user_completion_sql_params($instance, $userid, $filters, $timestart);
+        $select = "SELECT MAX(timecreated) ";
+        $lastlogtime = $DB->get_field_sql($select . ' FROM {bigbluebuttonbn_logs} WHERE ' . $wheresql, $params);
+        return $lastlogtime;
+    }
+
+    /**
+     * Helper method to get the right SQL query for completion
+     *
+     * @param instance $instance
+     * @param int|null $userid
+     * @param array|null $filters
+     * @param int|null $timestart
+     * @param string|null $logtablealias
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    protected static function get_user_completion_sql_params(instance $instance, ?int $userid, ?array $filters, ?int $timestart,
+        ?string $logtablealias = null) {
+        global $DB;
+        $filters = $filters ?? [self::EVENT_JOIN, self::EVENT_PLAYED, self::EVENT_SUMMARY];
+        [$insql, $params] = $DB->get_in_or_equal($filters, SQL_PARAMS_NAMED);
+        $wheres = [];
+        $wheres['bigbluebuttonbnid'] = '= :instanceid';
+        if ($timestart) {
+            $wheres['timecreated'] = ' > :timestart';
+            $params['timestart'] = $timestart;
+        }
+        if ($userid) {
+            $wheres['userid'] = ' = :userid';
+            $params['userid'] = $userid;
+        }
+        $params['instanceid'] = $instance->get_instance_id();
+        $wheres['log'] = " $insql";
+        $wheresqls = [];
+        foreach ($wheres as $key => $val) {
+            $prefix = !empty($logtablealias) ? "$logtablealias." : "";
+            $wheresqls[] = "$prefix$key $val";
+        }
+        return [join(' AND ', $wheresqls), $params];
     }
 
     /**
@@ -242,10 +344,10 @@ class logger {
      * @param instance $instance
      * @param string $event
      * @param array $overrides
-     * @param string $meta
+     * @param string|null $meta
      * @return bool
      */
-    protected static function log(instance $instance, $event, array $overrides = [], ?string $meta = null): bool {
+    protected static function log(instance $instance, string $event, array $overrides = [], ?string $meta = null): bool {
         return self::raw_log(
             $event,
             $instance->get_instance_id(),
@@ -264,8 +366,9 @@ class logger {
      * @param int $courseid
      * @param string $meetingid
      * @param array $overrides
-     * @param string $meta
+     * @param string|null $meta
      * @return bool
+     * @throws \dml_exception
      */
     protected static function raw_log(
         string $event,
@@ -298,9 +401,7 @@ class logger {
      * @param string $type
      * @param array $options [timecreated, userid, other]
      */
-    protected static function log_moodle_event(instance $instance, string $type, $options = []): void {
-        global $DB;
-
+    protected static function log_moodle_event(instance $instance, string $type, array $options = []): void {
         if (!in_array($type, \mod_bigbluebuttonbn\event\events::$events)) {
             // No log will be created.
             return;
@@ -337,20 +438,23 @@ class logger {
      * @param string $callbacktype
      * @return int
      */
-    protected static function count_callback_events($recordid, $callbacktype = 'recording_ready') {
+    protected static function count_callback_events(string $recordid, string $callbacktype = 'recording_ready'): int {
         global $DB;
         $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
         // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
         if ($callbacktype == 'recording_ready') {
             $sql .= ' AND (meta LIKE ? OR meta NOT LIKE ? )';
             $count =
-                $DB->count_records_sql($sql, array(self::EVENT_CALLBACK, '%recordid%', "%$recordid%",
-                    $callbacktype, 'callback'));
+                $DB->count_records_sql($sql, [
+                    self::EVENT_CALLBACK, '%recordid%',
+                    "%$recordid%",
+                    $callbacktype, 'callback'
+                ]);
             return $count;
         }
         $sql .= ' AND meta LIKE ?;';
         $count = $DB->count_records_sql($sql,
-            array(self::EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"));
+            [self::EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"]);
         return $count;
     }
 }

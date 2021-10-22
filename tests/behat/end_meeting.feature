@@ -87,7 +87,7 @@ Feature: Test the ability to end a meeting
       | role:student  | student        | should     |
       | user:traverst | student        | should     |
 
-  Scenario: An administrator can always end a meeting
+  Scenario: An administrator can always end a meeting on the index page
     Given the following course exists:
       | name      | Test course |
       | shortname | C1          |

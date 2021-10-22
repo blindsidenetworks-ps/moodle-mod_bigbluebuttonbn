@@ -26,7 +26,6 @@
 
 use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\local\view;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -47,7 +46,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @throws moodle_exception
      */
     public function definition() {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $PAGE;
         $mform = &$this->_form;
 
         // Validates if the BigBlueButton server is running.
@@ -61,14 +60,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $bigbluebuttonbn = null;
         if ($this->current->id) {
-            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->current->id), '*', MUST_EXIST);
+            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $this->current->id], '*', MUST_EXIST);
         }
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\local\config::get_options();
 
         // Get only those that are allowed.
         // TODO: check as here it seems more logical to get this through: $this->_course.
-        $course = get_course($this->current->course);
+        $course = $this->_course;
         $context = context_course::instance($course->id);
 
         $instancetyperofiles = $this->get_instance_type_profiles();
@@ -94,7 +93,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
         $jsvars = [
             'instanceTypeDefault' => array_keys($instancetyperofiles)[0],
-        ];;
+        ];
 
         // Now add the instance type profiles to the form as a html hidden field.
         $mform->addElement('html', html_writer::div('', 'd-none', [
@@ -156,7 +155,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             try {
                 $draftitemid = file_get_submitted_draft_itemid('presentation');
                 file_prepare_draft_area($draftitemid, $this->context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
-                    array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true)
+                    ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1, 'mainfile' => true]
                 );
                 $defaultvalues['presentation'] = $draftitemid;
             } catch (Exception $e) {
@@ -176,7 +175,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      *
      * @param array $data
      * @param array $files
-     * @return void
+     * @return array
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
@@ -235,6 +234,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->createElement('advcheckbox', 'completionengagementemojis', '', $engagement['emojis'] . '&nbsp;&nbsp;'),
         ];
         $mform->addGroup($engagement['group'], 'completionengagementgroup', $engagement['grouplabel'], [' '], false);
+        $mform->addGroupRule('completionattendancegroup', [
+            'completionattendance' => [
+                [null, 'numeric', null, 'client']
+            ]
+        ]);
         $mform->addHelpButton('completionengagementgroup', 'completionengagementgroup', 'bigbluebuttonbn');
         $mform->disabledIf('completionengagementgroup', 'completionview', 'notchecked');
 
@@ -248,7 +252,12 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * @return bool True if one or more rules is enabled, false if none are.
      */
     public function completion_rule_enabled($data) {
-        return (!empty($data['completionattendanceenabled']) && $data['completionattendance'] != 0);
+        return (!empty($data['completionattendanceenabled']) && $data['completionattendance'] != 0)
+            || !empty($data['completionengagementchats'])
+            || !empty($data['completionengagementtalks'])
+            || !empty($data['completionengagementraisehand'])
+            || !empty($data['completionengagementpollvotes'])
+            || !empty($data['completionengagementemojis']);
     }
 
     /**
@@ -580,7 +589,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             $mform->addElement('header', 'preuploadpresentation',
                 get_string('mod_form_block_presentation', 'bigbluebuttonbn'));
             $mform->setExpanded('preuploadpresentation');
-            $filemanageroptions = array();
+            $filemanageroptions = [];
             $filemanageroptions['accepted_types'] = '*';
             $filemanageroptions['maxbytes'] = 0;
             $filemanageroptions['subdirs'] = 0;
@@ -638,15 +647,14 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     private function bigbluebuttonbn_mform_add_block_schedule(&$mform, &$activity) {
         $mform->addElement('header', 'schedule', get_string('mod_form_block_schedule', 'bigbluebuttonbn'));
-        if (isset($activity->openingtime) && $activity->openingtime != 0 ||
-            isset($activity->closingtime) && $activity->closingtime != 0) {
+        if (!empty($activity->openingtime) || !empty($activity->closingtime)) {
             $mform->setExpanded('schedule');
         }
         $mform->addElement('date_time_selector', 'openingtime',
-            get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), array('optional' => true));
+            get_string('mod_form_field_openingtime', 'bigbluebuttonbn'), ['optional' => true]);
         $mform->setDefault('openingtime', 0);
         $mform->addElement('date_time_selector', 'closingtime',
-            get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), array('optional' => true));
+            get_string('mod_form_field_closingtime', 'bigbluebuttonbn'), ['optional' => true]);
         $mform->setDefault('closingtime', 0);
     }
 

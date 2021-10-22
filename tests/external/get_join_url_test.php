@@ -141,8 +141,8 @@ class get_join_url_test extends \externallib_advanced_testcase {
 
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $g1 = $generator->create_group(array('courseid' => $course->id));
-        $g2 = $generator->create_group(array('courseid' => $course->id));
+        $g1 = $generator->create_group(['courseid' => $course->id]);
+        $g2 = $generator->create_group(['courseid' => $course->id]);
         $record = $generator->create_module('bigbluebuttonbn', ['course' => $course->id]);
         $instance = instance::get_from_instanceid($record->id);
 

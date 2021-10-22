@@ -74,7 +74,7 @@ class import_view implements renderable, templatable {
         }
         $context = (object) [
             'bbbid' => $this->destinationinstance->get_instance_id(),
-            'has_recordings' => false,
+            'has_recordings' => true,
             'bbbsourceid' => 0
         ];
 
@@ -84,10 +84,8 @@ class import_view implements renderable, templatable {
                 'value' => ''
             ];
             $sourceinstance = instance::get_from_instanceid($this->sourceinstanceid);
-            if ($sourceinstance->is_type_recordings_only()) {
-                $context->has_recordings = true;
-            } else if ($sourceinstance->is_type_room_and_recordings()) {
-                $context->has_recordings = true;
+            if ($sourceinstance->is_type_room_only()) {
+                $context->has_recordings = false;
             }
             $context->bbbsourceid = $sourceinstance->get_instance_id();
         }
@@ -126,10 +124,6 @@ class import_view implements renderable, templatable {
             $context->bbb_select = $select->export_for_template($output);
         }
         $context->sourcecourseid = $this->sourcecourseid ?? 0;
-
-        if (empty($this->sourcecourseid) || empty($this->sourceinstanceid)) {
-            $context->has_recordings = true;
-        }
 
         // Course selector.
         $context->course_select = (new \single_select(

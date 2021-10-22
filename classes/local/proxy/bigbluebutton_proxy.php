@@ -16,21 +16,15 @@
 
 namespace mod_bigbluebuttonbn\local\proxy;
 
-use cache_store;
-use Exception;
 use cache;
 use completion_info;
+use Exception;
 use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
-use mod_bigbluebuttonbn\meeting;
-use mod_bigbluebuttonbn\plugin;
-use mod_bigbluebuttonbn\variable;
-use moodle_exception;
 use moodle_url;
-use stdClass;
 
 /**
  * The bigbluebutton proxy class.
@@ -52,9 +46,9 @@ class bigbluebutton_proxy extends proxy_base {
      * @param string $username
      * @param string $pw
      * @param string $logouturl
-     * @param string $configtoken
-     * @param string $userid
-     * @param string $createtime
+     * @param string|null $configtoken
+     * @param string|null $userid
+     * @param string|null $createtime
      *
      * @return string
      */
@@ -118,10 +112,10 @@ class bigbluebutton_proxy extends proxy_base {
     /**
      * Helper for getting the owner userid of a bigbluebuttonbn instance.
      *
-     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
-     * @return integer ownerid (a valid user id or null if not registered/found)
+     * @param object $bigbluebuttonbn BigBlueButtonBN instance
+     * @return int ownerid (a valid user id or null if not registered/found)
      */
-    public static function get_instance_ownerid($bigbluebuttonbn) {
+    public static function get_instance_ownerid(object $bigbluebuttonbn): int {
         global $DB;
 
         $filters = [
@@ -129,7 +123,7 @@ class bigbluebutton_proxy extends proxy_base {
             'log' => 'Add',
         ];
 
-        return (integer) $DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
+        return (int) $DB->get_field('bigbluebuttonbn_logs', 'userid', $filters);
     }
 
     /**
@@ -137,7 +131,7 @@ class bigbluebutton_proxy extends proxy_base {
      *
      * @param int $instance
      * @param int $voicebridge
-     * @return string
+     * @return bool
      */
     public static function is_voicebridge_number_unique(int $instance, int $voicebridge): bool {
         global $DB;
@@ -158,7 +152,7 @@ class bigbluebutton_proxy extends proxy_base {
      * Helper function validates a remote resource.
      *
      * @param string $url
-     * @return boolean
+     * @return bool
      */
     public static function is_remote_resource_valid(string $url): bool {
         $urlhost = parse_url($url, PHP_URL_HOST);
@@ -203,18 +197,18 @@ class bigbluebutton_proxy extends proxy_base {
      * Helper function enqueues one user for being validated as for completion.
      *
      * @param object $bigbluebuttonbn
-     * @param string $userid
+     * @param int $userid
      * @return void
      */
-    public static function enqueue_completion_event($bigbluebuttonbn, $userid): void {
+    public static function enqueue_completion_event(object $bigbluebuttonbn, int $userid): void {
         try {
             // Create the instance of completion_update_state task.
             $task = new \mod_bigbluebuttonbn\task\completion_update_state();
             // Add custom data.
-            $data = array(
+            $data = [
                 'bigbluebuttonbn' => $bigbluebuttonbn,
                 'userid' => $userid,
-            );
+            ];
             $task->set_custom_data($data);
             // CONTRIB-7457: Task should be executed by a user, maybe Teacher as Student won't have rights for overriding.
             // $ task -> set_userid ( $ user -> id );.
@@ -229,10 +223,10 @@ class bigbluebutton_proxy extends proxy_base {
      * Helper function enqueues completion trigger.
      *
      * @param object $bigbluebuttonbn
-     * @param string $userid
+     * @param int $userid
      * @return void
      */
-    public static function update_completion_state($bigbluebuttonbn, $userid) {
+    public static function update_completion_state(object $bigbluebuttonbn, int $userid) {
         global $CFG;
         require_once($CFG->libdir . '/completionlib.php');
         list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
@@ -257,21 +251,27 @@ class bigbluebutton_proxy extends proxy_base {
      *
      * @return array
      */
-    public static function get_instance_type_profiles() {
-        $instanceprofiles = array(
-            instance::TYPE_ALL => array('id' => instance::TYPE_ALL,
+    public static function get_instance_type_profiles(): array {
+        $instanceprofiles = [
+            instance::TYPE_ALL => [
+                'id' => instance::TYPE_ALL,
                 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                'features' => array('all')),
-            instance::TYPE_ROOM_ONLY => array('id' => instance::TYPE_ROOM_ONLY,
+                'features' => ['all']
+            ],
+            instance::TYPE_ROOM_ONLY => [
+                'id' => instance::TYPE_ROOM_ONLY,
                 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
-                'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
+                'features' => ['showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                     'recording', 'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                     'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                    'completionattendance', 'completionengagement', 'availabilityconditionsheader')),
-            instance::TYPE_RECORDING_ONLY => array('id' => instance::TYPE_RECORDING_ONLY,
+                    'completionattendance', 'completionengagement', 'availabilityconditionsheader']
+            ],
+            instance::TYPE_RECORDING_ONLY => [
+                'id' => instance::TYPE_RECORDING_ONLY,
                 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
-                'features' => array('showrecordings', 'importrecordings', 'availabilityconditionsheader')),
-        );
+                'features' => ['showrecordings', 'importrecordings', 'availabilityconditionsheader']
+            ],
+        ];
         return $instanceprofiles;
     }
 
@@ -279,12 +279,12 @@ class bigbluebutton_proxy extends proxy_base {
      * Helper function returns an array with the profiles (with features per profile) for the different types
      * of bigbluebuttonbn instances that the user is allowed to create.
      *
-     * @param boolean $room
-     * @param boolean $recording
+     * @param bool $room
+     * @param bool $recording
      *
      * @return array
      */
-    public static function get_instance_type_profiles_create_allowed($room, $recording) {
+    public static function get_instance_type_profiles_create_allowed(bool $room, bool $recording): array {
         $profiles = self::get_instance_type_profiles();
         if (!$room) {
             unset($profiles[instance::TYPE_ROOM_ONLY]);
@@ -305,8 +305,8 @@ class bigbluebutton_proxy extends proxy_base {
      *
      * @return array
      */
-    public static function get_instance_profiles_array($profiles = []) {
-        $profilesarray = array();
+    public static function get_instance_profiles_array(array $profiles = []): array {
+        $profilesarray = [];
         foreach ($profiles as $key => $profile) {
             $profilesarray[$profile['id']] = $profile['name'];
         }
@@ -319,7 +319,7 @@ class bigbluebutton_proxy extends proxy_base {
      * @param instance $instance
      * @return string
      */
-    public static function view_get_activity_status($instance) {
+    public static function view_get_activity_status(instance $instance): string {
         $now = time();
         if (!empty($instance->get_instance_var('openingtime')) && $now < $instance->get_instance_var('openingtime')) {
             // The activity has not been opened.
@@ -396,8 +396,8 @@ class bigbluebutton_proxy extends proxy_base {
      *
      * @param array $data
      * @param array $metadata
-     * @param null $presentationname
-     * @param null $presentationurl
+     * @param string|null $presentationname
+     * @param string|null $presentationurl
      * @return array
      * @throws bigbluebutton_exception
      * @throws server_not_available_exception
@@ -464,7 +464,7 @@ class bigbluebutton_proxy extends proxy_base {
     /**
      * Helper evaluates if the bigbluebutton server used belongs to blindsidenetworks domain.
      *
-     * @return boolean
+     * @return bool
      */
     public static function is_bn_server() {
         if (config::get('bn_server')) {

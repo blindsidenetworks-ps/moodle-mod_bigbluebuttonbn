@@ -30,7 +30,7 @@ use mod_bigbluebuttonbn\output\index;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__.'/../../config.php');
-
+global $PAGE, $OUTPUT;
 $id = required_param('id', PARAM_INT);
 $course = get_course($id);
 require_login($course, true);
@@ -45,11 +45,10 @@ $PAGE->navbar->add($PAGE->title, $PAGE->url);
 
 $instances = instance::get_all_instances_in_course($course->id);
 if (empty($instances)) {
-    \core\notification::add(
+    notification::add(
         get_string('index_error_noinstances', plugin::COMPONENT),
-        \core\notification::ERROR
+        notification::ERROR
     );
-
     redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
 }
 

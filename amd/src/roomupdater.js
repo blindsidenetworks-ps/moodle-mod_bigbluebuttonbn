@@ -39,7 +39,6 @@ const resetValues = () => {
 };
 
 /**
-<<<<<<< HEAD
  * Start the information poller.
  */
 export const start = () => {
@@ -87,17 +86,15 @@ const poll = () => {
 };
 
 /**
- * Update the room informatino.
+ * Update the room information.
  *
- * @param {Bool} [updatecache=false]
+ * @param {boolean} [updatecache=false]
  * @returns {Promise}
  */
 export const updateRoom = (updatecache = false) => {
     const bbbRoomViewElement = document.getElementById('bbb-room-view');
     const bbbId = bbbRoomViewElement.dataset.bbbId;
     const groupId = bbbRoomViewElement.dataset.groupId;
-
-    // TODO only update the summary info. Do not replace the buttons, ever.
     return getMeetingInfo(bbbId, groupId, updatecache)
         .then(data => Templates.renderForPromise('mod_bigbluebuttonbn/room_view', data))
         .then(({html, js}) => Templates.replaceNodeContents(bbbRoomViewElement, html, js))

@@ -21,7 +21,6 @@ use admin_setting;
 use admin_setting_configcheckbox;
 use admin_setting_configmultiselect;
 use admin_setting_configpasswordunmask;
-use admin_setting_configselect;
 use admin_setting_configstoredfile;
 use admin_setting_configtext;
 use admin_setting_configtextarea;
@@ -31,7 +30,6 @@ use cache_helper;
 use lang_string;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
-use mod_bigbluebuttonbn\recording;
 
 /**
  * The mod_bigbluebuttonbn settings helper
@@ -75,7 +73,7 @@ class settings {
 
         $admin->add('modsettings', $modbigbluebuttobnfolder);
 
-        $mainsettings = $this->add_general_settings($categoryname);
+        $mainsettings = $this->add_general_settings();
         $admin->add($categoryname, $mainsettings);
     }
 
@@ -230,7 +228,6 @@ class settings {
                 $item,
                 $recordingsetting
             );
-            $recordingsetting->add($item);
             $item = new admin_setting_configtext(
                 'bigbluebuttonbn_recording_refresh_period',
                 get_string('config_recording_refresh_period', 'bigbluebuttonbn'),
@@ -629,7 +626,7 @@ class settings {
                 $preuploadsettings
             );
             // Note: checks on curl library have been removed as it is a requirement from Moodle.
-            $filemanageroptions = array();
+            $filemanageroptions = [];
             $filemanageroptions['accepted_types'] = '*';
             $filemanageroptions['maxbytes'] = 0;
             $filemanageroptions['subdirs'] = 0;
@@ -718,7 +715,9 @@ class settings {
 
             // UI for 'participants' feature.
             $roles = roles::get_roles(null, false);
-            $owner = array('0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'));
+            $owner = [
+                '0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn')
+            ];
             $item = new admin_setting_configmultiselect(
                 'bigbluebuttonbn_participant_moderator_default',
                 get_string('config_participant_moderator_default', 'bigbluebuttonbn'),

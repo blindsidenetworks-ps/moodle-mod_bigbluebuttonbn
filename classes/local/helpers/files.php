@@ -49,12 +49,12 @@ class files {
      * @param stdClass $context context object
      * @param string $filearea file area
      *
-     * @return false|null false if file not valid
+     * @return bool|null false if file not valid
      */
-    public static function pluginfile_valid($context, $filearea) {
+    public static function pluginfile_valid(stdClass $context, string $filearea): ?bool {
 
         // Can be in context module or in context_system (if is the presentation by default).
-        if (!in_array($context->contextlevel, array(CONTEXT_MODULE, CONTEXT_SYSTEM))) {
+        if (!in_array($context->contextlevel, [CONTEXT_MODULE, CONTEXT_SYSTEM])) {
             return false;
         }
 
@@ -76,7 +76,7 @@ class files {
      *
      * @return \stored_file|bool
      */
-    public static function pluginfile_file($course, $cm, $context, $filearea, $args) {
+    public static function pluginfile_file(stdClass $course, \cm_info $cm, context $context, string $filearea, array $args) {
         $filename = self::get_plugin_filename($course, $cm, $context, $args);
         if (!$filename) {
             return false;
@@ -99,7 +99,7 @@ class files {
      * stores the file name/path
      * @return string
      */
-    public static function save_media_file(&$bigbluebuttonformdata) {
+    public static function save_media_file(object &$bigbluebuttonformdata): string {
         if (!isset($bigbluebuttonformdata->presentation) || $bigbluebuttonformdata->presentation == '') {
             return '';
         }
@@ -136,7 +136,7 @@ class files {
      * @param bool $withnonce add nonce to the url
      * @return array|null the representation of the presentation as an associative array
      */
-    public static function get_presentation($context, $presentation, $id = null, $withnonce = false): ?array {
+    public static function get_presentation(context $context, string $presentation, $id = null, $withnonce = false): ?array {
         global $CFG;
         $fs = get_file_storage();
         $files = [];
@@ -214,20 +214,20 @@ class files {
      * Helper for getting pluginfile name.
      *
      * @param object $course course object
-     * @param object $cm course module object
+     * @param \cm_info $cm course module object
      * @param context $context context object
      * @param array $args extra arguments
      *
-     * @return string|array|null
+     * @return string|null
      */
-    public static function get_plugin_filename($course, $cm, $context, $args) {
+    public static function get_plugin_filename(object $course, \cm_info $cm, context $context, array $args): ?string {
         global $DB;
         if ($context->contextlevel != CONTEXT_SYSTEM) {
             // Plugin has a file to use as default in general setting.
             // The difference with the standard bigbluebuttonbn_pluginfile_filename() are.
             // - Context is system, so we don't need to check the cmid in this case.
             // - The area is "presentationdefault_cache".
-            if (!$DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
+            if (!$DB->get_record('bigbluebuttonbn', ['id' => $cm->instance])) {
                 return null;
             }
         }
@@ -259,7 +259,7 @@ class files {
      * @return int
      * @throws \coding_exception
      */
-    protected static function get_nonce($id) {
+    protected static function get_nonce(int $id): int {
         $cache = static::get_nonce_cache();
         $pnoncekey = sha1($id);
         $existingnoncedata = $cache->get($pnoncekey);
@@ -281,7 +281,7 @@ class files {
      * @param int $id
      * @return int
      */
-    protected static function generate_nonce($id) {
+    protected static function generate_nonce($id): int {
         $cache = static::get_nonce_cache();
         $pnoncekey = sha1($id);
         // The item id was adapted for granting public access to the presentation once in order to allow BigBlueButton to gather
@@ -308,11 +308,10 @@ class files {
      * Returns an array of file areas.
      *
      * @return array a list of available file areas
-     * @category files
      *
      */
-    protected static function get_file_areas() {
-        $areas = array();
+    protected static function get_file_areas(): array {
+        $areas = [];
         $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
         $areas['presentationdefault'] = get_string('mod_form_block_presentation_default', 'bigbluebuttonbn');
         return $areas;

@@ -74,7 +74,6 @@ class can_join extends external_api {
 
         $result = [
             'can_join' => false,
-            'message' => '',
             'cmid' => $cmid,
         ];
 
@@ -106,7 +105,6 @@ class can_join extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'can_join' => new external_value(PARAM_BOOL, 'Can join session'),
-            'message' => new external_value(PARAM_RAW, 'Message if we cannot join', VALUE_OPTIONAL),
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
         ]);
     }

@@ -169,7 +169,7 @@ class recording extends persistent {
         if ($courseid) {
             $selects[] = "courseid = :courseid";
             $params['courseid'] = $courseid;
-            $course = $DB->get_record('course', array('id' => $courseid));
+            $course = $DB->get_record('course', ['id' => $courseid]);
             $groupmode = groups_get_course_groupmode($course);
             $context = context_course::instance($courseid);
         } else {
@@ -298,70 +298,70 @@ class recording extends persistent {
      * @return array
      */
     protected static function define_properties() {
-        return array(
-            'courseid' => array(
+        return [
+            'courseid' => [
                 'type' => PARAM_INT,
-            ),
-            'bigbluebuttonbnid' => array(
+            ],
+            'bigbluebuttonbnid' => [
                 'type' => PARAM_INT,
-            ),
-            'groupid' => array(
+            ],
+            'groupid' => [
                 'type' => PARAM_INT,
                 'null' => NULL_ALLOWED,
-            ),
-            'recordingid' => array(
+            ],
+            'recordingid' => [
                 'type' => PARAM_RAW,
-            ),
-            'headless' => array(
+            ],
+            'headless' => [
                 'type' => PARAM_BOOL,
-            ),
-            'imported' => array(
+            ],
+            'imported' => [
                 'type' => PARAM_BOOL,
-            ),
-            'status' => array(
+            ],
+            'status' => [
                 'type' => PARAM_INT,
-            ),
-            'importeddata' => array(
+            ],
+            'importeddata' => [
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
                 'default' => ''
-            ),
-            'name' => array(
+            ],
+            'name' => [
                 'type' => PARAM_TEXT,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-            'description' => array(
+            ],
+            'description' => [
                 'type' => PARAM_TEXT,
                 'null' => NULL_ALLOWED,
                 'default' => 0
-            ),
-            'protected' => array(
+            ],
+            'protected' => [
                 'type' => PARAM_BOOL,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-            'starttime' => array(
+            ],
+            'starttime' => [
                 'type' => PARAM_INT,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-            'endtime' => array(
+            ],
+            'endtime' => [
                 'type' => PARAM_INT,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-            'published' => array(
+            ],
+            'published' => [
                 'type' => PARAM_BOOL,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-            'playbacks' => array(
+            ],
+            'playbacks' => [
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
                 'default' => null
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -497,14 +497,14 @@ class recording extends persistent {
      * POSSIBLE_REMOTE_META_SOURCE match a field type and its metadataname (historical and current).
      */
     const POSSIBLE_REMOTE_META_SOURCE = [
-        'description' => array('meta_bbb-recording-description', 'meta_contextactivitydescription'),
-        'name' => array('meta_bbb-recording-name', 'meta_contextactivity', 'meetingName'),
-        'playbacks' => array('playbacks'),
-        'starttime' => array('startTime'),
-        'endtime' => array('endTime'),
-        'published' => array('published'),
-        'protected' => array('protected'),
-        'tags' => array('meta_bbb-recording-tags')
+        'description' => ['meta_bbb-recording-description', 'meta_contextactivitydescription'],
+        'name' => ['meta_bbb-recording-name', 'meta_contextactivity', 'meetingName'],
+        'playbacks' => ['playbacks'],
+        'starttime' => ['startTime'],
+        'endtime' => ['endTime'],
+        'published' => ['published'],
+        'protected' => ['protected'],
+        'tags' => ['meta_bbb-recording-tags']
     ];
 
     /**

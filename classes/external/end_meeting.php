@@ -23,10 +23,10 @@ use external_single_structure;
 use external_value;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\helpers\meeting_helper;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
-use moodle_exception;
 use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -95,14 +95,24 @@ class end_meeting extends external_api {
         }
         // Execute the end command.
         $meeting = new meeting($instance);
-        $meeting->end_meeting();
+        try {
+            $meeting->end_meeting();
+        } catch (bigbluebutton_exception $e) {
+            return [
+                'warnings' => [
+                    [
+                        'item' => $instance->get_meeting_name(),
+                        'itemid' => $instance->get_instance_id(),
+                        'warningcode' => 'notFound',
+                        'message' => $e->getMessage()
+                    ]
+                ]
+            ];
+        }
         logger::log_meeting_ended_event($instance);
-
         // Update the cache.
         $meeting->update_cache();
-
         notification::add(get_string('end_session_notification', 'mod_bigbluebuttonbn'), notification::INFO);
-
         return [];
     }
 
@@ -113,6 +123,8 @@ class end_meeting extends external_api {
      * @since Moodle 3.0
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure([]);
+        return new external_single_structure([
+            'warnings' => new \external_warnings()
+        ]);
     }
 }

@@ -46,56 +46,45 @@ class custom_completion extends activity_custom_completion {
         }
 
         // Default return value.
-        $value = false;
+        $value = COMPLETION_INCOMPLETE;
+        $filters = $rule != "completionview" ? [logger::EVENT_SUMMARY] : [logger::EVENT_JOIN, logger::EVENT_PLAYED];
+        $logs = logger::get_user_completion_logs($instance, $this->userid, $filters);
 
-        $logs = logger::get_user_summary_logs($instance, $this->userid);
-
-        switch ($rule) {
-            case 'completionattendance':
-                $value = $this->compute_state($logs, $rule, $instance, function($summary) {
-                    return $summary->data->duration;
-                });
-                break;
-            case 'completionengagementchats':
-            case 'completionengagementtalks':
-            case 'completionengagementraisehand':
-            case 'completionengagementpollvotes':
-            case 'completionengagementemojis':
-                $shortname = str_replace('completionengagement', '', $rule);
-                $value = $this->compute_state($logs, $rule, $instance, function($summary) use ($shortname) {
-                    return $summary->data->engagement->$shortname;
-                });
-                break;
+        if (method_exists($this, "get_{$rule}_value")) {
+            $valuecount = $this->count_actions($logs,  self::class."::get_{$rule}_value");
+            if ($valuecount) {
+                if (!is_null($instance->get_instance_var($rule))) {
+                    if ($instance->get_instance_var($rule) <= $valuecount) {
+                        $value = COMPLETION_COMPLETE;
+                    }
+                } else {
+                    // If there is at least a hit, we consider it as complete.
+                    $value = $valuecount ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
+                }
+            }
         }
-        return $value ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
-
+        return $value;
     }
 
     /**
      * Compute current state from logs.
      *
      * @param array $logs
-     * @param string $rulename
-     * @param instance $instance
-     * @param callable $summaryvaluegetter
-     * @return bool
+     * @param callable $logvaluegetter
+     * @return int the number of hits on this particular rule
      */
-    protected function compute_state(array $logs, string $rulename, instance $instance, $summaryvaluegetter) {
+    protected function count_actions(array $logs, callable $logvaluegetter): int {
         if (empty($logs)) {
             // As completion by engagement with $rulename hand was required, the activity hasn't been completed.
-            return false;
+            return 0;
         }
 
         $valuecount = 0;
         foreach ($logs as $log) {
-            $summary = json_decode($log->meta);
-            $valuecount += $summaryvaluegetter($summary);
+            $valuecount += $logvaluegetter($log);
         }
 
-        $value = isset($bigbluebuttonbn->$rulename);
-        $value = $value && ($instance->get_instance_var($rulename) <= $valuecount);
-
-        return $value;
+        return $valuecount;
     }
 
     /**
@@ -104,7 +93,8 @@ class custom_completion extends activity_custom_completion {
      * @return array
      */
     public static function get_defined_custom_rules(): array {
-        return ['completionattendance', 'completionengagementchats', 'completionengagementtalks'];
+        return ['completionattendance', 'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
+            'completionengagementpollvotes', 'completionengagementemojis'];
     }
 
     /**
@@ -120,17 +110,17 @@ class custom_completion extends activity_custom_completion {
         $completionengagementemojis = $this->cm->customdata['customcompletionrules']['completionengagementemojis'] ?? 0;
         $completionattendance = $this->cm->customdata['customcompletionrules']['completionattendance'] ?? 0;
         return [
-            'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
+            'completionengagementchats' => get_string('completionengagementchats_desc', 'mod_bigbluebuttonbn',
                 $completionengagementchats),
-            'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
+            'completionengagementtalks' => get_string('completionengagementtalks_desc', 'mod_bigbluebuttonbn',
                 $completionengagementtalks),
-            'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
+            'completionengagementraisehand' => get_string('completionengagementraisehand_desc', 'mod_bigbluebuttonbn',
                 $completionengagementraisehand),
-            'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
+            'completionengagementpollvotes' => get_string('completionengagementpollvotes_desc', 'mod_bigbluebuttonbn',
                 $completionengagementpollvotes),
-            'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
+            'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn',
                 $completionengagementemojis),
-            'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
+            'completionattendance' => get_string('completionattendance_desc', 'mod_bigbluebuttonbn',
                 $completionattendance),
         ];
     }
@@ -150,5 +140,148 @@ class custom_completion extends activity_custom_completion {
             'completionengagementemojis',
             'completionattendance',
         ];
+    }
+
+    /**
+     * Get current state in a  friendly version
+     *
+     * @param string $rule
+     * @return string
+     */
+    public function get_printable_state(string $rule): string {
+        // Get instance details.
+        $instance = instance::get_from_cmid($this->cm->id);
+
+        if (empty($instance)) {
+            throw new moodle_exception("Can't find bigbluebuttonbn instance {$this->cm->instance}");
+        }
+
+        $summary = "";
+        $filters = $rule != "completionview" ? [logger::EVENT_SUMMARY] : [logger::EVENT_JOIN, logger::EVENT_PLAYED];
+        $logs = logger::get_user_completion_logs($instance, $this->userid, $filters);
+
+        if (method_exists($this, "get_{$rule}_value")) {
+            $summary = get_string(
+                $rule . '_event_desc',
+                'mod_bigbluebuttonbn',
+                $this->count_actions($logs,  self::class."::get_{$rule}_value")
+            );
+        }
+        return $summary;
+    }
+    /**
+     * Get current state in a  friendly version
+     *
+     * @param string $rule
+     * @return string
+     */
+    public function get_last_log_timestamp(string $rule): string {
+        // Get instance details.
+        $instance = instance::get_from_cmid($this->cm->id);
+
+        if (empty($instance)) {
+            throw new moodle_exception("Can't find bigbluebuttonbn instance {$this->cm->instance}");
+        }
+        $filters = $rule != "completionview" ? [logger::EVENT_SUMMARY] : [logger::EVENT_JOIN, logger::EVENT_PLAYED];
+        return logger::get_user_completion_logs_max_timestamp($instance, $this->userid, $filters);
+    }
+
+    /**
+     * Fetches the list of custom completion rules that are being used by this activity module instance.
+     *
+     * @return array
+     */
+    public function get_available_custom_rules(): array {
+        $availablerules = parent::get_available_custom_rules();
+        $availablerules[] = 'completionview'; // Completion view is now a customrule.
+        return $availablerules;
+    }
+
+    /**
+     * Get completion view value
+     *
+     * This will override the usual completion value (see COMPLETION_CUSTOM_MODULE_FLOW)
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionview_value(object $log): int {
+        return $log->log == logger::EVENT_PLAYED || $log->log == logger::EVENT_JOIN;
+    }
+
+    /**
+     * Get attendance summary value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionattendance_value(object $log): int {
+        $summary = json_decode($log->meta);
+        if ($summary && !empty($summary->data->duration)) {
+            return COMPLETION_COMPLETE;
+        }
+        return COMPLETION_INCOMPLETE;
+    }
+
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionengagementchats_value(object $log):int {
+        return self::get_completionengagement_value($log, 'chats');
+    }
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionengagementtalks_value(object $log):int {
+        return self::get_completionengagement_value($log, 'talks');
+    }
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionengagementraisehand_value(object $log):int {
+        return self::get_completionengagement_value($log, 'raisehand');
+    }
+
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionengagementpollvotes_value(object $log):int {
+        return self::get_completionengagement_value($log, 'pollvotes');
+    }
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @return int
+     */
+    protected static function get_completionengagementemojis_value(object $log):int {
+        return self::get_completionengagement_value($log, 'emojis');
+    }
+
+    /**
+     * Get general completion engagement value
+     *
+     * @param object $log
+     * @param string $type
+     * @return int
+     */
+    protected static function get_completionengagement_value(object $log, string $type): int {
+        $summary = json_decode($log->meta);
+        if ($summary && !empty($summary->data->engagement->$type)) {
+            return COMPLETION_COMPLETE;
+        }
+        return COMPLETION_INCOMPLETE;
     }
 }

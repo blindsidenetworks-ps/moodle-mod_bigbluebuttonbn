@@ -23,7 +23,7 @@ namespace mod_bigbluebuttonbn\event;
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class bigbluebuttonbn_activity_management_viewed extends base {
+class activity_management_viewed extends base {
     /**
      * Init method.
      * @param string $crud
@@ -50,6 +50,6 @@ class bigbluebuttonbn_activity_management_viewed extends base {
      * @return array
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+        return ['db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn'];
     }
 }

@@ -109,7 +109,7 @@ class meeting {
         global $DB;
         do {
             $encodedseed = sha1(plugin::random_password(12));
-            $meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('meetingid' => $encodedseed));
+            $meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', ['meetingid' => $encodedseed]);
         } while ($meetingid == $encodedseed);
         return $encodedseed;
     }
@@ -173,11 +173,11 @@ class meeting {
         $response = bigbluebutton_proxy::create_meeting($data, $metadata, $presentationname, $presentationurl);
         // New recording management: Insert a recordingID that corresponds to the meeting created.
         if ($this->instance->is_recorded()) {
-            $recording = new recording(0, (object) array(
+            $recording = new recording(0, (object) [
                 'courseid' => $this->instance->get_course_id(),
                 'bigbluebuttonbnid' => $this->instance->get_instance_id(),
                 'recordingid' => $response['internalMeetingID'],
-                'groupid' => $this->instance->get_group_id())
+                'groupid' => $this->instance->get_group_id()]
             );
             $recording->create();
         }
@@ -229,10 +229,10 @@ class meeting {
             'presentations' => [],
         ];
         if ($instance->get_instance_var('openingtime')) {
-            $meetinginfo->openingtime = $instance->get_instance_var('openingtime');
+            $meetinginfo->openingtime = intval($instance->get_instance_var('openingtime'));
         }
         if ($instance->get_instance_var('closingtime')) {
-            $meetinginfo->closingtime = $instance->get_instance_var('closingtime');
+            $meetinginfo->closingtime = intval($instance->get_instance_var('closingtime'));
         }
         $activitystatus = bigbluebutton_proxy::view_get_activity_status($instance);
         // This might raise an exception if info cannot be retrieved.
@@ -253,7 +253,7 @@ class meeting {
         $meetinginfo->participantcount = $participantcount;
         $meetinginfo->canjoin = false;
 
-        if ($meetinginfo->statusrunning || !$instance->user_must_wait_to_join()) {
+        if (!$instance->user_must_wait_to_join() || $meetinginfo->statusrunning) {
             if (!$instance->has_user_limit_been_reached($participantcount)
                 || !$instance->does_current_user_count_towards_user_limit()
             ) {
@@ -287,8 +287,12 @@ class meeting {
             $meetinginfo->presentations[] = $presentation;
         }
         $meetinginfo->attendees = [];
-
-        $meetinginfo->attendees = $info['attendees'] ?? [];
+        if (!empty($info['attendees'])) {
+            // Make sure attendees is an array of object, not a simpleXML object.
+            foreach ($info['attendees'] as $attendee) {
+                $meetinginfo->attendees[] = (array) $attendee;
+            }
+        }
         return $meetinginfo;
     }
 
@@ -296,7 +300,7 @@ class meeting {
      * Gets a meeting info object cached or fetched from the live session.
      *
      * @param string $meetingid
-     * @param boolean $updatecache
+     * @param bool $updatecache
      *
      * @return array
      * @throws \coding_exception
@@ -312,10 +316,10 @@ class meeting {
             return (array) json_decode($result['meeting_info']);
         }
         $cache->delete($meetingid); // Make sure we purges the cache before checking info.
-        // Ping again and refresh the cache.
+        // Pings again and refreshes the cache.
         $meetinginfo = bigbluebutton_proxy::get_meeting_info($meetingid);
 
-        $cache->set($meetingid, array('creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)));
+        $cache->set($meetingid, ['creation_time' => time(), 'meeting_info' => json_encode($meetinginfo)]);
         return $meetinginfo;
     }
 
@@ -387,10 +391,10 @@ class meeting {
         // Special metadata for recording processing.
         if ((boolean) config::get('recordingstatus_enabled')) {
             $metadata["bn-recording-status"] = json_encode(
-                array(
-                    'email' => array('"' . fullname($USER) . '" <' . $USER->email . '>'),
+                [
+                    'email' => ['"' . fullname($USER) . '" <' . $USER->email . '>'],
                     'context' => $this->instance->get_view_url(),
-                )
+                ]
             );
         }
         if ((boolean) config::get('recordingready_enabled')) {
@@ -432,7 +436,7 @@ class meeting {
             $token = \Firebase\JWT\JWT::decode(
                 $authorization[1],
                 config::get('shared_secret'),
-                array('HS512')
+                ['HS512']
             );
 
             // Get JSON string from the body.

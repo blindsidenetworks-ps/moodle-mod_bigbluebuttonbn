@@ -45,7 +45,7 @@ trait testcase_helper_trait {
      * @param array $options Array of options to pass to the generator
      * @return array($context, $cm, $instance) Testable wrapper around the assign class.
      */
-    protected function create_instance($course = null, $params = [], $options = []) {
+    protected function create_instance(?object $course = null, array $params = [], array $options = []): array {
         if (!$course) {
             $course = $this->get_course();
         }
@@ -65,7 +65,7 @@ trait testcase_helper_trait {
      * @param object|null $course the course or null (taken from $this->get_course() if null)
      * @return mixed
      */
-    protected function get_form_data_from_instance($bbactivity, $course = null) {
+    protected function get_form_data_from_instance(object $bbactivity, ?object $course = null): object {
         global $USER;
 
         if (!$course) {
@@ -83,7 +83,7 @@ trait testcase_helper_trait {
      *
      * @return object|stdClass|null
      */
-    protected function get_course() {
+    protected function get_course(): object {
         if (!$this->course) {
             $this->course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         }
@@ -99,16 +99,17 @@ trait testcase_helper_trait {
      * @param int $groupsnum
      * @return array
      */
-    protected function setup_course_students_teachers($courserecord, $numstudents, $numteachers, $groupsnum) {
+    protected function setup_course_students_teachers(object $courserecord, int $numstudents, int $numteachers,
+        int $groupsnum): array {
         global $DB;
         $generator = $this->getDataGenerator();
         $course = $generator->create_course($courserecord);
         $groups = [];
         for ($i = 0; $i < $groupsnum; $i++) {
-            $groups[] = $generator->create_group(array('courseid' => $course->id));
+            $groups[] = $generator->create_group(['courseid' => $course->id]);
         }
-        $generator->create_group(array('courseid' => $course->id));
-        $generator->create_group(array('courseid' => $course->id));
+        $generator->create_group(['courseid' => $course->id]);
+        $generator->create_group(['courseid' => $course->id]);
 
         $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
 
@@ -131,11 +132,11 @@ trait testcase_helper_trait {
         }
         $bbactivity = $generator->create_module(
             'bigbluebuttonbn',
-            array('course' => $course->id),
+            ['course' => $course->id],
             ['visible' => true]);
 
         get_fast_modinfo(0, 0, true);
-        return array($course, $groups, $students, $teachers, $bbactivity, $roleids);
+        return [$course, $groups, $students, $teachers, $bbactivity, $roleids];
     }
 
     /**
@@ -158,7 +159,7 @@ trait testcase_helper_trait {
      * @return array
      * @throws \coding_exception
      */
-    protected function create_recordings_for_instance($instance, $recordingdata = []) {
+    protected function create_recordings_for_instance(instance $instance, array $recordingdata = []): array {
         $recordings = [];
         $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         // Create the meetings on the mock server, so like this we can find the recordings.
@@ -184,15 +185,13 @@ trait testcase_helper_trait {
     /**
      * Create an activity which includes a set of recordings.
      *
-     * @param stdClass $course
+     * @param object $course
      * @param int $type
      * @param array $recordingdata array of recording information
      * @param int $groupid
      * @return array
      */
-    protected function create_activity_with_recordings($course, int $type, array $recordingdata, $groupid = 0): array {
-        $this->resetAfterTest();
-
+    protected function create_activity_with_recordings(object $course, int $type, array $recordingdata, int $groupid = 0): array {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
 
         $activity = $generator->create_instance([
@@ -214,10 +213,11 @@ trait testcase_helper_trait {
      * Create a course, users and recording from dataset given in an array form
      *
      * @param array $dataset
+     * @return mixed
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    protected function create_from_dataset($dataset) {
+    protected function create_from_dataset(array $dataset) {
         list('type' => $type, 'recordingsdata' => $recordingsdata, 'groups' => $groups,
             'users' => $users) = $dataset;
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');

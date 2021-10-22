@@ -87,31 +87,39 @@ $string['privacy:metadata:bigbluebuttonbn_recordings'] = 'Stores metadata about 
 $string['privacy:metadata:bigbluebuttonbn_recordings:userid'] = 'The user ID of the user who last changed a recording.';
 
 $string['completionattendance'] = 'Student must attend the meeting for:';
-$string['completionattendancedesc'] = 'Student must attend the meeting and remain in the session for at least {$a} minute(s)';
+$string['completionattendance_desc'] = 'Student must attend the meeting and remain in the session for at least {$a} minute(s)';
+$string['completionattendance_event_desc'] = 'Student has attended the meeting or remained in the session for at least {$a} minute(s)';
 $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
-$string['completionengagementchats'] = 'Chat events';
-$string['completionengagementchatsdesc'] = '{$a} Chat events';
+$string['completionengagementchats'] = 'Require chats events';
+$string['completionengagementchats_desc'] = 'Student must take partipate into a chat to complete it';
+$string['completionengagementchats_event_desc'] = 'has raised {$a} Chat event(s)';
 $string['completionengagementtalks'] = 'Talk events';
-$string['completionengagementtalksdesc'] = '{$a} Talk events';
-$string['completionengagementtalktime'] = 'Talk time';
-$string['completionengagementraisehand'] = 'Raise hand events';
-$string['completionengagementraisehanddesc'] = '{$a} Raise Hands events';
+$string['completionengagementtalks_desc'] = 'Student must talk to complete it';
+$string['completionengagementtalks_event_desc'] = 'has raised {$a} Talk event(s)';
+$string['completionengagementraisehand'] = 'Require raise hand events';
+$string['completionengagementraisehand_desc'] = 'Student must trigger raise hands event to complete it';
+$string['completionengagementraisehand_event_desc'] = 'has raised {$a} Raise Hand event(s)';
 $string['completionengagementpollvotes'] = 'Poll votes';
-$string['completionengagementpollvotesdesc'] = '{$a} Poll votes events';
+$string['completionengagementpollvotes_desc'] = 'Student must vote into polls to complete it';
+$string['completionengagementpollvotes_event_desc'] = 'has raised {$a} Poll votes events';
 $string['completionengagementemojis'] = 'Emojis';
-$string['completionengagementemojisdesc'] = '{$a} Emojis events';
+$string['completionengagementemojis_desc'] = 'Student must send an emojis into polls to complete it';
+$string['completionengagementemojis_event_desc'] = 'has raised {$a} Emoji event(s)';
 
-$string['completionengagementdesc'] = 'Student must engage in activities during the meeting';
+$string['completionengagement_desc'] = 'Student must engage in activities during the meeting';
 $string['completionengagementgroup'] = 'Require engagement';
 $string['completionengagementgroup_help'] = 'Active participation during the session is required for completion';
 
-$string['completionupdatestate'] = "Completion update state";
-$string['completionvalidatestate'] = "Validate completion";
-$string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
+$string['completionupdatestate'] = 'Completion update state';
+$string['completionvalidatestate'] = 'Validate completion';
+$string['completionvalidatestatetriggered'] = 'Validate completion has been triggered.';
 
-$string['sendnotification'] = "Send notification";
+$string['completionview'] = 'Require view';
+$string['completionview_desc'] = 'Student must join a meeting or play a recording to complete it.';
+$string['completionview_event_desc'] = 'has joined the meeting or played a recording {$a} time(s).';
+$string['sendnotification'] = 'Send notification';
 
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';

@@ -29,7 +29,7 @@ class events {
      * Event name matcher.
      * @var $events
      */
-    public static $events = array(
+    public static $events = [
         'create' => 'activity_created',
         'view' => 'activity_viewed',
         'update' => 'activity_updated',
@@ -47,5 +47,5 @@ class events {
         'recording_edit' => 'recording_edited',
         'recording_play' => 'recording_viewed',
         'live_session' => 'live_session'
-    );
+    ];
 }

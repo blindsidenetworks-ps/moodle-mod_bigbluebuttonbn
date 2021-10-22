@@ -129,21 +129,12 @@ const fetchRecordingData = tableSelector => {
 };
 
 /**
- * Functions to manage the data table.
- *
- * @typedef dataTableFunctions
- * @property callable refreshTableData
- * @property callable filterByText
- * @property callable registerEventListeners
- */
-
-/**
  * Fetch the data table functinos for the specified table.
  *
  * @param {String} tableId in which we will display the table
  * @param {String} searchFormId The Id of the relate.
  * @param {Object} dataTable
- * @returns {dataTable}
+ * @returns {Object}
  * @private
  */
 const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
@@ -270,7 +261,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
 
         // If it has associated links imported in a different course/activity, show that in confirmation dialog.
         const associatedLinkCount = document.querySelector(`a#recording-${data.action}-${data.recordingid}`)?.dataset?.links;
-        if (!associatedLinkCount || associatedLinkCount == 0) {
+        if (!associatedLinkCount || associatedLinkCount === 0) {
             return confirmation;
         }
 
@@ -298,9 +289,7 @@ const getDataTableFunctions = (tableId, searchFormId, dataTable) => {
             const videoPlayer = window.open('', '_blank');
             videoPlayer.opener = null;
             videoPlayer.location.href = popoutLink.href;
-
-            // TODO repository.viewRecording(args); .
-
+            // TODO send a recording viewed event when this event will be implemented.
             return;
         }
 
@@ -386,17 +375,24 @@ const setupDatatable = (tableId, searchFormId, response) => {
         })
         .then(yuiInstance => {
             const tableData = getFormattedData(response);
-
+            yuiInstance.RecordsPaginatorView = Y.Base.create('my-paginator-view',yuiInstance.DataTable.Paginator.View, [],{
+                _modelChange : function (e) {
+                    var changed = e.changed,
+                        totalItems = (changed && changed.totalItems);
+                    if (totalItems) {
+                        this._updateControlsUI(e.target.get('page'));
+                    }
+                }
+            });
             const dataTable = new yuiInstance.DataTable({
+                paginatorView: "RecordsPaginatorView",
                 width: "1195px",
                 columns: recordingData.columns,
                 data: tableData,
                 rowsPerPage: 10,
-                paginatorLocation: ['header', 'footer']
+                paginatorLocation: ['header', 'footer'],
+                autoSync: true
             });
-            dataTable.set('currentData', dataTable.get('data'));
-            dataTable.set('currentFilter', '');
-
             return dataTable;
         })
         .then(dataTable => {
@@ -406,7 +402,6 @@ const setupDatatable = (tableId, searchFormId, response) => {
                 searchFormId,
                 dataTable);
             registerEventListeners();
-
             return dataTable;
         })
         .then(dataTable => {

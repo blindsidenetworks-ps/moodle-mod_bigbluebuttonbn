@@ -113,7 +113,7 @@ class get_recordings_to_import extends external_api {
         $sourceinstance = null;
         $sourcecourse = null;
         if ($sourcecourseid) {
-            $sourcecourse = $DB->get_record('course', array('id' => $sourcecourseid), '*', MUST_EXIST);
+            $sourcecourse = $DB->get_record('course', ['id' => $sourcecourseid], '*', MUST_EXIST);
         }
 
         if (!empty($sourcebigbluebuttonbnid)) {

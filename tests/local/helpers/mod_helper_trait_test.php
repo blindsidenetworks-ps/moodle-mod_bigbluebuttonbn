@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
+
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use mod_bigbluebuttonbn\instance;
@@ -39,10 +40,11 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  */
 class mod_helper_trait_test extends \advanced_testcase {
     use testcase_helper_trait;
+
     /**
      * Presave test
      */
-    public function test_bigbluebuttonbn_process_pre_save() {
+    public function test_process_pre_save() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
@@ -56,7 +58,7 @@ class mod_helper_trait_test extends \advanced_testcase {
     /**
      * Presave instance
      */
-    public function test_bigbluebuttonbn_process_pre_save_instance() {
+    public function test_process_pre_save_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
@@ -69,7 +71,7 @@ class mod_helper_trait_test extends \advanced_testcase {
     /**
      * Presave checkboxes
      */
-    public function test_bigbluebuttonbn_process_pre_save_checkboxes() {
+    public function test_process_pre_save_checkboxes() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
@@ -83,7 +85,7 @@ class mod_helper_trait_test extends \advanced_testcase {
     /**
      * Presave common
      */
-    public function test_bigbluebuttonbn_process_pre_save_common() {
+    public function test_process_pre_save_common() {
         global $CFG;
         $this->resetAfterTest();
 
@@ -99,7 +101,7 @@ class mod_helper_trait_test extends \advanced_testcase {
     /**
      * Post save
      */
-    public function test_bigbluebuttonbn_process_post_save() {
+    public function test_process_post_save() {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -125,14 +127,16 @@ class mod_helper_trait_test extends \advanced_testcase {
     /**
      * Post save notification
      */
-    public function test_bigbluebuttonbn_process_post_save_notification() {
+    public function test_process_post_save_with_add() {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) =
             $this->create_instance(null, ['type' => instance::TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
+
         $bbformdata->add = "1";
+
         $messagesink = $this->redirectMessages();
         // Enrol users in a course so he will receive the message.
         $teacher = $generator->create_user(['role' => 'editingteacher']);
@@ -147,30 +151,39 @@ class mod_helper_trait_test extends \advanced_testcase {
     }
 
     /**
-     * Post save event
+     * Post save
+     *
+     * There was an issue when both the opening time and completion were set
+     * and the form was saved twice.
      */
-    public function test_bigbluebuttonbn_process_post_save_event() {
+    public function test_process_post_save_twice_with_completion() {
         $this->resetAfterTest();
-        $this->setAdminUser();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
-        $eventsink = $this->redirectEvents();
-        $bbformdata = $this->get_form_data_from_instance($bbactivity);
-        $bbformdata->openingtime = time();
-        mod_helper::process_post_save($bbformdata);
-        $this->assertNotEmpty($eventsink->get_events());
-    }
 
-    /**
-     * Post save completion
-     */
-    public function test_bigbluebuttonbn_process_post_save_completion() {
-        $this->resetAfterTest();
-        $this->setAdminUser();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        $generator = $this->getDataGenerator();
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) =
+            $this->create_instance(null, ['type' => instance::TYPE_RECORDING_ONLY]);
         $bbformdata = $this->get_form_data_from_instance($bbactivity);
-        $eventsink = $this->redirectEvents();
-        $bbformdata->completionexpected = 1;
+        $bbformdata->completionunlocked = 0;
+        $bbformdata->completion = COMPLETION_AGGREGATION_ANY;
+        $bbformdata->completionview = COMPLETION_VIEWED;
+        $bbformdata->completionexpected = time();
+        $bbformdata->openingtime = time() - 1000;
+        $bbformdata->closing = time() + 1000;
+        // Enrol users in a course so he will receive the message.
+        $teacher = $generator->create_user(['role' => 'editingteacher']);
+        $generator->enrol_user($teacher->id, $this->get_course()->id);
+
+        // Mark the form to trigger notification.
+        $bbformdata->notification = true;
+        $messagesink = $this->redirectMessages();
         mod_helper::process_post_save($bbformdata);
-        $this->assertNotEmpty($eventsink->get_events());
+        // Now run cron.
+        ob_start();
+        $this->runAdhocTasks();
+        ob_get_clean(); // Suppress output as it can fail the test.
+        $this->assertEquals(1, $messagesink->count());
+        // Do it a again, so we check we still have one event of type EVENT_MEETING_START.
+        mod_helper::process_post_save($bbformdata);
+        $this->assertEquals(1, $messagesink->count());
     }
 }

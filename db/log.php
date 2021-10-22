@@ -28,16 +28,16 @@ defined('MOODLE_INTERNAL') || die();
 
 global $DB;
 
-$logs = array(
-    array('module' => 'bigbluebuttonbn', 'action' => 'add', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'update', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'view', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'view all', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'create', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'end', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'join', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'left', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'publish', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'unpublish', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-    array('module' => 'bigbluebuttonbn', 'action' => 'delete', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'),
-);
+$logs = [
+    ['module' => 'bigbluebuttonbn', 'action' => 'add', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'update', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'view', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'view all', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'create', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'end', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'join', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'left', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'publish', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'unpublish', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+    ['module' => 'bigbluebuttonbn', 'action' => 'delete', 'mtable' => 'bigbluebuttonbn', 'field' => 'name'],
+];

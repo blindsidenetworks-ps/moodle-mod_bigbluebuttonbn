@@ -94,6 +94,7 @@ class lib_test extends \advanced_testcase {
      */
     public function test_bigbluebuttonbn_delete_instance() {
         $this->resetAfterTest();
+        $this->initialise_mock_server();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $result = bigbluebuttonbn_delete_instance($bbactivity->id);
         $this->assertTrue($result);
@@ -113,16 +114,16 @@ class lib_test extends \advanced_testcase {
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
-        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, null, $bbactivity);
-        $this->assertEquals('', $result);
+        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
+        $this->assertEquals((object)[], $result);
 
         // Now create a couple of logs.
         $instance = instance::get_from_instanceid($bbactivity->id);
         logger::log_meeting_joined_event($instance, 0);
         logger::log_recording_played_event($instance, 1);
 
-        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, null, $bbactivity);
-        $this->assertMatchesRegularExpression('/.* has joined the session for 2 times/', $result);
+        $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
+        $this->assertStringContainsString('has joined the meeting or played a recording 2 time(s)', $result->info);
     }
 
     /**
@@ -142,9 +143,11 @@ class lib_test extends \advanced_testcase {
         $instance = instance::get_from_instanceid($bbactivity->id);
         logger::log_meeting_joined_event($instance, 0);
         logger::log_recording_played_event($instance, 1);
-
-        $result = bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivity);
-        $this->assertEquals(2, $result);
+        ob_start();
+        bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivitycm, $bbactivity);
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertStringContainsString('has joined the meeting or played a recording', $output);
     }
 
     /**
@@ -196,12 +199,12 @@ class lib_test extends \advanced_testcase {
         global $CFG;
         $this->resetAfterTest();
         $results = bigbluebuttonbn_reset_course_form_defaults($this->get_course());
-        $this->assertEquals(array(
+        $this->assertEquals([
             'reset_bigbluebuttonbn_events' => 0,
             'reset_bigbluebuttonbn_tags' => 0,
             'reset_bigbluebuttonbn_logs' => 0,
             'reset_bigbluebuttonbn_recordings' => 0,
-        ), $results);
+        ], $results);
     }
 
     /**
@@ -210,12 +213,10 @@ class lib_test extends \advanced_testcase {
      * @covers ::bigbluebuttonbn_reset_userdata
      */
     public function test_bigbluebuttonbn_reset_userdata() {
-        global $CFG;
         $this->resetAfterTest();
         $data = new stdClass();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $data->courseid = $this->get_course()->id;
-        $data->reset_bigbluebuttonbn_tags = true;
         $data->reset_bigbluebuttonbn_tags = true;
         $data->course = $bbactivity->course;
         $results = bigbluebuttonbn_reset_userdata($data);

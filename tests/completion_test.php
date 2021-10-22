@@ -43,7 +43,7 @@ class completion_test extends \advanced_testcase {
     /**
      * Completion with no rules
      */
-    public function test_bigbluebuttonbn_get_completion_state_no_rules() {
+    public function test_get_completion_state_no_rules() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
@@ -52,14 +52,33 @@ class completion_test extends \advanced_testcase {
 
         $completion = new custom_completion($bbactivitycm, $user->id);
         $result = $completion->get_overall_completion_state();
-        // No custom rules so complete.
+        // No custom rules but no join, so incomplete.
+        $this->assertEquals(COMPLETION_INCOMPLETE, $result);
+    }
+
+    /**
+     * Completion with no rules and join meeting
+     */
+    public function test_get_completion_state_no_rules_and_join_meeting() {
+        $this->resetAfterTest();
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // Now create a couple of logs.
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        logger::log_meeting_joined_event($instance, 0);
+        // No custom rules and we joined once so complete.
+        $completion = new custom_completion($bbactivitycm, $user->id);
+        $result = $completion->get_overall_completion_state();
         $this->assertEquals(COMPLETION_COMPLETE, $result);
     }
 
     /**
      * With state incomplete
      */
-    public function test_bigbluebuttonbn_get_completion_state_incomplete() {
+    public function test_get_completion_state_incomplete() {
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -80,7 +99,7 @@ class completion_test extends \advanced_testcase {
     /**
      * With state complete
      */
-    public function test_bigbluebuttonbn_get_completion_state_complete() {
+    public function test_get_completion_state_complete() {
         $this->resetAfterTest();
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -101,6 +120,7 @@ class completion_test extends \advanced_testcase {
                 ],
             ],
         ];
+        logger::log_meeting_joined_event($instance, 0);
         logger::log_event_summary($instance, $overrides, $meta);
         logger::log_event_summary($instance, $overrides, $meta);
 
@@ -140,46 +160,35 @@ class completion_test extends \advanced_testcase {
         // TODO: check the return value here as there might be an issue with the function compared to the forum for example.
         $this->assertEquals(
             [
-                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
-                    1),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
+                'completionengagementchats' => get_string('completionengagementchats_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementtalks' => get_string('completionengagementtalks_desc', 'mod_bigbluebuttonbn'),
+                'completionattendance' => get_string('completionattendance_desc', 'mod_bigbluebuttonbn', 1),
+                'completionengagementraisehand' => get_string('completionengagementraisehand_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementpollvotes' => get_string('completionengagementpollvotes_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn')
             ],
             $completioncm1->get_custom_rule_descriptions());
         $completioncm2 = new custom_completion($cm2, $user->id);
         $this->assertEquals(
             [
-                'completionengagementchats' => get_string('completionengagementchatsdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementtalks' => get_string('completionengagementtalksdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionattendance' => get_string('completionattendancedesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementraisehand' => get_string('completionengagementraisehanddesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementpollvotes' => get_string('completionengagementpollvotesdesc', 'mod_bigbluebuttonbn',
-                    0),
-                'completionengagementemojis' => get_string('completionengagementemojisdesc', 'mod_bigbluebuttonbn',
-                    0)
+                'completionengagementchats' => get_string('completionengagementchats_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementtalks' => get_string('completionengagementtalks_desc', 'mod_bigbluebuttonbn'),
+                'completionattendance' => get_string('completionattendance_desc', 'mod_bigbluebuttonbn', 0),
+                'completionengagementraisehand' => get_string('completionengagementraisehand_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementpollvotes' => get_string('completionengagementpollvotes_desc', 'mod_bigbluebuttonbn'),
+                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn')
             ], $completioncm2->get_custom_rule_descriptions());
     }
 
     /**
      * Completion View
      */
-    public function test_bigbluebuttonbn_view() {
+    public function test_view() {
         $this->resetAfterTest();
         $this->setAdminUser();
-        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance([],
-            array('completion' => 2, 'completionview' => 1));
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(
+            null, ['completion' => 2, 'completionview' => 1]
+        );
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -187,13 +196,13 @@ class completion_test extends \advanced_testcase {
         bigbluebuttonbn_view($bbactivity, $this->get_course(), $bbactivitycm, context_module::instance($bbactivitycm->id));
 
         $events = $sink->get_events();
-        $this->assertCount(3, $events);
+        $this->assertCount(2, $events);
         $event = reset($events);
 
         // Checking that the event contains the expected values.
         $this->assertInstanceOf('\mod_bigbluebuttonbn\event\activity_viewed', $event);
         $this->assertEquals($bbactivitycontext, $event->get_context());
-        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $bbactivitycontext->instanceid));
+        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $bbactivitycontext->instanceid]);
         $this->assertEquals($url, $event->get_url());
         $this->assertEventContextNotUsed($event);
         $this->assertNotEmpty($event->get_name());
@@ -201,6 +210,7 @@ class completion_test extends \advanced_testcase {
         // Check completion status.
         $completion = new completion_info($this->get_course());
         $completiondata = $completion->get_data($bbactivitycm);
-        $this->assertEquals(1, $completiondata->completionstate);
+        $this->assertEquals(1, $completiondata->viewed);
+        $this->assertEquals(COMPLETION_INCOMPLETE, $completiondata->completionstate);
     }
 }

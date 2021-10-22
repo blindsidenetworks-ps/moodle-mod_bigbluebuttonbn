@@ -25,24 +25,24 @@
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-$addons = array(
-    "mod_bigbluebuttonbn" => array(
-        "handlers" => array( // Different places where the add-on will display content.
-            'coursebigbluebuttonbn' => array( // Handler unique name (can be anything).
-                'displaydata' => array(
+$addons = [
+    "mod_bigbluebuttonbn" => [
+        "handlers" => [ // Different places where the add-on will display content.
+            'coursebigbluebuttonbn' => [ // Handler unique name (can be anything).
+                'displaydata' => [
                     'title' => 'pluginname',
                     'icon' => $CFG->wwwroot . '/mod/bigbluebuttonbn/pix/icon.gif',
                     'class' => '',
-                ),
+                ],
                 'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the add-on).
                 'method' => 'mobile_course_view' // Main function in \mod_bigbluebuttonbn\output\mobile.
-            )
-        ),
-        'lang' => array(
-            array('pluginname', 'bigbluebuttonbn'),
-            array('view_conference_action_join', 'bigbluebuttonbn'),
-            array('view_message_conference_room_ready', 'bigbluebuttonbn'),
-            array('view_mobile_message_reload_page_creation_time_meeting', 'bigbluebuttonbn')
-        )
-    )
-);
+            ]
+        ],
+        'lang' => [
+            ['pluginname', 'bigbluebuttonbn'],
+            ['view_conference_action_join', 'bigbluebuttonbn'],
+            ['view_message_conference_room_ready', 'bigbluebuttonbn'],
+            ['view_mobile_message_reload_page_creation_time_meeting', 'bigbluebuttonbn']
+        ]
+    ]
+];

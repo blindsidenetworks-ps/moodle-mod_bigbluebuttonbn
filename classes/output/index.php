@@ -90,15 +90,13 @@ class index implements renderable {
         if (!$cm->uservisible) {
             return;
         }
-
-        // Add a the data for the bbb instance.
         if (groups_get_activity_groupmode($cm) == 0) {
             $table->data[] = $this->add_room_row_to_table($output, $instance);
         } else {
-            // Add the 'All participants' room information.
+            // Add 'All participants' room information.
             $table->data[] = $this->add_room_row_to_table($output, $instance, 0);
 
-            // Add a the data for the groups belonging to the bbb instance, if any.
+            // Add data for the groups belonging to the bbb instance, if any.
             $groups = groups_get_activity_allowed_groups($cm);
             foreach ($groups as $group) {
                 $table->data[] = $this->add_room_row_to_table($output, $instance, $group->id);
@@ -114,15 +112,11 @@ class index implements renderable {
      * @param int|null $group
      * @return array
      */
-    protected function add_room_row_to_table(
-        renderer_base $output,
-        instance $instance,
-        ?int $group = null
-    ): array {
+    protected function add_room_row_to_table(renderer_base $output, instance $instance, ?int $group = null): array {
         if ($group) {
             $instance = instance::get_group_instance_from_instance($instance, $group);
         }
-        $meeting  = new meeting($instance);
+        $meeting = new meeting($instance);
 
         $viewurl = $instance->get_view_url();
         if ($groupid = $instance->get_group_id()) {
@@ -137,9 +131,9 @@ class index implements renderable {
                 $instance->get_cm()->sectionnum,
                 $joinurl,
                 $instance->get_group_name(),
-                $this->get_room_usercount($output, $meeting),
-                $this->get_room_attendee_list($output, $meeting, 'VIEWER'),
-                $this->get_room_attendee_list($output, $meeting, 'MODERATOR'),
+                $this->get_room_usercount($meeting),
+                $this->get_room_attendee_list($meeting, 'VIEWER'),
+                $this->get_room_attendee_list($meeting, 'MODERATOR'),
                 $this->get_room_record_info($output, $instance),
                 $this->get_room_actions($output, $instance, $meeting),
             ];
@@ -151,23 +145,21 @@ class index implements renderable {
     /**
      * Count the number of users in the meeting.
      *
-     * @param renderer_base $output
      * @param meeting $meeting
      * @return int
      */
-    protected function get_room_usercount(renderer_base $output, meeting $meeting): int {
+    protected function get_room_usercount(meeting $meeting): int {
         return count($meeting->get_attendees());
     }
 
     /**
      * Returns attendee list.
      *
-     * @param renderer_base $output
      * @param meeting $meeting
      * @param string $role
      * @return string
      */
-    protected function get_room_attendee_list(renderer_base $output, meeting $meeting, string $role): string {
+    protected function get_room_attendee_list(meeting $meeting, string $role): string {
         $attendees = [];
 
         foreach ($meeting->get_attendees() as $attendee) {
@@ -186,7 +178,7 @@ class index implements renderable {
      * @param instance $instance
      * @return string
      */
-    protected function get_room_record_info(renderer_base $output, instance $instance) {
+    protected function get_room_record_info(renderer_base $output, instance $instance): string {
         if ($instance->is_recorded()) {
             // If it has been set when meeting created, set the variable on/off.
             return get_string('index_enabled', 'bigbluebuttonbn');

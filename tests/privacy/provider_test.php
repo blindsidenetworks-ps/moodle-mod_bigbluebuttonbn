@@ -93,7 +93,7 @@ class provider_test extends \core_privacy\tests\provider_testcase {
         $course = $e['course'];
 
         // Another bigbluebuttonbn activity that has no user activity.
-        $this->getDataGenerator()->create_module('bigbluebuttonbn', array('course' => $course));
+        $this->getDataGenerator()->create_module('bigbluebuttonbn', ['course' => $course]);
 
         // Create a user which will make a submission.
         $user = $this->getDataGenerator()->create_user();
@@ -267,14 +267,14 @@ class provider_test extends \core_privacy\tests\provider_testcase {
      * @return array $e
      */
     protected function get_bigbluebuttonbn_environemnt() {
-        $e = array();
+        $e = [];
 
         // Create a course.
         $e['course'] = $this->getDataGenerator()->create_course();
 
         // Create a bigbluebuttonbn instance.
         $e['instance'] = $this->getDataGenerator()->create_module('bigbluebuttonbn',
-            array('course' => $e['course']->id));
+            ['course' => $e['course']->id]);
 
         // Create users that will use the bigbluebuttonbn instance.
         $e['users'][] = $this->getDataGenerator()->create_user();

@@ -25,6 +25,9 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+use core_calendar\action_factory;
+use core_calendar\local\event\entities\action_interface;
+use mod_bigbluebuttonbn\completion\custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
@@ -57,18 +60,18 @@ function bigbluebuttonbn_supports($feature) {
     if (!$feature) {
         return null;
     }
-    $features = array(
-        (string) FEATURE_IDNUMBER => true,
-        (string) FEATURE_GROUPS => true,
-        (string) FEATURE_GROUPINGS => true,
-        (string) FEATURE_MOD_INTRO => true,
-        (string) FEATURE_BACKUP_MOODLE2 => true,
-        (string) FEATURE_COMPLETION_TRACKS_VIEWS => true,
-        (string) FEATURE_COMPLETION_HAS_RULES => true,
-        (string) FEATURE_GRADE_HAS_GRADE => false,
-        (string) FEATURE_GRADE_OUTCOMES => false,
-        (string) FEATURE_SHOW_DESCRIPTION => true,
-    );
+    $features = [
+        FEATURE_IDNUMBER => true,
+        FEATURE_GROUPS => true,
+        FEATURE_GROUPINGS => true,
+        FEATURE_MOD_INTRO => true,
+        FEATURE_BACKUP_MOODLE2 => true,
+        FEATURE_COMPLETION_TRACKS_VIEWS => true,
+        FEATURE_COMPLETION_HAS_RULES => true,
+        FEATURE_GRADE_HAS_GRADE => false,
+        FEATURE_GRADE_OUTCOMES => false,
+        FEATURE_SHOW_DESCRIPTION => true,
+    ];
     if (isset($features[(string) $feature])) {
         return $features[$feature];
     }
@@ -81,7 +84,7 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $bigbluebuttonbn An object from the form in mod_form.php
+ * @param stdClass $bigbluebuttonbn An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
 function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
@@ -90,16 +93,12 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     mod_helper::process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
     $bigbluebuttonbn->presentation = files::save_media_file($bigbluebuttonbn);
-    // Insert a record.
-    $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
     $bigbluebuttonbn->meetingid = meeting::get_unique_meetingid_seed();
-    // Set the meetingid column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn->meetingid, array('id' => $bigbluebuttonbn->id));
-
+    // Insert a record.
+    $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Log insert action.
     logger::log_instance_created($bigbluebuttonbn);
-
     // Complete the process.
     mod_helper::process_post_save($bigbluebuttonbn);
     return $bigbluebuttonbn->id;
@@ -110,7 +109,7 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $bigbluebuttonbn An object from the form in mod_form.php
+ * @param stdClass $bigbluebuttonbn An object from the form in mod_form.php
  * @return bool Success/Fail
  */
 function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
@@ -126,7 +125,7 @@ function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
 
     // Get the meetingid column in the bigbluebuttonbn table.
-    $bigbluebuttonbn->meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $bigbluebuttonbn->id));
+    $bigbluebuttonbn->meetingid = (string) $DB->get_field('bigbluebuttonbn', 'meetingid', ['id' => $bigbluebuttonbn->id]);
 
     // Log update action.
     logger::log_instance_updated(instance::get_from_instanceid($bigbluebuttonbn->id));
@@ -153,7 +152,24 @@ function bigbluebuttonbn_delete_instance($id) {
         return false;
     }
 
-    // TODO: End the meeting if it is running.
+    // End all meeting if any still running.
+    try {
+        $meeting = new meeting($instance);
+        $meeting->end_meeting();
+        $groups = groups_get_course_group($instance->get_course());
+        if ($groups) {
+            foreach ($groups as $group) {
+                $instance->set_group_id($group->id);
+                $meeting = new meeting($instance);
+                $meeting->end_meeting();
+            }
+        }
+    } catch (moodle_exception $e) {
+        // Do not log any issue when testing.
+        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')) {
+            debugging($e->getMessage(), DEBUG_NORMAL, $e->getTrace());
+        }
+    }
 
     $result = true;
 
@@ -186,47 +202,59 @@ function bigbluebuttonbn_delete_instance($id) {
  *
  * @param object $course
  * @param object $user
- * @param object $mod
+ * @param cm_info $mod
  * @param object $bigbluebuttonbn
  *
- * @return bool
+ * @return object with info and time (timestamp of the last log)
  */
-function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
-    if ($completed = bigbluebuttonbn_user_complete($course, $user, $bigbluebuttonbn)) {
-        return fullname($user) . ' ' . get_string('view_message_has_joined', 'bigbluebuttonbn') . ' ' .
-            get_string('view_message_session_for', 'bigbluebuttonbn') . ' ' . (string) $completed . ' ' .
-            get_string('view_message_times', 'bigbluebuttonbn');
+function bigbluebuttonbn_user_outline($course, $user, cm_info $mod, $bigbluebuttonbn) {
+    $customcompletion = new custom_completion($mod, $user->id);
+    $completed = $customcompletion->get_overall_completion_state();
+    $result = new stdClass();
+    if ($completed) {
+        $results = [];
+        $lastlog = 0;
+        foreach ($customcompletion->get_available_custom_rules() as $rule) {
+            $results[] = $customcompletion->get_printable_state($rule);
+            $lastlogrule = $customcompletion->get_last_log_timestamp($rule);
+            if ($lastlogrule > $lastlog) {
+                $lastlog = $lastlogrule;
+            }
+        }
+        $result = new stdClass();
+        $result->info = join(', ', $results);
+        $result->time = $lastlog;
     }
-    return '';
+    return $result;
 }
 
 /**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param object|int $courseorid
- * @param object|int $userorid
+ * @param object $course
+ * @param object $user
+ * @param cm_info $mod
  * @param object $bigbluebuttonbn
  *
- * @return bool
  */
-function bigbluebuttonbn_user_complete($courseorid, $userorid, $bigbluebuttonbn) {
-    global $DB;
-    if (is_object($courseorid)) {
-        $course = $courseorid;
-    } else {
-        $course = (object) array('id' => $courseorid);
+function bigbluebuttonbn_user_complete($course, $user, cm_info $mod, $bigbluebuttonbn) {
+    $customcompletion = new custom_completion($mod, $user->id);
+    $result = "";
+    foreach ($customcompletion->get_available_custom_rules() as $rule) {
+        $result .= html_writer::tag('li', $customcompletion->get_printable_state($rule));
     }
-    if (is_object($userorid)) {
-        $user = $userorid;
-    } else {
-        $user = (object) array('id' => $userorid);
-    }
-    $sql = "SELECT COUNT(*) FROM {bigbluebuttonbn_logs} ";
-    $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
-    $result = $DB->count_records_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
-        logger::EVENT_JOIN, logger::EVENT_PLAYED));
-    return $result;
+    echo $result;
+}
+
+/**
+ * This flags this module with the capability to override the completion status with the custom completion rules.
+ *
+ *
+ * @return int
+ */
+function bigbluebuttonbn_get_completion_aggregation_state() {
+    return COMPLETION_CUSTOM_MODULE_FLOW;
 }
 
 /**
@@ -235,14 +263,13 @@ function bigbluebuttonbn_user_complete($courseorid, $userorid, $bigbluebuttonbn)
  * @return string[]
  */
 function bigbluebuttonbn_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups');
+    return ['moodle/site:accessallgroups'];
 }
 
 /**
  * Called by course/reset.php
  *
  * @param object $mform
- * @return void
  */
 function bigbluebuttonbn_reset_course_form_definition(&$mform) {
     $items = reset::reset_course_items();
@@ -266,7 +293,7 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
  * @return array
  */
 function bigbluebuttonbn_reset_course_form_defaults($course) {
-    $formdefaults = array();
+    $formdefaults = [];
     $items = reset::reset_course_items();
     // All unchecked by default.
     foreach ($items as $item => $default) {
@@ -278,12 +305,12 @@ function bigbluebuttonbn_reset_course_form_defaults($course) {
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
  *
- * @param array $data the data submitted from the reset course.
+ * @param object $data the data submitted from the reset course.
  * @return array status array
  */
 function bigbluebuttonbn_reset_userdata($data) {
     $items = reset::reset_course_items();
-    $status = array();
+    $status = [];
 
     // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
     // See MDL-9367.
@@ -300,15 +327,6 @@ function bigbluebuttonbn_reset_userdata($data) {
         unset($items['tags']);
         $status[] = reset::reset_getstatus('tags');
     }
-
-    // TODO : seems to be duplicated code unless we just want to force reset tags.
-    foreach ($items as $item => $default) {
-        // Remove instances or elements linked to this course, others than recordings or tags.
-        if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
-            call_user_func("bigbluebuttonbn_reset_{$item}", $data->courseid);
-            $status[] = reset::reset_getstatus($item);
-        }
-    }
     return $status;
 }
 
@@ -318,7 +336,7 @@ function bigbluebuttonbn_reset_userdata($data) {
  * this activity in a course listing.
  * See get_array_of_activities() in course/lib.php.
  *
- * @param object $coursemodule
+ * @param stdClass $coursemodule
  *
  * @return null|cached_cm_info
  */
@@ -360,7 +378,7 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
  * @category files
  *
  */
-function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     if (!files::pluginfile_valid($context, $filearea)) {
         return false;
     }
@@ -384,13 +402,13 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
 function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
 
     // Trigger course_module_viewed event.
-    $params = array(
+    $params = [
         'context' => $context,
         'objectid' => $bigbluebuttonbn->id
-    );
+    ];
 
     $event = \mod_bigbluebuttonbn\event\activity_viewed::create($params); // Fix event name.
-    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course_modules', $cm->get_course_module_record());
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
     $event->trigger();
@@ -409,8 +427,8 @@ function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
  * @return stdClass an object with the different type of areas indicating if they were updated or not
  * @since Moodle 3.2
  */
-function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array()) {
-    $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
+function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = []) {
+    $updates = course_check_module_updates_since($cm, $from, ['content'], $filter);
     return $updates;
 }
 
@@ -430,14 +448,14 @@ function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
  * is not displayed on the block.
  *
  * @param calendar_event $event
- * @param \core_calendar\action_factory $factory
- * @return \core_calendar\local\event\entities\action_interface|null
+ * @param action_factory $factory
+ * @return action_interface|null
  */
 function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     calendar_event $event,
-    \core_calendar\action_factory $factory
+    action_factory $factory
 ) {
-    global $CFG, $DB;
+    global $DB;
 
     $time = time();
 
@@ -445,7 +463,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
     // Get bigbluebuttonbn activity.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
+    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $event->instance], '*', MUST_EXIST);
 
     // Set flag haspassed if closingtime has already passed only if it is defined.
     $haspassed = ($bigbluebuttonbn->closingtime) && $bigbluebuttonbn->closingtime < $time;
@@ -459,7 +477,8 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     }
 
     // Get if the user has joined in live session or viewed the recorded.
-    $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, $bigbluebuttonbn);
+    $customcompletion = new custom_completion($cm, $event->userid);
+    $usercomplete = $customcompletion->get_overall_completion_state();
     $instance = instance::get_from_instanceid($bigbluebuttonbn->id);
     // Get if the room is available.
     $roomavailable = $instance->is_currently_open();
@@ -477,12 +496,16 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
 
     // Action data.
     $string = get_string('view_room', 'bigbluebuttonbn');
-    $url = new moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+    $url = new moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $cm->id]);
     if (groups_get_activity_groupmode($cm) == NOGROUPS) {
         // No groups mode.
         $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $url = new moodle_url('/mod/bigbluebuttonbn/bbb_view.php', array('action' => 'join',
-            'id' => $cm->id, 'bn' => $bigbluebuttonbn->id, 'timeline' => 1));
+        $url = new moodle_url('/mod/bigbluebuttonbn/bbb_view.php', [
+                'action' => 'join',
+                'id' => $cm->id,
+                'bn' => $bigbluebuttonbn->id,
+                'timeline' => 1]
+        );
     }
 
     return $factory->create_instance($string, $url, 1, $actionable);
@@ -531,12 +554,101 @@ function bigbluebuttonbn_extend_settings_navigation(settings_navigation $setting
  * @param string $itemtype
  * @param string $itemid
  * @param mixed $newvalue
- * @return mixed
+ * @return mixed|null
  */
 function bigbluebuttonbn_inplace_editable($itemtype, $itemid, $newvalue) {
     $editableclass = "\\mod_bigbluebuttonbn\\output\\recording_{$itemtype}_editable";
     if (class_exists($editableclass)) {
-        return call_user_func(array($editableclass, 'update'), $itemid, $newvalue);
+        return call_user_func([$editableclass, 'update'], $itemid, $newvalue);
     }
     return null; // Will raise an exception in core update_inplace_editable method.
+}
+
+/**
+ * Returns all events since a given time in specified bigbluebutton activity.
+ * We focus here on the two events: play and join.
+ *
+ * @param array $activities
+ * @param int $index
+ * @param int $timestart
+ * @param int $courseid
+ * @param int $cmid
+ * @param int $userid
+ * @param int $groupid
+ * @return array
+ */
+function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0,
+    $groupid = 0): array {
+    $instance = instance::get_from_cmid($cmid);
+    $instance->set_group_id($groupid);
+    $cm = $instance->get_cm();
+    $logs =
+
+        logger::get_user_completion_logs_with_userfields($instance,
+            $userid ?? null,
+            [logger::EVENT_JOIN, logger::EVENT_PLAYED],
+            $timestart);
+    foreach ($logs as $log) {
+        $activity = new stdClass();
+
+        $activity->type = 'bigbluebuttonbn';
+        $activity->cmid = $cm->id;
+        $activity->name = format_string($instance->get_meeting_name(), true);
+        $activity->sectionnum = $cm->sectionnum;
+        $activity->timestamp = $log->timecreated;
+        $activity->user = new stdClass();
+        $userfields = explode(',', implode(',', \core_user\fields::get_picture_fields()));
+        foreach ($userfields as $userfield) {
+            if ($userfield == 'id') {
+                // Aliased in SQL above.
+                $activity->user->{$userfield} = $log->userid;
+            } else {
+                $activity->user->{$userfield} = $log->{$userfield};
+            }
+        }
+        $activity->user->fullname = fullname($log);
+        switch ($log->log) {
+            case logger::EVENT_JOIN:
+                $activity->eventname = get_string('event_recording_viewed', 'mod_bigbluebuttonbn');
+                break;
+            case logger::EVENT_PLAYED:
+                $activity->eventname = get_string('event_meeting_joined', 'mod_bigbluebuttonbn');
+                break;
+        }
+        $activity->content = '';
+        $activities[$index++] = $activity;
+    }
+    return $activities;
+}
+
+/**
+ * Outputs the bigbluebutton logs indicated by $activity.
+ *
+ * @param object $activity the activity object the bigbluebuttonbn resides in
+ * @param int $courseid the id of the course the bigbluebuttonbn resides in
+ * @param bool $detail not used, but required for compatibilty with other modules
+ * @param int $modnames not used, but required for compatibilty with other modules
+ * @param bool $viewfullnames not used, but required for compatibilty with other modules
+ */
+function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
+    global $OUTPUT;
+
+    $modinfo = [];
+    if ($detail) {
+        $modinfo['modname'] = $activity->name;
+        $modinfo['modurl'] = new moodle_url('/mod/h5pactivity/view.php', ['id' => $activity->cmid]);
+        $modinfo['modicon'] = $OUTPUT->image_icon('icon', $modnames[$activity->type], 'h5pactivity');
+    }
+
+    $userpicture = $OUTPUT->user_picture($activity->user);
+
+    $template = ['userpicture' => $userpicture,
+        'submissiontimestamp' => $activity->timestamp,
+        'modinfo' => $modinfo,
+        'userurl' => new moodle_url('/user/view.php', array('id' => $activity->user->id, 'course' => $courseid)),
+        'fullname' => $activity->user->fullname];
+    if (isset($activity->eventname)) {
+        $template['eventname'] = $activity->eventname;
+    }
+    echo $OUTPUT->render_from_template('mod_bigbluebuttonbn/recentactivity', $template);
 }

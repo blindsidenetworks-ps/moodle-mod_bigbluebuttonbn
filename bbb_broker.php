@@ -26,27 +26,24 @@
 
 // We should not have any require login or MOODLE_INTERNAL Check in this file.
 // phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState,moodle.Files.RequireLogin.Missing
-require(__DIR__.'/../../config.php');
+require(__DIR__ . '/../../config.php');
 
 use mod_bigbluebuttonbn\broker;
 use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
+use mod_bigbluebuttonbn\meeting;
 
 global $PAGE, $USER, $CFG, $SESSION, $DB;
 
 $params = $_REQUEST;
 
-if (!isset($params['action']) || empty($params['action'])) {
-    header('HTTP/1.0 400 Bad Request. Parameter ['.$params['action'].'] was not included');
-    return;
-}
-
 $broker = new broker();
 $error = $broker->validate_parameters($params);
 if (!empty($error)) {
-    header('HTTP/1.0 400 Bad Request. '.$error);
+    header('HTTP/1.0 400 Bad Request. ' . $error);
     return;
 }
+
+$action = $params['action'];
 
 $instance = instance::get_from_instanceid($params['bigbluebuttonbn']);
 if (empty($instance)) {
@@ -57,7 +54,7 @@ if (empty($instance)) {
 $PAGE->set_context($instance->get_context());
 
 try {
-    switch(strtolower($params['action'])) {
+    switch (strtolower($action)) {
         case 'recording_ready':
             broker::recording_ready($instance, $params);
             return;
@@ -67,7 +64,7 @@ try {
             meeting::meeting_events($instance);
             return;
     }
-    header("HTTP/1.0 400 Bad request. The action '{$a}' does not exist");
+    header("HTTP/1.0 400 Bad request. The action '{$action}' does not exist");
 } catch (Exception $e) {
-    header('HTTP/1.0 500 Internal Server Error. '.$e->getMessage());
+    header('HTTP/1.0 500 Internal Server Error. ' . $e->getMessage());
 }

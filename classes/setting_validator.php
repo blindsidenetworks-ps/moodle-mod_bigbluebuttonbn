@@ -32,7 +32,7 @@ class setting_validator {
     /**
      * Validate if general section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_general_shown() {
         global $CFG;
@@ -43,7 +43,7 @@ class setting_validator {
     /**
      * Validate if record meeting section  will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_record_meeting_shown() {
         global $CFG;
@@ -59,7 +59,7 @@ class setting_validator {
     /**
      * Validate if import recording section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_import_recordings_shown() {
         global $CFG;
@@ -70,7 +70,7 @@ class setting_validator {
     /**
      * Validate if show recording section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_show_recordings_shown() {
         global $CFG;
@@ -89,7 +89,7 @@ class setting_validator {
     /**
      * Validate if wait moderator section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_wait_moderator_shown() {
         global $CFG;
@@ -102,7 +102,7 @@ class setting_validator {
     /**
      * Validate if static voice bridge section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_static_voice_bridge_shown() {
         global $CFG;
@@ -112,7 +112,7 @@ class setting_validator {
     /**
      * Validate if preupload presentation section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_preupload_presentation_shown() {
         global $CFG;
@@ -122,7 +122,7 @@ class setting_validator {
     /**
      * Validate if user limit section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_user_limit_shown() {
         global $CFG;
@@ -133,7 +133,7 @@ class setting_validator {
     /**
      * Validate if moderator default section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_moderator_default_shown() {
         global $CFG;
@@ -143,7 +143,7 @@ class setting_validator {
     /**
      * Validate if send notification section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_send_notifications_shown() {
         global $CFG;
@@ -153,7 +153,7 @@ class setting_validator {
     /**
      * Validate if settings extended section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_settings_extended_shown() {
         global $CFG;
@@ -164,7 +164,7 @@ class setting_validator {
     /**
      * Validate if muteonstart section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_muteonstart_shown() {
         global $CFG;
@@ -175,7 +175,7 @@ class setting_validator {
     /**
      * Validate if disablecam section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_disablecam_shown() {
         global $CFG;
@@ -186,7 +186,7 @@ class setting_validator {
     /**
      * Validate if disablemic section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_disablemic_shown() {
         global $CFG;
@@ -197,7 +197,7 @@ class setting_validator {
     /**
      * Validate if disableprivatechat section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_disableprivatechat_shown() {
         global $CFG;
@@ -208,7 +208,7 @@ class setting_validator {
     /**
      * Validate if disablepublicchat section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_disablepublicchat_shown() {
         global $CFG;
@@ -219,7 +219,7 @@ class setting_validator {
     /**
      * Validate if disablenote section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_disablenote_shown() {
         global $CFG;
@@ -230,7 +230,7 @@ class setting_validator {
     /**
      * Validate if hideuserlist section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_hideuserlist_shown() {
         global $CFG;
@@ -241,7 +241,7 @@ class setting_validator {
     /**
      * Validate if lockedlayout section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_lockedlayout_shown() {
         global $CFG;
@@ -252,7 +252,7 @@ class setting_validator {
     /**
      * Validate if lockonjoin section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_lockonjoin_shown() {
         global $CFG;
@@ -263,7 +263,7 @@ class setting_validator {
     /**
      * Validate if lockonjoinconfigurable section will be shown.
      *
-     * @return boolean
+     * @return bool
      */
     public static function section_lockonjoinconfigurable_shown() {
         global $CFG;

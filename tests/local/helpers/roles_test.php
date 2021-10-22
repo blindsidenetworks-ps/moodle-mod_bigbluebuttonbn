@@ -14,16 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * BBB Library tests class.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2018 - present, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Laurent David (laurent@call-learning.fr)
- */
 namespace mod_bigbluebuttonbn\local\helpers;
-defined('MOODLE_INTERNAL') || die();
+
 use context_course;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
@@ -39,11 +31,12 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  */
 class roles_test extends \advanced_testcase {
     use testcase_helper_trait;
+
     /**
      * Test select separate group prevent all
      *
      */
-    public function test_bigbluebuttonbn_get_users_select_separate_groups_prevent_all() {
+    public function test_get_users_select_separate_groups_prevent_all() {
         $this->resetAfterTest();
         $numstudents = 12;
         $numteachers = 3;
@@ -77,14 +70,14 @@ class roles_test extends \advanced_testcase {
      * Test select separate groups
      *
      */
-    public function test_bigbluebuttonbn_get_users_select_separate_groups() {
+    public function test_get_users_select_separate_groups() {
         $this->resetAfterTest();
         $numstudents = 12;
         $numteachers = 3;
         $groupsnum = 3;
         list($course, $groups, $students, $teachers, $bbactivity, $roleids) =
             $this->setup_course_students_teachers(
-                (object)['enablecompletion' => true, 'groupmode' => strval(VISIBLEGROUPS), 'groupmodeforce' => 1],
+                (object) ['enablecompletion' => true, 'groupmode' => strval(VISIBLEGROUPS), 'groupmodeforce' => 1],
                 $numstudents, $numteachers, $groupsnum);
 
         $context = context_course::instance($course->id);
@@ -98,6 +91,4 @@ class roles_test extends \advanced_testcase {
         $users = roles::get_users_array($context, $bbactivity);
         $this->assertCount($numstudents + $numteachers, $users);
     }
-
-
 }

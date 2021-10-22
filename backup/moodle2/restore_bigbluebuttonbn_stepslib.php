@@ -41,7 +41,7 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
      * @return array
      */
     protected function define_structure() {
-        $paths = array();
+        $paths = [];
         $paths[] = new restore_path_element('bigbluebuttonbn', '/activity/bigbluebuttonbn');
         $paths[] = new restore_path_element('bigbluebuttonbn_logs', '/activity/bigbluebuttonbn/logs/log');
         $paths[] = new restore_path_element('bigbluebuttonbn_recordings', '/activity/bigbluebuttonbn/recordings/recording');

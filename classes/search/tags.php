@@ -67,7 +67,7 @@ class tags extends \core_search\base_activity {
      * @param array    $options
      * @return \core_search\document|bool
      */
-    public function get_document($record, $options = array()) {
+    public function get_document($record, $options = []) {
 
         try {
             $cm = $this->get_cm($this->get_module_name(), $record->id, $record->course);
@@ -76,7 +76,7 @@ class tags extends \core_search\base_activity {
             $tags = \core_tag_tag::get_tags_by_area_in_contexts("core", "course_modules", [$context]);
             $tagsstring = "";
             if (!empty($tags)) {
-                $res = array();
+                $res = [];
                 foreach ($tags as $t) {
                     $res[] = $t->name;
                 }

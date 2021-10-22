@@ -51,5 +51,5 @@ class bbb_coverage extends phpunit_coverage_info {
 
     /** @var array The list of files relative to the plugin root to excludelist in coverage generation. */
     protected $excludelistfiles = [];
-};
+}
 return new bbb_coverage;
