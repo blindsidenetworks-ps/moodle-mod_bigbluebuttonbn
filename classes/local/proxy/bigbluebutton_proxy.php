@@ -65,7 +65,8 @@ class bigbluebutton_proxy extends proxy_base {
         string $logouturl,
         string $configtoken = null,
         string $userid = null,
-        string $createtime = null
+        string $createtime = null,
+        string $avatarurl = null
     ): ?string {
         $data = [
             'meetingID' => $meetingid,
@@ -84,6 +85,10 @@ class bigbluebutton_proxy extends proxy_base {
 
         if (!is_null($createtime)) {
             $data['createTime'] = $createtime;
+        }
+
+        if (!is_null($avatarurl)) {
+            $data['avatarURL'] = $avatarurl;
         }
 
         return self::action_url('join', $data);

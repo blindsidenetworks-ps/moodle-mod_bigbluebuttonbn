@@ -205,7 +205,8 @@ class meeting {
             $this->instance->get_logout_url()->out(false),
             null,
             $this->instance->get_user_id(),
-            $this->get_meeting_info()->createtime
+            $this->get_meeting_info()->createtime,
+            $this->instance->get_user_avatar_url()
         );
     }
 

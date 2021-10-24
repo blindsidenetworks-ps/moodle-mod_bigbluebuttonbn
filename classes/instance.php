@@ -27,6 +27,8 @@ use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use moodle_url;
 use stdClass;
 
+require_once("{$CFG->libdir}/filelib.php");
+
 /**
  * Instance record for mod_bigbluebuttonbn.
  *
@@ -567,6 +569,24 @@ EOF;
 
         return fullname($user);
     }
+
+    /**
+     * Get the avatar url for the current user.
+     * $size = 'large' => 'f1', 'small' => 'f2';
+     *
+     * @return string
+     */
+    public function get_user_avatar_url($size='f2'): string {
+        $user = $this->get_user();
+
+        $src = null;
+        if ($user->picture) {
+           $src = get_file_url($user->id.'/'.$size.'.jpg', null, 'user');
+        }
+
+        return $src;
+    }
+
 
     /**
      * Whether the current user is an administrator.
