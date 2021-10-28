@@ -52,7 +52,7 @@ abstract class base extends \core\event\base {
     /**
      * Init method.
      * @param string $crud
-     * @param integer $edulevel
+     * @param int $edulevel
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
         $this->data['crud'] = $crud;

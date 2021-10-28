@@ -478,9 +478,9 @@ class meeting {
      * Helper function enqueues list of meeting events to be stored and processed as for completion.
      *
      * @param instance $instance
-     * @param object $jsonobj
+     * @param stdClass $jsonobj
      */
-    protected static function process_meeting_events(instance $instance, $jsonobj) {
+    protected static function process_meeting_events(instance $instance, stdClass $jsonobj) {
         $meetingid = $jsonobj->{'meeting_id'};
         $recordid = $jsonobj->{'internal_meeting_id'};
         $attendees = $jsonobj->{'data'}->{'attendees'};

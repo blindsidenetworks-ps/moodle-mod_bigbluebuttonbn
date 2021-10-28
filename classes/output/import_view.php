@@ -21,6 +21,7 @@ use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\roles;
 use renderable;
 use renderer_base;
+use stdClass;
 use templatable;
 
 /**
@@ -64,9 +65,9 @@ class import_view implements renderable, templatable {
      * Defer to template.
      *
      * @param renderer_base $output
-     * @return object
+     * @return stdClass
      */
-    public function export_for_template(renderer_base $output) {
+    public function export_for_template(renderer_base $output): stdClass {
         $courses = roles::import_get_courses_for_select($this->destinationinstance);
         if (config::get('importrecordings_from_deleted_enabled')) {
             $courses[0] = get_string('recordings_from_deleted_activities', 'mod_bigbluebuttonbn');

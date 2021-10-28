@@ -200,14 +200,14 @@ function bigbluebuttonbn_delete_instance($id) {
  * user has done with a given particular instance of this module
  * Used for user activity reports.
  *
- * @param object $course
- * @param object $user
+ * @param stdClass $course
+ * @param stdClass $user
  * @param cm_info $mod
- * @param object $bigbluebuttonbn
+ * @param stdClass $bigbluebuttonbn
  *
- * @return object with info and time (timestamp of the last log)
+ * @return stdClass with info and time (timestamp of the last log)
  */
-function bigbluebuttonbn_user_outline($course, $user, cm_info $mod, $bigbluebuttonbn) {
+function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info $mod, stdClass $bigbluebuttonbn): stdClass {
     $customcompletion = new custom_completion($mod, $user->id);
     $completed = $customcompletion->get_overall_completion_state();
     $result = new stdClass();
@@ -232,13 +232,13 @@ function bigbluebuttonbn_user_outline($course, $user, cm_info $mod, $bigbluebutt
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param object $course
- * @param object $user
+ * @param stdClass $course
+ * @param stdClass $user
  * @param cm_info $mod
- * @param object $bigbluebuttonbn
+ * @param stdClass $bigbluebuttonbn
  *
  */
-function bigbluebuttonbn_user_complete($course, $user, cm_info $mod, $bigbluebuttonbn) {
+function bigbluebuttonbn_user_complete(stdClass $course, stdClass $user, cm_info $mod, stdClass $bigbluebuttonbn) {
     $customcompletion = new custom_completion($mod, $user->id);
     $result = "";
     foreach ($customcompletion->get_available_custom_rules() as $rule) {
@@ -271,7 +271,7 @@ function bigbluebuttonbn_get_extra_capabilities() {
  *
  * @param object $mform
  */
-function bigbluebuttonbn_reset_course_form_definition(&$mform) {
+function bigbluebuttonbn_reset_course_form_definition(object &$mform) {
     $items = reset::reset_course_items();
     $mform->addElement('header', 'bigbluebuttonbnheader', get_string('modulenameplural', 'bigbluebuttonbn'));
     foreach ($items as $item => $default) {
@@ -289,10 +289,10 @@ function bigbluebuttonbn_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
- * @param object $course
+ * @param stdClass $course
  * @return array
  */
-function bigbluebuttonbn_reset_course_form_defaults($course) {
+function bigbluebuttonbn_reset_course_form_defaults(stdClass $course) {
     $formdefaults = [];
     $items = reset::reset_course_items();
     // All unchecked by default.
@@ -305,10 +305,10 @@ function bigbluebuttonbn_reset_course_form_defaults($course) {
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
  *
- * @param object $data the data submitted from the reset course.
+ * @param stdClass $data the data submitted from the reset course.
  * @return array status array
  */
-function bigbluebuttonbn_reset_userdata($data) {
+function bigbluebuttonbn_reset_userdata(stdClass $data) {
     $items = reset::reset_course_items();
     $status = [];
 
@@ -624,13 +624,14 @@ function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timesta
 /**
  * Outputs the bigbluebutton logs indicated by $activity.
  *
- * @param object $activity the activity object the bigbluebuttonbn resides in
+ * @param stdClass $activity the activity object the bigbluebuttonbn resides in
  * @param int $courseid the id of the course the bigbluebuttonbn resides in
  * @param bool $detail not used, but required for compatibilty with other modules
  * @param int $modnames not used, but required for compatibilty with other modules
  * @param bool $viewfullnames not used, but required for compatibilty with other modules
  */
-function bigbluebuttonbn_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
+function bigbluebuttonbn_print_recent_mod_activity(stdClass $activity, int $courseid, bool $detail, int $modnames,
+    bool $viewfullnames) {
     global $OUTPUT;
 
     $modinfo = [];

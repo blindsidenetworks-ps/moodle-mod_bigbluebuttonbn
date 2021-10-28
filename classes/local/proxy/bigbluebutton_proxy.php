@@ -25,6 +25,7 @@ use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use moodle_url;
+use stdClass;
 
 /**
  * The bigbluebutton proxy class.
@@ -112,10 +113,10 @@ class bigbluebutton_proxy extends proxy_base {
     /**
      * Helper for getting the owner userid of a bigbluebuttonbn instance.
      *
-     * @param object $bigbluebuttonbn BigBlueButtonBN instance
+     * @param stdClass $bigbluebuttonbn BigBlueButtonBN instance
      * @return int ownerid (a valid user id or null if not registered/found)
      */
-    public static function get_instance_ownerid(object $bigbluebuttonbn): int {
+    public static function get_instance_ownerid(stdClass $bigbluebuttonbn): int {
         global $DB;
 
         $filters = [
@@ -196,11 +197,11 @@ class bigbluebutton_proxy extends proxy_base {
     /**
      * Helper function enqueues one user for being validated as for completion.
      *
-     * @param object $bigbluebuttonbn
+     * @param stdClass $bigbluebuttonbn
      * @param int $userid
      * @return void
      */
-    public static function enqueue_completion_event(object $bigbluebuttonbn, int $userid): void {
+    public static function enqueue_completion_event(stdClass $bigbluebuttonbn, int $userid): void {
         try {
             // Create the instance of completion_update_state task.
             $task = new \mod_bigbluebuttonbn\task\completion_update_state();
@@ -222,11 +223,11 @@ class bigbluebutton_proxy extends proxy_base {
     /**
      * Helper function enqueues completion trigger.
      *
-     * @param object $bigbluebuttonbn
+     * @param stdClass $bigbluebuttonbn
      * @param int $userid
      * @return void
      */
-    public static function update_completion_state(object $bigbluebuttonbn, int $userid) {
+    public static function update_completion_state(stdClass $bigbluebuttonbn, int $userid) {
         global $CFG;
         require_once($CFG->libdir . '/completionlib.php');
         list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');

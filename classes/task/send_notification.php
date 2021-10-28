@@ -113,7 +113,7 @@ abstract class send_notification extends adhoc_task {
     /**
      * Get the list of recipients for the notification.
      *
-     * @return object[]
+     * @return stdClass[]
      */
     protected function get_recipients(): array {
         // Potential users should be active users only.

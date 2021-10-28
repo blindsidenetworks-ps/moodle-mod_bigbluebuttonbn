@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step
-{
+class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step {
     /**
      * Structure step to restore one bigbluebuttonbn activity.
      *
@@ -52,10 +51,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     /**
      * Process a bigbluebuttonbn restore.
      *
-     * @param object $data The data in object form
+     * @param array $data The data in object form
      * @return void
      */
-    protected function process_bigbluebuttonbn($data) {
+    protected function process_bigbluebuttonbn(array $data) {
         global $DB;
         $data = (object) $data;
         $data->course = $this->get_courseid();
@@ -69,10 +68,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     /**
      * Process a bigbluebuttonbn_logs restore (additional table).
      *
-     * @param object $data The data in object form
+     * @param array $data The data in object form
      * @return void
      */
-    protected function process_bigbluebuttonbn_logs($data) {
+    protected function process_bigbluebuttonbn_logs(array $data) {
         global $DB;
         $data = (object) $data;
         // Apply modifications.
@@ -89,10 +88,10 @@ class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_s
     /**
      * Process a bigbluebuttonbn_recordings restore (additional table).
      *
-     * @param object $data The data in object form
+     * @param array $data The data in object form
      * @return void
      */
-    protected function process_bigbluebuttonbn_recordings($data) {
+    protected function process_bigbluebuttonbn_recordings(array $data) {
         global $DB;
         $data = (object) $data;
         // Apply modifications.
