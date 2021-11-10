@@ -94,8 +94,16 @@ class custom_completion extends activity_custom_completion {
      * @return array
      */
     public static function get_defined_custom_rules(): array {
-        return ['completionattendance', 'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
-            'completionengagementpollvotes', 'completionengagementemojis'];
+        return [
+            'completionattendance',
+            'completionengagementchats',
+            'completionengagementtalks',
+            'completionengagementraisehand',
+            'completionengagementpollvotes',
+            'completionengagementemojis',
+            'completionview' // Completion view is now a customrule as it depends on the logs and not
+            // the view action itself.
+        ];
     }
 
     /**
@@ -104,12 +112,12 @@ class custom_completion extends activity_custom_completion {
      * @return array
      */
     public function get_custom_rule_descriptions(): array {
-        $completionengagementchats = $this->cm->customdata['customcompletionrules']['completionengagementchats'] ?? 0;
-        $completionengagementtalks = $this->cm->customdata['customcompletionrules']['completionengagementtalks'] ?? 0;
-        $completionengagementraisehand = $this->cm->customdata['customcompletionrules']['completionengagementraisehand'] ?? 0;
-        $completionengagementpollvotes = $this->cm->customdata['customcompletionrules']['completionengagementpollvotes'] ?? 0;
-        $completionengagementemojis = $this->cm->customdata['customcompletionrules']['completionengagementemojis'] ?? 0;
-        $completionattendance = $this->cm->customdata['customcompletionrules']['completionattendance'] ?? 0;
+        $completionengagementchats = $this->cm->customdata['customcompletionrules']['completionengagementchats'] ?? 1;
+        $completionengagementtalks = $this->cm->customdata['customcompletionrules']['completionengagementtalks'] ?? 1;
+        $completionengagementraisehand = $this->cm->customdata['customcompletionrules']['completionengagementraisehand'] ?? 1;
+        $completionengagementpollvotes = $this->cm->customdata['customcompletionrules']['completionengagementpollvotes'] ?? 1;
+        $completionengagementemojis = $this->cm->customdata['customcompletionrules']['completionengagementemojis'] ?? 1;
+        $completionattendance = $this->cm->customdata['customcompletionrules']['completionattendance'] ?? 1;
         return [
             'completionengagementchats' => get_string('completionengagementchats_desc', 'mod_bigbluebuttonbn',
                 $completionengagementchats),

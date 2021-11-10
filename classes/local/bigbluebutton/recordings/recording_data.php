@@ -162,7 +162,7 @@ class recording_data {
      * @param recording $rec a recording row
      * @param array|null $tools
      * @param int|null $courseid
-     * @return stdClass
+     * @return stdClass|null
      */
     public static function row(?instance $instance, recording $rec, ?array $tools = null, ?int $courseid = 0): ?stdClass {
         global $PAGE;

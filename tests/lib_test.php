@@ -115,7 +115,7 @@ class lib_test extends \advanced_testcase {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
 
         $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
-        $this->assertEquals((object)[], $result);
+        $this->assertEquals((object) [], $result);
 
         // Now create a couple of logs.
         $instance = instance::get_from_instanceid($bbactivity->id);
@@ -123,7 +123,7 @@ class lib_test extends \advanced_testcase {
         logger::log_recording_played_event($instance, 1);
 
         $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
-        $this->assertStringContainsString('has joined the meeting or played a recording 2 time(s)', $result->info);
+        $this->assertStringContainsString('Has joined the meeting or played a recording 2 time(s)', $result->info);
     }
 
     /**
@@ -135,19 +135,150 @@ class lib_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
-        $user = $generator->create_user();
+        $user = $generator->create_and_enrol($this->get_course());
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $this->setUser($user);
 
         // Now create a couple of logs.
         $instance = instance::get_from_instanceid($bbactivity->id);
+        $recordings = $this->create_recordings_for_instance($instance, [['name' => "Pre-Recording 1"]]);
         logger::log_meeting_joined_event($instance, 0);
-        logger::log_recording_played_event($instance, 1);
+        logger::log_recording_played_event($instance, $recordings[0]->id);
         ob_start();
         bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivitycm, $bbactivity);
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertStringContainsString('has joined the meeting or played a recording', $output);
+        $this->assertStringContainsString('Has joined the meeting or played a recording', $output);
+    }
+
+    /**
+     * Check get recent activity
+     *
+     * @covers ::bigbluebuttonbn_get_recent_mod_activity
+     */
+    public function test_bigbluebuttonbn_get_recent_mod_activity() {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_and_enrol($this->get_course());
+        $this->setUser($user);
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        // Now create a couple of logs.
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        $recordings = $this->create_recordings_for_instance($instance, [['name' => "Pre-Recording 1"]]);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_recording_played_event($instance, $recordings[0]->id);
+
+        $activities = $this->prepare_for_recent_activity_array(0, $user->id, 0);
+        $this->assertCount(4, $activities);
+        $this->assertEquals(
+            ["Meeting joined", "Meeting joined", "Recording viewed"],
+            array_values(
+                array_filter(
+                    array_map(function($activity) {
+                        return $activity->eventname ?? "";
+                    }, $activities),
+                    function($e) {
+                        return !empty($e);
+                    }
+                )
+            )
+        );
+        $this->assertEquals("Pre-Recording 1", $activities[3]->content); // The recording view event should contain the name
+        // of the activity.
+    }
+
+    /**
+     * Prepare the list of activities as is done in course recent activity
+     *
+     * @param int $date
+     * @param int $user
+     * @param int $group
+     * @return array|void
+     * @throws \moodle_exception
+     */
+    protected function prepare_for_recent_activity_array($date, $user, $group) {
+        // Same algorithm as in cource/recent.php, but stops at the first bbb activity.
+        $course = $this->get_course();
+        $modinfo = get_fast_modinfo($course->id);
+        $sections = array();
+        $index = 0;
+        foreach ($modinfo->get_section_info_all() as $i => $section) {
+            if (!empty($section->uservisible)) {
+                $sections[$i] = $section;
+            }
+        }
+        foreach ($sections as $sectionnum => $section) {
+
+            $activity = new stdClass();
+            $activity->type = 'section';
+            if ($section->section > 0) {
+                $activity->name = get_section_name($this->get_course(), $section);
+            } else {
+                $activity->name = '';
+            }
+
+            $activity->visible = $section->visible;
+            $activities[$index++] = $activity;
+
+            if (empty($modinfo->sections[$sectionnum])) {
+                continue;
+            }
+
+            foreach ($modinfo->sections[$sectionnum] as $cmid) {
+                $cm = $modinfo->cms[$cmid];
+
+                if (!$cm->uservisible) {
+                    continue;
+                }
+
+                if (!empty($filter) and $cm->modname != $filter) {
+                    continue;
+                }
+
+                if (!empty($filtermodid) and $cmid != $filtermodid) {
+                    continue;
+                }
+
+                if ($cm->modname == 'bigbluebuttonbn') {
+                    return bigbluebuttonbn_get_recent_mod_activity($activities,
+                        $index,
+                        $date,
+                        $course->id, $cmid,
+                        $user,
+                        $group);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Check user recent activity
+     *
+     * @covers ::bigbluebuttonbn_print_recent_mod_activity
+     */
+    public function test_bigbluebuttonbn_print_recent_mod_activity() {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_and_enrol($this->get_course());
+        $this->setUser($user);
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        // Now create a couple of logs.
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        $recordings = $this->create_recordings_for_instance($instance, [['name' => "Pre-Recording 1"]]);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_recording_played_event($instance, $recordings[0]->id);
+
+        $activities = $this->prepare_for_recent_activity_array(0, $user->id, 0);
+        ob_start();
+        bigbluebuttonbn_print_recent_mod_activity($activities[1], $this->get_course()->id, false, [], false);
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertStringContainsString('Meeting joined', $output);
     }
 
     /**

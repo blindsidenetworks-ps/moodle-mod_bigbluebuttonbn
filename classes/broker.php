@@ -19,7 +19,6 @@ namespace mod_bigbluebuttonbn;
 use Exception;
 use Firebase\JWT\JWT;
 use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\logs;
 
 /**
  * The broker routines

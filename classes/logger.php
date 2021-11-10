@@ -330,11 +330,14 @@ EOF;
         // Moodle event logger: Create an event for recording played.
         self::log_moodle_event($instance, events::$events['recording_play'], ['other' => $rid]);
 
-        // Internal logger: Instert a record with the playback played.
+        // Internal logger: Insert a record with the playback played.
         self::log(
             $instance,
             self::EVENT_PLAYED,
-            ['meetingid' => $instance->get_meeting_id()]
+            [
+                'meetingid' => $instance->get_meeting_id(),
+            ],
+            json_encode(['recordingid' => $rid])
         );
     }
 

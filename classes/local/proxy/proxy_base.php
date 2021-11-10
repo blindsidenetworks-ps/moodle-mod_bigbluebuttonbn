@@ -16,14 +16,12 @@
 
 namespace mod_bigbluebuttonbn\local\proxy;
 
-use core\files\curl_security_helper;
-use Exception;
-use SimpleXMLElement;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\plugin;
 use moodle_url;
+use SimpleXMLElement;
 
 /**
  * The abstract proxy base class.
@@ -97,12 +95,12 @@ abstract class proxy_base {
     /**
      * Throw an exception if there is a problem in the returned XML value
      *
-     * @param null|SimpleXMLElement $xml
-     * @param string $additionaldetails
+     * @param SimpleXMLElement|bool $xml
+     * @param array|null $additionaldetails
      * @throws bigbluebutton_exception
      * @throws server_not_available_exception
      */
-    protected static function assert_returned_xml(?SimpleXMLElement $xml, string $additionaldetails = ''): void {
+    protected static function assert_returned_xml($xml, ?array $additionaldetails = null): void {
         if (empty($xml)) {
             throw new server_not_available_exception(
                 'general_error_no_answer',
@@ -110,17 +108,21 @@ abstract class proxy_base {
                 (new moodle_url('/admin/settings.php?section=modsettingbigbluebuttonbn'))->out()
             );
         }
-
+        if (is_bool($xml) && $xml) {
+            // Nothing to do here, this might be a post returning that everything went well.
+            return;
+        }
         if ((string) $xml->returncode == 'FAILED') {
             $messagekey = (string) $xml->messageKey ?? '';
-            $messagedetails = (string) $xml->message ?? '';
-            $messagedetails .= $additionaldetails ? " ($additionaldetails) " : '';
-
+            if (!$additionaldetails) {
+                $additionaldetails = [];
+            }
+            $additionaldetails['xmlmessage'] = (string) $xml->message ?? '';
             if (empty($messagekey) || empty(self::MEETING_ERROR[$messagekey])) {
                 $messagekey = 'general_error_unable_connect';
             }
 
-            throw new bigbluebutton_exception($messagekey, $additionaldetails);
+            throw new bigbluebutton_exception($messagekey, json_encode($additionaldetails));
         }
     }
 

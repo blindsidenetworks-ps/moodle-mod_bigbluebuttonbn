@@ -93,20 +93,20 @@ $string['completionattendancegroup'] = 'Require attendance';
 $string['completionattendancegroup_help'] = 'Attending the meeting for (n) minutes is required for completion';
 
 $string['completionengagementchats'] = 'Require chats events';
-$string['completionengagementchats_desc'] = 'Student must take partipate into a chat to complete it';
-$string['completionengagementchats_event_desc'] = 'has raised {$a} Chat event(s)';
+$string['completionengagementchats_desc'] = 'Student must take participate into {$a} chat(s) events to complete it';
+$string['completionengagementchats_event_desc'] = 'Has raised {$a} Chat(s) event(s)';
 $string['completionengagementtalks'] = 'Talk events';
-$string['completionengagementtalks_desc'] = 'Student must talk to complete it';
-$string['completionengagementtalks_event_desc'] = 'has raised {$a} Talk event(s)';
+$string['completionengagementtalks_desc'] = 'Student must talk {$a} time(s) to complete it';
+$string['completionengagementtalks_event_desc'] = 'Has raised {$a} Talk(s) event(s)';
 $string['completionengagementraisehand'] = 'Require raise hand events';
-$string['completionengagementraisehand_desc'] = 'Student must trigger raise hands event to complete it';
-$string['completionengagementraisehand_event_desc'] = 'has raised {$a} Raise Hand event(s)';
+$string['completionengagementraisehand_desc'] = 'Student must raise hand {$a} time(s) to complete it';
+$string['completionengagementraisehand_event_desc'] = 'Has raised {$a} Raise Hand event(s)';
 $string['completionengagementpollvotes'] = 'Poll votes';
-$string['completionengagementpollvotes_desc'] = 'Student must vote into polls to complete it';
-$string['completionengagementpollvotes_event_desc'] = 'has raised {$a} Poll votes events';
+$string['completionengagementpollvotes_desc'] = 'Student must vote into polls {$a} time(s) to complete it';
+$string['completionengagementpollvotes_event_desc'] = 'Has raised {$a} Poll vote(s) events';
 $string['completionengagementemojis'] = 'Emojis';
-$string['completionengagementemojis_desc'] = 'Student must send an emojis into polls to complete it';
-$string['completionengagementemojis_event_desc'] = 'has raised {$a} Emoji event(s)';
+$string['completionengagementemojis_desc'] = 'Student must send {$a} emoji(s) into polls to complete it';
+$string['completionengagementemojis_event_desc'] = 'Has raised {$a} Emoji(s) event(s)';
 
 $string['completionengagement_desc'] = 'Student must engage in activities during the meeting';
 $string['completionengagementgroup'] = 'Require engagement';
@@ -118,7 +118,7 @@ $string['completionvalidatestatetriggered'] = 'Validate completion has been trig
 
 $string['completionview'] = 'Require view';
 $string['completionview_desc'] = 'Student must join a meeting or play a recording to complete it.';
-$string['completionview_event_desc'] = 'has joined the meeting or played a recording {$a} time(s).';
+$string['completionview_event_desc'] = 'Has joined the meeting or played a recording {$a} time(s).';
 $string['sendnotification'] = 'Send notification';
 
 $string['minute'] = 'minute';
@@ -302,7 +302,8 @@ $string['config_lockonjoinconfigurable_editable_description'] = 'Lock configurat
 $string['config_experimental_features'] = 'Configuration for experimental features';
 $string['config_experimental_features_description'] = 'Configuration for experimental features.';
 
-$string['general_error_unable_connect'] = 'Unable to connect ({$a}). Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
+$string['general_error_unable_connect'] = 'Unable to connect. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.
+Details : {$a}';
 $string['general_error_no_answer'] = 'Empty response. Please check the url of the BigBlueButton server AND check to see if the BigBlueButton server is running.';
 $string['general_error_not_allowed_to_create_instances'] = 'User is not allowed to create any type of instances.';
 $string['general_error_not_found'] = 'Entity not found : {$a}.';

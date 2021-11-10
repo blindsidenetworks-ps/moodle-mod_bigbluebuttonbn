@@ -240,11 +240,11 @@ function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info 
  */
 function bigbluebuttonbn_user_complete(stdClass $course, stdClass $user, cm_info $mod, stdClass $bigbluebuttonbn) {
     $customcompletion = new custom_completion($mod, $user->id);
-    $result = "";
+    $result = [];
     foreach ($customcompletion->get_available_custom_rules() as $rule) {
-        $result .= html_writer::tag('li', $customcompletion->get_printable_state($rule));
+        $result[] = $customcompletion->get_printable_state($rule);
     }
-    echo $result;
+    echo join(', ', $result);
 }
 
 /**
@@ -607,15 +607,24 @@ function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timesta
             }
         }
         $activity->user->fullname = fullname($log);
+        $activity->content = '';
         switch ($log->log) {
             case logger::EVENT_JOIN:
-                $activity->eventname = get_string('event_recording_viewed', 'mod_bigbluebuttonbn');
-                break;
-            case logger::EVENT_PLAYED:
                 $activity->eventname = get_string('event_meeting_joined', 'mod_bigbluebuttonbn');
                 break;
+            case logger::EVENT_PLAYED:
+                $activity->eventname = get_string('event_recording_viewed', 'mod_bigbluebuttonbn');
+                if (!empty($log->meta)) {
+                    $meta = json_decode($log->meta);
+                    if (!empty($meta->recordingid)) {
+                        $recording = recording::get_record(['id' => $meta->recordingid]);
+                        if ($recording) {
+                            $activity->content = $recording->get('name');
+                        }
+                    }
+                }
+                break;
         }
-        $activity->content = '';
         $activities[$index++] = $activity;
     }
     return $activities;
@@ -627,20 +636,13 @@ function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timesta
  * @param stdClass $activity the activity object the bigbluebuttonbn resides in
  * @param int $courseid the id of the course the bigbluebuttonbn resides in
  * @param bool $detail not used, but required for compatibilty with other modules
- * @param int $modnames not used, but required for compatibilty with other modules
+ * @param array $modnames not used, but required for compatibilty with other modules
  * @param bool $viewfullnames not used, but required for compatibilty with other modules
  */
-function bigbluebuttonbn_print_recent_mod_activity(stdClass $activity, int $courseid, bool $detail, int $modnames,
+function bigbluebuttonbn_print_recent_mod_activity(stdClass $activity, int $courseid, bool $detail, array $modnames,
     bool $viewfullnames) {
     global $OUTPUT;
-
     $modinfo = [];
-    if ($detail) {
-        $modinfo['modname'] = $activity->name;
-        $modinfo['modurl'] = new moodle_url('/mod/h5pactivity/view.php', ['id' => $activity->cmid]);
-        $modinfo['modicon'] = $OUTPUT->image_icon('icon', $modnames[$activity->type], 'h5pactivity');
-    }
-
     $userpicture = $OUTPUT->user_picture($activity->user);
 
     $template = ['userpicture' => $userpicture,

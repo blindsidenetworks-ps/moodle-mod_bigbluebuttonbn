@@ -66,7 +66,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\local\config::get_options();
 
         // Get only those that are allowed.
-        // TODO: check as here it seems more logical to get this through: $this->_course.
         $course = $this->_course;
         $context = context_course::instance($course->id);
 
