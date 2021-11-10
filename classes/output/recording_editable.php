@@ -127,7 +127,7 @@ abstract class recording_editable extends \core\output\inplace_editable {
     /**
      * Helper function evaluates if a row for the data used by the recording table is editable.
      *
-     * @return boolean
+     * @return bool
      */
     protected function row_editable() {
         // Since the request to BBB are cached, it is safe to use the wrapper to check the server version.

@@ -27,7 +27,6 @@ use core\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\plugin;
@@ -35,7 +34,7 @@ use mod_bigbluebuttonbn\recording;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-global $SESSION, $PAGE, $CFG, $DB, $USER;
+global $SESSION, $PAGE, $CFG, $DB, $USER, $OUTPUT;
 
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
@@ -48,11 +47,9 @@ $index = optional_param('index', 0, PARAM_INT);
 $group = optional_param('group', -1, PARAM_INT);
 
 // Get the bbb instance from either the cmid (id), or the instanceid (bn).
-$id = optional_param('id', 0, PARAM_INT);
 if ($id) {
     $instance = instance::get_from_cmid($id);
 } else {
-    $bn = optional_param('bn', 0, PARAM_INT);
     if ($bn) {
         $instance = instance::get_from_instanceid($bn);
     }
@@ -77,7 +74,7 @@ if ($groupid) {
 
 // Print the page header.
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
+$PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', ['id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id]);
 $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
@@ -86,13 +83,18 @@ $PAGE->blocks->show_only_fake_blocks();
 switch (strtolower($action)) {
     case 'logout':
         if (isset($errors) && $errors != '') {
-            bigbluebuttonbn_bbb_view_errors($errors, $id);
-            break;
+            $errors = (array) json_decode(urldecode($errors));
+            $msgerrors = '';
+            foreach ($errors as $error) {
+                $msgerrors .= html_writer::tag('p', $error->{'message'}, ['class' => 'alert alert-danger']) . "\n";
+            }
+            throw new moodle_exception('view_error_bigbluebutton', 'bigbluebuttonbn',
+                $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $id, $msgerrors, $errors);
         }
 
         if (empty($bigbluebuttonbn)) {
-            bigbluebuttonbn_bbb_view_close_window_manually();
-            break;
+            echo get_string('view_message_tab_close', 'bigbluebuttonbn');
+            die();
         }
         // Moodle event logger: Create an event for meeting left.
         logger::log_meeting_left_event($instance);
@@ -116,9 +118,6 @@ switch (strtolower($action)) {
                 redirect($CFG->wwwroot . '/my/');
             }
         }
-
-        // Close the tab or window where BBB was opened.
-        bigbluebuttonbn_bbb_view_close_window();
         break;
     case 'join':
         if (empty($bigbluebuttonbn)) {
@@ -139,6 +138,7 @@ switch (strtolower($action)) {
         } catch (server_not_available_exception $e) {
             bigbluebutton_proxy::handle_server_not_available($instance);
         }
+        // We should never reach this point.
         break;
 
     case 'play':
@@ -150,121 +150,14 @@ switch (strtolower($action)) {
             notification::add(get_string('recordingurlnotfound', 'mod_bigbluebuttonbn'), notification::ERROR);
             redirect($instance->get_view_url());
         }
+        // We should never reach this point.
         break;
-    default:
-        bigbluebuttonbn_bbb_view_close_window();
 }
-
-/**
- * Helper for closing the tab or window when the user lefts the meeting.
- *
- * @return string
- */
-function bigbluebuttonbn_bbb_view_close_window() {
-    global $OUTPUT, $PAGE;
-    echo $OUTPUT->header();
-    // Behat does not like when we close the Windows as it is expecting to locate
-    // on click part of the pages (bug with selenium raising an exception). So this is a workaround.
-    if (!defined('BEHAT_SITE_RUNNING')) {
-        $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
-    }
-    echo $OUTPUT->footer();
+// When we reach this point, we can close the tab or window where BBB was opened.
+echo $OUTPUT->header();
+// Behat does not like when we close the Windows as it is expecting to locate
+// on click part of the pages (bug with selenium raising an exception). So this is a workaround.
+if (!defined('BEHAT_SITE_RUNNING')) {
+    $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/rooms', 'setupWindowAutoClose');
 }
-
-/**
- * Helper for showing a message when the tab or window can not be closed.
- *
- * @return string
- */
-function bigbluebuttonbn_bbb_view_close_window_manually() {
-    echo get_string('view_message_tab_close', 'bigbluebuttonbn');
-}
-
-/**
- * Helper for preparing data used for creating the meeting.
- *
- * @param instance $instance
- * @return object
- */
-function bigbluebuttonbn_bbb_view_create_meeting_data(instance $instance) {
-    $data = [
-        'meetingID' => $instance->get_meeting_id(),
-        'name' => plugin::html2text($instance->get_meeting_name(), 64),
-        'attendeePW' => $instance->get_viewer_password(),
-        'moderatorPW' => $instance->get_moderator_password(),
-        'logoutURL' => $instance->get_logout_url()->out(false),
-        'record' => bigbluebuttonbn_bbb_view_create_meeting_data_record($instance->is_recorded()),
-        'autoStartRecording' => $instance->should_record_from_start(),
-        'allowStartStopRecording' => $instance->allow_recording_start_stop(),
-        'welcome' => trim($instance->get_welcome_message()),
-        'muteOnStart' => $instance->get_mute_on_start(),
-    ];
-
-    $voicebridge = $instance->get_voice_bridge();
-    if ($voicebridge > 0 && $voicebridge < 79999) {
-        $data['voiceBridge'] = $voicebridge;
-    }
-
-    $maxparticipants = $instance->get_user_limit();
-    if ($maxparticipants > 0) {
-        $data['maxParticipants'] = $maxparticipants;
-    }
-
-    // Lock settings.
-    $lockedsettings = [
-        'lockSettingsDisableCam' => 'disablecam',
-        'lockSettingsDisableMic' => 'disablemic',
-        'lockSettingsDisablePrivateChat' => 'disableprivatechat',
-        'lockSettingsDisablePublicChat' => 'disablepublicchat',
-        'lockSettingsDisableNote' => 'disablenote',
-        'lockSettingsHideUserList' => 'hideuserlist',
-        'lockSettingsLockedLayout' => 'lockedlayout',
-        'lockSettingsLockOnJoin' => 'lockonjoin',
-        'lockSettingsLockOnJoinConfigurable' => 'lockonjoinconfigurable',
-    ];
-
-    foreach ($lockedsettings as $datakey => $instancekey) {
-        $data[$datakey] = $instance->get_instance_var($instancekey);
-    }
-
-    foreach ($data as $key => $value) {
-        if (is_bool($value)) {
-            $data[$key] = $value ? 'true' : 'false';
-        }
-    }
-
-    return $data;
-}
-
-/**
- * Helper for returning the flag to know if the meeting is recorded.
- *
- * @param boolean $record
- * @return string
- */
-function bigbluebuttonbn_bbb_view_create_meeting_data_record($record) {
-    if ((boolean) \mod_bigbluebuttonbn\local\config::recordings_enabled() && $record) {
-        return 'true';
-    }
-    return 'false';
-}
-
-/**
- * Helper for showinf error messages if any.
- *
- * @param string $serrors
- * @param string $id
- * @return string
- */
-function bigbluebuttonbn_bbb_view_errors($serrors, $id) {
-    global $CFG, $OUTPUT;
-    $errors = (array) json_decode(urldecode($serrors));
-    $msgerrors = '';
-    foreach ($errors as $error) {
-        $msgerrors .= html_writer::tag('p', $error->{'message'}, array('class' => 'alert alert-danger')) . "\n";
-    }
-    echo $OUTPUT->header();
-    throw new moodle_exception('view_error_bigbluebutton', 'bigbluebuttonbn',
-        $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $id, $msgerrors, $serrors);
-    echo $OUTPUT->footer();
-}
+echo $OUTPUT->footer();

@@ -111,16 +111,17 @@ class meeting_test extends \advanced_testcase {
     }
 
     /**
-     * Test for bigbluebuttonbn_get_allrecordings status refresh.
+     * Test that create meeing is working for all types.
      *
      * @dataProvider get_instance_types_meeting_info
      * @param int $type
-     * @param string $groupname
+     * @param string|null $groupname
      * @covers ::create_meeting
      * @covers ::create_meeting_data
      * @covers ::create_meeting_metadata
      */
-    public function test_create_meeting(int $type, $groupname) {
+    public function test_create_meeting(int $type, ?string $groupname) {
+        $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
             $this->prepare_meeting($type, $groupname, SEPARATEGROUPS, false);
         $meeting->create_meeting();
@@ -133,15 +134,16 @@ class meeting_test extends \advanced_testcase {
     }
 
     /**
-     * Test for get meeting info
+     * Test for get meeting info for all types
      *
      * @param int $type
-     * @param string $groupname
+     * @param string|null $groupname
      * @dataProvider get_instance_types_meeting_info
      * @covers ::get_meeting_info
      * @covers ::do_get_meeting_info
      */
-    public function test_get_meeting_info(int $type, $groupname) {
+    public function test_get_meeting_info(int $type, ?string $groupname) {
+        $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname);
         $meetinginfo = $meeting->get_meeting_info();
         $this->assertNotNull($meetinginfo);
@@ -156,17 +158,18 @@ class meeting_test extends \advanced_testcase {
     }
 
     /**
-     * Test for get meeting info
+     * Test can join is working for all types
      *
      * @param int $type
-     * @param string $groupname
+     * @param string|null $groupname
      * @param int $groupmode
      * @param array $canjoin
-     * @param array $dates
+     * @throws \coding_exception
      * @dataProvider get_instance_types_meeting_info
      * @covers ::can_join
      */
     public function test_can_join(int $type, ?string $groupname, int $groupmode, array $canjoin) {
+        $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname, $groupmode);
         $this->setUser($useringroup);
         $meeting->update_cache();
@@ -183,10 +186,10 @@ class meeting_test extends \advanced_testcase {
     }
 
     /**
-     * Test for get meeting info
+     * Test can join is working if opening/closing time are set
      *
      * @param int $type
-     * @param string $groupname
+     * @param string|null $groupname
      * @param int $groupmode
      * @param array $canjoin
      * @param array $dates
@@ -195,6 +198,7 @@ class meeting_test extends \advanced_testcase {
      * @covers ::can_join
      */
     public function test_can_join_with_dates(int $type, ?string $groupname, int $groupmode, array $canjoin, array $dates) {
+        $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
             $this->prepare_meeting($type, $groupname, $groupmode, true, $dates);
         $this->setUser($useringroup);
@@ -205,6 +209,38 @@ class meeting_test extends \advanced_testcase {
             $meeting->update_cache();
             $this->assertEquals($canjoin['usernotingroup'], $meeting->can_join());
         }
+    }
+
+    /**
+     * Test that attendees returns the right list of attendees
+     *
+     * @covers ::get_attendees
+     */
+    public function test_get_attendees() {
+        $this->resetAfterTest();
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
+            $this->prepare_meeting(instance::TYPE_ALL, null, NOGROUPS, true);
+        $this->setUser($useringroup);
+        $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
+        $meeting->update_cache();
+        $this->assertCount(1, $meeting->get_attendees());
+        $otheruser = $this->getDataGenerator()->create_and_enrol($this->get_course());
+        $this->setUser($useringroup);
+        $meeting->update_cache();
+        $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
+        $meeting->update_cache();
+        $this->assertCount(2, $meeting->get_attendees());
+    }
+
+    /**
+     * Send a join meeting API CALL
+     *
+     * @param string $url
+     */
+    protected function join_meeting(string $url) {
+        $curl = new \curl();
+        $url = new \moodle_url($url);
+        $curl->get($url->out_omit_querystring(), $url->params());
     }
 
     /**
@@ -235,15 +271,14 @@ class meeting_test extends \advanced_testcase {
      * Helper to prepare for a meeting
      *
      * @param int $type
-     * @param string $groupname
+     * @param string|null $groupname
      * @param int $groupmode
      * @param bool $createmeeting
+     * @param array $dates
      * @return array
-     * @throws \coding_exception
      */
-    protected function prepare_meeting(int $type, ?string $groupname, $groupmode = SEPARATEGROUPS, $createmeeting = true,
-        $dates = []) {
-        $this->resetAfterTest();
+    protected function prepare_meeting(int $type, ?string $groupname, int $groupmode = SEPARATEGROUPS, bool $createmeeting = true,
+        array $dates = []) {
         $this->setAdminUser();
         $bbbgenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
         $groupid = 0;
@@ -251,7 +286,7 @@ class meeting_test extends \advanced_testcase {
         $usernotingroup = $this->getDataGenerator()->create_and_enrol($this->get_course());
         if (!empty($groupname)) {
             $groupid = groups_get_group_by_name($this->get_course()->id, $groupname);
-            $this->getDataGenerator()->create_group_member(array('groupid' => $groupid, 'userid' => $useringroup->id));
+            $this->getDataGenerator()->create_group_member(['groupid' => $groupid, 'userid' => $useringroup->id]);
         }
         $meetinginfo = [
             'course' => $this->get_course()->id,

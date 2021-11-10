@@ -102,7 +102,6 @@ class backup_restore_test extends restore_date_testcase {
         $generator = $this->getDataGenerator();
         $othercourse = $generator->create_course();
         $otherbbbactivities = [];
-        // Other course.
         $recordingstoimport = [];
 
         list('activity' => $otherbbbactivities[], 'recordings' => $recordings) =

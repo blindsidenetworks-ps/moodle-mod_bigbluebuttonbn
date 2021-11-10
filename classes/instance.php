@@ -39,10 +39,10 @@ class instance {
     /** @var int Defines an instance type that includes room and recordings */
     public const TYPE_ALL = 0;
 
-    /** @var int Defines an instance type that inclueds only room */
+    /** @var int Defines an instance type that includes only room */
     public const TYPE_ROOM_ONLY = 1;
 
-    /** @var int Defines an instance type that inclueds only recordings */
+    /** @var int Defines an instance type that includes only recordings */
     public const TYPE_RECORDING_ONLY = 2;
 
     /** @var cm_info The cm_info object relating to the instance */
@@ -62,9 +62,6 @@ class instance {
 
     /** @var int The current groupid if set */
     protected $groupid;
-
-    /** @var array Legacy data for caching */
-    protected $legacydata;
 
     /**
      * instance constructor.
@@ -605,7 +602,7 @@ EOF;
         $inrightgroup = !$groupid || $this->user_has_group_access($USER, $groupid);
         $hascapability = has_capability('moodle/category:manage', $context)
             || (has_capability('mod/bigbluebuttonbn:join', $context) && $inrightgroup);
-        $canjoin = $this->get_type() != self::TYPE_RECORDING_ONLY && $hascapability; // Room only cannot be joined ever.
+        $canjoin = $this->get_type() != self::TYPE_RECORDING_ONLY && $hascapability; // Recording only cannot be joined ever.
         return $canjoin;
     }
 
@@ -1079,7 +1076,7 @@ EOF;
     /**
      * Check if meeting is recorded.
      *
-     * @return boolean
+     * @return bool
      */
     public function should_record() {
         return (boolean) config::recordings_enabled() && $this->is_recorded();

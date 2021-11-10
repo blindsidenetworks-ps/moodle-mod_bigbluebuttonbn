@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\external;
 
 use external_api;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use moodle_exception;
 use require_login_exception;
@@ -131,6 +132,34 @@ class end_meeting_test extends \externallib_advanced_testcase {
         $plugingenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
         ]);
+
+        $this->setAdminUser();
+
+        $result = $this->end_meeting($instance->get_instance_id(), 0);
+        $this->assertIsArray($result);
+
+        // TODO Check that the meeting was ended on the remote.
+    }
+    /**
+     * Test execute admin logic
+     */
+    public function test_execute_end_meeting_already_ended() {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $record = $generator->create_module('bigbluebuttonbn', ['course' => $course->id]);
+        $instance = instance::get_from_instanceid($record->id);
+
+        $plugingenerator = $generator->get_plugin_generator('mod_bigbluebuttonbn');
+        $plugingenerator->create_meeting([
+            'instanceid' => $instance->get_instance_id(),
+        ]);
+
+        // Then end the meeting.
+        // Execute the end command.
+        $meeting = new meeting($instance);
+        $meeting->end_meeting();
 
         $this->setAdminUser();
 

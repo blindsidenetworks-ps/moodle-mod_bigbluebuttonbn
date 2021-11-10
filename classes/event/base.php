@@ -40,7 +40,7 @@ abstract class base extends \core\event\base {
      *
      * @var array
      */
-    protected static $objectidmapping = array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+    protected static $objectidmapping = ['db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn'];
 
     /**
      * Legacy log data.
@@ -66,13 +66,13 @@ abstract class base extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $vars = array(
+        $vars = [
             'userid' => $this->userid,
             'courseid' => $this->courseid,
             'objectid' => $this->objectid,
             'contextinstanceid' => $this->contextinstanceid,
             'other' => $this->other
-          );
+        ];
         $string = $this->description;
         foreach ($vars as $key => $value) {
             $string = str_replace("##" . $key, $value, $string);
@@ -86,7 +86,7 @@ abstract class base extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/bigbluebuttonbn/view.php', ['id' => $this->contextinstanceid]);
     }
 
     /**
@@ -102,7 +102,7 @@ abstract class base extends \core\event\base {
             $fullurl .= '&' . $url;
         }
 
-        $this->legacylogdata = array($this->courseid, 'bigbluebuttonbn', $action, $fullurl, $info, $this->contextinstanceid);
+        $this->legacylogdata = [$this->courseid, 'bigbluebuttonbn', $action, $fullurl, $info, $this->contextinstanceid];
     }
 
     /**

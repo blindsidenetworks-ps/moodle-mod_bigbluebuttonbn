@@ -72,7 +72,7 @@ class renderer extends plugin_renderer_base {
             return '';
         }
 
-        if (has_capability('moodle/site:accessallgroups', $instance->get_context())) {
+        if (count($groups) > 1) {
             notification::add(get_string('view_groups_selection_warning', 'bigbluebuttonbn'), notification::INFO);
         }
 

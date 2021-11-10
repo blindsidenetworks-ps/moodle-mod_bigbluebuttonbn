@@ -10,7 +10,7 @@ Feature: bigbluebuttonbn instance
       | fullname    | shortname   | category |
       | Test course | Test course | 0        |
 
-  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+  Scenario: Add a mod_bigbluebuttonbn instance with Room/Activity with recordings
     Given I am on the "Test course" "course" page logged in as "admin"
     And I am on "Test course" course homepage with editing mode on
     When I add a "BigBlueButton" to section "1" and I fill the form with:
@@ -24,7 +24,7 @@ Feature: bigbluebuttonbn instance
     And I should see "Join session"
     And I should see "Recordings"
 
-  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+  Scenario: Add a mod_bigbluebuttonbn instance with Room/Activity only
     Given I am on the "Test course" "course" page logged in as "admin"
     And I am on "Test course" course homepage with editing mode on
     When I add a "BigBlueButton" to section "1" and I fill the form with:
@@ -37,7 +37,7 @@ Feature: bigbluebuttonbn instance
     And I should see "Join session"
     And I should not see "Recordings"
 
-  Scenario: Add a mod_bigbluebuttonbn instance with Room and Recordings
+  Scenario: Add a mod_bigbluebuttonbn instance with Recordings only
     Given I am on the "Test course" "course" page logged in as "admin"
     And I am on "Test course" course homepage with editing mode on
     When I add a "BigBlueButton" to section "1" and I fill the form with:

@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$icons = array(
-    'mod_bigbluebuttonbn|icon' => array(
-            'data' => array(
+$icons = [
+    'mod_bigbluebuttonbn|icon' => [
+            'data' => [
                     'classes' => 'icon-bigbluebutton',
-                ),
-        ),
-);
+            ],
+    ],
+];

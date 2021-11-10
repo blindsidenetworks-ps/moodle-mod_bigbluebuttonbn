@@ -44,12 +44,13 @@ class recording_data {
      *
      * @param array $recordings
      * @param array $tools
-     * @param instance $instance
+     * @param instance|null $instance
      * @param int $courseid
      * @return array
      * @throws \coding_exception
      */
-    public static function get_recording_table($recordings, $tools, $instance = null, $courseid = 0) {
+    public static function get_recording_table(array $recordings, array $tools, instance $instance = null,
+        int $courseid = 0): array {
         $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
         $lang = get_string('locale', 'core_langconfig');
         $locale = substr($lang, 0, strpos($lang, '.'));
@@ -71,7 +72,7 @@ class recording_data {
             // Protected recordings is not a standard feature, remove actions when protected flag is not present.
             $rowtools = $tools;
             if (in_array('protect', $rowtools) && $recording->get('protected') === null) {
-                $rowtools = array_diff($rowtools, array('protect', 'unprotect'));
+                $rowtools = array_diff($rowtools, ['protect', 'unprotect']);
             }
             $rowdata = self::row($instance, $recording, $rowtools);
             if (!empty($rowdata)) {
@@ -171,7 +172,7 @@ class recording_data {
         $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
         foreach ($tools as $key => $tool) {
             if ((!empty($instance) && !$instance->can_perform_on_recordings($tool))
-                || (empty($instance)  && !$hascapabilityincourse)) {
+                || (empty($instance) && !$hascapabilityincourse)) {
                 unset($tools[$key]);
             }
         }
@@ -186,7 +187,7 @@ class recording_data {
 
         if (empty($instance)) {
             // Set activity name.
-            $rowdata->recording = $rec->get('name');;
+            $rowdata->recording = $rec->get('name');
 
             // Set activity description.
             $rowdata->description = $rec->get('description');
@@ -221,17 +222,10 @@ class recording_data {
     }
 
     /**
-     * Helper function converts recording date used in row for the data used by the recording table.
-     *
-     * @param recording $recording
-     * @return int
-     */
-
-    /**
      * Helper function evaluates if recording preview should be included.
      *
      * @param instance $instance
-     * @return boolean
+     * @return bool
      */
     public static function preview_enabled(instance $instance): bool {
         return $instance->get_instance_var('recordings_preview') == '1';
@@ -269,7 +263,7 @@ class recording_data {
      * @return string the matching language string or a capitalised version of the provided string
      */
     public static function type_text(string $playbacktype): string {
-        // Check first if string exists, and if it does'nt just default to the capitalised version of the string.
+        // Check first if string exists, and if it does not, just default to the capitalised version of the string.
         $text = ucwords($playbacktype);
         $typestringid = 'view_recording_format_' . $playbacktype;
         if (get_string_manager()->string_exists($typestringid, 'bigbluebuttonbn')) {
@@ -283,7 +277,7 @@ class recording_data {
      *
      * @param instance|null $instance
      * @param recording $rec a bigbluebuttonbn_recordings row
-     * @return boolean
+     * @return bool
      */
     protected static function include_recording_table_row(?instance $instance, recording $rec): bool {
         if (empty($instance)) {

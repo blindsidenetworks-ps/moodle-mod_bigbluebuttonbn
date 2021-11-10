@@ -306,7 +306,7 @@ class instance_test extends advanced_testcase {
      */
     public function test_is_currently_open(?int $openingtime, ?int $closingtime, bool $expected): void {
         $stub = $this->getMockBuilder(instance::class)
-            ->setMethods(['get_instance_var'])
+            ->onlyMethods(['get_instance_var'])
             ->disableOriginalConstructor()
             ->getMock();
 

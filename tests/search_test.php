@@ -38,13 +38,8 @@ class search_test extends advanced_testcase {
     protected $bbbactivtyarea = null;
 
     public function setUp(): void {
-        $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
-
         $this->bbbactivtyarea = \core_search\manager::get_search_area('mod_bigbluebuttonbn-activity');
-
-        // Set \core_search::instance to the mock_search_engine as we don't require the search engine to be working to test this.
-        $search = testable_core_search::instance();
     }
 
     /**
@@ -76,5 +71,4 @@ class search_test extends advanced_testcase {
         $this->assertEquals(2, count($documents));
         $rs->close();
     }
-
 }

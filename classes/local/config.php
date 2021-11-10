@@ -52,7 +52,7 @@ class config {
      * @return array
      */
     protected static function defaultvalues() {
-        return array(
+        return [
             'server_url' => self::DEFAULT_SERVER_URL,
             'shared_secret' => self::DEFAULT_SHARED_SECRET,
             'voicebridge_editable' => false,
@@ -116,7 +116,7 @@ class config {
             'lockonjoinconfigurable_default' => false,
             'lockonjoinconfigurable_editable' => true,
             'welcome_default' => '',
-        );
+        ];
     }
 
     /**
@@ -153,7 +153,7 @@ class config {
     /**
      * Validates if recording settings are enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public static function recordings_enabled() {
         return (boolean)self::get('recordings_enabled');
@@ -162,7 +162,7 @@ class config {
     /**
      * Validates if imported recording settings are enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public static function importrecordings_enabled() {
         return (boolean)self::get('importrecordings_enabled');
@@ -174,7 +174,7 @@ class config {
      * @return array
      */
     public static function get_options() {
-        return array(
+        return [
                'version_major' => self::get_moodle_version_major(),
                'voicebridge_editable' => self::get('voicebridge_editable'),
                'importrecordings_enabled' => self::get('importrecordings_enabled'),
@@ -230,7 +230,7 @@ class config {
                'lockonjoinconfigurable_editable' => self::get('lockonjoinconfigurable_editable'),
                'lockonjoinconfigurable_default' => self::get('lockonjoinconfigurable_default'),
                'welcome_default' => self::get('welcome_default'),
-          );
+        ];
     }
 
     /**
@@ -242,7 +242,7 @@ class config {
      * @return array
      */
     public static function get_enabled_features($typeprofiles, $type = null) {
-        $enabledfeatures = array();
+        $enabledfeatures = [];
         $features = $typeprofiles[instance::TYPE_ALL]['features'];
         if (!is_null($type) && key_exists($type, $typeprofiles)) {
             $features = $typeprofiles[$type]['features'];

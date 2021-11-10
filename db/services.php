@@ -89,7 +89,7 @@ $functions = [
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
-    'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => array(
+    'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => [
         'classname'     => 'mod_bigbluebuttonbn\external\get_bigbluebuttonbns_by_courses',
         'methodname'    => 'execute',
         'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided
@@ -97,15 +97,15 @@ $functions = [
         'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ),
-    'mod_bigbluebuttonbn_view_bigbluebuttonbn' => array(
+    ],
+    'mod_bigbluebuttonbn_view_bigbluebuttonbn' => [
         'classname'     => 'mod_bigbluebuttonbn\external\view_bigbluebuttonbn',
         'methodname'    => 'execute',
         'description'   => 'Trigger the course module viewed event and update the module completion status.',
         'type'          => 'write',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE]
-    ),
+    ],
     'mod_bigbluebuttonbn_get_join_url' => [
         'classname'     => 'mod_bigbluebuttonbn\external\get_join_url',
         'methodname'    => 'execute',

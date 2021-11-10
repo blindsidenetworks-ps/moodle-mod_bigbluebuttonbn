@@ -51,6 +51,6 @@ class meeting_created extends base
      * @return array
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
+        return ['db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn'];
     }
 }

@@ -25,6 +25,7 @@
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use core_tag_tag;
+use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 
 /**
@@ -47,10 +48,10 @@ class reset_test extends \advanced_testcase {
         $this->resetAfterTest();
         $CFG->bigbluebuttonbn_recordings_enabled = false;
         $results = reset::reset_course_items();
-        $this->assertEquals(array("events" => 0, "tags" => 0, "logs" => 0), $results);
+        $this->assertEquals(["events" => 0, "tags" => 0, "logs" => 0], $results);
         $CFG->bigbluebuttonbn_recordings_enabled = true;
         $results = reset::reset_course_items();
-        $this->assertEquals(array("events" => 0, "tags" => 0, "logs" => 0, "recordings" => 0), $results);
+        $this->assertEquals(["events" => 0, "tags" => 0, "logs" => 0, "recordings" => 0], $results);
     }
 
     /**
@@ -59,11 +60,11 @@ class reset_test extends \advanced_testcase {
     public function test_reset_getstatus() {
         $this->resetAfterTest();
         $result = reset::reset_getstatus('events');
-        $this->assertEquals(array(
+        $this->assertEquals([
                 'component' => 'BigBlueButton',
                 'item' => 'Deleted events',
                 'error' => false,
-        ), $result);
+        ], $result);
     }
 
     /**
@@ -81,11 +82,11 @@ class reset_test extends \advanced_testcase {
         \mod_bigbluebuttonbn\local\helpers\mod_helper::process_post_save($formdata);
         $this->assertEquals(1, $DB->count_records(
                 'event',
-                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id)));
+                ['modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id]));
         reset::reset_events($this->get_course()->id);
         $this->assertEquals(0, $DB->count_records(
                 'event',
-                array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id)));
+                ['modulename' => 'bigbluebuttonbn', 'courseid' => $this->get_course()->id]));
     }
 
     /**
@@ -94,7 +95,7 @@ class reset_test extends \advanced_testcase {
     public function test_reset_tags() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(null,
-                array('course' => $this->get_course()->id),
+                ['course' => $this->get_course()->id],
                 ['visible' => true]
         );
         core_tag_tag::add_item_tag('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id, $bbactivitycontext, 'newtag');
@@ -103,5 +104,24 @@ class reset_test extends \advanced_testcase {
         reset::reset_tags($this->get_course()->id);
         $alltags = core_tag_tag::get_item_tags('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id);
         $this->assertCount(0, $alltags);
+    }
+
+    /**
+     * Reset recordings test
+     */
+    public function test_reset_recordings() {
+        $this->resetAfterTest();
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(null,
+            ['course' => $this->get_course()->id],
+            ['visible' => true]
+        );
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        $this->create_recordings_for_instance($instance, [
+            ['name' => 'Recording 1'],
+            ['name' => 'Recording 2'],
+        ]);
+        $this->assertCount(2, $instance->get_recordings());
+        reset::reset_recordings($this->get_course()->id);
+        $this->assertCount(0, $instance->get_recordings());
     }
 }

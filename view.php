@@ -27,12 +27,12 @@
 
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
-use mod_bigbluebuttonbn\local\view;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\output\view_page;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__ . '/../../config.php');
+global $OUTPUT, $PAGE;
 
 // Get the bbb instance from either the cmid (id), or the instanceid (bn).
 $id = optional_param('id', 0, PARAM_INT);
@@ -75,28 +75,23 @@ $PAGE->set_title($cm->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
-// Validate if the user is in a role allowed to join.
-if (!$instance->can_join() && $instance->get_type() != instance::TYPE_RECORDING_ONLY) {
-    // TODO Consider using \core\notification::add('message', \core\notification::ERROR);
-    // Combined with a redirect() to the course homepage.
-    echo $OUTPUT->header();
-    echo $OUTPUT->confirm(
-        sprintf(
-            '<p>%s</p>%s',
-            get_string(isguestuser() ? 'view_noguests' : 'view_nojoin', plugin::COMPONENT),
-            get_string('liketologin')
-        ),
-        get_login_url(),
-        new moodle_url('/course/view.php', ['id' => $course->id])
-    );
-    echo $OUTPUT->footer();
-    exit;
-}
-
 // Output starts.
 $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
 
 echo $OUTPUT->header();
+
+// Validate if the user is in a role allowed to join.
+if (!$instance->can_join() && $instance->get_type() != instance::TYPE_RECORDING_ONLY) {
+    if (isguestuser()) {
+        notice(get_string('view_noguests', plugin::COMPONENT), get_login_url());
+    } else {
+        notice(
+            get_string('view_nojoin', plugin::COMPONENT),
+            new moodle_url('/course/view.php', ['id' => $course->id])
+        );
+    }
+}
+
 echo $renderer->render(new view_page($instance));
 
 // Output finishes.

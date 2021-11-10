@@ -107,7 +107,7 @@ class files_test extends \advanced_testcase {
         $instance = instance::get_from_instanceid($bbactivity->id);
         $presentation = $instance->get_presentation_for_bigbluebutton_upload();
         $fulldirset = explode('/', $presentation['url']);
-        $filename = array_pop($fulldirset);;
+        $filename = array_pop($fulldirset);
         $nonce = array_pop($fulldirset);
         // The link should be valid twice.
         for ($i = 0; $i < 2; $i++) {
@@ -136,7 +136,7 @@ class files_test extends \advanced_testcase {
         $instance = instance::get_from_instanceid($bbactivity->id);
         $presentation = $instance->get_presentation();
         $fulldirset = explode('/', $presentation['url']);
-        $filename = array_pop($fulldirset);;
+        $filename = array_pop($fulldirset);
         $this->setGuestUser();
         $this->expectException(\require_login_exception::class);
         files::pluginfile_file($this->get_course(), $instance->get_cm(), $instance->get_context(), 'presentation',

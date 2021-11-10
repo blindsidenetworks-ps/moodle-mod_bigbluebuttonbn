@@ -56,6 +56,7 @@ class recording_test extends \advanced_testcase {
      * @covers ::get
      */
     public function test_get_allrecordings_status_refresh(int $status) {
+        $this->resetAfterTest();
         ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
             instance::TYPE_ALL, [['status' => $status]]);
 
@@ -68,6 +69,7 @@ class recording_test extends \advanced_testcase {
      * @covers ::get_name
      */
     public function test_get_name(): void {
+        $this->resetAfterTest();
         ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
             instance::TYPE_ALL, [['name' => 'Example name']]);
 
@@ -80,6 +82,7 @@ class recording_test extends \advanced_testcase {
      * @covers ::get_description
      */
     public function test_get_description(): void {
+        $this->resetAfterTest();
         ['recordings' => $recordings] = $this->create_activity_with_recordings($this->get_course(),
             instance::TYPE_ALL, [[
             'description' => 'Example description',
@@ -146,7 +149,7 @@ class recording_test extends \advanced_testcase {
      * @dataProvider get_allrecordings_types_provider
      */
     public function test_get_recording_for_group($type) {
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
 
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
 
@@ -209,6 +212,7 @@ class recording_test extends \advanced_testcase {
      */
     public function test_get_recordings_from_deleted_activity($type) {
         $this->resetAfterTest(true);
+        $this->initialise_mock_server();
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
 
         $testcourse = $this->getDataGenerator()->create_course();

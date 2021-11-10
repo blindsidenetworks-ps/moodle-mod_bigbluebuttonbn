@@ -18,8 +18,6 @@ namespace mod_bigbluebuttonbn\task;
 
 use core\task\adhoc_task;
 use mod_bigbluebuttonbn\recording;
-use cache;
-use moodle_exception;
 
 /**
  * Class containing the scheduled task for converting recordings for the BigBlueButton version 2.5 in Moodle 4.0.
@@ -86,8 +84,10 @@ class reset_recordings extends adhoc_task {
         return $DB->get_records_sql(
             'SELECT * FROM {bigbluebuttonbn_recordings}
              WHERE status = :status_processed OR status = :status_notified
-             ORDER BY timecreated DESC',
-            ['status_processed' => recording::RECORDING_STATUS_PROCESSED, 'status_notified' => recording::RECORDING_STATUS_NOTIFIED],
+             ORDER BY timecreated DESC', [
+                'status_processed' => recording::RECORDING_STATUS_PROCESSED,
+                'status_notified' => recording::RECORDING_STATUS_NOTIFIED
+            ],
             0,
             self::$chunksize
         );

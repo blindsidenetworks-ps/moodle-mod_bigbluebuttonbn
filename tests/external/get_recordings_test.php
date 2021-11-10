@@ -209,7 +209,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
     }
 
     /**
-     * Check we can see all recording from a cours in a room only instance
+     * Check we can see all recording from a course in a room only instance
      */
     public function test_get_recordings_room_only() {
         $this->resetAfterTest();

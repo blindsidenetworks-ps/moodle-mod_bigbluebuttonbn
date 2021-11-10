@@ -51,7 +51,7 @@ class behat_mod_bigbluebuttonbn extends behat_base {
     }
 
     /**
-     * Ensure that it is possible to connect to a bbb mock server.
+     * Check that the TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER is defined, so we can connect to the mock server.
      *
      * @Given /^a BigBlueButton mock server is configured$/
      */
@@ -116,10 +116,7 @@ XPATH
      * @throws Exception with a meaningful error message if the specified page cannot be found.
      */
     protected function resolve_page_url(string $page): moodle_url {
-        switch ($page) {
-            default:
-                throw new Exception("Unrecognised page type '{$page}'.");
-        }
+        throw new Exception("Unrecognised page type '{$page}'.");
     }
 
     /**

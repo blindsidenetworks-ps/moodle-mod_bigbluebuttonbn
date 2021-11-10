@@ -18,7 +18,6 @@ namespace mod_bigbluebuttonbn\local\proxy;
 
 use cache;
 use cache_helper;
-use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_helper;
 
 /**
  * The recording proxy.
@@ -47,7 +46,7 @@ class recording_proxy extends proxy_base {
      * Perform deleteRecordings on BBB.
      *
      * @param string $recordid a recording id
-     * @return boolean
+     * @return bool
      */
     public static function delete_recording(string $recordid): bool {
         $result = self::fetch_endpoint_xml('deleteRecordings', ['recordID' => $recordid]);
@@ -62,7 +61,7 @@ class recording_proxy extends proxy_base {
      *
      * @param string $recordid
      * @param string $publish
-     * @return boolean
+     * @return bool
      */
     public static function publish_recording(string $recordid, string $publish = 'true'): bool {
         $result = self::fetch_endpoint_xml('publishRecordings', [
@@ -85,7 +84,7 @@ class recording_proxy extends proxy_base {
      *
      * @param string $recordid
      * @param string $protected
-     * @return boolean
+     * @return bool
      */
     public static function protect_recording(string $recordid, string $protected = 'true'): bool {
         $result = self::fetch_endpoint_xml('updateRecordings', [
@@ -232,8 +231,8 @@ class recording_proxy extends proxy_base {
                     }
 
                     // If there were meetings already created.
-                    foreach ($xml->recordings->recording as $recordingxml) {
-                        $recording = self::parse_recording($recordingxml);
+                    foreach ($xml->recordings->recording as $subrecordingxml) {
+                        $recording = self::parse_recording($subrecordingxml);
                         $recordings[$recording['recordID']] = $recording;
                     }
                 }
@@ -277,10 +276,12 @@ class recording_proxy extends proxy_base {
      */
     public static function parse_recording(object $recording): array {
         // Add formats.
-        $playbackarray = array();
+        $playbackarray = [];
         foreach ($recording->playback->format as $format) {
-            $playbackarray[(string) $format->type] = array('type' => (string) $format->type,
-                'url' => trim((string) $format->url), 'length' => (string) $format->length);
+            $playbackarray[(string) $format->type] = [
+                'type' => (string) $format->type,
+                'url' => trim((string) $format->url), 'length' => (string) $format->length
+            ];
             // Add preview per format when existing.
             if ($format->preview) {
                 $playbackarray[(string) $format->type]['preview'] =
@@ -290,10 +291,12 @@ class recording_proxy extends proxy_base {
         // Add the metadata to the recordings array.
         $metadataarray =
             self::parse_recording_meta(get_object_vars($recording->metadata));
-        $recordingarray = array('recordID' => (string) $recording->recordID,
+        $recordingarray = [
+            'recordID' => (string) $recording->recordID,
             'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
             'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray);
+            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray
+        ];
         if (isset($recording->protected)) {
             $recordingarray['protected'] = (string) $recording->protected;
         }
@@ -308,7 +311,7 @@ class recording_proxy extends proxy_base {
      * @return array
      */
     public static function parse_recording_meta(array $metadata): array {
-        $metadataarray = array();
+        $metadataarray = [];
         foreach ($metadata as $key => $value) {
             if (is_object($value)) {
                 $value = '';
@@ -326,9 +329,9 @@ class recording_proxy extends proxy_base {
      * @return array
      */
     public static function parse_preview_images(object $preview): array {
-        $imagesarray = array();
+        $imagesarray = [];
         foreach ($preview->images->image as $image) {
-            $imagearray = array('url' => trim((string) $image));
+            $imagearray = ['url' => trim((string) $image)];
             foreach ($image->attributes() as $attkey => $attvalue) {
                 $imagearray[$attkey] = (string) $attvalue;
             }

@@ -45,7 +45,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
+        $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', ['id'], [
             'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
             'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
             'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
@@ -53,18 +53,18 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
             'recordings_html', 'recordings_deleted', 'recordings_imported', 'recordings_preview',
             'clienttype', 'muteonstart', 'completionattendance',
             'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
-            'completionengagementpollvotes', 'completionengagementemojis'));
+            'completionengagementpollvotes', 'completionengagementemojis']);
 
         $logs = new backup_nested_element('logs');
 
-        $log = new backup_nested_element('log', array('id'), array(
-            'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta'));
+        $log = new backup_nested_element('log', ['id'], [
+            'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta']);
 
         $recordings = new backup_nested_element('recordings');
 
-        $recording = new backup_nested_element('recording', array('id'), array(
+        $recording = new backup_nested_element('recording', ['id'], [
             'courseid', 'bigbluebuttonbnid', 'groupid', 'recordingid', 'headlesss', 'imported', 'status', 'importeddata',
-            'timecreated'));
+            'timecreated']);
 
         // Build the tree.
         $bigbluebuttonbn->add_child($logs);
@@ -73,12 +73,12 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         $recordings->add_child($recording);
 
         // Define sources.
-        $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
+        $bigbluebuttonbn->set_source_table('bigbluebuttonbn', ['id' => backup::VAR_ACTIVITYID]);
 
         // This source definition only happen if we are including user info.
         if ($userinfo) {
-            $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
-            $recording->set_source_table('bigbluebuttonbn_recordings', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+            $log->set_source_table('bigbluebuttonbn_logs', ['bigbluebuttonbnid' => backup::VAR_PARENTID]);
+            $recording->set_source_table('bigbluebuttonbn_recordings', ['bigbluebuttonbnid' => backup::VAR_PARENTID]);
         }
 
         // Define id annotations.

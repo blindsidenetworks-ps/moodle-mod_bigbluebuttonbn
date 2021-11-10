@@ -38,7 +38,7 @@ class mod_helper {
      *
      * @param stdClass $bigbluebuttonbn BigBlueButtonBN form data
      **/
-    public static function process_pre_save(stdClass $bigbluebuttonbn): void {
+    public static function process_pre_save(stdClass $bigbluebuttonbn) {
         self::process_pre_save_instance($bigbluebuttonbn);
         self::process_pre_save_checkboxes($bigbluebuttonbn);
         self::process_pre_save_common($bigbluebuttonbn);
@@ -183,6 +183,7 @@ class mod_helper {
         $eventid = $DB->get_field('event', 'id', [
             'modulename' => 'bigbluebuttonbn',
             'instance' => $bigbluebuttonbn->id,
+            'eventtype' => logger::EVENT_MEETING_START
         ]);
 
         // Delete the event from calendar when/if openingtime is NOT set.
@@ -232,7 +233,6 @@ class mod_helper {
         if (empty($bigbluebuttonbn->completionexpected)) {
             return;
         }
-
         \core_completion\api::update_completion_date_event(
             $bigbluebuttonbn->coursemodule,
             'bigbluebuttonbn',

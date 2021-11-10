@@ -64,8 +64,3 @@ if (!listening) {
     registerEventListeners();
     listening = true;
 }
-
-// Note: This call can be removed from Moodle 3.7 onwards.
-export const init = () => {
-    return;
-};

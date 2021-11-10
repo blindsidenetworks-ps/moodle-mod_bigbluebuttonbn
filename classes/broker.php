@@ -18,12 +18,8 @@ namespace mod_bigbluebuttonbn;
 
 use Exception;
 use Firebase\JWT\JWT;
-use coding_exception;
-use mod_bigbluebuttonbn\event\events;
-use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 
 /**
  * The broker routines
@@ -53,8 +49,8 @@ class broker {
      * @return null|string
      */
     public function validate_parameters(array $params): ?string {
-        if (!array_key_exists('action', $params)) {
-            return 'No action specified';
+        if (!isset($params['action']) || empty($params['action']) ) {
+            return 'Parameter ['.$params['action'].'] was not included';
         }
 
         $action = strtolower($params['action']);
@@ -94,7 +90,7 @@ class broker {
             $decodedparameters = JWT::decode(
                 $params['signed_parameters'],
                 config::get('shared_secret'),
-                array('HS256')
+                ['HS256']
             );
         } catch (Exception $e) {
             $error = 'Caught exception: ' . $e->getMessage();

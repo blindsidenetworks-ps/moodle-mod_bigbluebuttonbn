@@ -99,7 +99,7 @@ class recording_row_playback implements renderable, templatable {
      * Helper function renders the link used for recording type in row for the data used by the recording table.
      *
      * @param array $playback
-     * @return boolean
+     * @return bool
      */
     protected function should_be_included(array $playback): bool {
         // All types that are not restricted are included.

@@ -178,7 +178,7 @@ const participantListInit = () => {
         if (participant.selectiontype === 'all' ||
             typeof participantData[participant.selectiontype].children[participant.selectionid] !== 'undefined') {
             // Add it to the form, but don't add the delete button if it is the first item.
-            participantAddToForm(selectionTypeValue, selectionValue, selectionRole, true);
+            participantAddToForm(selectionTypeValue, selectionValue, selectionRole, true).then();
         }
     });
 };
@@ -189,7 +189,7 @@ const participantListInit = () => {
  * @param {string} selectionTypeValue
  * @param {string} selectionValue
  * @param {string} selectedRole
- * @param {bool} canRemove
+ * @param {boolean} canRemove
  * @returns {Promise<void>}
  */
 const participantAddToForm = async(selectionTypeValue, selectionValue, selectedRole, canRemove) => {
@@ -218,7 +218,7 @@ const participantAddToForm = async(selectionTypeValue, selectionValue, selectedR
         newNode.querySelector('.participant-select').addEventListener('change', () => {
             participantListRoleUpdate(selectionTypeValue, selectionValue);
         });
-        // Now add the callbacks: participantListRoleUpdate() and participantRemove()
+        // Now add the callbacks: participantListRoleUpdate() and participantRemove().
         const removeNode = newNode.querySelector('.remove-button');
         if (removeNode) {
             removeNode
@@ -288,7 +288,7 @@ const participantRemove = (selectionTypeValue, selectionValue) => {
  * Role update
  *
  * @param {string} type
- * @param {number} id
+ * @param {string} id
  */
 const participantListRoleUpdate = (type, id) => {
     // Update in memory.
@@ -297,7 +297,7 @@ const participantListRoleUpdate = (type, id) => {
 
     for (var i = 0; i < pList.length; i++) {
         if (pList[i].selectiontype === type &&
-            pList[i].selectionid === (id === '' ? null : id)) {
+            pList[i].selectionid === (id === '' ? null : parseInt(id))) {
             pList[i].role = participantListRoleSelection.value;
         }
     }
@@ -325,7 +325,7 @@ const participantAddFromCurrentSelection = () => {
         "role": "viewer"
     });
     // Add it to the form.
-    participantAddToForm(selectionType.value, selection.value, 'viewer', true);
+    participantAddToForm(selectionType.value, selection.value, 'viewer', true).then();
     // Update in the form.
     participantListUpdate(pList);
 };

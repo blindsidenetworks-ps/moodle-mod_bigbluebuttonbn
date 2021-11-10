@@ -17,10 +17,6 @@
 namespace mod_bigbluebuttonbn\task;
 
 use advanced_testcase;
-use core\message\message;
-use core\task\adhoc_task;
-use mod_bigbluebuttonbn\instance;
-use stdClass;
 
 /**
  * Class containing the scheduled task for lti module.

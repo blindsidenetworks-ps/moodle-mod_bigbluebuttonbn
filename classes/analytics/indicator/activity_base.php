@@ -24,8 +24,7 @@
  */
 
 namespace mod_bigbluebuttonbn\analytics\indicator;
-
-defined('MOODLE_INTERNAL') || die();
+use core_analytics\local\indicator\community_of_inquiry_activity;
 
 /**
  * Activity base class.
@@ -34,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class activity_base extends \core_analytics\local\indicator\community_of_inquiry_activity {
+abstract class activity_base extends community_of_inquiry_activity {
 
     /**
      * No need to fetch grades for resources.

@@ -3,9 +3,7 @@
 /* bigbluebutton-font */
 @font-face {
     font-family: "bigbluebutton-font";
-    src: url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.eot");
     src:
-        url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.eot?#iefix") format("embedded-opentype"),
         url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.woff") format("woff"),
         url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.ttf") format("truetype"),
         url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.svg#bigbluebutton-font") format("svg");
@@ -43,7 +41,6 @@
 .recording-thumbnail:hover {
     box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
     transform: scale(2.0); /* (200% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
-    -ms-transform: scale(2.0); /* Internet Explorer 9 */
     -moz-transform: scale(2.0); /* Firefox */
     -webkit-transform: scale(2.0); /* Safari and Chrome */
     -o-transform: scale(2.0); /* Opera */
