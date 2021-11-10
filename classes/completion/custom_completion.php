@@ -20,6 +20,7 @@ use core_completion\activity_custom_completion;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\logger;
 use moodle_exception;
+use stdClass;
 
 /**
  * Class custom_completion
@@ -51,7 +52,7 @@ class custom_completion extends activity_custom_completion {
         $logs = logger::get_user_completion_logs($instance, $this->userid, $filters);
 
         if (method_exists($this, "get_{$rule}_value")) {
-            $valuecount = $this->count_actions($logs,  self::class."::get_{$rule}_value");
+            $valuecount = $this->count_actions($logs, self::class . "::get_{$rule}_value");
             if ($valuecount) {
                 if (!is_null($instance->get_instance_var($rule))) {
                     if ($instance->get_instance_var($rule) <= $valuecount) {
@@ -164,11 +165,12 @@ class custom_completion extends activity_custom_completion {
             $summary = get_string(
                 $rule . '_event_desc',
                 'mod_bigbluebuttonbn',
-                $this->count_actions($logs,  self::class."::get_{$rule}_value")
+                $this->count_actions($logs, self::class . "::get_{$rule}_value")
             );
         }
         return $summary;
     }
+
     /**
      * Get current state in a  friendly version
      *
@@ -202,20 +204,20 @@ class custom_completion extends activity_custom_completion {
      *
      * This will override the usual completion value (see COMPLETION_CUSTOM_MODULE_FLOW)
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionview_value(object $log): int {
+    protected static function get_completionview_value(stdClass $log): int {
         return $log->log == logger::EVENT_PLAYED || $log->log == logger::EVENT_JOIN;
     }
 
     /**
      * Get attendance summary value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionattendance_value(object $log): int {
+    protected static function get_completionattendance_value(stdClass $log): int {
         $summary = json_decode($log->meta);
         if ($summary && !empty($summary->data->duration)) {
             return COMPLETION_COMPLETE;
@@ -226,58 +228,61 @@ class custom_completion extends activity_custom_completion {
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionengagementchats_value(object $log):int {
+    protected static function get_completionengagementchats_value(stdClass $log): int {
         return self::get_completionengagement_value($log, 'chats');
     }
+
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionengagementtalks_value(object $log):int {
+    protected static function get_completionengagementtalks_value(stdClass $log): int {
         return self::get_completionengagement_value($log, 'talks');
     }
+
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionengagementraisehand_value(object $log):int {
+    protected static function get_completionengagementraisehand_value(stdClass $log): int {
         return self::get_completionengagement_value($log, 'raisehand');
     }
 
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionengagementpollvotes_value(object $log):int {
+    protected static function get_completionengagementpollvotes_value(stdClass $log): int {
         return self::get_completionengagement_value($log, 'pollvotes');
     }
+
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @return int
      */
-    protected static function get_completionengagementemojis_value(object $log):int {
+    protected static function get_completionengagementemojis_value(stdClass $log): int {
         return self::get_completionengagement_value($log, 'emojis');
     }
 
     /**
      * Get general completion engagement value
      *
-     * @param object $log
+     * @param stdClass $log
      * @param string $type
      * @return int
      */
-    protected static function get_completionengagement_value(object $log, string $type): int {
+    protected static function get_completionengagement_value(stdClass $log, string $type): int {
         $summary = json_decode($log->meta);
         if ($summary && !empty($summary->data->engagement->$type)) {
             return COMPLETION_COMPLETE;

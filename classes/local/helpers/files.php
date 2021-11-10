@@ -94,12 +94,12 @@ class files {
      * Get a full path to the file attached as a preuploaded presentation
      * or if there is none, set the presentation field will be set to blank.
      *
-     * @param object $bigbluebuttonformdata BigBlueButtonBN form data
+     * @param stdClass $bigbluebuttonformdata BigBlueButtonBN form data
      * Note that $bigbluebuttonformdata->presentation is the id of the filearea whereas the bbb instance table
      * stores the file name/path
      * @return string
      */
-    public static function save_media_file(object &$bigbluebuttonformdata): string {
+    public static function save_media_file(stdClass &$bigbluebuttonformdata): string {
         if (!isset($bigbluebuttonformdata->presentation) || $bigbluebuttonformdata->presentation == '') {
             return '';
         }
@@ -132,7 +132,7 @@ class files {
      *
      * @param context $context
      * @param string $presentation matching presentation file name
-     * @param integer $id bigbluebutton instance id
+     * @param int $id bigbluebutton instance id
      * @param bool $withnonce add nonce to the url
      * @return array|null the representation of the presentation as an associative array
      */
@@ -213,14 +213,14 @@ class files {
     /**
      * Helper for getting pluginfile name.
      *
-     * @param object $course course object
+     * @param stdClass $course course object
      * @param \cm_info $cm course module object
      * @param context $context context object
      * @param array $args extra arguments
      *
      * @return string|null
      */
-    public static function get_plugin_filename(object $course, \cm_info $cm, context $context, array $args): ?string {
+    public static function get_plugin_filename(stdClass $course, \cm_info $cm, context $context, array $args): ?string {
         global $DB;
         if ($context->contextlevel != CONTEXT_SYSTEM) {
             // Plugin has a file to use as default in general setting.

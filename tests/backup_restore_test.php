@@ -27,6 +27,7 @@ namespace mod_bigbluebuttonbn;
 
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 use restore_date_testcase;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -179,10 +180,10 @@ class backup_restore_test extends restore_date_testcase {
     /**
      * Check two bbb activities are the same
      *
-     * @param object $bbboriginal
-     * @param object $bbbdest
+     * @param stdClass $bbboriginal
+     * @param stdClass $bbbdest
      */
-    protected function assert_bbb_activities_same($bbboriginal, $bbbdest) {
+    protected function assert_bbb_activities_same(stdClass $bbboriginal, stdClass $bbbdest) {
         $this->assertNotFalse($bbbdest);
         $filterfunction = function($key) {
             return !in_array($key, ['course', 'cmid', 'id', 'course']);

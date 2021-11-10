@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Performs data migrations and updates on upgrade.
  *
- * @param integer $oldversion
+ * @param int $oldversion
  * @return bool
  */
 function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
@@ -426,13 +426,14 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
 /**
  * Generic helper function for adding or changing a field in a table.
  *
- * @deprecated  please do not use this anymore (historical migrations)
- * @param object $dbman
+ * @param database_manager $dbman
  * @param string $tablename
  * @param string $fieldname
  * @param array $fielddefinition
+ * @deprecated  please do not use this anymore (historical migrations)
  */
-function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, $fielddefinition) {
+function xmldb_bigbluebuttonbn_add_change_field(database_manager $dbman, string $tablename, string $fieldname,
+    array $fielddefinition) {
     $table = new xmldb_table($tablename);
     $field = new xmldb_field($fieldname);
     $field->set_attributes($fielddefinition['type'], $fielddefinition['precision'], $fielddefinition['unsigned'],
@@ -456,14 +457,14 @@ function xmldb_bigbluebuttonbn_add_change_field($dbman, $tablename, $fieldname, 
 /**
  * Generic helper function for adding index to a table.
  *
- * @deprecated please do not use this anymore (historical migrations)
- * @param object $dbman
+ * @param database_manager $dbman
  * @param string $tablename
  * @param string $indexname
  * @param array $indexfields
- * @param string $indextype
+ * @param string|false|null $indextype
+ * @deprecated please do not use this anymore (historical migrations)
  */
-function xmldb_bigbluebuttonbn_index_table($dbman, $tablename, $indexname, $indexfields,
+function xmldb_bigbluebuttonbn_index_table(database_manager $dbman, string $tablename, string $indexname, array $indexfields,
     $indextype = XMLDB_INDEX_NOTUNIQUE) {
     $table = new xmldb_table($tablename);
     if (!$dbman->table_exists($table)) {

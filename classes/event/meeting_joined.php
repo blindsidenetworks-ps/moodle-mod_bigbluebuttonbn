@@ -28,7 +28,7 @@ class meeting_joined extends base
     /**
      * Init method.
      * @param string $crud
-     * @param integer $edulevel
+     * @param int $edulevel
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
         parent::init($crud, $edulevel);

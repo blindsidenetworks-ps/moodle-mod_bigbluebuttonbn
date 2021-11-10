@@ -309,9 +309,9 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
              * Log test event
              *
              * @param instance $instance
-             * @param object $record
+             * @param array $record
              */
-            public static function log_test_event(instance $instance, $record): void {
+            public static function log_test_event(instance $instance, array $record): void {
                 self::log(
                     $instance,
                     logger::EVENT_CREATE,

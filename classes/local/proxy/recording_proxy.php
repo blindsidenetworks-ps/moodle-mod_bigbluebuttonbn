@@ -18,6 +18,7 @@ namespace mod_bigbluebuttonbn\local\proxy;
 
 use cache;
 use cache_helper;
+use SimpleXMLElement;
 
 /**
  * The recording proxy.
@@ -77,7 +78,6 @@ class recording_proxy extends proxy_base {
 
         return true;
     }
-
 
     /**
      * Perform publishRecordings on BBB.
@@ -270,11 +270,11 @@ class recording_proxy extends proxy_base {
     /**
      * Helper function to parse an xml recording object and produce an array in the format used by the plugin.
      *
-     * @param object $recording
+     * @param SimpleXMLElement $recording
      *
      * @return array
      */
-    public static function parse_recording(object $recording): array {
+    public static function parse_recording(SimpleXMLElement $recording): array {
         // Add formats.
         $playbackarray = [];
         foreach ($recording->playback->format as $format) {
@@ -324,11 +324,11 @@ class recording_proxy extends proxy_base {
     /**
      * Helper function to convert an xml recording preview images to an array in the format used by the plugin.
      *
-     * @param object $preview
+     * @param SimpleXMLElement $preview
      *
      * @return array
      */
-    public static function parse_preview_images(object $preview): array {
+    public static function parse_preview_images(SimpleXMLElement $preview): array {
         $imagesarray = [];
         foreach ($preview->images->image as $image) {
             $imagearray = ['url' => trim((string) $image)];

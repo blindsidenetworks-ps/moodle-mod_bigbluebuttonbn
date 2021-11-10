@@ -28,7 +28,7 @@ class live_session_event extends base
     /**
      * Init method.
      * @param string $crud
-     * @param integer $edulevel
+     * @param int $edulevel
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_OTHER) {
         parent::init($crud, $edulevel);

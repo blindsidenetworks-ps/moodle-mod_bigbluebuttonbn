@@ -35,7 +35,7 @@ abstract class plugin {
      * Helper function to convert an html string to plain text.
      *
      * @param string $html
-     * @param integer $len
+     * @param int $len
      *
      * @return string
      */
@@ -53,7 +53,7 @@ abstract class plugin {
     /**
      * Helper generates a random password.
      *
-     * @param integer $length
+     * @param int $length
      * @param string $unique
      *
      * @return string

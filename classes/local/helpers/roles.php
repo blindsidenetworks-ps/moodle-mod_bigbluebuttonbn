@@ -21,6 +21,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David  (laurent [at] call-learning [dt] fr)
  */
+
 namespace mod_bigbluebuttonbn\local\helpers;
 
 use cache;
@@ -29,6 +30,7 @@ use context;
 use context_course;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
+use stdClass;
 
 /**
  * Utility class for all roles routines helper
@@ -48,12 +50,12 @@ class roles {
     /**
      * Returns user roles in a context.
      *
-     * @param object $context
-     * @param integer $userid
+     * @param context $context
+     * @param int $userid
      *
      * @return array $userroles
      */
-    public static function get_user_roles($context, $userid) {
+    public static function get_user_roles(context $context, int $userid) {
         global $DB;
         $userroles = get_user_roles($context, $userid);
         if ($userroles) {
@@ -115,7 +117,7 @@ class roles {
      * @param int $courseid
      * @param string $capability
      */
-    public static function has_capability_in_course($courseid, $capability) {
+    public static function has_capability_in_course(int $courseid, string $capability) {
         global $DB;
         if (empty($courseid) || $DB->record_exists('course', ['id' => $courseid])) {
             return has_capability('moodle/site:config', \context_system::instance());
@@ -129,11 +131,11 @@ class roles {
      * Returns an array containing all the roles in a context.
      *
      * @param context|null $context $context
-     * @param bool $onlyviewableroles
+     * @param bool|null $onlyviewableroles
      *
      * @return array $roles
      */
-    public static function get_roles(context $context = null, bool $onlyviewableroles = true) {
+    public static function get_roles(?context $context = null, ?bool $onlyviewableroles = true) {
         global $CFG;
 
         if ($onlyviewableroles == true && $CFG->branch >= 35) {
@@ -182,9 +184,9 @@ class roles {
      *
      * @param string|integer $id
      *
-     * @return object $role
+     * @return stdClass $role
      */
-    protected static function get_role($id) {
+    protected static function get_role($id): stdClass {
         $roles = (array) role_get_names();
         if (is_numeric($id) && isset($roles[$id])) {
             return (object) $roles[$id];
@@ -200,10 +202,10 @@ class roles {
      * Returns an array to populate a list of participants used in mod_form.js.
      *
      * @param context $context
-     * @param null|object $bbactivity
+     * @param null|stdClass $bbactivity
      * @return array $data
      */
-    public static function get_participant_data($context, $bbactivity = null) {
+    public static function get_participant_data(context $context, ?stdClass $bbactivity = null) {
         $data = [
             'all' => [
                 'name' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
@@ -224,12 +226,12 @@ class roles {
     /**
      * Returns an array to populate a list of participants used in mod_form.php.
      *
-     * @param object $bigbluebuttonbn
+     * @param stdClass|null $bigbluebuttonbn
      * @param context $context
      *
      * @return array
      */
-    public static function get_participant_list($bigbluebuttonbn, $context) {
+    public static function get_participant_list(?stdClass $bigbluebuttonbn, context $context): array {
         global $USER;
         if ($bigbluebuttonbn == null) {
             return self::get_participant_rules_encoded(
@@ -251,11 +253,11 @@ class roles {
      * Returns an array to populate a list of participants used in mod_form.php with default values.
      *
      * @param context $context
-     * @param integer $ownerid
+     * @param int $ownerid
      *
      * @return array
      */
-    protected static function get_participant_list_default($context, $ownerid = null) {
+    protected static function get_participant_list_default(context $context, ?int $ownerid = null) {
         $participantlist = [];
         $participantlist[] = [
             'selectiontype' => 'all',
@@ -288,7 +290,7 @@ class roles {
      *
      * @return array
      */
-    protected static function get_participant_rules_encoded($rules) {
+    protected static function get_participant_rules_encoded(array $rules): array {
         foreach ($rules as $key => $rule) {
             if ($rule['selectiontype'] !== 'role' || is_numeric($rule['selectionid'])) {
                 continue;
@@ -309,7 +311,7 @@ class roles {
      *
      * @return array
      */
-    public static function get_participant_selection_data() {
+    public static function get_participant_selection_data(): array {
         return [
             'type_options' => [
                 'all' => get_string('mod_form_field_participant_list_type_all', 'bigbluebuttonbn'),
@@ -327,11 +329,11 @@ class roles {
      *
      * @param context $context
      * @param array $participantlist
-     * @param integer $userid
+     * @param int $userid
      *
      * @return bool
      */
-    public static function is_moderator($context, $participantlist, $userid = null) {
+    public static function is_moderator(context $context, array $participantlist, ?int $userid = null): bool {
         global $USER;
         // If an admin, then also a moderator.
         if (has_capability('moodle/site:config', $context)) {
@@ -354,12 +356,12 @@ class roles {
      * Iterates participant list rules to evaluate if a user is moderator.
      *
      * @param array $participantlist
-     * @param integer $userid
+     * @param int $userid
      * @param array $userroles
      *
      * @return bool
      */
-    protected static function is_moderator_validator($participantlist, $userid, $userroles) {
+    protected static function is_moderator_validator(array $participantlist, int $userid, array $userroles): bool {
         // Iterate participant rules.
         foreach ($participantlist as $participant) {
             if (self::is_moderator_validate_rule($participant, $userid, $userroles)) {
@@ -372,13 +374,13 @@ class roles {
     /**
      * Evaluate if a user is moderator based on roles and a particular participation rule.
      *
-     * @param object $participant
-     * @param integer $userid
+     * @param array $participant
+     * @param int $userid
      * @param array $userroles
      *
      * @return bool
      */
-    protected static function is_moderator_validate_rule($participant, $userid, $userroles) {
+    protected static function is_moderator_validate_rule(array $participant, int $userid, array $userroles): bool {
         if ($participant['role'] == self::ROLE_VIEWER) {
             return false;
         }
@@ -409,7 +411,7 @@ class roles {
      *
      * @return void
      */
-    public static function participant_joined($meetingid, $ismoderator) {
+    public static function participant_joined(string $meetingid, bool $ismoderator): void {
         $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_bigbluebuttonbn', 'meetings_cache');
         $result = $cache->get($meetingid);
         $meetinginfo = json_decode($result['meeting_info']);
@@ -428,7 +430,7 @@ class roles {
      * @param instance $instance
      * @return array
      */
-    public static function import_get_courses_for_select(instance $instance) {
+    public static function import_get_courses_for_select(instance $instance): array {
         if ($instance->is_admin()) {
             $courses = get_courses('all', 'c.fullname ASC');
             // It includes the name of the site as a course (category 0), so remove the first one.

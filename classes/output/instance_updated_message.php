@@ -21,6 +21,7 @@ use mod_bigbluebuttonbn\local\helpers\roles;
 use moodle_url;
 use renderable;
 use renderer_base;
+use stdClass;
 use templatable;
 
 /**
@@ -59,9 +60,9 @@ class instance_updated_message implements renderable, templatable {
      * Defer to template.
      *
      * @param renderer_base $output
-     * @return object
+     * @return stdClass
      */
-    public function export_for_template(renderer_base $output) {
+    public function export_for_template(renderer_base $output): stdClass {
         return (object) [
             'is_update' => $this->type === self::TYPE_UPDATED,
             'is_create' => $this->type === self::TYPE_CREATED,

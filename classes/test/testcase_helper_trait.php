@@ -40,12 +40,12 @@ trait testcase_helper_trait {
     /**
      * Convenience function to create an instance of a bigbluebuttonactivty.
      *
-     * @param object|null $course course to add the module to
+     * @param stdClass|null $course course to add the module to
      * @param array $params Array of parameters to pass to the generator
      * @param array $options Array of options to pass to the generator
      * @return array($context, $cm, $instance) Testable wrapper around the assign class.
      */
-    protected function create_instance(?object $course = null, array $params = [], array $options = []): array {
+    protected function create_instance(?stdClass $course = null, array $params = [], array $options = []): array {
         if (!$course) {
             $course = $this->get_course();
         }
@@ -61,11 +61,11 @@ trait testcase_helper_trait {
     /**
      * Get the matching form data
      *
-     * @param object $bbactivity the current bigbluebutton activity
-     * @param object|null $course the course or null (taken from $this->get_course() if null)
+     * @param stdClass $bbactivity the current bigbluebutton activity
+     * @param stdClass|null $course the course or null (taken from $this->get_course() if null)
      * @return mixed
      */
-    protected function get_form_data_from_instance(object $bbactivity, ?object $course = null): object {
+    protected function get_form_data_from_instance(stdClass $bbactivity, ?stdClass $course = null): object {
         global $USER;
 
         if (!$course) {
@@ -81,9 +81,9 @@ trait testcase_helper_trait {
     /**
      * Get or create course if it does not exist
      *
-     * @return object|stdClass|null
+     * @return stdClass|null
      */
-    protected function get_course(): object {
+    protected function get_course(): stdClass {
         if (!$this->course) {
             $this->course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
         }
@@ -93,13 +93,13 @@ trait testcase_helper_trait {
     /**
      * Generate a course, several students and several groups
      *
-     * @param object $courserecord
+     * @param stdClass $courserecord
      * @param int $numstudents
      * @param int $numteachers
      * @param int $groupsnum
      * @return array
      */
-    protected function setup_course_students_teachers(object $courserecord, int $numstudents, int $numteachers,
+    protected function setup_course_students_teachers(stdClass $courserecord, int $numstudents, int $numteachers,
         int $groupsnum): array {
         global $DB;
         $generator = $this->getDataGenerator();
@@ -185,13 +185,13 @@ trait testcase_helper_trait {
     /**
      * Create an activity which includes a set of recordings.
      *
-     * @param object $course
+     * @param stdClass $course
      * @param int $type
      * @param array $recordingdata array of recording information
      * @param int $groupid
      * @return array
      */
-    protected function create_activity_with_recordings(object $course, int $type, array $recordingdata, int $groupid = 0): array {
+    protected function create_activity_with_recordings(stdClass $course, int $type, array $recordingdata, int $groupid = 0): array {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
 
         $activity = $generator->create_instance([
