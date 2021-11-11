@@ -19,7 +19,6 @@ namespace mod_bigbluebuttonbn\output;
 use core\output\notification;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\meeting;
 use renderable;
 use renderer_base;
@@ -90,7 +89,12 @@ class view_page implements renderable, templatable {
         }
 
         if ($this->instance->is_feature_enabled('showroom')) {
-            $templatedata->room = meeting::get_meeting_info_for_instance($this->instance);
+            $roomdata = meeting::get_meeting_info_for_instance($this->instance);
+            $roomdata->haspresentations = false;
+            if (!empty($roomdata->presentations)) {
+                $roomdata->haspresentations = true;
+            }
+            $templatedata->room = $roomdata;
         }
 
         if ($this->instance->is_feature_enabled('showrecordings') && $this->instance->is_recorded()) {

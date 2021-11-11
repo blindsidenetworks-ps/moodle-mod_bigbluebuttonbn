@@ -96,7 +96,14 @@ export const updateRoom = (updatecache = false) => {
     const bbbId = bbbRoomViewElement.dataset.bbbId;
     const groupId = bbbRoomViewElement.dataset.groupId;
     return getMeetingInfo(bbbId, groupId, updatecache)
-        .then(data => Templates.renderForPromise('mod_bigbluebuttonbn/room_view', data))
+        .then(data => {
+            // Just make sure we have the right information for the template.
+            data.haspresentations = false;
+            if (data.presentations && data.presentations.length) {
+                data.haspresentations = true;
+            }
+            return Templates.renderForPromise('mod_bigbluebuttonbn/room_view', data);
+        })
         .then(({html, js}) => Templates.replaceNodeContents(bbbRoomViewElement, html, js))
         .catch(displayException);
 };
