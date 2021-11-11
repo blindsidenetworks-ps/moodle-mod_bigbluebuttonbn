@@ -482,11 +482,7 @@ EOF;
      * @return null|string
      */
     public function get_type(): ?string {
-        if ($type = $this->get_instance_var('type')) {
-            return $type;
-        }
-
-        return null;
+        return $this->get_instance_var('type');
     }
 
     /**

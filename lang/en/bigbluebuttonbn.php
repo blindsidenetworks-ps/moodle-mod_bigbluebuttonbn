@@ -324,6 +324,7 @@ $string['index_heading_recording'] = 'Recording';
 $string['index_heading_users'] = 'Users';
 $string['index_heading_viewer'] = 'Viewers';
 $string['index_heading'] = 'BigBlueButton Rooms';
+$string['instanceprofilewithoutrecordings'] = 'This instance profile cannot display recordings';
 $string['mod_form_block_general'] = 'General settings';
 $string['mod_form_block_room'] = 'Activity/Room settings';
 $string['mod_form_block_recordings'] = 'View for recording';
