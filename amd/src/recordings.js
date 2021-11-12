@@ -357,14 +357,6 @@ const setupDatatable = (tableId, searchFormId, response) => {
 
     const recordingData = response.tabledata;
 
-    let showRecordings = recordingData.profile_features.indexOf('all') !== -1;
-    showRecordings = showRecordings || recordingData.profile_features.indexOf('showrecordings') !== -1;
-    if (!showRecordings) {
-        // TODO: This should be handled by the web service.
-        // This user is not allowed to view recordings.
-        return Promise.reject();
-    }
-
     const pendingPromise = new Pending('mod_bigbluebuttonbn/recordings/setupDatatable');
     return Promise.all([getYuiInstance(recordingData.locale), getStringsForYui()])
         .then(([yuiInstance, strings]) => {

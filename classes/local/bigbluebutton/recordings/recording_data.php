@@ -52,13 +52,14 @@ class recording_data {
     public static function get_recording_table(array $recordings, array $tools, instance $instance = null,
         int $courseid = 0): array {
         $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
+        $typeprofile = empty($instance) ? $typeprofiles[0] : $typeprofiles[$instance->get_type()];
         $lang = get_string('locale', 'core_langconfig');
         $locale = substr($lang, 0, strpos($lang, '.'));
         $tabledata = [
             'activity' => empty($instance) ? '' : bigbluebutton_proxy::view_get_activity_status($instance),
             'ping_interval' => (int) config::get('waitformoderator_ping_interval') * 1000,
             'locale' => substr($locale, 0, strpos($locale, '_')),
-            'profile_features' => $typeprofiles[0]['features'],
+            'profile_features' => $typeprofile['features'],
             'columns' => [],
             'data' => '',
         ];
@@ -149,6 +150,7 @@ class recording_data {
 
         $tabledata['columns'] = $columns;
         $tabledata['data'] = json_encode($data);
+
         return $tabledata;
     }
 
@@ -162,7 +164,7 @@ class recording_data {
      * @param recording $rec a recording row
      * @param array|null $tools
      * @param int|null $courseid
-     * @return stdClass
+     * @return stdClass|null
      */
     public static function row(?instance $instance, recording $rec, ?array $tools = null, ?int $courseid = 0): ?stdClass {
         global $PAGE;

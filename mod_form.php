@@ -66,7 +66,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $cfg = \mod_bigbluebuttonbn\local\config::get_options();
 
         // Get only those that are allowed.
-        // TODO: check as here it seems more logical to get this through: $this->_course.
         $course = $this->_course;
         $context = context_course::instance($course->id);
 
@@ -691,5 +690,27 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $mform->setDefault($name, $defaultvalue);
         $mform->setType($name, $datatype);
+    }
+
+    /**
+     * Definition after data
+     *
+     * Here just to tweak form group in completion that should not be frozen. This avoid
+     * unwanted warnings.
+     */
+    public function definition_after_data() {
+        global $COURSE;
+        parent::definition_after_data();
+        // Completion: If necessary, un-freeze group fields.
+        $completion = new completion_info($COURSE);
+        if ($completion->is_enabled()) {
+            $mform = $this->_form;
+            foreach (['completionattendancegroup', 'completionengagementgroup'] as $groupname) {
+                $element = $mform->getElement($groupname);
+                if ($element->isFrozen()) {
+                    $element->unfreeze();
+                }
+            }
+        }
     }
 }

@@ -86,7 +86,7 @@
                 <span></span>
             {{/isrunning}}
         {{/attendees}}
-        {{#presentations.0}}
+        {{#haspresentations}}
             <h4>{{#str}}view_section_title_presentation, mod_bigbluebuttonbn{{/str}}</h4>
             <div class="list-group list-group-flush">
               {{#presentations}}
@@ -96,7 +96,7 @@
                 </a>
               {{/presentations}}
             </div>
-        {{/presentations.0}}
+        {{/haspresentations}}
     </div>
     <div id="bigbluebuttonbn_view_action_button_box" class="box py-3 generalbox boxaligncenter">
         <div id="room_view_action_buttons">

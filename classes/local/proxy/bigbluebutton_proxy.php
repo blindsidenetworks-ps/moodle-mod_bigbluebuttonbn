@@ -41,7 +41,7 @@ use stdClass;
 class bigbluebutton_proxy extends proxy_base {
 
     /**
-     * Builds and retunrs a url for joining a bigbluebutton meeting.
+     * Builds and returns a url for joining a bigbluebutton meeting.
      *
      * @param string $meetingid
      * @param string $username
@@ -447,7 +447,7 @@ class bigbluebutton_proxy extends proxy_base {
      */
     public static function get_meeting_info(string $meetingid): array {
         $xmlinfo = self::fetch_endpoint_xml('getMeetingInfo', ['meetingID' => $meetingid]);
-        self::assert_returned_xml($xmlinfo, $meetingid);
+        self::assert_returned_xml($xmlinfo, ['meetingid' => $meetingid]);
         return (array) $xmlinfo;
     }
 
@@ -459,7 +459,7 @@ class bigbluebutton_proxy extends proxy_base {
      */
     public static function end_meeting(string $meetingid, string $modpw): void {
         $xml = self::fetch_endpoint_xml('end', ['meetingID' => $meetingid, 'password' => $modpw]);
-        self::assert_returned_xml($xml, $meetingid);
+        self::assert_returned_xml($xml, ['meetingid' => $meetingid]);
     }
 
     /**

@@ -251,20 +251,17 @@ class meeting {
         $meetinginfo->statusclosed = $activitystatus === 'ended';
         $meetinginfo->statusopen = !$meetinginfo->statusrunning && $activitystatus === 'open';
         $meetinginfo->participantcount = $participantcount;
-        $meetinginfo->canjoin = false;
 
-        if (!$instance->user_must_wait_to_join() || $meetinginfo->statusrunning) {
-            if (!$instance->has_user_limit_been_reached($participantcount)
-                || !$instance->does_current_user_count_towards_user_limit()
-            ) {
-                $meetinginfo->canjoin = true;
-            }
-        }
-        if (!($instance->is_currently_open() || $instance->user_can_force_join())) {
-            $meetinginfo->canjoin = false;
-        }
+        $canjoin = !$instance->user_must_wait_to_join() || $meetinginfo->statusrunning;
+        // Limit has not been reached or user does not count toward limit.
+        $canjoin = $canjoin && (
+            !$instance->has_user_limit_been_reached($participantcount)
+            || !$instance->does_current_user_count_towards_user_limit()
+            );
+        $canjoin = $canjoin && ($instance->is_currently_open() || $instance->user_can_force_join());
         // Double check that the user has the capabilities to join.
-        $meetinginfo->canjoin = $meetinginfo->canjoin && $instance->can_join();
+        $canjoin = $canjoin && $instance->can_join();
+        $meetinginfo->canjoin = $canjoin;
 
         // If user is administrator, moderator or if is viewer and no waiting is required, join allowed.
         if ($meetinginfo->statusrunning) {

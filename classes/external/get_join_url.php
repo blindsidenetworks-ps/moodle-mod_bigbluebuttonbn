@@ -72,7 +72,7 @@ class get_join_url extends external_api {
             'cmid' => $cmid,
             'groupid' => $groupid,
         ]);
-        $result['warnings'] = [];
+        $result = ['warnings' => []];
 
         $instance = instance::get_from_cmid($cmid);
         if (empty($instance)) {

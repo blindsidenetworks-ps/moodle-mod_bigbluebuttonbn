@@ -24,6 +24,7 @@ use external_value;
 use external_warnings;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\bigbluebutton\recordings\recording_data;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use restricted_context_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -98,20 +99,31 @@ class get_recordings extends external_api {
                     (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn'])
             ];
         } else {
-            $context = $instance->get_context();
-            // Validate that the user has access to this activity.
-            self::validate_context($context);
-            if (!$instance->user_has_group_access($USER, $groupid)) {
-                new restricted_context_exception();
-            }
-            if ($groupid) {
-                $instance->set_group_id($groupid);
-            }
-            $recordings = $instance->get_recordings([], $instance->get_instance_var('recordings_deleted'));
-            $tabledata = recording_data::get_recording_table($recordings, $tools, $instance);
+            $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
+            $profilefeature = $typeprofiles[$instance->get_type()]['features'];
+            $showrecordings = in_array('all', $profilefeature) || in_array('showrecordings', $profilefeature);
+            if ($showrecordings) {
+                $context = $instance->get_context();
+                // Validate that the user has access to this activity.
+                self::validate_context($context);
+                if (!$instance->user_has_group_access($USER, $groupid)) {
+                    new restricted_context_exception();
+                }
+                if ($groupid) {
+                    $instance->set_group_id($groupid);
+                }
+                $recordings = $instance->get_recordings([], $instance->get_instance_var('recordings_deleted'));
+                $tabledata = recording_data::get_recording_table($recordings, $tools, $instance);
 
-            $returnval['tabledata'] = $tabledata;
-            $returnval['status'] = true;
+                $returnval['tabledata'] = $tabledata;
+                $returnval['status'] = true;
+            } else {
+                $returnval['warnings'][] = [
+                    'item' => $bigbluebuttonbnid,
+                    'warningcode' => 'instanceprofilewithoutrecordings',
+                    'message' => get_string('instanceprofilewithoutrecordings', 'mod_bigbluebuttonbn')
+                ];
+            }
         }
         return $returnval;
     }
