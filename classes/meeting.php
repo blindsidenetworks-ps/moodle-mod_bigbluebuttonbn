@@ -269,7 +269,7 @@ class meeting {
             $meetinginfo->startedat = floor(intval($info['startTime']) / 1000); // Milliseconds.
             $meetinginfo->moderatorcount = $info['moderatorCount'];
             $meetinginfo->moderatorplural = $info['moderatorCount'] > 1;
-            $meetinginfo->participantcount = $info['participantCount'] ?? 0;
+            $meetinginfo->participantcount = $participantcount - $meetinginfo->moderatorcount;
             $meetinginfo->participantplural = $meetinginfo->participantcount > 1;
         } else {
             if ($instance->user_must_wait_to_join() && !$instance->user_can_force_join()) {
@@ -520,7 +520,7 @@ class meeting {
         logger::log_meeting_joined_event($this->instance, $origin);
 
         // Before executing the redirect, increment the number of participants.
-        roles::participant_joined($this->instance->get_meeting_id(), $this->instance->does_current_user_count_towards_user_limit());
+        roles::participant_joined($this->instance->get_meeting_id(), $this->instance->is_moderator());
         return $this->get_join_url();
     }
 }
