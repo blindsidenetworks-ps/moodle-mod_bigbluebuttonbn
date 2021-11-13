@@ -225,13 +225,41 @@ class meeting_test extends \advanced_testcase {
         $meeting->update_cache();
         $this->assertCount(1, $meeting->get_attendees());
         $otheruser = $this->getDataGenerator()->create_and_enrol($this->get_course());
-        $this->setUser($useringroup);
+        $this->setUser($otheruser);
         $meeting->update_cache();
         $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
         $meeting->update_cache();
         $this->assertCount(2, $meeting->get_attendees());
     }
 
+    /**
+     * Test that attendees returns the right list of attendees
+     *
+     * @covers ::get_attendees
+     */
+    public function test_participant_count() {
+        $this->resetAfterTest();
+        [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
+            $this->prepare_meeting(instance::TYPE_ALL, null, NOGROUPS, true);
+        $this->setUser($useringroup);
+        $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
+        $meeting->update_cache();
+        $meetinginfo = $meeting->get_meeting_info();
+        $this->assertEquals(1, $meetinginfo->participantcount);
+        $this->assertEquals(0, $meetinginfo->moderatorcount);
+        $this->setUser($usernotingroup);
+        $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
+        $meeting->update_cache();
+        $meetinginfo = $meeting->get_meeting_info();
+        $this->assertEquals(2, $meetinginfo->participantcount);
+        $this->assertEquals(0, $meetinginfo->moderatorcount);
+        $this->setAdminUser();
+        $this->join_meeting($meeting->join(logger::ORIGIN_BASE));
+        $meeting->update_cache();
+        $meetinginfo = $meeting->get_meeting_info();
+        $this->assertEquals(2, $meetinginfo->participantcount);
+        $this->assertEquals(1, $meetinginfo->moderatorcount);
+    }
     /**
      * Send a join meeting API CALL
      *
