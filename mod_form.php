@@ -706,9 +706,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ($completion->is_enabled()) {
             $mform = $this->_form;
             foreach (['completionattendancegroup', 'completionengagementgroup'] as $groupname) {
-                $element = $mform->getElement($groupname);
-                if ($element->isFrozen()) {
-                    $element->unfreeze();
+                if ($mform->elementExists($groupname)) {
+                    $element = $mform->getElement($groupname);
+                    if ($element->isFrozen()) {
+                        $element->unfreeze();
+                    }
                 }
             }
         }
