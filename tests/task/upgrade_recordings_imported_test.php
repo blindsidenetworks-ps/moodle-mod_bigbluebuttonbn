@@ -38,6 +38,7 @@ class upgrade_recordings_imported_test extends advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
+        $this->resetAfterTest();
         $this->initialise_mock_server();
     }
     /**
@@ -45,7 +46,6 @@ class upgrade_recordings_imported_test extends advanced_testcase {
      */
     public function test_upgrade_recordings(): void {
         global $DB;
-        $this->resetAfterTest();
         $generator = $this->getDataGenerator();
 
         // Create a course with student and teacher, and two groups.
@@ -61,7 +61,7 @@ class upgrade_recordings_imported_test extends advanced_testcase {
             'course' => $course->id,
         ]);
         $instance = instance::get_from_instanceid($activity->id);
-        $this->create_legacy_log_entries($instance, $teacher->id, 30);
+        $this->create_legacy_log_entries($instance, $teacher->id, 30, true);
 
         // Create an grouped activity.
         $activity = $generator->create_module('bigbluebuttonbn', [
@@ -71,17 +71,17 @@ class upgrade_recordings_imported_test extends advanced_testcase {
         $groupedinstance = instance::get_from_instanceid($activity->id);
 
         $groupainstance = instance::get_group_instance_from_instance($groupedinstance, $groupa->id);
-        $this->create_legacy_log_entries($groupainstance, $teacher->id, 15);
+        $this->create_legacy_log_entries($groupainstance, $teacher->id, 15, true);
 
         $groupbinstance = instance::get_group_instance_from_instance($groupedinstance, $groupb->id);
-        $this->create_legacy_log_entries($groupbinstance, $teacher->id, 15);
+        $this->create_legacy_log_entries($groupbinstance, $teacher->id, 15, true);
 
         // Create logs for an activity which no longer exists (because we deleted it).
         $activity = $generator->create_module('bigbluebuttonbn', [
             'course' => $course->id,
         ]);
         $oldinstance = instance::get_from_instanceid($activity->id);
-        $this->create_legacy_log_entries($oldinstance, $teacher->id, 15);
+        $this->create_legacy_log_entries($oldinstance, $teacher->id, 15, true);
         course_delete_module($oldinstance->get_cm_id());
 
         // Truncate the recordings table to reflect what it would have looked like before this version.
@@ -119,59 +119,5 @@ class upgrade_recordings_imported_test extends advanced_testcase {
             'No logs were found',
         ];
         $this->expectOutputRegex('/' . implode('.*', $matches) . '/s');
-    }
-
-    /**
-     * Create the legacy log entries for this task.
-     *
-     * @param instance $instance
-     * @param int $userid
-     * @param int $count
-     * @return array
-     */
-    protected function create_legacy_log_entries(instance $instance, int $userid, int $count = 30): array {
-        $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_bigbluebuttonbn');
-        $plugingenerator->create_meeting([
-            'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id(),
-        ]);
-
-        // Create log entries for each (30 for the ungrouped, 30 for the grouped).
-        $baselogdata = [
-            'courseid' => $instance->get_course_id(),
-            'userid' => $userid,
-            'log' => 'Import',
-            'meta' => json_encode(['record' => true]),
-            'imported' => true,
-        ];
-
-        for ($i = 0; $i < $count; $i++) {
-            // Create a recording.
-            $recording = $plugingenerator->create_recording([
-                'bigbluebuttonbnid' => $instance->get_instance_id(),
-                'groupid' => $instance->get_group_id()
-            ]);
-
-            // Fetch the data.
-            $data = recording_proxy::fetch_recordings([$recording->recordingid]);
-            $data = end($data);
-
-            $metaonly = array_filter($data, function($key) {
-                return strstr($key, 'meta_');
-            }, ARRAY_FILTER_USE_KEY);
-
-            $baselogdata['meetingid'] = $instance->get_meeting_id();
-            $baselogdata['meta'] = json_encode(array_merge([
-                'recording' => array_diff_key($data, $metaonly),
-            ], $metaonly));
-
-            // Insert the legacy log entry.
-            $logs[] = $plugingenerator->create_log(array_merge($baselogdata, [
-                'bigbluebuttonbnid' => $instance->get_instance_id(),
-                'timecreated' => time() - WEEKSECS + (HOURSECS * $i),
-            ]));
-        }
-
-        return $logs;
     }
 }

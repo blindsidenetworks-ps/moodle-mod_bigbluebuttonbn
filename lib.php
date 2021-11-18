@@ -151,7 +151,6 @@ function bigbluebuttonbn_delete_instance($id) {
     if (empty($instance)) {
         return false;
     }
-
     // End all meeting if any still running.
     try {
         $meeting = new meeting($instance);
