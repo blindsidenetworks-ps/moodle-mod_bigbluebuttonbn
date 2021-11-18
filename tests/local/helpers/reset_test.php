@@ -110,6 +110,7 @@ class reset_test extends \advanced_testcase {
      * Reset recordings test
      */
     public function test_reset_recordings() {
+        $this->initialise_mock_server();
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(null,
             ['course' => $this->get_course()->id],

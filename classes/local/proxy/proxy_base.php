@@ -134,13 +134,18 @@ abstract class proxy_base {
      * @param string $action
      * @param array $data
      * @param array $metadata
-     * @return null|SimpleXMLElement
+     * @return null|bool|SimpleXMLElement
      */
     protected static function fetch_endpoint_xml(
         string $action,
         array $data = [],
         array $metadata = []
-    ): ?SimpleXMLElement {
+    ) {
+        if (PHPUNIT_TEST && !defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
+            return true; // In case we still use fetch and mock server is not defined, this prevents
+            // an error. This can happen if a function from lib.php is called in test from other modules
+            // for example.
+        }
         $curl = new curl();
         return $curl->get(self::action_url($action, $data, $metadata));
     }

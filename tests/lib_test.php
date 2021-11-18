@@ -132,6 +132,7 @@ class lib_test extends \advanced_testcase {
      * @covers ::bigbluebuttonbn_user_complete
      */
     public function test_bigbluebuttonbn_user_complete() {
+        $this->initialise_mock_server();
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -157,6 +158,7 @@ class lib_test extends \advanced_testcase {
      * @covers ::bigbluebuttonbn_get_recent_mod_activity
      */
     public function test_bigbluebuttonbn_get_recent_mod_activity() {
+        $this->initialise_mock_server();
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -260,6 +262,7 @@ class lib_test extends \advanced_testcase {
      * @covers ::bigbluebuttonbn_print_recent_mod_activity
      */
     public function test_bigbluebuttonbn_print_recent_mod_activity() {
+        $this->initialise_mock_server();
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
