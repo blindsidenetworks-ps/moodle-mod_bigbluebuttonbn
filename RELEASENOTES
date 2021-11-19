@@ -1,4 +1,42 @@
-2.4-beta2 (2019101004)
+2.5-alpha.2 (2021091407)
+
+Extensive work required to integrate the BBB plugin into Moodle LMS (MDL-70658).
+
+2.5-alpha.1 (2021091406)
+
+Extensive refactoring: Align version 2.5 to the latest versions of Moodle 3.11 (CONTRIB-8390).
+
+2.4.4 (2019101011)
+Bug: Fix for users and roles should be sorted alphabetically (CONTRIB-8113).
+Bug: Fix for compatibility with protected recordings when BBB implements that.
+
+2.4.3 (2019101010)
+Bug: Fix default welcome message (CONTRIB-8573).
+Bug: Fix for issue with Imported recordings (CONTRIB-8580).
+Bug: Fix preuploading presentation process (CONTRIB-8587).
+Enhancement: Add option to allow teachers to edit the welcome message (CONTRIB-8574).
+Enhancement: Disable notification on recording ready callback (CONTRIB-8591).
+
+2.4.2 (2019101009)
+Bug: Fix for issue with bigbluebuttonbn_welcome_default considered not valid (CONTRIB-8435).
+Bug: Fix for issue with BBB Server being spammed on calendar dashboard view (CONTRIB-8419).
+Bug: Fix for issue with import recording page layout being broken (CONTRIB-8566).
+Bug: Fix for issue with activity always visible in the calendar (CONTRIB-8461).
+Bug: Fix for regresion on issue with activities are not being listed in Timeline tab of Course overview block (CONTRIB-7377).
+Bug: Fix for issue with manager not being able to see import links from all courses (CONTRIB-8489).
+
+2.4.1 (2019101008)
+Hot-fix: Patch for issue with Completion caused blocks view to crash (CONTRIB-8551).
+
+2.4 (2019101007)
+2.4-rc.2 (2019101006)
+Bug: Patch for issue with Groups (CONTRIB-8471).
+Enhancement: Re-brand BigBlueButtonBN to BigBlueButton (CONTRIB-8521)
+
+2.4-rc.1 (2019101005)
+Bug: Patch for issue with Calendar/Event (CONTRIB-8454).
+
+2.4-beta.2 (2019101004)
 Bug: Patch for adding timestamp to join.
 Bug: Fix for issue after bug fixed on BBB post_events script (CONTRIB-7457).
 Bug: Fix for check capabilities also in module context (CONTRIB-8371 & GITHUB-315).
@@ -6,7 +44,7 @@ Bug: Fix for preventing bugged displays on recordings (GITHUB-321).
 Enhancement: Update to external.php.
 Enhancement: Add default welcome message to settings (CONTRIB-7845).
 
-2.4-beta1 (2019101003)
+2.4-beta.1 (2019101003)
 Bug: Fix for issue with search on updated recordings only works if page is refreshed (CONTRIB-7700).
 Bug: Fix for end session action not always working (CONTRIB-7895).
 Bug: Fix for message sending triggered by recordng ready callback hangs (CONTRIB-7905).
@@ -30,8 +68,8 @@ Enhancement: Notification should contain link to BBB (CONTRIB-8029).
 Enhancement: Corrected problem of Import List Same Course Names (CONTRIB-8052).
 Enhancement: Recording parameters in activity form (CONTRIB-8116).
 Enhancement: Change the UI for Participants to User/Role Mapping (CONTRIB-8164).
-New Feature: Completion should be based on events captured from the live session (CONTRIB-7457).
-New Feature: Completion should be extended for supporting engagement (CONTRIB-7908).
+New Feature: -Experimental- Completion should be based on events captured from the live session (CONTRIB-7457).
+New Feature: -Experimental- Completion should be extended for supporting engagement (CONTRIB-7908).
 New Feature: Configure meeting room from the plugin (CONTRIB-8239).
 
 2.3.6 (2019042011)

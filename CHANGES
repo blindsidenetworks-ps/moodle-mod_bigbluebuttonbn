@@ -1,35 +1,7 @@
-2.4-beta2 (2019101004)
-Bug: Patch for adding timestamp to join.
-Bug: Fix for issue after bug fixed on BBB post_events script (CONTRIB-7457).
-Bug: Fix for check capabilities also in module context (CONTRIB-8371 & GITHUB-315).
-Bug: Fix for preventing bugged displays on recordings (GITHUB-321).
-Enhancement: Update to external.php.
-Enhancement: Add default welcome message to settings (CONTRIB-7845).
+2.5-alpha.2 (2021091407)
 
-2.4-beta1 (2019101003)
-Bug: Fix for issue with search on updated recordings only works if page is refreshed (CONTRIB-7700).
-Bug: Fix for end session action not always working (CONTRIB-7895).
-Bug: Fix for message sending triggered by recordng ready callback hangs (CONTRIB-7905).
-Bug: Fix for issue with mod_bigbluebuttonbn\privacy\provider::get_contexts_for_userid (CONTRIB-7915).
-Bug: Fix for participation report is not correctly implemented (CONTRIB-7951).
-Bug: Fix for "Recordings Only" instances have the feature [Restrict Access] disabled (CONTRIB-7960).
-Bug: Fix for missing strings for the new recording formats (CONTRIB-7962).
-Bug: Fix for "Moderator by default" setting does not recognise custom roles (CONTRIB-7966).
-Bug: Fix for BBB hard-coded dependency on mod_lti (CONTRIB-7969).
-Bug: Fix for possible CSRF vulnerability in BBB ajax intermediate script (CONTRIB-7971).
-Bug: Fix for BBB add participant module setting doesn't respect group mode/capabilities (CONTRIB-7972).
-Bug: Fix for error while creating or updating a BBB activity (CONTRIB-8019).
-Bug: Fix for '&' breaks the password when randomly assigned (CONTRIB-8049).
-Bug: Fix for validation of recording links fails some times (CONTRIB-8051).
-Bug: Fix for problem of List Table Pagination (CONTRIB-8053).
-Bug: Fix for improve performance on view (CONTRIB-8157).
-Enhancement: Add a way to reprocess completion validation (CONTRIB-7917).
-Enhancement: Completion by engagement should include configurable metrics (CONTRIB-7919).
-Enhancement: BBB should only include core libraries as required (CONTRIB-7970).
-Enhancement: Notification should contain link to BBB (CONTRIB-8029).
-Enhancement: Corrected problem of Import List Same Course Names (CONTRIB-8052).
-Enhancement: Recording parameters in activity form (CONTRIB-8116).
-Enhancement: Change the UI for Participants to User/Role Mapping (CONTRIB-8164).
-New Feature: Completion should be based on events captured from the live session (CONTRIB-7457).
-New Feature: Completion should be extended for supporting engagement (CONTRIB-7908).
-New Feature: Configure meeting room from the plugin (CONTRIB-8239).
+Extensive work required to integrate the BBB plugin into Moodle LMS (MDL-70658).
+
+2.5-alpha.1 (2021091406)
+
+Extensive refactoring: Align version 2.5 to the latest versions of Moodle 3.11 (CONTRIB-8390).
