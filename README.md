@@ -23,14 +23,26 @@ With the latest version of this plugin you can
 
 Note that on previous versions of Moodle you will need to use the specific version of this plugin.
 
-| Moodle Version    |  Branch      | Version                 |
-|-------------------|--------------|-------------------------|
-| Moodle 2.0 - 2.5  | v1.1-stable  | v1.1.1  (2015062101)    |
-| Moodle 2.6        | v2.0-stable  | v2.0.4  (2015080611)    |
-| Moodle 2.7 - 2.9  | v2.1-stable  | v2.1.15 (2016051920)    |
-| Moodle 3.0 - 3.1  | v2.2-stable  | v2.2.12 (2017101020)    |
-| Moodle 3.2 - 3.9  | v2.3-stable  | v2.3.4  (2019042009)    |
-| Moodle 3.4 - 3.9  | v2.4-beta    | v2.4-beta1 (2019101003) |
+| Moodle Version    |  Branch      | Version                   |
+|-------------------|--------------|---------------------------|
+| Moodle 2.0 - 2.5  | v1.1-stable  | v1.1.1  (2015062101)      |
+| Moodle 2.6 - 3.0  | v2.0-stable  | v2.0.4  (2015080611)      |
+| Moodle 2.7 - 3.4  | v2.1-stable  | v2.1.15 (2016051920)      |
+| Moodle 3.0 - 3.7  | v2.2-stable  | v2.2.13 (2017101021)      |
+| Moodle 3.2 - 3.10 | v2.3-stable  | v2.3.6  (2019042011)      |
+| Moodle 3.4 - 3.11 | v2.4-stable  | v2.4.4  (2019101011)      |
+| Moodle 3.11       | v3.0-alpha   | v3.0-alpha.1 (2021101001) |
+| Moodle 4.0        |      --      | moodle-core               |
+
+
+As the version included as part of Moodle 4.0 core develops, it would be hard to maintain full compatibility with previous versions of this plugin. For this reason the last major release will be v3.0, which was written for Moodle 3.11 and 4.0.
+
+This last version will be maintained and keep in pair with the Moodle 4.0 core version once it is released as stable, and it will be aligned to the Moodle project schedule for maintenance and support. But likely we will not see more new features added.
+
+For those running earlier versions of Moodle, we'll keep supporting the previous versions with security patches up to v2.2-stable, and for bug fixes up to v2.4-stable.
+
+We ecourage to update to the latest version of Moodle as soon as possible.
+
 
 Prerequisites
 =============
