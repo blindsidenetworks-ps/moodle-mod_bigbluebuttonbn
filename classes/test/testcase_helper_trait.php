@@ -294,19 +294,18 @@ trait testcase_helper_trait {
             $baselogdata['meetingid'] = $instance->get_meeting_id();
             if ($importrecordings) {
                 // Fetch the data.
-                $data = recording_proxy::fetch_recordings([$recording->recordingid]);
+                $data = recording_proxy::fetch_recordings([$recording->recordingid . 'A']);
                 $data = end($data);
                 if ($data) {
                     $metaonly = array_filter($data, function($key) {
                         return strstr($key, 'meta_');
                     }, ARRAY_FILTER_USE_KEY);
+                    $baselogdata['meta'] = json_encode(array_merge([
+                        'recording' => array_diff_key($data, $metaonly),
+                    ], $metaonly));
                 } else {
-                    $data = [];
+                    $baselogdata['meta'] = '';
                 }
-                $baselogdata['meta'] = json_encode(array_merge([
-                    'recording' => array_diff_key($data, $metaonly),
-                ], $metaonly));
-
             } else {
                 $baselogdata['meta'] = json_encode((object) ['record' => true]);
             }
