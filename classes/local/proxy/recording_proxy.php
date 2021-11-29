@@ -165,9 +165,10 @@ class recording_proxy extends proxy_base {
      *
      * @param array $keyids list of meetingids or recordingids
      * @param string $key the param name used for the BBB request (<recordID>|meetingID)
+     * @param int $cachettl the ttl used for expiring cached recordings, deault 0 for no cache
      * @return array (associative) with recordings indexed by recordID, each recording is a non sequential array
      */
-    public static function fetch_recordings(array $keyids = [], string $key = 'recordID'): array {
+    public static function fetch_recordings(array $keyids = [], string $key = 'recordID', int $cachettl = 0): array {
         $recordings = [];
 
         // If $ids is empty return array() to prevent a getRecordings with meetingID and recordID set to ''.
@@ -177,7 +178,14 @@ class recording_proxy extends proxy_base {
 
         $cache = cache::make('mod_bigbluebuttonbn', 'recordings');
         $currentfetchcache = cache::make('mod_bigbluebuttonbn', 'currentfetch');
-        $recordings = array_filter($cache->get_many($keyids));
+        $recordings = array_filter(array_map(function($recording) use ($cachettl) {
+            if (!isset($recording['fetchedAt']) || $recording['fetchedAt'] + $cachettl <= time()) {
+                // Invalidate cached recording.
+                self::invalidate_cache_for_recording($recording['recordID']);
+                return false;
+            }
+            return $recording;
+        }, array_filter($cache->get_many($keyids))));
         $missingkeys = array_diff(array_values($keyids), array_keys($recordings));
 
         $pagesize = 25;
@@ -188,7 +196,6 @@ class recording_proxy extends proxy_base {
 
             $recordings += $fetchrecordings;
         }
-
         // Sort recordings.
         return self::sort_recordings($recordings);
     }
@@ -202,7 +209,7 @@ class recording_proxy extends proxy_base {
      */
     private static function fetch_recordings_page(array $ids, $key = 'recordID'): array {
         // The getRecordings call is executed using a method GET (supported by all versions of BBB).
-        $xml = self::fetch_endpoint_xml('getRecordings', [$key => implode(',', $ids)]);
+        $xml = self::fetch_endpoint_xml('getRecordings', [$key => implode(',', $ids), 'state' => 'any']);
 
         if (!$xml) {
             return [];
@@ -220,6 +227,7 @@ class recording_proxy extends proxy_base {
         // If there were meetings already created.
         foreach ($xml->recordings->recording as $recordingxml) {
             $recording = self::parse_recording($recordingxml);
+            $recording['fetchedAt'] = (string)time();
             $recordings[$recording['recordID']] = $recording;
 
             // Check if there is childs.
@@ -293,9 +301,13 @@ class recording_proxy extends proxy_base {
             self::parse_recording_meta(get_object_vars($recording->metadata));
         $recordingarray = [
             'recordID' => (string) $recording->recordID,
-            'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name,
-            'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime,
-            'endTime' => (string) $recording->endTime, 'playbacks' => $playbackarray
+            'meetingID' => (string) $recording->meetingID,
+            'meetingName' => (string) $recording->name,
+            'published' => (string) $recording->published,
+            'state' => (string) $recording->state,
+            'startTime' => (string) $recording->startTime,
+            'endTime' => (string) $recording->endTime,
+            'playbacks' => $playbackarray
         ];
         if (isset($recording->protected)) {
             $recordingarray['protected'] = (string) $recording->protected;

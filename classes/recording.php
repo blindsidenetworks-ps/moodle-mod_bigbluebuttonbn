@@ -63,6 +63,9 @@ class recording extends persistent {
     /** @var int A meeting set to be recorded was processed and set back to an awaiting state */
     public const RECORDING_STATUS_RESET = 4;
 
+    /** @var int A meeting set to be recorded was deleted from bigbluebutton */
+    public const RECORDING_STATUS_DELETED = 5;
+
     /** @var bool Whether metadata been changed so the remote information needs to be updated ? */
     protected $metadatachanged = false;
 
@@ -683,27 +686,44 @@ class recording extends persistent {
     protected static function fetch_records(array $selects, array $params): array {
         global $DB;
 
+        $withindays = time() - (30 * DAYSECS);
+
         // Fetch the local data. Arbitrary sort by id, so we get the same result on different db engines.
         $recordings = $DB->get_records_select(static::TABLE, implode(" AND ", $selects), $params,
             self::DEFAULT_RECORDING_SORT);
 
         // Grab the recording IDs.
-        $recordingids = array_filter(array_map(function($recording) {
+        $recordingids = array_values(array_map(function($recording) {
             return $recording->recordingid;
         }, $recordings));
 
         // Fetch all metadata for these recordings.
-        $metadatas = recording_proxy::fetch_recordings($recordingids);
+        $cfg = \mod_bigbluebuttonbn\local\config::get_options();
+        $metadatas = recording_proxy::fetch_recordings($recordingids, 'recordID', $cfg['recording_refresh_period']);
 
         // Return the instances.
-        return array_map(function($recording) use ($metadatas) {
-            $metadata = null;
-            if (array_key_exists($recording->recordingid, $metadatas)) {
-                $metadata = $metadatas[$recording->recordingid];
+        return array_filter(array_map(function($recording) use ($metadatas, $withindays) {
+            // Do not include it if no metadata was fetched.
+            if (!array_key_exists($recording->recordingid, $metadatas)) {
+                // Mark it as dismissed if it is older than 30 days.
+                if ($withindays > $recording->timecreated) {
+                    $recording = new self(0, $recording, null);
+                    $recording->raw_set('status', self::RECORDING_STATUS_DISMISSED);
+                    $recording->update();
+                }
+                return false;
             }
-
+            $metadata = $metadatas[$recording->recordingid];
+            // Do not include it and mark it as deleted if it was deleted in BBB.
+            if ($metadata['state'] == 'deleted') {
+                $recording = new self(0, $recording, null);
+                $recording->raw_set('status', self::RECORDING_STATUS_DELETED);
+                $recording->update();
+                return false;
+            }
+            // Include it otherwise.
             return new self(0, $recording, $metadata);
-        }, $recordings);
+        }, $recordings));
     }
 
     /**
@@ -770,7 +790,8 @@ class recording extends persistent {
 
         // Fetch all metadata for these recordings.
         mtrace("=> Fetching recording metadata from server");
-        $metadatas = recording_proxy::fetch_recordings($recordingids);
+        $cfg = \mod_bigbluebuttonbn\local\config::get_options();
+        $metadatas = recording_proxy::fetch_recordings($recordingids, 'recordID', $cfg['recording_refresh_period']);
 
         $foundcount = 0;
         foreach ($metadatas as $recordingid => $metadata) {
