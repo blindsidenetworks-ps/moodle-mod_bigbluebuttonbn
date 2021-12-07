@@ -265,16 +265,20 @@ function bigbluebuttonbn_get_recordings_array_fetch_page($mids) {
 
             // Check if there is childs.
             if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
+                $breakoutrooms = [];
                 foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                    $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url('getRecordings',
-                        ['recordID' => implode(',', (array) $breakoutroom)]);
-                    $xml = bigbluebuttonbn_wrap_xml_load_file($url);
-                    if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
-                        // If there were meetings already created.
-                        foreach ($xml->recordings->recording as $recordingxml) {
-                            $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
-                            $recordings[$recording['recordID']] = $recording;
-                        }
+                    $breakoutrooms[] = trim((string) $breakoutroom);
+                }
+                $url = \mod_bigbluebuttonbn\locallib\bigbluebutton::action_url(
+                    'getRecordings',
+                    ['recordID' => implode(',', $breakoutrooms)]
+                );
+                $xml = bigbluebuttonbn_wrap_xml_load_file($url);
+                if ($xml && $xml->returncode == 'SUCCESS' && isset($xml->recordings)) {
+                    // If there were meetings already created.
+                    foreach ($xml->recordings->recording as $recordingxml) {
+                        $recording = bigbluebuttonbn_get_recording_array_value($recordingxml);
+                        $recordings[$recording['recordID']] = $recording;
                     }
                 }
             }
