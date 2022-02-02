@@ -40,7 +40,11 @@ $string['selected_server'] = "سرور انتخاب شده:";
 
 $string['config_servers'] = "سرور ها";
 $string['config_servers_description'] = "لیست سرور ها را در فرمت JSON وارد کنید.
-هر سرور باید این ویژگی ها را داشته باشد: url, secret, cap_sessions, cap_users";
+هر سرور باید ویژگی های زیر را داشته باشد.
+<li><b>url:</b> آدرس سرور بیگ بلو باتن در فرمت URL</li>
+<li><b>secret:</b> کد مخفی سرور بیگ بلو باتن</li>
+<li><b>cap_sessions:</b> شمار نسبی نشست هایی که سرور میتواند میزبان باشد</li>
+<li><b>cap_users:</b> شمار نسبی کاربرانی که سرور میتواند میزبان باشد </li>";
 
 $string['config_server_selection_method'] = 'روش انتخاب سرور';
 $string['config_server_selection_method_description'] =
