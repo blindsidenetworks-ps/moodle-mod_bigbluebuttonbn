@@ -31,10 +31,10 @@ global $CFG;
  * This file should be renamed to "config.php" in the plugin directory
  *
  * It is intended to be used for setting configuration by default and
- * also for enable/diable configuration options in the admin setting UI
+ * also for enable/disable configuration options in the admin setting UI
  * for those multitenancy deployments where the admin account is given
  * to the tenant owner and some shared information like the
- * bigbluebutton_server_url and bigbluebutton_shared_secret must been
+ * servers url and shared secrets must been
  * kept private. And also when some of the features are going to be
  * disabled for all the tenants in that server
  **/
@@ -61,8 +61,7 @@ global $CFG;
  * Networks that you can use for testing.
  **/
 
-$CFG->bigbluebuttonbn['server_url'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-$CFG->bigbluebuttonbn['shared_secret'] = '8cd8ef52e8e101574e400365b55e11a6';
+$CFG->bigbluebuttonbn['default_servers'] = BIGBLUEBUTTONBN_DEFAULT_SERVERS;
 
 /*
  * 1.2. CONFIGURATION FOR "RECORDING" FEATURE

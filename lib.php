@@ -24,6 +24,8 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+use mod_bigbluebuttonbn\locallib\config;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
@@ -61,6 +63,8 @@ if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 /** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
+/** @var BIGBLUEBUTTONBN_DEFAULT_SERVERS string of default servers' data */
+define("BIGBLUEBUTTONBN_DEFAULT_SERVERS", get_string('config_servers_default', 'bigbluebuttonbn'));
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_ADD string of event add for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_ADD = 'Add';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_EDIT string of event edit for bigbluebuttonbn_logs */
@@ -79,6 +83,13 @@ const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 /** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
+
+const BIGBLUEBUTTON_SERVER_SELECTION_METHOD_USERS = 'users';
+const BIGBLUEBUTTON_SERVER_SELECTION_METHOD_SESSIONS = 'sessions';
+const BIGBLUEBUTTON_SERVER_SELECTION_METHODS = array(
+    BIGBLUEBUTTON_SERVER_SELECTION_METHOD_USERS,
+    BIGBLUEBUTTON_SERVER_SELECTION_METHOD_SESSIONS
+);
 /**
  * Indicates API features that the bigbluebuttonbn supports.
  *
@@ -119,6 +130,103 @@ function bigbluebuttonbn_supports($feature) {
 }
 
 /**
+ * Return object of the best server for the session with criteria of
+ * either count of sessions or count of participants in given time period.
+ *
+ * @param $bigbluebuttonbn
+ * @return false|mixed|stdClass
+ * @throws dml_exception
+ */
+function bigbluebuttonbn_getBestServer($bigbluebuttonbn)
+{
+    global $DB;
+    $method = \mod_bigbluebuttonbn\locallib\config::get('server_selection_method');
+    $method = BIGBLUEBUTTON_SERVER_SELECTION_METHODS[$method];
+
+    if (($a = $bigbluebuttonbn->openingtime) == 0 and ($b = $bigbluebuttonbn->closingtime) == 0) {
+        return bigbluebuttonbn_getDefaultServer();
+    }
+
+    switch ($method) {
+        case BIGBLUEBUTTON_SERVER_SELECTION_METHOD_USERS:
+            $orderedServerRecords = $DB->get_recordset_sql("
+                SELECT userssum / cap_users as drawback, servers.* FROM 			
+                    (	
+                        SELECT servername, SUM(userscount) AS userssum FROM 
+                                (   
+                                    SELECT COUNT(DISTINCT userid) as userscount, instanceid AS courseid FROM 
+                                            (
+                                                SELECT userid, contextid, instanceid FROM 
+                                                {role_assignments} AS ra INNER JOIN {context} AS context
+                                                ON ra.contextid=context.id
+                                                WHERE context.contextlevel=".CONTEXT_COURSE."
+                                            ) AS ra_context
+                                        INNER JOIN 
+                                            {course}
+                                        ON ra_context.instanceid={course}.id
+                                    GROUP BY courseid
+                                ) AS course_userscount
+                            INNER JOIN 
+                                (
+                                    SELECT servername, id AS bbbid, course as courseid, openingtime, closingtime  FROM {bigbluebuttonbn}
+                                ) AS bbb
+                            ON bbb.courseid = course_userscount.courseid
+                        WHERE openingtime BETWEEN $a AND $b OR closingtime BETWEEN $a AND $b
+                        GROUP BY servername
+                    ) AS final
+                RIGHT JOIN
+                    {bigbluebuttonbn_servers} AS servers
+                ON servers.servername = final.servername
+                WHERE cap_users > 0
+                ORDER BY drawback ASC
+            ");
+            break;
+        case BIGBLUEBUTTON_SERVER_SELECTION_METHOD_SESSIONS:
+            $orderedServerRecords = $DB->get_recordset_sql("
+                SELECT COUNT(bbb.id) AS sessions_count, servers.* FROM 
+                        {bigbluebuttonbn_servers} 
+                        AS servers 
+                    LEFT JOIN 
+                        (
+                            SELECT * FROM {bigbluebuttonbn} WHERE
+                            openingtime BETWEEN $a AND $b OR closingtime BETWEEN $a AND $b
+                        ) 
+                        AS bbb
+                    ON bbb.servername=servers.servername
+                GROUP BY servers.id
+                HAVING cap_sessions > 0
+                ORDER BY sessions_count / cap_sessions
+            ");
+            break;
+        default:
+            $orderedServerRecords = [];
+            break;
+    }
+
+    foreach ($orderedServerRecords as $server) {
+        $version = bigbluebuttonbn_get_server_version($server);
+        if(is_null($version)) continue;
+        return $server;
+    }
+
+    throw new Exception("Neither of configured bigbluebuttonbn servers are available!");
+}
+
+/**
+ * Return object of the server which has been considered as default in setting
+ *
+ * @return false|mixed|stdClass
+ * @throws dml_exception
+ */
+function bigbluebuttonbn_getDefaultServer()
+{
+    global $DB;
+    return $DB->get_record('bigbluebuttonbn_servers',
+        ['servername' => config::get('default_server_name')]
+    );
+}
+
+/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -133,10 +241,14 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
     $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    // Get the best server
+    $server = bigbluebuttonbn_getBestServer($bigbluebuttonbn);
+    // Set server
+    $bigbluebuttonbn->servername = $server->servername;
     // Insert a record.
     $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
-    $bigbluebuttonbn->meetingid = bigbluebuttonbn_unique_meetingid_seed();
+    $bigbluebuttonbn->meetingid = bigbluebuttonbn_unique_meetingid_seed($server->id);
     // Set the meetingid column in the bigbluebuttonbn table.
     $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn->meetingid, array('id' => $bigbluebuttonbn->id));
     // Log insert action.
@@ -429,11 +541,21 @@ function bigbluebuttonbn_reset_logs($courseid) {
  * @return array status array
  */
 function bigbluebuttonbn_reset_recordings($courseid) {
+    global $DB;
     require_once(__DIR__.'/locallib.php');
     // Criteria for search [courseid | bigbluebuttonbn=null | subset=false | includedeleted=true].
     $recordings = bigbluebuttonbn_get_recordings($courseid, null, false, true);
     // Remove all the recordings.
-    bigbluebuttonbn_delete_recordings(implode(",", array_keys($recordings)));
+    $recordings_ = [];
+    foreach ($recordings as $recordingId => $content) {
+        $servername = $DB->get_field('bigbluebuttonbn', 'servername',
+            ['meetingid' => explode('-', $content['meetingID'])[0]]);
+        $recordings_[$servername][$recordingId] = $content;
+    }
+    foreach ($recordings_ as $servername => $recordings) {
+        $server = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $servername]);
+        bigbluebuttonbn_delete_recordings($server, implode(",", array_keys($recordings)));
+    }
 }
 
 /**

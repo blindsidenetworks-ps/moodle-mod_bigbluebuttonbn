@@ -8,6 +8,7 @@
     <TABLE NAME="bigbluebuttonbn" COMMENT="The bigbluebuttonbn table to store information about a meeting activities.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="servername" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
@@ -61,5 +62,23 @@
         <INDEX NAME="userlog" UNIQUE="false" FIELDS="userid, log"/>
       </INDEXES>
     </TABLE>
+
+    <TABLE NAME="bigbluebuttonbn_servers" COMMENT="The bigbluebuttonbn table to store servers' details">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="servername" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"/> <!-- unique -->
+        <FIELD NAME="url" TYPE="char" LENGTH="512" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="secret" TYPE="char" LENGTH="256" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cap_sessions" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cap_users" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="servername-unique" UNIQUE="true" FIELDS="servername"/>
+      </INDEXES>
+    </TABLE>
+
   </TABLES>
 </XMLDB>

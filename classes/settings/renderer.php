@@ -24,6 +24,7 @@
  */
 
 namespace mod_bigbluebuttonbn\settings;
+require_once "admin_setting_servers.php";
 
 defined('MOODLE_INTERNAL') || die();
 

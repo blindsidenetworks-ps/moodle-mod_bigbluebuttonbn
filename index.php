@@ -54,6 +54,7 @@ $action = optional_param('action', '', PARAM_TEXT);
 if ($action === 'end') {
     // A request to end the meeting.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $a]);
+    $server = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
     if (!$bigbluebuttonbn) {
         print_error('index_error_bbtn', plugin::COMPONENT, '', $a);
     }
@@ -71,7 +72,7 @@ if ($action === 'end') {
             $meetingid .= sprintf('[%d]', $g);
         }
 
-        bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
+        bigbluebuttonbn_end_meeting($server, $meetingid, $bigbluebuttonbn->moderatorpass);
         redirect($PAGE->url);
     }
 }

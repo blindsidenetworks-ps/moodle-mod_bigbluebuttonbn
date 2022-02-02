@@ -31,6 +31,8 @@ require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/locallib.php');
 require_once(__DIR__.'/viewlib.php');
 
+global $DB, $PAGE, $SESSION;
+
 $id = required_param('id', PARAM_INT);
 $bn = optional_param('bn', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
@@ -54,11 +56,13 @@ $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+$bbbsession['server'] = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
+
 // In locallib.
 mod_bigbluebuttonbn\locallib\bigbluebutton::view_bbbsession_set($PAGE->context, $bbbsession);
 
 // Validates if the BigBlueButton server is working.
-$serverversion = bigbluebuttonbn_get_server_version();  // In locallib.
+$serverversion = bigbluebuttonbn_get_server_version($bbbsession['server']);  // In locallib.
 if ($serverversion === null) {
     $errmsg = 'view_error_unable_join_student';
     $errurl = '/course/view.php';

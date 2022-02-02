@@ -55,8 +55,7 @@ class config {
      */
     public static function defaultvalues() {
         return array(
-            'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
-            'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+            'default_servers' => BIGBLUEBUTTONBN_DEFAULT_SERVERS,
             'voicebridge_editable' => false,
             'importrecordings_enabled' => false,
             'importrecordings_from_deleted_enabled' => false,

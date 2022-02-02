@@ -78,10 +78,6 @@ $string['privacy:metadata:bigbluebutton:fullname'] = 'The fullname of the user a
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
-$string['config_server_url'] = 'BigBlueButton Server URL';
-$string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
-$string['config_shared_secret'] = 'BigBlueButton Shared Secret';
-$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 
 $string['config_recording'] = 'Configuration for "Record meeting" feature';
 $string['config_recording_description'] = 'These settings are feature specific';
@@ -475,3 +471,38 @@ $string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
 
 $string['view_mobile_message_reload_page_creation_time_meeting'] = 'You exceeded the 45 seconds in this page, please reload the page to join correctly to the meeting.';
 $string['view_mobile_message_groups_not_supported'] = 'This instance is enable to work with groups but the mobile app has not support for this. Please open in desktop if you want to use the group support.';
+
+$string['error_format_json'] = "Wrong format! Please enter data in JSON format.";
+$string['error_default_server_count_more_than_one'] = "Default servers are more than one";
+$string['error_no_default_server'] = "One server must be defined as 'default' by adding a property with key=\"default\" and value=true to the intended server.";
+$string['error_repetitive_servername'] = "The servername '%s' has been defined %d times.";
+$string['error_field_required'] = "Each server object must include the property '%s'!";
+$string['error_forbidden_servername'] = "The name '%s' is not allowed to be assigned as a server's name";
+$string['error_server_unavailable'] = "Server '%s' is not available";
+
+$string['server_unavailable'] = "Server is Unavailable!";
+$string['server_available'] = "Server is available!<br>Server version: %s";
+$string['selected_server'] = "Selected server:";
+
+
+$string['config_servers'] = "Servers";
+$string['config_servers_description'] = "Fill list of the servers in JSON format. 
+Each server must contain these attributes: url, secret, cap_sessions, cap_users";
+$string['config_servers_default'] = "
+[
+    {
+        \"servername\": \"default\",
+        \"url\":\"http://test-install.blindsidenetworks.com/bigbluebutton/\",
+        \"default\": true,
+        \"secret\": \"8cd8ef52e8e101574e400365b55e11a6\",
+        \"cap_sessions\": 1,
+        \"cap_users\": 1
+    }
+]
+";
+
+$string['config_server_selection_method'] = 'Server selection method';
+$string['config_server_selection_method_description'] =
+    'Enter the method to select a server for a new session in an offline way.';
+$string['server_selection_method__users'] = 'Count of users on each server';
+$string['server_selection_method__sessions'] = 'Count of sessions on each server';

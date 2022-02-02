@@ -112,7 +112,11 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         'locale' => bigbluebuttonbn_get_localcode(), 'profile_features' => $typeprofiles[0]['features']);
     $output  = '';
     // Renders warning messages when configured.
-    $output .= bigbluebuttonbn_view_warning_default_server($bbbsession);
+    if (is_siteadmin($bbbsession['userID'])) {
+        $output .= bigbluebuttonbn_view_warning_default_server($bbbsession);
+        $output .= bigbluebuttonbn_view_server_details($bbbsession);
+        $output .= bigbluebuttonbn_view_server_status($bbbsession);
+    }
     $output .= bigbluebuttonbn_view_warning_general($bbbsession);
 
     // Renders the rest of the page.
@@ -355,13 +359,49 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
  * @return string
  */
 function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
-    if (!is_siteadmin($bbbsession['userID'])) {
-        return '';
+    global $DB;
+    $urls = [];
+    foreach ($DB->get_records('bigbluebuttonbn_servers') as $record) {
+        $urls[] = parse_url($record->url, PHP_URL_HOST);
     }
-    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
-        return '';
+    if (in_array(parse_url(BIGBLUEBUTTONBN_DEFAULT_SERVER_URL, PHP_URL_HOST), $urls)) {
+        return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'danger');
     }
-    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
+    return '';
+}
+
+/**
+ * Renders details of bbb server
+ *
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_server_details(&$bbbsession) {
+    $inner = get_string('selected_server', 'bigbluebuttonbn');
+    $inner = "<h3>$inner</h3>" .
+        bigbluebuttonbn_render_list((array)$bbbsession['server'], ['id', 'secret'], 'w-75');
+    return bigbluebuttonbn_render_warning($inner, 'info', '','','w-50');
+}
+
+/**
+ * Renders status of bigbluebutton server
+ *
+ * @param array $bbbsession
+ *
+ * @return string
+ */
+function bigbluebuttonbn_view_server_status(&$bbbsession) {
+    $version = bigbluebuttonbn_get_server_version($bbbsession['server']);
+    if (is_null($version))
+        return bigbluebuttonbn_render_warning(
+            get_string('server_unavailable', 'bigbluebuttonbn'),
+            'danger'
+        );
+    return bigbluebuttonbn_render_warning(
+        sprintf(get_string('server_available', 'bigbluebuttonbn'), $version),
+        'success'
+    );
 }
 
 /**

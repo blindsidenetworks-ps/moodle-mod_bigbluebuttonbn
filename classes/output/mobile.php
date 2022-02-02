@@ -54,7 +54,7 @@ class mobile {
      */
     public static function mobile_course_view($args) {
 
-        global $OUTPUT, $SESSION;
+        global $DB, $OUTPUT, $SESSION;
 
         $args = (object) $args;
         $viewinstance = bigbluebuttonbn_view_validator($args->cmid, null);
@@ -68,6 +68,7 @@ class mobile {
         // Create variables for easy access.
         $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
         $serverversion = $bbbsession['serverversion'];
+        $bbbsession['server'] = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
         $cm = $bbbsession['cm'];
         $course = $bbbsession['course'];
         $context = $bbbsession['context'];
@@ -141,10 +142,11 @@ class mobile {
         }
 
         // See if the BBB session is already in progress.
-        if (!bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
+        if (!bigbluebuttonbn_is_meeting_running($bbbsession['server'], $bbbsession['meetingid'])) {
 
             // The meeting doesnt exist in BBB server, must be created.
             $response = bigbluebuttonbn_get_create_meeting_array(
+                $bbbsession['server'],
                 \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_data($bbbsession),
                 \mod_bigbluebuttonbn\locallib\mobileview::bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
                 $bbbsession['presentation']['name'],
@@ -183,7 +185,7 @@ class mobile {
 
         // It is part of 'bigbluebutton_bbb_view_join_meeting' in bbb_view.
         // Update the cache.
-        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['server'], $bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
             // No more users allowed to join.
             $message = get_string('view_error_userlimit_reached', 'bigbluebuttonbn');

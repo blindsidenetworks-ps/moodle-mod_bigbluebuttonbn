@@ -115,15 +115,17 @@ class index implements renderable {
      * @return array
      */
     public static function bigbluebuttonbn_index_display_room($moderator, $course, $bigbluebuttonbn, $groupobj = null) {
+        global $DB;
         $meetingid = sprintf('%s-%d-%d', $bigbluebuttonbn->meetingid, $course->id, $bigbluebuttonbn->id);
         $groupname = '';
+        $server = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
         $urlparams = ['id' => $bigbluebuttonbn->coursemodule];
         if ($groupobj) {
             $meetingid .= sprintf('[%d]', $groupobj->id);
             $urlparams['group'] = $groupobj->id;
             $groupname = $groupobj->name;
         }
-        $meetinginfo = bigbluebuttonbn_get_meeting_info_array($meetingid);
+        $meetinginfo = bigbluebuttonbn_get_meeting_info_array($server, $meetingid);
         if (empty($meetinginfo)) {
             // The server was unreachable.
             print_error('index_error_unable_display', plugin::COMPONENT);

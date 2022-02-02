@@ -47,8 +47,9 @@ class bigbluebutton {
      * @param array  $metadata
      * @return string
      */
-    public static function action_url($action = '', $data = array(), $metadata = array()) {
-        $baseurl = self::sanitized_url() . $action . '?';
+    public static function action_url($server, $action = '', $data = array(), $metadata = array()) {
+        $server = self::get_sanitized($server);
+        $baseurl = $server->url . $action . '?';
         $metadata = array_combine(
             array_map(
                 function($k) {
@@ -59,32 +60,27 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
+        return $baseurl . $params . '&checksum=' . sha1($action . $params . $server->secret);
     }
 
     /**
-     * Makes sure the url used doesn't is in the format required.
-     *
-     * @return string
+     * Makes sure the url and secret is in the format required.
+     * @param object $server
+     * @return object
      */
-    public static function sanitized_url() {
-        $serverurl = trim(config::get('server_url'));
+    public static function get_sanitized($server){
+        // Makes sure the url used doesn't is in the format required.
+        $serverurl = trim($server->url);
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
         }
         if (substr($serverurl, -4) == '/api') {
             $serverurl = rtrim($serverurl, '/api');
         }
-        return $serverurl . '/api/';
-    }
-
-    /**
-     * Makes sure the shared_secret used doesn't have trailing white characters.
-     *
-     * @return string
-     */
-    public static function sanitized_secret() {
-        return trim(config::get('shared_secret'));
+        return (object)[
+            'url' => $serverurl . '/api/',
+            'secret' => trim($server->secret),
+        ];
     }
 
     /**
@@ -92,8 +88,9 @@ class bigbluebutton {
      *
      * @return string
      */
-    public static function root() {
-        $pserverurl = parse_url(trim(config::get('server_url')));
+    public static function root($server=null) {
+        $server = is_null($server) ? bigbluebuttonbn_getDefaultServer() : $server;
+        $pserverurl = parse_url(trim($server->url));
         $pserverurlport = "";
         if (isset($pserverurl['port'])) {
             $pserverurlport = ":" . $pserverurl['port'];
@@ -133,7 +130,7 @@ class bigbluebutton {
      * @throws \required_capability_exception
      */
     public static function build_bbb_session($cm, $course, $bigbluebuttonbn) {
-        global $CFG;
+        global $CFG, $DB;
         $context = context_module::instance($cm->id);
         require_login($course->id, false, $cm, true, true);
         require_capability('mod/bigbluebuttonbn:join', $context);
@@ -143,12 +140,13 @@ class bigbluebutton {
 
         // Create array bbbsession with configuration for BBB server.
         $bbbsession['course'] = $course;
+        $bbbsession['server'] = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
         $bbbsession['coursename'] = $course->fullname;
         $bbbsession['cm'] = $cm;
         $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
         self::view_bbbsession_set($context, $bbbsession);
 
-        $serverversion = bigbluebuttonbn_get_server_version();
+        $serverversion = bigbluebuttonbn_get_server_version($bbbsession['server']);
         $bbbsession['serverversion'] = (string) $serverversion;
 
         // Operation URLs.
@@ -236,7 +234,7 @@ class bigbluebutton {
         $session['originServerUrl'] = $CFG->wwwroot;
         $session['originServerCommonName'] = '';
         $session['originTag'] = 'moodle-mod_bigbluebuttonbn ('.get_config('mod_bigbluebuttonbn', 'version').')';
-        $session['bnserver'] = bigbluebuttonbn_is_bn_server();
+        $session['bnserver'] = bigbluebuttonbn_is_bn_server($session['server']);
         $session['clienttype'] = config::get('clienttype_default');
 
         if (config::get('clienttype_editable')) {
@@ -268,7 +266,7 @@ class bigbluebutton {
             $bbbsession = self::build_bbb_session_fromviewinstance($viewinstance);
             if ($bbbsession) {
                 require_once($CFG->dirroot . "/mod/bigbluebuttonbn/brokerlib.php");
-                $info = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], false);
+                $info = bigbluebuttonbn_get_meeting_info($bbbsession['server'], $bbbsession['meetingid'], false);
                 $running = false;
                 if ($info['returncode'] == 'SUCCESS') {
                     $running = ($info['running'] === 'true');

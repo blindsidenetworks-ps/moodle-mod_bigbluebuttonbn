@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(__FILE__)).'/locallib.php');
 
+define('FILLING_SERVER_NAME', 'DEFAULT_DEFAULT_DEFAULT_DEFAULT_DEFAULT_DEFAULT');
+
 /**
  * Performs data migrations and updates on upgrade.
  *
@@ -205,6 +207,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2019042012, 'bigbluebuttonbn');
     }
 
+    if ($oldversion < 2022010100) {
+        $newTable = new xmldb_table('bigbluebuttonbn_servers');
+        $newTable->add_field('id', XMLDB_TYPE_INTEGER, 10, true, true, true);
+        $newTable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $newTable->add_field('servername', XMLDB_TYPE_CHAR, 128, null, true, false);
+        $newTable->add_key('servername-unique', XMLDB_KEY_UNIQUE, ['servername']);
+        $newTable->add_field('url', XMLDB_TYPE_CHAR, 512, null, true, false);
+        $newTable->add_field('secret', XMLDB_TYPE_CHAR, 256, null, true, false);
+        $newTable->add_field('cap_sessions', XMLDB_TYPE_INTEGER, 10, true, true, false);
+        $newTable->add_field('cap_users', XMLDB_TYPE_INTEGER, 10, true, true, false);
+        $dbman->create_table($newTable);
+        xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'servername', [
+            'type' => XMLDB_TYPE_CHAR, 'precision' => 128, 'unsigned' => null, 'notnull' => true,
+            'sequence' => false, 'default' => FILLING_SERVER_NAME, 'previous' => 'id'
+        ]);
+    }
     return true;
 }
 

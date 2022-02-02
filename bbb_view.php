@@ -25,8 +25,8 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
-
-global $SESSION;
+require_once 'classes/settings/renderer.php';
+global $SESSION, $DB, $CFG, $PAGE;
 
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
@@ -48,6 +48,7 @@ if (!$bbbviewinstance) {
 $cm = $bbbviewinstance['cm'];
 $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
+$server = $DB->get_record('bigbluebuttonbn_servers', ['id' => $bigbluebuttonbn->id]);
 $context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
@@ -59,7 +60,7 @@ if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
 
 if ($timeline || $index) {
     // Validates if the BigBlueButton server is working.
-    $serverversion = bigbluebuttonbn_get_server_version();
+    $serverversion = bigbluebuttonbn_get_server_version($server);
     if (is_null($serverversion)) {
         if ($bbbsession['administrator']) {
             print_error('view_error_unable_join', 'bigbluebuttonbn',
@@ -105,6 +106,8 @@ if ($timeline || $index) {
     $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
 }
 
+$bbbsession['server'] = $server;
+
 // Print the page header.
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/bigbluebuttonbn/bbb_view.php', array('id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id));
@@ -126,7 +129,7 @@ switch (strtolower($action)) {
         // Moodle event logger: Create an event for meeting left.
         bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_left'], $bigbluebuttonbn);
         // Update the cache.
-        $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        $meetinginfo = bigbluebuttonbn_get_meeting_info($server, $bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
         // Check the origin page.
         $select = "userid = ? AND log = ?";
         $params = array(
@@ -156,7 +159,7 @@ switch (strtolower($action)) {
             $origin = BIGBLUEBUTTON_ORIGIN_INDEX;
         }
         // See if the session is in progress.
-        if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
+        if (bigbluebuttonbn_is_meeting_running($server, $bbbsession['meetingid'])) {
             // Since the meeting is already running, we just join the session.
             bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
             break;
@@ -168,6 +171,7 @@ switch (strtolower($action)) {
         }
         // As the meeting doesn't exist, try to create it.
         $response = bigbluebuttonbn_get_create_meeting_array(
+            $server,
             bigbluebutton_bbb_view_create_meeting_data($bbbsession),
             bigbluebutton_bbb_view_create_meeting_metadata($bbbsession),
             $bbbsession['presentation']['name'],
@@ -402,8 +406,9 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
  * @param integer  $origin
  */
 function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0) {
+    global $DB;
     // Update the cache.
-    $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+    $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['server'], $bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
         // No more users allowed to join.
         header('Location: '.$bbbsession['logoutURL']);
@@ -415,7 +420,8 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $ori
         $password = $bbbsession['modPW'];
     }
     $bbbsession['createtime'] = $meetinginfo['createTime'];
-    $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
+    $server = $DB->get_record('bigbluebuttonbn_servers', ['servername' => $bigbluebuttonbn->servername]);
+    $joinurl = bigbluebuttonbn_get_join_url($server, $bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype'], $bbbsession['createTime']);
     // Moodle event logger: Create an event for meeting joined.
     bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
