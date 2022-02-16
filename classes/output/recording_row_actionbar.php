@@ -116,16 +116,13 @@ class recording_row_actionbar implements renderable, templatable {
                 $disabledwhen = $buttonpayload['disablewhen'] ?? null;
                 $this->actionbar_update_diplay($buttonpayload, $disabledwhen, $this->recording, 'disabled');
                 $this->actionbar_update_diplay($buttonpayload, $conditionalhiding, $this->recording);
-
                 if (!empty($buttonpayload)) {
-                    // With text for $manageaction.
                     $iconortext = '';
                     $target = $buttonpayload['action'];
                     if (isset($buttonpayload['target'])) {
                         $target .= '-' . $buttonpayload['target'];
                     }
                     $id = 'recording-' . $target . '-' . $this->recording->get('recordingid');
-                
                     // With icon for $manageaction.
                     $iconattributes = [
                         'id' => $id,
