@@ -123,7 +123,6 @@ class recording_row_actionbar implements renderable, templatable {
                         $target .= '-' . $buttonpayload['target'];
                     }
                     $id = 'recording-' . $target . '-' . $this->recording->get('recordingid');
-                    // With icon for $manageaction.
                     $iconattributes = [
                         'id' => $id,
                         'class' => 'iconsmall',
