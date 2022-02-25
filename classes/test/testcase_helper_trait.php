@@ -158,7 +158,6 @@ trait testcase_helper_trait {
      * @param instance $instance
      * @param array $recordingdata array of recording information
      * @return array
-     * @throws \coding_exception
      */
     protected function create_recordings_for_instance(instance $instance, array $recordingdata = []): array {
         $recordings = [];
@@ -215,8 +214,6 @@ trait testcase_helper_trait {
      *
      * @param array $dataset
      * @return mixed
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     protected function create_from_dataset(array $dataset) {
         list('type' => $type, 'recordingsdata' => $recordingsdata, 'groups' => $groups,
@@ -265,6 +262,7 @@ trait testcase_helper_trait {
      * @param instance $instance
      * @param int $userid
      * @param int $count
+     * @param bool $importrecordings
      * @return array
      */
     protected function create_legacy_log_entries(instance $instance, int $userid, int $count = 30,
@@ -306,6 +304,7 @@ trait testcase_helper_trait {
                 $baselogdata['meta'] = json_encode(array_merge([
                     'recording' => array_diff_key($data, $metaonly),
                 ], $metaonly));
+
             } else {
                 $baselogdata['meta'] = json_encode((object) ['record' => true]);
             }

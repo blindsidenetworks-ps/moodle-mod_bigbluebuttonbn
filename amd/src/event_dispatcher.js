@@ -15,7 +15,7 @@
 /**
  * An Event dispatcher used to dispatch Native JS CustomEvent objects with custom default properties.
  *
- * @module     core/event_dispatcher
+ * @module     ./event_dispatcher
  * @copyright  2021 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      4.0

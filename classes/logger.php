@@ -79,8 +79,6 @@ class logger {
      * @param array|null $filters
      * @param int|null $timestart
      * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public static function get_user_completion_logs(
         instance $instance,
@@ -102,8 +100,6 @@ class logger {
      * @param array|null $filters
      * @param int|null $timestart
      * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public static function get_user_completion_logs_with_userfields(
         instance $instance,
@@ -138,8 +134,6 @@ EOF;
      * @param array|null $filters
      * @param int|null $timestart
      * @return int
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public static function get_user_completion_logs_max_timestamp(
         instance $instance,
@@ -164,8 +158,6 @@ EOF;
      * @param int|null $timestart
      * @param string|null $logtablealias
      * @return array
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     protected static function get_user_completion_sql_params(instance $instance, ?int $userid, ?array $filters, ?int $timestart,
         ?string $logtablealias = null) {
@@ -371,7 +363,6 @@ EOF;
      * @param array $overrides
      * @param string|null $meta
      * @return bool
-     * @throws \dml_exception
      */
     protected static function raw_log(
         string $event,
@@ -459,5 +450,30 @@ EOF;
         $count = $DB->count_records_sql($sql,
             [self::EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"]);
         return $count;
+    }
+
+    /**
+     * Log event to string that can be internationalised via get_string.
+     */
+    const LOG_TO_STRING = [
+        self::EVENT_JOIN => 'event_meeting_joined',
+        self::EVENT_PLAYED => 'event_recording_viewed',
+        self::EVENT_IMPORT => 'event_recording_imported',
+        self::EVENT_ADD => 'event_activity_created',
+        self::EVENT_DELETE => 'event_activity_deleted',
+        self::EVENT_EDIT => 'event_activity_updated',
+        self::EVENT_SUMMARY => 'event_meeting_summary',
+        self::EVENT_LOGOUT => 'event_meeting_left',
+        self::EVENT_MEETING_START => 'event_meeting_joined',
+    ];
+
+    /**
+     * Get the event name (human friendly version)
+     *
+     * @param object $log object as returned by get_user_completion_logs_with_userfields
+     */
+    public static function get_printable_event_name(object $log) {
+        $logstringname = self::LOG_TO_STRING[$log->log] ?? 'event_unknown';
+        return get_string($logstringname, 'mod_bigbluebuttonbn');
     }
 }

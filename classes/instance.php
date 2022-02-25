@@ -731,9 +731,10 @@ EOF;
      */
     public function should_show_recording_button(): bool {
         global $CFG;
-
         if (!empty($CFG->bigbluebuttonbn_recording_hide_button_editable)) {
-            return (bool) $this->get_instance_var('recordhidebutton');
+            $recordhidebutton = (bool) $this->get_instance_var('recordhidebutton');
+            $recordallfromstart = (bool) $this->get_instance_var('recordallfromstart');
+            return !($recordhidebutton || $recordallfromstart);
         }
 
         return !$CFG->bigbluebuttonbn_recording_hide_button_default;
@@ -796,6 +797,9 @@ EOF;
      */
     public function get_welcome_message(): string {
         $welcomestring = $this->get_instance_var('welcome');
+        if (!config::get('welcome_editable') || empty($welcomestring)) {
+            $welcomestring = config::get('welcome_default');
+        }
         if (empty($welcomestring)) {
             $welcomestring = get_string('mod_form_field_welcome_default', 'bigbluebuttonbn');
         }

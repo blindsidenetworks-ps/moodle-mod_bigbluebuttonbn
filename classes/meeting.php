@@ -21,6 +21,7 @@ use cache_store;
 use context_course;
 use core_tag_tag;
 use Exception;
+use Firebase\JWT\Key;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
@@ -63,7 +64,6 @@ class meeting {
      * @param int $origin
      * @return string
      * @throws meeting_join_exception this is sent if we cannot join (meeting full, user needs to wait...)
-     * @throws server_not_available_exception
      */
     public static function join_meeting(instance $instance, $origin = logger::ORIGIN_BASE): string {
         // See if the session is in progress.
@@ -79,7 +79,6 @@ class meeting {
      * Get currently stored meeting info
      *
      * @return mixed|stdClass
-     * @throws \coding_exception
      */
     public function get_meeting_info() {
         if (!$this->meetinginfo) {
@@ -161,8 +160,6 @@ class meeting {
      * Creates a bigbluebutton meeting, send the message to BBB and returns the response in an array.
      *
      * @return array
-     * @throws bigbluebutton_exception
-     * @throws server_not_available_exception
      */
     public function create_meeting() {
         $data = $this->create_meeting_data();
@@ -195,7 +192,6 @@ class meeting {
      * Get meeting join URL
      *
      * @return string
-     * @throws \coding_exception
      */
     public function get_join_url() {
         return bigbluebutton_proxy::get_join_url(
@@ -300,8 +296,6 @@ class meeting {
      * @param bool $updatecache
      *
      * @return array
-     * @throws \coding_exception
-     * @throws bigbluebutton_exception
      */
     protected static function retrieve_cached_meeting_info($meetingid, $updatecache = false) {
         $cachettl = (int) config::get('waitformoderator_cache_ttl');
@@ -321,6 +315,18 @@ class meeting {
     }
 
     /**
+     * Conversion between form settings and lockSettings as set in BBB API.
+     */
+    const LOCK_SETTINGS_MEETING_DATA = [
+        'disablecam' => 'lockSettingsDisableCam',
+        'disablemic' => 'lockSettingsDisableMic',
+        'disableprivatechat' => 'lockSettingsDisablePrivateChat',
+        'disablepublicchat' => 'lockSettingsDisablePublicChat',
+        'disablenote' => 'lockSettingsDisableNote',
+        'lockonjoin' => 'lockSettingsLockOnJoin',
+        'hideuserlist' => 'lockSettingsHideUserList'
+    ];
+    /**
      * Helper to prepare data used for create meeting.
      *
      * @return array
@@ -336,10 +342,10 @@ class meeting {
         // Check if auto_start_record is enable.
         if ($data['record'] == 'true' && $this->instance->should_record_from_start()) {
             $data['autoStartRecording'] = 'true';
-            // Check if hide_record_button is enable.
-            if (!$this->instance->should_show_recording_button()) {
-                $data['allowStartStopRecording'] = 'false';
-            }
+        }
+        // Check if hide_record_button is enable.
+        if (!$this->instance->should_show_recording_button()) {
+            $data['allowStartStopRecording'] = 'false';
         }
         $data['welcome'] = trim($this->instance->get_welcome_message());
         $voicebridge = intval($this->instance->get_voice_bridge());
@@ -352,6 +358,13 @@ class meeting {
         }
         if ($this->instance->get_mute_on_start()) {
             $data['muteOnStart'] = 'true';
+        }
+        // Locks settings.
+        foreach (self::LOCK_SETTINGS_MEETING_DATA as $instancevarname => $lockname) {
+            $instancevar = $this->instance->get_instance_var($instancevarname);
+            if (!is_null($instancevar)) {
+                $data[$lockname] = $instancevar ? 'true' : 'false';
+            }
         }
         return $data;
     }
@@ -432,8 +445,7 @@ class meeting {
             // Verify the authenticity of the request.
             $token = \Firebase\JWT\JWT::decode(
                 $authorization[1],
-                config::get('shared_secret'),
-                ['HS512']
+                new Key(config::get('shared_secret'), 'HS512')
             );
 
             // Get JSON string from the body.

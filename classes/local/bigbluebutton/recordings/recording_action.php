@@ -72,14 +72,11 @@ class recording_action {
      */
     public static function unprotect(recording $recording) {
         if (!(boolean) config::get('recording_protect_editable')) {
-            /* Since the recording protect action through UI is disabled, there is no need to do anything else
-             */
+            // Recording protect action through UI is disabled, there is no need to do anything else.
             throw new \moodle_exception('cannotperformaction', 'mod_bigblubuebuttobn', '', 'unprotect');
         }
         if ($recording->get('imported')) {
-            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
-             * unprotected. There is no need to do anything else.
-             */
+            // Imported recordings can not be unprotected. There is no need to do anything else.
             throw new \moodle_exception('cannotperformaction', 'mod_bigblubuebuttobn', '', 'unprotect');
         }
         $recording->set('protected', false);
@@ -93,14 +90,11 @@ class recording_action {
      */
     public static function protect(recording $recording) {
         if (!(boolean) config::get('recording_protect_editable')) {
-            /* Since the recording protect action through UI is disabled, there is no need to do anything else
-             */
+            // Recording protect action through UI is disabled, there is no need to do anything else.
             throw new \moodle_exception('cannotperformaction', 'mod_bigblubuebuttobn', '', 'protect');
         }
         if ($recording->get('imported')) {
-            /* Since the recording link is the one fetched from the BBB server, imported recordings can not be
-             * protected. There is no need to do anything else.
-             */
+            // Imported recordings can not be unprotected. There is no need to do anything else.
             throw new \moodle_exception('cannotperformaction', 'mod_bigblubuebuttobn', '', 'protect');
         }
         $recording->set('protected', true);

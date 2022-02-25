@@ -87,6 +87,13 @@ class recording_proxy extends proxy_base {
      * @return bool
      */
     public static function protect_recording(string $recordid, string $protected = 'true'): bool {
+        global $CFG;
+
+        // Ignore action if recording_protect_editable is set to false.
+        if (empty($CFG->bigbluebuttonbn_recording_protect_editable)) {
+            return false;
+        }
+
         $result = self::fetch_endpoint_xml('updateRecordings', [
             'recordID' => $recordid,
             'protect' => $protected,
@@ -223,18 +230,17 @@ class recording_proxy extends proxy_base {
 
             // Check if there is childs.
             if (isset($recordingxml->breakoutRooms->breakoutRoom)) {
-                $breakoutrooms = [];
                 foreach ($recordingxml->breakoutRooms->breakoutRoom as $breakoutroom) {
-                    $breakoutrooms[] = trim((string) $breakoutroom);
-                }
-                $xml = self::fetch_endpoint_xml('getRecordings', ['recordID' => implode(',', $breakoutrooms)]);
-                if (!$xml || $xml->returncode != 'SUCCESS' || empty($xml->recordings)) {
-                    continue;
-                }
-                // If there were meetings already created.
-                foreach ($xml->recordings->recording as $subrecordingxml) {
-                    $recording = self::parse_recording($subrecordingxml);
-                    $recordings[$recording['recordID']] = $recording;
+                    $xml = self::fetch_endpoint_xml('getRecordings', ['recordID' => implode(',', (array) $breakoutroom)]);
+                    if (!$xml || $xml->returncode != 'SUCCESS' || empty($xml->recordings)) {
+                        continue;
+                    }
+
+                    // If there were meetings already created.
+                    foreach ($xml->recordings->recording as $subrecordingxml) {
+                        $recording = self::parse_recording($subrecordingxml);
+                        $recordings[$recording['recordID']] = $recording;
+                    }
                 }
             }
         }

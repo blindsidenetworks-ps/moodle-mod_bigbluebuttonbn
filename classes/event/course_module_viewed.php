@@ -14,21 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_bigbluebuttonbn\event;
+
 /**
- * Pix icon handler for Totara
+ * The mod_bigbluebuttonbn activity viewed event.
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
+class course_module_viewed extends \core\event\course_module_viewed {
+    /**
+     * Init method.
+     * @param string $crud
+     * @param int $edulevel
+     */
+    protected function init() {
+        $this->data['crud'] = 'r';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'bigbluebuttonbn';
+    }
 
-defined('MOODLE_INTERNAL') || die();
-
-$icons = [
-    'mod_bigbluebuttonbn|icon' => [
-            'data' => [
-                    'classes' => 'icon-bigbluebutton',
-            ],
-    ],
-];
+    /**
+     * Return objectid mapping.
+     *
+     * @return array
+     */
+    public static function get_objectid_mapping() {
+        return ['db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn'];
+    }
+}

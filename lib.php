@@ -432,15 +432,6 @@ function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = []) {
 }
 
 /**
- * Get icon mapping for font-awesome.
- */
-function mod_bigbluebuttonbn_get_fontawesome_icon_map() {
-    return [
-        'mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton',
-    ];
-}
-
-/**
  * This function receives a calendar event and returns the action associated with it, or null if there is none.
  *
  * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
