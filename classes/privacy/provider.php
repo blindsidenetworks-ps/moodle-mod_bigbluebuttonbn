@@ -137,7 +137,7 @@ class provider implements
     public static function _get_contexts_for_userid(int $userid) {
         // If user was already deleted, do nothing.
         if (!\core_user::get_user($userid)) {
-            return;
+            return new contextlist();
         }
         // Fetch all bigbluebuttonbn logs.
         $sql = "SELECT c.id

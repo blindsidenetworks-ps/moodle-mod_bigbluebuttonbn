@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step
-{
+class restore_bigbluebuttonbn_activity_structure_step extends restore_activity_structure_step {
     /**
      * Structure step to restore one bigbluebuttonbn activity.
      *

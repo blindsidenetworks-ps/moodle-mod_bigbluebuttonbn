@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step
-{
+class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step {
     /**
      * Define the complete bigbluebuttonbn structure for backup, with file and id annotations.
      *
