@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010-2017 Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class bigbluebuttonbn_activity_management_viewed extends base
-{
+class bigbluebuttonbn_activity_management_viewed extends base {
     /**
      * Init method.
      * @param string $crud

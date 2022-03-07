@@ -34,8 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class meeting_ended extends base
-{
+class meeting_ended extends base {
     /**
      * Init method.
      * @param string $crud

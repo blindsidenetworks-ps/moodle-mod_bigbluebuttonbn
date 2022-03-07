@@ -38,8 +38,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @copyright 2019 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class send_notification extends adhoc_task
-{
+class send_notification extends adhoc_task {
 
     /**
      * Get a descriptive name for this task (shown to admins).

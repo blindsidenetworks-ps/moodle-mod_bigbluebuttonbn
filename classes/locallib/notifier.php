@@ -38,8 +38,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class notifier
-{
+class notifier {
     /**
      * Prepares html message body for instance updated notification.
      *
