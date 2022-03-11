@@ -17,8 +17,7 @@ When a bibluebutton instance has been created I can edit it
       | name                   | <activityname> |
       | Instance type          | <instancetype> |
       | Room name              | <activityname> |
-    Given I am on the "<activityname>" "bigbluebuttonbn activity" page logged in as admin
-    And I click on "Settings" "link"
+    Given I am on the "<activityname>" "bigbluebuttonbn activity editing" page logged in as admin
     And the field "Instance type" matches value "<instancetype>"
     And I <shouldseerole> "Role assigned during live session"
     And I expand all fieldsets

@@ -309,6 +309,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->setAdvanced('showdescription');
     }
 
+
+
     /**
      * Function for showing details of the room settings for the room.
      *

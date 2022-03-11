@@ -153,7 +153,7 @@ class recording_row_actionbar implements renderable, templatable {
                     );
                     $iconortext = $output->render($icon);
                     $actionlink = new \action_link(new \moodle_url('#'), $iconortext, null, $linkattributes);
-                    $context->tools [] = $actionlink->export_for_template($output);
+                    $context->tools[] = $actionlink->export_for_template($output);
                 }
             }
         }
