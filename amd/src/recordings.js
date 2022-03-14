@@ -71,18 +71,20 @@ const getYuiInstance = lang => new Promise(resolve => {
  * Format the supplied date per the specified locale.
  *
  * @param   {string} locale
- * @param   {number} date
+ * @param   {array} dateList
  * @returns {array}
  */
-const formatDate = (locale, date) => {
-    const realDate = new Date(date);
-    return realDate.toLocaleDateString(locale, {
+ const formatDates = (locale, dateList) => dateList.map(row => {
+    const date = new Date(row.date);
+    row.date = date.toLocaleDateString(locale, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
     });
-};
+    return row;
+
+});
 
 /**
  * Format response data for the table.
@@ -92,7 +94,9 @@ const formatDate = (locale, date) => {
  */
 const getFormattedData = response => {
     const recordingData = response.tabledata;
-    return JSON.parse(recordingData.data);
+    const rowData = JSON.parse(recordingData.data);
+
+    return formatDates(recordingData.locale, rowData);
 };
 
 const getTableNode = tableSelector => document.querySelector(tableSelector);
@@ -354,10 +358,10 @@ const setupDatatable = (tableId, searchFormId, response) => {
             // Inspired from examples here: https://clarle.github.io/yui3/yui/docs/datatable/
             // Normally formatter have the prototype: (col) => (cell) => <computed value>, see:
             // https://clarle.github.io/yui3/yui/docs/api/files/datatable_js_formatters.js.html#l100 .
-            const dateCustomFormatter = () => (cell) => formatDate(recordingData.locale, cell.value);
+           // const dateCustomFormatter = () => (cell) => formatDate(recordingData.locale, cell.value);
             // Add the fetched strings to the YUI Instance.
             yuiInstance.Intl.add('datatable-paginator', yuiInstance.config.lang, {...strings});
-            yuiInstance.DataTable.BodyView.Formatters.customDate = dateCustomFormatter;
+           // yuiInstance.DataTable.BodyView.Formatters.customDate = dateCustomFormatter;
             return yuiInstance;
         })
         .then(yuiInstance => {
@@ -372,7 +376,8 @@ const setupDatatable = (tableId, searchFormId, response) => {
                     }
                 }
             });
-            return new yuiInstance.DataTable({
+            const dataTable = new yuiInstance.DataTable({
+           // return new yuiInstance.DataTable({
                 paginatorView: "RecordsPaginatorView",
                 width: "1195px",
                 columns: recordingData.columns,
@@ -381,6 +386,7 @@ const setupDatatable = (tableId, searchFormId, response) => {
                 paginatorLocation: ['header', 'footer'],
                 autoSync: true
             });
+            return dataTable;
         })
         .then(dataTable => {
             dataTable.render(tableId);
