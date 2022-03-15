@@ -123,7 +123,7 @@ class lib_test extends \advanced_testcase {
         logger::log_recording_played_event($instance, 1);
 
         $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
-        $this->assertStringContainsString('Has joined the meeting or played a recording 2 time(s)', $result->info);
+        $this->assertStringContainsString(get_string('completionview_event_desc', 'mod_bigbluebuttonbn', 2), $result->info);
     }
 
     /**
@@ -149,7 +149,7 @@ class lib_test extends \advanced_testcase {
         bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivitycm, $bbactivity);
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertStringContainsString('Has joined the meeting or played a recording', $output);
+        $this->assertStringContainsString(get_string('completionview_event_desc', 'mod_bigbluebuttonbn', 2), $output);
     }
 
     /**
@@ -198,7 +198,6 @@ class lib_test extends \advanced_testcase {
      * @param int $user
      * @param int $group
      * @return array|void
-     * @throws \moodle_exception
      */
     protected function prepare_for_recent_activity_array($date, $user, $group) {
         // Same algorithm as in cource/recent.php, but stops at the first bbb activity.
@@ -282,6 +281,56 @@ class lib_test extends \advanced_testcase {
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertStringContainsString('Meeting joined', $output);
+    }
+
+
+    /**
+     * Check recent activity for the course
+     *
+     * @covers ::bigbluebuttonbn_print_recent_activity
+     */
+    public function test_bigbluebuttonbn_print_recent_activity() {
+        global $CFG;
+        $this->initialise_mock_server();
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_and_enrol($this->get_course());
+        list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
+        // Now create a couple of logs.
+        $timestart = time() - HOURSECS;
+        $instance = instance::get_from_instanceid($bbactivity->id);
+        $recordings = $this->create_recordings_for_instance($instance, [['name' => "Pre-Recording 1"]]);
+
+        $this->setUser($user); // Important so the logs are set to this user.
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_meeting_joined_event($instance, 0);
+        logger::log_recording_played_event($instance, $recordings[0]->id);
+
+        $this->setAdminUser();
+        // Test that everything is displayed.
+        ob_start();
+        bigbluebuttonbn_print_recent_activity($this->get_course(), true, $timestart);
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertStringContainsString('Meeting joined', $output);
+        $this->assertStringContainsString(fullname($user), $output);
+        // Test that username are displayed in a different format.
+        $CFG->alternativefullnameformat = 'firstname lastname firstnamephonetic lastnamephonetic middlename alternatename';
+        $expectedname = "$user->firstname $user->lastname $user->firstnamephonetic "
+            . "$user->lastnamephonetic $user->middlename $user->alternatename";
+        ob_start();
+        bigbluebuttonbn_print_recent_activity($this->get_course(), false, $timestart);
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertStringContainsString('Meeting joined', $output);
+        $this->assertStringNotContainsString($expectedname, $output);
+        // Test that nothing is displayed as per timestart.
+        ob_start();
+        bigbluebuttonbn_print_recent_activity($this->get_course(), true, time());
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEmpty($output);
     }
 
     /**
@@ -389,17 +438,6 @@ class lib_test extends \advanced_testcase {
             '{"updated":false},"completion":{"updated":false}}',
             json_encode($result)
         );
-    }
-
-    /**
-     * Check font awesome icon map
-     *
-     * @covers ::mod_bigbluebuttonbn_get_fontawesome_icon_map
-     */
-    public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
-        $this->resetAfterTest();
-        $this->assertEquals(['mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'],
-            mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 
     /**

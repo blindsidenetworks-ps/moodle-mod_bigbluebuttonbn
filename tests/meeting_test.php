@@ -164,7 +164,6 @@ class meeting_test extends \advanced_testcase {
      * @param string|null $groupname
      * @param int $groupmode
      * @param array $canjoin
-     * @throws \coding_exception
      * @dataProvider get_instance_types_meeting_info
      * @covers ::can_join
      */
@@ -176,7 +175,7 @@ class meeting_test extends \advanced_testcase {
         $this->assertEquals($canjoin['useringroup'], $meeting->can_join());
         if ($meeting->can_join()) {
             $meetinginfo = $meeting->get_meeting_info();
-            $this->assertStringContainsString("This conference is in progress", $meetinginfo->statusmessage);
+            $this->assertStringContainsString("The session is in progress.", $meetinginfo->statusmessage);
         }
         if ($groupname) {
             $this->setUser($usernotingroup);
@@ -193,7 +192,6 @@ class meeting_test extends \advanced_testcase {
      * @param int $groupmode
      * @param array $canjoin
      * @param array $dates
-     * @throws \coding_exception
      * @dataProvider get_data_can_join_with_dates
      * @covers ::can_join
      */
