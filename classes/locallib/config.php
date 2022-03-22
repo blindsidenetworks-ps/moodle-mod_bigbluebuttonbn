@@ -114,8 +114,8 @@ class config {
             'disablenote_editable' => true,
             'hideuserlist_default' => false,
             'hideuserlist_editable' => true,
-            'lockonjoin_default' => false,
-            'lockonjoin_editable' => true,
+            'lockonjoin_default' => true,
+            'lockonjoin_editable' => false,
             'welcome_default' => '',
         );
     }

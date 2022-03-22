@@ -354,7 +354,7 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
         $data['lockSettingsHideUserList'] = 'true';
     }
     if ($bbbsession['lockonjoin']) {
-        $data['lockSettingsLockOnJoin'] = 'false';
+        $data['lockSettingsLockOnJoin'] = 'true';
     }
     return $data;
 }
