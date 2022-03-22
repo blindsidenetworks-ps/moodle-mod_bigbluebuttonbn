@@ -754,14 +754,8 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->hideuserlist)) {
         $bigbluebuttonbn->hideuserlist = 0;
     }
-    if (!isset($bigbluebuttonbn->lockedlayout)) {
-        $bigbluebuttonbn->lockedlayout = 0;
-    }
     if (!isset($bigbluebuttonbn->lockonjoin)) {
         $bigbluebuttonbn->lockonjoin = 0;
-    }
-    if (!isset($bigbluebuttonbn->lockonjoinconfigurable)) {
-        $bigbluebuttonbn->lockonjoinconfigurable = 0;
     }
     if (!isset($bigbluebuttonbn->recordings_validate_url)) {
         $bigbluebuttonbn->recordings_validate_url = 1;

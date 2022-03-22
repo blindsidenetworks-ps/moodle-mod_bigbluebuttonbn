@@ -237,9 +237,7 @@ class bigbluebutton {
         $bbbsession['disablepublicchat'] = $bbbsession['bigbluebuttonbn']->disablepublicchat;
         $bbbsession['disablenote'] = $bbbsession['bigbluebuttonbn']->disablenote;
         $bbbsession['hideuserlist'] = $bbbsession['bigbluebuttonbn']->hideuserlist;
-        $bbbsession['lockedlayout'] = $bbbsession['bigbluebuttonbn']->lockedlayout;
         $bbbsession['lockonjoin'] = $bbbsession['bigbluebuttonbn']->lockonjoin;
-        $bbbsession['lockonjoinconfigurable'] = $bbbsession['bigbluebuttonbn']->lockonjoinconfigurable;
         // Additional info related to the course.
         $bbbsession['context'] = $context;
         // Metadata (origin).

@@ -353,14 +353,8 @@ function bigbluebuttonbn_bbb_view_create_meeting_data(&$bbbsession) {
     if ($bbbsession['hideuserlist']) {
         $data['lockSettingsHideUserList'] = 'true';
     }
-    if ($bbbsession['lockedlayout']) {
-        $data['lockSettingsLockedLayout'] = 'true';
-    }
     if ($bbbsession['lockonjoin']) {
-        $data['lockSettingsLockOnJoin'] = 'false';
-    }
-    if ($bbbsession['lockonjoinconfigurable']) {
-        $data['lockSettingsLockOnJoinConfigurable'] = 'true';
+        $data['lockSettingsLockOnJoin'] = 'true';
     }
     return $data;
 }
