@@ -58,7 +58,6 @@ class validator {
         global $CFG;
         return (!isset($CFG->bigbluebuttonbn['recording_default']) ||
                 !isset($CFG->bigbluebuttonbn['recording_editable']) ||
-                !isset($CFG->bigbluebuttonbn['recording_icons_enabled']) ||
                 !isset($CFG->bigbluebuttonbn['recording_all_from_start_default']) ||
                 !isset($CFG->bigbluebuttonbn['recording_all_from_start_editable']) ||
                 !isset($CFG->bigbluebuttonbn['recording_hide_button_default']) ||
@@ -276,17 +275,6 @@ class validator {
     }
 
     /**
-     * Validate if lockedlayout section will be shown.
-     *
-     * @return boolean
-     */
-    public static function section_lockedlayout_shown() {
-        global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['lockedlayout_default']) ||
-            !isset($CFG->bigbluebuttonbn['lockedlayout_editable']));
-    }
-
-    /**
      * Validate if lockonjoin section will be shown.
      *
      * @return boolean
@@ -297,14 +285,4 @@ class validator {
             !isset($CFG->bigbluebuttonbn['lockonjoin_editable']));
     }
 
-    /**
-     * Validate if lockonjoinconfigurable section will be shown.
-     *
-     * @return boolean
-     */
-    public static function section_lockonjoinconfigurable_shown() {
-        global $CFG;
-        return (!isset($CFG->bigbluebuttonbn['lockonjoinconfigurable_default']) ||
-            !isset($CFG->bigbluebuttonbn['lockonjoinconfigurable_editable']));
-    }
 }

@@ -1887,36 +1887,30 @@ function bigbluebuttonbn_actionbar_render_button($recording, $data) {
     }
     $id = 'recording-' . $target . '-' . $recording['recordID'];
     $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this); return false;';
-    if ((boolean) \mod_bigbluebuttonbn\locallib\config::get('recording_icons_enabled')) {
-        // With icon for $manageaction.
-        $iconattributes = array('id' => $id, 'class' => 'iconsmall');
-        $linkattributes = array(
-            'id' => $id,
-            'onclick' => $onclick,
-            'data-action' => $data['action'],
+    $iconattributes = array('id' => $id, 'class' => 'iconsmall');
+    $linkattributes = array(
+        'id' => $id,
+        'onclick' => $onclick,
+        'data-action' => $data['action'],
+    );
+    if (!isset($recording['imported'])) {
+        $linkattributes['data-links'] = bigbluebuttonbn_count_recording_imported_instances(
+            $recording['recordID']
         );
-        if (!isset($recording['imported'])) {
-            $linkattributes['data-links'] = bigbluebuttonbn_count_recording_imported_instances(
-                $recording['recordID']
-            );
-        }
-        if (isset($data['disabled'])) {
-            $iconattributes['class'] .= ' fa-' . $data['disabled'];
-            $linkattributes['class'] = 'disabled';
-            unset($linkattributes['onclick']);
-        }
-        $icon = new pix_icon(
-            'i/' . $data['tag'],
-            get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
-            'moodle',
-            $iconattributes
-        );
-        return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
     }
-    // With text for $manageaction.
-    $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger',
-        'onclick' => $onclick);
-    return $OUTPUT->action_link('#', get_string($data['action']), null, $linkattributes);
+    if (isset($data['disabled'])) {
+        $iconattributes['class'] .= ' fa-' . $data['disabled'];
+        $linkattributes['class'] = 'disabled';
+        unset($linkattributes['onclick']);
+    }
+    $icon = new pix_icon(
+        'i/' . $data['tag'],
+        get_string('view_recording_list_actionbar_' . $data['action'], 'bigbluebuttonbn'),
+        'moodle',
+        $iconattributes
+    );
+    return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
+
 }
 
 /**
@@ -2721,11 +2715,6 @@ function bigbluebuttonbn_settings_record(&$renderer) {
             'recording_editable',
             $renderer->render_group_element_checkbox('recording_editable', 1)
         );
-        $renderer->render_group_element(
-            'recording_icons_enabled',
-            $renderer->render_group_element_checkbox('recording_icons_enabled', 1)
-        );
-
         // Add recording start to load and allow/hide stop/pause.
         $renderer->render_group_element(
             'recording_all_from_start_default',
@@ -3074,9 +3063,7 @@ function bigbluebuttonbn_settings_locksettings(&$renderer) {
     bigbluebuttonbn_settings_disablepublicchat($renderer);
     bigbluebuttonbn_settings_disablenote($renderer);
     bigbluebuttonbn_settings_hideuserlist($renderer);
-    bigbluebuttonbn_settings_lockedlayout($renderer);
     bigbluebuttonbn_settings_lockonjoin($renderer);
-    bigbluebuttonbn_settings_lockonjoinconfigurable($renderer);
 }
 
 /**
@@ -3212,58 +3199,16 @@ function bigbluebuttonbn_settings_hideuserlist(&$renderer) {
  *
  * @return void
  */
-function bigbluebuttonbn_settings_lockedlayout(&$renderer) {
-    // Configuration for BigBlueButton.
-    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockedlayout_shown()) {
-        $renderer->render_group_element(
-            'lockedlayout_default',
-            $renderer->render_group_element_checkbox('lockedlayout_default', 0)
-        );
-        $renderer->render_group_element(
-            'lockedlayout_editable',
-            $renderer->render_group_element_checkbox('lockedlayout_editable', 1)
-        );
-    }
-}
-
-/**
- * Helper function renders general settings if the feature is enabled.
- *
- * @param object $renderer
- *
- * @return void
- */
 function bigbluebuttonbn_settings_lockonjoin(&$renderer) {
     // Configuration for BigBlueButton.
     if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockonjoin_shown()) {
         $renderer->render_group_element(
             'lockonjoin_default',
-            $renderer->render_group_element_checkbox('lockonjoin_default', 0)
+            $renderer->render_group_element_checkbox('lockonjoin_default', 1)
         );
         $renderer->render_group_element(
             'lockonjoin_editable',
-            $renderer->render_group_element_checkbox('lockonjoin_editable', 1)
-        );
-    }
-}
-
-/**
- * Helper function renders general settings if the feature is enabled.
- *
- * @param object $renderer
- *
- * @return void
- */
-function bigbluebuttonbn_settings_lockonjoinconfigurable(&$renderer) {
-    // Configuration for BigBlueButton.
-    if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_lockonjoinconfigurable_shown()) {
-        $renderer->render_group_element(
-            'lockonjoinconfigurable_default',
-            $renderer->render_group_element_checkbox('lockonjoinconfigurable_default', 0)
-        );
-        $renderer->render_group_element(
-            'lockonjoinconfigurable_editable',
-            $renderer->render_group_element_checkbox('lockonjoinconfigurable_editable', 1)
+            $renderer->render_group_element_checkbox('lockonjoin_editable', 0)
         );
     }
 }

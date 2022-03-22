@@ -111,7 +111,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
         $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn);
         $jsvars['participantList'] = $participantlist;
-        $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
         $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
             'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
@@ -449,15 +448,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['hideuserlist_default']);
 
-        $field = ['type' => 'hidden', 'name' => 'lockedlayout', 'data_type' => PARAM_INT, 'description_key' => null];
-        if ($cfg['lockedlayout_editable']) {
-            $field['type'] = 'checkbox';
-            $field['description_key'] = 'mod_form_field_lockedlayout';
-            $locksettings = true;
-        }
-        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], $cfg['lockedlayout_default']);
-
         $field = ['type' => 'hidden', 'name' => 'lockonjoin', 'data_type' => PARAM_INT, 'description_key' => null];
         if ($cfg['lockonjoin_editable']) {
             $field['type'] = 'checkbox';
@@ -466,15 +456,6 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
             $field['description_key'], $cfg['lockonjoin_default']);
-
-        $field = ['type' => 'hidden', 'name' => 'lockonjoinconfigurable', 'data_type' => PARAM_INT, 'description_key' => null];
-        if ($cfg['lockonjoinconfigurable_editable']) {
-            $field['type'] = 'checkbox';
-            $field['description_key'] = 'mod_form_field_lockonjoinconfigurable';
-            $locksettings = true;
-        }
-        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
-            $field['description_key'], $cfg['lockonjoinconfigurable_default']);
 
         // Output message if no settings.
         if (!$locksettings) {
