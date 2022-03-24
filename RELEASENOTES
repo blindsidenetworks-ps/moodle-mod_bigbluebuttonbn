@@ -1,3 +1,14 @@
+2.4.5 (2019101012)
+Security: Fix for potential security risk: removed href from playback action (BN-2021-001)
+Bug: Fix for Update Lock Settings and Fix Inverted LockOnJoin Logic (CONTRIB-8873)
+Bug: Fix for bigbluebutton privacy function problem get_contexts_for… (CONTRIB-8681
+Bug: Fix for overflow of getRecordings when breakout rooms a… (CONTRIB-8802)
+Bug: Fix for plugin name exception on errors (#490)
+Bug: Fix fatal errors when referencing missing class names (#481)
+Bug: Fix for bbb-meeting-size-hint meta parameter on create (#485) (CONTRIB-8695)
+Bug: Fix for preventing the shared_secret setting from being observed w… (CONTRIB-8696)
+Bug: Fix for adapting mobile app code to Ionic 5 (#435) (CONTRIB-8582)
+
 2.4.4 (2019101011)
 Bug: Fix for users and roles should be sorted alphabetically (CONTRIB-8113).
 Bug: Fix for compatibility with protected recordings when BBB implements that.
