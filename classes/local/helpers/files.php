@@ -140,7 +140,7 @@ class files {
         global $CFG;
         $fs = get_file_storage();
         $files = [];
-        if (empty($presentation) || !$CFG->bigbluebuttonbn_preuploadpresentation_editable) {
+        if (empty($presentation) || !\mod_bigbluebuttonbn\local\config::get('preuploadpresentation_editable')) {
             // Item has no presentation but the default is there.
             // Check if exist some file by default in general mod setting ("presentationdefault").
                 $files = $fs->get_area_files(
