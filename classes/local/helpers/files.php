@@ -158,7 +158,7 @@ class files {
                 $context->id,
                 'mod_bigbluebuttonbn',
                 'presentation',
-                0,
+                false,
                 'itemid, filepath, filename',
                 false
             );
