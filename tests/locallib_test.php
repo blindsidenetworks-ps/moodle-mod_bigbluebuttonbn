@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
+class mod_bigbluebuttonbn_locallib_test extends advanced_testcase {
     /**
      * Clean the temporary mocked up recordings
      *
@@ -49,7 +49,9 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
     }
 
     /**
-     * Test for provider::get_metadata().
+     * Check recording type
+     *
+     * @covers ::bigbluebuttonbn_get_recording_type_text
      */
     public function test_bigbluebuttonbn_get_recording_type_text() {
         $this->resetAfterTest(true);
@@ -60,6 +62,11 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $this->assertEquals('Whatever It Can Be', bigbluebuttonbn_get_recording_type_text('whatever it can be'));
     }
 
+    /**
+     * Check return value containing all the ordered users in a context
+     *
+     * @covers ::bigbluebuttonbn_get_users_select
+     */
     public function test_bigbluebuttonbn_get_users_select_ordered() {
         $this->resetAfterTest();
         $numstudents = 12;
@@ -91,6 +98,11 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Check return value containing separate group users in a context
+     *
+     * @covers ::bigbluebuttonbn_get_users_select
+     */
     public function test_bigbluebuttonbn_get_users_select_separate_groups_prevent_all() {
         $this->resetAfterTest();
         $numstudents = 12;
@@ -122,6 +134,11 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Check return value containing separate group users in a context
+     *
+     * @covers ::bigbluebuttonbn_get_users_select
+     */
     public function test_bigbluebuttonbn_get_users_select_separate_groups() {
         $this->resetAfterTest();
         $numstudents = 12;
@@ -144,6 +161,11 @@ class mod_bigbluebuttonbn_locallib_testcase extends advanced_testcase {
         $this->assertCount($numstudents + $numteachers, $users);
     }
 
+    /**
+     * Check return value of user roles in a context
+     *
+     * @covers ::bigbluebuttonbn_get_role
+     */
     public function test_bigbluebuttonbn_get_role() {
         $this->resetAfterTest();
         $numstudents = 12;
