@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class mod_bigbluebuttonbn_recordings_testcase extends advanced_testcase {
+class mod_bigbluebuttonbn_recordings_test extends advanced_testcase {
 
     /**
      * @var array of courses
@@ -100,7 +100,9 @@ class mod_bigbluebuttonbn_recordings_testcase extends advanced_testcase {
     }
 
     /**
-     * Test for bigbluebuttonbn_get_allrecordings().
+     * Check get all recordings
+     *
+     * @covers ::bigbluebuttonbn_get_allrecordings
      */
     public function test_bigbluebuttonbn_get_allrecordings() {
         $this->resetAfterTest();

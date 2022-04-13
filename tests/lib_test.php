@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
  */
-class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
+class mod_bigbluebuttonbn_lib_test extends advanced_testcase {
     /**
      * @var testing_data_generator|null $generator
      */
@@ -117,6 +117,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->course = $this->generator->create_course(['enablecompletion' => 1]);
     }
 
+    /**
+     * Check support
+     *
+     * @covers ::bigbluebuttonbn_supports
+     */
     public function test_bigbluebuttonbn_supports() {
         $this->resetAfterTest();
         $this->assertTrue(bigbluebuttonbn_supports(FEATURE_IDNUMBER));
@@ -124,6 +129,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertFalse(bigbluebuttonbn_supports(FEATURE_GRADE_HAS_GRADE));
     }
 
+    /**
+     * Check completion activity state
+     *
+     * @covers ::bigbluebuttonbn_get_completion_state
+     */
     public function test_bigbluebuttonbn_get_completion_state() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -145,6 +155,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(COMPLETION_AND, $result);
     }
 
+    /**
+     * Check add instance
+     *
+     * @covers ::bigbluebuttonbn_add_instance
+     */
     public function test_bigbluebuttonbn_add_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -153,6 +168,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertNotNull($id);
     }
 
+    /**
+     * Check update instance
+     *
+     * @covers ::bigbluebuttonbn_update_instance
+     */
     public function test_bigbluebuttonbn_update_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -161,6 +181,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertTrue($result);
     }
 
+    /**
+     * Check delete instance
+     *
+     * @covers ::bigbluebuttonbn_delete_instance
+     */
     public function test_bigbluebuttonbn_delete_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -168,6 +193,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertTrue($result);
     }
 
+    /**
+     * Check delete instance log
+     *
+     * @covers ::bigbluebuttonbn_delete_instance_log
+     */
     public function test_bigbluebuttonbn_delete_instance_log() {
         global $DB;
         $this->resetAfterTest();
@@ -177,6 +207,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
                 'log' => BIGBLUEBUTTONBN_LOG_EVENT_DELETE)));
     }
 
+    /**
+     * Check user outline page
+     *
+     * @covers ::bigbluebuttonbn_user_outline
+     */
     public function test_bigbluebuttonbn_user_outline() {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
@@ -198,6 +233,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Check user completion
+     *
+     * @covers ::bigbluebuttonbn_user_complete
+     */
     public function test_bigbluebuttonbn_user_complete() {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
@@ -211,11 +251,21 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(2, $result);
     }
 
+    /**
+     * Check extra capabilities return value
+     *
+     * @covers ::bigbluebuttonbn_get_extra_capabilities
+     */
     public function test_bigbluebuttonbn_get_extra_capabilities() {
         $this->resetAfterTest();
         $this->assertEquals(array('moodle/site:accessallgroups'), bigbluebuttonbn_get_extra_capabilities());
     }
 
+    /**
+     * Check reset course items return value
+     *
+     * @covers ::bigbluebuttonbn_reset_course_items
+     */
     public function test_bigbluebuttonbn_reset_course_items() {
         global $CFG;
         $this->resetAfterTest();
@@ -227,6 +277,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(array("events" => 0, "tags" => 0, "logs" => 0, "recordings" => 0), $results);
     }
 
+    /**
+     * Check form definition
+     *
+     * @covers ::bigbluebuttonbn_reset_course_form_definition
+     */
     public function test_bigbluebuttonbn_reset_course_form_definition() {
         global $CFG, $PAGE;
         $PAGE->set_course($this->course);
@@ -250,6 +305,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertNotNull($mform->getElement('bigbluebuttonbnheader'));
     }
 
+    /**
+     * Check defaults for form
+     *
+     * @covers ::bigbluebuttonbn_reset_course_form_defaults
+     */
     public function test_bigbluebuttonbn_reset_course_form_defaults() {
         global $CFG;
         $this->resetAfterTest();
@@ -262,6 +322,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         ), $results);
     }
 
+    /**
+     * Reset user data
+     *
+     * @covers ::bigbluebuttonbn_reset_userdata
+     */
     public function test_bigbluebuttonbn_reset_userdata() {
         global $CFG;
         $this->resetAfterTest();
@@ -279,6 +344,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         ), $results[0]);
     }
 
+    /**
+     * Check reset status return value
+     *
+     * @covers ::bigbluebuttonbn_reset_getstatus
+     */
     public function test_bigbluebuttonbn_reset_getstatus() {
         $this->resetAfterTest();
         $result = bigbluebuttonbn_reset_getstatus('events');
@@ -289,6 +359,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         ), $result);
     }
 
+    /**
+     * Reset events
+     *
+     * @covers ::bigbluebuttonbn_reset_events
+     */
     public function test_bigbluebuttonbn_reset_events() {
         global $DB;
         $this->resetAfterTest();
@@ -308,6 +383,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
                 array('modulename' => 'bigbluebuttonbn', 'courseid' => $this->course->id)));
     }
 
+    /**
+     * Reset tags
+     *
+     * @covers ::bigbluebuttonbn_reset_tags
+     */
     public function test_bigbluebuttonbn_reset_tags() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance(null,
@@ -321,7 +401,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $alltags = core_tag_tag::get_item_tags('mod_bigbluebuttonbn', 'bbitem', $bbactivity->id);
         $this->assertCount(0, $alltags);
     }
-
+    /**
+     * Reset logs
+     *
+     * @covers ::bigbluebuttonbn_reset_logs
+     */
     public function test_bigbluebuttonbn_reset_logs() {
         global $DB;
         $this->resetAfterTest();
@@ -341,6 +425,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
                 array('bigbluebuttonbnid' => $bbactivity->id, 'courseid' => $this->course->id)));
     }
 
+    /**
+     * Reset recordings
+     *
+     * @covers ::bigbluebuttonbn_reset_recordings
+     */
     public function test_bigbluebuttonbn_reset_recordings() {
         $this->resetAfterTest();
         // TODO complete this test.
@@ -349,16 +438,31 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         );
     }
 
+    /**
+     * Check get view log actions
+     *
+     * @covers ::bigbluebuttonbn_get_view_actions
+     */
     public function test_bigbluebuttonbn_get_view_actions() {
         $this->resetAfterTest();
         $this->assertEquals(array('view', 'view all'), bigbluebuttonbn_get_view_actions());
     }
 
+    /**
+     * Check get update log actions
+     *
+     * @covers ::bigbluebuttonbn_get_post_actions
+     */
     public function test_bigbluebuttonbn_get_post_actions() {
         $this->resetAfterTest();
         $this->assertEquals(array('update', 'add', 'delete'), bigbluebuttonbn_get_post_actions());
     }
 
+    /**
+     * Check print overview of all BBB instances
+     *
+     * @covers ::bigbluebuttonbn_print_overview
+     */
     public function test_bigbluebuttonbn_print_overview() {
         $this->resetAfterTest();
 
@@ -382,6 +486,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Check print overview of a BBB instance
+     *
+     * @covers ::bigbluebuttonbn_print_overview_element
+     */
     public function test_bigbluebuttonbn_print_overview_element() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -397,6 +506,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Get course module info
+     *
+     * @covers ::bigbluebuttonbn_get_coursemodule_info
+     */
     public function test_bigbluebuttonbn_get_coursemodule_info() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -404,6 +518,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals($info->name, $bbactivity->name);
     }
 
+    /**
+     * Get active completion rule descriptions
+     *
+     * @covers ::bigbluebuttonbn_get_completion_active_rule_descriptions
+     */
     public function test_mod_bigbluebuttonbn_get_completion_active_rule_descriptions() {
         $this->resetAfterTest();
         // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
@@ -437,6 +556,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Check process pre save
+     *
+     * @covers ::bigbluebuttonbn_process_pre_save
+     */
     public function test_bigbluebuttonbn_process_pre_save() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -448,6 +572,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals('<p>this -> "</p>\n', $bbformdata->participants);
     }
 
+    /**
+     * Check process pre save for an instance definition
+     *
+     * @covers ::bigbluebuttonbn_process_pre_save_instance
+     */
     public function test_bigbluebuttonbn_process_pre_save_instance() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -458,6 +587,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertTrue($bbformdata->timemodified == 0);
     }
 
+    /**
+     * Check assignment of default values to checkboxes
+     *
+     * @covers ::bigbluebuttonbn_process_pre_save_checkboxes
+     */
     public function test_bigbluebuttonbn_process_pre_save_checkboxes() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -469,6 +603,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertTrue(isset($bbformdata->recordallfromstart));
     }
 
+    /**
+     * Check process for wiping common settings when 'recordings only'
+     *
+     * @covers ::bigbluebuttonbn_process_pre_save_common
+     */
     public function test_bigbluebuttonbn_process_pre_save_common() {
         global $CFG;
         require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -483,6 +622,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(0, $bbformdata->groupmode);
     }
 
+    /**
+     * Check process for wiping common settings when 'recordings only'
+     *
+     * @covers ::bigbluebuttonbn_process_pre_save_common
+     */
     public function test_bigbluebuttonbn_process_post_save() {
         global $CFG;
         require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -507,6 +651,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(1, $messagesink->count());
     }
 
+    /**
+     * Check process post save notification
+     *
+     * @covers ::bigbluebuttonbn_process_post_save_notification
+     */
     public function test_bigbluebuttonbn_process_post_save_notification() {
         global $CFG;
         require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
@@ -529,6 +678,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(1, $messagesink->count());
     }
 
+    /**
+     * Check process post save event
+     *
+     * @covers ::bigbluebuttonbn_process_post_save_event
+     */
     public function test_bigbluebuttonbn_process_post_save_event() {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -540,6 +694,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertNotEmpty($eventsink->get_events());
     }
 
+    /**
+     * Check process post save completion
+     *
+     * @covers ::bigbluebuttonbn_process_post_save_completion
+     */
     public function test_bigbluebuttonbn_process_post_save_completion() {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -551,6 +710,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertNotEmpty($eventsink->get_events());
     }
 
+    /**
+     * Check return value of media file path
+     *
+     * @covers ::bigbluebuttonbn_get_media_file
+     */
     public function test_bigbluebuttonbn_get_media_file() {
         $this->resetAfterTest();
         $user = $this->generator->create_user();
@@ -581,6 +745,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals('/bbfile.pptx', $mediafilepath);
     }
 
+    /**
+     * Check if plugin file found
+     *
+     * @covers ::bigbluebuttonbn_pluginfile
+     */
     public function test_bigbluebuttonbn_pluginfile() {
         $this->resetAfterTest();
         $this->markTestSkipped(
@@ -594,6 +763,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         */
     }
 
+    /**
+     * Check plugin validation
+     *
+     * @covers ::bigbluebuttonbn_pluginfile_valid
+     */
     public function test_bigbluebuttonbn_pluginfile_valid() {
         $this->resetAfterTest();
         $this->assertFalse(bigbluebuttonbn_pluginfile_valid(context_course::instance($this->course->id), 'presentation'));
@@ -601,6 +775,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertFalse(bigbluebuttonbn_pluginfile_valid(context_system::instance(), 'otherfilearea'));
     }
 
+    /**
+     * Check pluginfile helper
+     *
+     * @covers ::bigbluebuttonbn_pluginfile_file
+     */
     public function test_bigbluebuttonbn_pluginfile_file() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -632,6 +811,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals('bbfile.pptx', $mediafile->get_filename());
     }
 
+    /**
+     * Get defaut presentation file
+     *
+     * @covers ::bigbluebuttonbn_default_presentation_get_file
+     */
     public function test_bigbluebuttonbn_default_presentation_get_file() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -648,6 +832,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals('presentation', $mediafile);
     }
 
+    /**
+     * Check pluginfile name
+     *
+     * @covers ::bigbluebuttonbn_pluginfile_filename
+     */
     public function test_bigbluebuttonbn_pluginfile_filename() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -662,6 +851,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals('bbfile.pptx', $filename);
     }
 
+    /**
+     * Check return value of file areas
+     *
+     * @covers ::bigbluebuttonbn_get_file_areas
+     */
     public function test_bigbluebuttonbn_get_file_areas() {
         $this->resetAfterTest();
         $this->assertEquals(array(
@@ -670,6 +864,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         ), bigbluebuttonbn_get_file_areas());
     }
 
+    /**
+     * Check return value of file areas
+     *
+     * @covers ::bigbluebuttonbn_view
+     */
     public function test_bigbluebuttonbn_view() {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -700,6 +899,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertEquals(1, $completiondata->completionstate);
     }
 
+    /**
+     * Check updates
+     *
+     * @covers ::bigbluebuttonbn_check_updates_since
+     */
     public function test_bigbluebuttonbn_check_updates_since() {
         $this->resetAfterTest();
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
@@ -710,12 +914,22 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         );
     }
 
+    /**
+     * Check icon mapping for font-awesome
+     *
+     * @covers ::bigbluebuttonbn_get_fontawesome_icon_map
+     */
     public function test_mod_bigbluebuttonbn_get_fontawesome_icon_map() {
         $this->resetAfterTest();
         $this->assertEquals(array('mod_bigbluebuttonbn:icon' => 'icon-bigbluebutton'),
                 mod_bigbluebuttonbn_get_fontawesome_icon_map());
     }
 
+    /**
+     * Check event action (calendar)
+     *
+     * @covers ::mod_bigbluebuttonbn_core_calendar_provide_event_action
+     */
     public function test_mod_bigbluebuttonbn_core_calendar_provide_event_action() {
         global $DB;
         $this->resetAfterTest();
@@ -762,6 +976,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         return calendar_event::create($event);
     }
 
+    /**
+     * Check that bigbluebutton event registers
+     *
+     * @covers ::mod_bigbluebuttonbn_log
+     */
     public function test_bigbluebuttonbn_log() {
         global $DB;
         $this->resetAfterTest();
@@ -770,6 +989,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => $bbactivity->id)));
     }
 
+    /**
+     * Test setting navigation admin menu
+     *
+     * @covers ::mod_bigbluebuttonbn_extend_settings_navigation
+     */
     public function test_bigbluebuttonbn_extend_settings_navigation_admin() {
         global $PAGE, $CFG;
         $this->resetAfterTest();
@@ -787,6 +1011,11 @@ class mod_bigbluebuttonbn_lib_testcase extends advanced_testcase {
         $this->assertCount(1, $node->get_children_key_list());
     }
 
+    /**
+     * Check additional setting menu
+     *
+     * @covers ::bigbluebuttonbn_extend_settings_navigation
+     */
     public function test_bigbluebuttonbn_extend_settings_navigation_user() {
         global $PAGE, $CFG;
         $this->resetAfterTest();
