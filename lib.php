@@ -326,6 +326,13 @@ function bigbluebuttonbn_reset_userdata(stdClass $data) {
         unset($items['tags']);
         $status[] = reset::reset_getstatus('tags');
     }
+
+    if (!empty($data->reset_bigbluebuttonbn_logs)) {
+        // Remove all the tags linked to the room/activities in this course.
+        reset::reset_logs($data->courseid);
+        unset($items['logs']);
+        $status[] = reset::reset_getstatus('logs');
+    }
     return $status;
 }
 
@@ -574,11 +581,11 @@ function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timesta
     $instance->set_group_id($groupid);
     $cm = $instance->get_cm();
     $logs =
-
         logger::get_user_completion_logs_with_userfields($instance,
             $userid ?? null,
             [logger::EVENT_JOIN, logger::EVENT_PLAYED],
             $timestart);
+
     foreach ($logs as $log) {
         $activity = new stdClass();
 
@@ -599,22 +606,17 @@ function bigbluebuttonbn_get_recent_mod_activity(&$activities, &$index, $timesta
         }
         $activity->user->fullname = fullname($log);
         $activity->content = '';
-        switch ($log->log) {
-            case logger::EVENT_JOIN:
-                $activity->eventname = get_string('event_meeting_joined', 'mod_bigbluebuttonbn');
-                break;
-            case logger::EVENT_PLAYED:
-                $activity->eventname = get_string('event_recording_viewed', 'mod_bigbluebuttonbn');
-                if (!empty($log->meta)) {
-                    $meta = json_decode($log->meta);
-                    if (!empty($meta->recordingid)) {
-                        $recording = recording::get_record(['id' => $meta->recordingid]);
-                        if ($recording) {
-                            $activity->content = $recording->get('name');
-                        }
+        $activity->eventname = logger::get_printable_event_name($log);
+        if ($log->log == logger::EVENT_PLAYED) {
+            if (!empty($log->meta)) {
+                $meta = json_decode($log->meta);
+                if (!empty($meta->recordingid)) {
+                    $recording = recording::get_record(['id' => $meta->recordingid]);
+                    if ($recording) {
+                        $activity->content = $recording->get('name');
                     }
                 }
-                break;
+            }
         }
         $activities[$index++] = $activity;
     }
