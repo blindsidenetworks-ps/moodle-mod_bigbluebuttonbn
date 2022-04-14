@@ -72,6 +72,20 @@ contains the latest source. We recommend to download the latest snapshot from th
 
 Note: Since version 2.2 the use of the RecordingsBN activity module to access recordings is no longer needed. But when running an older version, it is requiered in order to gain access to the recordings.
 
+Bug reports and Feature requests
+================================
+
+Bug reports and Feature requests have been tracked since long time using the [Moodle Tracker](https://tracker.moodle.org/) system under CONTRIB. But there are a few things to consider:
+
+1. Since this plugin is merged into Moodle core, version 2.4 is frozen for features and enhancements. Only bug fixes and security patches are being considered at this point.
+2. There is a version 3.0 coming up, but it is for Moodle 3.11 only and it is an adaptation of the version that is in core right now. But that will be released frozen for features and enhancements. Only bug fixes and security patches will be considered as well.
+3. Moodle will continue its own schedule, so you can expect new features and enhancements happening in Moodle 4.1
+4. Bug reports for version 2.4 and 3.0 should be done under [CONTRIB](https://tracker.moodle.org/projects/CONTRIB/). 
+5. Bug reports for Moodle 4.0 should be done under [MDL](https://tracker.moodle.org/projects/MDL/).
+6. Feature requests for Moodle 4.1 and later should be done under [MDL](https://tracker.moodle.org/projects/MDL/).
+7. All issues open should be following [Moodle rules](https://docs.moodle.org/dev/Tracker_introduction) for documenting the issues and requests.
+8. Accepting or rejecting a request, same as scheduling its development is now done following Moodle development process.
+
 
 Contact Us
 ==========
