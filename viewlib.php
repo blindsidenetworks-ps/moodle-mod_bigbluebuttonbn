@@ -127,8 +127,8 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
         $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-rooms',
             'M.mod_bigbluebuttonbn.rooms.init', array($jsvars));
     }
-    // Show recordings should only be enabled if recordings are also enabled in session.
-    if ($enabledfeatures['showrecordings'] && $bbbsession['record']) {
+    // Show recordings can be enabled even if recordings are disabled in session.
+    if ($enabledfeatures['showrecordings']) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings'));
         $output .= bigbluebuttonbn_view_render_recording_section($bbbsession, $type, $enabledfeatures, $jsvars);
         $output .= html_writer::end_tag('div');
@@ -156,19 +156,17 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
         return '';
     }
     $output = '';
-    if ($type == BIGBLUEBUTTONBN_TYPE_ALL && $bbbsession['record']) {
+    if ($type == BIGBLUEBUTTONBN_TYPE_ALL) {
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_header'));
         $output .= html_writer::tag('h4', get_string('view_section_title_recordings', 'bigbluebuttonbn'));
         $output .= html_writer::end_tag('div');
     }
-    if ($type == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY || $bbbsession['record']) {
-        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_content'));
-        $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
-        $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
-        $output .= html_writer::end_tag('div');
-    }
+    $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_content'));
+    $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
+    $output .= html_writer::end_tag('div');
+    $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
+    $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
+    $output .= html_writer::end_tag('div');
     return $output;
 }
 
