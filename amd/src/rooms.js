@@ -21,63 +21,69 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import './actions';
-import * as repository from './repository';
-import * as roomUpdater from './roomupdater';
-import {
-    exception as displayException,
-    fetchNotifications,
-} from 'core/notification';
+ import './actions';
+ import * as repository from './repository';
+ import * as roomUpdater from './roomupdater';
+ import {
+     exception as displayException,
+     fetchNotifications,
+ } from 'core/notification';
 
-import {eventTypes, notifyCurrentSessionEnded} from './events';
+ import {eventTypes, notifyCurrentSessionEnded} from './events';
 
-export const init = (bigbluebuttonbnid) => {
-    const completionElement = document.querySelector('a[href*=completion_validate]');
-    if (completionElement) {
-        completionElement.addEventListener("click", () => {
-            repository.completionValidate(bigbluebuttonbnid).catch(displayException);
-        });
-    }
+ const timeoutjoin = 5000;
 
-    document.addEventListener('click', e => {
-        const joinButton = e.target.closest('[data-action="join"]');
-        if (joinButton) {
-            window.open(joinButton.href, 'bigbluebutton_conference');
-            e.preventDefault();
-        }
-    });
+ export const init = (bigbluebuttonbnid) => {
+     const completionElement = document.querySelector('a[href*=completion_validate]');
+     if (completionElement) {
+         completionElement.addEventListener("click", () => {
+             repository.completionValidate(bigbluebuttonbnid).catch(displayException);
+         });
+     }
 
-    document.addEventListener(eventTypes.sessionEnded, () => {
-        roomUpdater.stop();
-        roomUpdater.updateRoom();
-        fetchNotifications();
-    });
+     document.addEventListener('click', e => {
+         const joinButton = e.target.closest('[data-action="join"]');
+         if (joinButton) {
+             window.open(joinButton.href, 'bigbluebutton_conference');
+             e.preventDefault();
+             // Gives the user a bit of time to go into the meeting.
+             setTimeout(() => {
+                 roomUpdater.updateRoom(true);
+                 }, timeoutjoin);
+         }
+     });
 
-    window.addEventListener(eventTypes.currentSessionEnded, () => {
-        roomUpdater.stop();
-        roomUpdater.updateRoom();
-        fetchNotifications();
-    });
-    // Room update.
-    roomUpdater.start();
-};
+     document.addEventListener(eventTypes.sessionEnded, () => {
+         roomUpdater.stop();
+         roomUpdater.updateRoom();
+         fetchNotifications();
+     });
 
-/**
- * Handle autoclosing of the window.
- */
-const autoclose = () => {
-    window.opener.setTimeout(() => {
-        roomUpdater.updateRoom(true);
-    }, 5000);
-    window.removeEventListener('onbeforeunload', autoclose);
-};
+     window.addEventListener(eventTypes.currentSessionEnded, () => {
+         roomUpdater.stop();
+         roomUpdater.updateRoom();
+         fetchNotifications();
+     });
+     // Room update.
+     roomUpdater.start();
+ };
 
-/**
- * Auto close child windows when clicking the End meeting button.
- */
-export const setupWindowAutoClose = () => {
-    notifyCurrentSessionEnded(window.opener);
-    window.addEventListener('onbeforeunload', autoclose);
+ /**
+  * Handle autoclosing of the window.
+  */
+ const autoclose = () => {
+     window.opener.setTimeout(() => {
+         roomUpdater.updateRoom(true);
+     }, timeoutjoin);
+     window.removeEventListener('onbeforeunload', autoclose);
+ };
 
-    window.close(); // This does not work as scripts can only close windows that are opened by themselves.
-};
+ /**
+  * Auto close child windows when clicking the End meeting button.
+  */
+ export const setupWindowAutoClose = () => {
+     notifyCurrentSessionEnded(window.opener);
+     window.addEventListener('onbeforeunload', autoclose);
+
+     window.close(); // This does not work as scripts can only close windows that are opened by themselves.
+ };

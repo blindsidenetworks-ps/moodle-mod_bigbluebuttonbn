@@ -32,5 +32,5 @@ $plugin->requires = 2020061500;
 $plugin->cron = 0;
 $plugin->component = 'mod_bigbluebuttonbn';
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '3.0-alpha.2';
+$plugin->release = '3.0-beta.1';
 
