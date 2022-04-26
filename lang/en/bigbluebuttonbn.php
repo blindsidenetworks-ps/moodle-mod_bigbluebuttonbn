@@ -117,8 +117,8 @@ $string['completionvalidatestate'] = 'Validate completion';
 $string['completionvalidatestatetriggered'] = 'Validate completion has been triggered.';
 
 $string['completionview'] = 'Require view';
-$string['completionview_desc'] = 'Student must join a room or play a recording to complete it.';
-$string['completionview_event_desc'] = 'Has joined the room or played a recording {$a} time(s)';
+$string['completionview_desc'] = 'Student must view the Room to complete it.';
+$string['completionview_event_desc'] = 'Has viewed the Room page.';
 $string['sendnotification'] = 'Send notification';
 
 $string['minute'] = 'minute';

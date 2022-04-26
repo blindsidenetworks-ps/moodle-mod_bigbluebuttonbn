@@ -220,9 +220,16 @@ function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info 
                 $lastlog = $lastlogrule;
             }
         }
-        $result = new stdClass();
-        $result->info = join(', ', $results);
-        $result->time = $lastlog;
+        if ($lastlog) {
+            $result->info = join(', ', $results);
+            $result->time = $lastlog;
+        }
+    }
+    // Check for completion view on its own. This is a temporary measure and will do that better in MDL-74468.
+    $completion = new \completion_info($course);
+    $cdata = $completion->get_data($mod, false, $user->id);
+    if (!empty($cdata->viewed) && $cdata->viewed) {
+        $result->info = ($result->info ?? '') . get_string('completionview_event_desc', 'mod_bigbluebuttonbn');
     }
     return $result;
 }
@@ -242,6 +249,12 @@ function bigbluebuttonbn_user_complete(stdClass $course, stdClass $user, cm_info
     $result = [];
     foreach ($customcompletion->get_available_custom_rules() as $rule) {
         $result[] = $customcompletion->get_printable_state($rule);
+    }
+    // Check for completion view on its own. This is a temporary measure and will do that better in MDL-74468.
+    $completion = new \completion_info($course);
+    $cdata = $completion->get_data($mod, false, $user->id);
+    if (!empty($cdata->viewed) && $cdata->viewed) {
+        $result[] = get_string('completionview_event_desc', 'mod_bigbluebuttonbn');
     }
     echo join(', ', $result);
 }
