@@ -126,16 +126,10 @@ $string['minutes'] = 'minutes';
 
 $string['config_general'] = 'General settings';
 $string['config_general_description'] = 'These settings are always used.';
-$string['config_server_url'] = 'BigBlueButton server URL';
-$string['config_server_url_description'] = 'The default credentials are for a <a href="https://bigbluebutton.org/free-bigbluebutton-service-for-moodle/" target="_blank">free BigBlueButton service for Moodle (opens in new window)</a> provided by Blindside Networks with restrictions as follows:
-<ol>
-<li>The maximum length for each session is 60 minutes</li>
-<li>The maximum number of concurrent users per session is 25</li>
-<li>Recordings expire after seven (7) days and are not downloadable</li>
-<li>Student webcams are only visible to the moderator.</li>
-</ol>';
-$string['config_shared_secret'] = 'BigBlueButton shared secret';
-$string['config_shared_secret_description'] = 'The security secret of your BigBlueButton server. The default secret is for a free BigBlueButton service provided by Blindside Networks.';
+$string['config_server_url'] = 'BigBlueButton Server URL';
+$string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_shared_secret'] = 'BigBlueButton Shared Secret';
+$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
 
 $string['config_recording'] = 'Recording';
 $string['config_recording_description'] = 'These settings are feature specific';

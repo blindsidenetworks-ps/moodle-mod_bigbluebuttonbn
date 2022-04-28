@@ -30,10 +30,10 @@ use mod_bigbluebuttonbn\recording;
 class config {
 
     /** @var string Default bigbluebutton server url */
-    public const DEFAULT_SERVER_URL = 'https://test-moodle.blindsidenetworks.com/bigbluebutton/';
+    public const DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 
     /** @var string Default bigbluebutton server shared secret */
-    public const DEFAULT_SHARED_SECRET = '0b21fcaf34673a8c3ec8ed877d76ae34';
+    public const DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
 
     /**
      * Returns moodle version.
