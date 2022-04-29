@@ -397,16 +397,6 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2021083100, 'bigbluebuttonbn');
     }
 
-    if ($oldversion < 2021091408) {
-        // Change BigBliueButton Server credentials to new defaults if test-install is being used.
-        if (config::get('server_url') == 'http://test-install.blindsidenetworks.com/bigbluebutton/') {
-            set_config('bigbluebuttonbn_server_url', config::DEFAULT_SERVER_URL);
-            set_config('bigbluebuttonbn_shared_secret', config::DEFAULT_SHARED_SECRET);
-        }
-        // Bigbluebuttonbn savepoint reached.
-        upgrade_mod_savepoint(true, 2021091408, 'bigbluebuttonbn');
-    }
-
     if ($oldversion < 2021101003) {
         // Create adhoc task for upgrading of existing bigbluebuttonbn_logs related to recordings.
         upgrade_recordings_task::schedule_upgrade_per_meeting();
