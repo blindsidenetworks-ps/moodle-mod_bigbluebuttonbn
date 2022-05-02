@@ -129,7 +129,6 @@ class recording_data {
             'width' => '225px',
             'type' => 'html',
             'allowHTML' => true,
-            // 'formatter' => 'customDate',
         ];
         $columns[] = [
             'key' => 'duration',

@@ -51,7 +51,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param ... $params
+     * @param mixed ...$params
      * @return mixed
      */
     protected function get_join_url(...$params) {

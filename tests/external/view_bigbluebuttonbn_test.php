@@ -51,7 +51,7 @@ class view_bigbluebuttonbn_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param ... $params
+     * @param mixed ...$params
      * @return mixed
      */
     protected function view_bigbluebuttonbn(...$params) {
