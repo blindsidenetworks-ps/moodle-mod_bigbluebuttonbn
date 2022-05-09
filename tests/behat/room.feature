@@ -22,8 +22,8 @@ Feature: The recording can be managed through the room page and as a user I can 
       | RoomRecordings  | Recording 4 | Description 4 | 2      | 1649666194  |
 
   #behat test disabled for now until recording.js file updated to be compatible with 4.0 code
-  #@javascript
-  #Scenario: Recording should be sortable by date
+  @javascript
+  Scenario: Recording should be sortable by date
    # Given I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as admin
     #Then I click on "th[data-yui3-col-id='date'] .yui3-datatable-sort-indicator" "css_element"
     #Then "Recording 1" "text" should appear before "Recording 3" "text"

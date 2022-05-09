@@ -13,7 +13,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+namespace mod_bigbluebuttonbn;
 
+use advanced_testcase;
+use context_course;
+use context_module;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\test\testcase_helper_trait;
 

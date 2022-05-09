@@ -50,7 +50,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param ... $params
+     * @param mixed ...$params
      * @return array|bool|mixed
      */
     protected function get_recordings(...$params) {
@@ -317,7 +317,13 @@ class get_recordings_test extends \externallib_advanced_testcase {
     /**
      * Check if recording are visible/invisible depending on the group.
      *
-     * @covers       \mod_bigbluebuttonbn\external\get_recordings::execute
+     * @param string $type
+     * @param array $groups
+     * @param array $users
+     * @param array $recordingsdata
+     * @param array $test
+     * @param int $coursemode
+     * @covers \mod_bigbluebuttonbn\external\get_recordings::execute
      * @dataProvider recording_group_test_data
      */
     public function test_get_recordings_groups($type, $groups, $users, $recordingsdata, $test, $coursemode) {

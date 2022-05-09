@@ -50,7 +50,7 @@ class completion_validate_test extends \externallib_advanced_testcase {
     /**
      * Helper
      *
-     * @param ... $params
+     * @param mixed ...$params
      * @return mixed
      */
     protected function completion_validate(...$params) {
