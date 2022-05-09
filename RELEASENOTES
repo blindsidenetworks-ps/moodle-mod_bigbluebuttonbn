@@ -1,3 +1,8 @@
+2.4.6 (2019101013)
+Bug: Fix for code precheck errors (CONTRIB-8897).
+Bug: Fix for show recording conditions (CONTRIB-8917).
+Bug: Fix for bigbluebuttonbn_logs 'has_recordings' value for meta column (CONTRIB-8922).
+
 2.4.5 (2019101012)
 Security: Fix for potential security risk: removed href from playback action (BN-2021-001)
 Bug: Fix for Update Lock Settings and Fix Inverted LockOnJoin Logic (CONTRIB-8873)
