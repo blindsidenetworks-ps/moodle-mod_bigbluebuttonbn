@@ -3,12 +3,12 @@
 /* bigbluebutton-font */
 @font-face {
     font-family: "bigbluebutton-font";
-    src: url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.eot");
+    src: url([[font:mod_bigbluebuttonbn|bigbluebutton-font.eot]]);
     src:
-        url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.eot?#iefix") format("embedded-opentype"),
-        url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.woff") format("woff"),
-        url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.ttf") format("truetype"),
-        url("../../../../mod/bigbluebuttonbn/fonts/bigbluebutton-font.svg#bigbluebutton-font") format("svg");
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.eot]]#iefix) format("embedded-opentype"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.woff]]) format("woff"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.ttf]]) format("truetype"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.svg]]#bigbluebutton-font) format("svg");
     font-weight: normal;
     font-style: normal;
 }
