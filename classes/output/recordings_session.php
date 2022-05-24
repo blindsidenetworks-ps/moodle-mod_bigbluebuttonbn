@@ -65,7 +65,7 @@ class recordings_session implements renderable, templatable {
             ],
         ];
 
-        if ((boolean)config::get('importrecordings_enabled') && $this->instance->can_import_recordings()) {
+        if ((bool) config::get('importrecordings_enabled') && $this->instance->can_import_recordings()) {
             $button = new \single_button(
                 $this->instance->get_import_url(),
                 get_string('view_recording_button_import', 'mod_bigbluebuttonbn')
