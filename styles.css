@@ -5,10 +5,10 @@
     font-family: "bigbluebutton-font";
     src: url([[font:mod_bigbluebuttonbn|bigbluebutton-font.eot]]);
     src:
-            url([[font:mod_bigbluebuttonbn|bigbluebutton-font.eot]]#iefix) format("embedded-opentype"),
-            url([[font:mod_bigbluebuttonbn|bigbluebutton-font.woff]]) format("woff"),
-            url([[font:mod_bigbluebuttonbn|bigbluebutton-font.ttf]]) format("truetype"),
-            url([[font:mod_bigbluebuttonbn|bigbluebutton-font.svg]]#bigbluebutton-font) format("svg");
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.eot]]#iefix) format("embedded-opentype"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.woff]]) format("woff"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.ttf]]) format("truetype"),
+         url([[font:mod_bigbluebuttonbn|bigbluebutton-font.svg]]#bigbluebutton-font) format("svg");
     font-weight: normal;
     font-style: normal;
 }
