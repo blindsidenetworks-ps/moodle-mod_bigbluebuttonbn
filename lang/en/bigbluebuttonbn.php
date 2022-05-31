@@ -604,3 +604,18 @@ $string['userlimitreached'] = 'The number of users allowed in a session has been
 $string['waitformoderator'] = 'Waiting for a moderator to join.';
 
 $string['recordingurlnotfound'] = 'The recording URL is invalid.';
+
+// Deprecated strings still needed for older BBB versions using 3.11 language packs.
+$string['mod_form_field_notification_msg_created'] = 'added';
+$string['mod_form_field_notification_msg_modified'] = 'updated';
+$string['email_body_notification_meeting_has_been'] = 'has been';
+$string['email_body_notification_meeting_details'] = 'Details';
+$string['email_body_notification_meeting_title'] = 'Title';
+$string['email_body_notification_meeting_description'] = 'Description';
+$string['email_body_notification_meeting_start_date'] = 'Start date';
+$string['email_body_notification_meeting_end_date'] = 'End date';
+$string['email_body_notification_meeting_by'] = 'by';
+$string['email_body_recording_ready_for'] = 'There is a recording ready for';
+$string['email_body_recording_ready_in_course'] = 'in the course';
+$string['email_footer_sent_by'] = 'This automatic notification message was sent by';
+$string['email_footer_sent_from'] = 'from the course';
