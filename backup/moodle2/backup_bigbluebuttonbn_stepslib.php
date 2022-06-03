@@ -48,7 +48,7 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
             'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
             'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
             'timemodified', 'presentation', 'participants', 'userlimit',
-            'recordings_html', 'recordings_deleted', 'recordings_imported', 'recordings_preview',
+            'recordings_html', 'recordings_imported', 'recordings_preview',
             'clienttype', 'muteonstart', 'completionattendance',
             'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
             'completionengagementpollvotes', 'completionengagementemojis']);
