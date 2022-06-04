@@ -677,11 +677,6 @@ class recording extends persistent {
     }
 
     /**
-     * @var string Default sort for recordings when fetching from the database.
-     */
-    const DEFAULT_RECORDING_SORT = 'timecreated ASC';
-
-    /**
      * Fetch all records which match the specified parameters, including all metadata that relates to them.
      *
      * @param array $selects
@@ -689,16 +684,18 @@ class recording extends persistent {
      * @return recording[]
      */
     protected static function fetch_records(array $selects, array $params): array {
-        global $DB;
+        global $DB, $CFG;
 
         $withindays = time() - (self::RECORDING_TIME_LIMIT_DAYS * DAYSECS);
+        // Sort for recordings when fetching from the database.
+        $recordingsort = $CFG->bigbluebuttonbn_recordings_sortorder ? 'timecreated ASC' : 'timecreated DESC';
 
         // Fetch the local data. Arbitrary sort by id, so we get the same result on different db engines.
         $recordings = $DB->get_records_select(
             static::TABLE,
             implode(" AND ", $selects),
             $params,
-            self::DEFAULT_RECORDING_SORT
+            $recordingsort
         );
 
         // Grab the recording IDs.
@@ -772,8 +769,10 @@ class recording extends persistent {
      * This function should be called by the check_pending_recordings scheduled task.
      */
     public static function sync_pending_recordings_from_server(): void {
-        global $DB;
+        global $DB, $CFG;
 
+        // Sort by bigbluebuttonbn_recordings_sortorder we get the same result on different db engines.
+        $recordingsort = $CFG->bigbluebuttonbn_recordings_sortorder ? 'timecreated ASC' : 'timecreated DESC';
         // Fetch the local data.
         mtrace("=> Looking for any recording awaiting processing from the past " . self::RECORDING_TIME_LIMIT_DAYS . " days.");
         $select = 'status = :status_awaiting AND timecreated > :withindays OR status = :status_reset';
@@ -781,8 +780,7 @@ class recording extends persistent {
                 'status_awaiting' => self::RECORDING_STATUS_AWAITING,
                 'withindays' => time() - (self::RECORDING_TIME_LIMIT_DAYS * DAYSECS),
                 'status_reset' => self::RECORDING_STATUS_RESET,
-            ], self::DEFAULT_RECORDING_SORT);
-        // Sort by DEFAULT_RECORDING_SORT we get the same result on different db engines.
+            ], $recordingsort);
 
         $recordingcount = count($recordings);
         mtrace("=> Found {$recordingcount} recordings to query");
