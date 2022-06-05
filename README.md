@@ -31,7 +31,7 @@ Note that on previous versions of Moodle you will need to use the specific versi
 | Moodle 3.0 - 3.7  | v2.2-stable  | v2.2.13 (2017101021)      |
 | Moodle 3.2 - 3.10 | v2.3-stable  | v2.3.6  (2019042011)      |
 | Moodle 3.4 - 3.11 | v2.4-stable  | v2.4.4  (2019101011)      |
-| Moodle 3.11       | v3.0-alpha   | v3.0-alpha.1 (2021101001) |
+| Moodle 3.11       | v3.0-rc.2    | v3.0-rc.2 (2021101005)    |
 | Moodle 4.0        |      --      | moodle-core               |
 
 
@@ -80,7 +80,7 @@ Bug reports and Feature requests have been tracked since long time using the [Mo
 1. Since this plugin is merged into Moodle core, version 2.4 is frozen for features and enhancements. Only bug fixes and security patches are being considered at this point.
 2. There is a version 3.0 coming up, but it is for Moodle 3.11 only and it is an adaptation of the version that is in core right now. But that will be released frozen for features and enhancements. Only bug fixes and security patches will be considered as well.
 3. Moodle will continue its own schedule, so you can expect new features and enhancements happening in Moodle 4.1
-4. Bug reports for version 2.4 and 3.0 should be done under [CONTRIB](https://tracker.moodle.org/projects/CONTRIB/). 
+4. Bug reports for version 2.4 and 3.0 should be done under [CONTRIB](https://tracker.moodle.org/projects/CONTRIB/).
 5. Bug reports for Moodle 4.0 should be done under [MDL](https://tracker.moodle.org/projects/MDL/).
 6. Feature requests for Moodle 4.1 and later should be done under [MDL](https://tracker.moodle.org/projects/MDL/).
 7. All issues open should be following [Moodle rules](https://docs.moodle.org/dev/Tracker_introduction) for documenting the issues and requests.

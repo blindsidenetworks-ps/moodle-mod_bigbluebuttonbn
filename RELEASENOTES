@@ -1,3 +1,14 @@
+3.0rc2 (2021101005)
+
+Bug: Fix for recording sort (CONTRIB-8967).
+Bug: Fix deprecated.txt codecheck errors (CONTRIB-8965).
+Bug: Fix for Remove recordings_deleted from code (CONTRIB-8934).
+Bug: Fix for recording table (CONTRIB-8953).
+Bug: Fix for string localization (CONTRIB-8959).
+Bug: Fix for logic of show imported links (CONTRIB-8955).
+Bug: Fix for import recording links button (CONTRIB-8949).
+Bug: Fix for added muteonstart_editable to show the field when needed (CONTRIB-8939).
+
 3.0rc1 (2021101004)
 
 Bug: Fix for Reverts credentials back to default after upgrade (CONTRIB-8930).
