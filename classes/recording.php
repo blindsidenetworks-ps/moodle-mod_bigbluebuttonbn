@@ -151,7 +151,6 @@ class recording extends persistent {
      * @param bool $includeimported
      * @param bool $onlyimported
      * @param bool $includedeleted
-     * @param bool $onlydeleted
      *
      * @return recording[] containing the recordings indexed by recordID, each recording is also a
      * non sequential associative array itself that corresponds to the actual recording in BBB
@@ -161,16 +160,14 @@ class recording extends persistent {
         array $excludedinstanceid = [],
         bool $includeimported = false,
         bool $onlyimported = false,
-        bool $includedeleted = false,
-        bool $onlydeleted = false
+        bool $includedeleted = false
     ): array {
         global $DB;
 
         [$selects, $params] = self::get_basic_select_from_parameters(
             $includedeleted,
             $includeimported,
-            $onlyimported,
-            $onlydeleted
+            $onlyimported
         );
         if ($courseid) {
             $selects[] = "courseid = :courseid";
@@ -258,24 +255,18 @@ class recording extends persistent {
      * @param bool $includedeleted
      * @param bool $includeimported
      * @param bool $onlyimported
-     * @param bool $onlydeleted
      * @return array
      */
     protected static function get_basic_select_from_parameters(
         bool $includedeleted = false,
         bool $includeimported = false,
-        bool $onlyimported = false,
-        bool $onlydeleted = false
+        bool $onlyimported = false
     ): array {
         $selects = [];
         $params = [];
 
         // Start with the filters.
-        if ($onlydeleted) {
-            // Only headless recordings when only deleted is set.
-            $selects[] = "headless = :headless";
-            $params['headless'] = self::RECORDING_HEADLESS;
-        } else if (!$includedeleted) {
+        if (!$includedeleted) {
             // Exclude headless recordings unless includedeleted.
             $selects[] = "headless != :headless";
             $params['headless'] = self::RECORDING_HEADLESS;

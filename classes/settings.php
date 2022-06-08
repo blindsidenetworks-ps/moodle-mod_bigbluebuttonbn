@@ -378,28 +378,6 @@ class settings {
             );
             $showrecordingsettings->add($item);
             $item = new admin_setting_configcheckbox(
-                'bigbluebuttonbn_recordings_deleted_default',
-                get_string('config_recordings_deleted_default', 'bigbluebuttonbn'),
-                get_string('config_recordings_deleted_default_description', 'bigbluebuttonbn'),
-                1
-            );
-            $this->add_conditional_element(
-                'recordings_deleted_default',
-                $item,
-                $showrecordingsettings
-            );
-            $item = new admin_setting_configcheckbox(
-                'bigbluebuttonbn_recordings_deleted_editable',
-                get_string('config_recordings_deleted_editable', 'bigbluebuttonbn'),
-                get_string('config_recordings_deleted_editable_description', 'bigbluebuttonbn'),
-                0
-            );
-            $this->add_conditional_element(
-                'recordings_deleted_editable',
-                $item,
-                $showrecordingsettings
-            );
-            $item = new admin_setting_configcheckbox(
                 'bigbluebuttonbn_recordings_imported_default',
                 get_string('config_recordings_imported_default', 'bigbluebuttonbn'),
                 get_string('config_recordings_imported_default_description', 'bigbluebuttonbn'),

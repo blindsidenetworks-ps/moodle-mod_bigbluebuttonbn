@@ -83,9 +83,6 @@ class mod_helper {
         if (!isset($bigbluebuttonbn->recordings_html)) {
             $bigbluebuttonbn->recordings_html = 0;
         }
-        if (!isset($bigbluebuttonbn->recordings_deleted)) {
-            $bigbluebuttonbn->recordings_deleted = 0;
-        }
         if (!isset($bigbluebuttonbn->recordings_imported)) {
             $bigbluebuttonbn->recordings_imported = 0;
         }
