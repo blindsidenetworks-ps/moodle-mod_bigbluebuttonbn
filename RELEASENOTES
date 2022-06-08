@@ -1,3 +1,7 @@
+2.4.7 (2019101014)
+Bug: Fix font paths in styles.css (CONTRIB-8957).
+Bug: Fix for muteonstart_editable visibility (CONTRIB-8941).
+
 2.4.6 (2019101013)
 Bug: Fix for code precheck errors (CONTRIB-8897).
 Bug: Fix for show recording conditions (CONTRIB-8917).

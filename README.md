@@ -30,7 +30,7 @@ Note that on previous versions of Moodle you will need to use the specific versi
 | Moodle 2.7 - 2.9  | v2.1-stable  | v2.1.15 (2016051920)    |
 | Moodle 3.0 - 3.1  | v2.2-stable  | v2.2.12 (2017101020)    |
 | Moodle 3.2 - 3.9  | v2.3-stable  | v2.3.4  (2019042009)    |
-| Moodle 3.4 - 3.11 | v2.4-stable  | v2.4    (2019101007)    |
+| Moodle 3.4 - 3.11 | v2.4-stable  | v2.4.7  (2019101014)    |
 
 Prerequisites
 =============
