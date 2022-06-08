@@ -11,4 +11,3 @@ email_body_recording_ready_for,mod_bigbluebuttonbn
 email_body_recording_ready_in_course,mod_bigbluebuttonbn
 email_footer_sent_by,mod_bigbluebuttonbn
 email_footer_sent_from,mod_bigbluebuttonbn
-
