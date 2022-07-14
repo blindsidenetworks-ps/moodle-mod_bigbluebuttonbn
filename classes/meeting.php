@@ -472,7 +472,8 @@ class meeting {
             // Verify the authenticity of the request.
             $token = \Firebase\JWT\JWT::decode(
                 $authorization[1],
-                new Key(config::get('shared_secret'), 'HS512')
+                config::get('shared_secret'),
+                array('HS512')
             );
 
             // Get JSON string from the body.
