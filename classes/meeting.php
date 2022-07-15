@@ -21,7 +21,7 @@ use cache_store;
 use context_course;
 use core_tag_tag;
 use Exception;
-use Firebase\JWT\Key;
+use Firebase\JWT\JWT;
 use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\meeting_join_exception;
@@ -472,9 +472,11 @@ class meeting {
             $authorization = explode(" ", $headers['Authorization']);
 
             // Verify the authenticity of the request.
-            $token = \Firebase\JWT\JWT::decode(
+            // Encoding is different than the one used in broker.php for recording_ready_notifications.
+            $token = JWT::decode(
                 $authorization[1],
-                new Key(config::get('shared_secret'), 'HS512')
+                config::get('shared_secret'),
+                array('HS512')
             );
 
             // Get JSON string from the body.
