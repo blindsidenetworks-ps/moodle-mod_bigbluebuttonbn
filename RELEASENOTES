@@ -1,4 +1,9 @@
-3.0rc2 (2021101005)
+3.0-rc.3 (2021101006)
+
+Bug: Fix for compatibility with BBB join (CONTRIB-8983).
+Bug: Fix for processing post_events_analytics_callback (CONTRIB-9007).
+
+3.0-rc.2 (2021101005)
 
 Bug: Fix for recording sort (CONTRIB-8967).
 Bug: Fix deprecated.txt codecheck errors (CONTRIB-8965).
@@ -9,7 +14,7 @@ Bug: Fix for logic of show imported links (CONTRIB-8955).
 Bug: Fix for import recording links button (CONTRIB-8949).
 Bug: Fix for added muteonstart_editable to show the field when needed (CONTRIB-8939).
 
-3.0rc1 (2021101004)
+3.0-rc.1 (2021101004)
 
 Bug: Fix for Reverts credentials back to default after upgrade (CONTRIB-8930).
 Bug: Fix for code precheck errors for 3.0-beta.1 (CONTRIB-8929).
