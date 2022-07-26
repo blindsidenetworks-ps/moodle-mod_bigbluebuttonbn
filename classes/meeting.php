@@ -493,6 +493,7 @@ class meeting {
         $recordid = $jsonobj->{'internal_meeting_id'};
         $attendees = $jsonobj->{'data'}->{'attendees'};
         foreach ($attendees as $attendee) {
+            debugging(json_encode($attendee), DEBUG_DEVELOPER);
             $userid = $attendee->{'ext_user_id'};
             $overrides['meetingid'] = $meetingid;
             $overrides['userid'] = $userid;
