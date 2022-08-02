@@ -157,7 +157,7 @@ EOF;
         [$wheresql, $params] = static::get_user_completion_sql_params($instance, $userid, $filters, $timestart);
         $select = "SELECT MAX(timecreated) ";
         $lastlogtime = $DB->get_field_sql($select . ' FROM {bigbluebuttonbn_logs} WHERE ' . $wheresql, $params);
-        return $lastlogtime;
+        return $lastlogtime ?? 0;
     }
 
     /**
@@ -255,7 +255,7 @@ EOF;
             json_encode($meta)
         );
 
-        return self::count_callback_events($meta['recordid'], 'meeting_events');
+        return self::count_callback_events($overrides['meetingid'], 'meeting_events');
     }
 
     /**
@@ -439,11 +439,11 @@ EOF;
     /**
      * Helper function to count the number of callback logs matching the supplied specifications.
      *
-     * @param string $recordid
+     * @param string $id
      * @param string $callbacktype
      * @return int
      */
-    protected static function count_callback_events(string $recordid, string $callbacktype = 'recording_ready'): int {
+    protected static function count_callback_events(string $id, string $callbacktype = 'recording_ready'): int {
         global $DB;
         $sql = 'SELECT count(DISTINCT id) FROM {bigbluebuttonbn_logs} WHERE log = ? AND meta LIKE ? AND meta LIKE ?';
         // Callback type added on version 2.4, validate recording_ready first or assume it on records with no callback.
@@ -452,14 +452,14 @@ EOF;
             $count =
                 $DB->count_records_sql($sql, [
                     self::EVENT_CALLBACK, '%recordid%',
-                    "%$recordid%",
+                    "%$id%",
                     $callbacktype, 'callback'
                 ]);
             return $count;
         }
         $sql .= ' AND meta LIKE ?;';
         $count = $DB->count_records_sql($sql,
-            [self::EVENT_CALLBACK, '%recordid%', "%$recordid%", "%$callbacktype%"]);
+            [self::EVENT_CALLBACK, '%%', "%$id%", "%$callbacktype%"]);
         return $count;
     }
 

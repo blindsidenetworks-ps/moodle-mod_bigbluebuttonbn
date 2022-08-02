@@ -33,9 +33,11 @@ use mod_bigbluebuttonbn\local\bigbluebutton;
 use mod_bigbluebuttonbn\local\helpers\files;
 use mod_bigbluebuttonbn\local\helpers\mod_helper;
 use mod_bigbluebuttonbn\local\helpers\reset;
+use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\meeting;
 use mod_bigbluebuttonbn\recording;
+use mod_bigbluebuttonbn\local\config;
 
 global $CFG;
 
@@ -207,31 +209,11 @@ function bigbluebuttonbn_delete_instance($id) {
  * @return stdClass with info and time (timestamp of the last log)
  */
 function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info $mod, stdClass $bigbluebuttonbn): stdClass {
-    $customcompletion = new custom_completion($mod, $user->id);
-    $completed = $customcompletion->get_overall_completion_state();
-    $result = new stdClass();
-    if ($completed) {
-        $results = [];
-        $lastlog = 0;
-        foreach ($customcompletion->get_available_custom_rules() as $rule) {
-            $results[] = $customcompletion->get_printable_state($rule);
-            $lastlogrule = $customcompletion->get_last_log_timestamp($rule);
-            if ($lastlogrule > $lastlog) {
-                $lastlog = $lastlogrule;
-            }
-        }
-        if ($lastlog) {
-            $result->info = join(', ', $results);
-            $result->time = $lastlog;
-        }
-    }
-    // Check for completion view on its own. This is a temporary measure and will do that better in MDL-74468.
-    $completion = new \completion_info($course);
-    $cdata = $completion->get_data($mod, false, $user->id);
-    if (!empty($cdata->viewed) && $cdata->viewed) {
-        $result->info = ($result->info ?? '') . get_string('completionview_event_desc', 'mod_bigbluebuttonbn');
-    }
-    return $result;
+    [$infos, $logtimestamps] = \mod_bigbluebuttonbn\local\helpers\user_info::get_user_info_outline($course, $user, $mod);
+    return (object) [
+        'info' => join(',', $infos),
+        'time' => !empty($logtimestamps) ? max($logtimestamps) : 0
+    ];
 }
 
 /**
@@ -245,18 +227,8 @@ function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info 
  *
  */
 function bigbluebuttonbn_user_complete(stdClass $course, stdClass $user, cm_info $mod, stdClass $bigbluebuttonbn) {
-    $customcompletion = new custom_completion($mod, $user->id);
-    $result = [];
-    foreach ($customcompletion->get_available_custom_rules() as $rule) {
-        $result[] = $customcompletion->get_printable_state($rule);
-    }
-    // Check for completion view on its own. This is a temporary measure and will do that better in MDL-74468.
-    $completion = new \completion_info($course);
-    $cdata = $completion->get_data($mod, false, $user->id);
-    if (!empty($cdata->viewed) && $cdata->viewed) {
-        $result[] = get_string('completionview_event_desc', 'mod_bigbluebuttonbn');
-    }
-    echo join(', ', $result);
+    [$infos] = \mod_bigbluebuttonbn\local\helpers\user_info::get_user_info_outline($course, $user, $mod);
+    echo join(', ', $infos);
 }
 
 /**
@@ -363,7 +335,14 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, completionattendance';
+    $customcompletionfields = custom_completion::get_defined_custom_rules();
+    $fieldsarray = array_merge([
+        'id',
+        'name',
+        'intro',
+        'introformat',
+    ], $customcompletionfields);
+    $fields = join(',', $fieldsarray);
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', $dbparams, $fields);
     if (!$bigbluebuttonbn) {
         return null;
@@ -376,7 +355,10 @@ function bigbluebuttonbn_get_coursemodule_info($coursemodule) {
     }
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $info->customdata['customcompletionrules']['completionattendance'] = $bigbluebuttonbn->completionattendance;
+        foreach ($customcompletionfields as $completiontype) {
+            $info->customdata['customcompletionrules'][$completiontype] =
+                $bigbluebuttonbn->$completiontype ?? 0;
+        }
     }
 
     return $info;
@@ -493,8 +475,20 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
     $instance = instance::get_from_instanceid($bigbluebuttonbn->id);
     // Get if the room is available.
     $roomavailable = $instance->is_currently_open();
-    // Get if the user can join.
-    $meetinginfo = meeting::get_meeting_info_for_instance($instance);
+
+    $meetinginfo = null;
+    // Check first if the server can be contacted.
+    try {
+        if (empty(bigbluebutton_proxy::get_server_version())) {
+            // In this case we should already have debugging message printed.
+            return null;
+        }
+        // Get if the user can join.
+        $meetinginfo = meeting::get_meeting_info_for_instance($instance);
+    } catch (moodle_exception $e) {
+        debugging('Error - Cannot retrieve info from meeting ('.$instance->get_meeting_id().') ' . $e->getMessage());
+        return null;
+    }
     $usercanjoin = $meetinginfo->canjoin;
 
     // Check if the room is closed and the user has already joined this session or played the record.

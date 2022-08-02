@@ -115,11 +115,11 @@ class lib_test extends \advanced_testcase {
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance($this->get_course(),
             ['completion' => 2, 'completionview' => 1]);
         $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
-        $this->assertEquals((object) [], $result);
+        $this->assertEquals((object) ['info' => '', 'time' => 0], $result);
 
         bigbluebuttonbn_view($bbactivity, $this->get_course(), $bbactivitycm, $bbactivitycontext);
         $result = bigbluebuttonbn_user_outline($this->get_course(), $user, $bbactivitycm, $bbactivity);
-        $this->assertStringContainsString(get_string('completionview_event_desc', 'mod_bigbluebuttonbn', 2), $result->info);
+        $this->assertStringContainsString(get_string('report_room_view', 'mod_bigbluebuttonbn'), $result->info);
     }
 
     /**
@@ -143,7 +143,7 @@ class lib_test extends \advanced_testcase {
         bigbluebuttonbn_user_complete($this->get_course(), $user, $bbactivitycm, $bbactivity);
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertStringContainsString(get_string('completionview_event_desc', 'mod_bigbluebuttonbn', 1), $output);
+        $this->assertStringContainsString(get_string('report_room_view', 'mod_bigbluebuttonbn'), $output);
     }
 
     /**
@@ -397,6 +397,7 @@ class lib_test extends \advanced_testcase {
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $this->getDataGenerator()->enrol_user($user->id, $this->course->id);
+        $this->setUser($user);
 
         logger::log_meeting_joined_event(instance::get_from_instanceid($bbactivity->id), 0);
         $data->courseid = $this->get_course()->id;
@@ -462,6 +463,7 @@ class lib_test extends \advanced_testcase {
 
         list($bbactivitycontext, $bbactivitycm, $bbactivity) = $this->create_instance();
         $this->getDataGenerator()->enrol_user($user->id, $this->course->id);
+        $this->setUser($user);
         logger::log_meeting_joined_event(instance::get_from_instanceid($bbactivity->id), 0);
 
         $data->courseid = $this->get_course()->id;
