@@ -1,3 +1,7 @@
+3.0-rc.4 (2021101007)
+
+Bug: Backport of Custom Completion Fix (CONTRIB-9006).
+
 3.0-rc.3 (2021101006)
 
 Bug: Fix for compatibility with BBB join (CONTRIB-8983).
