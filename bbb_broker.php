@@ -41,9 +41,9 @@ $params = $_REQUEST;
 $broker = new broker();
 $error = $broker->validate_parameters($params);
 if (!empty($error)) {
-    $errormessage = 'HTTP/1.0 400 Bad Request. ' . $error;
-    debugging($errormessage, DEBUG_DEVELOPER);
-    header($errormessage);
+    $msg = 'HTTP/1.0 400 Bad Request. ' . $error;
+    debugging($msg, DEBUG_DEVELOPER);
+    header($msg);
     return;
 }
 
@@ -51,9 +51,9 @@ $action = $params['action'];
 
 $instance = instance::get_from_instanceid($params['bigbluebuttonbn']);
 if (empty($instance)) {
-    $errormessage = 'HTTP/1.0 410 Gone. The activity may have been deleted';
-    debugging($errormessage, DEBUG_DEVELOPER);
-    header($errormessage);
+    $msg = 'HTTP/1.0 410 Gone. The activity may have been deleted';
+    debugging($msg, DEBUG_DEVELOPER);
+    header($msg);
     return;
 }
 
@@ -69,11 +69,9 @@ try {
             // which is processed in the function using super globals.
             broker::process_meeting_events($instance);
     }
-    $errormessage = "HTTP/1.0 400 Bad request. The action '{$action}' does not exist";
-    debugging($errormessage, DEBUG_DEVELOPER);
-    header($errormessage);
+    $msg = "HTTP/1.0 400 Bad request. The action '{$action}' does not exist";
 } catch (Exception $e) {
-    $errormessage = 'HTTP/1.0 500 Internal Server Error. ' . $e->getMessage();
-    debugging($errormessage, DEBUG_DEVELOPER);
-    header($errormessage);
+    $msg = 'HTTP/1.0 500 Internal Server Error. ' . $e->getMessage();
 }
+debugging($msg, DEBUG_DEVELOPER);
+header($msg);
