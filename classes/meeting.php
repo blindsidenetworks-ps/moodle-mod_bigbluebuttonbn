@@ -463,7 +463,9 @@ class meeting {
         $meetingidelements = explode('[', $data->{'meeting_id'});
         $meetingidelements = explode('-', $meetingidelements[0]);
         if (!isset($bigbluebuttonbn) || $bigbluebuttonbn->meetingid != $meetingidelements[0]) {
-            return 'HTTP/1.0 410 Gone. The activity may have been deleted';
+            $msg = 'HTTP/1.0 410 Gone. The activity may have been deleted';
+            debugging($msg, DEBUG_DEVELOPER);
+            return $msg;
         }
 
         // We make sure events are processed only once.
@@ -476,10 +478,12 @@ class meeting {
         if ($eventcount === 1) {
             // Process the events.
             self::process_meeting_events($instance, $data);
-            return 'HTTP/1.0 200 Accepted. Enqueued.';
+            $msg = 'HTTP/1.0 200 Accepted. Enqueued.';
         } else {
-            return 'HTTP/1.0 202 Accepted. Already processed.';
+            $msg = 'HTTP/1.0 202 Accepted. Already processed.';
         }
+        debugging($msg, DEBUG_DEVELOPER);
+        return $msg;
     }
 
     /**
