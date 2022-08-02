@@ -141,8 +141,9 @@ class broker {
 
             // Pull the Bearer from the headers.
             if (!array_key_exists('Authorization', $headers)) {
-                $msg = 'Authorization failed';
-                header('HTTP/1.0 400 Bad Request. ' . $msg);
+                $msg = 'HTTP/1.0 400 Bad Request. Authorization failed';
+                debugging($msg, DEBUG_DEVELOPER);
+                header($msg);
                 return;
             }
             $authorization = explode(" ", $headers['Authorization']);
@@ -163,8 +164,9 @@ class broker {
             $headermsg = meeting::meeting_events($instance, $jsonobj);
             header($headermsg);
         } catch (Exception $e) {
-            $msg = 'Caught exception: ' . $e->getMessage();
-            header('HTTP/1.0 400 Bad Request. ' . $msg);
+            $msg = 'HTTP/1.0 400 Bad Request. Caught exception: ' . $e->getMessage();
+            debugging($msg, DEBUG_DEVELOPER);
+            header($msg);
         }
     }
 }
