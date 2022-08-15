@@ -68,6 +68,7 @@ try {
             // When meeting_events callback is implemented by BigBlueButton, Moodle receives a POST request
             // which is processed in the function using super globals.
             broker::process_meeting_events($instance);
+            return;
     }
     $msg = "HTTP/1.0 400 Bad request. The action '{$action}' does not exist";
 } catch (Exception $e) {
