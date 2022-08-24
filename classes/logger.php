@@ -255,7 +255,7 @@ EOF;
             json_encode($meta)
         );
 
-        return self::count_callback_events($overrides['meetingid'], 'meeting_events');
+        return self::count_callback_events($meta['internalmeetingid'], 'meeting_events');
     }
 
     /**
