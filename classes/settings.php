@@ -175,7 +175,6 @@ class settings {
                 $item,
                 $settingsgeneral
             );
-            $settingsgeneral->add($item);
             $item = new admin_setting_heading(
                 'bigbluebuttonbn_config_default_messages',
                 get_string('config_default_messages', 'bigbluebuttonbn'),
@@ -194,7 +193,6 @@ class settings {
                 $item,
                 $settingsgeneral
             );
-            $settingsgeneral->add($item);
             $item = new admin_setting_configcheckbox(
                 'bigbluebuttonbn_welcome_editable',
                 get_string('config_welcome_editable', 'bigbluebuttonbn'),
