@@ -41,6 +41,17 @@ class setting_validator {
     }
 
     /**
+     * Validate if default messages section will be shown.
+     *
+     * @return bool
+     */
+    public static function section_default_messages_shown() {
+        global $CFG;
+        return (!isset($CFG->bigbluebuttonbn['welcome_default']) ||
+                !isset($CFG->bigbluebuttonbn['welcome_editable']));
+    }
+
+    /**
      * Validate if record meeting section  will be shown.
      *
      * @return bool
