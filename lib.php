@@ -166,8 +166,8 @@ function bigbluebuttonbn_delete_instance($id) {
             }
         }
     } catch (moodle_exception $e) {
-        // Do not log any issue when testing.
-        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')) {
+        // Do not log any issue when testing and meeting is not running on deletion.
+        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING') && $e->getMessage() !== 'mod_bigbluebuttonbn/notFound') {
             debugging($e->getMessage(), DEBUG_NORMAL, $e->getTrace());
         }
     }

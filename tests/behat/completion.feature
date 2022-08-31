@@ -27,4 +27,3 @@ Feature: As a user I can complete a BigblueButtonBN activity by usual or custom 
     Given I am on the "RoomRecordings" "bigbluebuttonbn activity" page logged in as traverst
     And I am on the "Test course" course page
     Then I should see "Done: View"
-

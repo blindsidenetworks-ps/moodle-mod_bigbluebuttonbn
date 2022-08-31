@@ -57,7 +57,7 @@ class view_page implements renderable, templatable {
             'instanceid' => $this->instance->get_instance_id(),
             'groupselector' => $output->render_groups_selector($this->instance),
             'meetingname' => $this->instance->get_meeting_name(),
-            'description' => $this->instance->get_meeting_description(true),
+            'meetingdescription' => $this->instance->get_meeting_description(true),
             'joinurl' => $this->instance->get_join_url(),
         ];
 
