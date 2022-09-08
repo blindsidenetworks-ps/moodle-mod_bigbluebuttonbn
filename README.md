@@ -31,7 +31,7 @@ Note that on previous versions of Moodle you will need to use the specific versi
 | Moodle 3.0 - 3.7  | v2.2-stable  | v2.2.13 (2017101021)      |
 | Moodle 3.2 - 3.10 | v2.3-stable  | v2.3.6  (2019042011)      |
 | Moodle 3.4 - 3.11 | v2.4-stable  | v2.4.7  (2019101014)      |
-| Moodle 3.11       | v3.0-rc      | v3.0-rc.4 (2021101007)    |
+| Moodle 3.11       | v3.0-stable  | v3.0.1 (2021101009)       |
 | Moodle 4.0        |      --      | moodle-core               |
 
 

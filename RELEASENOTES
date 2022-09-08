@@ -1,3 +1,13 @@
+3.0.1 (2021101009)
+
+Bug: Fix default messages section (CONTRIB-9059).
+Bug: Fix alert banner for group mode (CONTRIB-9049).
+Bug: Fix count to include next sessions (CONTRIB-9055).
+Bug: Fix activity description display (CONTRIB-9047).
+Bug: Fix lock on start for recording only (CONTRIB-9046).
+Bug: Fix error thrown on deletion (CONTRIB-9042).
+Bug: Fix 400 error message (CONTRIB-9045).
+
 3.0 (2021101008)
 3.0-rc.4 (2021101007)
 
