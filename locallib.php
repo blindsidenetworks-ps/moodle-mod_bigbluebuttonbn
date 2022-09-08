@@ -2692,11 +2692,11 @@ function bigbluebuttonbn_settings_general(&$renderer) {
             'shared_secret',
             $renderer->render_group_element_password('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
         );
-        $checksum_choices = array('SHA1' => 'SHA1', 'SHA256'=> 'SHA256', 'SHA512'=> 'SHA512');
-        $checksum_default = \mod_bigbluebuttonbn\locallib\config::get('checksum_algorithm');
+        $checksumchoices = array('SHA1' => 'SHA1', 'SHA256' => 'SHA256', 'SHA512' => 'SHA512');
+        $checksumdefault = \mod_bigbluebuttonbn\locallib\config::get('checksum_algorithm');
         $renderer->render_group_element(
             'checksum_algorithm',
-            $renderer->render_group_element_configselect('checksum_algorithm', BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM, $checksum_choices)
+            $renderer->render_group_element_configselect('checksum_algorithm', BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM, $checksumchoices)
         );
     }
 }
