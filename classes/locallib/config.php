@@ -57,6 +57,7 @@ class config {
         return array(
             'server_url' => (string) BIGBLUEBUTTONBN_DEFAULT_SERVER_URL,
             'shared_secret' => (string) BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET,
+            'checksum_algorithm' => (string) BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM,
             'voicebridge_editable' => false,
             'importrecordings_enabled' => false,
             'importrecordings_from_deleted_enabled' => false,
@@ -238,6 +239,7 @@ class config {
                'lockonjoin_default' => self::get('lockonjoin_default'),
                'welcome_default' => self::get('welcome_default'),
                'welcome_editable' => self::get('welcome_editable'),
+               'checksum_algorithm' => self::get('checksum_algorithm'),
           );
     }
 }
