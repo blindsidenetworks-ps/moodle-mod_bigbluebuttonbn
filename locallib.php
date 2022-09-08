@@ -1382,12 +1382,6 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
  *
  * @return string
  */
-// function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
-//     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
-//     $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
-//     $configxmlparams = $params . '&checksum=' . sha1('setConfigXML' . $params . $sharedsecret);
-//     return $configxmlparams;
-// }
 function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
     return $params . '&checksum=' . bigbluebutton::get_checksum('setConfigXML', $params);
