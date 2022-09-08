@@ -59,6 +59,7 @@ global $CFG;
  * The URL of your BigBlueButton server must end with /bigbluebutton/.
  * This default URL is for a BigBlueButton server provided by Blindside
  * Networks that you can use for testing.
+ * checksum_algorithm can be set to SHA1 (default), SHA256, SHA384 and SHA512.
  **/
 
 $CFG->bigbluebuttonbn['server_url'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
