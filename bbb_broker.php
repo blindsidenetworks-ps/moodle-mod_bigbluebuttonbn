@@ -28,7 +28,6 @@
 // phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState,moodle.Files.RequireLogin.Missing
 require(__DIR__ . '/../../config.php');
 
-use Firebase\JWT\Key;
 use mod_bigbluebuttonbn\broker;
 use mod_bigbluebuttonbn\instance;
 use mod_bigbluebuttonbn\local\config;
