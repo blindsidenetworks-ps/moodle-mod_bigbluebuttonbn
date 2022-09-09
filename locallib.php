@@ -1384,10 +1384,9 @@ function bigbluebuttonbn_set_config_xml($meetingid, $configxml) {
  */
 function bigbluebuttonbn_set_config_xml_params($meetingid, $configxml) {
     $params = 'configXML=' . urlencode($configxml) . '&meetingID=' . urlencode($meetingid);
-    $sharedsecret = \mod_bigbluebuttonbn\locallib\config::get('shared_secret');
-    $configxmlparams = $params . '&checksum=' . sha1('setConfigXML' . $params . $sharedsecret);
-    return $configxmlparams;
+    return $params . '&checksum=' . bigbluebutton::get_checksum('setConfigXML', $params);
 }
+
 
 /**
  * Sets a custom config.xml file for being used on create.
@@ -2692,6 +2691,11 @@ function bigbluebuttonbn_settings_general(&$renderer) {
         $renderer->render_group_element(
             'shared_secret',
             $renderer->render_group_element_password('shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET)
+        );
+        $checksumchoices = array('SHA1' => 'SHA1', 'SHA256' => 'SHA256', 'SHA512' => 'SHA512');
+        $renderer->render_group_element(
+            'checksum_algorithm',
+            $renderer->render_group_element_configselect('checksum_algorithm', BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM, $checksumchoices)
         );
     }
 }

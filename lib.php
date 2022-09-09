@@ -61,6 +61,8 @@ if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 /** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
+/** @var BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM string of default bigbluebutton checksum algorithm */
+const BIGBLUEBUTTONBN_DEFAULT_CHECKSUM_ALGORITHM = 'SHA1';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_ADD string defines the bigbluebuttonbn Add event */
 const BIGBLUEBUTTONBN_LOG_EVENT_ADD = 'Add';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_EDIT string defines the bigbluebuttonbn Edit event */

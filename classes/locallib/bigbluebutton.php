@@ -60,7 +60,8 @@ class bigbluebutton {
             $metadata
         );
         $params = http_build_query($data + $metadata, '', '&');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
+        return $baseurl . $params . '&checksum=' . self::get_checksum($action, $params);
+
     }
 
     /**
@@ -322,4 +323,9 @@ class bigbluebutton {
         }
         return false;
     }
+
+    public static function get_checksum($action, $params) {
+        return hash(config::get('checksum_algorithm'), $action . $params . self::sanitized_secret());
+    }
+
 }
