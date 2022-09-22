@@ -22,9 +22,7 @@
     Example context (json):
     {
        "statusclosed": true,
-       "statusclosed": false,
-       "openingtime": 123456789,
-       "closingtime": 987654321
+       "statusclosed": false
     }
 }}
 
@@ -32,20 +30,6 @@
      data-group-id="{{groupid}}">
     <span id="status_bar">
         <span class="status-message">{{statusmessage}}</span>
-        <span class="conf-opening-time">
-          {{#openingtime}}
-          <span class="conf-opening">
-            {{#str}}mod_form_field_openingtime, bigbluebuttonbn{{/str}}:
-            {{#userdate}} {{.}}, {{#str}} strftimedaydatetime, langconfig {{/str}} {{/userdate}}
-          </span>
-          {{/openingtime}}
-          {{#closingtime}}
-          <span class="conf-closing">
-            {{#str}}mod_form_field_closingtime, bigbluebuttonbn{{/str}}:
-            {{#userdate}} {{.}}, {{#str}} strftimedaydatetime, langconfig {{/str}} {{/userdate}}
-          </span>
-          {{/closingtime}}
-        </span>
         {{#statusrunning}}
             <div>
             <span>{{#str}}view_message_session_started_at, mod_bigbluebuttonbn{{/str}}</span>

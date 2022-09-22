@@ -71,27 +71,7 @@ class mobile {
         if ($instance->before_start_time()) {
             $message = get_string('view_message_conference_not_started', 'bigbluebuttonbn');
 
-            $notstarted = [
-                'starts_at' => '',
-                'ends_at' => '',
-            ];
-            if (!empty($instance->get_instance_var('openingtime'))) {
-                $notstarted['starts_at'] = sprintf(
-                    '%s: %s',
-                    get_string('mod_form_field_openingtime', 'bigbluebuttonbn'),
-                    userdate($instance->get_instance_var('openingtime'))
-                );
-            }
-
-            if (!empty($instance->get_instance_var('closingtime'))) {
-                $notstarted['ends_at'] = sprintf(
-                    '%s: %s',
-                    get_string('mod_form_field_closingtime', 'bigbluebuttonbn'),
-                    userdate($instance->get_instance_var('closingtime'))
-                );
-            }
-
-            return self::mobile_print_notification($instance, $message, $notstarted);
+            return self::mobile_print_notification($instance, $message);
         }
 
         if ($instance->has_ended()) {
@@ -199,17 +179,15 @@ class mobile {
      *
      * @param instance $instance
      * @param string $message Message to display.
-     * @param array $notstarted Extra messages for not started session.
      * @return array HTML, javascript and otherdata
      */
-    protected static function mobile_print_notification(instance $instance, $message, $notstarted = []): array {
+    protected static function mobile_print_notification(instance $instance, $message): array {
         global $OUTPUT, $CFG;
 
         $data = [
             'bigbluebuttonbn' => $instance->get_instance_data(),
             'cmid' => $instance->get_cm_id(),
-            'message' => $message,
-            'not_started' => $notstarted,
+            'message' => $message
         ];
 
         return [

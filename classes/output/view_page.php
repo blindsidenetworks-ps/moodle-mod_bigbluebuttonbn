@@ -108,6 +108,12 @@ class view_page implements renderable, templatable {
             ))->export_for_template($output);
         }
 
+        // Render the activity information.
+        $cminfo = $this->instance->get_cm();
+        $cm = \cm_info::create($cminfo);
+        $completiondetails = \core_completion\cm_completion_details::get_instance($cm, $this->instance->get_user_id());
+        $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $this->instance->get_user_id());
+        $templatedata->activityinformation = $output->activity_information($cminfo, $completiondetails, $activitydates);
         return $templatedata;
     }
 
