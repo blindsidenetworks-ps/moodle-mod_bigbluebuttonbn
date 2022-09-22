@@ -1,3 +1,11 @@
+3.0.2 (2021101010)
+
+Bug: Fix precheck errors (CONTRIB-9069).
+Bug: Fix section error (CONTRIB-9038).
+Bug: Fix schedule dates (CONTRIB-9035).
+Bug: Backport of Upgrade script fix (CONTRIB-9023).
+Bug: Fix JWT library use (CONTRIB-9044).
+
 3.0.1 (2021101009)
 
 Bug: Fix default messages section (CONTRIB-9059).
