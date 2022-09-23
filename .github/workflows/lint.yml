@@ -3,7 +3,15 @@
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
 name: CI Tests (Linting)
-on: [push, pull_request]
+  push:
+    branches-ignore:
+      - master
+      - v2.3-stable
+      - v2.4-stable
+      - v3.0-stable
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
   test:
