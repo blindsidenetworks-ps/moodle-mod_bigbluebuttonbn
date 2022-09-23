@@ -3,7 +3,16 @@
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
 name: CI Tests (Testing)
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - master
+      - v2.3-stable
+      - v2.4-stable
+      - v3.0-stable
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
   test:
