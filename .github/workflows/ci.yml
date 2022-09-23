@@ -3,7 +3,6 @@
 # https://github.com/moodleou/moodle-filter_embedquestion/tree/main/.github/workflows
 
 name: CI Tests (Testing)
-on: [push, pull_request]
 on:
   push:
     branches-ignore:
