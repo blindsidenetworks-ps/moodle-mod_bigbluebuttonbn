@@ -691,7 +691,7 @@ EOF;
      * @return bool
      */
     public function get_mute_on_start(): bool {
-        return $this->get_instance_var('muteonstart');
+        return boolval($this->get_instance_var('muteonstart'));
     }
 
     /**
