@@ -21,6 +21,7 @@ use admin_setting;
 use admin_setting_configcheckbox;
 use admin_setting_configmultiselect;
 use admin_setting_configpasswordunmask;
+use admin_setting_configselect;
 use admin_setting_configstoredfile;
 use admin_setting_configtext;
 use admin_setting_configtextarea;
@@ -87,6 +88,7 @@ class settings {
         // Renders settings for welcome messages.
         $this->add_defaultmessages_settings();
         // Evaluates if recordings are enabled for the Moodle site.
+
         // Renders settings for record feature.
         $this->add_record_settings();
         // Renders settings for import recordings.
@@ -180,6 +182,18 @@ class settings {
                 $settingsgeneral
             );
 
+            $item = new admin_setting_configselect(
+                'bigbluebuttonbn_checksum_algorithm',
+                get_string('config_checksum_algorithm', 'bigbluebuttonbn'),
+                get_string('config_checksum_algorithm_description', 'bigbluebuttonbn'),
+                config::DEFAULT_CHECKSUM_ALGORITHM,
+                array_combine(config::CHECKSUM_ALGORITHMS, config::CHECKSUM_ALGORITHMS)
+            );
+            $this->add_conditional_element(
+                'checksum_algorithm',
+                $item,
+                $settingsgeneral
+            );
         }
         return $settingsgeneral;
     }

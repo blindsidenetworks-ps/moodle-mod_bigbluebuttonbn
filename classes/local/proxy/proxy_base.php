@@ -61,7 +61,8 @@ abstract class proxy_base {
         }, array_keys($metadata)), $metadata);
 
         $params = http_build_query($data + $metadata, '', '&');
-        return $baseurl . $params . '&checksum=' . sha1($action . $params . self::sanitized_secret());
+        $checksum = self::get_checksum($action, $params);
+        return $baseurl . $params . '&checksum=' . $checksum;
     }
 
     /**
@@ -69,7 +70,7 @@ abstract class proxy_base {
      *
      * @return string
      */
-    protected static function sanitized_url() {
+    protected static function sanitized_url(): string {
         $serverurl = trim(config::get('server_url'));
         if (PHPUNIT_TEST) {
             $serverurl = (new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER))->out(false);
@@ -148,5 +149,16 @@ abstract class proxy_base {
         }
         $curl = new curl();
         return $curl->get(self::action_url($action, $data, $metadata));
+    }
+
+    /**
+     * Get checksum
+     *
+     * @param string $action
+     * @param string $params
+     * @return string
+     */
+    public static function get_checksum(string $action, string $params): string {
+        return hash(config::get('checksum_algorithm'), $action . $params . self::sanitized_secret());
     }
 }

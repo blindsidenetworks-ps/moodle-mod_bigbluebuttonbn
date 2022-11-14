@@ -35,6 +35,16 @@ class config {
     /** @var string Default bigbluebutton server shared secret */
     public const DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
 
+    /** @var string the default bigbluebutton checksum algorithm */
+    public const DEFAULT_CHECKSUM_ALGORITHM = 'SHA1';
+
+    /** @var array list of supported bigbluebutton checksum algorithm */
+    const CHECKSUM_ALGORITHMS = [
+        self::DEFAULT_CHECKSUM_ALGORITHM,
+        'SHA256',
+        'SHA512'
+    ];
+
     /**
      * Returns moodle version.
      *
@@ -107,6 +117,7 @@ class config {
             'lockonjoin_default' => true,
             'lockonjoin_editable' => false,
             'welcome_default' => '',
+            'checksum_algorithm' => self::DEFAULT_CHECKSUM_ALGORITHM
         ];
     }
 
