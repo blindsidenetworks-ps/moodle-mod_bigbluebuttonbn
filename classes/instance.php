@@ -760,7 +760,10 @@ EOF;
      * @return bool
      */
     public function is_recorded(): bool {
-        return (bool) $this->get_instance_var('record');
+        if (config::get('recording_editable')) {
+            return (bool) ($this->get_instance_var('record'));
+        }
+        return config::get('recording_default');
     }
 
     /**
@@ -945,8 +948,10 @@ EOF;
         if ($this->is_admin() || $this->is_moderator()) {
             return false;
         }
-
-        return (bool) $this->get_instance_var('wait');
+        if (config::get('waitformoderator_editable')) {
+            return (bool) $this->get_instance_var('wait');
+        }
+        return config::get('waitformoderator_default');
     }
 
     /**
