@@ -1,3 +1,6 @@
+2.4.8 (2019101015)
+Bug: Fix to Enforce checksum algorithm (CONTRIB-9063).
+
 2.4.7 (2019101014)
 Bug: Fix font paths in styles.css (CONTRIB-8957).
 Bug: Fix for muteonstart_editable visibility (CONTRIB-8941).
