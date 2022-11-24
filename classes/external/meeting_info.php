@@ -117,9 +117,10 @@ class meeting_info extends external_api {
                 'statusmessage' => new external_value(PARAM_TEXT, 'Status message', VALUE_OPTIONAL),
                 'startedat' => new external_value(PARAM_INT, 'Started at', VALUE_OPTIONAL),
                 'moderatorcount' => new external_value(PARAM_INT, 'Moderator count', VALUE_OPTIONAL),
+                'viewercount' => new external_value(PARAM_INT, 'Viewer count', VALUE_OPTIONAL),
                 'participantcount' => new external_value(PARAM_INT, 'Participant count', VALUE_OPTIONAL),
                 'moderatorplural' => new external_value(PARAM_BOOL, 'Several moderators ?', VALUE_OPTIONAL),
-                'participantplural' => new external_value(PARAM_BOOL, 'Several participants ?', VALUE_OPTIONAL),
+                'viewerplural' => new external_value(PARAM_BOOL, 'Several viewers ?', VALUE_OPTIONAL),
                 'canjoin' => new external_value(PARAM_BOOL, 'Can join'),
                 'ismoderator' => new external_value(PARAM_BOOL, 'Is moderator'),
                 'presentations' => new \external_multiple_structure(
