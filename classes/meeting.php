@@ -250,11 +250,8 @@ class meeting {
         $meetinginfo->participantcount = $participantcount;
 
         $canjoin = !$instance->user_must_wait_to_join() || $meetinginfo->statusrunning;
-        // Limit has not been reached or user does not count toward limit.
-        $canjoin = $canjoin && (
-            !$instance->has_user_limit_been_reached($participantcount)
-            || !$instance->does_current_user_count_towards_user_limit()
-            );
+        // Limit has not been reached.
+        $canjoin = $canjoin && !$instance->has_user_limit_been_reached($participantcount);
         $canjoin = $canjoin && ($instance->is_currently_open() || $instance->user_can_force_join());
         // User should only join during scheduled session start and end time, if defined.
         $canjoin = $canjoin && (!$instance->before_start_time() && !$instance->has_ended());
@@ -267,8 +264,8 @@ class meeting {
             $meetinginfo->startedat = floor(intval($info['startTime']) / 1000); // Milliseconds.
             $meetinginfo->moderatorcount = $info['moderatorCount'];
             $meetinginfo->moderatorplural = $info['moderatorCount'] > 1;
-            $meetinginfo->participantcount = $participantcount - $meetinginfo->moderatorcount;
-            $meetinginfo->participantplural = $meetinginfo->participantcount > 1;
+            $meetinginfo->viewercount = $participantcount - $meetinginfo->moderatorcount;
+            $meetinginfo->viewerplural = $meetinginfo->viewercount > 1;
         }
         $meetinginfo->statusmessage = $this->get_status_message($meetinginfo, $instance);
 
@@ -296,6 +293,9 @@ class meeting {
      * @return string
      */
     protected function get_status_message(object $meetinginfo, instance $instance): string {
+        if ($instance->has_user_limit_been_reached($meetinginfo->participantcount)) {
+            return get_string('view_message_conference_user_limit_reached', 'bigbluebuttonbn');
+        }
         if ($meetinginfo->statusrunning) {
             return get_string('view_message_conference_in_progress', 'bigbluebuttonbn');
         }
@@ -523,10 +523,7 @@ class meeting {
     public function join(int $origin): string {
         $this->do_get_meeting_info(true);
         if ($this->is_running()) {
-            if (
-                $this->instance->has_user_limit_been_reached($this->get_participant_count())
-                && $this->instance->does_current_user_count_towards_user_limit()
-            ) {
+            if ($this->instance->has_user_limit_been_reached($this->get_participant_count())) {
                 throw new meeting_join_exception('userlimitreached');
             }
         } else if ($this->instance->user_must_wait_to_join()) {

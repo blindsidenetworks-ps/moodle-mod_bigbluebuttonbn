@@ -372,47 +372,7 @@ class instance_test extends advanced_testcase {
     }
 
     /**
-     * Ensure that the does_current_user_count_towards_user_limit function works as expectd.
-     *
-     * @dataProvider does_current_user_count_towards_user_limit_provider
-     * @param bool $isadmin
-     * @param bool $ismoderator
-     * @param bool $expected
-     */
-    public function test_does_current_user_count_towards_user_limit(
-        bool $isadmin,
-        bool $ismoderator,
-        bool $expected
-    ): void {
-        $stub = $this->getMockBuilder(instance::class)
-            ->setMethods([
-                'is_admin',
-                'is_moderator',
-            ])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stub->method('is_admin')->willReturn($isadmin);
-        $stub->method('is_moderator')->willReturn($ismoderator);
-
-        $this->assertEquals($expected, $stub->does_current_user_count_towards_user_limit());
-    }
-
-    /**
-     * Data provider for the does_current_user_count_towards_user_limit function.
-     *
-     * @return array
-     */
-    public function does_current_user_count_towards_user_limit_provider(): array {
-        return [
-            'Admin does not count' => [true, false, false],
-            'Moderator does not count' => [false, true, false],
-            'Other users do count' => [false, false, true],
-        ];
-    }
-
-    /**
-     * Ensure that the does_current_user_count_towards_user_limit function works as expectd.
+     * Ensure that the get_current_user_password function works as expectd.
      *
      * @dataProvider get_current_user_password_provider
      * @param bool $isadmin
