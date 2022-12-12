@@ -655,23 +655,6 @@ EOF;
     }
 
     /**
-     * Check whether the current user counts towards the user limit.
-     *
-     * @return bool
-     */
-    public function does_current_user_count_towards_user_limit(): bool {
-        if ($this->is_admin()) {
-            return false;
-        }
-
-        if ($this->is_moderator()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Get the voice bridge details.
      *
      * @return null|int
