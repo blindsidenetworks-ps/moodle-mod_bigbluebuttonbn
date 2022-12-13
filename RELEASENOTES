@@ -1,3 +1,12 @@
+3.0.3 (2021101011)
+
+Bug: Fix for Userlimit (CONTRIB-9140).
+Bug: Backport of checksum algorithm (CONTRIB-9139).
+Bug: Fix for plugin and activity settings (CONTRIB-9110).
+Bug: Fix js strings (CONTRIB-9103).
+Bug: Fix null return value on muteonstart (CONTRIB-9100).
+Bug: Fix print recent activity block (CONTRIB-9092).
+
 3.0.2 (2021101010)
 
 Bug: Fix precheck errors (CONTRIB-9069).
