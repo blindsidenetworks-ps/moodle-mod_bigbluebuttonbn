@@ -668,6 +668,11 @@ class recording extends persistent {
     }
 
     /**
+     * @var string Default sort for recordings when fetching from the database.
+     */
+    const DEFAULT_RECORDING_SORT = 'timecreated ASC';
+
+    /**
      * Fetch all records which match the specified parameters, including all metadata that relates to them.
      *
      * @param array $selects
@@ -757,27 +762,34 @@ class recording extends persistent {
     /**
      * Synchronise pending recordings from the server.
      *
+     * @param bool $dismissedonly
      * This function should be called by the check_pending_recordings scheduled task.
      */
-    public static function sync_pending_recordings_from_server(): void {
+    public static function sync_pending_recordings_from_server($dismissedonly = false): void {
         global $DB, $CFG;
-
-        // Sort by bigbluebuttonbn_recordings_sortorder we get the same result on different db engines.
-        $recordingsort = $CFG->bigbluebuttonbn_recordings_sortorder ? 'timecreated ASC' : 'timecreated DESC';
+        $params = [
+            'withindays' => time() - (self::RECORDING_TIME_LIMIT_DAYS * DAYSECS),
+        ];
         // Fetch the local data.
-        mtrace("=> Looking for any recording awaiting processing from the past " . self::RECORDING_TIME_LIMIT_DAYS . " days.");
-        $select = 'status = :status_awaiting AND timecreated > :withindays OR status = :status_reset';
-        $recordings = $DB->get_records_select(static::TABLE, $select, [
-                'status_awaiting' => self::RECORDING_STATUS_AWAITING,
-                'withindays' => time() - (self::RECORDING_TIME_LIMIT_DAYS * DAYSECS),
-                'status_reset' => self::RECORDING_STATUS_RESET,
-            ], $recordingsort);
+        if ($dismissedonly) {
+            mtrace("=> Looking for any recording dismissed processing from the past " . self::RECORDING_TIME_LIMIT_DAYS . " days.");
+            $select = 'status = :status_dismissed AND timecreated > :withindays';
+            $params['status_dismissed'] = self::RECORDING_STATUS_DISMISSED;
+        } else {
+            mtrace("=> Looking for any recording awaiting processing from the past " . self::RECORDING_TIME_LIMIT_DAYS . " days.");
+            $select = 'status = :status_awaiting AND timecreated > :withindays OR status = :status_reset';
+            $params['status_reset'] = self::RECORDING_STATUS_RESET;
+            $params['status_awaiting'] = self::RECORDING_STATUS_AWAITING;
+        }
+
+        $recordings = $DB->get_records_select(static::TABLE, $select, $params, self::DEFAULT_RECORDING_SORT);
+        // Sort by DEFAULT_RECORDING_SORT we get the same result on different db engines.
 
         $recordingcount = count($recordings);
         mtrace("=> Found {$recordingcount} recordings to query");
 
         // Grab the recording IDs.
-        $recordingids = array_map(function ($recording) {
+        $recordingids = array_map(function($recording) {
             return $recording->recordingid;
         }, $recordings);
 
