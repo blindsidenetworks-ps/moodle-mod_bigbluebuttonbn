@@ -1,3 +1,6 @@
+3.0.4 (2021101012)
+Bug: Fix for dismissed recordings (CONTRIB-9161).
+
 3.0.3 (2021101011)
 
 Bug: Fix for Userlimit (CONTRIB-9140).
