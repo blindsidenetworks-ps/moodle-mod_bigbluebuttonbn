@@ -26,7 +26,7 @@ use mod_bigbluebuttonbn\output\instance_updated_message;
  * @copyright 2021 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class send_instance_update_notification extends send_notification {
+class send_instance_update_notification extends base_send_notification {
 
     /** @var int The activity was created */
     const TYPE_CREATED = 0;
