@@ -163,8 +163,8 @@ class index implements renderable {
         $attendees = [];
 
         foreach ($meeting->get_attendees() as $attendee) {
-            if ((string) $attendee->role == $role) {
-                $attendees[] = $attendee->fullName;
+            if (strcmp((string) $attendee['role'], $role) === 0) {
+                $attendees[] = $attendee['fullName'];
             }
         }
 
