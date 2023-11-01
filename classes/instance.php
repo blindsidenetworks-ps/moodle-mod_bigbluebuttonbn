@@ -755,8 +755,9 @@ EOF;
      * @return bool
      */
     public function can_import_recordings(): bool {
-        if ($this->can_manage_recordings()) {
-            return true;
+        // Users who can't manage recordings should not be able to import them.
+        if (!$this->can_manage_recordings()) {
+            return false;
         }
 
         return $this->is_feature_enabled('importrecordings');
