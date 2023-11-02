@@ -1,4 +1,9 @@
-3.0.4 (2022101011)
+3.0.5 (2021101013)
+Bug: Fix import recording link (CONTRIB-9415).
+Bug: Fix BBB index page (CONTRIB-9081).
+Bug: Fix send_notifications (CONTRIB-9347).
+
+3.0.4 (2021101012)
 Bug: Fix for dismissed recordings (CONTRIB-9161).
 
 3.0.3 (2021101011)
