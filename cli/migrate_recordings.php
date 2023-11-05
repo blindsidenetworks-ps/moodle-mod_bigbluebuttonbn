@@ -39,13 +39,13 @@ list($options, $unrecognized) = cli_get_params(
         'help' => false,
         'courseid' => 0,
         'bigbluebuttonid' => 0,
-        'forcemigrate' => false
+        'forcemigrate' => false,
     ],
     [
         'h' => 'help',
         'c' => 'courseid',
         'b' => 'bigbluebuttoncmid',
-        'f' => 'forcemigrate'
+        'f' => 'forcemigrate',
     ]
 );
 
@@ -106,20 +106,20 @@ foreach ($bbcms as $bbcm) {
             [
                 'courseid' => $instance->get_course_id(),
                 'bigbluebuttonbnid' => $instance->get_instance_id(),
-                'log' => logger::EVENT_IMPORT_MIGRATED
+                'log' => logger::EVENT_IMPORT_MIGRATED,
             ]);
         $DB->set_field('bigbluebuttonbn_logs', 'log', logger::EVENT_CREATE,
             [
                 'courseid' => $instance->get_course_id(),
                 'bigbluebuttonbnid' => $instance->get_instance_id(),
-                'log' => logger::EVENT_CREATE_MIGRATED
+                'log' => logger::EVENT_CREATE_MIGRATED,
             ]);
     }
     $meetingids = $DB->get_fieldset_sql(
         'SELECT DISTINCT meetingid FROM {bigbluebuttonbn_logs} WHERE log = :createlog OR log = :importlog',
         [
             'importlog' => logger::EVENT_IMPORT,
-            'createlog' => logger::EVENT_CREATE
+            'createlog' => logger::EVENT_CREATE,
         ]
     );
     if (empty($meetingids)) {
@@ -130,14 +130,14 @@ foreach ($bbcms as $bbcm) {
         $adhoctask->set_custom_data((object)
         [
             'meetingid' => $mid,
-            'isimported' => false
+            'isimported' => false,
         ]);
         $adhoctask->execute();
         cli_writeln("...imported recordings....");
         $adhoctask->set_custom_data((object)
         [
             'meetingid' => $mid,
-            'isimported' => true
+            'isimported' => true,
         ]);
         $adhoctask->execute();
     }

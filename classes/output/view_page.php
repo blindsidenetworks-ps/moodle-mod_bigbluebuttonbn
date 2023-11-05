@@ -84,7 +84,7 @@ class view_page implements renderable, templatable {
                 $templatedata->sitenotification->actions = [[
                     'url' => $url,
                     'title' => config::get('general_warning_button_text'),
-                ]];
+                ], ];
             }
         }
 

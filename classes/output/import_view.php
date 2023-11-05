@@ -76,13 +76,13 @@ class import_view implements renderable, templatable {
         $context = (object) [
             'bbbid' => $this->destinationinstance->get_instance_id(),
             'has_recordings' => true,
-            'bbbsourceid' => 0
+            'bbbsourceid' => 0,
         ];
 
         if (!empty($this->sourceinstanceid)) {
             $context->sourceid = $this->sourceinstanceid;
             $context->search = [
-                'value' => ''
+                'value' => '',
             ];
             $sourceinstance = instance::get_from_instanceid($this->sourceinstanceid);
             if ($sourceinstance->is_type_room_only()) {

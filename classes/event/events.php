@@ -46,6 +46,6 @@ class events {
         'recording_unpublish' => 'recording_unpublished',
         'recording_edit' => 'recording_edited',
         'recording_play' => 'recording_viewed',
-        'live_session' => 'live_session'
+        'live_session' => 'live_session',
     ];
 }

@@ -708,7 +708,7 @@ class settings {
             // UI for 'participants' feature.
             $roles = roles::get_roles(null, false);
             $owner = [
-                '0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn')
+                '0' => get_string('mod_form_field_participant_list_type_owner', 'bigbluebuttonbn'),
             ];
             $item = new admin_setting_configmultiselect(
                 'bigbluebuttonbn_participant_moderator_default',

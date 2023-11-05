@@ -34,10 +34,10 @@ class broker {
     protected $requiredparams = [
         'recording_ready' => [
             'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
-            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].'
+            'signed_parameters' => 'A JWT encoded string must be included as [signed_parameters].',
         ],
         'meeting_events' => [
-            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.'
+            'bigbluebuttonbn' => 'The BigBlueButtonBN instance ID must be specified.',
         ],
     ];
 
@@ -89,7 +89,7 @@ class broker {
             $decodedparameters = JWT::decode(
                 $params['signed_parameters'],
                 config::get('shared_secret'),
-                array('HS256')
+                ['HS256'],
             );
         } catch (Exception $e) {
             $error = 'Caught exception: ' . $e->getMessage();
@@ -153,7 +153,7 @@ class broker {
             $token = JWT::decode(
                 $authorization[1],
                 config::get('shared_secret'),
-                array('HS512')
+                ['HS512'],
             );
 
             // Get JSON string from the body.

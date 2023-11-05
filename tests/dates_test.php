@@ -52,35 +52,35 @@ class dates_test extends advanced_testcase {
 
         return [
             'without any dates' => [
-                null, null, []
+                null, null, [],
             ],
             'only with opening time' => [
                 $after, null, [
                     ['label' => get_string('activitydate:opens', 'course'), 'timestamp' => $after],
-                ]
+                ],
             ],
             'only with closing time' => [
                 null, $after, [
                     ['label' => get_string('activitydate:closes', 'course'), 'timestamp' => $after],
-                ]
+                ],
             ],
             'with both times' => [
                 $after, $later, [
                     ['label' => get_string('activitydate:opens', 'course'), 'timestamp' => $after],
                     ['label' => get_string('activitydate:closes', 'course'), 'timestamp' => $later],
-                ]
+                ],
             ],
             'between the dates' => [
                 $before, $after, [
                     ['label' => get_string('activitydate:opened', 'course'), 'timestamp' => $before],
                     ['label' => get_string('activitydate:closes', 'course'), 'timestamp' => $after],
-                ]
+                ],
             ],
             'dates are past' => [
                 $earlier, $before, [
                     ['label' => get_string('activitydate:opened', 'course'), 'timestamp' => $earlier],
                     ['label' => get_string('activitydate:closed', 'course'), 'timestamp' => $before],
-                ]
+                ],
             ],
         ];
     }

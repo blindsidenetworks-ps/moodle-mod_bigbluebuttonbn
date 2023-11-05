@@ -177,7 +177,7 @@ class upgrade_recordings_task extends adhoc_task {
             [
                 'logmatch' => logger::EVENT_CREATE,
                 'match' => '%true%',
-                'meetingid' => $meetingid
+                'meetingid' => $meetingid,
             ],
         ];
     }

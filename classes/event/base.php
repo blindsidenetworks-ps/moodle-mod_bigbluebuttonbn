@@ -71,7 +71,7 @@ abstract class base extends \core\event\base {
             'courseid' => $this->courseid,
             'objectid' => $this->objectid,
             'contextinstanceid' => $this->contextinstanceid,
-            'other' => $this->other
+            'other' => $this->other,
         ];
         $string = $this->description;
         foreach ($vars as $key => $value) {

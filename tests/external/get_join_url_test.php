@@ -120,7 +120,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
         // Make sure the meeting is running (this is not the default with the mock server).
         $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
+            'groupid' => $instance->get_group_id(),
         ]);
 
         $this->setUser($user);
@@ -151,7 +151,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
         // Make sure the meeting is running (this is not the default with the mock server).
         $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
+            'groupid' => $instance->get_group_id(),
         ]);
 
         $this->setUser($user);
@@ -188,7 +188,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
         // Make sure the meeting is running (this is not the default with the mock server).
         $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
+            'groupid' => $instance->get_group_id(),
         ]);
 
         $this->setUser($user);
@@ -223,7 +223,7 @@ class get_join_url_test extends \externallib_advanced_testcase {
         $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
             'groupid' => $instance->get_group_id(),
-            'participants' => 2
+            'participants' => 2,
         ]);
         $this->setUser($user);
         $joinurl = $this->get_join_url($instance->get_cm_id());

@@ -92,7 +92,7 @@ class curl extends \curl {
                 'Content-Type: ' . $this->get_content_type(),
                 'Content-Length: ' . strlen($params),
                 'Content-Language: en-US',
-            ]
+            ],
         ]);
 
         return $this->handle_response(parent::post($url, $params, $options));

@@ -60,7 +60,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
             "timecreated" => $now,
             "timemodified" => $now,
             "presentation" => null,
-            "recordings_preview" => 0
+            "recordings_preview" => 0,
         ];
 
         $record = (array) $record;
@@ -242,7 +242,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 'bn-presenter-name' => $data['presentername'] ?? 'Fake presenter',
                 'bn-recording-ready-url' => new moodle_url('/mod/bigbluebuttonbn/bbb_broker.php', [
                     'action' => 'recording_ready',
-                    'bigbluebuttonbn' => $instance->get_instance_id()
+                    'bigbluebuttonbn' => $instance->get_instance_id(),
                 ]),
                 'bbb-recording-description' => $data['description'] ?? '',
                 'bbb-recording-name' => $data['name'] ?? '',
@@ -423,7 +423,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
                 'attendeeID' => $user->id,
                 'attendeeName' => fullname($user),
                 'eventType' => $eventtype,
-                'eventData' => $eventdata
+                'eventData' => $eventdata,
             ]
         );
     }
@@ -438,7 +438,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
         if (defined('TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER')) {
             return $this->send_mock_request('backoffice/sendAllEvents', [
                 'meetingID' => $instance->get_meeting_id(),
-                'sendQuery' => defined('BEHAT_SITE_RUNNING')
+                'sendQuery' => defined('BEHAT_SITE_RUNNING'),
             ]);
         }
         return null;

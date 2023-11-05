@@ -99,14 +99,14 @@ class meeting_test extends \advanced_testcase {
                 'type' => instance::TYPE_RECORDING_ONLY,
                 'groupname' => null,
                 'groupmode' => NOGROUPS,
-                'canjoin' => ['useringroup' => false, 'usernotingroup' => false]
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
             ],
             'Instance Type Recording Only - Group 1' => [
                 'type' => instance::TYPE_RECORDING_ONLY,
                 'groupname' => 'G1',
                 'groupmode' => VISIBLEGROUPS,
-                'canjoin' => ['useringroup' => false, 'usernotingroup' => false]
-            ]
+                'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
+            ],
         ];
     }
 
@@ -408,14 +408,14 @@ class meeting_test extends \advanced_testcase {
                 'groupname' => null,
                 'groupmode' => NOGROUPS,
                 'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
-                'dates' => ['openingtime' => -7200, 'closingtime' => -3600]
+                'dates' => ['openingtime' => -7200, 'closingtime' => -3600],
             ],
             'Instance Type ALL - No Group - Open in future' => [
                 'type' => instance::TYPE_ALL,
                 'groupname' => null,
                 'groupmode' => NOGROUPS,
                 'canjoin' => ['useringroup' => false, 'usernotingroup' => false],
-                'dates' => ['openingtime' => 3600, 'closingtime' => 7200]
+                'dates' => ['openingtime' => 3600, 'closingtime' => 7200],
             ],
         ];
     }
@@ -443,7 +443,7 @@ class meeting_test extends \advanced_testcase {
         }
         $meetinginfo = [
             'course' => $this->get_course()->id,
-            'type' => $type
+            'type' => $type,
         ];
         if ($dates) {
             $meetinginfo = array_merge($meetinginfo, $dates);
@@ -457,7 +457,7 @@ class meeting_test extends \advanced_testcase {
             // Create the meetings on the mock server, so we can join it as a simple user.
             $bbbgenerator->create_meeting([
                 'instanceid' => $instance->get_instance_id(),
-                'groupid' => $instance->get_group_id()
+                'groupid' => $instance->get_group_id(),
             ]);
         }
         $meeting = new meeting($instance);

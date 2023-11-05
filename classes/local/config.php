@@ -42,7 +42,7 @@ class config {
     const CHECKSUM_ALGORITHMS = [
         self::DEFAULT_CHECKSUM_ALGORITHM,
         'SHA256',
-        'SHA512'
+        'SHA512',
     ];
 
     /**
@@ -117,7 +117,7 @@ class config {
             'lockonjoin_default' => true,
             'lockonjoin_editable' => false,
             'welcome_default' => '',
-            'checksum_algorithm' => self::DEFAULT_CHECKSUM_ALGORITHM
+            'checksum_algorithm' => self::DEFAULT_CHECKSUM_ALGORITHM,
         ];
     }
 

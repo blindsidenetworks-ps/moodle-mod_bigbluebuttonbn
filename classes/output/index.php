@@ -42,8 +42,8 @@ class index implements renderable {
     /**
      * Constructor for the index renderable.
      *
-     * @param stdClass $course
-     * @param instance[] List of bbbbn instances
+     * @param stdClass $course The course object
+     * @param instance[] $instances List of bbbbn instances
      */
     public function __construct(stdClass $course, array $instances) {
         $this->course = $course;

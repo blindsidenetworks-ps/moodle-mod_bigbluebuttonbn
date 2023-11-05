@@ -51,18 +51,18 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
             'recordings_html', 'recordings_imported', 'recordings_preview',
             'clienttype', 'muteonstart', 'completionattendance',
             'completionengagementchats', 'completionengagementtalks', 'completionengagementraisehand',
-            'completionengagementpollvotes', 'completionengagementemojis']);
+            'completionengagementpollvotes', 'completionengagementemojis', ]);
 
         $logs = new backup_nested_element('logs');
 
         $log = new backup_nested_element('log', ['id'], [
-            'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta']);
+            'courseid', 'bigbluebuttonbnid', 'userid', 'timecreated', 'meetingid', 'log', 'meta', ]);
 
         $recordings = new backup_nested_element('recordings');
 
         $recording = new backup_nested_element('recording', ['id'], [
             'courseid', 'bigbluebuttonbnid', 'groupid', 'recordingid', 'headlesss', 'imported', 'status', 'importeddata',
-            'timecreated']);
+            'timecreated', ]);
 
         // Build the tree.
         $bigbluebuttonbn->add_child($logs);

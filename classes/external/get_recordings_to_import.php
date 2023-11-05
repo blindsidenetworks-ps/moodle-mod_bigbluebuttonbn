@@ -105,7 +105,7 @@ class get_recordings_to_import extends external_api {
             'sourcebigbluebuttonbnid' => $sourcebigbluebuttonbnid,
             'sourcecourseid' => $sourcecourseid,
             'tools' => $tools,
-            'groupid' => $groupid
+            'groupid' => $groupid,
         ]);
 
         $tools = explode(',', $tools ?? 'protect,unprotect,publish,unpublish,delete');
@@ -200,7 +200,7 @@ class get_recordings_to_import extends external_api {
                 ])),
                 'data' => new external_value(PARAM_RAW), // For now it will be json encoded.
             ], '', VALUE_OPTIONAL),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 }

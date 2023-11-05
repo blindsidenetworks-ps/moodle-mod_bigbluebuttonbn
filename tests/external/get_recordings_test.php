@@ -137,7 +137,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
             'users' => [['username' => 't1', 'role' => 'editingteacher'], ['username' => 's1', 'role' => 'student']],
             'recordingsdata' => [
                 [['name' => 'Recording1']],
-                [['name' => 'Recording2']]
+                [['name' => 'Recording2']],
             ],
         ];
         $activityid = $this->create_from_dataset($dataset);
@@ -186,13 +186,13 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $dataset = [
             'type' => instance::TYPE_ALL,
             'additionalsettings' => [
-                'recordings_preview' => 1
+                'recordings_preview' => 1,
             ],
             'groups' => null,
             'users' => [['username' => 't1', 'role' => 'editingteacher'], ['username' => 's1', 'role' => 'student']],
             'recordingsdata' => [
                 [['name' => 'Recording1']],
-                [['name' => 'Recording2']]
+                [['name' => 'Recording2']],
             ],
         ];
         $activityid = $this->create_from_dataset($dataset);
@@ -221,7 +221,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
             'users' => [['username' => 't1', 'role' => 'editingteacher'], ['username' => 's1', 'role' => 'student']],
             'recordingsdata' => [
                 [['name' => 'Recording1']],
-                [['name' => 'Recording2']]
+                [['name' => 'Recording2']],
             ],
         ];
         $activityid = $this->create_from_dataset($dataset);
@@ -233,7 +233,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $newactivity = $plugingenerator->create_instance([
             'course' => $instance->get_course_id(),
             'type' => instance::TYPE_RECORDING_ONLY,
-            'name' => 'Example 2'
+            'name' => 'Example 2',
         ]);
         $plugingenerator->create_meeting([
             'instanceid' => $newactivity->id,
@@ -264,7 +264,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
             'users' => [['username' => 't1', 'role' => 'editingteacher'], ['username' => 's1', 'role' => 'student']],
             'recordingsdata' => [
                 [['name' => 'Recording1']],
-                [['name' => 'Recording2']]
+                [['name' => 'Recording2']],
             ],
         ];
 
@@ -276,7 +276,7 @@ class get_recordings_test extends \externallib_advanced_testcase {
         $newactivity = $plugingenerator->create_instance([
             'course' => $instance->get_course_id(),
             'type' => instance::TYPE_ALL,
-            'name' => 'Example 2'
+            'name' => 'Example 2',
         ]);
         $plugingenerator->create_meeting([
             'instanceid' => $newactivity->id,
@@ -377,21 +377,21 @@ class get_recordings_test extends \externallib_advanced_testcase {
                     ['username' => 't1', 'role' => 'editingteacher'],
                     ['username' => 's1', 'role' => 'student'],
                     ['username' => 's2', 'role' => 'student'],
-                    ['username' => 's3', 'role' => 'student']
+                    ['username' => 's3', 'role' => 'student'],
                 ],
                 'recordingsdata' => [
                     'G1' => [['name' => 'Recording1']],
                     'G2' => [['name' => 'Recording2']],
-                    '' => [['name' => 'Recording3']]
+                    '' => [['name' => 'Recording3']],
                 ],
                 'test' => [
                     't1' => ['Recording1', 'Recording2', 'Recording3'], // A moderator should see all recordings.
                     's1' => ['Recording1'], // S1 can only see the recordings from his group.
                     's2' => ['Recording2'], // S2 can only see the recordings from his group.
-                    's3' => ['Recording3', 'Recording2', 'Recording1']
+                    's3' => ['Recording3', 'Recording2', 'Recording1'],
                     // S3 should see recordings which have no groups and his groups's recording.
                 ],
-                'coursemode' => VISIBLEGROUPS
+                'coursemode' => VISIBLEGROUPS,
             ],
             'separategroups' => [
                 'type' => instance::TYPE_ALL,
@@ -399,21 +399,21 @@ class get_recordings_test extends \externallib_advanced_testcase {
                 'users' => [
                     ['username' => 't1', 'role' => 'editingteacher'],
                     ['username' => 's1', 'role' => 'student'],
-                    ['username' => 's2', 'role' => 'student']
+                    ['username' => 's2', 'role' => 'student'],
                 ],
                 'recordingsdata' => [
                     'G1' => [['name' => 'Recording1']],
                     'G2' => [['name' => 'Recording2']],
-                    '' => [['name' => 'Recording3']]
+                    '' => [['name' => 'Recording3']],
                 ],
                 'test' => [
                     't1' => ['Recording1', 'Recording2', 'Recording3'], // A moderator should see all recordings.
                     's1' => ['Recording1'], // S1 can only see the recordings from his group.
                     's2' => ['Recording2'], // S2 can only see the recordings from his group.
-                    's3' => ['Recording3'] // S3 should see recordings which have no groups.
+                    's3' => ['Recording3'], // S3 should see recordings which have no groups.
                 ],
-                'coursemode' => SEPARATEGROUPS
-            ]
+                'coursemode' => SEPARATEGROUPS,
+            ],
         ];
     }
 }

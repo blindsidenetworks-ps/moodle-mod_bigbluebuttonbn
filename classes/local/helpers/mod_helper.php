@@ -174,7 +174,7 @@ class mod_helper {
         $eventid = $DB->get_field('event', 'id', [
             'modulename' => 'bigbluebuttonbn',
             'instance' => $bigbluebuttonbn->id,
-            'eventtype' => logger::EVENT_MEETING_START
+            'eventtype' => logger::EVENT_MEETING_START,
         ]);
 
         // Delete the event from calendar when/if openingtime is NOT set.

@@ -140,13 +140,13 @@ class recording_test extends \advanced_testcase {
     public function get_allrecordings_types_provider(): array {
         return [
             'Instance Type ALL' => [
-                'type' => instance::TYPE_ALL
+                'type' => instance::TYPE_ALL,
             ],
             'Instance Type ROOM Only' => [
                 'type' => instance::TYPE_ROOM_ONLY,
             ],
             'Instance Type Recording only' => [
-                'type' => instance::TYPE_RECORDING_ONLY
+                'type' => instance::TYPE_RECORDING_ONLY,
             ],
         ];
     }
@@ -179,7 +179,7 @@ class recording_test extends \advanced_testcase {
         $activity = $plugingenerator->create_instance([
             'course' => $testcourse->id,
             'type' => $type,
-            'name' => 'Example'
+            'name' => 'Example',
         ]);
         $instance = instance::get_from_instanceid($activity->id);
         $instance->set_group_id(0);
@@ -228,14 +228,14 @@ class recording_test extends \advanced_testcase {
         $activity = $plugingenerator->create_instance([
             'course' => $testcourse->id,
             'type' => $type,
-            'name' => 'Example'
+            'name' => 'Example',
         ]);
         $instance = instance::get_from_instanceid($activity->id);
         $this->create_recordings_for_instance($instance, [['name' => "Deleted Recording 1"]]);
         $activity2 = $plugingenerator->create_instance([
             'course' => $testcourse->id,
             'type' => $type,
-            'name' => 'Example'
+            'name' => 'Example',
         ]);
         $instance2 = instance::get_from_instanceid($activity2->id);
         $this->create_recordings_for_instance($instance2, [['name' => "Recording 1"]]);
@@ -282,13 +282,13 @@ class recording_test extends \advanced_testcase {
             'instanceid' => $instance->get_instance_id(),
             'groupid' => $instance->get_group_id(),
             'isBreakout' => true,
-            'sequence' => 1
+            'sequence' => 1,
         ]);
         $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
             'groupid' => $instance->get_group_id(),
             'isBreakout' => true,
-            'sequence' => 2
+            'sequence' => 2,
         ]);
         // For now only recording from the main room have been created.
         $this->create_recordings_for_instance($instance, [
@@ -300,7 +300,7 @@ class recording_test extends \advanced_testcase {
         // Now the breakoutroom recordings appears.
         $this->create_recordings_for_instance($instance, [
             ['name' => 'Recording 2', 'isBreakout' => true, 'sequence' => 1],
-            ['name' => 'Recording 3', 'isBreakout' => true, 'sequence' => 2]
+            ['name' => 'Recording 3', 'isBreakout' => true, 'sequence' => 2],
         ]);
         $recordings = recording::get_recordings_for_instance($instance);
         $this->assertCount(3, $recordings);

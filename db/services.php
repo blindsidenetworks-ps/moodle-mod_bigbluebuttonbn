@@ -104,7 +104,7 @@ $functions = [
         'description'   => 'Trigger the course module viewed event and update the module completion status.',
         'type'          => 'write',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE]
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_bigbluebuttonbn_get_join_url' => [
         'classname'     => 'mod_bigbluebuttonbn\external\get_join_url',

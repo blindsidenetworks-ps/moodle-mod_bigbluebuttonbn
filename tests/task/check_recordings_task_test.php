@@ -104,18 +104,18 @@ class check_recordings_task_test extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $activity = $generator->create_instance([
             'course' => $course->id,
-            'type' => instance::TYPE_ALL
+            'type' => instance::TYPE_ALL,
         ]);
         $instance = instance::get_from_instanceid($activity->id);
         $generator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
-            'groupid' => $instance->get_group_id()
+            'groupid' => $instance->get_group_id(),
         ]);
         foreach (self::RECORDINGS_DATA as $rindex => $data) {
             $recordings[] = $generator->create_recording(
                 array_merge([
                     'bigbluebuttonbnid' => $instance->get_instance_id(),
-                    'groupid' => $instance->get_group_id()
+                    'groupid' => $instance->get_group_id(),
                 ], $data)
             );
         }

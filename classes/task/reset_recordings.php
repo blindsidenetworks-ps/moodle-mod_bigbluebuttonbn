@@ -86,7 +86,7 @@ class reset_recordings extends adhoc_task {
              WHERE status = :status_processed OR status = :status_notified
              ORDER BY timecreated DESC', [
                 'status_processed' => recording::RECORDING_STATUS_PROCESSED,
-                'status_notified' => recording::RECORDING_STATUS_NOTIFIED
+                'status_notified' => recording::RECORDING_STATUS_NOTIFIED,
             ],
             0,
             self::$chunksize

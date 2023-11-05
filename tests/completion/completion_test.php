@@ -90,7 +90,7 @@ class completion_test extends \advanced_testcase {
 
         $bbactivitycm->override_customdata('customcompletionrules', [
             'completionengagementchats' => '1',
-            'completionattendance' => '1'
+            'completionattendance' => '1',
         ]);
 
         $user = $this->getDataGenerator()->create_user();
@@ -113,7 +113,7 @@ class completion_test extends \advanced_testcase {
                 'completion' => '2',
                 'completionengagementtalks' => 2,
                 'completionengagementchats' => 2,
-                'completionattendance' => 15
+                'completionattendance' => 15,
             ]
         );
         $instance = instance::get_from_instanceid($bbactivity->id);
@@ -161,7 +161,7 @@ class completion_test extends \advanced_testcase {
         list($bbactivitycontext, $cm1, $bbactivity) = $this->create_instance($this->get_course(),
             ['completion' => '2']);
         $cm1->override_customdata('customcompletionrules', [
-            'completionattendance' => '1'
+            'completionattendance' => '1',
         ]);
         list($bbactivitycontext, $cm2, $bbactivity) = $this->create_instance($this->get_course(),
             ['completion' => '2']);
@@ -178,7 +178,7 @@ class completion_test extends \advanced_testcase {
                 'completionattendance' => get_string('completionattendance_desc', 'mod_bigbluebuttonbn', 1),
                 'completionengagementraisehand' => get_string('completionengagementraisehand_desc', 'mod_bigbluebuttonbn', 1),
                 'completionengagementpollvotes' => get_string('completionengagementpollvotes_desc', 'mod_bigbluebuttonbn', 1),
-                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn', 1)
+                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn', 1),
             ],
             $completioncm1->get_custom_rule_descriptions());
         $completioncm2 = new custom_completion($cm2, $user->id);
@@ -189,7 +189,7 @@ class completion_test extends \advanced_testcase {
                 'completionattendance' => get_string('completionattendance_desc', 'mod_bigbluebuttonbn', 0),
                 'completionengagementraisehand' => get_string('completionengagementraisehand_desc', 'mod_bigbluebuttonbn', 1),
                 'completionengagementpollvotes' => get_string('completionengagementpollvotes_desc', 'mod_bigbluebuttonbn', 1),
-                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn', 1)
+                'completionengagementemojis' => get_string('completionengagementemojis_desc', 'mod_bigbluebuttonbn', 1),
             ], $completioncm2->get_custom_rule_descriptions());
     }
 

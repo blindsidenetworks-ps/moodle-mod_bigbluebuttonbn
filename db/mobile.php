@@ -35,14 +35,14 @@ $addons = [
                     'class' => '',
                 ],
                 'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the add-on).
-                'method' => 'mobile_course_view' // Main function in \mod_bigbluebuttonbn\output\mobile.
-            ]
+                'method' => 'mobile_course_view', // Main function in \mod_bigbluebuttonbn\output\mobile.
+            ],
         ],
         'lang' => [
             ['pluginname', 'bigbluebuttonbn'],
             ['view_conference_action_join', 'bigbluebuttonbn'],
             ['view_message_conference_room_ready', 'bigbluebuttonbn'],
-            ['view_mobile_message_reload_page_creation_time_meeting', 'bigbluebuttonbn']
-        ]
-    ]
+            ['view_mobile_message_reload_page_creation_time_meeting', 'bigbluebuttonbn'],
+        ],
+    ],
 ];

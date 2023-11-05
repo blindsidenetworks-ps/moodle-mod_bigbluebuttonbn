@@ -76,7 +76,7 @@ class behat_mod_bigbluebuttonbn extends behat_base {
             new behat_component_named_selector('Meeting field', [
                 <<<XPATH
     .//*[@data-identifier=%locator%]
-XPATH
+XPATH,
             ], false),
         ];
     }
