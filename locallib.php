@@ -2684,6 +2684,9 @@ function bigbluebuttonbn_settings_general(&$renderer) {
     // Configuration for BigBlueButton.
     if ((boolean) \mod_bigbluebuttonbn\settings\validator::section_general_shown()) {
         $renderer->render_group_header('general');
+        if ((boolean) \mod_bigbluebuttonbn\locallib\config::server_credentials_invalid()) {
+            $renderer->render_warning_message('credentials_warning', get_string('credentials_warning', 'bigbluebuttonbn'), 'danger');
+        }
         $renderer->render_group_element(
             'server_url',
             $renderer->render_group_element_text('server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL)

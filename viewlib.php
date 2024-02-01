@@ -325,20 +325,25 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
 }
 
 /**
- * Renders a default server warning message when using test-install.
+ * Renders a default server warning message when using test-install or test-moodle.
  *
  * @param array $bbbsession
  *
  * @return string
  */
 function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
-    if (!is_siteadmin($bbbsession['userID'])) {
+    if (!\mod_bigbluebuttonbn\locallib\config::server_credentials_invalid()) {
         return '';
     }
-    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
+    if (!bigbluebuttonbn_view_warning_shown($bbbsession)) {
         return '';
     }
-    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
+    // Admin should see warning with link to registration portal.
+    if (is_siteadmin($bbbsession['userID'])) {
+        return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'danger');
+    }
+
+    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server_no_capability', 'bigbluebuttonbn'), 'danger');
 }
 
 /**
