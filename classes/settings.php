@@ -138,6 +138,7 @@ class settings {
      * @throws \coding_exception
      */
     protected function add_general_settings(): admin_settingpage {
+        global $OUTPUT;
         $settingsgeneral = new admin_settingpage(
             $this->section,
             get_string('config_general', 'bigbluebuttonbn'),
@@ -151,6 +152,16 @@ class settings {
                 get_string('config_general_description', 'bigbluebuttonbn'));
 
             $settingsgeneral->add($item);
+
+            if (config::server_credentials_invalid()) {
+                // A notification should appear when there are no credentials or old ones are used.
+                $settingsgeneral->add(new admin_setting_heading(
+                    'bigbluebuttonbn_notification',
+                    '',
+                    $OUTPUT->notification(get_string('credentials_warning', 'mod_bigbluebuttonbn'), 'error')
+                ));
+            }
+
             $item = new admin_setting_configtext(
                 'bigbluebuttonbn_server_url',
                 get_string('config_server_url', 'bigbluebuttonbn'),

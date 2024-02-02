@@ -26,6 +26,7 @@
  */
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\config;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\logger;
 use mod_bigbluebuttonbn\output\view_page;
@@ -79,6 +80,15 @@ $PAGE->set_heading($course->fullname);
 $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
 
 echo $OUTPUT->header();
+
+// Credentials have not been setup, then we output a message to teachers and admin.
+if (config::server_credentials_invalid()) {
+    if (has_capability('moodle/site:config', context_system::instance())) {
+        echo $OUTPUT->notification(get_string('settings_credential_warning', 'bigbluebuttonbn'), 'notifywarning');
+    } else if (has_capability('moodle/course:manageactivities', context_course::instance($course->id))) {
+        echo $OUTPUT->notification(get_string('settings_credential_warning_no_capability', 'bigbluebuttonbn'), 'notifywarning');
+    }
+}
 
 // Validate if the user is in a role allowed to join.
 if (!$instance->can_join() && $instance->get_type() != instance::TYPE_RECORDING_ONLY) {

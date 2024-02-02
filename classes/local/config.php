@@ -171,6 +171,16 @@ class config {
     }
 
     /**
+     * Check if bbb server credentials are invalid.
+     *
+     * @return bool
+     */
+    public static function server_credentials_invalid(): bool {
+        return (empty(self::get('server_url')) || self::get('server_url') == self::DEFAULT_SERVER_URL ||
+                self::get('server_url') == 'https://test-moodle.blindsidenetworks.com/bigbluebutton/');
+    }
+
+    /**
      * Wraps current settings in an array.
      *
      * @return array

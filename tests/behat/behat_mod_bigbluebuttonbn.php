@@ -27,6 +27,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use mod_bigbluebuttonbn\local\config;
 use Moodle\BehatExtension\Exception\SkippedException;
 
 /**
@@ -90,6 +91,18 @@ XPATH
      */
     public static function get_mocked_server_url(string $endpoint = '', array $params = []): moodle_url {
         return new moodle_url(TEST_MOD_BIGBLUEBUTTONBN_MOCK_SERVER . '/' . $endpoint, $params);
+    }
+
+    /**
+     * Set the BigBlueButton server URL to plugin default value.
+     *
+     * An activity can be created and accessed before the plugin is configured correctly. This is
+     * to ensure a 'zero-state' exists once default credentials are phased out.
+     *
+     * @BeforeScenario @with_default_bbb_server
+     */
+    public function set_server_to_default() {
+        set_config('bigbluebuttonbn_server_url', config::DEFAULT_SERVER_URL);
     }
 
     /**

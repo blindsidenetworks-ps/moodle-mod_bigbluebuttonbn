@@ -61,14 +61,6 @@ class view_page implements renderable, templatable {
             'joinurl' => $this->instance->get_join_url(),
         ];
 
-        if ($this->show_default_server_warning()) {
-            $templatedata->serverwarning = (new notification(
-                get_string('view_warning_default_server', 'mod_bigbluebuttonbn'),
-                notification::NOTIFY_WARNING,
-                false
-            ))->export_for_template($output);
-        }
-
         $viewwarningmessage = config::get('general_warning_message');
         if ($this->show_view_warning() && !empty($viewwarningmessage)) {
             $templatedata->sitenotification = (object) [
@@ -115,23 +107,6 @@ class view_page implements renderable, templatable {
         $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $this->instance->get_user_id());
         $templatedata->activityinformation = $output->activity_information($cminfo, $completiondetails, $activitydates);
         return $templatedata;
-    }
-
-    /**
-     * Whether to show the default server warning.
-     *
-     * @return bool
-     */
-    protected function show_default_server_warning(): bool {
-        if (!$this->instance->is_admin()) {
-            return false;
-        }
-
-        if (config::DEFAULT_SERVER_URL != config::get('server_url')) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
