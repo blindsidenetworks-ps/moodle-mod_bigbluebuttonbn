@@ -1,3 +1,7 @@
+3.0.6 (2021101014)
+Bug: Fix codechecker errors (CONTRIB-9416).
+Bug: Backport of registration code (CONTRIB-9485).
+
 3.0.5 (2021101013)
 Bug: Fix import recording link (CONTRIB-9415).
 Bug: Fix BBB index page (CONTRIB-9081).
