@@ -173,7 +173,7 @@ class meeting {
                 'courseid' => $this->instance->get_course_id(),
                 'bigbluebuttonbnid' => $this->instance->get_instance_id(),
                 'recordingid' => $response['internalMeetingID'],
-                'groupid' => $this->instance->get_group_id()]
+                'groupid' => $this->instance->get_group_id(), ],
             );
             $recording->create();
         }
@@ -354,7 +354,7 @@ class meeting {
         'disablepublicchat' => 'lockSettingsDisablePublicChat',
         'disablenote' => 'lockSettingsDisableNote',
         'lockonjoin' => 'lockSettingsLockOnJoin',
-        'hideuserlist' => 'lockSettingsHideUserList'
+        'hideuserlist' => 'lockSettingsHideUserList',
     ];
     /**
      * Helper to prepare data used for create meeting.

@@ -177,7 +177,7 @@ trait testcase_helper_trait {
         if (!$meeting->is_running()) {
             $additionalmeetingdata = array_merge([
                 'instanceid' => $instance->get_instance_id(),
-                'groupid' => $instance->get_group_id()
+                'groupid' => $instance->get_group_id(),
             ], $additionalmeetingdata);
             $bbbgenerator->create_meeting($additionalmeetingdata);
         }
@@ -185,7 +185,7 @@ trait testcase_helper_trait {
             $recordings[] = $bbbgenerator->create_recording(
                 array_merge([
                     'bigbluebuttonbnid' => $instance->get_instance_id(),
-                    'groupid' => $instance->get_group_id()
+                    'groupid' => $instance->get_group_id(),
                 ], $data)
             );
         }
@@ -206,7 +206,7 @@ trait testcase_helper_trait {
 
         $activity = $generator->create_instance([
             'course' => $course->id,
-            'type' => $type
+            'type' => $type,
         ]);
 
         $instance = instance::get_from_instanceid($activity->id);

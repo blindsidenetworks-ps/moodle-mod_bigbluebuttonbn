@@ -197,7 +197,7 @@ class lib_test extends \advanced_testcase {
         // Same algorithm as in cource/recent.php, but stops at the first bbb activity.
         $course = $this->get_course();
         $modinfo = get_fast_modinfo($course->id);
-        $sections = array();
+        $sections = [];
         $index = 0;
         foreach ($modinfo->get_section_info_all() as $i => $section) {
             if (!empty($section->uservisible)) {
@@ -411,7 +411,7 @@ class lib_test extends \advanced_testcase {
         $this->assertEquals([
             'component' => 'BigBlueButton',
             'item' => 'Deleted tags',
-            'error' => false
+            'error' => false,
         ],
             $results[0]
         );

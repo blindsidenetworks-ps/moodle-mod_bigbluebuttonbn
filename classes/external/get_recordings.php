@@ -97,7 +97,7 @@ class get_recordings extends external_api {
                 'item' => $bigbluebuttonbnid,
                 'warningcode' => 'nosuchinstance',
                 'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
-                    (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn'])
+                    (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn']),
             ];
         } else {
             $typeprofiles = bigbluebutton_proxy::get_instance_type_profiles();
@@ -122,7 +122,7 @@ class get_recordings extends external_api {
                 $returnval['warnings'][] = [
                     'item' => $bigbluebuttonbnid,
                     'warningcode' => 'instanceprofilewithoutrecordings',
-                    'message' => get_string('instanceprofilewithoutrecordings', 'mod_bigbluebuttonbn')
+                    'message' => get_string('instanceprofilewithoutrecordings', 'mod_bigbluebuttonbn'),
                 ];
             }
         }
@@ -154,7 +154,7 @@ class get_recordings extends external_api {
                 ])),
                 'data' => new external_value(PARAM_RAW), // For now it will be json encoded.
             ], '', VALUE_OPTIONAL),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 }

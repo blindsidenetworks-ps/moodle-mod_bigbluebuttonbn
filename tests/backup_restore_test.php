@@ -58,7 +58,7 @@ class backup_restore_test extends restore_date_testcase {
     const ALL_TYPES = [
         'Instance Type ALL' => instance::TYPE_ALL,
         'Instance Type Recording Only' => instance::TYPE_RECORDING_ONLY,
-        'Instance Room Only' => instance::TYPE_ROOM_ONLY
+        'Instance Room Only' => instance::TYPE_ROOM_ONLY,
     ];
 
     /**

@@ -101,7 +101,7 @@ class get_bigbluebuttonbns_by_courses extends external_api {
 
         $result = [
             'bigbluebuttonbns' => $returnedbigbluebuttonbns,
-            'warnings' => $warnings
+            'warnings' => $warnings,
         ];
         return $result;
     }

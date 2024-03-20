@@ -321,42 +321,42 @@ class recording extends persistent {
             'importeddata' => [
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
-                'default' => ''
+                'default' => '',
             ],
             'name' => [
                 'type' => PARAM_TEXT,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
             'description' => [
                 'type' => PARAM_TEXT,
                 'null' => NULL_ALLOWED,
-                'default' => 0
+                'default' => 0,
             ],
             'protected' => [
                 'type' => PARAM_BOOL,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
             'starttime' => [
                 'type' => PARAM_INT,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
             'endtime' => [
                 'type' => PARAM_INT,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
             'published' => [
                 'type' => PARAM_BOOL,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
             'playbacks' => [
                 'type' => PARAM_RAW,
                 'null' => NULL_ALLOWED,
-                'default' => null
+                'default' => null,
             ],
         ];
     }
@@ -509,7 +509,7 @@ class recording extends persistent {
         'endtime' => ['endTime'],
         'published' => ['published'],
         'protected' => ['protected'],
-        'tags' => ['meta_bbb-recording-tags']
+        'tags' => ['meta_bbb-recording-tags'],
     ];
 
     /**
@@ -821,7 +821,7 @@ class recording extends persistent {
                             'courseid' => $recording->get('courseid'),
                             'bigbluebuttonbnid' => $recording->get('bigbluebuttonbnid'),
                             'groupid' => $recording->get('groupid'),
-                            'recordingid' => $breakoutrecordingid
+                            'recordingid' => $breakoutrecordingid,
                         ], $breakoutmetadata);
                         $breakoutrecording->create();
                     }

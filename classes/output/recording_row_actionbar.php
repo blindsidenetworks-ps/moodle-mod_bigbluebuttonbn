@@ -53,38 +53,38 @@ class recording_row_actionbar implements renderable, templatable {
             'icon' => 'lock',
             'hidewhen' => '!protected',
             'requireconfirmation' => true,
-            'disablewhen' => 'imported'
+            'disablewhen' => 'imported',
         ],
         'unprotect' => [
             'action' => 'protect',
             'icon' => 'unlock',
             'hidewhen' => 'protected',
             'requireconfirmation' => true,
-            'disablewhen' => 'imported'
+            'disablewhen' => 'imported',
         ],
         'publish' => [
             'action' => 'publish',
             'icon' => 'show',
             'hidewhen' => 'published',
             'requireconfirmation' => true,
-            'disablewhen' => 'imported'
+            'disablewhen' => 'imported',
         ],
         'unpublish' => [
             'action' => 'unpublish',
             'icon' => 'hide',
             'hidewhen' => '!published',
             'requireconfirmation' => true,
-            'disablewhen' => 'imported'
+            'disablewhen' => 'imported',
         ],
         'delete' => [
             'action' => 'delete',
             'icon' => 'trash',
-            'requireconfirmation' => true
+            'requireconfirmation' => true,
         ],
         'import' => [
             'action' => 'import',
             'icon' => 'import',
-        ]
+        ],
     ];
 
     /**
@@ -131,7 +131,7 @@ class recording_row_actionbar implements renderable, templatable {
                         'id' => $id,
                         'data-action' => $buttonpayload['action'],
                         'data-require-confirmation' => !empty($buttonpayload['requireconfirmation']),
-                        'class' => 'action-icon'
+                        'class' => 'action-icon',
                     ];
                     if ($this->recording->get('imported')) {
                         $linkattributes['data-links'] = recording::count_records(

@@ -74,18 +74,18 @@ class recording_proxy_test extends \advanced_testcase {
             'instanceid' => $instance->get_instance_id(),
             'groupid' => $instance->get_group_id(),
             'isBreakout' => true,
-            'sequence' => 1
+            'sequence' => 1,
         ]);
         $submeeting2 = $bbbgenerator->create_meeting([
             'instanceid' => $instance->get_instance_id(),
             'groupid' => $instance->get_group_id(),
             'isBreakout' => true,
-            'sequence' => 2
+            'sequence' => 2,
         ]);
         $recordings = $this->create_recordings_for_instance($instance, [
             ['name' => 'Recording 1'],
             ['name' => 'Recording 2', 'isBreakout' => true, 'sequence' => 1],
-            ['name' => 'Recording 3', 'isBreakout' => true, 'sequence' => 2]
+            ['name' => 'Recording 3', 'isBreakout' => true, 'sequence' => 2],
         ]);
         $recordingsid = array_map(function ($r) {
             return $r->recordingid;

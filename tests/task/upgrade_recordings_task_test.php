@@ -69,9 +69,9 @@ class upgrade_recordings_task_test extends advanced_testcase {
         // Old logs are kept but renamed.
         $this->assertEquals(75, $DB->count_records('bigbluebuttonbn_logs', ['log' => logger::EVENT_CREATE_MIGRATED]));
         $this->assertEquals(15, recording::count_records(['groupid' => $this->groups[0]->id, 'imported' => '0',
-            'status' => recording::RECORDING_STATUS_PROCESSED]));
+            'status' => recording::RECORDING_STATUS_PROCESSED, ]));
         $this->assertEquals(15, recording::count_records(['groupid' => $this->groups[1]->id, 'imported' => '0',
-            'status' => recording::RECORDING_STATUS_PROCESSED]));
+            'status' => recording::RECORDING_STATUS_PROCESSED, ]));
         $this->assertEquals(45,
             recording::count_records(['groupid' => 0, 'imported' => '0', 'status' => recording::RECORDING_STATUS_PROCESSED]));
 
@@ -86,7 +86,7 @@ class upgrade_recordings_task_test extends advanced_testcase {
             'log = :logmatch AND ' . $DB->sql_like('meta', ':match'),
             [
                 'logmatch' => 'Create',
-                'match' => '%true%'
+                'match' => '%true%',
             ]
         ));
         $this->runAdhocTasks(upgrade_recordings_task::class);
@@ -95,7 +95,7 @@ class upgrade_recordings_task_test extends advanced_testcase {
             'log = :logmatch AND ' . $DB->sql_like('meta', ':match'),
             [
                 'logmatch' => 'Create',
-                'match' => '%true%'
+                'match' => '%true%',
             ]
         ));
         $this->assertEquals(0, $DB->count_records('bigbluebuttonbn_logs', ['log' => 'Create']));
@@ -118,8 +118,8 @@ class upgrade_recordings_task_test extends advanced_testcase {
                 'Fetching logs for conversion',
                 "Creating new recording records",
                 "Unable to find an activity for .*. This recording is headless",
-                'Migrated 15 recordings'
-            ]
+                'Migrated 15 recordings',
+            ],
         ];
         foreach ($matchesarray as $matches) {
             $this->expectOutputRegex('/' . implode('.*', $matches) . '/s');
@@ -142,9 +142,9 @@ class upgrade_recordings_task_test extends advanced_testcase {
         $this->assertEquals(75, recording::count_records(['imported' => '1']));
 
         $this->assertEquals(15, recording::count_records(['groupid' => $this->groups[0]->id, 'imported' => '1',
-            'status' => recording::RECORDING_STATUS_PROCESSED]));
+            'status' => recording::RECORDING_STATUS_PROCESSED, ]));
         $this->assertEquals(15, recording::count_records(['groupid' => $this->groups[1]->id, 'imported' => '1',
-            'status' => recording::RECORDING_STATUS_PROCESSED]));
+            'status' => recording::RECORDING_STATUS_PROCESSED, ]));
         $this->assertEquals(45,
             recording::count_records(['groupid' => 0, 'imported' => '1', 'status' => recording::RECORDING_STATUS_PROCESSED]));
 
@@ -158,7 +158,7 @@ class upgrade_recordings_task_test extends advanced_testcase {
             'bigbluebuttonbn_logs',
             'log = :logmatch',
             [
-                'logmatch' => 'Import'
+                'logmatch' => 'Import',
             ]
         ));
         // Ensure that logs match.
@@ -180,8 +180,8 @@ class upgrade_recordings_task_test extends advanced_testcase {
                 'Fetching logs for conversion',
                 "Creating new recording records",
                 "Unable to find an activity for .*. This recording is headless",
-                'Migrated 15 recordings'
-            ]
+                'Migrated 15 recordings',
+            ],
         ];
         foreach ($matchesarray as $matches) {
             $this->expectOutputRegex('/' . implode('.*', $matches) . '/s');

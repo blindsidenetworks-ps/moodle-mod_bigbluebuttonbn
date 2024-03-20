@@ -36,7 +36,7 @@ class user_info {
      */
     const EVENT_TO_WATCH = [
         'join' => logger::EVENT_JOIN,
-        'play_recording' => logger::EVENT_PLAYED
+        'play_recording' => logger::EVENT_PLAYED,
     ];
 
     /**

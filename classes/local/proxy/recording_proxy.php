@@ -116,7 +116,7 @@ class recording_proxy extends proxy_base {
      */
     public static function update_recording(string $recordid, array $params): bool {
         $result = self::fetch_endpoint_xml('updateRecordings', array_merge([
-            'recordID' => $recordid
+            'recordID' => $recordid,
         ], $params));
 
         self::invalidate_cache_for_recording($recordid);
@@ -288,7 +288,7 @@ class recording_proxy extends proxy_base {
         foreach ($recording->playback->format as $format) {
             $playbackarray[(string) $format->type] = [
                 'type' => (string) $format->type,
-                'url' => trim((string) $format->url), 'length' => (string) $format->length
+                'url' => trim((string) $format->url), 'length' => (string) $format->length,
             ];
             // Add preview per format when existing.
             if ($format->preview) {
@@ -307,7 +307,7 @@ class recording_proxy extends proxy_base {
             'state' => (string) $recording->state,
             'startTime' => (string) $recording->startTime,
             'endTime' => (string) $recording->endTime,
-            'playbacks' => $playbackarray
+            'playbacks' => $playbackarray,
         ];
         if (isset($recording->protected)) {
             $recordingarray['protected'] = (string) $recording->protected;

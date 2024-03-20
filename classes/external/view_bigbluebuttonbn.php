@@ -81,9 +81,9 @@ class view_bigbluebuttonbn extends external_api {
                         'itemid' => 0,
                         'warningcode' => 'nosuchinstance',
                         'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
-                            (object) ['id' => $instanceid, 'entity' => 'bigbluebuttonbn'])
-                    ]
-                ]
+                            (object) ['id' => $instanceid, 'entity' => 'bigbluebuttonbn']),
+                    ],
+                ],
             ];
         }
         $context = context_module::instance($instance->get_cm_id());
@@ -94,7 +94,7 @@ class view_bigbluebuttonbn extends external_api {
         bigbluebuttonbn_view($instance->get_instance_data(), $instance->get_course(), $instance->get_cm(), $context);
         return [
             'status' => true,
-            'warnings' => []
+            'warnings' => [],
         ];
     }
 
@@ -107,7 +107,7 @@ class view_bigbluebuttonbn extends external_api {
     public static function execute_returns() {
         return new external_single_structure([
                 'status' => new external_value(PARAM_BOOL, 'status: true if success'),
-                'warnings' => new external_warnings()
+                'warnings' => new external_warnings(),
             ]
         );
     }

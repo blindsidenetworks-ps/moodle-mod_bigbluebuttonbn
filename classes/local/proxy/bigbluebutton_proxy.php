@@ -69,7 +69,7 @@ class bigbluebutton_proxy extends proxy_base {
             'fullName' => $username,
             'password' => $pw,
             'logoutURL' => $logouturl,
-            'role' => $role
+            'role' => $role,
         ];
 
         if (!is_null($configtoken)) {
@@ -262,7 +262,7 @@ class bigbluebutton_proxy extends proxy_base {
             instance::TYPE_ALL => [
                 'id' => instance::TYPE_ALL,
                 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                'features' => ['all']
+                'features' => ['all'],
             ],
             instance::TYPE_ROOM_ONLY => [
                 'id' => instance::TYPE_ROOM_ONLY,
@@ -270,12 +270,12 @@ class bigbluebutton_proxy extends proxy_base {
                 'features' => ['showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit',
                     'recording', 'sendnotifications', 'lock', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
                     'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection',
-                    'completionattendance', 'completionengagement', 'availabilityconditionsheader']
+                    'completionattendance', 'completionengagement', 'availabilityconditionsheader', ],
             ],
             instance::TYPE_RECORDING_ONLY => [
                 'id' => instance::TYPE_RECORDING_ONLY,
                 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'),
-                'features' => ['showrecordings', 'importrecordings', 'availabilityconditionsheader']
+                'features' => ['showrecordings', 'importrecordings', 'availabilityconditionsheader'],
             ],
         ];
         return $instanceprofiles;
@@ -439,7 +439,7 @@ class bigbluebutton_proxy extends proxy_base {
             'meetingID' => (string) $xml->meetingID,
             'internalMeetingID' => (string) $xml->internalMeetingID,
             'attendeePW' => (string) $xml->attendeePW,
-            'moderatorPW' => (string) $xml->moderatorPW
+            'moderatorPW' => (string) $xml->moderatorPW,
         ];
     }
 

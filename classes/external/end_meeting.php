@@ -105,9 +105,9 @@ class end_meeting extends external_api {
                         'item' => $instance->get_meeting_name(),
                         'itemid' => $instance->get_instance_id(),
                         'warningcode' => 'notFound',
-                        'message' => $e->getMessage()
-                    ]
-                ]
+                        'message' => $e->getMessage(),
+                    ],
+                ],
             ];
         }
         logger::log_meeting_ended_event($instance);
@@ -125,7 +125,7 @@ class end_meeting extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'warnings' => new \external_warnings()
+            'warnings' => new \external_warnings(),
         ]);
     }
 }

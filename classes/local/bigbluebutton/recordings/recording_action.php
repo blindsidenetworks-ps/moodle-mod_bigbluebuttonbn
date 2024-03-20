@@ -49,7 +49,7 @@ class recording_action {
         // As the recordingid was not identified as imported recording link, execute delete on a real recording.
         // Step 1, delete imported links associated to the recording.
         $recordingstodelete = recording::get_records(['recordingid' => $recording->get('recordingid'),
-            'imported' => true]);
+            'imported' => true, ]);
         foreach ($recordingstodelete as $rec) {
             $rec->delete();
         }

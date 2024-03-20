@@ -187,7 +187,7 @@ class mobile {
         $data = [
             'bigbluebuttonbn' => $instance->get_instance_data(),
             'cmid' => $instance->get_cm_id(),
-            'message' => $message
+            'message' => $message,
         ];
 
         return [
@@ -199,7 +199,7 @@ class mobile {
             ],
             'javascript' => file_get_contents($CFG->dirroot . '/mod/bigbluebuttonbn/mobileapp/mobile.notification.js'),
             'otherdata' => '',
-            'files' => ''
+            'files' => '',
         ];
     }
 }

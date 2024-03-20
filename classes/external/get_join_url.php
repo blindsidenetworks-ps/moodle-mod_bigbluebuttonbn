@@ -94,7 +94,7 @@ class get_join_url extends external_api {
                 'item' => 'mod_bigbluebuttonbn',
                 'itemid' => $instance->get_instance_id(),
                 'warningcode' => $e->errorcode,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ];
         }
         return $result;
@@ -109,7 +109,7 @@ class get_join_url extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'join_url' => new external_value(PARAM_RAW, 'Can join session', VALUE_OPTIONAL),
-            'warnings' => new \external_warnings()
+            'warnings' => new \external_warnings(),
         ]);
     }
 }

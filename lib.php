@@ -213,7 +213,7 @@ function bigbluebuttonbn_user_outline(stdClass $course, stdClass $user, cm_info 
     [$infos, $logtimestamps] = \mod_bigbluebuttonbn\local\helpers\user_info::get_user_info_outline($course, $user, $mod);
     return (object) [
         'info' => join(',', $infos),
-        'time' => !empty($logtimestamps) ? max($logtimestamps) : 0
+        'time' => !empty($logtimestamps) ? max($logtimestamps) : 0,
     ];
 }
 
@@ -406,7 +406,7 @@ function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
     // Trigger course_module_viewed event.
     $params = [
         'context' => $context,
-        'objectid' => $bigbluebuttonbn->id
+        'objectid' => $bigbluebuttonbn->id,
     ];
 
     $event = \mod_bigbluebuttonbn\event\course_module_viewed::create($params); // Fix event name.
@@ -510,7 +510,7 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(
                 'action' => 'join',
                 'id' => $cm->id,
                 'bn' => $bigbluebuttonbn->id,
-                'timeline' => 1]
+                'timeline' => 1, ],
         );
     }
 
@@ -649,8 +649,8 @@ function bigbluebuttonbn_print_recent_mod_activity(stdClass $activity, int $cour
     $template = ['userpicture' => $userpicture,
         'submissiontimestamp' => $activity->timestamp,
         'modinfo' => $modinfo,
-        'userurl' => new moodle_url('/user/view.php', array('id' => $activity->user->id, 'course' => $courseid)),
-        'fullname' => $activity->user->fullname];
+        'userurl' => new moodle_url('/user/view.php', ['id' => $activity->user->id, 'course' => $courseid]),
+        'fullname' => $activity->user->fullname, ];
     if (isset($activity->eventname)) {
         $template['eventname'] = $activity->eventname;
     }

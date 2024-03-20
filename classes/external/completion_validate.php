@@ -85,7 +85,7 @@ class completion_validate extends external_api {
                     'item' => 'mod_bigbluebuttonbn',
                     'itemid' => $instance->get_instance_id(),
                     'warningcode' => 'nopermissions',
-                    'message' => get_string('nopermissions', 'error', 'completion_validate')
+                    'message' => get_string('nopermissions', 'error', 'completion_validate'),
                 ];
             }
         } else {
@@ -93,7 +93,7 @@ class completion_validate extends external_api {
                 'item' => 'mod_bigbluebuttonbn',
                 'itemid' => $bigbluebuttonbnid,
                 'warningcode' => 'indexerrorbbtn',
-                'message' => get_string('index_error_bbtn', 'mod_bigbluebuttonbn', $bigbluebuttonbnid)
+                'message' => get_string('index_error_bbtn', 'mod_bigbluebuttonbn', $bigbluebuttonbnid),
             ];
         }
         // We might want to return a status here or some warnings.
@@ -108,7 +108,7 @@ class completion_validate extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-                'warnings' => new \external_warnings()
+                'warnings' => new \external_warnings(),
             ]
         );
     }

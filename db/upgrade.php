@@ -46,13 +46,13 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         }
         // Change welcome, allow null.
         $fielddefinition = ['type' => XMLDB_TYPE_TEXT, 'precision' => null, 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'type', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'welcome',
             $fielddefinition);
         // Change userid definition in bigbluebuttonbn_log.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '10', 'unsigned' => null,
             'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null,
-            'previous' => 'bigbluebuttonbnid'];
+            'previous' => 'bigbluebuttonbnid', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn_log', 'userid',
             $fielddefinition);
         // No settings to migrate.
@@ -90,22 +90,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         }
         // Add field type.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
             $fielddefinition);
         // Add field recordings_html.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_html',
             $fielddefinition);
         // Add field recordings_deleted.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 1, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_deleted',
             $fielddefinition);
         // Add field recordings_imported.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
         // Drop field newwindow.
@@ -129,7 +129,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2017101009) {
         // Add field recordings_preview.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
             $fielddefinition);
         // Update db version tag.
@@ -159,22 +159,22 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2017101012) {
         // Update field type (Fix for CONTRIB-7302).
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '2', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'id', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'type',
             $fielddefinition);
         // Update field meetingid (Fix for CONTRIB-7302).
         $fielddefinition = ['type' => XMLDB_TYPE_CHAR, 'precision' => '255', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'introformat'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => null, 'previous' => 'introformat', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'meetingid',
             $fielddefinition);
         // Update field recordings_imported (Fix for CONTRIB-7302).
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_imported',
             $fielddefinition);
         // Add field recordings_preview.(Fix for CONTRIB-7302).
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordings_preview',
             $fielddefinition);
         // Update db version tag.
@@ -183,7 +183,7 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2017101015) {
         // Add field for client technology choice.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'clienttype',
             $fielddefinition);
         // Update db version tag.
@@ -192,17 +192,17 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2019042000) {
         // Add field for Mute on start feature.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'muteonstart',
             $fielddefinition);
         // Add field for record all from start.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordallfromstart',
             $fielddefinition);
         // Add field for record hide button.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'recordhidebutton',
             $fielddefinition);
         // Update db version tag.
@@ -211,32 +211,32 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2019101001) {
         // Add field for Completion with attendance.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionattendance',
             $fielddefinition);
         // Add field for Completion with engagement through chats.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementchats',
             $fielddefinition);
         // Add field for Completion with engagement through talks.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementtalks',
             $fielddefinition);
         // Add field for Completion with engagement through raisehand.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementraisehand',
             $fielddefinition);
         // Add field for Completion with engagement through pollvotes.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementpollvotes',
             $fielddefinition);
         // Add field for Completion with engagement through emojis.
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '9', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => null, ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'completionengagementemojis',
             $fielddefinition);
         // Add index to bigbluebuttonbn_logs (Fix for CONTRIB-8157).
@@ -253,47 +253,47 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
     if ($oldversion < 2019101002) {
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'muteonstart'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'muteonstart', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'disablecam',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablecam'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablecam', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'disablemic',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablemic'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablemic', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'disableprivatechat',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disableprivatechat'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disableprivatechat', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'disablepublicchat',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablepublicchat'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablepublicchat', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'disablenote',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablenote'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'disablenote', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'hideuserlist',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'hideuserlist'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'hideuserlist', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'lockedlayout',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'lockedlayout'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'lockedlayout', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'lockonjoin',
             $fielddefinition);
 
         $fielddefinition = ['type' => XMLDB_TYPE_INTEGER, 'precision' => '1', 'unsigned' => null,
-            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'lockonjoin'];
+            'notnull' => XMLDB_NOTNULL, 'sequence' => null, 'default' => 0, 'previous' => 'lockonjoin', ];
         xmldb_bigbluebuttonbn_add_change_field($dbman, 'bigbluebuttonbn', 'lockonjoinconfigurable',
             $fielddefinition);
 

@@ -232,7 +232,7 @@ EOF;
         $logs = $DB->get_records_select('bigbluebuttonbn_logs', $wheresql, [
             'instanceid' => $instance->get_instance_id(),
             'logtype' => self::EVENT_CREATE,
-            'meta' => "{\"record\":true}"
+            'meta' => "{\"record\":true}",
         ]);
 
         $meta = "{\"has_recordings\":" . empty($logs) ? "true" : "false" . "}";
@@ -453,7 +453,7 @@ EOF;
                 $DB->count_records_sql($sql, [
                     self::EVENT_CALLBACK, '%recordid%',
                     "%$id%",
-                    $callbacktype, 'callback'
+                    $callbacktype, 'callback',
                 ]);
             return $count;
         }
