@@ -554,7 +554,7 @@ function bigbluebuttonbn_get_server_version() {
  *
  * @return object
  */
-function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null, $contenttype = 'application/xml') {
     if (extension_loaded('curl')) {
         $response = bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method, $data, $contenttype);
         if (!$response) {
@@ -595,14 +595,15 @@ function bigbluebuttonbn_wrap_xml_load_file($url, $method = 'GET', $data = null,
  *
  * @return object
  */
-function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null, $contenttype = 'text/xml') {
+function bigbluebuttonbn_wrap_xml_load_file_curl_request($url, $method = 'GET', $data = null, $contenttype = 'application/xml') {
     global $CFG;
     require_once($CFG->libdir . '/filelib.php');
     $c = new curl();
     $c->setopt(array('SSL_VERIFYPEER' => true));
     if ($method == 'POST') {
-        if (is_null($data) || is_array($data)) {
-            return $c->post($url);
+        if (is_null($data) || !is_string($data)) {
+            debugging('Only string parameters are supported', DEBUG_DEVELOPER);
+            $data = '';
         }
         $options = array();
         $options['CURLOPT_HTTPHEADER'] = array(
