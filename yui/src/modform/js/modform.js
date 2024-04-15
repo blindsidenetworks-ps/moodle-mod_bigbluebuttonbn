@@ -61,6 +61,9 @@ M.mod_bigbluebuttonbn.modform = {
         // Show recordings settings validation.
         this.showFieldset('id_recordings', showAll ||
                           this.isFeatureEnabled(profileType, 'showrecordings'));
+        // Show lock settings validation.
+        this.showFieldset('id_lock', showAll ||
+                          this.isFeatureEnabled(profileType, 'lock'));
         // Show recordings imported settings validation.
         this.showInput('id_recordings_imported', showAll ||
                        this.isFeatureEnabled(profileType, 'showrecordings'));
