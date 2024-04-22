@@ -102,11 +102,11 @@ $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
 
 $string['config_general'] = 'General configuration';
-$string['config_general_description'] = 'These settings are <b>always</b> used';
+$string['config_general_description'] = '<p>These settings are always used.</p><p>To use BigBlueButton, you can setup your own BigBlueButton server and enter the credentials below, or visit the <a href="https://registration-portal.blindsidenetworks.com/" target="_blank">Blindside Networks Registration Portal (opens in a new window)</a> to obtain free trial credentials</p>';
 $string['config_server_url'] = 'BigBlueButton Server URL';
-$string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/. (This default URL is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_server_url_description'] = 'The URL of your BigBlueButton server must end with /bigbluebutton/';
 $string['config_shared_secret'] = 'BigBlueButton Shared Secret';
-$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.  (This default salt is for a BigBlueButton server provided by Blindside Networks that you can use for testing.)';
+$string['config_shared_secret_description'] = 'The security salt of your BigBlueButton server.';
 $string['config_checksum_algorithm'] = 'BigBlueButton Checksum Algorithm';
 $string['config_checksum_algorithm_description'] = 'The checksum algorithm of your BigBlueButton server.  (SHA1 guarantees compatability with older server versions but is less secure whereas SHA512 is FIPS 140-2 compliant.)';
 
@@ -539,7 +539,9 @@ $string['email_footer_sent_from'] = 'from the course';
 $string['view_error_meeting_not_running'] = 'Something went wrong, the meeting is not running.';
 $string['view_error_current_state_not_found'] = 'Current state was not found. The recording may have been deleted or the BigBlueButton server is not compatible with the action performed.';
 $string['view_error_action_not_completed'] = 'Action could not be completed';
-$string['view_warning_default_server'] = 'This Moodle server is making use of the BigBlueButton testing server that comes pre-configured by default. It should be replaced for production.';
+$string['view_warning_default_server'] = 'Default BigBlueButton plugin credentials will soon expire. See BigBlueButton<a href="{$a->settingslink}" target="_blank"> plugin settings (opens in a new window)</a> for more information.';
+$string['view_warning_default_server_no_capability'] = 'The use of default server credentials will soon expire. To use BigBlueButton your site will require new server credentials. Please contact your site administrator for help with this.';
+$string['credentials_warning'] = 'The use of default server credentials will soon expire (see note above to obtain new credentials).';
 
 $string['view_room'] = 'View room';
 $string['mod_form_block_clienttype'] = 'Web Client Technology';
