@@ -199,13 +199,13 @@ class renderer {
      * @return Object
      */
     public function render_warning_message($name, $message, $type = 'warning', $closable = true) {
-        $output = $this->output->box_start('box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in',
-            'bigbluebuttonbn_' . $name)."\n";
+        $output = '<div class="box boxalignleft adminerror alert alert-' . $type . ' alert-block fade in" id=
+            "bigbluebuttonbn_' . $name . '">';
         if ($closable) {
             $output .= '  <button type="button" class="close" data-dismiss="alert">&times;</button>' . "\n";
         }
         $output .= '  ' . $message . "\n";
-        $output .= $this->output->box_end() . "\n";
+        $output .= '</div>';
         $item = new \admin_setting_heading('bigbluebuttonbn_' . $name, '', $output);
         $this->settings->add($item);
         return $item;
