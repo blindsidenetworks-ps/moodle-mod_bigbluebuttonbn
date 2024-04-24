@@ -325,20 +325,29 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
 }
 
 /**
- * Renders a default server warning message when using test-install.
+ * Renders a default server warning message when using test-install or test-moodle.
  *
  * @param array $bbbsession
  *
  * @return string
  */
 function bigbluebuttonbn_view_warning_default_server(&$bbbsession) {
-    if (!is_siteadmin($bbbsession['userID'])) {
+    if (\mod_bigbluebuttonbn\locallib\config::server_credentials_invalid()) {
+        $context = context_module::instance($bbbsession['cm']->id);
+        // Admin and teacher should see warning.
+        if (is_siteadmin($bbbsession['userID'])) {
+            $settingslink = new moodle_url('/admin/settings.php', ['section' => 'modsettingbigbluebuttonbn']);
+            return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn',
+                ['settingslink' => $settingslink->out()]), 'danger');
+        } else if (has_capability('moodle/course:manageactivities', $context, $bbbsession['userID'])) {
+            return bigbluebuttonbn_render_warning(get_string('view_warning_default_server_no_capability', 'bigbluebuttonbn'),
+                'danger');
+        }
+    }
+    if (!bigbluebuttonbn_view_warning_shown($bbbsession)) {
         return '';
     }
-    if (BIGBLUEBUTTONBN_DEFAULT_SERVER_URL != \mod_bigbluebuttonbn\locallib\config::get('server_url')) {
-        return '';
-    }
-    return bigbluebuttonbn_render_warning(get_string('view_warning_default_server', 'bigbluebuttonbn'), 'warning');
+    return '';
 }
 
 /**

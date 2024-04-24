@@ -113,6 +113,9 @@ class mod_bigbluebuttonbn_lib_test extends advanced_testcase {
         global $CFG;
         parent::setUp();
         set_config('enablecompletion', true); // Enable completion for all tests.
+        // Fields are empty by default which causes tests to fail.
+        set_config('bigbluebuttonbn_server_url', BIGBLUEBUTTONBN_DEFAULT_SERVER_URL);
+        set_config('bigbluebuttonbn_shared_secret', BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET);
         $this->generator = $this->getDataGenerator();
         $this->course = $this->generator->create_course(['enablecompletion' => 1]);
     }
