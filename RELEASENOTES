@@ -1,3 +1,6 @@
+3.0.8 (2021101016)
+Bug: Backport registration (CONTRIB-9485).
+
 3.0.7 (2021101015)
 Bug: Fix content-type (CONTRIB-9539).
 
