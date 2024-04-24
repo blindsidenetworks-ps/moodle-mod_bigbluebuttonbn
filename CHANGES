@@ -1,3 +1,6 @@
+2.4.10 (2019101017)
+Bug: Backport registration (CONTRIB-9484).
+
 2.4.9 (2019101016)
 Bug: Change to content-type (CONTRIB-9549).
 
