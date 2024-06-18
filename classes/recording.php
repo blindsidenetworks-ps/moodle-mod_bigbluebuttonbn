@@ -709,7 +709,7 @@ class recording extends persistent {
             // Filter out if no metadata was fetched.
             if (!array_key_exists($recording->recordingid, $metadatas)) {
                 // If the recording was successfully fetched, mark it as dismissed if it is older than 30 days.
-                if (!in_array($recording->recordingid, $failedids) && $withindays > $recording->timecreated) {
+                if (!in_array($recording->recordingid, $failedids) && $withindays > $recording->timemodified) {
                     $recording = new self(0, $recording, null);
                     $recording->set_status(self::RECORDING_STATUS_DISMISSED);
                 }
