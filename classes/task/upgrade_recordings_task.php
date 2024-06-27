@@ -74,7 +74,8 @@ class upgrade_recordings_task extends adhoc_task {
             return false;
         }
         // Retrieve recordings from the servers for this meeting.
-        $recordings = recording_proxy::fetch_recording_by_meeting_id([$meetingid]);
+        $result = recording_proxy::fetch_recording_by_meeting_id([$meetingid]);
+        $recordings = $result['recordings'];
         // Sort recordings by meetingId, then startTime.
         uasort($recordings, function($a, $b) {
             return $b['startTime'] - $a['startTime'];
