@@ -105,7 +105,8 @@ foreach ($bbcms as $bbcm) {
     $recordingkeys = array_map(function($rec) {
         return $rec->get('recordingid');
     }, $recordings);
-    $recordingmeta = \mod_bigbluebuttonbn\local\proxy\recording_proxy::fetch_recordings($recordingkeys);
+    $result = \mod_bigbluebuttonbn\local\proxy\recording_proxy::fetch_recordings($recordingkeys);
+    $recordingmeta = $result['recordings'];
     if (empty($recordings)) {
         cli_writeln("\t->No dimissed recordings found ...");
     } else {

@@ -309,7 +309,8 @@ trait testcase_helper_trait {
                 $baselogdata['meetingid'] = $instance->get_meeting_id();
                 if ($importedrecordings) {
                     // Fetch the data.
-                    $data = recording_proxy::fetch_recordings([$recording->recordingid]);
+                    $result = recording_proxy::fetch_recordings([$recording->recordingid]);
+                    $data = $result['recordings'];
                     $data = end($data);
                     if ($data) {
                         $metaonly = array_filter($data, function($key) {
