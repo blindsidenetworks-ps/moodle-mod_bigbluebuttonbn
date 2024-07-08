@@ -46,7 +46,8 @@ class recording_proxy_test extends \advanced_testcase {
         $recordingsid = array_map(function ($r) {
             return $r->recordingid;
         }, $recordings);
-        $recordings = recording_proxy::fetch_recordings($recordingsid);
+        $result = recording_proxy::fetch_recordings($recordingsid);
+        $recordings = $result['recordings'];
         $this->assertCount(2, $recordings);
     }
 
@@ -90,7 +91,8 @@ class recording_proxy_test extends \advanced_testcase {
         $recordingsid = array_map(function ($r) {
             return $r->recordingid;
         }, $recordings);
-        $recordings = recording_proxy::fetch_recordings([$recordingsid[0]]);
+        $result = recording_proxy::fetch_recordings([$recordingsid[0]]);
+        $recordings = $result['recordings'];
         $this->assertCount(3, $recordings);
     }
 }
