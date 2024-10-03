@@ -352,7 +352,7 @@ class meeting {
         'disablemic' => 'lockSettingsDisableMic',
         'disableprivatechat' => 'lockSettingsDisablePrivateChat',
         'disablepublicchat' => 'lockSettingsDisablePublicChat',
-        'disablenote' => 'lockSettingsDisableNote',
+        'disablenote' => 'lockSettingsDisableNotes',
         'lockonjoin' => 'lockSettingsLockOnJoin',
         'hideuserlist' => 'lockSettingsHideUserList',
     ];
